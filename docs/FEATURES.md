@@ -42,7 +42,7 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 ### Framework-agnostic component library ✅
 - Built on standard custom elements (Lit 3 + TypeScript): work in every
   framework and in plain HTML.
-- **54 component families** across inputs, layout, feedback, navigation,
+- **57 components** across inputs, layout, feedback, navigation,
   content, and format/observer helpers, including a responsive **grid** (column
   / `<fluid-col>`) and a dense bento **mosaic** layout system.
 - Distributed as scoped `@fluid-ds/*` packages.
@@ -165,7 +165,7 @@ Kept out of the core so the base bundle stays lean:
 | Package | What it is | Status |
 | --- | --- | --- |
 | `@fluid-ds/tokens` | Design tokens → CSS + manifest | ✅ |
-| `@fluid-ds/components` | The 52-component core library | ✅ |
+| `@fluid-ds/components` | The 57-component core library | ✅ |
 | `@fluid-ds/icons` | Lucide-backed icon registry | ✅ |
 | `@fluid-ds/themes` | Brand presets (Midnight, Corporate) | ✅ |
 | `@fluid-ds/charts` | Charts (opt-in) | ✅ |

@@ -1,6 +1,151 @@
 ---
-title: "Brand attribute"
-description: "Brand attribute, write the description here."
+title: Brand attribute
+description: Retune Fluid's accent across everything with one data-fluid-brand block, from a subtle palette swap to a full neon takeover.
 ---
 
-*This page is a stub. Write the content.*
+import Demo from "../../../components/Demo.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+`data-fluid-brand` is the top rung of the [override ladder](/theming/tokens/):
+set it on any ancestor, write one CSS block that retunes the brand tokens, and
+every Fluid component inside adopts the new look. No per-component edits, no
+rebuild.
+
+The attribute itself is just a hook. The values come from CSS you write (or one
+of the presets below), so the brand lives entirely in stylesheets, not in the
+components.
+
+## What a brand controls
+
+A brand retunes the **accent track** and the **brand color ramp** it derives
+from. The semantic status tones (success / danger / warning / info) are
+deliberately left alone, a delete button should stay red in every brand, so you
+override those only if you really mean to.
+
+| Token group | Variables | Brand should set? |
+| --- | --- | --- |
+| Brand ramp | `--fluid-color-brand-50` … `--fluid-color-brand-900` | Yes, the source palette |
+| Accent | `--fluid-accent-base`, `-hover`, `-active`, `-text` | Yes, what most components read |
+| Surfaces | `--fluid-surface-base`, `-subtle`, `-muted` | Only for a full reskin |
+| Text | `--fluid-text-primary`, `-secondary`, `-inverse` | Only for a full reskin |
+| Status tones | `--fluid-success-*`, `--fluid-danger-*`, … | Rarely, they are theme-independent on purpose |
+
+## The built-in presets
+
+`@fluid-ds/themes` ships three ready-made brands as pure CSS (no JavaScript):
+**Default**, **Midnight**, and **Corporate**. Import the ones you want and flip
+the attribute at runtime.
+
+```ts
+import "@fluid-ds/themes/midnight.css";
+import "@fluid-ds/themes/corporate.css";
+```
+
+```ts
+// Swap the whole UI to Midnight, or remove the attribute for Default.
+document.documentElement.dataset.fluidBrand = "midnight";
+```
+
+<Demo title="Default">
+  <fluid-button>Primary</fluid-button>
+  <fluid-button variant="secondary">Secondary</fluid-button>
+  <fluid-badge>Badge</fluid-badge>
+</Demo>
+
+<Demo title='data-fluid-brand="midnight"'>
+  <div data-fluid-brand="midnight" style="display: contents;">
+    <fluid-button>Primary</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+    <fluid-badge>Badge</fluid-badge>
+  </div>
+</Demo>
+
+## Rolling your own
+
+A custom brand is one rule. Override the accent track (and, if you want the
+palette to ripple through tints and hovers, the brand ramp) under your own
+attribute value:
+
+```css title="brand.css"
+[data-fluid-brand="ocean"] {
+  /* the ramp the accent derives from */
+  --fluid-color-brand-500: #0ea5e9;
+  --fluid-color-brand-600: #0284c7;
+  --fluid-color-brand-700: #0369a1;
+
+  /* what components actually read */
+  --fluid-accent-base: #0284c7;
+  --fluid-accent-hover: #0369a1;
+  --fluid-accent-active: #075985;
+  --fluid-accent-text: #ffffff;
+}
+```
+
+```html
+<body data-fluid-brand="ocean">
+  <!-- every Fluid component in here is now ocean blue -->
+</body>
+```
+
+Because component tokens fall through to these semantics (see
+[Semantic vs component tokens](/theming/tokens/)), that single block reaches
+buttons, switches, sliders, focus rings, chart series, everything, at once.
+
+## Go on, go feral
+
+The override ladder does not judge. Nothing stops you from building a brand
+that looks like a synthwave album cover, accent, surfaces, text, and all. Here
+is a deliberately unhinged neon theme:
+
+<Demo title='data-fluid-brand="neon" (the whole canvas retuned)'>
+  <div style="
+    --fluid-accent-base:#ff00e5; --fluid-accent-hover:#ff57ee; --fluid-accent-active:#cc00b8; --fluid-accent-text:#11001a;
+    --fluid-surface-base:#0b0014; --fluid-surface-subtle:#16001f; --fluid-surface-muted:#220233;
+    --fluid-text-primary:#f6e9ff; --fluid-text-secondary:#c9a3ff;
+    --fluid-border-default:#5a1480; --fluid-border-strong:#8a23bf; --fluid-radius-md:4px;
+    background:#0b0014; color:#f6e9ff; padding:1.75rem; border-radius:14px;
+    box-shadow:0 0 0 1px #5a1480, 0 0 48px rgba(255,0,229,0.35);
+    display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+    <fluid-button>Launch 🚀</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+    <fluid-badge>NEON</fluid-badge>
+    <fluid-switch checked aria-label="Neon switch"></fluid-switch>
+    <fluid-input placeholder="type something…" aria-label="Neon input" style="max-width:14rem;"></fluid-input>
+  </div>
+</Demo>
+
+The CSS behind it, just tokens, no component code touched:
+
+```css title="neon.css"
+[data-fluid-brand="neon"] {
+  --fluid-accent-base: #ff00e5;
+  --fluid-accent-hover: #ff57ee;
+  --fluid-accent-active: #cc00b8;
+  --fluid-accent-text: #11001a;
+
+  --fluid-surface-base: #0b0014;
+  --fluid-surface-subtle: #16001f;
+  --fluid-surface-muted: #220233;
+
+  --fluid-text-primary: #f6e9ff;
+  --fluid-text-secondary: #c9a3ff;
+
+  --fluid-border-default: #5a1480;
+  --fluid-border-strong: #8a23bf;
+  --fluid-radius-md: 4px;
+}
+```
+
+<Aside type="caution" title="With great neon comes great responsibility">
+  A theme this loud trips contrast checks fast. If you ship something in this
+  spirit, run the color pairs through a contrast tool: Fluid's accessibility
+  guarantees only hold while your token values keep their contrast ratios. See
+  the [accessibility model](/guides/accessibility/).
+</Aside>
+
+## Where to go next
+
+- [Semantic vs component tokens](/theming/tokens/), the full override ladder and the token reference.
+- [Per-element overrides](/theming/per-element/), restyle a single instance.
+- [Dark mode](/theming/dark-mode/), the `data-fluid-theme` scheme switch (composes with any brand).
+- The [Theme builder](/playground/) lets you tune all of this in the browser and exports the CSS.

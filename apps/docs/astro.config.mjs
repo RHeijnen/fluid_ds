@@ -31,7 +31,15 @@ import { fluidCodeBlockTransformer } from "./src/lib/fluid-code-shiki.mjs";
  */
 const base = process.env.DOCS_BASE ?? "/";
 
+/**
+ * `site` is the production origin, used for canonical URLs + the sitemap.
+ * Temporary Cloudflare Pages host for now; override via DOCS_SITE (or just
+ * change this default) once a custom domain is attached.
+ */
+const site = process.env.DOCS_SITE ?? "https://fluid-25z.pages.dev";
+
 export default defineConfig({
+  site,
   base,
   // Disable Expressive Code (in the Starlight block) so Astro's built-in
   // Shiki highlights fenced blocks, then a transformer wraps each highlighted

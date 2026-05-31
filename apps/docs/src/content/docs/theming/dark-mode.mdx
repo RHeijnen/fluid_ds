@@ -1,6 +1,87 @@
 ---
-title: "Dark mode"
-description: "Dark mode, write the description here."
+title: Dark mode
+description: One attribute flips the whole UI between light and dark. The semantic tokens re-resolve, so your brand and per-element overrides keep working.
 ---
 
-*This page is a stub. Write the content.*
+import Demo from "../../../components/Demo.astro";
+import { Aside } from "@astrojs/starlight/components";
+
+Dark mode is a scheme switch, not a separate theme. `@fluid-ds/tokens` ships a
+`light.css` and a `dark.css`; the dark sheet re-declares the surface, text, and
+border semantics under `[data-fluid-theme="dark"]`. Set that attribute and
+every component re-resolves, no dark variants, no duplicate styles.
+
+## Setup
+
+Load both scheme sheets after `base.css`, then set the attribute on `<html>`:
+
+```html
+<link rel="stylesheet" href="@fluid-ds/tokens/base.css" />
+<link rel="stylesheet" href="@fluid-ds/tokens/light.css" />
+<link rel="stylesheet" href="@fluid-ds/tokens/dark.css" />
+```
+
+```ts title="theme-toggle.ts"
+const root = document.documentElement;
+
+function setScheme(scheme /* "light" | "dark" */) {
+  root.dataset.fluidTheme = scheme;
+  localStorage.setItem("theme", scheme);
+}
+
+// Restore the saved choice, falling back to the OS preference.
+const saved = localStorage.getItem("theme");
+const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
+setScheme(saved ?? (prefersDark ? "dark" : "light"));
+```
+
+<Aside type="tip" title="Avoid the flash">
+  Apply the attribute in a tiny inline `<script>` in `<head>`, before your CSS
+  paints, so a returning dark-mode visitor never sees a white flash. (This docs
+  site does exactly that.)
+</Aside>
+
+## It composes with everything
+
+Because dark mode only moves the semantic surface/text tokens, your
+[brand](/theming/brand/), [component](/theming/tokens/), and
+[per-element](/theming/per-element/) overrides keep applying on top. The same
+panel, light and dark:
+
+<Demo title="Light">
+  <div style="background:var(--fluid-surface-base); color:var(--fluid-text-primary); border:1px solid var(--fluid-border-default); border-radius:12px; padding:1.25rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+    <fluid-button>Primary</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+    <fluid-badge>Badge</fluid-badge>
+    <fluid-input placeholder="Search…" aria-label="Search" style="max-width:12rem;"></fluid-input>
+  </div>
+</Demo>
+
+<Demo title='Same markup under data-fluid-theme="dark"'>
+  <div data-fluid-theme="dark" style="background:var(--fluid-surface-base); color:var(--fluid-text-primary); border:1px solid var(--fluid-border-default); border-radius:12px; padding:1.25rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+    <fluid-button>Primary</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+    <fluid-badge>Badge</fluid-badge>
+    <fluid-input placeholder="Search…" aria-label="Search" style="max-width:12rem;"></fluid-input>
+  </div>
+</Demo>
+
+The attribute works on **any** ancestor, not just `<html>`, which is exactly
+how the demo above shows a dark panel on a light page. Scope it to a section if
+you only want part of the UI dark.
+
+## Scheme vs brand
+
+Two independent axes you can combine freely:
+
+- `data-fluid-theme` = **light / dark** (the surface + text scheme).
+- `data-fluid-brand` = **which accent palette** (Default / Midnight / Corporate / your own).
+
+So "Midnight brand in dark mode" is just both attributes set. They never fight,
+one picks the canvas, the other picks the accent.
+
+## Where to go next
+
+- [Brand attribute](/theming/brand/), pick the accent palette this composes with.
+- [Semantic vs component tokens](/theming/tokens/), the tokens dark mode re-resolves.
+- [Theme builder](/playground/), preview light and dark as you edit.

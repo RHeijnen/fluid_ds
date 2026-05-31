@@ -1,6 +1,65 @@
 ---
-title: "Per-element overrides"
-description: "Per-element overrides, write the description here."
+title: Per-element overrides
+description: Restyle a single instance with data-fluid-id, the most specific rung of the override ladder.
 ---
 
-*This page is a stub. Write the content.*
+import Demo from "../../../components/Demo.astro";
+
+Sometimes one element needs to break from its siblings: a hero call-to-action,
+a single highlighted row, one chart that wears your accent gradient. That's the
+bottom rung of the [override ladder](/theming/tokens/): a **per-instance**
+override keyed off `data-fluid-id`.
+
+## How it works
+
+Put a `data-fluid-id` on the element, then scope a CSS rule to it that sets
+component tokens. Because the rule is just custom properties, it layers on top
+of the brand and component scopes without fighting them.
+
+```html
+<fluid-button data-fluid-id="primary-cta">Get started</fluid-button>
+```
+
+```css
+[data-fluid-id="primary-cta"] {
+  --fluid-button-bg: linear-gradient(90deg, #6366f1, #22d3ee);
+  --fluid-button-text: #ffffff;
+  --fluid-button-radius: 999px;
+}
+```
+
+<Demo title="One button overridden, its neighbor untouched">
+  <fluid-button>Default</fluid-button>
+  <fluid-button data-fluid-id="primary-cta"
+    style="--fluid-button-bg: linear-gradient(90deg,#6366f1,#22d3ee); --fluid-button-text:#fff; --fluid-button-radius:999px;">
+    Get started
+  </fluid-button>
+</Demo>
+
+<small>(The demo sets the tokens inline to keep the example self-contained; in
+your app you'd put them in the `[data-fluid-id="primary-cta"]` rule above.)</small>
+
+## Why an attribute, not a class
+
+`data-fluid-*` is a separate namespace from your own class system, so these
+overrides are:
+
+- **Easy to grep** for, every theming hook starts with `data-fluid-`.
+- **Easy to audit**, one element, one rule, no cascade surprises.
+- **Easy to remove**, delete the attribute and the rule, nothing else moves.
+
+It also never collides with utility classes or CSS-in-JS hashes.
+
+## Let the Theme builder write it
+
+You don't have to hand-author these. Open the [Theme builder](/playground/),
+click any component to **isolate** it, and tweak its tokens visually. The
+builder stamps a stable `data-fluid-id` on the element and emits exactly the
+scoped rule above, ready to paste into your stylesheet. It's the fastest way to
+land a one-off without guessing token names.
+
+## Where to go next
+
+- [Semantic vs component tokens](/theming/tokens/), the tokens you're overriding here.
+- [Brand attribute](/theming/brand/), the app-wide scope above this one.
+- [Dark mode](/theming/dark-mode/), composes with per-element overrides automatically.

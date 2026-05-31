@@ -1,7 +1,6 @@
-// Registers every Fluid element the portal uses (one self-contained bundle,
-// resolved through the import map in index.html). Plain ESM — no framework,
-// no app bundler.
-import "@fluid-ds/fluid";
+// Registers every Fluid element the portal uses, loaded from the CDN via the
+// import map in index.html. Plain ESM, no framework, no app bundler.
+import "./register.js";
 import { PAGES } from "./pages.js";
 
 const NAV = [

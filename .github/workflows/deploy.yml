@@ -60,7 +60,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # The Pages project must already exist (create it once as a
-          # "Direct Upload" project named exactly `fluid` in the Cloudflare
-          # dashboard, or with `wrangler pages project create fluid`).
-          command: pages deploy website --project-name=fluid --branch=main
+          # Must match the existing Direct Upload Pages project name exactly
+          # (its production host is fluid-25z.pages.dev). Created once via
+          # `wrangler pages project create`.
+          command: pages deploy website --project-name=fluid-25z --branch=main

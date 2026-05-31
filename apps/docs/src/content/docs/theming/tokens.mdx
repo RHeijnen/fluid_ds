@@ -1,6 +1,106 @@
 ---
-title: "Semantic vs component tokens"
-description: "Semantic vs component tokens, write the description here."
+title: Semantic vs component tokens
+description: The two-tier token system and the brand → component → instance override ladder that makes Fluid themable at any scope.
 ---
 
-*This page is a stub. Write the content.*
+import Demo from "../../../components/Demo.astro";
+
+Fluid's theming runs on two tiers of CSS custom properties:
+
+1. **Semantic tokens**, a small global vocabulary (`--fluid-accent-base`,
+   `--fluid-surface-base`, `--fluid-text-primary`, …) that describes *roles*,
+   not raw colors.
+2. **Component tokens**, per-component variables (`--fluid-button-bg`,
+   `--fluid-slider-track`, …) that **fall back** to a semantic token.
+
+The fallback is the whole trick. Every component token is declared inline like
+this:
+
+```css
+/* inside fluid-button */
+background: var(--fluid-button-bg, var(--fluid-accent-base));
+```
+
+If you never set `--fluid-button-bg`, the button uses `--fluid-accent-base`.
+Set it, and only buttons change. That one pattern gives you three scopes for
+free.
+
+## The override ladder
+
+Each rung is more specific than the last. They compose, pick whichever scope a
+change belongs at.
+
+| Scope | You set | Affects |
+| --- | --- | --- |
+| **Brand** | a semantic token under `[data-fluid-brand]` | everything that rolls up to it |
+| **Component** | a component token (e.g. `--fluid-button-bg`) | every instance of that component |
+| **Instance** | a token under `[data-fluid-id]` | one element |
+
+```css
+/* 1. Brand: move the accent, everything follows */
+[data-fluid-brand="custom"] { --fluid-accent-base: #6366f1; }
+
+/* 2. Component: only buttons, brand untouched */
+[data-fluid-brand="custom"] { --fluid-button-bg: #db2777; }
+
+/* 3. Instance: just this one button */
+[data-fluid-id="primary-cta"] { --fluid-button-bg: linear-gradient(90deg,#6366f1,#22d3ee); }
+```
+
+<Demo title="Brand scope: --fluid-accent-base changes every accent">
+  <div style="--fluid-accent-base:#7c3aed; --fluid-accent-hover:#6d28d9; --fluid-accent-active:#5b21b6; display:contents;">
+    <fluid-button>Button</fluid-button>
+    <fluid-switch checked aria-label="On"></fluid-switch>
+    <fluid-badge>Badge</fluid-badge>
+  </div>
+</Demo>
+
+<Demo title="Component scope: --fluid-button-bg changes only buttons">
+  <div style="--fluid-button-bg:#db2777; --fluid-button-bg-hover:#be185d; display:contents;">
+    <fluid-button>Button</fluid-button>
+    <fluid-switch checked aria-label="On"></fluid-switch>
+    <fluid-badge>Badge</fluid-badge>
+  </div>
+</Demo>
+
+Notice the switch and badge stay on the default accent in the second demo,
+only the button token moved.
+
+## The semantic vocabulary
+
+These are the global roles a brand retunes. Component tokens fall back to them,
+so this is the shortlist worth knowing.
+
+| Group | Tokens |
+| --- | --- |
+| **Accent** | `--fluid-accent-base`, `--fluid-accent-hover`, `--fluid-accent-active`, `--fluid-accent-text` |
+| **Status** | `--fluid-success-*`, `--fluid-danger-*`, `--fluid-warning-*`, `--fluid-info-*` (each with `-base` / `-hover` / `-active` / `-text`) |
+| **Surfaces** | `--fluid-surface-base`, `--fluid-surface-subtle`, `--fluid-surface-muted` |
+| **Text** | `--fluid-text-primary`, `--fluid-text-secondary`, `--fluid-text-inverse` |
+| **Borders** | `--fluid-border-default`, `--fluid-border-strong` |
+| **Shape** | `--fluid-radius-none` … `--fluid-radius-full` |
+| **Type** | `--fluid-font-family-sans`, `--fluid-font-family-mono` |
+| **Brand ramp** | `--fluid-color-brand-50` … `--fluid-color-brand-900` (the source the accent derives from) |
+
+Status tones are intentionally **theme-independent**: a brand retunes the
+accent, not danger/success, so destructive actions stay recognizable across
+every brand. Override them only with intent.
+
+## Finding a component's tokens
+
+Every component page lists the exact tokens it exposes in its **API table**
+(generated from the Custom Elements Manifest). For example, the
+[button](/components/button/#css-custom-properties) page documents
+`--fluid-button-bg`, `--fluid-button-radius`, and the rest, each annotated
+with the semantic token it falls back to.
+
+In JSDoc those are the `@cssproperty` (component token) and `@uses-token`
+(semantic dependency) tags the analyzer reads, so the docs never drift from the
+source.
+
+## Where to go next
+
+- [Brand attribute](/theming/brand/), retune the accent for the whole app (and a neon example).
+- [Per-element overrides](/theming/per-element/), the instance scope in detail.
+- [Dark mode](/theming/dark-mode/), the scheme switch that re-resolves surfaces and text.
+- The [Theme builder](/playground/) edits these live and exports the CSS.

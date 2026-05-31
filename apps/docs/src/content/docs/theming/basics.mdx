@@ -17,9 +17,9 @@ adopts the new brand.
 
 ```css title="brand.css"
 [data-fluid-brand="custom"] {
-  --fluid-color-primary: #6366f1;
-  --fluid-color-success: #16a34a;
-  --fluid-color-danger:  #dc2626;
+  --fluid-accent-base: #6366f1;   /* the accent every component reads */
+  --fluid-success-base: #16a34a;
+  --fluid-danger-base:  #dc2626;
 }
 ```
 
@@ -34,8 +34,8 @@ adopts the new brand.
   <fluid-button variant="secondary">Secondary</fluid-button>
 </Demo>
 
-<Demo title='With data-fluid-brand="custom" + --fluid-color-primary: #db2777'>
-  <div data-fluid-brand="custom" style="--fluid-color-primary: #db2777; display: contents;">
+<Demo title='With data-fluid-brand="custom" + --fluid-accent-base: #db2777'>
+  <div data-fluid-brand="custom" style="--fluid-accent-base: #db2777; display: contents;">
     <fluid-button>Custom</fluid-button>
     <fluid-button variant="secondary">Secondary</fluid-button>
   </div>
@@ -60,7 +60,7 @@ exposes, look for the **CSS custom properties** section.
 ## 3. Per-element overrides
 
 If you want a single instance to look different from its siblings, use the
-[Theme builder](/) to isolate the element. The builder stamps a stable
+[Theme builder](/playground/) to isolate the element. The builder stamps a stable
 `data-fluid-id` attribute on the element and emits a CSS rule scoped to that
 id:
 

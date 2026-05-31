@@ -6,38 +6,40 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Fluid Admin · Native</title>
 
-    <!-- Design tokens. Always base first, then the scheme sheets (they key off
-         [data-fluid-theme] on <html>, which the topbar toggle flips). -->
-    <link rel="stylesheet" href="./vendor/tokens/base.css" />
-    <link rel="stylesheet" href="./vendor/tokens/light.css" />
-    <link rel="stylesheet" href="./vendor/tokens/dark.css" />
+    <!-- Design tokens, straight from the CDN. Always base first, then the
+         scheme sheets (they key off [data-fluid-theme] on <html>, which the
+         topbar toggle flips). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/dark.css" />
     <!-- Brand presets. Inert until the topbar sets data-fluid-brand on <html>. -->
-    <link rel="stylesheet" href="./vendor/themes/midnight.css" />
-    <link rel="stylesheet" href="./vendor/themes/corporate.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@alpha/src/midnight.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@alpha/src/corporate.css" />
     <link rel="stylesheet" href="./src/styles.css" />
 
     <!--
-      Local consumption: the import map points at the bundle that
-      scripts/build-vendor.mjs produced from the LOCAL packages. The app code
-      imports the bare specifier "@fluid-ds/fluid", exactly as it would a CDN.
+      Buildless CDN consumption: no bundler, no vendor step. The import map
+      resolves the bare specifiers register.js imports to the published
+      @fluid-ds/*@alpha packages on jsDelivr. The last entries map the runtime
+      deps the Fluid dist files import (lit, floating-ui, chart.js) to esm.run,
+      which resolves *their* transitive deps for us.
 
-      To switch to the published packages over a CDN, delete the vendor bundle
-      and replace the map below with:
-
-        {
-          "imports": {
-            "@fluid-ds/fluid": "https://esm.run/@fluid-ds/components",
-            "@fluid-ds/icons": "https://esm.run/@fluid-ds/icons"
-          }
-        }
-
-      and point the three token <link>s at
-      https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/*.css.
+      To pin a release for production, swap `@alpha` for a version (e.g.
+      `@0.0.1-alpha.0`).
     -->
     <script type="importmap">
       {
         "imports": {
-          "@fluid-ds/fluid": "./vendor/fluid.js"
+          "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/",
+          "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/index.js",
+          "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/",
+          "@fluid-ds/charts/":     "https://cdn.jsdelivr.net/npm/@fluid-ds/charts@alpha/dist/components/",
+
+          "lit":              "https://esm.run/lit",
+          "lit/":             "https://esm.run/lit/",
+          "@floating-ui/dom": "https://esm.run/@floating-ui/dom",
+          "chart.js":         "https://esm.run/chart.js",
+          "chart.js/auto":    "https://esm.run/chart.js/auto"
         }
       }
     </script>

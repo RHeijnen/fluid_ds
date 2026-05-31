@@ -26,13 +26,13 @@ and `<link>` tags from [jsDelivr](https://www.jsdelivr.com/).
     <title>Hello, Fluid</title>
 
     <!-- 1. Design tokens, CSS custom properties -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
 
     <!-- 2. Default icons + the components you use (each registers one tag) -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/card/define.js"></script>
   </head>
   <body>
     <!-- 3. Use the tags like any other HTML element -->
@@ -55,10 +55,10 @@ just works.
   boilerplate.
 </Aside>
 
-<Aside type="caution" title="Packages not yet on npm">
-  Fluid isn't published to npm yet, the URLs above are how it will work
-  once it is. For now, clone the repo and run `pnpm dev` to play locally
-  ([see Development](#local-development)).
+<Aside type="note" title="Alpha release">
+  Fluid is published to npm under the `alpha` dist-tag. Pin `@alpha` in the
+  URLs above (or `npm i @fluid-ds/components@alpha`); a bare `@latest` won't
+  resolve until the first stable release.
 </Aside>
 
 ### Import maps
@@ -70,9 +70,9 @@ in the rest of your page:
 <script type="importmap">
   {
     "imports": {
-      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
-      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
-      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/"
+      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/",
+      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/index.js",
+      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/"
     }
   }
 </script>
@@ -165,7 +165,7 @@ Full per-framework guide: **[Framework integrations](/guides/frameworks/)**.
 
 ## Local development
 
-Until the packages are published, you can run the full stack locally:
+Want to hack on Fluid itself (or run the docs/theme-builder/Storybook)? Run the full stack locally:
 
 ```bash
 git clone https://github.com/RHeijnen/fluid_ds

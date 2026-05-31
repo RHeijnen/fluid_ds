@@ -22,15 +22,15 @@ Every Fluid asset is one of:
 https://cdn.jsdelivr.net/npm/@fluid-ds/{package}@{version}/{file}
 ```
 
-For example, `<fluid-button>`'s define module at the latest release:
+For example, `<fluid-button>`'s define module on the alpha channel:
 
 ```
-https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js
+https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js
 ```
 
-<Aside type="caution" title="Packages not yet on npm">
-  Fluid isn't published to npm yet, these URLs document how it will
-  work once it is. Until then, [run the stack locally](/getting-started/installation/#local-development).
+<Aside type="note" title="Alpha release">
+  Fluid is published to npm under the `alpha` dist-tag, so pin `@alpha` in
+  these URLs. A bare `@latest` won't resolve until the first stable release.
 </Aside>
 
 ## Version pinning
@@ -67,9 +67,9 @@ dist/
 Load as `<link rel="stylesheet">`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/dark.css" />
 ```
 
 ### `@fluid-ds/icons`
@@ -84,8 +84,8 @@ dist/
 Load defaults plus any extras you need:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/lucide/rocket.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/lucide/rocket.js"></script>
 ```
 
 ### `@fluid-ds/components`
@@ -102,9 +102,9 @@ The `define.js` entries are what you load. Each one registers exactly one
 element, so unused components stay out of your page weight:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dialog/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/input/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/dialog/define.js"></script>
 ```
 
 ### Expansion packs
@@ -127,9 +127,9 @@ bundler import.
 <script type="importmap">
   {
     "imports": {
-      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
-      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
-      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/",
+      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/",
+      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/index.js",
+      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/",
 
       "lit":                   "https://esm.run/lit",
       "lit/":                  "https://esm.run/lit/",
@@ -168,8 +168,8 @@ jsDelivr is the recommended default, but any npm-mirroring CDN works:
 
 | CDN | URL pattern | Notes |
 | --- | --- | --- |
-| **[jsDelivr](https://www.jsdelivr.com)** | `https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/...` | Recommended. Free, global, version ranges, file listing at the package root. |
-| **[unpkg](https://unpkg.com)** | `https://unpkg.com/@fluid-ds/components@latest/dist/...` | Free, well-known. No file listing in browsers. |
+| **[jsDelivr](https://www.jsdelivr.com)** | `https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/...` | Recommended. Free, global, version ranges, file listing at the package root. |
+| **[unpkg](https://unpkg.com)** | `https://unpkg.com/@fluid-ds/components@alpha/dist/...` | Free, well-known. No file listing in browsers. |
 | **[esm.sh](https://esm.sh)** | `https://esm.sh/@fluid-ds/components/define/button` | On-demand ESM rewriting; resolves dependencies automatically. Great with import maps. |
 
 ## Subresource integrity (SRI)

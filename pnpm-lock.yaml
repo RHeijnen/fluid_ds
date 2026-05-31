@@ -112,27 +112,7 @@ importers:
         specifier: ~5.8.3
         version: 5.8.3
 
-  apps/admin-native:
-    dependencies:
-      '@fluid-ds/charts':
-        specifier: workspace:*
-        version: link:../../packages/charts
-      '@fluid-ds/components':
-        specifier: workspace:*
-        version: link:../../packages/components
-      '@fluid-ds/icons':
-        specifier: workspace:*
-        version: link:../../packages/icons
-      '@fluid-ds/themes':
-        specifier: workspace:*
-        version: link:../../packages/themes
-      '@fluid-ds/tokens':
-        specifier: workspace:*
-        version: link:../../packages/tokens
-    devDependencies:
-      vite:
-        specifier: ^5.4.11
-        version: 5.4.21(@types/node@24.12.4)(sass@1.90.0)
+  apps/admin-native: {}
 
   apps/admin-next:
     dependencies:

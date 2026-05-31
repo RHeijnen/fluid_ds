@@ -24,26 +24,30 @@ to hand off context when you switch machines.
   (`display:contents` on routed hosts); and the docs header rework
   (control alignment, WCAG-toggle target-size + contrast a11y fixes, GitHub/
   brand-select overlap, single bar divider).
-- **🚀 Launch readiness (deployment plan decided + wired):**
+- **🚀 Launch status (LIVE on npm; website deploys on next push):**
   - Model: **git is the source of truth; npm package + website are two outputs
-    of the same commit.** The website already consumes `@fluid-ds/*` via
-    `workspace:*`, so they can't drift.
-  - **Hosting = Cloudflare Pages**, project name **`fluid`**, **deploy on every
-    push to `main`** (site tracks HEAD). Release line stays **alpha** (`0.0.x-
-    alpha`, `alpha` dist-tag) so `npm i` default `latest` gets nothing until we
-    cut stable.
-  - Added `.github/workflows/deploy.yml` (build:website → `wrangler pages
-    deploy`) and fixed `release.yml` to auth via `NODE_AUTH_TOKEN`. Both inert
-    until secrets exist.
-  - **Pending manual steps (user):** add GH secrets `NPM_TOKEN` (npm granular
-    *automation* token), `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; create
-    the `fluid` Cloudflare Pages (Direct Upload) project.
-  - **Next:** squash history to a single public commit → make repo public →
-    first `@fluid-ds/*@alpha` publish via `release.yml` → custom domain + flip
-    docs CDN snippets / native-demo import map to the published version.
+    of the same commit.** The website consumes `@fluid-ds/*` via `workspace:*`,
+    so they can't drift. The *user-facing* references (README/docs CDN snippets,
+    native demo import map) point at the published `@alpha`.
+  - ✅ **History squashed** to a single public commit; **repo is public**.
+  - ✅ **All 9 `@fluid-ds/*` packages published** to npm at `0.0.1-alpha.0`
+    under the **`alpha`** dist-tag (bootstrapped locally, no token; provenance
+    was stripped for that one publish then restored). `npm i` default `latest`
+    gets nothing until we cut stable. Install today with `@alpha`.
+  - **Trusted Publishing is the plan for future releases** (no token): configure
+    an OIDC trusted publisher per package on npm, then rewire `release.yml` to
+    drop the token + use `id-token` (npm ≥ 11.5.1). NOT done yet, `release.yml`
+    still token-shaped (`NODE_AUTH_TOKEN`); revisit before the next publish.
+  - **Hosting = Cloudflare Pages**, Direct Upload project **`fluid-25z`**, temp
+    URL **https://fluid-25z.pages.dev** (custom domain later). `deploy.yml`
+    builds the unified site in GH Actions and `wrangler pages deploy`s it on
+    every push to `main`. Secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`
+    are set. Astro `site` is set to the temp URL (override via `DOCS_SITE`).
+  - **Next:** push the current batch → first website deploy fires → verify
+    `fluid-25z.pages.dev` (incl. docs search, which only works built). Then:
+    custom domain, and the Trusted-Publishing rewire of `release.yml`.
   - Docs search (Pagefind) only indexes at **build**, so it's empty in
-    `astro dev`; it starts working once the site is deployed (or via
-    `pnpm docs:build` + preview).
+    `astro dev`; it works once the site is deployed (or via `pnpm docs:build`).
 - **⚠️ Process note: `pnpm verify` does NOT build the docs site.** `verify`'s
   `build` step only compiles the component packages (tsc + cem); the Astro docs
   (MDX) are never touched. **After editing any `*.mdx`, run `pnpm docs:build`**
