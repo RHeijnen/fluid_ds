@@ -1,0 +1,6 @@
+html,
+body {
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-sans);
+}

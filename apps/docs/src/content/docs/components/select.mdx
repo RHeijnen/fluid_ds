@@ -1,0 +1,379 @@
+---
+title: "Select"
+description: "Single-select dropdown using the WAI-ARIA combobox + listbox pattern. Form-associated, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-select>` is the dense single-select picker, a button trigger that opens
+a listbox of `<fluid-option>` children. It's form-associated and implements the
+WAI-ARIA combobox + listbox pattern, with arrow-key navigation, type-to-jump,
+and roving-tabindex focus inside the listbox.
+
+<Demo>
+  <fluid-select value="us" aria-label="Country" style="max-width: 18rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="mx">Mexico</fluid-option>
+    <fluid-option value="uk">United Kingdom</fluid-option>
+    <fluid-option value="de">Germany</fluid-option>
+  </fluid-select>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/select/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/select"; // registers select + option
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+`value` selects the matching option; the trigger shows its label.
+
+<Demo>
+  <fluid-select value="us" aria-label="Country" style="max-width: 18rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="mx">Mexico</fluid-option>
+  </fluid-select>
+</Demo>
+
+<ConformanceCode code={`<fluid-select name="country" value="us">
+  <fluid-option value="us">United States</fluid-option>
+  <fluid-option value="ca">Canada</fluid-option>
+  <fluid-option value="mx">Mexico</fluid-option>
+</fluid-select>`} />
+
+### Placeholder
+
+With no value, the placeholder text shows until a choice is made.
+
+<Demo>
+  <fluid-select placeholder="Select a country…" aria-label="Country" style="max-width: 18rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="mx">Mexico</fluid-option>
+  </fluid-select>
+</Demo>
+
+<ConformanceCode code={`<fluid-select placeholder="Select a country…">
+  <fluid-option value="us">United States</fluid-option>
+  <fluid-option value="ca">Canada</fluid-option>
+</fluid-select>`} />
+
+### Sizes
+
+`size` accepts `sm`, `md` (default), and `lg`.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:18rem;">
+    <fluid-select size="sm" value="md" aria-label="Small">
+      <fluid-option value="sm">Small</fluid-option>
+      <fluid-option value="md">Medium</fluid-option>
+    </fluid-select>
+    <fluid-select size="md" value="md" aria-label="Medium">
+      <fluid-option value="sm">Small</fluid-option>
+      <fluid-option value="md">Medium</fluid-option>
+    </fluid-select>
+    <fluid-select size="lg" value="md" aria-label="Large">
+      <fluid-option value="sm">Small</fluid-option>
+      <fluid-option value="md">Medium</fluid-option>
+    </fluid-select>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-select size="sm">…</fluid-select>
+<fluid-select size="md">…</fluid-select>
+<fluid-select size="lg">…</fluid-select>`} />
+
+### Disabled option
+
+<Demo>
+  <fluid-select value="us" aria-label="Country" style="max-width: 18rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="aq" disabled>Antarctica (closed)</fluid-option>
+  </fluid-select>
+</Demo>
+
+<ConformanceCode code={`<fluid-select value="us">
+  <fluid-option value="us">United States</fluid-option>
+  <fluid-option value="aq" disabled>Antarctica (closed)</fluid-option>
+</fluid-select>`} />
+
+## Listening for changes
+
+The select fires **`fluid-change`** with `{ value }` in `detail` when the
+selection changes.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-select id="country" aria-label="Country">…</fluid-select>
+
+    <script type="module">
+      document.getElementById("country").addEventListener("fluid-change", (e) => {
+        console.log("selected:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="CountryPicker.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/select";
+
+    export function CountryPicker() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return (
+        <fluid-select ref={ref} aria-label="Country">
+          <fluid-option value="us">United States</fluid-option>
+          <fluid-option value="ca">Canada</fluid-option>
+        </fluid-select>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="CountryPicker.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/select";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-select aria-label="Country" @fluid-change="onChange">
+        <fluid-option value="us">United States</fluid-option>
+        <fluid-option value="ca">Canada</fluid-option>
+      </fluid-select>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="country-picker.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/select";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "country-picker",
+      template: `
+        <fluid-select aria-label="Country" (fluid-change)="onChange($event)">
+          <fluid-option value="us">United States</fluid-option>
+          <fluid-option value="ca">Canada</fluid-option>
+        </fluid-select>
+      `
+    })
+    export class CountryPicker {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="CountryPicker.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/select";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-select aria-label="Country" on:fluid-change={onChange}>
+      <fluid-option value="us">United States</fluid-option>
+      <fluid-option value="ca">Canada</fluid-option>
+    </fluid-select>
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+The select is form-associated: it submits `name=<value>`, and `required` blocks
+submission until a choice is made.
+
+<Demo>
+  <form
+    style="display:flex; flex-direction:column; gap:0.75rem; align-items:flex-start; max-width:18rem;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'role=' + (new FormData(this).get('role') ?? '(none)');"
+  >
+    <fluid-select name="role" required placeholder="Pick a role…" style="width:100%;">
+      <fluid-option value="admin">Admin</fluid-option>
+      <fluid-option value="editor">Editor</fluid-option>
+      <fluid-option value="viewer">Viewer</fluid-option>
+    </fluid-select>
+    <div>
+      <fluid-button type="submit">Continue</fluid-button>
+      <output style="font-size:0.875rem; color: var(--fluid-text-secondary); margin-left:0.5rem;"></output>
+    </div>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-select name="role" required>
+    <fluid-option value="admin">Admin</fluid-option>
+    <fluid-option value="editor">Editor</fluid-option>
+    <fluid-option value="viewer">Viewer</fluid-option>
+  </fluid-select>
+  <fluid-button type="submit">Continue</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property of the select reads a **component-scoped `--fluid-select-*`
+token that falls back to a main semantic var** (the override ladder), most fall
+through to the shared `--fluid-field-*` field tokens so a select matches your
+inputs by default. The **complete list** is in the [API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-select-bg: var(--fluid-surface-base);
+  --fluid-select-border: var(--fluid-border-default);
+  --fluid-select-border-focus: var(--fluid-accent-base);
+  --fluid-option-selected-bg: var(--fluid-accent-base);
+  --fluid-option-selected-fg: var(--fluid-accent-text);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-select` in the [Theme builder](/playground/) to tweak the
+  trigger, listbox, and option tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The trigger is [`part="trigger"`](#api) and the listbox is `part="listbox"`.
+Reach them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token.
+
+## When to use
+
+- **One-of-many** selection where the option set is finite and known in advance.
+
+### When *not* to use
+
+- **Free-form text plus suggestions**: use
+  [`<fluid-typeahead>`](/components/typeahead/).
+- **2–5 always-visible options**: use
+  [`<fluid-segmented-control>`](/components/segmented-control/) or
+  [`<fluid-radio>`](/components/radio/).
+- **A menu of actions** (not a value): use
+  [`<fluid-dropdown>`](/components/dropdown/).
+
+## Accessibility
+
+The trigger is `role="combobox"` and the popup is `role="listbox"`, following
+the WAI-ARIA APG. The notes below are select-specific; the cross-component
+contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>↓</kbd> | Open the listbox; focus the selected (or first) option. |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Move the active option (skips disabled). |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last option. |
+| _type a character_ | Jump to the next option starting with it. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the active option and close. |
+| <kbd>Escape</kbd> | Close without changing the value. |
+
+Closing returns focus to the trigger.
+
+### Names & roles
+
+The trigger carries `aria-haspopup="listbox"` and `aria-expanded` reflecting the
+open state. Each option is `role="option"` with `aria-selected` reflecting the
+current value. The select needs an accessible name, a visible label wired with
+`aria-labelledby`, or an `aria-label`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+`required` participates in form validation; the active option is tracked with
+`aria-activedescendant` so screen readers announce navigation without moving DOM
+focus.
+
+### Motion & target size
+
+- Open/close and option transitions honor `prefers-reduced-motion`.
+- The trigger reads `--fluid-target-min` as a height floor: ≥ **24×24** (AA) /
+  **44×44** (AAA), so even the `sm` size stays a comfortable hit target.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-select" />
+
+### `<fluid-option>`
+
+<ComponentApi tag="fluid-option" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Typeahead"
+    href="/components/typeahead/"
+    description="Free-form text with filtered suggestions."
+  />
+  <LinkCard
+    title="Radio"
+    href="/components/radio/"
+    description="One-of-few with all options visible."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="A menu of actions, not a value."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

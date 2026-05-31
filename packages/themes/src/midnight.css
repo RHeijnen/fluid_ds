@@ -1,0 +1,31 @@
+/*
+ * Midnight, a moody violet preset.
+ * Usage: load this stylesheet, then set `data-fluid-brand="midnight"` on
+ * <html> (global) or any subtree you want themed.
+ *
+ *   <html data-fluid-brand="midnight">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/midnight.css">
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme).
+ */
+[data-fluid-brand="midnight"] {
+  /* Brand palette, violet */
+  --fluid-color-brand-50: #f5f3ff;
+  --fluid-color-brand-100: #ede9fe;
+  --fluid-color-brand-200: #ddd6fe;
+  --fluid-color-brand-300: #c4b5fd;
+  --fluid-color-brand-400: #a78bfa;
+  --fluid-color-brand-500: #8b5cf6;
+  --fluid-color-brand-600: #7c3aed;
+  --fluid-color-brand-700: #6d28d9;
+  --fluid-color-brand-800: #5b21b6;
+  --fluid-color-brand-900: #4c1d95;
+
+  /* Softer corners */
+  --fluid-radius-md: 0.5rem;
+  --fluid-radius-lg: 0.75rem;
+
+  /* Slower, more deliberate motion */
+  --fluid-duration-fast: 160ms;
+  --fluid-duration-normal: 240ms;
+}

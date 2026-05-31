@@ -1,0 +1,294 @@
+---
+title: "File input"
+description: "Drop zone with native file-input fallback, inline file list, and form participation. Accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-file-input>` is the file picker, a drag-and-drop zone that also accepts
+clicks, listing each selected file inline with a remove button. It's
+form-associated, so the selected files submit with the parent `<form>`.
+
+<Demo>
+  <fluid-file-input style="width: 100%; max-width: 28rem;"></fluid-file-input>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/file-input/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/file-input";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-file-input style="width: 100%; max-width: 28rem;"></fluid-file-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-file-input name="upload"></fluid-file-input>`} />
+
+### Multiple files
+
+<Demo>
+  <fluid-file-input multiple style="width: 100%; max-width: 28rem;"></fluid-file-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-file-input name="uploads" multiple></fluid-file-input>`} />
+
+### Restricting file types
+
+```html
+<fluid-file-input accept="image/*" name="avatar"></fluid-file-input>
+<fluid-file-input accept=".pdf,.docx" name="docs" multiple></fluid-file-input>
+```
+
+### Custom label + hint
+
+Slot your own copy into `label` and `hint` to match your tone.
+
+<Demo>
+  <fluid-file-input accept="image/*" style="width: 100%; max-width: 28rem;">
+    <span slot="label">Drop your avatar here</span>
+    <span slot="hint">PNG or JPG, up to 2 MB</span>
+  </fluid-file-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-file-input accept="image/*">
+  <span slot="label">Drop your avatar here</span>
+  <span slot="hint">PNG or JPG, up to 2 MB</span>
+</fluid-file-input>`} />
+
+## Listening for changes
+
+File-input fires **`fluid-change`** when the selected list changes.
+`detail.files` is a `File[]`; `detail.value` is a comma-separated filename
+string.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-file-input id="up" aria-label="Upload"></fluid-file-input>
+
+    <script type="module">
+      document.getElementById("up").addEventListener("fluid-change", (e) => {
+        console.log(e.detail.files); // File[]
+        console.log(e.detail.value); // "a.png, b.png"
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Uploader.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/file-input";
+
+    export function Uploader() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.files);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-file-input ref={ref} aria-label="Upload" multiple />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Uploader.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/file-input";
+    const onChange = (e: CustomEvent) => console.log(e.detail.files);
+    </script>
+
+    <template>
+      <fluid-file-input aria-label="Upload" multiple @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="uploader.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/file-input";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-uploader",
+      template: `<fluid-file-input aria-label="Upload" multiple (fluid-change)="onChange($event)"></fluid-file-input>`
+    })
+    export class Uploader {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.files);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Uploader.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/file-input";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.files);
+      }
+    </script>
+
+    <fluid-file-input aria-label="Upload" multiple on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+You can clear the selection programmatically:
+
+```ts
+document.querySelector("fluid-file-input").reset();
+```
+
+## Inside a form
+
+The picker is form-associated: each file is appended to the submitted `FormData`
+under `name`, and `required` blocks submission until a file is chosen.
+
+```html
+<form enctype="multipart/form-data">
+  <fluid-file-input name="docs" multiple required></fluid-file-input>
+  <fluid-button type="submit">Upload</fluid-button>
+</form>
+```
+
+## When to use
+
+- Anywhere you'd reach for a native `<input type="file">` and want the drop-zone
+  affordance, file listing, and theming on top.
+
+### When *not* to use
+
+- **Just a button** that opens the picker without a drop zone: wrap a hidden
+  native input with [`<fluid-button>`](/components/button/).
+
+## Theming
+
+Every styled property of the file input reads a **component-scoped
+`--fluid-file-input-*` token that falls back to a main semantic var** (the
+override ladder). The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-file-input-bg: var(--fluid-surface-subtle);
+  --fluid-file-input-border: var(--fluid-border-default);
+  --fluid-file-input-accent: var(--fluid-accent-base);
+  --fluid-file-input-file-bg: var(--fluid-surface-base);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-file-input` in the [Theme builder](/playground/) to tweak the
+  drop zone, file rows, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The drop zone is [`part="label"`](#api), the list is `part="file-list"`, each
+row is `part="file"`, and the native control is `part="input"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## Accessibility
+
+The drop zone is a `<label>` wrapping a real `<input type="file">`, so it
+inherits native semantics. The notes below are file-input-specific; the
+cross-component contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Focus the drop zone, then each remove button. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Open the system file picker. |
+
+Drag-and-drop sets a `dragging` state for visual feedback; the underlying input
+still handles selection.
+
+### Names & roles
+
+Set `aria-label` on the host to give the picker a meaningful name ("Upload
+avatar", "Attach documents"). Each file row's remove button is labeled
+"Remove &lt;filename&gt;"
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+`required` participates in native constraint validation, so an empty required
+picker blocks form submission.
+
+### Motion & target size
+
+- Border/background transitions honor `prefers-reduced-motion`.
+- The drop zone is large; each file's remove button floors its box to
+  `--fluid-target-min`, so AAA grows that hit area to 44px without resizing the
+  close glyph.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-file-input" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="Single-line text, the everyday form field."
+  />
+  <LinkCard
+    title="Button"
+    href="/components/button/"
+    description="Wrap a hidden file input for a picker without a drop zone."
+  />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="Show upload progress once files are chosen."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+storybook-static
+.cache
+.turbo
+coverage
+pnpm-lock.yaml
+**/custom-elements.json
+packages/tokens/dist

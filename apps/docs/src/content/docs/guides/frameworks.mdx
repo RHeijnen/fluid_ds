@@ -1,0 +1,297 @@
+---
+title: "Framework integrations"
+description: "Per-framework setup and gotchas for React, Vue, Angular, Svelte, and SolidJS."
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+Fluid components are **standard custom elements**. Once they're
+registered (via `import "@fluid-ds/components/define/button"` or a
+`<script src>` tag from a CDN), every framework can render them as
+regular HTML.
+
+That said, each framework has a few specifics worth knowing, mostly
+around event handling, TypeScript typings, and how the compiler treats
+unknown tags. This page collects them.
+
+## See it running
+
+The same admin portal — dashboard with charts, a users table with a
+dialog and toasts, a settings form, live brand + light/dark theming — is
+built four ways, each consuming the identical Fluid components. They're
+pixel-for-pixel the same; only the host framework differs.
+
+- [**Native HTML**](/demos/native/) — buildless, import-map + ES modules.
+- [**React**](/demos/react/) — React 19 + Vite.
+- [**Next.js**](/demos/next/) — Next.js 15 App Router, SSR-safe.
+- [**Angular**](/demos/angular/) — Angular 20 standalone.
+
+The source for all four lives under `apps/admin-*` in the repo and is the
+canonical reference for the per-framework patterns documented below.
+
+<Aside type="tip">
+  Each portal currently consumes the local workspace build of Fluid. The
+  native demo loads it through an import map (one line to repoint at a
+  CDN); the framework apps depend on the `@fluid-ds/*` packages directly
+  (one `npm install` once they're published).
+</Aside>
+
+---
+
+## React
+
+### Setup
+
+Add the packages and register the components you use, same as any
+plain web component setup:
+
+```ts title="src/main.tsx"
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+import "@fluid-ds/icons/register-defaults";
+
+import "@fluid-ds/components/define/button";
+import "@fluid-ds/components/define/input";
+```
+
+### Using the tags
+
+```tsx title="App.tsx"
+export default function App() {
+  return (
+    <fluid-button
+      variant="primary"
+      onClick={(e) => console.log("clicked", e)}
+    >
+      Save changes
+    </fluid-button>
+  );
+}
+```
+
+### React 19 vs 18
+
+| Concern | React 19 | React 18 |
+| --- | --- | --- |
+| Custom-element tags | Native | Native |
+| Custom-element props | Passed straight through | Stringified via attributes; non-string props need a `ref` |
+| Custom events (`fluid-*`) | Native event handlers (`onFluidClick`) | Use a `ref` + `addEventListener`, React 18 only synthesises standard DOM events |
+
+React 18 fallback for custom events:
+
+```tsx
+import { useRef, useEffect } from "react";
+
+export function ButtonWithCustomEvent() {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onFluidClick = (e: CustomEvent) => console.log(e.detail);
+    el.addEventListener("fluid-click", onFluidClick as EventListener);
+    return () => el.removeEventListener("fluid-click", onFluidClick as EventListener);
+  }, []);
+
+  return <fluid-button ref={ref}>Save</fluid-button>;
+}
+```
+
+### TypeScript
+
+Tell TS about the `fluid-*` tags so JSX types check correctly. Drop a
+declaration file anywhere in your project's `include`:
+
+```ts title="src/fluid-ds.d.ts"
+import type { HTMLAttributes } from "react";
+
+declare module "react" {
+  namespace JSX {
+    interface IntrinsicElements {
+      "fluid-button": HTMLAttributes<HTMLElement> & {
+        variant?: "primary" | "secondary" | "ghost";
+        size?: "sm" | "md" | "lg";
+        disabled?: boolean;
+      };
+      // …repeat per component, or `[tag: \`fluid-${string}\`]: any;` for a catch-all
+    }
+  }
+}
+```
+
+A more complete `.d.ts` will land in `@fluid-ds/react-types` in a future
+release.
+
+---
+
+## Vue 3
+
+### Setup
+
+```ts title="src/main.ts"
+import { createApp } from "vue";
+import App from "./App.vue";
+
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+import "@fluid-ds/icons/register-defaults";
+import "@fluid-ds/components/define/button";
+
+createApp(App).mount("#app");
+```
+
+Tell the Vue compiler to treat `fluid-*` as native elements (otherwise
+it logs a warning every time it sees an unknown tag):
+
+```ts title="vite.config.ts"
+import vue from "@vitejs/plugin-vue";
+
+export default {
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith("fluid-")
+        }
+      }
+    })
+  ]
+};
+```
+
+### Using the tags
+
+```vue title="App.vue"
+<template>
+  <fluid-button variant="primary" @fluid-click="onClick">
+    {{ label }}
+  </fluid-button>
+</template>
+
+<script setup lang="ts">
+const label = "Save changes";
+function onClick(e: CustomEvent) {
+  console.log("clicked", e.detail);
+}
+</script>
+```
+
+### Gotchas
+
+- `.prop` modifier: if a property's name differs from its attribute, use
+  `:variant.prop="..."` to set the property directly. Most Fluid
+  props mirror an attribute so this is rarely needed.
+- Vue's two-way `v-model` does not bind to custom-element properties by
+  default, use `:value` + `@fluid-change` instead.
+
+---
+
+## Angular
+
+### Setup
+
+Add `CUSTOM_ELEMENTS_SCHEMA` so Angular accepts the `fluid-*` tags
+without complaining:
+
+```ts title="app.module.ts"
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+// …
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+```
+
+Register components and tokens in `main.ts` exactly like the React/Vue
+setup above.
+
+### Using the tags
+
+```html title="app.component.html"
+<fluid-button variant="primary" (click)="onClick($event)">
+  Save changes
+</fluid-button>
+```
+
+### Custom events
+
+Angular's `(eventName)` syntax handles any DOM event, including custom
+events:
+
+```html
+<fluid-input
+  (fluid-change)="onChange($event)"
+  [value]="searchTerm"
+></fluid-input>
+```
+
+Note Angular's template parser is case-sensitive, use `(fluid-change)`
+exactly as the event name, not `(fluidChange)`.
+
+---
+
+## Svelte
+
+Svelte handles custom elements natively. Events come through as normal
+DOM events; properties bind via `attr={value}` for strings and `bind:`
+for two-way:
+
+```svelte
+<script>
+  let value = "";
+</script>
+
+<fluid-input bind:value placeholder="Search" on:fluid-change={(e) => {
+  console.log(e.detail.value);
+}}></fluid-input>
+```
+
+---
+
+## SolidJS
+
+Solid passes JSX to standard DOM APIs, so custom elements work without
+ceremony. Event handlers use lowercase names that match the event:
+
+```tsx
+import "@fluid-ds/components/define/button";
+
+export function App() {
+  return (
+    <fluid-button
+      variant="primary"
+      on:fluid-click={(e) => console.log(e.detail)}
+    >
+      Save
+    </fluid-button>
+  );
+}
+```
+
+The `on:` namespace prefix tells Solid to attach via `addEventListener`
+rather than the property setter, which is what you want for custom
+events.
+
+---
+
+## CDN setup per framework
+
+You can also load the components from a CDN inside a framework app, no
+npm install required. This is handy for prototypes, framework
+documentation embedded examples, or storybooks.
+
+```html title="index.html, same as a vanilla app"
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+```
+
+The framework still owns the rest of the page; it just renders against
+elements the browser registered on its own. See
+[CDN reference](/getting-started/cdn/) for URL patterns + pinning.

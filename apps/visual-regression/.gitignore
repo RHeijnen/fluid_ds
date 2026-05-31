@@ -1,0 +1,8 @@
+# Playwright run artifacts, NOT baselines.
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Generated test specs are committed so CI doesn't depend on the
+# generator at install-time, but local devs can regenerate freely.
+# (no exclusion here: generated specs ARE tracked)

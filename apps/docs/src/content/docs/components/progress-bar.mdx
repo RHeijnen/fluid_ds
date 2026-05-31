@@ -1,0 +1,168 @@
+---
+title: "Progress bar"
+description: "Horizontal progress indicator. Determinate (0–100) or indeterminate loop."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-progress-bar>` shows how far along a task is. Pass `value` as a
+0–100 percentage. Drop a label into the default slot and optionally turn
+on `show-value` for the trailing "42%" readout. Omit `value` (or set
+`indeterminate`) for the looping animation when the duration is unknown.
+
+<Demo>
+  <fluid-progress-bar value="60" show-value style="width: 100%;">Uploading…</fluid-progress-bar>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/progress-bar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/progress-bar";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-progress-bar value="60" style="width: 100%;"></fluid-progress-bar>
+</Demo>
+
+```html
+<fluid-progress-bar value="60"></fluid-progress-bar>
+```
+
+### With a label and readout
+
+<Demo>
+  <fluid-progress-bar value="42" show-value style="width: 100%;">Uploading…</fluid-progress-bar>
+</Demo>
+
+```html
+<fluid-progress-bar value="42" show-value>Uploading…</fluid-progress-bar>
+```
+
+### Indeterminate
+
+<Demo>
+  <fluid-progress-bar indeterminate style="width: 100%;">Working…</fluid-progress-bar>
+</Demo>
+
+```html
+<fluid-progress-bar indeterminate>Working…</fluid-progress-bar>
+```
+
+### Custom value format
+
+Pass a function as the `valueFormatter` property (not an attribute).
+
+```ts
+const bar = document.querySelector("fluid-progress-bar");
+bar.valueFormatter = (v) => `${Math.round(v / 100 * 250)} of 250`;
+bar.value = 40;
+```
+
+## When to use
+
+- A task with **measurable progress** in a horizontal layout.
+- Use [`<fluid-progress-ring>`](/components/progress-ring/) when
+  horizontal space is tight (toolbars, list rows).
+- For an indefinite spinner without a labeled track, reach for
+  [`<fluid-spinner>`](/components/spinner/).
+- For "loading the structure of the page" placeholders, use
+  [`<fluid-skeleton>`](/components/skeleton/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-progress-bar-*` token
+that falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-progress-bar-track: var(--fluid-color-neutral-200);
+  --fluid-progress-bar-fill: var(--fluid-accent-base);
+  --fluid-progress-bar-height: 0.5rem;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api) with `part="track"`, `part="indicator"`,
+and `part="label"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-progress-bar" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+progress-bar-specific.
+
+### Names & roles
+
+- The host is `role="progressbar"` with `aria-valuemin="0"`,
+  `aria-valuemax="100"`, and `aria-valuenow` reflecting the value.
+- In `indeterminate` mode, `aria-valuenow` is removed so the task is announced
+  as in-progress without a specific value.
+- Always provide an `aria-label` (or a visible label via the default slot); the
+  host defaults to "Progress"
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- Don't rely on the fill color alone: pair with `show-value` or a label for
+  non-color cues ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+
+### Motion
+
+Both the determinate transition and the indeterminate loop honor
+`prefers-reduced-motion` (the loop slows dramatically rather than spinning fast).
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Progress ring"
+    href="/components/progress-ring/"
+    description="The circular form for tight horizontal space."
+  />
+  <LinkCard
+    title="Spinner"
+    href="/components/spinner/"
+    description="Indeterminate loading with no measurable value."
+  />
+  <LinkCard
+    title="Skeleton"
+    href="/components/skeleton/"
+    description="Placeholder shapes while page structure loads."
+  />
+  <LinkCard
+    title="Toast"
+    href="/components/toast/"
+    description="Announce when a tracked task finishes."
+  />
+</CardGrid>

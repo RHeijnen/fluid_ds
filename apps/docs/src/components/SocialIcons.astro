@@ -1,0 +1,138 @@
+---
+/*
+ * Override of Starlight's <SocialIcons> slot (top-right header).
+ * Renders the brand-preset picker first, then forwards to the default
+ * SocialIcons component so the existing GitHub link still appears.
+ *
+ * The picker uses a tiny <select> with the three brand presets, kept
+ * deliberately minimal so it sits cleanly next to Starlight's theme
+ * toggle without taking visual weight. Its `change` handler writes
+ * `data-fluid-brand` on <html> (and persists to localStorage), the
+ * actual styling lives in @fluid-ds/themes/{midnight,corporate}.css
+ * which are imported from custom.css.
+ *
+ * The default Brand value uses an empty string so the attribute is
+ * cleared rather than set to "default", keeps the DOM clean and
+ * matches the convention used by the demos app + landing page.
+ */
+import Default from "@astrojs/starlight/components/SocialIcons.astro";
+import HeaderConformanceToggle from "./HeaderConformanceToggle.astro";
+import type { Props } from "@astrojs/starlight/props";
+
+const props = Astro.props as Props;
+---
+
+<!--
+  Wrap our two injected controls in an explicit element. Without this
+  boundary Astro emits Starlight's <Default> social links (the GitHub
+  <a>) *inside* <starlight-brand-select>, so the select and the GitHub
+  icon overlap. The wrapper is `display: contents`, so it adds the DOM
+  boundary without changing the flex layout: conformance toggle, brand
+  select, and the GitHub link all stay direct flex items of Starlight's
+  .social-icons row with its normal gap.
+-->
+<div class="fluid-header-controls">
+  <HeaderConformanceToggle />
+
+  <starlight-brand-select>
+    <label>
+      <span class="sr-only">Select brand preset</span>
+      <select aria-label="Brand preset">
+        <option value="">Default</option>
+        <option value="midnight">Midnight</option>
+        <option value="corporate">Corporate</option>
+      </select>
+    </label>
+  </starlight-brand-select>
+</div>
+
+<Default {...props} />
+
+<style>
+  /* A real inline-flex unit (not display:contents) so the WCAG toggle +
+     brand select are ONE item in Starlight's .social-icons row. This keeps
+     the GitHub link a clean sibling (no nesting / overlap) and lets the row
+     gap space the three groups evenly. */
+  .fluid-header-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  starlight-brand-select {
+    display: inline-flex;
+    align-items: center;
+  }
+  starlight-brand-select select {
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
+    /* Match the conformance toggle's --ctl-h so the two custom controls line
+       up at the same height in the header. */
+    height: 2.125rem;
+    background: transparent;
+    color: var(--sl-color-text);
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 0.5rem;
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 0 1.75rem 0 0.65rem;
+    cursor: pointer;
+    /* Chevron baked in as an inline SVG so the picker stays minimal
+       and inherits color from the text token. */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='m1 1 4 4 4-4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.55rem center;
+    transition:
+      border-color 120ms ease,
+      background-color 120ms ease;
+  }
+  starlight-brand-select select:hover {
+    border-color: var(--sl-color-gray-3, var(--sl-color-hairline));
+    background-color: var(--sl-color-bg-inline-code);
+  }
+  starlight-brand-select select:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+    border-color: var(--sl-color-accent);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script>
+  /**
+   * Tiny custom element that owns the brand picker. Restoring the
+   * persisted value on connect keeps the select in sync with the
+   * `data-fluid-brand` attribute that Head.astro applied
+   * pre-paint, so the dropdown shows the user's choice (not just
+   * "Default") on a hard refresh.
+   */
+  class StarlightBrandSelect extends HTMLElement {
+    connectedCallback() {
+      const select = this.querySelector<HTMLSelectElement>("select");
+      if (!select) return;
+      const stored = localStorage.getItem("fluid-docs-brand") ?? "";
+      select.value = stored === "default" ? "" : stored;
+      select.addEventListener("change", () => {
+        const value = select.value;
+        if (value) {
+          document.documentElement.dataset.fluidBrand = value;
+          localStorage.setItem("fluid-docs-brand", value);
+        } else {
+          delete document.documentElement.dataset.fluidBrand;
+          localStorage.removeItem("fluid-docs-brand");
+        }
+      });
+    }
+  }
+  customElements.define("starlight-brand-select", StarlightBrandSelect);
+</script>

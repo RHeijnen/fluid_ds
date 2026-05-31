@@ -1,0 +1,77 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+# Don't compete with verify on the same SHA, let it finish first.
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Changesets, version + publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write   # needed so changesets can push the version PR
+      pull-requests: write
+      id-token: write   # needed for npm provenance
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # changesets reads tags
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      # The changesets action does both of the following, depending on
+      # whether there are pending changeset files in the repo:
+      #
+      #   1. If there are unreleased changesets, open (or update) a PR
+      #      titled "Version Packages". Merging that PR bumps versions
+      #      and writes CHANGELOG entries.
+      #   2. If the merge that triggered this run was the Version Packages
+      #      PR, run `publish` to push the bumped packages to npm.
+      #
+      # We pass `--tag alpha` to keep pre-release versions off the default
+      # dist-tag until we cut a stable line.
+      - name: Create release PR or publish
+        uses: changesets/action@v1
+        with:
+          publish: pnpm exec changeset publish --tag alpha
+          version: pnpm exec changeset version
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN must be a granular *automation* access token scoped to
+          # the @fluid-ds/* packages with read+write, generated at
+          # https://www.npmjs.com/settings/<user>/tokens, stored under
+          # repo Settings → Secrets and variables → Actions.
+          #
+          # `actions/setup-node` (with registry-url, above) wrote an .npmrc
+          # that reads the token from NODE_AUTH_TOKEN, so that is the variable
+          # npm/changeset actually authenticates with. NPM_TOKEN is kept as an
+          # alias for any tooling/scripts that look for it.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # npm provenance: requires id-token write permission (declared
+          # above) + the OIDC token from GH Actions. The `provenance: true`
+          # in each package's publishConfig opts us in. Provenance proves
+          # the package was built from a specific commit of this repo.
+          NPM_CONFIG_PROVENANCE: "true"

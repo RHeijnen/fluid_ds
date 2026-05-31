@@ -1,0 +1,235 @@
+---
+title: "Code block"
+description: "Monospaced code display with a built-in copy-to-clipboard button."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-code-block>` is the read-only code viewer, a monospaced surface
+with a corner copy button that flips to a check mark when it succeeds.
+Out of the box it renders plain text. For syntax highlighting, generate
+the HTML with your tool of choice (Shiki, Prism, etc.) and drop it into
+the `highlighted` slot.
+
+<Demo>
+  <fluid-code-block style="width: 100%;" code={`const greet = (name) => \`Hello, \${name}\`;`}></fluid-code-block>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/code-block/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/code-block";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-code-block style="width: 100%;" code={`const greet = (name) => \`Hello, \${name}\`;`}></fluid-code-block>
+</Demo>
+
+```html
+<fluid-code-block code="const greet = (name) => `Hello, ${name}`;"></fluid-code-block>
+```
+
+You can also place the code as slotted text, useful for multi-line
+content that's awkward in an attribute:
+
+```html
+<fluid-code-block>{`
+  body {
+    color: var(--fluid-text-primary);
+  }
+`}</fluid-code-block>
+```
+
+### With a language hint
+
+The `language` attribute doesn't highlight on its own, it only adjusts
+the copy button's tooltip ("Copy CSS code"). Pair it with pre-highlighted
+content for actual coloring.
+
+```html
+<fluid-code-block language="css" code="body { color: red; }"></fluid-code-block>
+```
+
+### Pre-highlighted output
+
+If you've already run the source through a highlighter, slot the
+resulting HTML into `highlighted` and the plain content is ignored.
+
+```html
+<fluid-code-block language="ts">
+  <span slot="highlighted" innerHTML="<span class='kw'>const</span> x = 1;"></span>
+</fluid-code-block>
+```
+
+### Without copy
+
+```html
+<fluid-code-block code="…" no-copy></fluid-code-block>
+```
+
+## Listening for copy
+
+The block fires **`fluid-copy`** after a successful copy, with the copied
+string on `event.detail.text`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-code-block id="snippet" code="npm i @fluid-ds/components"></fluid-code-block>
+
+    <script type="module">
+      document.getElementById("snippet").addEventListener("fluid-copy", (e) => {
+        console.log("user copied", e.detail.text.length, "chars");
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Snippet.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/code-block";
+
+    export function Snippet() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onCopy = (e: any) => console.log(e.detail.text);
+        el.addEventListener("fluid-copy", onCopy);
+        return () => el.removeEventListener("fluid-copy", onCopy);
+      }, []);
+      return <fluid-code-block ref={ref} code="npm i @fluid-ds/components" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Snippet.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/code-block";
+    const onCopy = (e: any) => console.log(e.detail.text);
+    </script>
+
+    <template>
+      <fluid-code-block code="npm i @fluid-ds/components" @fluid-copy="onCopy" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="snippet.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/code-block";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-snippet",
+      template: `<fluid-code-block code="npm i @fluid-ds/components" (fluid-copy)="onCopy($event)"></fluid-code-block>`
+    })
+    export class Snippet {
+      onCopy(e: any) { console.log(e.detail.text); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Snippet.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/code-block";
+      const onCopy = (e: any) => console.log(e.detail.text);
+    </script>
+
+    <fluid-code-block code="npm i @fluid-ds/components" on:fluid-copy={onCopy} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Read-only display of code, config, or any monospaced fragment the user
+  might want to copy.
+- For just the copy-on-click action without the code-block chrome, reach
+  for [`<fluid-copy-button>`](/components/copy-button/).
+
+## Theming
+
+The surface reads **component-scoped `--fluid-code-*` tokens** (the override
+ladder), pair a dark `--fluid-code-bg` with a light `--fluid-code-fg` for the
+classic editor look. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-code-bg: var(--fluid-color-neutral-900);
+  --fluid-code-fg: var(--fluid-color-neutral-100);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The surface is [`part="base"`](#api) and the copy button is `part="copy"`.
+Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. always-visible vs hover-revealed copy.
+
+## API
+
+<ComponentApi tag="fluid-code-block" />
+
+## Accessibility
+
+- The code is rendered inside a `<pre><code>` block so screen readers
+  treat it as preformatted text.
+- The copy button has an `aria-label` of "Copy code" (or "Copy
+  &lt;language&gt; code" when `language` is set), flipping to "Copied"
+  for ~1.5 s after a successful copy.
+- The copy action calls `navigator.clipboard.writeText` and fails
+  silently if the clipboard API isn't available, the button stays
+  functional and the user just gets no copy.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Copy button"
+    href="/components/copy-button/"
+    description="Just the copy affordance, without the code-block chrome."
+  />
+  <LinkCard
+    title="Icon"
+    href="/components/icon/"
+    description="The copy / check glyphs the button swaps between."
+  />
+  <LinkCard
+    title="Tag"
+    href="/components/tag/"
+    description="Label a snippet's language or status inline."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

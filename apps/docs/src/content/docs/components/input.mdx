@@ -1,0 +1,395 @@
+---
+title: "Input"
+description: "Single-line text field, form-associated, prefix/suffix slots, every input type, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-input>` is the single-line text field. It wraps a native `<input>` and
+is **form-associated** via `ElementInternals`, so it participates in `<form>`
+submission, `FormData`, and constraint validation exactly like the native
+element, while adding the Fluid field styling, prefix/suffix slots, and the
+WCAG 2.2 guarantees (focus ring, target size, validity conveyed beyond color).
+
+<Demo>
+  <fluid-input type="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/input";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  The input has no built-in label. Give it an `aria-label`, or pair it with a
+  `<label>` (see [Accessibility](#accessibility)). A dedicated field wrapper
+  that pairs label + help + error is on the roadmap.
+</Aside>
+
+## Examples
+
+### Types
+
+`type` maps straight to the native input type, `text` (default), `email`,
+`password`, `search`, `tel`, `url`, and `number`. Each gets the matching
+on-screen keyboard and native validation.
+
+<Demo>
+  <fluid-input type="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
+  <fluid-input type="password" value="hunter2" aria-label="Password"></fluid-input>
+  <fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-input type="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
+<fluid-input type="password" value="hunter2" aria-label="Password"></fluid-input>
+<fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>`} />
+
+### Sizes
+
+Three sizes scale font + height together. Each meets the AA 24×24 target floor
+(and grows to 44 under AAA, try the toggle).
+
+<Demo>
+  <fluid-input size="sm" placeholder="Small" aria-label="Small"></fluid-input>
+  <fluid-input size="md" placeholder="Medium" aria-label="Medium"></fluid-input>
+  <fluid-input size="lg" placeholder="Large" aria-label="Large"></fluid-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-input size="sm" placeholder="Small" aria-label="Small"></fluid-input>
+<fluid-input size="md" placeholder="Medium" aria-label="Medium"></fluid-input>
+<fluid-input size="lg" placeholder="Large" aria-label="Large"></fluid-input>`} />
+
+### Prefix & suffix
+
+Drop an icon, unit, or any inline adornment into the `prefix` / `suffix` slots.
+They render as flush, fused sections of the field.
+
+<Demo>
+  <fluid-input placeholder="Search…" aria-label="Search">
+    <fluid-icon slot="prefix" name="search"></fluid-icon>
+  </fluid-input>
+  <fluid-input type="number" value="100" aria-label="Amount">
+    <span slot="prefix">$</span>
+    <span slot="suffix">USD</span>
+  </fluid-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-input placeholder="Search…" aria-label="Search">
+  <fluid-icon slot="prefix" name="search"></fluid-icon>
+</fluid-input>
+
+<fluid-input type="number" value="100" aria-label="Amount">
+  <span slot="prefix">$</span>
+  <span slot="suffix">USD</span>
+</fluid-input>`} />
+
+### States
+
+`disabled`, `readonly`, and the invalid state (shown here via `required` left
+empty after blur). Invalid uses the **danger tone token**, so it stays correct
+across brands and dark mode, and validity is also conveyed via `aria-invalid`
+and the message, never by color alone.
+
+<Demo>
+  <fluid-input value="With value" aria-label="Filled"></fluid-input>
+  <fluid-input readonly value="Read-only" aria-label="Read-only"></fluid-input>
+  <fluid-input disabled value="Disabled" aria-label="Disabled"></fluid-input>
+  <fluid-input required placeholder="Required" aria-label="Required"></fluid-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-input readonly value="Read-only" aria-label="Read-only"></fluid-input>
+<fluid-input disabled value="Disabled" aria-label="Disabled"></fluid-input>
+<fluid-input required placeholder="Required" aria-label="Required"></fluid-input>`} />
+
+## Listening for input
+
+A `<fluid-input>` fires two custom events: **`fluid-input`** on every keystroke
+and **`fluid-change`** when the value is committed (on blur). Both carry the
+current value in `event.detail.value`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-input id="email" aria-label="Email"></fluid-input>
+
+    <script type="module">
+      document.getElementById("email").addEventListener("fluid-input", (e) => {
+        console.log("value:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="EmailField.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/input";
+
+    export function EmailField() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onInput = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-input", onInput);
+        return () => el.removeEventListener("fluid-input", onInput);
+      }, []);
+      return <fluid-input ref={ref} aria-label="Email" />;
+    }
+    ```
+
+    <Aside type="note">
+      `fluid-input` is a custom event, so React 18 needs `ref +
+      addEventListener` (above); React 19 supports `onfluidInput`. See the
+      [framework guide](/guides/frameworks/#react).
+    </Aside>
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="EmailField.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/input";
+    const onInput = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-input aria-label="Email" @fluid-input="onInput" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="email-field.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/input";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "email-field",
+      template: `
+        <fluid-input aria-label="Email" (fluid-input)="onInput($event)"></fluid-input>
+      `
+    })
+    export class EmailField {
+      onInput(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="EmailField.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/input";
+      function onInput(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-input aria-label="Email" on:fluid-input={onInput} />
+    ```
+  </TabItem>
+</Tabs>
+
+### `fluid-input` vs `fluid-change`
+
+- **`fluid-input`**: fires on **every keystroke**. Use it for live filtering,
+  character counts, or as-you-type validation.
+- **`fluid-change`**: fires once the value is **committed** (on blur). Use it
+  for "save when the user is done" / autosave, to avoid firing per keystroke.
+
+## Inside a form
+
+`<fluid-input>` is form-associated: its `name` + `value` are submitted with the
+enclosing form, `required` blocks submission, and native constraints
+(`type="email"`, `pattern`, `minlength`, …) participate in validation.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.5rem; align-items:center;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Submitted: ' + new FormData(this).get('email');"
+  >
+    <fluid-input name="email" type="email" placeholder="you@example.com" required aria-label="Email"></fluid-input>
+    <fluid-button type="submit">Subscribe</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-input name="email" type="email" required aria-label="Email"></fluid-input>
+  <fluid-button type="submit">Subscribe</fluid-button>
+</form>
+```
+
+See the [Forms guide](/guides/forms/) for validation, custom messages, and
+form-data wiring across frameworks.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-input-*` token that
+falls back to a main semantic variable**:
+`background: var(--fluid-input-bg, var(--fluid-surface-base))`,
+`border-color: var(--fluid-input-border, var(--fluid-border-default))`, and so
+on. That fall-back chain is the override ladder, giving three levels for free:
+
+1. **Brand**: override the main var (`--fluid-surface-base`,
+   `--fluid-border-default`, …) and every component reflows.
+2. **Component**: override the `--fluid-input-*` token and all inputs change.
+3. **Instance**: set the `--fluid-input-*` token inline or on a
+   `[data-fluid-id]` and one input changes.
+
+The **complete list** of both layers is in the [API tables below](#api): **CSS
+custom properties** is every `--fluid-input-*` knob; **Semantic tokens
+consumed** is every main var they fall back to.
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-input-bg: #fafafa;
+  --fluid-input-border-focus: #6366f1;
+}
+```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select an input and tweak these
+  tokens visually, then exports the CSS.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+For anything not tokenized, the field shell is [`part="base"`](#api) and the
+native control is `part="input"`, so you can reach either with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) and set
+**any** CSS:
+
+```css
+/* A pill-shaped search field with a custom caret color. */
+fluid-input.search::part(base) { border-radius: 999px; }
+fluid-input.search::part(input) { caret-color: #6366f1; }
+```
+
+## When to use
+
+- Anywhere you'd use a native `<input type="...">` and want consistent Fluid
+  styling, focus rings, and form participation.
+
+### When *not* to use
+
+- **Multi-line text**: use [`<fluid-textarea>`](/components/textarea/); it
+  grows vertically and shares the same field family.
+- **Numbers with stepper buttons**: use
+  [`<fluid-number-input>`](/components/number-input/).
+- **Picking from a fixed list**: use [`<fluid-select>`](/components/select/) or
+  [`<fluid-typeahead>`](/components/typeahead/).
+
+## Accessibility
+
+`<fluid-input>` wraps a real native `<input>`, so it inherits the textbox role,
+keyboard behavior, and constraint validation for free. `delegatesFocus`
+forwards `.focus()` to the inner input. The notes below are input-specific; the
+cross-component contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+Standard text-field editing, all native: caret movement, selection,
+<kbd>Home</kbd>/<kbd>End</kbd>, clipboard, etc. <kbd>Tab</kbd> moves focus in
+and out. The focus ring is shown for both keyboard and pointer focus (it marks
+the active field); its width reads `--fluid-focus-ring-width`, so AAA thickens
+it automatically.
+
+### Names
+
+- The input has **no built-in visible label**. Provide an accessible name with
+  `aria-label`, or associate a visible `<label>` via `aria-labelledby` /
+  `id` ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value),
+  [SC 3.3.2 Labels or Instructions](https://www.w3.org/WAI/WCAG22/Understanding/labels-or-instructions)).
+- A `placeholder` is **not** a label: it disappears on input. Always pair it
+  with a real name.
+
+### State semantics
+
+- **`disabled`** sets the native `disabled` (removed from tab order, not
+  submitted).
+- **`readonly`** keeps the field focusable and submitted but not editable.
+- **`required`** + the native constraints feed `ElementInternals` validity, so
+  the field participates in `:invalid` / form submission blocking.
+- The invalid state sets **`aria-invalid="true"`** and colors the border with
+  the **danger tone**, but validity is never conveyed by color alone
+  ([SC 1.4.1 Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)):
+  pair it with a visible message and `aria-describedby`.
+
+### Motion & target size
+
+- Border/shadow transitions are brief and honor `prefers-reduced-motion`.
+- The field is at least **24×24** CSS px (AA, [SC 2.5.8](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA** by default; flip the **Conformance** toggle at the top to
+**AAA** and every example resizes (and the snippets gain the
+`data-fluid-conformance="aaa"` wrapper). The input reads conformance tokens, so
+it scales with no per-component branching:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+```html
+<html data-fluid-conformance="aaa">
+  …
+  <fluid-input aria-label="44px tall, 3px focus ring" />
+</html>
+```
+
+## API
+
+<ComponentApi tag="fluid-input" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Textarea"
+    href="/components/textarea/"
+    description="Multi-line text, same field family."
+  />
+  <LinkCard
+    title="Number input"
+    href="/components/number-input/"
+    description="Numeric input with stepper buttons."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick one value from a list."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

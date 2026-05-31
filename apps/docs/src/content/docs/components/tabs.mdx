@@ -1,0 +1,303 @@
+---
+title: "Tabs"
+description: "Tabbed content using the WAI-ARIA tab pattern, manual or automatic activation, full keyboard support, themable rail."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-tabs>` is the container; `<fluid-tab>` is one trigger; `<fluid-tab-panel>`
+is the body shown when its matching tab is selected. Together they implement the
+WAI-ARIA tab pattern with full keyboard support and a themable rail.
+
+<Demo>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
+    <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
+    <fluid-tab slot="nav" panel="api">API</fluid-tab>
+    <fluid-tab-panel name="overview"><p>The overview tab is selected by default, first in document order.</p></fluid-tab-panel>
+    <fluid-tab-panel name="usage"><p>How to use this thing.</p></fluid-tab-panel>
+    <fluid-tab-panel name="api"><p>The complete API.</p></fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tabs/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/tabs"; // registers tabs + tab + tab-panel
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+The `panel` attribute on a tab points to the matching `name` on a panel. Names
+only need to be unique within one `<fluid-tabs>` instance.
+
+<Demo>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
+    <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
+    <fluid-tab slot="nav" panel="api">API</fluid-tab>
+    <fluid-tab-panel name="overview"><p>Overview content.</p></fluid-tab-panel>
+    <fluid-tab-panel name="usage"><p>Usage content.</p></fluid-tab-panel>
+    <fluid-tab-panel name="api"><p>API content.</p></fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
+
+<ConformanceCode code={`<fluid-tabs>
+  <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
+  <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
+  <fluid-tab-panel name="overview">…</fluid-tab-panel>
+  <fluid-tab-panel name="usage">…</fluid-tab-panel>
+</fluid-tabs>`} />
+
+### Disabled tab
+
+A disabled tab can't be selected by click or keyboard, but stays in the reading
+order so its label is still announced.
+
+<ConformanceCode code={`<fluid-tab slot="nav" panel="advanced" disabled>Advanced</fluid-tab>`} />
+
+### Activation mode
+
+By default, arrow-key navigation **changes the panel immediately** as focus
+moves (`activation="auto"`). For panels that are expensive to render, use
+`manual`, focus moves, but the user presses <kbd>Enter</kbd> / <kbd>Space</kbd>
+to activate.
+
+<ConformanceCode code={`<fluid-tabs activation="manual">…</fluid-tabs>`} />
+
+## Listening for changes
+
+`<fluid-tabs>` fires **`fluid-change`** with `{ value }` (the active panel name)
+in `detail` when the selection changes.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-tabs id="t">…</fluid-tabs>
+
+    <script type="module">
+      document.getElementById("t").addEventListener("fluid-change", (e) => {
+        console.log("active panel:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Panels.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/tabs";
+
+    export function Panels() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return (
+        <fluid-tabs ref={ref}>
+          <fluid-tab slot="nav" panel="a">A</fluid-tab>
+          <fluid-tab-panel name="a">…</fluid-tab-panel>
+        </fluid-tabs>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Panels.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/tabs";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-tabs @fluid-change="onChange">
+        <fluid-tab slot="nav" panel="a">A</fluid-tab>
+        <fluid-tab-panel name="a">…</fluid-tab-panel>
+      </fluid-tabs>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="panels.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/tabs";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-panels",
+      template: `
+        <fluid-tabs (fluid-change)="onChange($event)">
+          <fluid-tab slot="nav" panel="a">A</fluid-tab>
+          <fluid-tab-panel name="a">…</fluid-tab-panel>
+        </fluid-tabs>
+      `
+    })
+    export class Panels {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Panels.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/tabs";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-tabs on:fluid-change={onChange}>
+      <fluid-tab slot="nav" panel="a">A</fluid-tab>
+      <fluid-tab-panel name="a">…</fluid-tab-panel>
+    </fluid-tabs>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Switching between **related** views of the same content (cuts of a dataset,
+  sections of a settings page).
+
+### When *not* to use
+
+- **Conceptually separate pages**: use real navigation links + routing; tabs
+  aren't a router.
+- **A small set of mutually-exclusive options that set a value**: use
+  [`<fluid-segmented-control>`](/components/segmented-control/).
+
+## Theming
+
+Every styled property reads a **component-scoped token that falls back to a main
+semantic var** (the override ladder): the container exposes `--fluid-tabs-*`
+(nav border + gap) and each tab exposes `--fluid-tab-*` (fg / hover / selected /
+indicator-width / focus). The **complete list** is in the [API tables
+below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-tabs-nav-border: var(--fluid-border-default);
+  --fluid-tab-fg: var(--fluid-text-secondary);
+  --fluid-tab-selected-fg: var(--fluid-accent-base);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-tab` in the [Theme builder](/playground/) to tweak the rail,
+  selected color, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The container exposes [`part="base"`](#api), `part="nav"`, and `part="panels"`.
+Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-tabs" />
+
+### `<fluid-tab>`
+
+<ComponentApi tag="fluid-tab" />
+
+### `<fluid-tab-panel>`
+
+<ComponentApi tag="fluid-tab-panel" />
+
+## Accessibility
+
+Implements the WAI-ARIA Tabs pattern. The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move into the tab list, then into the selected panel. |
+| <kbd>←</kbd> / <kbd>→</kbd> | Move focus between tabs (wraps). |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last tab. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused tab (only in `manual` mode; `auto` activates on focus). |
+
+Only the selected tab is a tab stop (roving tabindex), so <kbd>Tab</kbd> doesn't
+walk every tab.
+
+### Names & roles
+
+- `<fluid-tabs>` is `role="tablist"`; `<fluid-tab>` is `role="tab"` with
+  `aria-selected` + `aria-controls`; `<fluid-tab-panel>` is `role="tabpanel"`
+  with `aria-labelledby` back to its tab
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### Motion & target size
+
+- The color/underline transition honors `prefers-reduced-motion`.
+- Each tab floors its height to `--fluid-target-min`: ≥ **24px** (AA) / **44px**
+  (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
+`[data-fluid-conformance="aaa"]`) lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Segmented control"
+    href="/components/segmented-control/"
+    description="One-of-few that sets a value, not a content switch."
+  />
+  <LinkCard
+    title="Accordion"
+    href="/components/accordion/"
+    description="Stacked collapsible sections instead of a tab strip."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A common container for tab-panel content."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-change across React, Vue, Angular, Svelte."
+  />
+</CardGrid>

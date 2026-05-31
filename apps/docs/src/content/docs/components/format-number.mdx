@@ -1,0 +1,151 @@
+---
+title: "Format number"
+description: "Locale-aware decimal, currency, percent, and unit formatting via Intl.NumberFormat."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-format-number>` is a thin declarative wrapper around `Intl.NumberFormat`:
+decimals, currencies, percents, and unit-bearing values with full locale
+support (thousand separators, decimal commas, currency symbols).
+
+<Demo>
+  <fluid-format-number value="1499.99" type="currency" currency="USD"></fluid-format-number>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/format-number/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/format-number";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Renders plain inline text and reads no design tokens beyond the inherited
+  text color, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Decimal
+
+<Demo>
+  <fluid-format-number value="1234567.89"></fluid-format-number><br/>
+  <fluid-format-number value="1234567.89" maximum-fraction-digits="0"></fluid-format-number>
+</Demo>
+
+```html
+<fluid-format-number value="1234567.89"></fluid-format-number>
+<!-- → "1,234,567.89" -->
+```
+
+### Currency
+
+`type="currency"` requires `currency` (ISO 4217). Pair with
+`currency-display` for code / name / symbol variants.
+
+<Demo>
+  <fluid-format-number value="1499.99" type="currency" currency="USD"></fluid-format-number><br/>
+  <fluid-format-number value="1499.99" type="currency" currency="EUR" locale="de-DE"></fluid-format-number><br/>
+  <fluid-format-number value="1499.99" type="currency" currency="JPY"></fluid-format-number>
+</Demo>
+
+```html
+<fluid-format-number value="1499.99" type="currency" currency="USD"></fluid-format-number>
+```
+
+### Percent
+
+The value is the **fraction**, not a percentage, pass `0.42` for "42%".
+
+<Demo>
+  <fluid-format-number value="0.42" type="percent"></fluid-format-number><br/>
+  <fluid-format-number value="0.4275" type="percent" maximum-fraction-digits="2"></fluid-format-number>
+</Demo>
+
+```html
+<fluid-format-number value="0.42" type="percent"></fluid-format-number>
+```
+
+### Unit
+
+<Demo>
+  <fluid-format-number value="65" type="unit" unit="mile-per-hour"></fluid-format-number><br/>
+  <fluid-format-number value="2.5" type="unit" unit="kilogram" unit-display="long"></fluid-format-number>
+</Demo>
+
+```html
+<fluid-format-number value="65" type="unit" unit="mile-per-hour"></fluid-format-number>
+```
+
+### Locale
+
+<Demo>
+  <fluid-format-number value="1234567.89" locale="fr-FR"></fluid-format-number><br/>
+  <fluid-format-number value="1234567.89" locale="de-DE"></fluid-format-number><br/>
+  <fluid-format-number value="1234567.89" locale="hi-IN"></fluid-format-number>
+</Demo>
+
+## When to use
+
+- Anywhere you'd `value.toLocaleString(...)` in JS: markup is shorter
+  and the locale propagates from page settings.
+- For byte sizes specifically, prefer
+  [`<fluid-format-bytes>`](/components/format-bytes/) so you don't have
+  to compute the unit yourself.
+
+## Theming
+
+The element is inline text, no component tokens. Style with surrounding
+CSS (`font-variant-numeric: tabular-nums` is a popular pair for tables).
+
+## API
+
+<ComponentApi tag="fluid-format-number" />
+
+## Accessibility
+
+- Output is plain text. Screen readers read it as written.
+- Currency: `currency-display="name"` produces longer, more readable
+  output ("US dollars") for contexts where the symbol is ambiguous.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Format bytes"
+    href="/components/format-bytes/"
+    description="Byte sizes with auto kB / MB / GiB units."
+  />
+  <LinkCard
+    title="Format date"
+    href="/components/format-date/"
+    description="Locale-aware absolute date / time formatting."
+  />
+  <LinkCard
+    title="Relative time"
+    href="/components/relative-time/"
+    description="Auto-updating “in 3 days” style output."
+  />
+  <LinkCard
+    title="Rating"
+    href="/components/rating/"
+    description="Show a numeric score as stars instead of digits."
+  />
+</CardGrid>

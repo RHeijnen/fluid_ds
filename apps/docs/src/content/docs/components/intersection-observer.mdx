@@ -1,0 +1,145 @@
+---
+title: "Intersection observer"
+description: "Declarative IntersectionObserver. Fires events when slotted children enter or leave the viewport."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-intersection-observer>` wraps the platform's `IntersectionObserver` so
+you can use it without imperative wiring. Drop elements inside and you'll get a
+**`fluid-intersect`** event whenever any of them crosses the viewport (or your
+configured root) at the configured thresholds, good for lazy-loading, scroll-
+spy, infinite scroll, and animate-on-enter.
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/intersection-observer/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/intersection-observer";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A behavior wrapper, it renders no UI (`display: contents`) and reads no
+  design tokens, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Reveal on scroll
+
+```html
+<fluid-intersection-observer threshold="0.25">
+  <section data-reveal>…</section>
+</fluid-intersection-observer>
+
+<script type="module">
+  document
+    .querySelector("fluid-intersection-observer")
+    .addEventListener("fluid-intersect", (e) => {
+      for (const entry of e.detail.entries) {
+        if (entry.isIntersecting) entry.target.dataset.visible = "true";
+      }
+    });
+</script>
+```
+
+### Lazy-load images
+
+```html
+<fluid-intersection-observer root-margin="200px">
+  <img data-src="/hero.jpg" alt="…">
+</fluid-intersection-observer>
+
+<script type="module">
+  document
+    .querySelector("fluid-intersection-observer")
+    .addEventListener("fluid-intersect", (e) => {
+      for (const entry of e.detail.entries) {
+        if (entry.isIntersecting) {
+          entry.target.src = entry.target.dataset.src;
+        }
+      }
+    });
+</script>
+```
+
+### Multiple thresholds
+
+Pass a comma-separated list to fire at multiple progress points.
+
+```html
+<fluid-intersection-observer threshold="0,0.25,0.5,0.75,1">…</fluid-intersection-observer>
+```
+
+### Pause observation
+
+```html
+<fluid-intersection-observer disabled>…</fluid-intersection-observer>
+```
+
+## When to use
+
+- Lazy-load images / iframes / heavy widgets.
+- Highlight the section the user is reading.
+- Infinite scroll: watch a sentinel at the bottom of the list.
+
+For "is the element being resized?" use
+[`<fluid-resize-observer>`](/components/resize-observer/). For "did
+something change in the DOM?" use
+[`<fluid-mutation-observer>`](/components/mutation-observer/).
+
+## Theming
+
+This is a behavior component, not a visual one, it has no tokens.
+
+## API
+
+<ComponentApi tag="fluid-intersection-observer" />
+
+## Accessibility
+
+- The host renders with `display: contents`, so it doesn't affect
+  layout or accessibility tree shape, its children are observed
+  directly.
+- No ARIA role of its own. Whatever you slot in keeps its semantics.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Resize observer"
+    href="/components/resize-observer/"
+    description="React to an element's own size changes."
+  />
+  <LinkCard
+    title="Mutation observer"
+    href="/components/mutation-observer/"
+    description="React to DOM attribute / child changes."
+  />
+  <LinkCard
+    title="Animation"
+    href="/components/animation/"
+    description="Pair with reveal-on-enter scroll effects."
+  />
+  <LinkCard
+    title="Skeleton"
+    href="/components/skeleton/"
+    description="Placeholders for lazy-loaded content."
+  />
+</CardGrid>

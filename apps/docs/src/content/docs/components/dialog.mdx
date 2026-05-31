@@ -1,0 +1,295 @@
+---
+title: "Dialog"
+description: "Modal dialog built on the native <dialog> element. Focus trap, Escape-to-close, backdrop click, and slot-based header/footer."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-dialog>` wraps the native `<dialog>` element, so the browser handles the
+focus trap, backdrop, and top-layer rendering for free. You get a styled,
+themable shell on top: label / body / footer slots, an optional built-in close
+button, and a backdrop click that dismisses by default.
+
+<Demo>
+  <fluid-button onclick="document.querySelector('#hero-dialog').show()">Open dialog</fluid-button>
+  <fluid-dialog id="hero-dialog">
+    <span slot="label">Confirm delete</span>
+    <p>This permanently deletes the item, there's no undo.</p>
+    <div slot="footer">
+      <fluid-button variant="ghost" onclick="document.querySelector('#hero-dialog').hide()">Cancel</fluid-button>
+      <fluid-button onclick="document.querySelector('#hero-dialog').hide()">Delete</fluid-button>
+    </div>
+  </fluid-dialog>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dialog/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/dialog";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-button
+    id="demo-dialog-trigger"
+    onclick="document.querySelector('#demo-dialog').show()"
+  >
+    Open dialog
+  </fluid-button>
+  <fluid-dialog id="demo-dialog">
+    <span slot="label">Confirm delete</span>
+    <p>This will permanently delete the item. There's no undo.</p>
+    <div slot="footer">
+      <fluid-button variant="ghost" onclick="document.querySelector('#demo-dialog').hide()">Cancel</fluid-button>
+      <fluid-button onclick="document.querySelector('#demo-dialog').hide()">Delete</fluid-button>
+    </div>
+  </fluid-dialog>
+</Demo>
+
+```html
+<fluid-button id="open">Open</fluid-button>
+<fluid-dialog id="confirm-delete">
+  <span slot="label">Confirm delete</span>
+  <p>This will permanently delete the item. There's no undo.</p>
+  <div slot="footer">
+    <fluid-button variant="ghost">Cancel</fluid-button>
+    <fluid-button>Delete</fluid-button>
+  </div>
+</fluid-dialog>
+
+<script type="module">
+  const open = document.querySelector("#open");
+  const dlg = document.querySelector("#confirm-delete");
+  open.addEventListener("click", () => dlg.show());
+</script>
+```
+
+### Sizes
+
+Five preset sizes, `sm`, `md` (default), `lg`, `xl`, and `fullscreen`.
+
+```html
+<fluid-dialog size="sm">…</fluid-dialog>
+<fluid-dialog size="fullscreen">…</fluid-dialog>
+```
+
+### Programmatic control
+
+The dialog exposes `show()` and `hide()` methods plus a `fluid-show`
+and `fluid-hide` event pair you can listen for.
+
+```ts
+const dialog = document.querySelector("fluid-dialog");
+dialog.show();
+
+dialog.addEventListener("fluid-hide", () => {
+  console.log("user dismissed");
+});
+```
+
+### Disabling backdrop dismiss
+
+By default a click on the backdrop closes the dialog. Set
+`no-light-dismiss` to require a button click instead, useful for
+unsaved-changes warnings.
+
+```html
+<fluid-dialog no-light-dismiss>…</fluid-dialog>
+```
+
+## When to use
+
+- A blocking interaction the user must respond to before continuing
+  (confirm delete, sign in, complete a form).
+- Anything that fits on one screen and needs the full attention of the
+  user.
+
+Reach for [`<fluid-drawer>`](/components/drawer/) instead when the
+content is a side-anchored panel (settings, filters, nav). Reach for
+[`<fluid-popover>`](/components/popover/) when the content is
+contextual and shouldn't block.
+
+## Listening for changes
+
+`<fluid-dialog>` fires **`fluid-show`** when it opens and **`fluid-hide`** when
+it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-dialog id="d">…</fluid-dialog>
+
+    <script type="module">
+      const d = document.getElementById("d");
+      d.addEventListener("fluid-hide", () => console.log("closed"));
+      d.show();
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Confirm.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/dialog";
+
+    export function Confirm() {
+      const ref = useRef<HTMLElement & { show(): void }>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onHide = () => console.log("closed");
+        el.addEventListener("fluid-hide", onHide);
+        return () => el.removeEventListener("fluid-hide", onHide);
+      }, []);
+      return <fluid-dialog ref={ref}><span slot="label">Hi</span>…</fluid-dialog>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Confirm.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/dialog";
+    </script>
+
+    <template>
+      <fluid-dialog @fluid-hide="() => {}"><span slot="label">Hi</span>…</fluid-dialog>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="confirm.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/dialog";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-confirm",
+      template: `<fluid-dialog (fluid-hide)="onHide()"><span slot="label">Hi</span>…</fluid-dialog>`
+    })
+    export class Confirm {
+      onHide() {}
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Confirm.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/dialog";
+    </script>
+
+    <fluid-dialog on:fluid-hide={() => {}}><span slot="label">Hi</span>…</fluid-dialog>
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-dialog-*` token that
+falls back to a main semantic var** (the override ladder), including the
+backdrop (`--fluid-dialog-backdrop`), radius, and separators. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-dialog-bg: var(--fluid-surface-base);
+  --fluid-dialog-radius: 12px;
+  --fluid-dialog-backdrop: rgb(0 0 0 / 0.5);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The native element is [`part="base"`](#api); inside are `part="panel"`,
+`part="header"`, `part="body"`, `part="footer"`, and `part="close"`. Reach them
+with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
+CSS not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-dialog" />
+
+## Accessibility
+
+The dialog is built on the native `<dialog>` element, so it inherits the
+platform's modal semantics. The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Focus & keyboard
+
+- `showModal()` provides the **focus trap**: focus moves into the dialog on
+  `show()` and is **restored** to the previously focused element on `hide()`
+  ([SC 2.4.3](https://www.w3.org/WAI/WCAG22/Understanding/focus-order)).
+- <kbd>Escape</kbd> closes the dialog (handled natively).
+- The dialog renders in the **top layer**, so it's never clipped by ancestor
+  `overflow`/`transform`.
+
+### Names & roles
+
+- The native `<dialog>` exposes `role="dialog"` + `aria-modal="true"`.
+- The `label` slot is the accessible name; with no label, set `aria-label` on
+  the host ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- The built-in close button is labeled "Close dialog".
+
+### Motion & target size
+
+- The panel/backdrop entrance animations honor `prefers-reduced-motion`.
+- The close button floors its hit area to `--fluid-target-min`: ≥ **24×24**
+  (AA) / **44×44** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Drawer"
+    href="/components/drawer/"
+    description="Edge-anchored modal panel for nav / filters."
+  />
+  <LinkCard
+    title="Popover"
+    href="/components/popover/"
+    description="Non-modal, dismissible panel anchored to a trigger."
+  />
+  <LinkCard
+    title="Toast"
+    href="/components/toast/"
+    description="Transient confirmation that needs no acknowledgement."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring show()/hide() + fluid-show/hide across frameworks."
+  />
+</CardGrid>

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(corepack --version)",
+      "Bash(pnpm --version)",
+      "Bash(corepack pnpm *)"
+    ]
+  }
+}

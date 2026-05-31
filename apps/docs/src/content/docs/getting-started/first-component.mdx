@@ -1,0 +1,174 @@
+---
+title: "First component"
+description: "Paste a single HTML file, render a real Fluid button, wire a click handler, theme it with one CSS variable."
+---
+
+import Demo from "../../../components/Demo.astro";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+This page walks you through your first working Fluid component end to
+end, render it, listen for events, and theme it, using only HTML, JS,
+and CSS. No framework, no build step.
+
+If you're using a bundler or a framework, the same tags work, see
+[bundlers](/getting-started/installation/#bundlers) and
+[framework integrations](/guides/frameworks/) once you're done here.
+
+## 1. Render a button
+
+Save this as `index.html` and open it in a browser. That's it, there is
+no other step.
+
+```html title="index.html"
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>My first Fluid button</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+  </head>
+  <body>
+    <fluid-button id="save">Save changes</fluid-button>
+  </body>
+</html>
+```
+
+You should see:
+
+<Demo>
+  <fluid-button>Save changes</fluid-button>
+</Demo>
+
+Once `define/button.js` has executed, the `<fluid-button>` tag is a real,
+registered HTML element. Inspect the page and you'll see a normal node in
+the DOM, no shadow magic, no proxy, just a custom element.
+
+## 2. Listen for a click
+
+Custom elements fire normal `click` events, exactly like a native
+`<button>`. Fluid also fires a typed `fluid-click` event so analytics
+code can stay component-aware without sniffing the inner element.
+
+<Tabs syncKey="impl">
+  <TabItem label="HTML + JS (CDN)">
+    ```html title="<script> at the bottom of index.html"
+    <script type="module">
+      const btn = document.querySelector("#save");
+
+      btn.addEventListener("click", () => {
+        console.log("native click");
+      });
+
+      btn.addEventListener("fluid-click", (e) => {
+        console.log("typed fluid-click", e.detail);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React 19">
+    ```tsx
+    <fluid-button id="save" onClick={() => console.log("clicked")}>
+      Save changes
+    </fluid-button>
+    ```
+
+    React 19 supports custom elements and custom events natively. For
+    `fluid-click`, use a `ref` + `addEventListener` instead, React's
+    `on*` prop names only synthesise standard DOM event names.
+  </TabItem>
+  <TabItem label="Vue 3">
+    ```html
+    <fluid-button @fluid-click="onClick">Save changes</fluid-button>
+    ```
+
+    Add `compilerOptions.isCustomElement: tag => tag.startsWith('fluid-')`
+    to your Vue config so the compiler treats unknown tags as elements,
+    not components.
+  </TabItem>
+  <TabItem label="Angular">
+    ```html
+    <fluid-button (click)="onClick($event)">Save changes</fluid-button>
+    ```
+
+    Add `CUSTOM_ELEMENTS_SCHEMA` to your module's `schemas` array.
+  </TabItem>
+</Tabs>
+
+## 3. Theme it with one CSS variable
+
+Every Fluid component reads from a small set of semantic CSS variables
+(`--fluid-color-primary`, `--fluid-surface-base`, etc.). Override one in
+a single rule and every consumer adapts.
+
+Add this to the `<head>`:
+
+```html title="<style> block"
+<style>
+  [data-fluid-brand="custom"] {
+    --fluid-color-primary: #db2777;
+  }
+</style>
+```
+
+Wrap your button (or any ancestor) with the matching attribute:
+
+```html
+<body data-fluid-brand="custom">
+  <fluid-button>Save changes</fluid-button>
+</body>
+```
+
+<Demo title="Default brand">
+  <fluid-button>Default</fluid-button>
+</Demo>
+
+<Demo title="With --fluid-color-primary: #db2777">
+  <div data-fluid-brand="custom" style="--fluid-color-primary: #db2777; display: contents;">
+    <fluid-button>Custom</fluid-button>
+  </div>
+</Demo>
+
+The same pattern works for every other semantic token (surface, text,
+border, focus ring). Browse [Theming](/theming/basics/) for the full
+three-layer model.
+
+## 4. Add another component
+
+Adding the next component is the same shape: one more `<script>` tag (or
+one more `define` import), and you can use the element.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js"></script>
+
+<fluid-input placeholder="Search…" aria-label="Search">
+  <fluid-icon slot="prefix" name="search"></fluid-icon>
+</fluid-input>
+```
+
+<Demo>
+  <fluid-input placeholder="Search…" aria-label="Search">
+    <fluid-icon slot="prefix" name="search"></fluid-icon>
+  </fluid-input>
+</Demo>
+
+<Aside type="tip" title="Too many script tags?">
+  Once your import list grows, switch to an
+  [import map](/getting-started/installation/#import-maps), same CDN,
+  cleaner bare imports.
+</Aside>
+
+## Where to next?
+
+- [CDN reference](/getting-started/cdn/): URL patterns, version pinning,
+  the full file layout per package.
+- [Theming basics](/theming/basics/): brand, component, per-element
+  layers.
+- [Framework integrations](/guides/frameworks/): the gotchas for React,
+  Vue, Angular, Svelte, SolidJS.
+- [Button reference](/components/button/): every variant, prop, slot,
+  CSS part, and custom property, auto-generated from the source.

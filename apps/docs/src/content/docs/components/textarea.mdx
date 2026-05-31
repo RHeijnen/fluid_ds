@@ -1,0 +1,320 @@
+---
+title: "Textarea"
+description: "Multi-line text input, auto-resize, character counter, form-associated, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-textarea>` is the multi-line companion to
+[`<fluid-input>`](/components/input/), same field shell and focus behavior,
+plus an auto-resize mode that grows the box to fit its content and an inline
+character counter when `maxlength` is set. It's **form-associated** (submits +
+validates like a native `<textarea>`).
+
+<Demo>
+  <fluid-textarea placeholder="Tell us more…" rows="4" aria-label="Notes" style="width:100%;"></fluid-textarea>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/textarea/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/textarea";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-textarea placeholder="Tell us more…" rows="4" aria-label="Notes" style="width:100%;"></fluid-textarea>
+</Demo>
+
+<ConformanceCode code={`<fluid-textarea name="notes" rows="4" placeholder="Tell us more…"></fluid-textarea>`} />
+
+### Auto-resize
+
+`resize="auto"` grows the textarea to fit its content as the user types, good
+for chat composers and comment fields.
+
+<Demo>
+  <fluid-textarea resize="auto" placeholder="Type to grow…" aria-label="Auto" style="width:100%;"></fluid-textarea>
+</Demo>
+
+<ConformanceCode code={`<fluid-textarea resize="auto" placeholder="Type to grow…"></fluid-textarea>`} />
+
+### Character counter
+
+Set `maxlength` and the counter appears automatically. It shifts to the
+**warning** tone near the limit and the **danger** tone at/over it (both
+theme-independent tokens).
+
+<Demo>
+  <fluid-textarea maxlength="140" value="The counter tracks how close you are to the limit." aria-label="Bio" style="width:100%;"></fluid-textarea>
+</Demo>
+
+<ConformanceCode code={`<fluid-textarea name="bio" maxlength="140"></fluid-textarea>`} />
+
+### Disabled & read-only
+
+<Demo>
+  <fluid-textarea disabled value="Disabled" aria-label="Disabled" style="width:100%;"></fluid-textarea>
+  <fluid-textarea readonly value="Read-only content" aria-label="Read-only" style="width:100%; margin-top: var(--fluid-space-3);"></fluid-textarea>
+</Demo>
+
+<ConformanceCode code={`<fluid-textarea disabled value="Disabled"></fluid-textarea>
+<fluid-textarea readonly value="Read-only content"></fluid-textarea>`} />
+
+## Listening for input
+
+Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
+(blur); both carry `event.detail.value`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-textarea id="msg" aria-label="Message"></fluid-textarea>
+
+    <script type="module">
+      document.getElementById("msg").addEventListener("fluid-input", (e) => {
+        console.log("value:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="MessageField.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/textarea";
+
+    export function MessageField() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onInput = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-input", onInput);
+        return () => el.removeEventListener("fluid-input", onInput);
+      }, []);
+      return <fluid-textarea ref={ref} aria-label="Message" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="MessageField.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/textarea";
+    const onInput = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-textarea aria-label="Message" @fluid-input="onInput" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="message-field.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/textarea";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "message-field",
+      template: `
+        <fluid-textarea aria-label="Message" (fluid-input)="onInput($event)"></fluid-textarea>
+      `
+    })
+    export class MessageField {
+      onInput(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="MessageField.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/textarea";
+      function onInput(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-textarea aria-label="Message" on:fluid-input={onInput} />
+    ```
+  </TabItem>
+</Tabs>
+
+### `fluid-input` vs `fluid-change`
+
+- **`fluid-input`**: every keystroke. Use it to drive the live character
+  count or as-you-type validation.
+- **`fluid-change`**: once committed (blur). Use it to autosave a draft.
+
+## Inside a form
+
+Form-associated: `name` + `value` submit with the form, and native constraints
+(`required`, `minlength`, `maxlength`) participate in validation.
+
+<Demo>
+  <form
+    style="display:flex; flex-direction:column; gap:0.5rem; max-width: 28rem;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Sent ' + (new FormData(this).get('message')||'').length + ' chars';"
+  >
+    <fluid-textarea name="message" required minlength="10" rows="4" placeholder="At least 10 characters" aria-label="Message"></fluid-textarea>
+    <div>
+      <fluid-button type="submit">Send</fluid-button>
+      <output style="font-size:0.875rem; color: var(--fluid-text-secondary); margin-left: 0.5rem;"></output>
+    </div>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-textarea name="message" required minlength="10" rows="6"></fluid-textarea>
+  <fluid-button type="submit">Send</fluid-button>
+</form>
+```
+
+See the [Forms guide](/guides/forms/) for validation + submission patterns.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-textarea-*` token
+that falls back to a main semantic var** (the override ladder), including the
+counter's warning/danger tones. The three layers (brand → component → instance)
+work like [`<fluid-input>`](/components/input/#theming). The **complete list**
+is in the [API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-textarea-bg: #fafafa;
+  --fluid-textarea-border-focus: #6366f1;
+}
+```
+
+<Aside type="tip">
+  Select a textarea in the [Theme builder](/playground/) to tweak these tokens
+  visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The shell is [`part="base"`](#api), the field is `part="textarea"`, and the
+counter is `part="counter"`. Reach any of them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token:
+
+```css
+fluid-textarea::part(textarea) { min-height: 8rem; }
+fluid-textarea::part(counter) { font-style: italic; }
+```
+
+## When to use
+
+- Multi-line free-form text: comments, messages, descriptions, bios.
+
+### When *not* to use
+
+- **Single-line text**: use [`<fluid-input>`](/components/input/).
+- **Code editing**: this is a textarea, not a Monaco/CodeMirror replacement;
+  use a real editor.
+
+## Accessibility
+
+Wraps a native `<textarea>`, so it inherits the textbox role, multi-line
+editing, and constraint validation. The notes below are textarea-specific; the
+cross-component contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+Native multi-line editing, caret movement, selection, <kbd>Enter</kbd> inserts
+a newline. <kbd>Tab</kbd> moves focus out (it does not insert a tab). The focus
+ring reads `--fluid-focus-ring-width`.
+
+### Names
+
+Provide an accessible name with `aria-label` or a paired `<label>`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). A
+`placeholder` is not a label.
+
+### State semantics
+
+- `disabled` / `readonly` behave like the native textarea.
+- The invalid state sets **`aria-invalid="true"`** and the danger-tone border:
+  never by color alone
+  ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)); pair
+  with a message + `aria-describedby`.
+- The character **counter is visual only**: it isn't announced. The native
+  `maxlength` already blocks typing past the limit; if the count itself must be
+  announced, add an `aria-live` region in your own markup.
+
+### Motion & target size
+
+- Transitions honor `prefers-reduced-motion`.
+- A textarea is inherently tall (multi-line), so it always exceeds the AA
+  **and** AAA target-size minimums, the AAA delta that applies here is the
+  thicker focus ring.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
+The focus ring reads the conformance token:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| `--fluid-target-min` | 24px | 44px | 2.5.8 → 2.5.5 (already satisfied, the field is multi-line) |
+
+## API
+
+<ComponentApi tag="fluid-textarea" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="The single-line field this shares its shell with."
+  />
+  <LinkCard
+    title="Number input"
+    href="/components/number-input/"
+    description="Numeric field with stepper buttons."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

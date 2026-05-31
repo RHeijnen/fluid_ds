@@ -1,0 +1,154 @@
+---
+title: "Format bytes"
+description: "Localized byte-size formatter, kB/MB/GB or KiB/MiB/GiB, short or long display."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-format-bytes>` formats a byte count as a human-readable, locale-aware
+string (comma vs. dot decimal, unit names). Choose binary (`1024`-based: KiB,
+MiB) or decimal (`1000`-based: KB, MB), and short / long / narrow display. Built
+on `Intl.NumberFormat` with `style: "unit"`, no extra dependencies.
+
+<Demo>
+  <fluid-format-bytes value="1500000"></fluid-format-bytes>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/format-bytes/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/format-bytes";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Formatters render plain inline text and read no design tokens beyond the
+  inherited text color, so they need no `@fluid-ds/tokens` stylesheet.
+</Aside>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-format-bytes value="1500"></fluid-format-bytes><br/>
+  <fluid-format-bytes value="1500000"></fluid-format-bytes><br/>
+  <fluid-format-bytes value="1500000000"></fluid-format-bytes>
+</Demo>
+
+```html
+<fluid-format-bytes value="1500"></fluid-format-bytes>          <!-- 1.5 kB -->
+<fluid-format-bytes value="1500000"></fluid-format-bytes>       <!-- 1.5 MB -->
+<fluid-format-bytes value="1500000000"></fluid-format-bytes>    <!-- 1.5 GB -->
+```
+
+### Binary base
+
+Use `base="binary"` for IEC units (KiB, MiB).
+
+<Demo>
+  <fluid-format-bytes value="1024" base="binary"></fluid-format-bytes><br/>
+  <fluid-format-bytes value="1048576" base="binary"></fluid-format-bytes>
+</Demo>
+
+```html
+<fluid-format-bytes value="1048576" base="binary"></fluid-format-bytes>
+```
+
+### Long-form display
+
+<Demo>
+  <fluid-format-bytes value="1500000" display="long"></fluid-format-bytes>
+</Demo>
+
+```html
+<fluid-format-bytes value="1500000" display="long"></fluid-format-bytes>
+<!-- → "1.5 megabytes" -->
+```
+
+### Bits
+
+`unit="bit"` outputs bits instead of bytes (Mbps, Gbps for network
+speeds).
+
+<Demo>
+  <fluid-format-bytes value="125000000" unit="bit"></fluid-format-bytes>
+</Demo>
+
+### Locale
+
+<Demo>
+  <fluid-format-bytes value="1500000" locale="fr-FR"></fluid-format-bytes>
+</Demo>
+
+```html
+<fluid-format-bytes value="1500000" locale="fr-FR"></fluid-format-bytes>
+<!-- → "1,5 Mo" -->
+```
+
+## When to use
+
+- File sizes, upload progress, storage limits, bandwidth.
+- For plain numeric output, reach for
+  [`<fluid-format-number>`](/components/format-number/).
+- For "5 minutes ago", use
+  [`<fluid-relative-time>`](/components/relative-time/).
+
+## Theming
+
+```css
+[data-fluid-brand="custom"] {
+  --fluid-format-bytes-color: var(--fluid-text-primary);
+}
+```
+
+## API
+
+<ComponentApi tag="fluid-format-bytes" />
+
+## Accessibility
+
+- The element renders inline plain text: no special ARIA needed.
+- The unit suffix (kB, MiB, kilobytes) is announced like any other text,
+  so screen-reader users hear the same string sighted users read.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Format number"
+    href="/components/format-number/"
+    description="Locale-aware numbers, currency, and percentages."
+  />
+  <LinkCard
+    title="Format date"
+    href="/components/format-date/"
+    description="Locale-aware absolute date / time formatting."
+  />
+  <LinkCard
+    title="Relative time"
+    href="/components/relative-time/"
+    description="Auto-updating “5 minutes ago” style output."
+  />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="Pair with byte sizes for upload/download progress."
+  />
+</CardGrid>

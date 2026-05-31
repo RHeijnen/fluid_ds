@@ -1,0 +1,170 @@
+---
+title: "Scroller"
+description: "Scroll container with edge-fade indicators that signal more content."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-scroller>` is a scrollable container that adds fade-out shadow
+indicators at the edges where more content exists. Useful for
+horizontal tab strips, wide tables, vertical lists, anywhere you want
+to hint "scroll for more" without baking arrows into the design.
+
+<Demo>
+  <fluid-scroller style="max-width: 28rem;">
+    <div style="display: inline-flex; gap: var(--fluid-space-3); padding: var(--fluid-space-3);">
+      <fluid-tag>One</fluid-tag>
+      <fluid-tag>Two</fluid-tag>
+      <fluid-tag>Three</fluid-tag>
+      <fluid-tag>Four</fluid-tag>
+      <fluid-tag>Five</fluid-tag>
+      <fluid-tag>Six</fluid-tag>
+      <fluid-tag>Seven</fluid-tag>
+      <fluid-tag>Eight</fluid-tag>
+      <fluid-tag>Nine</fluid-tag>
+    </div>
+  </fluid-scroller>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/scroller/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/scroller";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Horizontal
+
+<Demo>
+  <fluid-scroller style="max-width: 28rem;">
+    <div style="display: inline-flex; gap: var(--fluid-space-3); padding: var(--fluid-space-3);">
+      <fluid-tag>One</fluid-tag>
+      <fluid-tag>Two</fluid-tag>
+      <fluid-tag>Three</fluid-tag>
+      <fluid-tag>Four</fluid-tag>
+      <fluid-tag>Five</fluid-tag>
+      <fluid-tag>Six</fluid-tag>
+      <fluid-tag>Seven</fluid-tag>
+      <fluid-tag>Eight</fluid-tag>
+      <fluid-tag>Nine</fluid-tag>
+    </div>
+  </fluid-scroller>
+</Demo>
+
+```html
+<fluid-scroller>
+  <div style="display: inline-flex; gap: 12px;">
+    <fluid-tag>One</fluid-tag>
+    <fluid-tag>Two</fluid-tag>
+    …
+  </div>
+</fluid-scroller>
+```
+
+### Vertical
+
+<Demo>
+  <fluid-scroller orientation="vertical" style="height: 12rem; width: 100%;">
+    <div style="padding: var(--fluid-space-3);">
+      <p>Line one</p><p>Line two</p><p>Line three</p>
+      <p>Line four</p><p>Line five</p><p>Line six</p>
+      <p>Line seven</p><p>Line eight</p><p>Line nine</p>
+    </div>
+  </fluid-scroller>
+</Demo>
+
+### No visible scrollbar
+
+```html
+<fluid-scroller no-scrollbar>…</fluid-scroller>
+```
+
+## When to use
+
+- A horizontal strip of tags, tabs, or filters that doesn't fit on
+  narrow viewports.
+- A vertical list where the user might miss that more is below.
+
+For an auto-rotating slideshow, reach for
+[`<fluid-carousel>`](/components/carousel/) instead, it provides
+navigation buttons and snap behavior.
+
+## Theming
+
+The fade overlays read **component-scoped `--fluid-scroller-*` tokens** (the
+override ladder): set `--fluid-scroller-fade-color` to match the surface the
+scroller sits on so the fade blends seamlessly. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-scroller-fade-color: var(--fluid-surface-base);
+  --fluid-scroller-fade-size: 1.5rem;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The scroll container is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. a custom scroll-snap behavior.
+
+## API
+
+<ComponentApi tag="fluid-scroller" />
+
+## Accessibility
+
+- The container is a plain `<div>` with `overflow: auto`: it's
+  keyboard-scrollable (<kbd>↑</kbd>/<kbd>↓</kbd> for vertical,
+  <kbd>←</kbd>/<kbd>→</kbd> for horizontal) when focused.
+- The fade overlays are `pointer-events: none` and have no semantics:
+  they're purely visual.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Carousel"
+    href="/components/carousel/"
+    description="An auto-rotating slideshow with nav buttons and snap."
+  />
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="When a horizontal strip is really a set of tab panels."
+  />
+  <LinkCard
+    title="Split panel"
+    href="/components/split-panel/"
+    description="Two resizable panes, each of which can scroll."
+  />
+  <LinkCard
+    title="Stack"
+    href="/components/stack/"
+    description="Lay out the children before handing them to the scroller."
+  />
+</CardGrid>

@@ -1,0 +1,280 @@
+---
+title: "Segmented control"
+description: "Pill-style single-select picker for a small set of related options. WAI-ARIA radiogroup."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-segmented-control>` is the iOS-style pill toggle, a row of
+mutually-exclusive options inside a tinted track, with a "selected" chip that
+moves between segments. Use it for a small set of related options (Day / Week /
+Month, List / Grid, Light / Dark) you want all visible at once. Each segment is
+a `<fluid-segment>`; the container implements the WAI-ARIA radiogroup pattern.
+
+<Demo>
+  <fluid-segmented-control value="week" aria-label="Date range">
+    <fluid-segment value="day">Day</fluid-segment>
+    <fluid-segment value="week">Week</fluid-segment>
+    <fluid-segment value="month">Month</fluid-segment>
+  </fluid-segmented-control>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/segmented-control/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/segmented-control"; // registers segmented-control + segment
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-segmented-control value="week" aria-label="Date range">
+    <fluid-segment value="day">Day</fluid-segment>
+    <fluid-segment value="week">Week</fluid-segment>
+    <fluid-segment value="month">Month</fluid-segment>
+  </fluid-segmented-control>
+</Demo>
+
+```html
+<fluid-segmented-control value="week" aria-label="Date range">
+  <fluid-segment value="day">Day</fluid-segment>
+  <fluid-segment value="week">Week</fluid-segment>
+  <fluid-segment value="month">Month</fluid-segment>
+</fluid-segmented-control>
+```
+
+### Disabled segment
+
+<Demo>
+  <fluid-segmented-control value="list" aria-label="View">
+    <fluid-segment value="list">List</fluid-segment>
+    <fluid-segment value="grid">Grid</fluid-segment>
+    <fluid-segment value="kanban" disabled>Kanban</fluid-segment>
+  </fluid-segmented-control>
+</Demo>
+
+### Listening for change
+
+```ts
+const seg = document.querySelector("fluid-segmented-control");
+seg.addEventListener("fluid-change", (e) => {
+  console.log("now showing:", e.detail.value);
+});
+```
+
+## When to use
+
+- 2–5 related views or modes.
+- The whole set fits comfortably across the available width.
+
+If you have more options, or if the labels are long, use
+[`<fluid-select>`](/components/select/) (form-associated, denser) or
+[`<fluid-tabs>`](/components/tabs/) (for switching between content
+panels). For a fused row of independent actions, use
+[`<fluid-button-group>`](/components/button-group/).
+
+## Listening for changes
+
+`<fluid-segmented-control>` fires **`fluid-change`** with `{ value }` in `detail`
+when the selection changes.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-segmented-control id="range" aria-label="Range">…</fluid-segmented-control>
+
+    <script type="module">
+      document.getElementById("range").addEventListener("fluid-change", (e) => {
+        console.log("now:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="RangePicker.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/segmented-control";
+
+    export function RangePicker() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return (
+        <fluid-segmented-control ref={ref} aria-label="Range">
+          <fluid-segment value="day">Day</fluid-segment>
+          <fluid-segment value="week">Week</fluid-segment>
+        </fluid-segmented-control>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="RangePicker.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/segmented-control";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-segmented-control aria-label="Range" @fluid-change="onChange">
+        <fluid-segment value="day">Day</fluid-segment>
+        <fluid-segment value="week">Week</fluid-segment>
+      </fluid-segmented-control>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="range-picker.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/segmented-control";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "range-picker",
+      template: `
+        <fluid-segmented-control aria-label="Range" (fluid-change)="onChange($event)">
+          <fluid-segment value="day">Day</fluid-segment>
+          <fluid-segment value="week">Week</fluid-segment>
+        </fluid-segmented-control>
+      `
+    })
+    export class RangePicker {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="RangePicker.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/segmented-control";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-segmented-control aria-label="Range" on:fluid-change={onChange}>
+      <fluid-segment value="day">Day</fluid-segment>
+      <fluid-segment value="week">Week</fluid-segment>
+    </fluid-segmented-control>
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped token that falls back to a main
+semantic var** (the override ladder): the track exposes `--fluid-segmented-*`
+and each segment exposes `--fluid-segment-*`. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-segmented-bg: var(--fluid-surface-muted);
+  --fluid-segment-selected-bg: var(--fluid-surface-base);
+  --fluid-segment-selected-fg: var(--fluid-text-primary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container exposes [`part="base"`](#api) (the track). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-segmented-control" />
+
+### `<fluid-segment>`
+
+<ComponentApi tag="fluid-segment" />
+
+## Accessibility
+
+Implements the WAI-ARIA Radio Group pattern. The cross-component contract is in
+the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> (or <kbd>↑</kbd> / <kbd>↓</kbd>) | Move selection (disabled segments skipped). |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last segment. |
+
+### Names & roles
+
+The container is `role="radiogroup"`; each segment is `role="radio"` with
+`aria-checked`. Always set `aria-label` so screen readers know what's being
+chosen ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### Motion & target size
+
+- The selection transition honors `prefers-reduced-motion`.
+- Each segment floors its height to `--fluid-target-min`: ≥ **24px** (AA) /
+  **44px** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="Switch content panels rather than set a value."
+  />
+  <LinkCard
+    title="Radio group"
+    href="/components/radio/"
+    description="One-of-many when options need full labels / descriptions."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick from a longer list via a dropdown."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-change across frameworks."
+  />
+</CardGrid>

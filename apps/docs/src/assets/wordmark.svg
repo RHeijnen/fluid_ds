@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116 32" aria-label="Fluid">
+  <defs>
+    <linearGradient id="fluidMark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+    <clipPath id="fluidMarkClip"><rect x="2" y="2" width="28" height="28" rx="7" /></clipPath>
+  </defs>
+  <g clip-path="url(#fluidMarkClip)">
+    <rect x="2" y="2" width="28" height="28" fill="url(#fluidMark)" />
+    <g transform="translate(2 2) scale(0.29167)" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round">
+      <path d="M-6,40 C12,30 26,50 44,40 S72,30 102,40" opacity="0.95" />
+      <path d="M-6,58 C12,48 26,68 44,58 S72,48 102,58" opacity="0.65" />
+      <path d="M-6,76 C12,66 26,86 44,76 S72,66 102,76" opacity="0.35" />
+    </g>
+  </g>
+  <text x="40" y="23" font-family="ui-sans-serif, system-ui" font-size="21" font-weight="700" fill="currentColor">Fluid</text>
+</svg>

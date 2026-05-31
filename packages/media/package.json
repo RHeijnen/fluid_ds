@@ -1,0 +1,74 @@
+{
+  "name": "@fluid-ds/media",
+  "version": "0.0.1-alpha.0",
+  "description": "Media web components for Fluid (expansion pack): video, video playlist, animated image with play/pause, zoomable frame, Web Animations API wrapper.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/media"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "media",
+    "video",
+    "animation",
+    "web-components",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./define/*": {
+        "types": "./dist/components/*/define.d.ts",
+        "import": "./dist/components/*/define.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./define/*": {
+      "types": "./src/components/*/define.ts",
+      "import": "./src/components/*/define.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/define.js",
+    "**/define.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

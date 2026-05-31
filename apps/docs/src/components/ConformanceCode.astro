@@ -1,0 +1,81 @@
+---
+/**
+ * Conformance-aware code block for a component example.
+ *
+ * Renders the example markup TWICE, once as-is (AA, the default) and once
+ * wrapped in `data-fluid-conformance="aaa"` (the attribute that actually makes
+ * the component AAA). CSS shows only the block matching the page's current
+ * `<html data-fluid-conformance>` state, which the ConformanceToggle flips. So
+ * when a reader switches the toggle to AAA, the copyable code switches too:
+ * pasting it reproduces what the live `<Demo>` above is showing, instead of a
+ * snippet that's silently still AA.
+ *
+ * Pairs with `<Demo>` (the live example) and `<ConformanceToggle>` (the
+ * switch). Use it in place of a plain ```html fence inside an example.
+ *
+ * Uses Astro's built-in (Shiki) `<Code>`, NOT Starlight's Expressive-Code
+ * one, which is disabled site-wide. We pass the same dual-theme config and the
+ * `fluidCodeBlockTransformer` as the markdown pipeline, so these blocks render
+ * inside `<fluid-code-block>` and follow light/dark just like fenced code.
+ */
+import { Code } from "astro:components";
+import type { ComponentProps } from "astro/types";
+import { fluidCodeBlockTransformer } from "../lib/fluid-code-shiki.mjs";
+
+type CodeProps = ComponentProps<typeof Code>;
+type CodeLang = CodeProps["lang"];
+
+// `as const` narrows the values to their literal theme names so they satisfy
+// Shiki's theme-name union (a plain string is too wide for <Code themes>).
+const shikiThemes = { light: "github-light", dark: "github-dark" } as const;
+
+interface Props {
+  /** The example markup, exactly as it should appear in the AA snippet. */
+  code: string;
+  /** Language for highlighting. Defaults to html. */
+  lang?: CodeLang;
+}
+
+const { code, lang = "html" } = Astro.props;
+const trimmed = code.replace(/^\n+/, "").replace(/\s+$/, "");
+const indented = trimmed
+  .split("\n")
+  .map((line) => (line.length ? "  " + line : line))
+  .join("\n");
+const aaaCode =
+  "<!-- AAA: set data-fluid-conformance once on an ancestor (here, or on <html>). -->\n" +
+  '<div data-fluid-conformance="aaa">\n' +
+  indented +
+  "\n</div>";
+---
+
+<div class="cc cc--aa">
+  <Code
+    code={trimmed}
+    lang={lang}
+    themes={shikiThemes}
+    defaultColor="light"
+    transformers={[fluidCodeBlockTransformer()]}
+  />
+</div>
+<div class="cc cc--aaa">
+  <Code
+    code={aaaCode}
+    lang={lang}
+    themes={shikiThemes}
+    defaultColor="light"
+    transformers={[fluidCodeBlockTransformer()]}
+  />
+</div>
+
+<style>
+  /* Show only the block matching the page's conformance state. Default
+     (attribute absent) is AA. The ConformanceToggle flips the attribute on
+     <html>, so these swap live with no per-block script. */
+  :global(html:not([data-fluid-conformance="aaa"])) .cc--aaa {
+    display: none;
+  }
+  :global(html[data-fluid-conformance="aaa"]) .cc--aa {
+    display: none;
+  }
+</style>

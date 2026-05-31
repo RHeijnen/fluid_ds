@@ -1,0 +1,298 @@
+---
+title: "Animations"
+description: "Two layers of motion, built-in component transitions (tokens, swappable, opt-out) and the @fluid-ds/animations attribute system for arbitrary elements."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Fluid has **two layers of motion**:
+
+1. **Component motion (built in).** Overlays and disclosure components: dialog,
+   drawer, toast, popover, tooltip, accordion, animate their own enter/exit, and
+   tabs / segmented-control slide their active indicator. You don't wire anything;
+   it's part of the component. Every bit of it is **token-driven, swappable, and
+   opt-out-able** (below).
+2. **Element motion (`@fluid-ds/animations`).** An opt-in package to animate *any*
+   element declaratively via `data-fluid-animation`, reveal-on-scroll, attention
+   pulses, etc. (covered further down). For one-off imperative motion, the core
+   [`<fluid-animation>`](/components/animation/) element wraps the Web Animations API.
+
+---
+
+## Component motion: tokens, swapping, opt-out
+
+The motion baked into components is governed by the same override ladder as
+color and shape. Two things are tokenized: **timing** and **which animation runs**.
+
+**Shared motion tokens** (`@fluid-ds/tokens`, theme-independent):
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--fluid-duration-fast` / `-normal` / `-slow` / `-slower` | 120 / 200 / 320 / 480 ms | timing steps |
+| `--fluid-easing-standard` | `cubic-bezier(0.2,0,0,1)` | general |
+| `--fluid-easing-decelerate` | `cubic-bezier(0,0,0,1)` | enter (things appearing) |
+| `--fluid-easing-accelerate` | `cubic-bezier(0.3,0,1,1)` | exit (things leaving) |
+| `--fluid-easing-emphasized` | `cubic-bezier(0.05,0.7,0.1,1)` | expressive enter (large panels) |
+
+**Swap which animation a component uses.** The animation *name* is itself a token,
+so point it at any of the shipped presets (`fluid-fade-in/out`, `fluid-scale-in/out`,
+`fluid-slide-in-{up,down,left,right}` + `-out`):
+
+```css title="brand.css"
+/* Make dialogs slide up instead of scaling in */
+[data-fluid-brand="custom"] fluid-dialog {
+  --fluid-dialog-enter-animation: fluid-slide-in-up;
+}
+/* …or per instance */
+<fluid-drawer style="--fluid-drawer-enter-easing: var(--fluid-easing-standard)">
+```
+
+**Turn motion down, or off, at any scope.** A single inherited scalar
+`--fluid-motion` multiplies every component animation/transition duration
+(custom properties pierce shadow DOM, so it works on `:root`, a subtree, or one
+element):
+
+```css
+:root { --fluid-motion: 0; }          /* off everywhere */
+.calm-section { --fluid-motion: 0.5; } /* half-speed in one region */
+```
+
+Or disable a single component's animation by name: `--fluid-dialog-enter-animation: none`.
+
+**Reduced motion is automatic.** Every animating component honors
+`prefers-reduced-motion: reduce` (animations collapse to a near-instant tick),
+and auto-playing motion like carousel autoplay simply doesn't start. You never
+have to gate component motion yourself.
+
+Each component's exact `--fluid-<name>-enter-*` tokens are listed in its API
+table (e.g. [Dialog](/components/dialog/#api), [Tabs](/components/tabs/#api)).
+
+---
+
+## Element motion: `@fluid-ds/animations`
+
+`@fluid-ds/animations` is an opt-in package that adds a small set of
+named animations you apply to any element through a `data-fluid-animation`
+attribute. A single global controller, a MutationObserver + an
+IntersectionObserver, watches the page for the attribute and runs the
+matching animation through the Web Animations API.
+
+Animations are **per-instance**, not theme-level. The theme builder doesn't
+edit them, you pick the animation for the specific element that needs to
+move, then paste the attribute(s) onto the matching element in your app.
+
+## Setup
+
+```html
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/define/controller.js"
+></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/register-defaults.js"
+></script>
+
+<fluid-card
+  data-fluid-animation="fade-in"
+  data-fluid-animation-trigger="in-view"
+>
+  Fades in when scrolled into view.
+</fluid-card>
+```
+
+Or via your bundler:
+
+```bash
+pnpm add @fluid-ds/animations
+```
+
+```ts
+import "@fluid-ds/animations/define/controller"; // boots the global controller
+import "@fluid-ds/animations/register-defaults"; // 12 default animations
+```
+
+If you only want a couple of the defaults, skip `register-defaults` and
+import the individual modules, they're tree-shakable.
+
+```ts
+import "@fluid-ds/animations/define/controller";
+import "@fluid-ds/animations/animations/fade-in";
+import "@fluid-ds/animations/animations/slide-up";
+```
+
+## Attributes
+
+| Attribute                            | Purpose                                              | Default     |
+| ------------------------------------ | ---------------------------------------------------- | ----------- |
+| `data-fluid-animation`               | Animation name from the registry                     | required    |
+| `data-fluid-animation-trigger`       | `mount` / `in-view` / `hover` / `click` / `manual`   | `mount`     |
+| `data-fluid-animation-duration`      | Milliseconds                                         | per-anim    |
+| `data-fluid-animation-delay`         | Milliseconds                                         | `0`         |
+| `data-fluid-animation-easing`        | Any CSS easing function                              | per-anim    |
+| `data-fluid-animation-iterations`    | Integer or `infinite`                                | per-anim    |
+
+Triggers in detail:
+
+- **`mount`**: plays as soon as the element is added to the document.
+- **`in-view`**: plays once when the element first intersects the
+  viewport. Uses a shared `IntersectionObserver` with a 15% threshold.
+- **`hover`**: plays on `pointerenter`.
+- **`click`**: plays on `click`.
+- **`manual`**: never plays automatically. Call
+  `playElementAnimation(el)` to trigger it.
+
+## The default animations
+
+The `register-defaults` entry registers thirteen animations:
+
+| Category   | Names                                                                |
+| ---------- | -------------------------------------------------------------------- |
+| Reveals    | `fade-in`, `fade-out`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale-in`, `zoom-in` |
+| Attention  | `pulse`, `shake`, `bounce`, `flash`                                  |
+| Loaders    | `spin`                                                               |
+
+Live demos for each animation live in **[Storybook → Animations][sb]**.
+
+[sb]: https://your-deploy-host/storybook/?path=/story/animations-overview--catalog
+
+## Per-component examples
+
+These are attribute-only, there's nothing component-specific to wire.
+
+```html
+<!-- Cards that fade in as they scroll into view (e.g. feature grid). -->
+<fluid-card
+  data-fluid-animation="slide-up"
+  data-fluid-animation-trigger="in-view"
+  data-fluid-animation-delay="0"
+>…</fluid-card>
+<fluid-card
+  data-fluid-animation="slide-up"
+  data-fluid-animation-trigger="in-view"
+  data-fluid-animation-delay="120"
+>…</fluid-card>
+<fluid-card
+  data-fluid-animation="slide-up"
+  data-fluid-animation-trigger="in-view"
+  data-fluid-animation-delay="240"
+>…</fluid-card>
+
+<!-- A subtle pulse on a CTA, looping. -->
+<fluid-button
+  data-fluid-animation="pulse"
+  data-fluid-animation-trigger="mount"
+  data-fluid-animation-iterations="infinite"
+>Sign up free</fluid-button>
+
+<!-- Shake an input on a failed submission attempt. -->
+<fluid-input
+  id="email"
+  data-fluid-animation="shake"
+  data-fluid-animation-trigger="manual"
+></fluid-input>
+```
+
+The `manual` trigger leaves play timing up to your code:
+
+```ts
+import { playElementAnimation } from "@fluid-ds/animations";
+
+const email = document.getElementById("email")!;
+if (!email.checkValidity()) playElementAnimation(email);
+```
+
+## Custom animations
+
+Register your own to use the same attribute API:
+
+```ts
+import { registerAnimation } from "@fluid-ds/animations";
+
+registerAnimation("blur-in", {
+  keyframes: [
+    { opacity: 0, filter: "blur(8px)" },
+    { opacity: 1, filter: "blur(0)" }
+  ],
+  defaults: { duration: 600, easing: "ease-out", fill: "forwards" }
+});
+```
+
+After registration, `data-fluid-animation="blur-in"` Just Works on any
+element.
+
+## Reduced motion
+
+<Aside type="tip">
+The controller respects `prefers-reduced-motion: reduce`. Animations
+collapse to a 0&nbsp;ms tick that lands on the final frame, users get
+the static end state, never the motion.
+</Aside>
+
+You don't have to gate the attributes yourself or wrap them in a media
+query. The decision is made when the animation runs, so the same markup
+works for everyone.
+
+## Imperative API
+
+For cases where attributes aren't enough, wiring an animation to a
+form-validation result, replaying on a router event, building a custom
+trigger, `@fluid-ds/animations` exposes a tiny imperative surface:
+
+```ts
+import {
+  registerAnimation,
+  getAnimation,
+  hasAnimation,
+  listAnimations,
+  playElementAnimation,
+  stopElementAnimation,
+  startAnimationController
+} from "@fluid-ds/animations";
+```
+
+- `registerAnimation(name, def)`: add or replace a named animation
+- `getAnimation(name)`: read the registered def
+- `hasAnimation(name)` / `listAnimations()`: introspection
+- `playElementAnimation(el)` / `stopElementAnimation(el)`: run / cancel
+  on demand (also works with `trigger="manual"`)
+- `startAnimationController(root?)`: boot the global controller
+  manually (importing `@fluid-ds/animations/define/controller` does this
+  for you)
+
+## When *not* to use this
+
+- For component-internal motion (the focus ring on a button, the slide
+  on a tabs indicator), that's part of the component and lives in its
+  shadow DOM.
+- For complex stagger orchestration: the Web Animations API handles
+  this via promises (`animation.finished`), but if you're scripting a
+  cinematic sequence, a dedicated tool like Motion or GSAP will be more
+  ergonomic.
+- For scroll-linked animations: `data-fluid-animation` is event-driven,
+  not progress-driven. Use the CSS `animation-timeline: scroll()`
+  property directly for that.
+
+## Theming consideration
+
+Durations and easings *could* be wired through the
+`--fluid-duration-*` and `--fluid-easing-*` semantic tokens, they're
+defined in `@fluid-ds/tokens`. Today the default animations use
+hand-picked values per animation; a future revision may expose
+`data-fluid-animation-duration="var(--fluid-duration-medium)"`-style
+references. If you want consistency across your animations now, use the
+JS API and read from `getComputedStyle()`:
+
+```ts
+import { registerAnimation } from "@fluid-ds/animations";
+
+const tokens = getComputedStyle(document.documentElement);
+registerAnimation("fade-in-themed", {
+  keyframes: [{ opacity: 0 }, { opacity: 1 }],
+  defaults: {
+    duration: parseFloat(tokens.getPropertyValue("--fluid-duration-medium")) || 500,
+    easing: tokens.getPropertyValue("--fluid-easing-standard").trim() || "ease",
+    fill: "forwards"
+  }
+});
+```

@@ -1,0 +1,197 @@
+---
+title: "Avatar"
+description: "Identity image with image / initials / icon fallback chain plus an optional badge."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-avatar>` is the identity glyph, a profile photo, a set of initials,
+or a generic icon, whichever is available. The fallback chain runs in that
+order: try the image, fall back to initials, fall back to whatever's in the
+`icon` slot. A second `badge` slot anchors a status dot or count to the
+bottom-right corner.
+
+<Demo>
+  <fluid-avatar image="https://i.pravatar.cc/80?img=1" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar label="Grace Hopper"></fluid-avatar>
+  <fluid-avatar>
+    <fluid-icon slot="icon" name="user"></fluid-icon>
+  </fluid-avatar>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/avatar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/avatar";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Image
+
+<Demo>
+  <fluid-avatar image="https://i.pravatar.cc/80?img=1" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar image="https://i.pravatar.cc/80?img=2" label="Grace Hopper"></fluid-avatar>
+  <fluid-avatar image="https://i.pravatar.cc/80?img=3" label="Alan Turing"></fluid-avatar>
+</Demo>
+
+```html
+<fluid-avatar image="/u/ada.jpg" label="Ada Lovelace"></fluid-avatar>
+```
+
+### Initials fallback
+
+Pass `label` (full name) and the avatar derives two-letter initials
+automatically. Or pass `initials` directly.
+
+<Demo>
+  <fluid-avatar label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar label="Grace Hopper"></fluid-avatar>
+  <fluid-avatar initials="AL"></fluid-avatar>
+</Demo>
+
+```html
+<fluid-avatar label="Ada Lovelace"></fluid-avatar>
+<fluid-avatar initials="AL"></fluid-avatar>
+```
+
+### Icon fallback
+
+Provide a `<fluid-icon>` (or any element) in the `icon` slot for the
+generic-user case, no image, no initials.
+
+<Demo>
+  <fluid-avatar>
+    <fluid-icon slot="icon" name="user"></fluid-icon>
+  </fluid-avatar>
+</Demo>
+
+```html
+<fluid-avatar>
+  <fluid-icon slot="icon" name="user"></fluid-icon>
+</fluid-avatar>
+```
+
+### Sizes & shapes
+
+Five sizes (`xs`, `sm`, `md`, `lg`, `xl`) and three shapes (`circle`,
+`square`, `rounded`).
+
+<Demo>
+  <fluid-avatar size="xs" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar size="sm" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar size="md" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar size="lg" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar size="xl" label="Ada Lovelace"></fluid-avatar>
+</Demo>
+
+<Demo>
+  <fluid-avatar shape="circle" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar shape="rounded" label="Ada Lovelace"></fluid-avatar>
+  <fluid-avatar shape="square" label="Ada Lovelace"></fluid-avatar>
+</Demo>
+
+### Badge slot
+
+Drop a [`<fluid-badge>`](/components/badge/) (or anything small) into the
+`badge` slot for a status dot, online indicator, or notification count.
+
+<Demo>
+  <fluid-avatar image="https://i.pravatar.cc/80?img=1" label="Ada Lovelace">
+    <fluid-badge slot="badge" variant="success" dot></fluid-badge>
+  </fluid-avatar>
+  <fluid-avatar label="Grace Hopper">
+    <fluid-badge slot="badge" variant="danger">3</fluid-badge>
+  </fluid-avatar>
+</Demo>
+
+## When to use
+
+- The user's identity (signed-in user, team members, comment authors).
+- Anywhere a "who" is part of the row: assignees, mentions, sharing
+  lists.
+
+If you need a plain status indicator without a user attached, reach for
+[`<fluid-badge>`](/components/badge/) directly.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-avatar-*` token that
+falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-avatar-bg: var(--fluid-surface-muted);
+  --fluid-avatar-fg: var(--fluid-text-primary);
+  --fluid-avatar-border: var(--fluid-border-default);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The avatar exposes [`part="base"`](#api) plus `part="image"` and
+`part="initials"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. a ring around the image.
+
+## API
+
+<ComponentApi tag="fluid-avatar" />
+
+## Accessibility
+
+- The host carries `role="img"` with an `aria-label` derived from `label`
+  (falling back to the initials if no label).
+- The `<img>` itself has `alt=""` because the host already provides the
+  accessible name, this prevents screen readers from announcing the
+  image twice.
+- Set `label` whenever you can. Without it, the accessible name is just
+  the initials, which isn't very helpful on its own.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Badge"
+    href="/components/badge/"
+    description="The status dot / count that anchors to the avatar's badge slot."
+  />
+  <LinkCard
+    title="Icon"
+    href="/components/icon/"
+    description="The generic-user fallback that fills the icon slot."
+  />
+  <LinkCard
+    title="Tag"
+    href="/components/tag/"
+    description="Chips for the names that often sit beside an avatar."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="Decorative vs labelled image semantics."
+  />
+</CardGrid>

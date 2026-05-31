@@ -1,0 +1,244 @@
+---
+title: "Split panel"
+description: "Two-pane resizable split with a draggable divider. Horizontal or vertical."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-split-panel>` lays out two slotted panels (`start` and `end`)
+with a draggable divider between them. The divider responds to pointer
+drag, touch drag, and arrow keys when focused. Position is a percentage
+from the start edge, so it scales as the parent resizes.
+
+<Demo>
+  <fluid-split-panel position="40" style="height: 12rem; width: 100%;">
+    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;">Left pane</div>
+    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">Right pane</div>
+  </fluid-split-panel>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/split-panel/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/split-panel";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Horizontal split
+
+<Demo>
+  <fluid-split-panel position="40" style="height: 12rem; width: 100%;">
+    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;">Left pane</div>
+    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">Right pane</div>
+  </fluid-split-panel>
+</Demo>
+
+```html
+<fluid-split-panel position="40">
+  <div slot="start">Left pane</div>
+  <div slot="end">Right pane</div>
+</fluid-split-panel>
+```
+
+### Vertical split
+
+<Demo>
+  <fluid-split-panel orientation="vertical" position="50" style="height: 14rem; width: 100%;">
+    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);">Top pane</div>
+    <div slot="end" style="padding: var(--fluid-space-3);">Bottom pane</div>
+  </fluid-split-panel>
+</Demo>
+
+```html
+<fluid-split-panel orientation="vertical">
+  <div slot="start">Top pane</div>
+  <div slot="end">Bottom pane</div>
+</fluid-split-panel>
+```
+
+## Listening for resize
+
+The divider fires **`fluid-reposition`** whenever the split changes (drag or
+keyboard), with the new percentage on `event.detail.position`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-split-panel id="split">
+      <div slot="start">A</div>
+      <div slot="end">B</div>
+    </fluid-split-panel>
+
+    <script type="module">
+      document.getElementById("split").addEventListener("fluid-reposition", (e) => {
+        console.log("divider at", e.detail.position, "%");
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Editor.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/split-panel";
+
+    export function Editor() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onMove = (e: any) => console.log(e.detail.position);
+        el.addEventListener("fluid-reposition", onMove);
+        return () => el.removeEventListener("fluid-reposition", onMove);
+      }, []);
+      return (
+        <fluid-split-panel ref={ref}>
+          <div slot="start">A</div>
+          <div slot="end">B</div>
+        </fluid-split-panel>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Editor.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/split-panel";
+    const onMove = (e: any) => console.log(e.detail.position);
+    </script>
+
+    <template>
+      <fluid-split-panel @fluid-reposition="onMove">
+        <div slot="start">A</div>
+        <div slot="end">B</div>
+      </fluid-split-panel>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="editor.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/split-panel";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-editor",
+      template: `
+        <fluid-split-panel (fluid-reposition)="onMove($event)">
+          <div slot="start">A</div>
+          <div slot="end">B</div>
+        </fluid-split-panel>
+      `
+    })
+    export class Editor {
+      onMove(e: any) { console.log(e.detail.position); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Editor.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/split-panel";
+      const onMove = (e: any) => console.log(e.detail.position);
+    </script>
+
+    <fluid-split-panel on:fluid-reposition={onMove}>
+      <div slot="start">A</div>
+      <div slot="end">B</div>
+    </fluid-split-panel>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Editor layouts (file tree + editor; preview + source).
+- Master-detail layouts where the user wants to resize the columns.
+- For app-level shells (header, nav, main, aside, footer), use
+  [`<fluid-page>`](/components/page/), it covers the same layout
+  shapes without resizing.
+
+## Theming
+
+The divider reads **component-scoped `--fluid-split-*` tokens that fall back to
+main semantic vars** (the override ladder); its active/focus colors come off
+the accent track. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-split-divider-size: 4px;
+  --fluid-split-divider-color: var(--fluid-border-default);
+  --fluid-split-divider-active-color: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The split exposes [`part="base"`](#api) plus `part="panel"` and
+`part="divider"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. a grip texture on the divider.
+
+## API
+
+<ComponentApi tag="fluid-split-panel" />
+
+## Accessibility
+
+- The divider carries `role="separator"` with `aria-orientation`
+  matching the split, `aria-valuemin="0"`, `aria-valuemax="100"`, and
+  `aria-valuenow` reflecting the current position.
+- Keyboard, when the divider is focused:
+  - <kbd>←</kbd>/<kbd>→</kbd> (horizontal) or <kbd>↑</kbd>/<kbd>↓</kbd>
+    (vertical) move 1%.
+  - <kbd>Shift</kbd>+arrow moves 10%.
+  - <kbd>Home</kbd>/<kbd>End</kbd> snap to 0% / 100%.
+- The divider has a visible focus ring; the panels themselves are
+  ordinary regions you should label appropriately.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Page"
+    href="/components/page/"
+    description="The full app shell, header, nav, main, aside, footer."
+  />
+  <LinkCard
+    title="Scroller"
+    href="/components/scroller/"
+    description="Add edge-fade scroll hints inside a resizable pane."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A self-contained surface to drop into either pane."
+  />
+  <LinkCard
+    title="Grid"
+    href="/components/grid/"
+    description="Multi-column layout when panes don't need to resize."
+  />
+</CardGrid>

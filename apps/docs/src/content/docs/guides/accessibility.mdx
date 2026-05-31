@@ -1,0 +1,209 @@
+---
+title: "Accessibility model"
+description: "How Fluid components handle ARIA, keyboard, focus management, and motion preferences, and how to test that they actually do."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Accessibility isn't a coat of paint applied at the end, it's baked into
+the components. This page explains the **a11y model** Fluid follows
+so you know what to expect when you reach for a tag, and how to verify
+your own pages stay clean.
+
+## The contract
+
+Every Fluid component ships with:
+
+1. **The right ARIA pattern.** Buttons are `role="button"`. Tabs follow
+   the [WAI-ARIA Authoring Practices][apg] tab pattern. Dropdowns are
+   `role="menu"`. Tooltips are `role="tooltip"`. Disclosure widgets fire
+   `aria-expanded`. None of this is opt-in, registering the component
+   activates it.
+2. **Full keyboard support** for the relevant pattern. Arrow keys
+   navigate within composite widgets, <kbd>Escape</kbd> closes
+   popovers + dialogs, <kbd>Tab</kbd> moves between widgets, focus
+   never disappears.
+3. **Focus management.** Opening a dialog moves focus in and traps it;
+   closing returns focus to the trigger. Tabs move focus with arrow
+   keys but don't trap.
+4. **Reduced-motion compliance.** Anything that animates checks
+   `prefers-reduced-motion: reduce` and falls back to opacity / no
+   transition.
+5. **An automated audit.** Every component has a unit test that runs
+   [`@open-wc/testing`](https://open-wc.org)'s
+   [`expect(...).to.be.accessible()`][owc-a11y] assertion, wrapping
+   axe, against its default + a few key states. 254 tests today, all
+   passing in Chromium + WebKit.
+
+What this means in practice: you don't need to add `role="button"`,
+`aria-haspopup`, or arrow-key handlers to a Fluid component. They're
+already there. You **do** still own the **accessible name** in most
+cases, see below.
+
+## Your job (the bits we can't do for you)
+
+These are the parts of a11y that depend on **what you put inside** the
+component, not on the component itself.
+
+### Accessible names
+
+If a component contains its own visible label (e.g. `<fluid-button>Save</fluid-button>`),
+the slot content **is** the accessible name. No extra attribute needed.
+
+If a component is icon-only or wraps something opaque (e.g. a media
+player), set `aria-label` on the host:
+
+```html
+<fluid-button aria-label="Close panel">
+  <fluid-icon name="x"></fluid-icon>
+</fluid-button>
+
+<fluid-icon name="search" aria-label="Search"></fluid-icon>
+```
+
+For form controls that pair with a label outside the host:
+
+```html
+<label id="email-label">Email</label>
+<fluid-input aria-labelledby="email-label" type="email"></fluid-input>
+```
+
+### Heading levels
+
+Slots like `<h3 slot="header">` inside a `<fluid-card>` are **your
+content**. Pick the heading level (`h2`/`h3`/`h4`) that matches your
+page's outline. The card doesn't impose one.
+
+### Form validity messages
+
+Form controls forward native validity, `required`, `pattern`, etc. all
+work and the browser provides the messaging. If you want
+language-localised or custom-styled error messages, call
+`setCustomValidity()` and render the message yourself.
+
+## Keyboard cheat sheet
+
+The full keyboard map for every interactive component is on its API
+page. Quick reference for the most-asked patterns:
+
+| Component | Open / Activate | Navigate | Close |
+| --- | --- | --- | --- |
+| [Button](/components/button/) | <kbd>Space</kbd> / <kbd>Enter</kbd> |, |, |
+| [Tabs](/components/tabs/) | <kbd>Enter</kbd> (manual mode) | <kbd>←</kbd> <kbd>→</kbd>, <kbd>Home</kbd>/<kbd>End</kbd> |, |
+| [Dropdown](/components/dropdown/) | <kbd>Enter</kbd> | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead | <kbd>Esc</kbd>, <kbd>Tab</kbd> |
+| [Dialog](/components/dialog/) | (call `show()`) | <kbd>Tab</kbd> (trapped) | <kbd>Esc</kbd> |
+| [Drawer](/components/drawer/) | (call `show()`) | <kbd>Tab</kbd> (trapped) | <kbd>Esc</kbd> |
+| [Tree](/components/tree/) | <kbd>Enter</kbd> | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> |, |
+| [Select](/components/select/) | <kbd>Space</kbd> | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead | <kbd>Esc</kbd> |
+
+## Focus rings
+
+The components use `:focus-visible` exclusively, so:
+
+- **Mouse / touch users** don't see the ring on most interactions.
+- **Keyboard users** see a clear high-contrast ring.
+
+The ring color is themable via `--fluid-focus-ring-color`. Don't strip
+it, replace it with something that meets contrast against your brand.
+
+## Motion + animation
+
+Two micro-rules every component respects:
+
+1. **Animations < 200 ms.** Any longer and it gets in the way.
+2. **Honor `prefers-reduced-motion: reduce`.** Transitions become
+   instant; carousels stop auto-playing; toasts cross-fade instead of
+   sliding.
+
+If you add custom animations on top of Fluid components, wrap them
+in the same media query:
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  .custom-bouncy { animation: bounce 400ms ease; }
+}
+```
+
+## Color contrast + dark mode
+
+The default tokens hit WCAG AA contrast (4.5:1 for normal text,
+3:1 for large text) for both light and dark schemes. If you override
+`--fluid-color-primary` to a brand color, **re-check contrast** against
+`--fluid-accent-text` (the on-accent text).
+
+The theme builder shows live contrast scores per token; the
+[contrast checker](https://webaim.org/resources/contrastchecker/) at
+WebAIM is the canonical alternative.
+
+<Aside type="caution" title="Brand swap pitfall">
+  When you swap the brand color, the **only** thing that changes is
+  `--fluid-color-primary`. The semantic `--fluid-accent-text` defaults
+  to white. If your new primary is pale (yellow, light blue), white
+  text on it fails contrast. Override `--fluid-accent-text` too:
+
+  ```css
+  [data-fluid-brand="custom"] {
+    --fluid-color-primary: #fbbf24;
+    --fluid-accent-text: #1f2937;  /* dark text on yellow */
+  }
+  ```
+</Aside>
+
+## Testing
+
+### Static (the cheap layer)
+
+Use [axe DevTools][axe] (browser extension) on every page you ship.
+It catches the broad strokes, missing labels, contrast, landmark
+structure, in under a second.
+
+### Component-level (already done for you)
+
+Fluid itself runs `@open-wc/testing`'s a11y audit per component as
+part of `pnpm verify`. If you fork or extend a component, do the same:
+
+```ts
+import { expect, fixture, html } from "@open-wc/testing";
+import "@fluid-ds/components/define/button";
+
+it("is accessible", async () => {
+  const el = await fixture(html`<fluid-button>Save</fluid-button>`);
+  await expect(el).to.be.accessible();
+});
+```
+
+### Manual (irreplaceable)
+
+Once a quarter, navigate each major page with **only** the keyboard.
+Tab through it, activate things, dismiss things. If you get lost,
+trapped, or focus disappears, the page has a bug. No automated tool
+catches "the focus order is illogical."
+
+For screen readers:
+
+- **macOS / iOS**: VoiceOver. <kbd>Cmd</kbd>+<kbd>F5</kbd> toggles.
+- **Windows**: NVDA (free). <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>N</kbd>.
+- **Linux**: Orca. <kbd>Super</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd>.
+
+You don't need to be fluent, just hit the major routes once, listen
+for "unlabeled button" or "image", and fix what comes up.
+
+## What we don't ship
+
+Some components could go further; we don't yet:
+
+- **No language localisation** for built-in strings ("Close", "Loading",
+  "Required"). Set the relevant `*-label` attribute or override with a
+  translated slot.
+- **No high-contrast-mode tuning** beyond what the browser does by
+  default. If you need WCAG AAA contrast (7:1), audit and override the
+  semantic tokens.
+- **No automated focus-trap testing** beyond "does it trap": the order
+  of focusable elements is on you.
+
+If you hit a real a11y bug, please open an issue with a minimal repro.
+We treat a11y bugs the same as crashes, they block a release.
+
+[apg]: https://www.w3.org/WAI/ARIA/apg/
+[owc-a11y]: https://open-wc.org/docs/testing/testing-package/#a11y
+[axe]: https://www.deque.com/axe/devtools/

@@ -1,0 +1,29 @@
+{
+  "name": "@fluid-ds/demos",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "pnpm --filter @fluid-ds/tokens build",
+    "dev": "vite",
+    "dev:open": "vite --open",
+    "prebuild": "pnpm --filter @fluid-ds/tokens build && pnpm --filter @fluid-ds/components build",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/charts": "workspace:*",
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/markdown": "workspace:*",
+    "@fluid-ds/themes": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  }
+}

@@ -1,0 +1,180 @@
+---
+title: "Page"
+description: "App-shell layout, a CSS-grid with named slots for banner, header, nav, main, aside, footer."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-page>` is the outermost layout, a CSS-grid app shell that
+covers the common regions: banner, header, subheader, navigation, main,
+aside, footer. Leave a slot empty and its row or column collapses, so
+you can use the same component for "header + main + nav" and for
+"banner + header + everything" without reaching for media queries.
+
+On narrow viewports it falls back to a single-column stack.
+
+<Demo>
+  <fluid-page style="width: 100%; height: 13rem; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow: hidden;">
+    <header slot="header" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle); font-weight: 600;">My app</header>
+    <nav slot="navigation" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);">Nav</nav>
+    <main style="padding: var(--fluid-space-3);">Main content area.</main>
+    <aside slot="aside" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);">Aside</aside>
+    <footer slot="footer" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);">© 2026</footer>
+  </fluid-page>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/page/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/page";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic shell
+
+```html
+<fluid-page>
+  <header slot="header">My app</header>
+  <nav slot="navigation">…</nav>
+  <main>Main content</main>
+  <aside slot="aside">Side panel</aside>
+  <footer slot="footer">© 2026</footer>
+</fluid-page>
+```
+
+### Just header + main
+
+Skip the slots you don't need, their grid space collapses to zero.
+
+```html
+<fluid-page>
+  <header slot="header">My app</header>
+  <main>Content fills the whole width.</main>
+</fluid-page>
+```
+
+### Banner row
+
+The banner sits above everything, use it for system-wide announcements
+or maintenance notices.
+
+```html
+<fluid-page>
+  <fluid-callout slot="banner" variant="warning">
+    Scheduled downtime tonight at 02:00 UTC.
+  </fluid-callout>
+  <header slot="header">…</header>
+  <main>…</main>
+</fluid-page>
+```
+
+### Subheader
+
+A second header row for breadcrumbs, page titles, or tabs that change
+per route.
+
+```html
+<fluid-page>
+  <header slot="header">App chrome</header>
+  <div slot="subheader">
+    <fluid-breadcrumb>…</fluid-breadcrumb>
+  </div>
+  <main>…</main>
+</fluid-page>
+```
+
+## When to use
+
+- As the **outermost wrapper** on app-style pages. One per route.
+- For content-driven sites, a plain HTML structure may be a better fit
+, this is opinionated and aimed at app shells.
+
+For a self-contained card with header / body / footer, use
+[`<fluid-card>`](/components/card/). For the entire content area split
+into two resizable panes, use
+[`<fluid-split-panel>`](/components/split-panel/).
+
+## Theming
+
+Every layout measurement reads a **component-scoped `--fluid-page-*` token that
+falls back to a sensible default** (the override ladder), so you can retune the
+shell's track sizes per brand without forking the component. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-page-nav-width: 14rem;
+  --fluid-page-aside-width: 18rem;
+  --fluid-page-header-height: 3.5rem;
+  --fluid-page-bg: var(--fluid-surface-base);
+  --fluid-page-fg: var(--fluid-text-primary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The grid itself is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. a custom `grid-template` at a breakpoint.
+
+## API
+
+<ComponentApi tag="fluid-page" />
+
+## Accessibility
+
+- The host is a plain grid: no implicit landmarks. Add proper
+  landmark elements (`<header>`, `<nav>`, `<main>`, `<aside>`,
+  `<footer>`) inside the slots so screen readers can navigate by
+  region.
+- The collapse-when-empty logic uses `data-has-nav` and `data-has-aside`
+  attributes that the host sets automatically, your CSS can hook off
+  them too.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Split panel"
+    href="/components/split-panel/"
+    description="Split the main area into two resizable panes."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A self-contained surface with its own header/body/footer."
+  />
+  <LinkCard
+    title="Stack"
+    href="/components/stack/"
+    description="One-dimensional flow layout for the content inside a region."
+  />
+  <LinkCard
+    title="Grid"
+    href="/components/grid/"
+    description="Responsive multi-column layout within main."
+  />
+</CardGrid>

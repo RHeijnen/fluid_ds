@@ -1,0 +1,318 @@
+---
+title: "Number input"
+description: "Numeric field with stepper buttons, min/max/step, form participation, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-number-input>` is the numeric variant of
+[`<fluid-input>`](/components/input/), the same field shell plus dedicated
+increment/decrement buttons. It enforces `min` / `max` / `step`, formats the
+value with `tabular-nums`, is **form-associated** (submits + validates like a
+native `<input type="number">`), and meets the WCAG 2.2 guarantees (focus ring,
+target size, validity conveyed beyond color).
+
+<Demo>
+  <fluid-number-input value="42" aria-label="Quantity" style="max-width: 12rem;"></fluid-number-input>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/number-input/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/number-input";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+The stepper buttons increment / decrement by `step`; the field also accepts
+typed input and native <kbd>↑</kbd>/<kbd>↓</kbd>.
+
+<Demo>
+  <fluid-number-input value="42" aria-label="Quantity" style="max-width: 12rem;"></fluid-number-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-number-input name="qty" value="42"></fluid-number-input>`} />
+
+### Min, max, step
+
+`min` / `max` clamp the value (and disable the matching stepper at the bound);
+`step` sets the increment.
+
+<Demo>
+  <fluid-number-input value="50" min="0" max="100" step="5" aria-label="Percent" style="max-width: 12rem;"></fluid-number-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-number-input name="percent" value="50" min="0" max="100" step="5"></fluid-number-input>`} />
+
+### Without stepper buttons
+
+`no-steppers` keeps the numeric validation + formatting but drops the buttons:
+useful in tight layouts or when you only want the typed field.
+
+<Demo>
+  <fluid-number-input value="3.14159" step="0.00001" no-steppers aria-label="Pi" style="max-width: 12rem;"></fluid-number-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-number-input value="3.14159" step="0.00001" no-steppers></fluid-number-input>`} />
+
+## Listening for input
+
+Like `<fluid-input>`, it fires **`fluid-input`** on every keystroke / stepper
+click and **`fluid-change`** when the value is committed. Both carry the value
+in `event.detail.value`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-number-input id="qty" value="1" aria-label="Quantity"></fluid-number-input>
+
+    <script type="module">
+      document.getElementById("qty").addEventListener("fluid-change", (e) => {
+        console.log("committed:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Quantity.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/number-input";
+
+    export function Quantity() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-number-input ref={ref} value="1" aria-label="Quantity" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Quantity.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/number-input";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-number-input value="1" aria-label="Quantity" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="quantity.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/number-input";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "qty-field",
+      template: `
+        <fluid-number-input value="1" aria-label="Quantity" (fluid-change)="onChange($event)"></fluid-number-input>
+      `
+    })
+    export class QtyField {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Quantity.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/number-input";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-number-input value="1" aria-label="Quantity" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+### `fluid-input` vs `fluid-change`
+
+- **`fluid-input`**: every keystroke and every stepper click. Use it for live
+  recalculation (running totals, previews).
+- **`fluid-change`**: once the value is committed (blur or stepper click). Use
+  it for "save when done" / persisting the value.
+
+## Inside a form
+
+Form-associated: `name` + `value` submit with the form, and the native
+constraints (`min` / `max` / `step` / `required`) participate in validation.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.5rem; align-items:center;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Qty: ' + new FormData(this).get('quantity');"
+  >
+    <fluid-number-input name="quantity" value="1" min="1" max="99" required aria-label="Quantity" style="max-width: 10rem;"></fluid-number-input>
+    <fluid-button type="submit">Add to cart</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-number-input name="quantity" value="1" min="1" max="99" required></fluid-number-input>
+  <fluid-button type="submit">Add to cart</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-number-input-*` token
+that falls back to a main semantic var** (the override ladder), including the
+stepper buttons. The three layers (brand → component → instance) work the same
+way as on [`<fluid-input>`](/components/input/#theming). The **complete list**
+of both layers is in the [API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-number-input-border-focus: #6366f1;
+  --fluid-number-input-stepper-hover-bg: var(--fluid-surface-muted);
+}
+```
+
+<Aside type="tip">
+  Select a number input in the [Theme builder](/playground/) to tweak these
+  tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The shell is [`part="base"`](#api), the field is `part="input"`, and the
+steppers are `part="steppers"` / `part="stepper-up"` / `part="stepper-down"`.
+Reach any of them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token:
+
+```css
+/* Wider, pill-cornered steppers. */
+fluid-number-input::part(steppers) { width: 2.25rem; }
+fluid-number-input::part(base) { border-radius: 12px; }
+```
+
+## When to use
+
+- Quantities, ages, counts, percentages: anything with a numeric range where
+  the exact value matters.
+
+### When *not* to use
+
+- **Relative position** matters more than the exact number: use
+  [`<fluid-slider>`](/components/slider/).
+- **Free-form text that happens to contain digits** (phone, postcode): use
+  [`<fluid-input>`](/components/input/) with the right `type`.
+
+## Accessibility
+
+Wraps a native `<input type="number">`, so it inherits the spinbutton role,
+numeric keyboard, and constraint validation. The notes below are
+number-input-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move focus to/from the field. |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Step the value up/down (native). |
+| Typing | Enter a value directly. |
+
+The stepper buttons are **mouse/touch affordances**, they're `tabindex="-1"`
+(keyboard users step with the arrow keys on the field), so there's no redundant
+tab stop. The focus ring reads `--fluid-focus-ring-width`.
+
+### Names
+
+Provide an accessible name with `aria-label`, or associate a visible `<label>`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). The
+steppers carry their own `aria-label`s ("Increase" / "Decrease").
+
+### State semantics
+
+- `disabled` / `readonly` behave like the native input; steppers disable at the
+  `min` / `max` bounds.
+- The invalid state sets **`aria-invalid="true"`** and colors the border with
+  the **danger tone**, never by color alone
+  ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)); pair
+  it with a message + `aria-describedby`.
+
+### Motion & target size
+
+- Transitions honor `prefers-reduced-motion`.
+- The field meets the AA 24×24 target floor.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA** and
+the field + snippets update. It reads conformance tokens, so it scales with no
+per-component branching:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-number-input" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="The text field this is built on, types, prefix/suffix, states."
+  />
+  <LinkCard
+    title="Slider"
+    href="/components/slider/"
+    description="When relative position matters more than the exact value."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

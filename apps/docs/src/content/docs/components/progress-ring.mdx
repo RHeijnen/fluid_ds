@@ -1,0 +1,173 @@
+---
+title: "Progress ring"
+description: "Circular progress indicator, compact alternative to the bar for tight layouts."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-progress-ring>` is the circular sibling of
+[`<fluid-progress-bar>`](/components/progress-bar/), same 0–100 value and
+accessible-name conventions, but a square footprint instead of a row. The center
+is a free-form slot (the percentage when `show-value` is set, or anything you
+put inside).
+
+<Demo>
+  <fluid-progress-ring value="72" show-value style="--fluid-progress-ring-size: 4rem;"></fluid-progress-ring>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/progress-ring/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/progress-ring";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-progress-ring value="0"></fluid-progress-ring>
+  <fluid-progress-ring value="25"></fluid-progress-ring>
+  <fluid-progress-ring value="60"></fluid-progress-ring>
+  <fluid-progress-ring value="100"></fluid-progress-ring>
+</Demo>
+
+```html
+<fluid-progress-ring value="60"></fluid-progress-ring>
+```
+
+### With center label
+
+<Demo>
+  <fluid-progress-ring value="42" show-value></fluid-progress-ring>
+</Demo>
+
+```html
+<fluid-progress-ring value="42" show-value></fluid-progress-ring>
+```
+
+### Custom center content
+
+<Demo>
+  <fluid-progress-ring value="72" style="--fluid-progress-ring-size: 5rem;">
+    <strong>7/10</strong>
+  </fluid-progress-ring>
+</Demo>
+
+```html
+<fluid-progress-ring value="72" style="--fluid-progress-ring-size: 5rem;">
+  <strong>7/10</strong>
+</fluid-progress-ring>
+```
+
+### Sizing
+
+The ring size is the `--fluid-progress-ring-size` custom property.
+
+<Demo>
+  <fluid-progress-ring value="50" style="--fluid-progress-ring-size: 2rem;"></fluid-progress-ring>
+  <fluid-progress-ring value="50" style="--fluid-progress-ring-size: 3rem;"></fluid-progress-ring>
+  <fluid-progress-ring value="50" style="--fluid-progress-ring-size: 5rem;"></fluid-progress-ring>
+</Demo>
+
+## When to use
+
+- Tight layouts where a horizontal bar would overflow.
+- A "circular gauge" feel: onboarding completion, profile-fill
+  meters, storage usage.
+- For long horizontal tasks (uploads, exports), use
+  [`<fluid-progress-bar>`](/components/progress-bar/), it's easier to
+  read at a glance.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-progress-ring-*` token
+that falls back to a main semantic var** (the override ladder). Stroke thickness
+is the `thickness` attribute (it drives the arc geometry, so it isn't a CSS
+var). The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-progress-ring-size: 3rem;
+  --fluid-progress-ring-track: var(--fluid-color-neutral-200);
+  --fluid-progress-ring-fill: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The SVG is [`part="base"`](#api) with `part="track"`, `part="indicator"`, and
+`part="label"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-progress-ring" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+progress-ring-specific.
+
+### Names & roles
+
+- The host is `role="progressbar"` with `aria-valuemin="0"`,
+  `aria-valuemax="100"`, and `aria-valuenow` reflecting the value.
+- The default `aria-label` is "Progress": override with a specific name
+  ("Onboarding completion", "Storage used")
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- Pair with `show-value` or a slotted label so the value isn't conveyed by the
+  arc color alone ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+
+### Motion
+
+The arc transition honors `prefers-reduced-motion`.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="The horizontal form, easier to read for long tasks."
+  />
+  <LinkCard
+    title="Spinner"
+    href="/components/spinner/"
+    description="Indeterminate loading with no measurable value."
+  />
+  <LinkCard
+    title="Rating"
+    href="/components/rating/"
+    description="A small discrete score rather than a 0–100 gauge."
+  />
+  <LinkCard
+    title="Theming guide"
+    href="/guides/theming/"
+    description="How brand, component, and instance tokens compose."
+  />
+</CardGrid>

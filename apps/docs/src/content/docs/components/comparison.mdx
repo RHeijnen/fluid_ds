@@ -1,0 +1,258 @@
+---
+title: "Comparison"
+description: "Before/after slider, drag the divider to reveal more of the after image."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-comparison>` is the classic before/after slider, two images
+stacked, with a draggable divider that wipes from one to the other. Drop
+your two images (or any equally-sized content) into the `before` and
+`after` slots and the component handles the dragging, clipping, click-to-
+jump, and keyboard control.
+
+<Demo>
+  <fluid-comparison style="max-width: 32rem;">
+    <img slot="before" src="https://placehold.co/600x400/1f2937/f3f4f6?text=Before" alt="Before" />
+    <img slot="after" src="https://placehold.co/600x400/0ea5e9/f3f4f6?text=After" alt="After" />
+  </fluid-comparison>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/comparison/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/comparison";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-comparison style="max-width: 32rem;">
+    <img slot="before" src="https://placehold.co/600x400/1f2937/f3f4f6?text=Before" alt="Before" />
+    <img slot="after" src="https://placehold.co/600x400/0ea5e9/f3f4f6?text=After" alt="After" />
+  </fluid-comparison>
+</Demo>
+
+```html
+<fluid-comparison>
+  <img slot="before" src="/before.jpg" alt="…">
+  <img slot="after"  src="/after.jpg"  alt="…">
+</fluid-comparison>
+```
+
+### Initial position
+
+`position` is a percentage from the start side (0–100). The default is
+50.
+
+<Demo>
+  <fluid-comparison position="25" style="max-width: 32rem;">
+    <img slot="before" src="https://placehold.co/600x400/1f2937/f3f4f6?text=Before" alt="Before" />
+    <img slot="after" src="https://placehold.co/600x400/22c55e/f3f4f6?text=After" alt="After" />
+  </fluid-comparison>
+</Demo>
+
+```html
+<fluid-comparison position="25">…</fluid-comparison>
+```
+
+### Custom handle
+
+Override the default chevron icon by slotting your own content into
+`handle`.
+
+```html
+<fluid-comparison>
+  <img slot="before" src="…" alt="…">
+  <img slot="after"  src="…" alt="…">
+  <fluid-icon slot="handle" name="arrow-left-right"></fluid-icon>
+</fluid-comparison>
+```
+
+## Listening for drag
+
+The slider fires **`fluid-position-change`** as the handle moves (drag or
+keyboard), with the new percentage on `event.detail.position`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-comparison id="cmp">
+      <img slot="before" src="/before.jpg" alt="…">
+      <img slot="after"  src="/after.jpg"  alt="…">
+    </fluid-comparison>
+
+    <script type="module">
+      document.getElementById("cmp").addEventListener("fluid-position-change", (e) => {
+        console.log("now at", e.detail.position, "%");
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Compare.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/comparison";
+
+    export function Compare() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onMove = (e: any) => console.log(e.detail.position);
+        el.addEventListener("fluid-position-change", onMove);
+        return () => el.removeEventListener("fluid-position-change", onMove);
+      }, []);
+      return (
+        <fluid-comparison ref={ref}>
+          <img slot="before" src="/before.jpg" alt="…" />
+          <img slot="after" src="/after.jpg" alt="…" />
+        </fluid-comparison>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Compare.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/comparison";
+    const onMove = (e: any) => console.log(e.detail.position);
+    </script>
+
+    <template>
+      <fluid-comparison @fluid-position-change="onMove">
+        <img slot="before" src="/before.jpg" alt="…" />
+        <img slot="after" src="/after.jpg" alt="…" />
+      </fluid-comparison>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="compare.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/comparison";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-compare",
+      template: `
+        <fluid-comparison (fluid-position-change)="onMove($event)">
+          <img slot="before" src="/before.jpg" alt="…" />
+          <img slot="after" src="/after.jpg" alt="…" />
+        </fluid-comparison>
+      `
+    })
+    export class Compare {
+      onMove(e: any) { console.log(e.detail.position); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Compare.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/comparison";
+      const onMove = (e: any) => console.log(e.detail.position);
+    </script>
+
+    <fluid-comparison on:fluid-position-change={onMove}>
+      <img slot="before" src="/before.jpg" alt="…" />
+      <img slot="after" src="/after.jpg" alt="…" />
+    </fluid-comparison>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Showing two states of the same content (light/dark, retouched/raw,
+  before/after edit).
+- Compose two images or videos with the same aspect ratio. Mismatched
+  sizes will look off, pre-process to match.
+
+For an auto-rotating carousel of separate items, reach for
+[`<fluid-carousel>`](/components/carousel/) instead.
+
+## Theming
+
+The divider and handle read **component-scoped `--fluid-comparison-*` tokens**
+(the override ladder); the divider and handle foreground ride the accent track
+by default. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-comparison-divider-color: var(--fluid-accent-base);
+  --fluid-comparison-handle-bg: var(--fluid-surface-base);
+  --fluid-comparison-handle-fg: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The slider exposes [`part="base"`](#api) plus `part="before"`, `part="after"`,
+`part="divider"`, and `part="handle"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-comparison" />
+
+## Accessibility
+
+- The handle carries `role="slider"` with `aria-valuemin`,
+  `aria-valuemax`, and `aria-valuenow` reflecting the percentage.
+- Keyboard, when the handle is focused:
+  - <kbd>←</kbd>/<kbd>→</kbd> move 1%.
+  - <kbd>Shift</kbd>+<kbd>←</kbd>/<kbd>→</kbd> move 10%.
+  - <kbd>Home</kbd>/<kbd>End</kbd> snap to 0% / 100%.
+- Always set meaningful `alt` text on both images: the slider doesn't
+  describe them.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Carousel"
+    href="/components/carousel/"
+    description="Rotate through separate slides instead of wiping between two."
+  />
+  <LinkCard
+    title="Slider"
+    href="/components/slider/"
+    description="The form-control sibling of this drag interaction."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="Frame the comparison in a titled surface."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="Slider semantics and keyboard expectations."
+  />
+</CardGrid>

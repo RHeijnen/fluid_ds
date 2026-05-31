@@ -1,0 +1,135 @@
+---
+title: "Relative time"
+description: "Locale-aware relative phrases, 5 minutes ago, in 2 days. Auto-refreshes once a minute."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-relative-time>` formats a date as a relative phrase ("5 minutes ago",
+"in 2 days", "yesterday") using `Intl.RelativeTimeFormat`. It picks the largest
+sensible unit automatically and re-renders once a minute so labels stay current.
+For absolute dates, reach for [`<fluid-format-date>`](/components/format-date/).
+
+<Demo>
+  <fluid-relative-time date="2026-05-29T13:00:00Z"></fluid-relative-time>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/relative-time/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/relative-time";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Renders plain inline text and reads no design tokens beyond the inherited
+  text color, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-relative-time date="2026-05-29T13:00:00Z"></fluid-relative-time>
+</Demo>
+
+```html
+<fluid-relative-time date="2026-05-29T13:00:00Z"></fluid-relative-time>
+```
+
+### Numeric mode
+
+`auto` (default) lets the formatter use phrases like "yesterday" and
+"tomorrow". `always` forces the number form ("1 day ago").
+
+```html
+<fluid-relative-time date="…" numeric="always"></fluid-relative-time>
+```
+
+### Short / narrow
+
+<Demo>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" format="long"></fluid-relative-time><br/>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" format="short"></fluid-relative-time><br/>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" format="narrow"></fluid-relative-time>
+</Demo>
+
+### Locale
+
+<Demo>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" locale="fr-FR"></fluid-relative-time><br/>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" locale="ja-JP"></fluid-relative-time>
+</Demo>
+
+### Disable auto-refresh
+
+```html
+<fluid-relative-time date="…" no-sync></fluid-relative-time>
+```
+
+Set this for pages with hundreds of timestamps where you'd rather batch
+refresh manually.
+
+## When to use
+
+- Activity feeds, message timestamps, anywhere "when did this happen?"
+  is more useful as a relative phrase than an exact date.
+- For an exact date you want to display alongside or instead, use
+  [`<fluid-format-date>`](/components/format-date/).
+
+## Theming
+
+Inline plain text, no component tokens.
+
+## API
+
+<ComponentApi tag="fluid-relative-time" />
+
+## Accessibility
+
+- The text is plain: screen readers announce it like any other word.
+- For audit log / activity-feed use, pair the relative phrase with an
+  exact timestamp (in a `<time datetime="…">` or as a tooltip) so users
+  can disambiguate when needed.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Format date"
+    href="/components/format-date/"
+    description="The exact absolute date to pair with a relative phrase."
+  />
+  <LinkCard
+    title="Format number"
+    href="/components/format-number/"
+    description="Locale-aware numeric formatting."
+  />
+  <LinkCard
+    title="Tooltip"
+    href="/components/tooltip/"
+    description="Show the exact timestamp on hover/focus."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

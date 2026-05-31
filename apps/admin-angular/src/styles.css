@@ -1,0 +1,259 @@
+/* App-level layout only. The components style themselves from Fluid tokens;
+   this sheet arranges the shell and reuses the same --fluid-* variables so the
+   chrome matches the components (and re-themes with data-fluid-theme). */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+body {
+  background: var(--fluid-surface-subtle);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-sans);
+  font-size: var(--fluid-font-size-md);
+  line-height: var(--fluid-line-height-normal, 1.5);
+}
+.muted {
+  color: var(--fluid-text-secondary);
+  font-size: var(--fluid-font-size-sm);
+}
+
+/* Card headers: the slotted <h3> keeps the browser's big default margin/size,
+   which makes the header bar tall. Reset to a compact title (matches the theme
+   builder's card headers). */
+fluid-card [slot="header"] {
+  margin: 0;
+  font-size: var(--fluid-font-size-md);
+  font-weight: var(--fluid-font-weight-semibold, 600);
+  line-height: 1.2;
+}
+
+/* ---- Shell: sidebar + main column ---- */
+.shell {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 100vh;
+}
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fluid-space-5);
+  padding: var(--fluid-space-5);
+  background: var(--fluid-surface-base);
+  border-right: 1px solid var(--fluid-border-default);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: inherit;
+  text-decoration: none;
+}
+.brand-mark {
+  width: 1.7rem;
+  height: 1.7rem;
+  flex: none;
+  display: block;
+}
+.nav {
+  display: grid;
+  gap: 0.15rem;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--fluid-radius-md);
+  color: var(--fluid-text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.nav-link:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+.nav-link.active {
+  background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
+  color: var(--fluid-accent-base);
+}
+.sidebar-foot {
+  margin-top: auto;
+}
+
+.main-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem var(--fluid-space-6);
+  background: color-mix(in srgb, var(--fluid-surface-base) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(8px);
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.view {
+  padding: var(--fluid-space-6);
+  display: grid;
+  gap: var(--fluid-space-5);
+  align-content: start;
+}
+/* Angular renders each routed page inside its own component-host element
+   (<app-dashboard> etc.), placed as a sibling of <router-outlet> inside
+   .view. Left as default block boxes, those wrappers swallow the .view grid
+   gap, so the page's own sections (.cards, .grid-2) end up flush against each
+   other. Making the hosts and the empty outlet `display: contents` removes
+   their boxes so the sections become direct grid children of .view and pick up
+   its row gap, matching the React / Next / native portals 1:1. */
+router-outlet,
+app-dashboard,
+app-users,
+app-settings {
+  display: contents;
+}
+
+/* ---- Dashboard ---- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--fluid-space-4);
+}
+.stat {
+  --fluid-card-padding: var(--fluid-space-5);
+}
+.stat-label {
+  display: block;
+  color: var(--fluid-text-secondary);
+  font-size: var(--fluid-font-size-sm);
+}
+.stat-value {
+  display: block;
+  font-size: var(--fluid-font-size-2xl, 1.75rem);
+  font-weight: 700;
+  margin: 0.15rem 0 0.5rem;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--fluid-space-4);
+}
+.usage {
+  display: grid;
+  gap: 0.4rem;
+}
+.usage-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+/* ---- Users table ---- */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fluid-font-size-md);
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--fluid-border-default);
+  vertical-align: middle;
+}
+.table th {
+  font-size: var(--fluid-font-size-sm);
+  color: var(--fluid-text-secondary);
+  font-weight: 600;
+}
+.table tbody tr:hover {
+  background: var(--fluid-surface-subtle);
+}
+.table .row-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.user-name {
+  font-weight: 600;
+}
+.empty {
+  text-align: center;
+  color: var(--fluid-text-secondary);
+  padding: 1.5rem;
+}
+
+/* ---- Forms / dialogs / settings ---- */
+.form-grid {
+  display: grid;
+  gap: var(--fluid-space-4);
+}
+.form-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.toggles {
+  display: grid;
+  gap: 0.25rem;
+}
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+.toggle-row:last-child {
+  border-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+  .sidebar-foot {
+    display: none;
+  }
+  .nav {
+    grid-auto-flow: column;
+  }
+}

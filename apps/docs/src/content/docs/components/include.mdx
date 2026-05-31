@@ -1,0 +1,136 @@
+---
+title: "Include"
+description: "Declarative HTML include. Fetches a fragment and injects it. Like server-side includes, but client-side."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-include>` fetches the HTML at `src` and renders it inline, the
+client-side equivalent of an SSI, for sharing headers, footers, marketing
+fragments, and signed-in widgets across static pages without a build step.
+Scripts in the fetched markup are **not** executed unless you opt in with
+`allow-scripts` (trusted sources only).
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/include/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/include";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A behavior wrapper, it injects whatever markup it fetched and reads no design
+  tokens of its own, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Basic
+
+```html
+<fluid-include src="/partials/header.html"></fluid-include>
+```
+
+### With fallback content
+
+The default slot is shown while the include loads or if it errors. Use it
+for a skeleton, an error message, or sane default content.
+
+```html
+<fluid-include src="/partials/promo.html">
+  <p>Default copy if the include fails.</p>
+</fluid-include>
+```
+
+### Executing scripts
+
+```html
+<fluid-include
+  src="/partials/widget.html"
+  allow-scripts
+></fluid-include>
+```
+
+### Listening for load / error
+
+```ts
+const el = document.querySelector("fluid-include");
+el.addEventListener("fluid-load",  (e) => console.log("loaded", e.detail.src));
+el.addEventListener("fluid-error", (e) => console.log("failed", e.detail.src));
+```
+
+### Cross-origin
+
+Default fetch mode is `cors`. Switch to `no-cors` for opaque responses,
+or `same-origin` to restrict.
+
+```html
+<fluid-include src="https://other.example/snippet.html" mode="cors"></fluid-include>
+```
+
+## When to use
+
+- A common page chrome you don't want to duplicate across static HTML
+  pages.
+- Lazy-loaded widgets that don't need their own framework.
+- Iframes are heavier and break the DOM tree: use them only when you
+  actually need an isolated origin.
+
+## Theming
+
+No tokens, the include forwards whatever markup it loaded. Style with
+ambient CSS.
+
+## API
+
+<ComponentApi tag="fluid-include" />
+
+## Accessibility
+
+- The fetched content keeps whatever roles, labels, and structure it
+  was authored with, be sure the source fragment is itself accessible.
+- The fallback slot stays in the DOM until the include succeeds, so
+  screen-reader users see your default content during the load.
+- Don't `allow-scripts` for any source that isn't fully under your
+  control, included scripts run in the host page's context.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Skeleton"
+    href="/components/skeleton/"
+    description="A good fallback while the include loads."
+  />
+  <LinkCard
+    title="Mutation observer"
+    href="/components/mutation-observer/"
+    description="React to the injected DOM after it loads."
+  />
+  <LinkCard
+    title="Page"
+    href="/components/page/"
+    description="App shell whose chrome an include can share."
+  />
+  <LinkCard
+    title="SSR guide"
+    href="/guides/ssr/"
+    description="When to prefer server rendering over client includes."
+  />
+</CardGrid>

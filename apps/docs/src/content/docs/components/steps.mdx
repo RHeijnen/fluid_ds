@@ -1,0 +1,382 @@
+---
+title: "Steps"
+description: "A progress / navigation stepper, derives complete / current / upcoming state from one index, horizontal or vertical, optionally clickable, with a themable connector and numbered indicators."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-steps>` is the container; `<fluid-step>` is one step. The container takes a
+single `current` index and **derives** each step's state, complete (before
+`current`), current, or upcoming (after), so you move the whole stepper by
+changing one number. A stepper is a progress indicator, not a button group.
+
+<Demo>
+  <fluid-steps current="1" aria-label="Checkout progress" style="width: 100%;">
+    <fluid-step description="Your details">Account</fluid-step>
+    <fluid-step description="Where to ship">Shipping</fluid-step>
+    <fluid-step description="How to pay">Payment</fluid-step>
+    <fluid-step description="All done">Review</fluid-step>
+  </fluid-steps>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/steps/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/steps"; // registers steps + step
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Horizontal (default)
+
+`current` is **0-based**: `current="1"` makes the second step current, the first
+complete, the rest upcoming. The complete step shows a check; the rest show their
+1-based number.
+
+<Demo>
+  <fluid-steps current="2" aria-label="Order" style="width: 100%;">
+    <fluid-step>Cart</fluid-step>
+    <fluid-step>Address</fluid-step>
+    <fluid-step>Payment</fluid-step>
+    <fluid-step>Confirm</fluid-step>
+  </fluid-steps>
+</Demo>
+
+<ConformanceCode code={`<fluid-steps current="2" aria-label="Order">
+  <fluid-step>Cart</fluid-step>
+  <fluid-step>Address</fluid-step>
+  <fluid-step>Payment</fluid-step>
+  <fluid-step>Confirm</fluid-step>
+</fluid-steps>`} />
+
+### Vertical
+
+Set `orientation="vertical"` to stack the steps with a vertical connector, good
+for a sidebar or a tall wizard.
+
+<Demo>
+  <fluid-steps current="1" orientation="vertical" aria-label="Setup">
+    <fluid-step description="Create your workspace">Workspace</fluid-step>
+    <fluid-step description="Invite your team">Team</fluid-step>
+    <fluid-step description="Connect a data source">Integrations</fluid-step>
+  </fluid-steps>
+</Demo>
+
+<ConformanceCode code={`<fluid-steps current="1" orientation="vertical" aria-label="Setup">
+  <fluid-step description="Create your workspace">Workspace</fluid-step>
+  <fluid-step description="Invite your team">Team</fluid-step>
+  <fluid-step description="Connect a data source">Integrations</fluid-step>
+</fluid-steps>`} />
+
+### Clickable
+
+By default steps are presentational. Add `clickable` and each step becomes a real
+`<button>`, focusable, keyboard-activatable, and floored to the AA/AAA target
+size, that fires `fluid-step-change` so you can let users jump back to an earlier
+step.
+
+<Demo>
+  <fluid-steps current="2" clickable aria-label="Editable wizard" style="width: 100%;">
+    <fluid-step>Plan</fluid-step>
+    <fluid-step>Build</fluid-step>
+    <fluid-step>Ship</fluid-step>
+  </fluid-steps>
+</Demo>
+
+<ConformanceCode code={`<fluid-steps current="2" clickable aria-label="Editable wizard">
+  <fluid-step>Plan</fluid-step>
+  <fluid-step>Build</fluid-step>
+  <fluid-step>Ship</fluid-step>
+</fluid-steps>`} />
+
+### Chip variant
+
+Set `variant="chip"` for a compact, wrapping row of pills (a number badge plus an
+inline label, no connectors). It shares the same state model and tokens as the
+default connector style, so the current step picks up the accent tint and a
+complete step shows the check badge. Descriptions are hidden in this variant to
+keep the chips compact.
+
+<Demo>
+  <fluid-steps current="2" variant="chip" clickable aria-label="Wizard progress" style="width: 100%;">
+    <fluid-step>Theme</fluid-step>
+    <fluid-step>Color</fluid-step>
+    <fluid-step>Font</fluid-step>
+    <fluid-step>Shape</fluid-step>
+    <fluid-step>Review</fluid-step>
+  </fluid-steps>
+</Demo>
+
+<ConformanceCode code={`<fluid-steps current="2" variant="chip" clickable aria-label="Wizard progress">
+  <fluid-step>Theme</fluid-step>
+  <fluid-step>Color</fluid-step>
+  <fluid-step>Font</fluid-step>
+  <fluid-step>Shape</fluid-step>
+  <fluid-step>Review</fluid-step>
+</fluid-steps>`} />
+
+### Descriptions
+
+Add secondary text with the `description` attribute (or slot richer content into
+the `description` slot). Shown in the default variant; hidden in the chip variant.
+
+<ConformanceCode code={`<fluid-step description="Tell us about yourself">Account</fluid-step>`} />
+
+## Listening for changes
+
+A `clickable` `<fluid-steps>` fires **`fluid-step-change`** with `{ index }` (the
+0-based index of the activated step) in `detail`. The component does **not** move
+`current` itself, you own that state and set `current` in response (so you can
+validate or block a jump first).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-steps id="s" current="0" clickable aria-label="Wizard">…</fluid-steps>
+
+    <script type="module">
+      const steps = document.getElementById("s");
+      steps.addEventListener("fluid-step-change", (e) => {
+        steps.current = e.detail.index; // jump to the clicked step
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Wizard.tsx"
+    import { useRef, useState, useEffect } from "react";
+    import "@fluid-ds/components/define/steps";
+
+    export function Wizard() {
+      const ref = useRef<HTMLElement>(null);
+      const [current, setCurrent] = useState(0);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          setCurrent((e as CustomEvent).detail.index);
+        el.addEventListener("fluid-step-change", onChange);
+        return () => el.removeEventListener("fluid-step-change", onChange);
+      }, []);
+      return (
+        <fluid-steps ref={ref} current={current} clickable aria-label="Wizard">
+          <fluid-step>Plan</fluid-step>
+          <fluid-step>Build</fluid-step>
+          <fluid-step>Ship</fluid-step>
+        </fluid-steps>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Wizard.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/steps";
+    const current = ref(0);
+    const onChange = (e: CustomEvent) => (current.value = e.detail.index);
+    </script>
+
+    <template>
+      <fluid-steps :current="current" clickable aria-label="Wizard" @fluid-step-change="onChange">
+        <fluid-step>Plan</fluid-step>
+        <fluid-step>Build</fluid-step>
+        <fluid-step>Ship</fluid-step>
+      </fluid-steps>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="wizard.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/steps";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-wizard",
+      template: `
+        <fluid-steps [attr.current]="current" clickable aria-label="Wizard"
+                     (fluid-step-change)="onChange($event)">
+          <fluid-step>Plan</fluid-step>
+          <fluid-step>Build</fluid-step>
+          <fluid-step>Ship</fluid-step>
+        </fluid-steps>
+      `
+    })
+    export class Wizard {
+      current = 0;
+      onChange(e: CustomEvent) {
+        this.current = e.detail.index;
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Wizard.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/steps";
+      let current = 0;
+      function onChange(e: CustomEvent) {
+        current = e.detail.index;
+      }
+    </script>
+
+    <fluid-steps {current} clickable aria-label="Wizard" on:fluid-step-change={onChange}>
+      <fluid-step>Plan</fluid-step>
+      <fluid-step>Build</fluid-step>
+      <fluid-step>Ship</fluid-step>
+    </fluid-steps>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Communicating **progress through a known, ordered sequence**: a checkout, an
+  onboarding wizard, a multi-page form.
+
+### When *not* to use
+
+- **Switching between peer views** of the same content: use
+  [`<fluid-tabs>`](/components/tabs/).
+- **A single continuous progress value** (a download, an upload): use
+  [`<fluid-progress-bar>`](/components/progress-bar/).
+- **Site location / hierarchy**: use [`<fluid-breadcrumb>`](/components/breadcrumb/).
+
+## Theming
+
+Every styled property reads a **component-scoped token that falls back to a main
+semantic var** (the override ladder): the container exposes `--fluid-steps-*`
+(gap) and each step exposes `--fluid-step-*` (indicator bg/fg per state, connector
+color, label color per state). Complete and current indicators ride the accent
+track (`--fluid-accent-base` / `--fluid-accent-text`); upcoming uses a muted
+surface; the connector is `--fluid-border-default` by default and the accent for
+completed segments. The **complete list** is in the [API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-step-current-bg: var(--fluid-accent-base);
+  --fluid-step-upcoming-bg: var(--fluid-surface-muted);
+  --fluid-step-connector-complete-color: var(--fluid-accent-base);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-step` in the [Theme builder](/playground/) to tweak the
+  indicator colors, connector, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The step exposes [`part="base"`](#api), `part="indicator"`, `part="connector"`,
+`part="label"`, and `part="description"`; the container exposes `part="base"`.
+Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token, e.g. squaring off the indicator:
+
+```css
+fluid-step::part(indicator) {
+  border-radius: var(--fluid-radius-sm);
+}
+```
+
+## API
+
+<ComponentApi tag="fluid-steps" />
+
+### `<fluid-step>`
+
+<ComponentApi tag="fluid-step" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Names & roles
+
+- `<fluid-steps>` exposes a list (`role="list"`) and takes its accessible name
+  from `aria-label`; each `<fluid-step>` is a list item (`role="listitem"`), the
+  same accessibility tree as an ordered list
+  ([SC 1.3.1](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships)).
+- The current step carries
+  [`aria-current="step"`](https://www.w3.org/TR/wai-aria-1.2/#aria-current), so a
+  screen reader announces "current step", progress is conveyed by the
+  `aria-current` state and the visible label, **not by color alone**
+  ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+- The complete-step check icon is decorative (`aria-hidden`); the step's number
+  and label carry the meaning.
+
+### Keyboard
+
+When `clickable`, each step is a native `<button>`, so it is in the Tab order and
+activates with <kbd>Enter</kbd> / <kbd>Space</kbd>. Presentational steps are not
+focusable (there's nothing to do).
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move to the next clickable step (clickable mode only). |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused step → fires `fluid-step-change`. |
+
+### Motion & target size
+
+- Each clickable step floors its height to `--fluid-target-min`: ≥ **24px** (AA) /
+  **44px** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
+`[data-fluid-conformance="aaa"]`) lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="Switch between peer views, not an ordered progression."
+  />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="A single continuous progress value instead of discrete steps."
+  />
+  <LinkCard
+    title="Breadcrumb"
+    href="/components/breadcrumb/"
+    description="Where you are in a site hierarchy, not how far through a flow."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-step-change across React, Vue, Angular, Svelte."
+  />
+</CardGrid>

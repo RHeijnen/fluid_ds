@@ -1,0 +1,190 @@
+---
+title: "Grid"
+description: "Responsive column / grid layout, intrinsic auto-fill or fixed breakpoint-aware columns, with spanning cells."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-grid>` is a CSS-Grid container with two modes. Leave `cols` off for an
+**intrinsic** layout that auto-fills as many equal columns as fit (each at least
+`min-col-width` wide), naturally responsive, no breakpoints. Or set `cols`
+(plus optional `cols-sm` / `cols-md` / `cols-lg`) for an explicit,
+breakpoint-aware count. Drop in [`<fluid-col>`](#fluid-col) to span cells.
+
+<Demo>
+  <fluid-grid cols="3" gap="0.75rem" style="width:100%;">
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">2</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">3</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">4</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">5</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">6</div>
+  </fluid-grid>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/grid/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/grid"; // registers grid + col
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Intrinsic (auto-fill)
+
+No `cols`, the grid fits as many `min-col-width`-wide columns as the container
+allows and reflows on resize. The most robust responsive default.
+
+<Demo>
+  <fluid-grid min-col-width="8rem" gap="0.75rem" style="width:100%;">
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">A</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">B</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">C</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">D</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">E</div>
+  </fluid-grid>
+</Demo>
+
+```html
+<fluid-grid min-col-width="16rem">
+  <div>…</div>
+  <div>…</div>
+</fluid-grid>
+```
+
+### Fixed + responsive columns
+
+`cols` is the base count; `cols-sm` / `cols-md` / `cols-lg` override it at the
+**40rem / 48rem / 64rem** breakpoints (each falls back to the next-smaller
+value).
+
+```html
+<fluid-grid cols="1" cols-md="2" cols-lg="4">
+  <div>…</div>
+  <div>…</div>
+</fluid-grid>
+```
+
+### Spanning cells
+
+Wrap items in `<fluid-col>` to span columns (`span`, with responsive
+`span-sm/md/lg`), pin a start line (`start`), or span rows (`row-span`).
+
+<Demo>
+  <fluid-grid cols="4" gap="0.75rem" style="width:100%;">
+    <fluid-col span="2"><div style="background:var(--fluid-accent-base);color:var(--fluid-accent-text);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">span 2</div></fluid-col>
+    <fluid-col><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div></fluid-col>
+    <fluid-col><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div></fluid-col>
+    <fluid-col span="4"><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">span 4</div></fluid-col>
+  </fluid-grid>
+</Demo>
+
+```html
+<fluid-grid cols="4">
+  <fluid-col span="2">wide</fluid-col>
+  <fluid-col>1</fluid-col>
+  <fluid-col>1</fluid-col>
+  <fluid-col start="2" span="2">offset + span</fluid-col>
+</fluid-grid>
+```
+
+## When to use
+
+- **Uniform card / tile layouts** that should reflow with the viewport.
+- **Page scaffolding**: sidebars, content columns, dashboards.
+
+### When *not* to use
+
+- **Mixed-size tiles that should pack densely**: use
+  [`<fluid-mosaic>`](/components/mosaic/).
+- **A resizable two-pane split**: use
+  [`<fluid-split-panel>`](/components/split-panel/).
+
+## Theming
+
+Every layout knob reads a **component-scoped `--fluid-grid-*` token that falls
+back to a main semantic var** (the override ladder); the `gap` / `min-col-width`
+/ `align` / `justify` attributes set the matching token per instance. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+fluid-grid {
+  --fluid-grid-gap: var(--fluid-space-6);
+  --fluid-grid-min-col: 18rem;
+}
+```
+
+<Aside type="note">
+  The grid container itself uses `display: grid`, so slotted children become its
+  grid items directly, there's no inner wrapper to fight with.
+</Aside>
+
+## Accessibility
+
+`<fluid-grid>` and `<fluid-col>` are **presentational layout primitives**, they
+add no ARIA roles and don't alter the accessibility tree, so your slotted
+content keeps its own semantics.
+
+- **Source order = reading order.** Grid placement is visual only; keep the DOM
+  order matching the intended reading/tab order
+  ([SC 1.3.2](https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence),
+  [SC 2.4.3](https://www.w3.org/WAI/WCAG22/Understanding/focus-order)). Avoid
+  using `start` to visually reorder interactive content away from its DOM order.
+- **Reflow.** The intrinsic mode and the responsive breakpoints satisfy
+  [SC 1.4.10 Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow), content
+  collapses to fewer columns instead of forcing horizontal scroll.
+
+## API
+
+<ComponentApi tag="fluid-grid" />
+
+### `<fluid-col>`
+
+<ComponentApi tag="fluid-col" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Mosaic"
+    href="/components/mosaic/"
+    description="Dense bento layout for mixed-size tiles."
+  />
+  <LinkCard
+    title="Split panel"
+    href="/components/split-panel/"
+    description="A resizable two-pane split."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="The usual occupant of a grid cell."
+  />
+  <LinkCard
+    title="Page"
+    href="/components/page/"
+    description="App shell with header, sidebar, and content slots."
+  />
+</CardGrid>

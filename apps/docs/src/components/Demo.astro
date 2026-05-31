@@ -1,0 +1,25 @@
+---
+/**
+ * Visual frame around an embedded `<fluid-*>` example. Keeps the
+ * background, padding, and border consistent across pages so demos
+ * stand apart from prose without each page needing its own wrapper.
+ */
+interface Props {
+  /** Optional caption rendered above the demo. */
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+{title && <p class="fluid-api-empty" style="margin-bottom:0.25em;">{title}</p>}
+{/*
+  `not-content` opts this subtree OUT of Starlight's prose styling.
+  Without it, Starlight's flow-spacing rule (every element after the
+  first sibling gets a top margin) lands on the demo's <fluid-*>
+  elements, so in a centered flex row the first item sat ~8px higher
+  than the rest. not-content stops that; the explicit child-margin
+  reset in custom.css is the belt-and-suspenders backup.
+*/}
+<div class="fluid-demo not-content">
+  <slot />
+</div>

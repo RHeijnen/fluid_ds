@@ -1,0 +1,91 @@
+{
+  "name": "@fluid-ds/animations",
+  "version": "0.0.1-alpha.0",
+  "description": "Attribute-driven animation system for Fluid. A registry of named keyframes plus a global controller that watches data-fluid-animation attributes on any element.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/animations"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "animations",
+    "web-animations-api",
+    "design-system",
+    "web-components",
+    "keyframes"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./register-defaults": {
+      "types": "./src/register-defaults.ts",
+      "import": "./src/register-defaults.ts"
+    },
+    "./define/controller": {
+      "types": "./src/define/controller.ts",
+      "import": "./src/define/controller.ts"
+    },
+    "./animations/*": {
+      "types": "./src/animations/*.ts",
+      "import": "./src/animations/*.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./register-defaults": {
+        "types": "./dist/register-defaults.d.ts",
+        "import": "./dist/register-defaults.js"
+      },
+      "./define/controller": {
+        "types": "./dist/define/controller.d.ts",
+        "import": "./dist/define/controller.js"
+      },
+      "./animations/*": {
+        "types": "./dist/animations/*.d.ts",
+        "import": "./dist/animations/*.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/register-defaults.js",
+    "**/register-defaults.ts",
+    "**/animations/*.js",
+    "**/animations/*.ts",
+    "**/define/controller.js",
+    "**/define/controller.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

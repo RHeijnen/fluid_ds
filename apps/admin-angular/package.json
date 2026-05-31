@@ -1,0 +1,39 @@
+{
+  "name": "@fluid-ds/admin-angular",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Admin-portal demo built with Angular 20 (standalone, no NgModules) and the Fluid web components.",
+  "scripts": {
+    "prebuild": "pnpm --filter @fluid-ds/tokens build && pnpm --filter @fluid-ds/icons build && pnpm --filter @fluid-ds/components build && pnpm --filter @fluid-ds/charts build",
+    "predev": "pnpm --filter @fluid-ds/tokens build",
+    "dev": "ng serve --port 5391",
+    "start": "ng serve --port 5391",
+    "build": "ng build",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+  },
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/forms": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@fluid-ds/charts": "workspace:*",
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/themes": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*",
+    "@floating-ui/dom": "^1.6.13",
+    "chart.js": "^4.4.7",
+    "lit": "^3.2.1",
+    "rxjs": "^7.8.0",
+    "tslib": "^2.8.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.3.0",
+    "@angular/cli": "^20.3.0",
+    "@angular/compiler-cli": "^20.3.0",
+    "typescript": "~5.8.3"
+  }
+}

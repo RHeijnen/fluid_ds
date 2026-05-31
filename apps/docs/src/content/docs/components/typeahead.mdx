@@ -1,0 +1,345 @@
+---
+title: "Typeahead"
+description: "Autocomplete input, type to filter, async loaders supported. WAI-ARIA combobox, form-associated, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-typeahead>` is the autocomplete input, a text field that opens a
+filtered listbox as you type. Feed it options four ways: an array property, a
+JSON-string attribute, an async loader function, or slotted `<fluid-option>`
+children. The query / option-loading / selection contract is the same in every
+mode. Form-associated; implements the WAI-ARIA combobox pattern.
+
+<Demo>
+  <fluid-typeahead
+    aria-label="Country"
+    placeholder="Pick a country…"
+    options='["United States","Canada","Mexico","United Kingdom","Germany","France","Japan"]'
+    style="max-width: 20rem;"
+  ></fluid-typeahead>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/typeahead/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/typeahead";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Static options (JSON attribute)
+
+For vanilla HTML with a static list, pass a JSON array string.
+
+<Demo>
+  <fluid-typeahead
+    aria-label="Country"
+    placeholder="Pick a country…"
+    options='["United States","Canada","Mexico","United Kingdom","Germany","France","Japan"]'
+    style="max-width: 20rem;"
+  ></fluid-typeahead>
+</Demo>
+
+<ConformanceCode code={`<fluid-typeahead
+  name="country"
+  placeholder="Pick a country…"
+  options='["United States","Canada","Mexico","United Kingdom"]'
+></fluid-typeahead>`} />
+
+### Static options (property)
+
+For framework consumers with dynamic data, set `.options` as a property:
+strings or `{ value, label }` objects both work.
+
+```ts
+const input = document.querySelector("fluid-typeahead");
+input.options = [
+  { value: "us", label: "United States" },
+  { value: "ca", label: "Canada" }
+];
+```
+
+### Slotted options
+
+For richer markup, slot `<fluid-option>` children.
+
+<Demo>
+  <fluid-typeahead aria-label="Country" placeholder="Pick a country…" style="max-width: 20rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="mx">Mexico</fluid-option>
+  </fluid-typeahead>
+</Demo>
+
+<ConformanceCode code={`<fluid-typeahead placeholder="Pick a country…">
+  <fluid-option value="us">United States</fluid-option>
+  <fluid-option value="ca">Canada</fluid-option>
+  <fluid-option value="mx">Mexico</fluid-option>
+</fluid-typeahead>`} />
+
+### Async loader
+
+Set `loadOptions` as a property. It receives the current query (debounced via
+`debounce`) and returns an array of options.
+
+```ts
+const input = document.querySelector("fluid-typeahead");
+input.loadOptions = async (q) => {
+  const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+  return res.json(); // expects [{ value, label }, …]
+};
+```
+
+Add `debounce="200"` to throttle requests, `min-query="2"` to wait for a couple
+of characters, and `strict` to clear free text that doesn't match an option.
+
+### Sizes
+
+`size` accepts `sm`, `md` (default), and `lg`.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-typeahead size="sm" aria-label="Small" placeholder="Small" options='["Apple","Banana"]'></fluid-typeahead>
+    <fluid-typeahead size="md" aria-label="Medium" placeholder="Medium" options='["Apple","Banana"]'></fluid-typeahead>
+    <fluid-typeahead size="lg" aria-label="Large" placeholder="Large" options='["Apple","Banana"]'></fluid-typeahead>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-typeahead size="sm" …></fluid-typeahead>
+<fluid-typeahead size="md" …></fluid-typeahead>
+<fluid-typeahead size="lg" …></fluid-typeahead>`} />
+
+## Listening for changes
+
+Typeahead fires **`fluid-input`** on every keystroke (`detail.value` is the
+query) and **`fluid-change`** when an option is selected (`detail.option` is the
+chosen `{ value, label, data? }`).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-typeahead id="country" aria-label="Country" options='["…"]'></fluid-typeahead>
+
+    <script type="module">
+      const el = document.getElementById("country");
+      el.addEventListener("fluid-input", (e) => console.log("typed:", e.detail.value));
+      el.addEventListener("fluid-change", (e) => console.log("picked:", e.detail.option));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="CountrySearch.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/typeahead";
+
+    export function CountrySearch() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.option);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-typeahead ref={ref} aria-label="Country" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="CountrySearch.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/typeahead";
+    const onChange = (e: CustomEvent) => console.log(e.detail.option);
+    </script>
+
+    <template>
+      <fluid-typeahead aria-label="Country" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="country-search.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/typeahead";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "country-search",
+      template: `<fluid-typeahead aria-label="Country" (fluid-change)="onChange($event)"></fluid-typeahead>`
+    })
+    export class CountrySearch {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.option);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="CountrySearch.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/typeahead";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.option);
+      }
+    </script>
+
+    <fluid-typeahead aria-label="Country" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+Typeahead is form-associated: it submits `name=<value>`, where the value is the
+current input text (or the selected option's label).
+
+```html
+<form>
+  <fluid-typeahead name="city" required options='["Berlin","Paris","Tokyo"]'></fluid-typeahead>
+  <fluid-button type="submit">Search</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property of the typeahead reads a **component-scoped
+`--fluid-typeahead-*` token that falls back to a main semantic var** (the
+override ladder), most fall through to the shared `--fluid-field-*` tokens so a
+typeahead matches your inputs by default. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-typeahead-bg: var(--fluid-surface-base);
+  --fluid-typeahead-border: var(--fluid-border-default);
+  --fluid-typeahead-border-focus: var(--fluid-accent-base);
+  --fluid-typeahead-accent: var(--fluid-accent-base);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-typeahead` in the [Theme builder](/playground/) to tweak the
+  input, listbox, and highlight tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The input is [`part="input"`](#api), the listbox is `part="listbox"`, and each
+row is `part="option"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## When to use
+
+- The user picks from a list **but** can type to filter or search.
+- Remote-loaded suggestions (search-as-you-type).
+
+### When *not* to use
+
+- **A fixed list with no filtering**: use
+  [`<fluid-select>`](/components/select/).
+- **A menu of actions** (not a value): use
+  [`<fluid-dropdown>`](/components/dropdown/).
+
+## Accessibility
+
+The input is `role="combobox"` and the popup is `role="listbox"`, following the
+WAI-ARIA APG. The notes below are typeahead-specific; the cross-component
+contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| _type_ | Filter options; the listbox opens once the query reaches `min-query`. |
+| <kbd>↓</kbd> | Open the listbox / move to the next option. |
+| <kbd>↑</kbd> | Open the listbox / move to the previous option. |
+| <kbd>Enter</kbd> | Commit the active option. |
+| <kbd>Escape</kbd> | Close without committing. |
+| <kbd>Tab</kbd> | Close the listbox and move on. |
+
+The input keeps DOM focus the entire time; `aria-activedescendant` points at the
+active option so screen readers announce navigation.
+
+### Names & roles
+
+The input carries `aria-autocomplete="list"`, `aria-haspopup="listbox"`, and
+`aria-expanded` reflecting the open state. Each option is `role="option"` with
+`aria-selected`. The field needs an accessible name, a visible label or an
+`aria-label` ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+`required` participates in form validation. The matched substring inside each
+option is wrapped for a visual highlight; it carries no extra semantics, so the
+announced label stays the full option text.
+
+### Motion & target size
+
+- Open/close transitions honor `prefers-reduced-motion`.
+- The field reads `--fluid-target-min` as a height floor: ≥ **24×24** (AA) /
+  **44×44** (AAA), so even the `sm` size stays a comfortable hit target.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-typeahead" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="A fixed, finite option list with no free-form text."
+  />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="Plain single-line text, no suggestions."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="A menu of actions, not a value."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

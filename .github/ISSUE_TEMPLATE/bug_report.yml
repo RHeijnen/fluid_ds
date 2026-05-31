@@ -1,0 +1,77 @@
+name: Bug report
+description: A component or token isn't behaving the way it's documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug.
+
+        For security issues, please **don't open a public issue**, see
+        [SECURITY.md](../blob/main/SECURITY.md) instead.
+
+  - type: input
+    id: package
+    attributes:
+      label: Package + version
+      description: Which Fluid package + version are you using? Run `npm ls @fluid-ds/components` or check your `package.json`.
+      placeholder: "@fluid-ds/components@0.0.1-alpha.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework
+      options:
+        - "Vanilla HTML / no framework"
+        - "React 19"
+        - "React 18"
+        - "Vue 3"
+        - "Angular"
+        - "Svelte"
+        - "SolidJS"
+        - "Other"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      multiple: true
+      options:
+        - "Chrome / Edge (Chromium)"
+        - "Firefox"
+        - "Safari"
+        - "Mobile Safari (iOS)"
+        - "Mobile Chrome (Android)"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: A CodePen / StackBlitz link, or a paste-ready HTML snippet using the CDN. Bugs without a repro are very hard to fix.
+      placeholder: |
+        ```html
+        <fluid-button @click=...>Trigger</fluid-button>
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

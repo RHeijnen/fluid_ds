@@ -1,0 +1,87 @@
+{
+  "name": "@fluid-ds/icons",
+  "version": "0.0.1-alpha.0",
+  "description": "Icon registry for Fluid. Curated lucide subset registered by default, ~1500 more available as side-effect modules or via the lazy loadIcon() API.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/icons"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "icons",
+    "lucide",
+    "svg-icons",
+    "icon-registry",
+    "web-components",
+    "design-system"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./register-defaults": {
+      "types": "./src/register-defaults.ts",
+      "import": "./src/register-defaults.ts"
+    },
+    "./lucide/*": {
+      "types": "./src/lucide/*.ts",
+      "import": "./src/lucide/*.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./register-defaults": {
+        "types": "./dist/register-defaults.d.ts",
+        "import": "./dist/register-defaults.js"
+      },
+      "./lucide/*": {
+        "types": "./dist/lucide/*.d.ts",
+        "import": "./dist/lucide/*.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/register-defaults.js",
+    "**/register-defaults.ts",
+    "**/lucide/*.js",
+    "**/lucide/*.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:icons": "tsx scripts/build-lucide.ts",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "lucide-static": "^0.469.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,131 @@
+---
+title: "Mutation observer"
+description: "Declarative MutationObserver. Watch slotted children for DOM changes and react via events."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-mutation-observer>` wraps the platform `MutationObserver` in a component
+you drop into markup. Configure which changes you care about, attributes, child
+list, character data, subtree, and listen for **`fluid-mutation`**. The right
+tool for tracking DOM changes you don't own (third-party widgets, slotted user
+content).
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/mutation-observer/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/mutation-observer";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A behavior wrapper, it renders no UI (`display: contents`) and reads no
+  design tokens, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Watch the child list
+
+```html
+<fluid-mutation-observer child-list>
+  <ul id="list">…</ul>
+</fluid-mutation-observer>
+
+<script type="module">
+  document
+    .querySelector("fluid-mutation-observer")
+    .addEventListener("fluid-mutation", (e) => {
+      console.log("records:", e.detail.records);
+    });
+</script>
+```
+
+### Watch attribute changes
+
+`attr-filter` restricts firing to specific attributes.
+
+```html
+<fluid-mutation-observer attr attr-filter="data-state,aria-expanded">
+  <button data-state="closed">Toggle</button>
+</fluid-mutation-observer>
+```
+
+### Watch the whole subtree
+
+```html
+<fluid-mutation-observer child-list subtree>
+  <article id="content">…</article>
+</fluid-mutation-observer>
+```
+
+### Pause observation
+
+```html
+<fluid-mutation-observer child-list disabled>…</fluid-mutation-observer>
+```
+
+## When to use
+
+- Reacting to DOM changes you don't directly trigger: third-party
+  widgets, server-rendered fragments, drag-and-drop reorderings.
+- For visibility changes, use
+  [`<fluid-intersection-observer>`](/components/intersection-observer/).
+- For size changes, use
+  [`<fluid-resize-observer>`](/components/resize-observer/).
+
+## Theming
+
+Behavior component, no tokens.
+
+## API
+
+<ComponentApi tag="fluid-mutation-observer" />
+
+## Accessibility
+
+- `display: contents`, so it's invisible to layout and to the
+  accessibility tree, observation has no semantic effect.
+- The events fire frequently if you observe a busy subtree. Debounce in
+  your handler if you're doing expensive work per record.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Intersection observer"
+    href="/components/intersection-observer/"
+    description="React to elements entering / leaving the viewport."
+  />
+  <LinkCard
+    title="Resize observer"
+    href="/components/resize-observer/"
+    description="React to an element's own size changes."
+  />
+  <LinkCard
+    title="Include"
+    href="/components/include/"
+    description="Fetch + inject external HTML, then observe it."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

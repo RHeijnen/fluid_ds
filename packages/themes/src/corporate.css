@@ -1,0 +1,32 @@
+/*
+ * Corporate, restrained slate preset for serious applications.
+ * Usage: load this stylesheet, then set `data-fluid-brand="corporate"` on
+ * <html> (global) or any subtree you want themed.
+ *
+ *   <html data-fluid-brand="corporate">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/corporate.css">
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme).
+ */
+[data-fluid-brand="corporate"] {
+  /* Brand palette, slate */
+  --fluid-color-brand-50: #f8fafc;
+  --fluid-color-brand-100: #f1f5f9;
+  --fluid-color-brand-200: #e2e8f0;
+  --fluid-color-brand-300: #cbd5e1;
+  --fluid-color-brand-400: #94a3b8;
+  --fluid-color-brand-500: #64748b;
+  --fluid-color-brand-600: #475569;
+  --fluid-color-brand-700: #334155;
+  --fluid-color-brand-800: #1e293b;
+  --fluid-color-brand-900: #0f172a;
+
+  /* Sharper corners, feels more enterprise */
+  --fluid-radius-sm: 0;
+  --fluid-radius-md: 0.125rem;
+  --fluid-radius-lg: 0.25rem;
+
+  /* Tighter motion */
+  --fluid-duration-fast: 100ms;
+  --fluid-duration-normal: 160ms;
+}

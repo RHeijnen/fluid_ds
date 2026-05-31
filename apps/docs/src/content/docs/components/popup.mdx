@@ -1,0 +1,168 @@
+---
+title: "Popup"
+description: "Low-level positioning primitive, anchors one element to another and tracks it on scroll/resize."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-popup>` is the positioning primitive underneath
+[`<fluid-popover>`](/components/popover/),
+[`<fluid-dropdown>`](/components/dropdown/),
+[`<fluid-tooltip>`](/components/tooltip/), and the listbox inside
+[`<fluid-select>`](/components/select/). It anchors one element ("the
+popup") to another ("the anchor") and keeps them positioned together as
+the page scrolls or the window resizes, but it doesn't impose any
+open/close behavior, dismiss handling, or roles of its own.
+
+Reach for it when you need precise control over positioning without
+inheriting popover semantics. For 90% of cases, a higher-level component
+will fit better.
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/popup/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/components/define/popup";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Anchored via slot
+
+The default anchor lookup is the slotted `anchor` element.
+
+```html
+<fluid-popup placement="bottom-end" open>
+  <fluid-button slot="anchor">Anchor</fluid-button>
+  <div class="my-tooltip">Anchored content</div>
+</fluid-popup>
+```
+
+### Anchored by selector
+
+```html
+<button id="ref">Anchor</button>
+<fluid-popup anchor="#ref" placement="top" open>
+  <div>I follow #ref around.</div>
+</fluid-popup>
+```
+
+### Anchored by element reference
+
+```ts
+const popup = document.querySelector("fluid-popup");
+popup.anchorElement = document.querySelector("#ref");
+popup.open = true;
+```
+
+### Match anchor width
+
+Useful for select-style listboxes that should be as wide as their
+trigger.
+
+```html
+<fluid-popup match-width open>…</fluid-popup>
+```
+
+### Track placement after flip
+
+```ts
+popup.addEventListener("fluid-reposition", (e) => {
+  console.log("placement is now", e.detail.placement);
+});
+```
+
+## When to use
+
+- You need anchored positioning without the open/close UX of
+  popover / dropdown / tooltip.
+- You're building a custom overlay primitive on top of Fluid.
+
+For the common cases, prefer:
+
+- [`<fluid-popover>`](/components/popover/): click-toggle, outside-
+  dismiss.
+- [`<fluid-dropdown>`](/components/dropdown/): menu pattern.
+- [`<fluid-tooltip>`](/components/tooltip/): hover/focus.
+
+## Theming
+
+`<fluid-popup>` is a **headless positioning primitive**, it paints no surface
+(no background, border, or padding), so it has no visual tokens. Style whatever
+you slot in. The only knob is the stacking layer:
+
+```css title="brand.css"
+/* Raise the stacking layer if you need to escape an overflow context */
+fluid-popup {
+  --fluid-popup-z-index: 9999;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container exposes [`part="base"`](#api) and `part="popup"` (the positioned
+box), style those if you add your own surface.
+
+## API
+
+<ComponentApi tag="fluid-popup" />
+
+## Accessibility
+
+Because it's a headless primitive, `<fluid-popup>` adds **no** semantics, that's
+by design. The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+- The popup has **no ARIA role** of its own: add the role that fits what you're
+  building (`dialog`, `menu`, `tooltip`, `listbox`, …).
+- The anchor receives no ARIA either: wire `aria-haspopup`, `aria-expanded`,
+  and `aria-controls` yourself for open/close patterns
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- For batteries-included overlays, prefer the higher-level
+  [`<fluid-popover>`](/components/popover/), [`<fluid-dropdown>`](/components/dropdown/),
+  or [`<fluid-tooltip>`](/components/tooltip/), which wire roles + focus for you.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Popover"
+    href="/components/popover/"
+    description="Click-toggle floating panel with dismiss + focus handling."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="Menu of actions built on this primitive."
+  />
+  <LinkCard
+    title="Tooltip"
+    href="/components/tooltip/"
+    description="Hover/focus help built on this primitive."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Its listbox is positioned with this primitive."
+  />
+</CardGrid>

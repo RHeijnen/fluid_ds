@@ -1,0 +1,300 @@
+---
+title: "Rating"
+description: "Star rating with half-step support, custom symbols, and read-only display mode. Form-associated, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-rating>` is the row-of-stars rating control, interactive by default,
+switchable to read-only for displaying averages. Half-stars, custom symbols
+(hearts, thumbs, anything you slot in), full keyboard support, and form
+participation.
+
+<Demo>
+  <fluid-rating value="3" aria-label="Rating"></fluid-rating>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/rating/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/rating";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-rating value="3" aria-label="Rating"></fluid-rating>
+</Demo>
+
+<ConformanceCode code={`<fluid-rating name="score" value="3"></fluid-rating>`} />
+
+### Half stars
+
+`precision="0.5"` enables half-step selection, the half is chosen by which side
+of the symbol the pointer is over.
+
+<Demo>
+  <fluid-rating value="3.5" precision="0.5" aria-label="Rating"></fluid-rating>
+</Demo>
+
+<ConformanceCode code={`<fluid-rating value="3.5" precision="0.5"></fluid-rating>`} />
+
+### Read-only (for averages)
+
+<Demo>
+  <fluid-rating value="4.5" precision="0.5" readonly aria-label="Average rating"></fluid-rating>
+</Demo>
+
+<ConformanceCode code={`<fluid-rating value="4.5" precision="0.5" readonly></fluid-rating>`} />
+
+### Custom symbols
+
+Slot any element into `symbol`, every star uses the same node, so a single SVG
+is enough.
+
+<Demo>
+  <fluid-rating value="3" aria-label="Hearts">
+    <svg slot="symbol" viewBox="0 0 24 24" fill="currentColor" style="width: 100%; height: 100%;">
+      <path d="M12 21s-7-4.5-9.5-9C.4 8.3 2 4 5.5 4 7.7 4 9.7 5.3 12 7.7 14.3 5.3 16.3 4 18.5 4 22 4 23.6 8.3 21.5 12 19 16.5 12 21 12 21z"/>
+    </svg>
+  </fluid-rating>
+</Demo>
+
+```html
+<fluid-rating value="3">
+  <svg slot="symbol" viewBox="0 0 24 24" fill="currentColor">…</svg>
+</fluid-rating>
+```
+
+### Out of N
+
+<Demo>
+  <fluid-rating value="4" max="10" aria-label="Rating out of 10"></fluid-rating>
+</Demo>
+
+<ConformanceCode code={`<fluid-rating value="4" max="10"></fluid-rating>`} />
+
+## Listening for changes
+
+Rating fires **`fluid-change`** with `{ value }` in `detail` when the user
+commits a new score.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-rating id="score" aria-label="Rate this"></fluid-rating>
+
+    <script type="module">
+      document.getElementById("score").addEventListener("fluid-change", (e) => {
+        console.log("new rating:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="ScoreInput.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/rating";
+
+    export function ScoreInput() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-rating ref={ref} aria-label="Rate this" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="ScoreInput.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/rating";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-rating aria-label="Rate this" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="score-input.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/rating";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "score-input",
+      template: `<fluid-rating aria-label="Rate this" (fluid-change)="onChange($event)"></fluid-rating>`
+    })
+    export class ScoreInput {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="ScoreInput.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/rating";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-rating aria-label="Rate this" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+Rating is form-associated: it submits `name=<value>`.
+
+```html
+<form>
+  <fluid-rating name="score" value="4"></fluid-rating>
+  <fluid-button type="submit">Submit review</fluid-button>
+</form>
+```
+
+## When to use
+
+- Capturing a satisfaction or quality score (1–5 stars is the canonical case).
+- Displaying an average rating elsewhere on the page (`readonly`).
+
+### When *not* to use
+
+- **Exact precision** (a percentage, not a 1–5 score): use
+  [`<fluid-slider>`](/components/slider/).
+
+## Theming
+
+Every styled property of the rating reads a **component-scoped `--fluid-rating-*`
+token that falls back to a main semantic var** (the override ladder). The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-rating-active-color: var(--fluid-color-amber-500);
+  --fluid-rating-inactive-color: var(--fluid-color-neutral-300);
+  --fluid-rating-symbol-size: 1.5rem;
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-rating` in the [Theme builder](/playground/) to tweak the
+  active / inactive colors, symbol size, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api) and each symbol is `part="star"`. Reach
+them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token.
+
+## Accessibility
+
+The host carries `role="slider"` so it's announced as a single value control,
+following the WAI-ARIA APG. The notes below are rating-specific; the
+cross-component contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>→</kbd> / <kbd>↑</kbd> | Increase by `precision`. |
+| <kbd>←</kbd> / <kbd>↓</kbd> | Decrease by `precision`. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to 0 / `max`. |
+
+The focus ring renders around the row and reads `--fluid-focus-ring-width`.
+
+### Names & roles
+
+The host exposes `aria-valuemin="0"`, `aria-valuemax` (= `max`), and
+`aria-valuenow` (= value). Always set `aria-label` (defaults to "Rating") so
+screen readers announce what's being rated
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). The
+individual symbols are `role="presentation"`, the host is the only interactive
+node, so there are no nested controls to confuse assistive tech.
+
+### State semantics
+
+`readonly` removes the control from the tab order and ignores pointer/keyboard
+input, so an average display can't be edited.
+
+### Motion & target size
+
+- The hover-scale transition honors `prefers-reduced-motion`.
+- Each symbol floors its box to `--fluid-target-min`, so AAA grows every star's
+  hit area to 44px without a per-size override.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-rating" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Slider"
+    href="/components/slider/"
+    description="A continuous numeric value when exact precision matters."
+  />
+  <LinkCard
+    title="Radio"
+    href="/components/radio/"
+    description="One-of-few labelled choices instead of a score."
+  />
+  <LinkCard
+    title="Theming guide"
+    href="/guides/theming/"
+    description="How brand, component, and instance tokens compose."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

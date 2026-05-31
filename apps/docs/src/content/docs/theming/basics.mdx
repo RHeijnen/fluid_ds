@@ -1,0 +1,88 @@
+---
+title: Theming basics
+description: Three layers of theming, from a one-line brand swap to single-element overrides.
+---
+
+import Demo from "../../../components/Demo.astro";
+
+Fluid has **three layers of theming**, each more specific than the last.
+You can stay at the first layer (one variable) or drop down to the third
+(one element), they compose.
+
+## 1. Brand-wide overrides
+
+Apply a `data-fluid-brand="custom"` attribute to any ancestor, then override
+the semantic tokens in a single CSS block. Everything inside that ancestor
+adopts the new brand.
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-color-primary: #6366f1;
+  --fluid-color-success: #16a34a;
+  --fluid-color-danger:  #dc2626;
+}
+```
+
+```html
+<body data-fluid-brand="custom">
+  <!-- everything inside uses the brand above -->
+</body>
+```
+
+<Demo title="Default brand">
+  <fluid-button>Default</fluid-button>
+  <fluid-button variant="secondary">Secondary</fluid-button>
+</Demo>
+
+<Demo title='With data-fluid-brand="custom" + --fluid-color-primary: #db2777'>
+  <div data-fluid-brand="custom" style="--fluid-color-primary: #db2777; display: contents;">
+    <fluid-button>Custom</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+  </div>
+</Demo>
+
+## 2. Component-scoped tokens
+
+Every styled component declares its own CSS custom properties that default
+to the semantic tokens above but can be overridden independently. Use these
+when you want to restyle **just one type of component** without touching the
+global brand.
+
+```css
+[data-fluid-brand="custom"] {
+  --fluid-button-bg: #db2777;          /* changes only buttons */
+}
+```
+
+Each component's [API table](/components/button/) lists the tokens it
+exposes, look for the **CSS custom properties** section.
+
+## 3. Per-element overrides
+
+If you want a single instance to look different from its siblings, use the
+[Theme builder](/) to isolate the element. The builder stamps a stable
+`data-fluid-id` attribute on the element and emits a CSS rule scoped to that
+id:
+
+```css
+[data-fluid-id="primary-cta"] {
+  --fluid-button-bg: linear-gradient(to right, #6366f1, #22d3ee);
+}
+```
+
+Drop the same attribute on the matching element in your app and the override
+applies. The `data-fluid-*` namespace stays distinct from your own class
+system so it's easy to grep for, easy to audit, easy to remove.
+
+## Dark mode
+
+`@fluid-ds/tokens/dark.css` overrides every surface and text token for the
+dark scheme. Toggle by setting `data-fluid-theme="dark"` on `<html>`:
+
+```ts title="theme-toggle.ts"
+document.documentElement.setAttribute("data-fluid-theme", "dark");
+```
+
+The semantic tokens, `--fluid-text-primary`, `--fluid-surface-base`, etc.:
+re-resolve under that attribute, so any component-scoped overrides you've
+made continue to work without a separate dark variant.

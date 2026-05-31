@@ -1,0 +1,57 @@
+{
+  "name": "@fluid-ds/tokens",
+  "version": "0.0.1-alpha.0",
+  "description": "Design tokens for Fluid, typed source, generates CSS + a programmatic manifest. Drop the CSS files in your <head> or import them in your bundler.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/tokens"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "design-tokens",
+    "css-custom-properties",
+    "design-system",
+    "dtcg",
+    "theming"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true
+  },
+  "exports": {
+    ".": "./dist/base.css",
+    "./base.css": "./dist/base.css",
+    "./light.css": "./dist/light.css",
+    "./dark.css": "./dist/dark.css",
+    "./manifest.json": "./dist/manifest.json",
+    "./source": {
+      "types": "./src/tokens.ts",
+      "default": "./src/tokens.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsx scripts/build.ts",
+    "dev": "tsx watch scripts/build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

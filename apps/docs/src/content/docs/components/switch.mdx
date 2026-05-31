@@ -1,0 +1,302 @@
+---
+title: "Switch"
+description: "Form-associated on/off toggle for immediate-effect settings. Accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-switch>` is a binary on/off control, like a checkbox, but with
+**immediate-effect** semantics: flipping a switch should *do something now*, not
+wait for a Save button. It wraps a native `role="switch"` checkbox, is
+**form-associated** (submits / validates like a native checkbox), and meets the
+WCAG 2.2 guarantees (focus ring, target size, name from the label).
+
+<Demo>
+  <fluid-switch checked>Wi-Fi</fluid-switch>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/switch/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/switch";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### States
+
+The default slot is the visible label (and the accessible name). `checked`
+sets the initial state; `disabled` dims + removes it from the tab order.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
+    <fluid-switch>Notifications</fluid-switch>
+    <fluid-switch checked>Two-factor auth</fluid-switch>
+    <fluid-switch disabled>Unavailable</fluid-switch>
+    <fluid-switch checked disabled>Locked on</fluid-switch>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-switch>Notifications</fluid-switch>
+<fluid-switch checked>Two-factor auth</fluid-switch>
+<fluid-switch disabled>Unavailable</fluid-switch>`} />
+
+### Without a visible label
+
+A label-less switch **must** carry an `aria-label` (the control has no text to
+name it). Its hit target still meets the 24×24 minimum (44×44 under AAA).
+
+<Demo>
+  <fluid-switch aria-label="Dark mode" checked></fluid-switch>
+</Demo>
+
+<ConformanceCode code={`<fluid-switch aria-label="Dark mode" checked></fluid-switch>`} />
+
+## Listening for changes
+
+The switch fires **`fluid-change`** with `{ checked: boolean }` in `detail`
+whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-switch id="notify">Notifications</fluid-switch>
+
+    <script type="module">
+      document.getElementById("notify").addEventListener("fluid-change", (e) => {
+        console.log("on:", e.detail.checked);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="NotifyToggle.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/switch";
+
+    export function NotifyToggle() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.checked);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-switch ref={ref}>Notifications</fluid-switch>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="NotifyToggle.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/switch";
+    const onChange = (e: CustomEvent) => console.log(e.detail.checked);
+    </script>
+
+    <template>
+      <fluid-switch @fluid-change="onChange">Notifications</fluid-switch>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="notify-toggle.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/switch";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "notify-toggle",
+      template: `
+        <fluid-switch (fluid-change)="onChange($event)">Notifications</fluid-switch>
+      `
+    })
+    export class NotifyToggle {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.checked);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="NotifyToggle.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/switch";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.checked);
+      }
+    </script>
+
+    <fluid-switch on:fluid-change={onChange}>Notifications</fluid-switch>
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+Form-associated: when checked it submits `name=value` (default value `"on"`);
+when off it's omitted entirely, matching native checkbox semantics.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.75rem; align-items:center;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'marketing=' + (new FormData(this).get('marketing') ?? '(off)');"
+  >
+    <fluid-switch name="marketing" value="yes" checked>Marketing emails</fluid-switch>
+    <fluid-button type="submit">Save</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-switch name="marketing" value="yes" checked>Marketing emails</fluid-switch>
+  <fluid-button type="submit">Save</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-switch-*` token that
+falls back to a main semantic var** (the override ladder). The "on" track is
+the brand accent by default. The three layers (brand → component → instance)
+work like the rest of the system; the **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-switch-track-bg-on: var(--fluid-success-base);
+}
+```
+
+<Aside type="tip">
+  Select a switch in the [Theme builder](/playground/) to tweak the track,
+  thumb, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The label is [`part="base"`](#api); the track and thumb are `part="track"` /
+`part="thumb"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token:
+
+```css
+fluid-switch::part(track) { width: 3rem; }
+fluid-switch::part(thumb) { box-shadow: none; }
+```
+
+## When to use
+
+- **Immediate-effect settings**: Wi-Fi, dark mode, notifications. The toggle
+  *is* the action; there's no Save step.
+
+### When *not* to use
+
+- **Applies on submit / part of a form choice**: use a
+  [`<fluid-checkbox>`](/components/checkbox/) ("remember this, apply on save").
+- **Exclusive choice** between options: use
+  [`<fluid-radio>`](/components/radio/).
+- A **long list of toggles** reads better as checkboxes in a form.
+
+## Accessibility
+
+Wraps a native checkbox with `role="switch"`, so it inherits keyboard behavior
+and form participation. `delegatesFocus` forwards `.focus()` to it. The notes
+below are switch-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move focus to/from the switch. |
+| <kbd>Space</kbd> | Toggle on/off. |
+| <kbd>Enter</kbd> | Toggle on/off (matches form expectations). |
+
+The focus ring renders around the track and reads `--fluid-focus-ring-width`.
+
+### Names
+
+The accessible name comes from the default slot (the visible label). A
+**label-less** switch **MUST** set `aria-label`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+- `role="switch"` + `aria-checked` reflect the on/off state (AT announces
+  "on/off", not "checked").
+- `disabled` removes it from the tab order; `required` blocks form submission
+  until it's on.
+
+### Motion & target size
+
+- The thumb-slide + track transition honor `prefers-reduced-motion`.
+- The visible track is small (20px tall), so the **clickable `<label>`** carries
+  the target floor: ≥ **24×24** (AA) and **44×44** (AAA) via `--fluid-target-min`
+, the graphic stays the same size, the hit area grows.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
+The switch reads both conformance tokens (target size matters most for a small
+control like this):
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-switch" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Checkbox"
+    href="/components/checkbox/"
+    description="When the change applies on submit, not immediately."
+  />
+  <LinkCard
+    title="Radio"
+    href="/components/radio/"
+    description="Exclusive choice between options."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

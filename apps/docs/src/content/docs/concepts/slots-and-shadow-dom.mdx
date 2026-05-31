@@ -1,0 +1,213 @@
+---
+title: "Slots & shadow DOM"
+description: "How encapsulation works, default and named slots, ::part() and ::slotted(), and why --fluid-* tokens are the one thing that crosses the boundary."
+---
+
+import Demo from "../../../components/Demo.astro";
+import { Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Every Fluid component renders into a **shadow DOM**, a private DOM tree the
+browser keeps separate from your page. This is what makes a component look the
+same everywhere, and it's the rulebook you need to understand before you
+theme one. If you're new to custom elements, read
+[What are web components?](/concepts/web-components/) first.
+
+## Encapsulation: styles don't leak
+
+A shadow root is a wall. It cuts both ways:
+
+- **Your page styles can't reach in.** A global
+  `button { background: red }` in your stylesheet does **not** repaint the
+  `<button>` inside `<fluid-button>`'s shadow tree.
+- **The component's styles can't leak out.** The `.base { … }` rule inside a
+  component only ever matches that component's own shadow tree, it can't
+  touch your page's `.base` class.
+
+That isolation is the whole point: a component carries its own appearance and
+nothing in the surrounding CSS can accidentally break it (or be broken by it).
+
+```html
+<style>
+  /* Has NO effect on the button rendered inside fluid-button's shadow DOM. */
+  button { background: lime; }
+</style>
+
+<fluid-button>Still themed by Fluid, not lime</fluid-button>
+```
+
+<Aside>
+  There are two DOM trees in play. The **light DOM** is the markup you write
+  between the tags (`<fluid-card>…here…</fluid-card>`). The **shadow DOM** is
+  what the component renders internally. They're stitched together by slots.
+</Aside>
+
+## Slots: projecting your content in
+
+A component decides *where* your light-DOM children appear by placing `<slot>`
+elements in its shadow tree. Your content stays in the light DOM, the slot is
+just a window the component renders it through.
+
+### The default slot
+
+Anything you put between the tags with no `slot` attribute lands in the
+default (unnamed) slot:
+
+<Demo>
+  <fluid-badge variant="success">Active</fluid-badge>
+</Demo>
+
+```html
+<fluid-badge variant="success">Active</fluid-badge>
+<!-- "Active" is projected into the badge's default <slot> -->
+```
+
+### Named slots
+
+A component with multiple regions exposes **named slots**. You target one with
+`slot="name"` on a child. `<fluid-card>` has `header`, default (body), and
+`footer`:
+
+<Demo>
+  <fluid-card style="max-width: 22rem;">
+    <h3 slot="header" style="margin: 0;">Project settings</h3>
+    <p style="margin: 0;">Body content goes in the default slot.</p>
+    <div slot="footer" style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end;">
+      <fluid-button variant="ghost">Cancel</fluid-button>
+      <fluid-button>Save</fluid-button>
+    </div>
+  </fluid-card>
+</Demo>
+
+```html
+<fluid-card>
+  <h3 slot="header">Project settings</h3>
+  <p>Body content goes in the default slot.</p>
+  <div slot="footer">
+    <fluid-button variant="ghost">Cancel</fluid-button>
+    <fluid-button>Save</fluid-button>
+  </div>
+</fluid-card>
+```
+
+Each component's docs page lists its slots in the **API table**, see
+[`<fluid-card>`'s API](/components/card/#api) for the live list.
+
+## Styling across the wall
+
+Because page CSS can't reach into the shadow tree, a component has to *opt in*
+to the styling you're allowed to do. There are three sanctioned doors.
+
+### `::part()`: styling exposed internals
+
+A component can tag an internal element with `part="name"`. You then style it
+from outside with the [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+pseudo-element. This is the escape hatch for CSS the component didn't expose as
+a token.
+
+`<fluid-dialog>` exposes `part="panel"` (among others), so you can restyle the
+modal panel without forking the component:
+
+```css
+fluid-dialog::part(panel) {
+  border-radius: 0;
+  max-width: 40rem;
+}
+```
+
+`<fluid-card>` exposes `part="base"`, `part="header"`, `part="body"`, and
+`part="footer"`:
+
+```css
+fluid-card::part(header) {
+  position: sticky;
+  top: 0;
+}
+```
+
+### `::slotted()`: styling projected content from inside
+
+The mirror image: from *inside* the component's stylesheet,
+[`::slotted()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::slotted)
+matches the light-DOM nodes that landed in a slot. You won't write this as a
+consumer, it's how a component author reaches the content you slotted in (for
+example, to reset stray margins on slotted text). It only matches the
+*top-level* projected node, not its descendants.
+
+```css
+/* inside the component's styles */
+::slotted(*) {
+  margin: 0;
+}
+```
+
+### Inherited CSS custom properties: the one thing that crosses
+
+Here's the door that makes Fluid theming work. **CSS custom properties
+(`--variables`) are inherited, and inheritance pierces the shadow boundary.**
+A custom property set on an ancestor in the light DOM flows *into* every shadow
+tree underneath it.
+
+Regular properties (`color`, `background`) don't cross. Custom properties do.
+That single asymmetry is the foundation of the whole theming model: a
+component reads `var(--fluid-…)` inside its shadow styles, and your page sets
+that variable from outside.
+
+<Demo title="Setting --fluid-accent-base on a wrapper flows into the button's shadow DOM">
+  <div style="--fluid-accent-base: #db2777; display: contents;">
+    <fluid-button>Pink, themed from outside the shadow tree</fluid-button>
+  </div>
+</Demo>
+
+```html
+<div style="--fluid-accent-base: #db2777;">
+  <!-- the variable inherits across the boundary into the button's shadow DOM -->
+  <fluid-button>Pink</fluid-button>
+</div>
+```
+
+This is why every `--fluid-*` token works the way it does, set it anywhere
+above a component (a wrapper, `<body>`, `:root`) and it reaches the styled
+internals the component reads it from. The full layered model is in
+[Theming basics](/theming/basics/).
+
+<Aside type="tip">
+  Rule of thumb: **`::part()` to change CSS the component didn't tokenize;
+  `--fluid-*` tokens for the styling it *did* intend you to change.** Tokens
+  for the knobs, parts for the long tail.
+</Aside>
+
+## Why this is worth the constraint
+
+Encapsulation feels strict until you've debugged a global-CSS collision. The
+payoff:
+
+- A component looks identical in a marketing page, a dense dashboard, and a
+  third-party embed, its styles are sealed.
+- You can't *accidentally* break it, and it can't break you.
+- Theming is explicit and greppable: it only happens through `--fluid-*`
+  tokens and `::part()`, never through ambient selector soup.
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="Build your own component"
+    href="/concepts/build-your-own/"
+    description="Author a fluid-* element: FluidElement, the token ladder, slots, and parts."
+  />
+  <LinkCard
+    title="Theming basics"
+    href="/theming/basics/"
+    description="The three layers, brand swap, component tokens, per-element overrides."
+  />
+  <LinkCard
+    title="Per-element overrides"
+    href="/theming/per-element/"
+    description="Restyle a single instance with data-fluid-id."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A real component with header / body / footer slots and matching parts."
+  />
+</CardGrid>

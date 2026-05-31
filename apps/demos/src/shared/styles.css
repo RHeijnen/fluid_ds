@@ -1,0 +1,203 @@
+/*
+ * Shared page styles for the demos. Each demo HTML entry imports this
+ * once via its own <link>. Page-specific styling lives in the demo's
+ * own CSS file alongside its TypeScript entry.
+ *
+ * Goals here:
+ *   - A neutral reset so demos look like real apps, not browser default
+ *   - Consistent shell (top bar, sidebar, content area) across demos
+ *   - The theme-picker affordance pinned to the top right
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light dark;
+  font-family: var(--fluid-font-family-sans);
+  font-size: 16px;
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--fluid-color-primary, var(--fluid-accent-base));
+}
+
+/* App shell */
+
+.demo-shell {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  min-height: 100vh;
+}
+
+/*
+ * Header is intentionally identical to the landing's `.site-nav`
+ * (apps/landing/src/styles.css) so navigating between root and
+ * /demos/ has zero header layout jump. If you tweak one, tweak the
+ * other.
+ */
+.demo-shell header.site-nav {
+  grid-area: header;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: color-mix(in srgb, var(--fluid-surface-base) 85%, transparent);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+
+.demo-shell header.site-nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.demo-shell header.site-nav .brand-mark {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: block;
+  flex: none;
+}
+
+.demo-shell header.site-nav nav.primary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+.demo-shell header.site-nav nav.primary a {
+  text-decoration: none;
+  color: var(--fluid-text-secondary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: background 100ms ease, color 100ms ease;
+}
+
+.demo-shell header.site-nav nav.primary a:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+
+.demo-shell header.site-nav nav.primary a[aria-current="page"] {
+  background: color-mix(in srgb, var(--fluid-color-primary, var(--fluid-accent-base)) 14%, transparent);
+  color: var(--fluid-color-primary, var(--fluid-accent-base));
+  font-weight: 600;
+}
+
+.demo-shell header.site-nav nav.primary a.cta {
+  padding: 0;
+  background: none;
+}
+
+.demo-shell header.site-nav .picker-host {
+  display: flex;
+  align-items: center;
+}
+
+.demo-shell aside {
+  grid-area: sidebar;
+  border-right: 1px solid var(--fluid-border-default);
+  background: var(--fluid-surface-subtle);
+  padding: 1.25rem 0.75rem;
+  overflow-y: auto;
+}
+
+.demo-shell aside nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.demo-shell aside nav a {
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: var(--fluid-text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-shell aside nav a:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+
+.demo-shell aside nav a[aria-current="page"] {
+  background: color-mix(in srgb, var(--fluid-color-primary, var(--fluid-accent-base)) 14%, transparent);
+  color: var(--fluid-color-primary, var(--fluid-accent-base));
+  font-weight: 600;
+}
+
+.demo-shell aside .section-label {
+  margin: 1.25rem 0.75rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fluid-text-secondary);
+}
+
+.demo-shell main {
+  grid-area: main;
+  padding: 1.5rem 2rem 4rem;
+  overflow-x: hidden;
+}
+
+/* The reusable theme picker injected by demo-theme-picker.ts */
+
+.demo-theme-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+}
+
+.demo-theme-picker label {
+  margin-right: 0.25rem;
+}
+
+/* Table row hover affordance, used by the admin demo. */
+table tbody tr {
+  transition: background 100ms ease;
+}
+table tbody tr:hover {
+  background: var(--fluid-surface-muted);
+}
+
+@media (max-width: 720px) {
+  .demo-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+  .demo-shell aside {
+    display: none;
+  }
+}

@@ -1,0 +1,48 @@
+name: Feature request
+description: Propose a new component, prop, event, or token.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! Before filing, please check the
+        [open issues](https://github.com/RHeijnen/fluid_ds/issues) for
+        similar requests.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case. "I wish I could ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: Sketch the markup / props / events / tokens you'd like to see. Doesn't have to be final.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing components, workarounds, or other libraries that solve this. Helps us understand what's already possible.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Likely scope
+      options:
+        - "New component in @fluid-ds/components"
+        - "Prop / event / slot on an existing component"
+        - "New design token"
+        - "New theme preset in @fluid-ds/themes"
+        - "Expansion pack"
+        - "Documentation"
+        - "Tooling / playground"
+        - "Other"
+    validations:
+      required: true

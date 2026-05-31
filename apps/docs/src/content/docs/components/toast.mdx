@@ -1,0 +1,214 @@
+---
+title: "Toast"
+description: "Ephemeral status messages that fade after a few seconds. Stack-managed; one container per region."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-toast>` is the **container**, one per app (or per region). Call
+`.toast({ message, variant })` on it to push a toast onto the stack; toasts
+auto-dismiss after a duration and the stack handles its own positioning. For
+persistent in-page status, reach for [`<fluid-callout>`](/components/callout/).
+
+<Demo>
+  <fluid-button onclick="document.querySelector('#hero-toaster').toast({ message: 'Saved ' + new Date().toLocaleTimeString(), variant: 'success' })">
+    Show a toast
+  </fluid-button>
+  <fluid-toast id="hero-toaster" placement="top-end"></fluid-toast>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/toast/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/toast"; // registers toast + toast-item
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Container in your page
+
+Drop one `<fluid-toast>` container near the end of `<body>`. Choose
+where it anchors with `placement`. Six positions:
+`top-start` `top` `top-end` `bottom-start` `bottom` `bottom-end`.
+
+```html
+<fluid-toast id="toaster" placement="top-end"></fluid-toast>
+```
+
+### Push a toast
+
+<Demo>
+  <fluid-button onclick="document.querySelector('#demo-toaster').toast({ message: 'Saved at ' + new Date().toLocaleTimeString(), variant: 'success' })">
+    Show success toast
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#demo-toaster').toast({ message: 'Heads up', variant: 'warning' })">
+    Show warning
+  </fluid-button>
+  <fluid-toast id="demo-toaster" placement="top-end"></fluid-toast>
+</Demo>
+
+```ts
+const toaster = document.querySelector("#toaster");
+
+// Most usage: one line
+toaster.toast({ message: "Saved!", variant: "success" });
+
+// Returns the underlying toast item, useful if you want to dismiss
+// programmatically or update later.
+const t = toaster.toast({
+  message: "Uploading…",
+  variant: "neutral",
+  duration: 0  // 0 = sticky
+});
+// later:
+t.dismiss();
+```
+
+### Variants
+
+`neutral` (default), `info`, `success`, `warning`, `danger`. Pick the
+one that matches the urgency.
+
+```ts
+toaster.toast({ message: "Saved!", variant: "success" });
+toaster.toast({ message: "Couldn't connect", variant: "danger" });
+```
+
+### Duration
+
+Defaults to ~5 seconds. Pass `duration: 0` for sticky (user must
+dismiss). Pass any number in milliseconds.
+
+```ts
+toaster.toast({ message: "Don't go anywhere", duration: 0 });
+toaster.toast({ message: "Quick note", duration: 2000 });
+```
+
+## When to use
+
+- An action the user just took succeeded or failed (saved, copied,
+  network error).
+- A short notification that doesn't need to interrupt the user's flow.
+
+If the message must be acknowledged before the user continues,
+**don't use a toast**, use a [`<fluid-dialog>`](/components/dialog/).
+Toasts will be missed by users who aren't watching the corner of the
+screen.
+
+## Theming
+
+Every styled property of a toast reads a **component-scoped
+`--fluid-toast-item-*` token that falls back to a main semantic var** (the
+override ladder); the per-variant accents use the **theme-independent semantic
+tone tokens** (`--fluid-success-base`, `--fluid-danger-base`, …). The container
+exposes `--fluid-toast-gap`. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-toast-item-bg: var(--fluid-surface-base);
+  --fluid-toast-item-border: var(--fluid-border-default);
+  --fluid-toast-item-success-accent: var(--fluid-success-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The item is [`part="base"`](#api) with `part="icon"`, `part="body"`, and
+`part="close"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-toast" />
+
+### `<fluid-toast-item>`
+
+The toast container creates these for you, you don't author them directly.
+Tokens it exposes:
+
+<ComponentApi tag="fluid-toast-item" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+toast-specific.
+
+### Names & roles
+
+- The container is `role="region"` with `aria-label="Notifications"`.
+- Each toast item is `role="status"` (info / neutral / success) or
+  `role="alert"` (warning / danger) so screen readers announce it at the right
+  urgency ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
+- The dismiss button is labeled "Dismiss".
+
+### Timing & motion
+
+- Auto-dismiss honors `prefers-reduced-motion`. Per
+  [SC 2.2.1](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable),
+  prefer `duration: 0` (sticky) for any message that must be read or acted on.
+- Don't use a toast for content that must be acknowledged before continuing:
+  use a [`<fluid-dialog>`](/components/dialog/).
+
+### Motion & target size
+
+- The dismiss button floors its hit area to `--fluid-target-min`: ≥ **24×24**
+  (AA) / **44×44** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Callout"
+    href="/components/callout/"
+    description="Persistent, in-flow status instead of transient."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="When the message must be acknowledged before continuing."
+  />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="Show a long task's progress, then toast on completion."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="status vs alert live-region semantics."
+  />
+</CardGrid>

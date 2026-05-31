@@ -1,0 +1,346 @@
+---
+title: "Radio"
+description: "Mutually-exclusive selection, fluid-radio inside fluid-radio-group. Form-associated, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-radio>` is one option; `<fluid-radio-group>` is the container that holds
+the set and manages selection, keyboard navigation, and form participation.
+Always wrap radios in a group, a radio on its own has no concept of its set.
+The group implements the WAI-ARIA radiogroup pattern (roving tabindex, arrow-key
+nav) and is form-associated.
+
+<Demo>
+  <fluid-radio-group value="medium" aria-label="Size">
+    <fluid-radio value="small">Small</fluid-radio>
+    <fluid-radio value="medium">Medium</fluid-radio>
+    <fluid-radio value="large">Large</fluid-radio>
+  </fluid-radio-group>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/radio/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/radio"; // registers radio + radio-group
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+`value` on the group selects the matching option.
+
+<Demo>
+  <fluid-radio-group value="medium" aria-label="Size">
+    <fluid-radio value="small">Small</fluid-radio>
+    <fluid-radio value="medium">Medium</fluid-radio>
+    <fluid-radio value="large">Large</fluid-radio>
+  </fluid-radio-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-radio-group name="size" value="medium">
+  <fluid-radio value="small">Small</fluid-radio>
+  <fluid-radio value="medium">Medium</fluid-radio>
+  <fluid-radio value="large">Large</fluid-radio>
+</fluid-radio-group>`} />
+
+### With a group label
+
+The `label` slot renders above the options and is wired via `aria-labelledby`.
+
+<Demo>
+  <fluid-radio-group value="email">
+    <span slot="label">How should we contact you?</span>
+    <fluid-radio value="email">Email</fluid-radio>
+    <fluid-radio value="sms">SMS</fluid-radio>
+    <fluid-radio value="phone">Phone</fluid-radio>
+  </fluid-radio-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-radio-group value="email">
+  <span slot="label">How should we contact you?</span>
+  <fluid-radio value="email">Email</fluid-radio>
+  <fluid-radio value="sms">SMS</fluid-radio>
+</fluid-radio-group>`} />
+
+### Horizontal layout
+
+<Demo>
+  <fluid-radio-group orientation="horizontal" value="yes" aria-label="Subscribed">
+    <fluid-radio value="yes">Yes</fluid-radio>
+    <fluid-radio value="no">No</fluid-radio>
+    <fluid-radio value="unsure">Unsure</fluid-radio>
+  </fluid-radio-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-radio-group orientation="horizontal" value="yes">
+  <fluid-radio value="yes">Yes</fluid-radio>
+  <fluid-radio value="no">No</fluid-radio>
+</fluid-radio-group>`} />
+
+## Listening for changes
+
+The group fires **`fluid-change`** with `{ value }` in `detail` when the
+selection changes.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-radio-group id="plan" aria-label="Plan">…</fluid-radio-group>
+
+    <script type="module">
+      document.getElementById("plan").addEventListener("fluid-change", (e) => {
+        console.log("selected:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="PlanPicker.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/radio";
+
+    export function PlanPicker() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return (
+        <fluid-radio-group ref={ref} aria-label="Plan">
+          <fluid-radio value="free">Free</fluid-radio>
+          <fluid-radio value="pro">Pro</fluid-radio>
+        </fluid-radio-group>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="PlanPicker.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/radio";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-radio-group aria-label="Plan" @fluid-change="onChange">
+        <fluid-radio value="free">Free</fluid-radio>
+        <fluid-radio value="pro">Pro</fluid-radio>
+      </fluid-radio-group>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="plan-picker.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/radio";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "plan-picker",
+      template: `
+        <fluid-radio-group aria-label="Plan" (fluid-change)="onChange($event)">
+          <fluid-radio value="free">Free</fluid-radio>
+          <fluid-radio value="pro">Pro</fluid-radio>
+        </fluid-radio-group>
+      `
+    })
+    export class PlanPicker {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="PlanPicker.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/radio";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-radio-group aria-label="Plan" on:fluid-change={onChange}>
+      <fluid-radio value="free">Free</fluid-radio>
+      <fluid-radio value="pro">Pro</fluid-radio>
+    </fluid-radio-group>
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+The **group** is form-associated: it submits `name=<selected value>`, and
+`required` blocks submission until a choice is made.
+
+<Demo>
+  <form
+    style="display:flex; flex-direction:column; gap:0.75rem; align-items:flex-start;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'plan=' + (new FormData(this).get('plan') ?? '(none)');"
+  >
+    <fluid-radio-group name="plan" required>
+      <span slot="label">Pick a plan</span>
+      <fluid-radio value="free">Free</fluid-radio>
+      <fluid-radio value="pro">Pro</fluid-radio>
+      <fluid-radio value="enterprise">Enterprise</fluid-radio>
+    </fluid-radio-group>
+    <div>
+      <fluid-button type="submit">Continue</fluid-button>
+      <output style="font-size:0.875rem; color: var(--fluid-text-secondary); margin-left:0.5rem;"></output>
+    </div>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-radio-group name="plan" required>
+    <span slot="label">Pick a plan</span>
+    <fluid-radio value="free">Free</fluid-radio>
+    <fluid-radio value="pro">Pro</fluid-radio>
+  </fluid-radio-group>
+  <fluid-button type="submit">Continue</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property of the radio reads a **component-scoped `--fluid-radio-*`
+token that falls back to a main semantic var** (the override ladder); the
+checked color is the brand accent. The group exposes
+`--fluid-radio-group-label-fg` for its legend. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-radio-accent: var(--fluid-accent-base);
+}
+```
+
+<Aside type="tip">
+  Select a radio in the [Theme builder](/playground/) to tweak the circle, dot,
+  and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+A radio's label is [`part="base"`](#api) and its circle is `part="control"`.
+Reach them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token.
+
+## When to use
+
+- **One-of-many** selection where all options should be visible at once.
+
+### When *not* to use
+
+- A **long list** (> ~7): use [`<fluid-select>`](/components/select/) (denser)
+  or [`<fluid-typeahead>`](/components/typeahead/) (filterable).
+- **Boolean** on/off: use [`<fluid-checkbox>`](/components/checkbox/) or
+  [`<fluid-switch>`](/components/switch/).
+
+## Accessibility
+
+The group is `role="radiogroup"` and each option is `role="radio"`, following
+the WAI-ARIA APG. The notes below are radio-specific; the cross-component
+contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Enter/leave the group (roving tabindex, only the selected option is a tab stop). |
+| <kbd>↑</kbd> / <kbd>←</kbd> | Select + focus the previous option. |
+| <kbd>↓</kbd> / <kbd>→</kbd> | Select + focus the next option. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Select the first / last option. |
+| <kbd>Space</kbd> | Select the focused option. |
+
+The focus ring renders around the circle and reads `--fluid-focus-ring-width`.
+
+### Names
+
+The group needs an accessible name: a `label` slot (wired via
+`aria-labelledby`) or an `aria-label`. Each radio's name comes from its slotted
+text ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+`aria-checked` reflects each option; the group manages `required` validity and
+submits the selected value.
+
+### Motion & target size
+
+- The dot-scale transition honors `prefers-reduced-motion`.
+- The circle is small (~18px), so each option's clickable label carries the
+  target floor: ≥ **24×24** (AA) / **44×44** (AAA) via `--fluid-target-min`.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-radio-group" />
+
+### `<fluid-radio>`
+
+<ComponentApi tag="fluid-radio" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Checkbox"
+    href="/components/checkbox/"
+    description="Multi-select or a single boolean opt-in."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="One-of-many from a denser dropdown list."
+  />
+  <LinkCard
+    title="Segmented control"
+    href="/components/segmented-control/"
+    description="One-of-few as a fused button row."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

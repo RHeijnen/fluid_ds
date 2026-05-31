@@ -1,0 +1,66 @@
+name: deploy website
+
+# Builds the unified website artifact (landing + docs + storybook + theme
+# builder + demos + the four framework portals) and deploys it to
+# Cloudflare Pages.
+#
+# Why build in GitHub Actions rather than Cloudflare's own build system:
+# `pnpm build:website` is a heavy, multi-toolchain build (Astro + Storybook +
+# several Vite apps + a Next.js static export + an Angular CLI build). Running
+# it on the same Node 20 + pnpm runner that `verify` already uses is far more
+# reliable than Cloudflare's generic builder, and keeps one source of truth for
+# the build environment. Cloudflare only receives the finished static folder.
+#
+# The site tracks `main` (deploys on every push). Package releases are a
+# separate concern handled by release.yml; the two are independent outputs of
+# the same commit.
+
+on:
+  push:
+    branches: [main]
+  # Manual redeploy button in the Actions tab.
+  workflow_dispatch:
+
+# A newer commit supersedes an in-flight deploy.
+concurrency:
+  group: deploy-website-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build + deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # build:website runs `pnpm build` (packages) internally, then builds every
+      # app with the correct *_BASE env vars and stages everything into website/.
+      - name: Build unified website
+        run: pnpm build:website
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The Pages project must already exist (create it once as a
+          # "Direct Upload" project named exactly `fluid` in the Cloudflare
+          # dashboard, or with `wrangler pages project create fluid`).
+          command: pages deploy website --project-name=fluid --branch=main

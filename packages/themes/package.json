@@ -1,0 +1,45 @@
+{
+  "name": "@fluid-ds/themes",
+  "version": "0.0.1-alpha.0",
+  "description": "Drop-in brand presets for Fluid, pure CSS, no build required. Apply via `data-fluid-brand` to swap brands at runtime.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/themes"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "themes",
+    "brand",
+    "design-system",
+    "css"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true
+  },
+  "exports": {
+    "./midnight.css": "./src/midnight.css",
+    "./corporate.css": "./src/corporate.css"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@fluid-ds/tokens": "workspace:*"
+  },
+  "scripts": {
+    "build": "echo \"(themes: no build step, CSS shipped as-is)\"",
+    "typecheck": "echo \"(no types)\""
+  }
+}

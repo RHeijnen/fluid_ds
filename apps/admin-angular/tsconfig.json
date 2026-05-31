@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "bundler",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom", "dom.iterable"],
+    "paths": {
+      "@fluid-ds/components": ["../../packages/components/dist/index.js"],
+      "@fluid-ds/components/define/*": ["../../packages/components/dist/components/*/define.js"],
+      "@fluid-ds/charts": ["../../packages/charts/dist/index.js"],
+      "@fluid-ds/charts/define/*": ["../../packages/charts/dist/components/*/define.js"],
+      "@fluid-ds/icons": ["../../packages/icons/dist/index.js"],
+      "@fluid-ds/icons/register-defaults": ["../../packages/icons/dist/register-defaults.js"],
+      "@fluid-ds/icons/lucide/*": ["../../packages/icons/dist/lucide/*.js"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "typeCheckHostBindings": true,
+    "strictTemplates": true
+  }
+}

@@ -1,0 +1,254 @@
+---
+title: "Copy button"
+description: "One-click clipboard with built-in success feedback. Resolves text from value, from-id, or slot."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-copy-button>` is the focused, single-purpose copy-to-clipboard
+button. It resolves the text to copy in this order: the `value` attribute,
+the element referenced by `from` (an ID), then its slotted text content.
+On success it flips to a check icon for ~1.5 seconds; on failure it stays
+silent.
+
+For copy-as-affordance on a code snippet, reach for
+[`<fluid-code-block>`](/components/code-block/), it embeds one of these
+already.
+
+<Demo>
+  <fluid-copy-button value="hello@example.com" aria-label="Copy email"></fluid-copy-button>
+  <fluid-copy-button value="hello@example.com">
+    <fluid-icon name="copy"></fluid-icon>
+    Copy email
+  </fluid-copy-button>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/copy-button/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/copy-button";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Copy a fixed value
+
+<Demo>
+  <fluid-copy-button value="hello@example.com" aria-label="Copy email"></fluid-copy-button>
+</Demo>
+
+```html
+<fluid-copy-button value="hello@example.com" aria-label="Copy email"></fluid-copy-button>
+```
+
+### Copy from an element
+
+<Demo>
+  <code id="demo-token" style="font-family: var(--fluid-font-family-mono); padding: 4px 8px; background: var(--fluid-surface-muted); border-radius: 4px;">sk-1234-abcd-ef</code>
+  <fluid-copy-button from="demo-token" aria-label="Copy token"></fluid-copy-button>
+</Demo>
+
+```html
+<code id="token">sk-1234-abcd-ef</code>
+<fluid-copy-button from="token" aria-label="Copy token"></fluid-copy-button>
+```
+
+### Slot-based label
+
+The default slot becomes the idle label, use it to add a visible "Copy"
+text alongside the icon, or to replace the icon entirely.
+
+<Demo>
+  <fluid-copy-button value="hello@example.com">
+    <fluid-icon name="copy"></fluid-icon>
+    Copy email
+  </fluid-copy-button>
+</Demo>
+
+You can also override the `success` and `error` slots if you want bespoke
+labels for those states:
+
+```html
+<fluid-copy-button value="…">
+  <span>Copy link</span>
+  <span slot="success">Copied!</span>
+</fluid-copy-button>
+```
+
+### Custom feedback duration
+
+`feedback-duration` is in milliseconds; default 1500.
+
+```html
+<fluid-copy-button value="…" feedback-duration="3000">…</fluid-copy-button>
+```
+
+## Listening for copy
+
+The button fires **`fluid-copy`** after every attempt, with `event.detail.success`
+(did the clipboard write succeed?) and `event.detail.text` (what was copied).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-copy-button id="btn" value="hello@example.com" aria-label="Copy email"></fluid-copy-button>
+
+    <script type="module">
+      document.getElementById("btn").addEventListener("fluid-copy", (e) => {
+        console.log("success:", e.detail.success, "text:", e.detail.text);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="CopyEmail.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/copy-button";
+
+    export function CopyEmail() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onCopy = (e: any) => console.log(e.detail.success);
+        el.addEventListener("fluid-copy", onCopy);
+        return () => el.removeEventListener("fluid-copy", onCopy);
+      }, []);
+      return <fluid-copy-button ref={ref} value="hello@example.com" aria-label="Copy email" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="CopyEmail.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/copy-button";
+    const onCopy = (e: any) => console.log(e.detail.success);
+    </script>
+
+    <template>
+      <fluid-copy-button value="hello@example.com" aria-label="Copy email" @fluid-copy="onCopy" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="copy-email.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/copy-button";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-copy-email",
+      template: `<fluid-copy-button value="hello@example.com" aria-label="Copy email" (fluid-copy)="onCopy($event)"></fluid-copy-button>`
+    })
+    export class CopyEmail {
+      onCopy(e: any) { console.log(e.detail.success); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="CopyEmail.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/copy-button";
+      const onCopy = (e: any) => console.log(e.detail.success);
+    </script>
+
+    <fluid-copy-button value="hello@example.com" aria-label="Copy email" on:fluid-copy={onCopy} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Inline copy of a single value: a token, an address, an API key.
+- For code-block copy, use [`<fluid-code-block>`](/components/code-block/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-copy-button-*` token
+that falls back to a main semantic var** (the override ladder); the success
+flash uses the **theme-independent** success tone. The **complete list** is in
+the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-copy-button-fg: var(--fluid-text-primary);
+  --fluid-copy-button-hover-bg: var(--fluid-surface-muted);
+  --fluid-copy-button-success-color: var(--fluid-success-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The button is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-copy-button" />
+
+## Accessibility
+
+- The internal button has an `aria-label` of "Copy to clipboard" that
+  flips to "Copied" for the feedback duration.
+- Set your own `aria-label` on the host when copying something specific
+  ("Copy email", "Copy API key") for better screen-reader context.
+- The copy action calls `navigator.clipboard.writeText` and fires
+  `fluid-copy` with `success: false` if it fails, no exception is
+  thrown.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts the
+focus indicator:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Code block"
+    href="/components/code-block/"
+    description="A read-only code surface with this copy button built in."
+  />
+  <LinkCard
+    title="Button"
+    href="/components/button/"
+    description="The general-purpose action button."
+  />
+  <LinkCard
+    title="Tooltip"
+    href="/components/tooltip/"
+    description="Add a hover hint to an icon-only copy button."
+  />
+  <LinkCard
+    title="Toast"
+    href="/components/toast/"
+    description="Confirm a copy with a transient notification instead."
+  />
+</CardGrid>

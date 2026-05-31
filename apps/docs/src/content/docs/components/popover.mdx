@@ -1,0 +1,263 @@
+---
+title: "Popover"
+description: "Click-triggered floating panel anchored to a trigger. Outside-click and Escape dismiss."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-popover>` is the general-purpose floating panel, click a trigger to
+open it, click outside or press <kbd>Escape</kbd> to close. Positioned with
+floating-ui, so it auto-flips when it would overflow the viewport.
+
+<Demo>
+  <fluid-popover>
+    <fluid-button slot="trigger">Open popover</fluid-button>
+    <p style="margin: 0;">Any content goes here.</p>
+  </fluid-popover>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/popover/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/popover";
+    ```
+  </TabItem>
+</Tabs>
+
+For a list of selectable menu items, prefer
+[`<fluid-dropdown>`](/components/dropdown/) (WAI-ARIA menu pattern). For just the
+positioning primitive without the open/close state machine, reach for
+[`<fluid-popup>`](/components/popup/).
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-popover>
+    <fluid-button slot="trigger">Open popover</fluid-button>
+    <p style="margin: 0;">Any content goes here.</p>
+    <p style="margin: var(--fluid-space-2) 0 0;">
+      Click outside or press Escape to dismiss.
+    </p>
+  </fluid-popover>
+</Demo>
+
+```html
+<fluid-popover>
+  <fluid-button slot="trigger">Open popover</fluid-button>
+  <p>Any content goes here.</p>
+</fluid-popover>
+```
+
+### Placement
+
+```html
+<fluid-popover placement="top-end">…</fluid-popover>
+```
+
+Accepts every floating-ui placement: `top`, `top-start`, `top-end`,
+`bottom`, `bottom-start` (default), `bottom-end`, `left`, `left-start`,
+`right`, `right-start`, etc.
+
+### Distance & skidding
+
+`distance` is gap from the trigger; `skidding` shifts along the cross
+axis.
+
+```html
+<fluid-popover placement="bottom" distance="12" skidding="-8">…</fluid-popover>
+```
+
+### Settings panel
+
+A common use, an icon-only button that reveals a small form.
+
+```html
+<fluid-popover placement="bottom-end">
+  <fluid-button slot="trigger" variant="ghost" aria-label="Settings">
+    <fluid-icon name="settings"></fluid-icon>
+  </fluid-button>
+  <form>
+    <fluid-switch>Dark mode</fluid-switch>
+    <fluid-switch>Compact density</fluid-switch>
+  </form>
+</fluid-popover>
+```
+
+## Listening for changes
+
+`<fluid-popover>` fires **`fluid-show`** and **`fluid-hide`**, and exposes
+imperative `show()` / `hide()` / `toggle()`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-popover id="p"><fluid-button slot="trigger">Open</fluid-button>…</fluid-popover>
+
+    <script type="module">
+      const p = document.getElementById("p");
+      p.addEventListener("fluid-show", () => console.log("opened"));
+      p.addEventListener("fluid-hide", () => console.log("closed"));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Settings.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/popover";
+
+    export function Settings() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onShow = () => console.log("opened");
+        el.addEventListener("fluid-show", onShow);
+        return () => el.removeEventListener("fluid-show", onShow);
+      }, []);
+      return <fluid-popover ref={ref}><button slot="trigger">Open</button>…</fluid-popover>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Settings.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/popover";
+    </script>
+
+    <template>
+      <fluid-popover @fluid-show="() => {}" @fluid-hide="() => {}">
+        <button slot="trigger">Open</button>…
+      </fluid-popover>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="settings.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/popover";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-settings",
+      template: `<fluid-popover (fluid-show)="onShow()"><button slot="trigger">Open</button>…</fluid-popover>`
+    })
+    export class Settings {
+      onShow() {}
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Settings.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/popover";
+    </script>
+
+    <fluid-popover on:fluid-show={() => {}} on:fluid-hide={() => {}}>
+      <button slot="trigger">Open</button>…
+    </fluid-popover>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Contextual options or controls attached to a specific element.
+
+### When *not* to use
+
+- **A list of actions**: use [`<fluid-dropdown>`](/components/dropdown/).
+- **Text-only help**: use [`<fluid-tooltip>`](/components/tooltip/) (hover-
+  triggered, lighter).
+- **A flow that must be completed/submitted first**: use
+  [`<fluid-dialog>`](/components/dialog/) (modal, not dismissible).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-popover-*` token that
+falls back to a main semantic var** (the override ladder). The **complete list**
+is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-popover-bg: var(--fluid-surface-base);
+  --fluid-popover-border: var(--fluid-border-default);
+  --fluid-popover-radius: var(--fluid-radius-md);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container exposes [`part="base"`](#api) and `part="panel"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-popover" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+popover-specific.
+
+### Focus & keyboard
+
+- The panel is `role="dialog"`; the trigger gets `aria-haspopup="true"` +
+  `aria-expanded`.
+- Focus moves into the first focusable element on open; on close it returns to
+  the trigger ([SC 2.4.3](https://www.w3.org/WAI/WCAG22/Understanding/focus-order)).
+- <kbd>Escape</kbd> and outside-click both dismiss.
+- For a form that **must be submitted before the user moves on**, use
+  [`<fluid-dialog>`](/components/dialog/), popovers are dismissible.
+
+### Motion
+
+The open/close scale + fade honors `prefers-reduced-motion`.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="A menu of selectable actions (WAI-ARIA menu)."
+  />
+  <LinkCard
+    title="Tooltip"
+    href="/components/tooltip/"
+    description="Lightweight hover/focus help text."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="A modal that must be dealt with before continuing."
+  />
+  <LinkCard
+    title="Popup"
+    href="/components/popup/"
+    description="The headless positioning primitive underneath."
+  />
+</CardGrid>

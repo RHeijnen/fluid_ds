@@ -1,0 +1,24 @@
+{
+  "name": "@fluid-ds/admin-native",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Admin-portal demo built with plain HTML + the Fluid web components (no framework, no app bundler).",
+  "scripts": {
+    "build:vendor": "node scripts/build-vendor.mjs",
+    "predev": "pnpm build:vendor",
+    "dev": "node scripts/serve.mjs",
+    "prebuild": "pnpm build:vendor",
+    "build": "node scripts/build-static.mjs"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "@fluid-ds/charts": "workspace:*",
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/themes": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*"
+  }
+}

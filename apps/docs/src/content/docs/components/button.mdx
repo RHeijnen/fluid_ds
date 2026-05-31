@@ -1,0 +1,632 @@
+---
+title: "Button"
+description: "Triggers an action. Three variants, six semantic tones, three sizes, icon slots, form-aware, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-button>` triggers an action, submit a form, open a dialog, run a
+command. It wraps a native `<button>` inside shadow DOM, so it behaves like
+a real form button (`type="submit"` works, `disabled` blocks submission)
+while adding variants, semantic tones, sizes, icon slots, loading and
+toggle states, and a focus-visible ring.
+
+<Demo>
+  <fluid-button>Save changes</fluid-button>
+  <fluid-button variant="secondary">
+    <fluid-icon slot="prefix" name="download"></fluid-icon>
+    Download
+  </fluid-button>
+  <fluid-button variant="ghost">
+    Cancel
+    <fluid-icon slot="suffix" name="x"></fluid-icon>
+  </fluid-button>
+</Demo>
+
+## Install
+
+Just this component, from a CDN or npm. Both paths register the
+`<fluid-button>` tag globally, once it's defined, every framework on the
+page can render it.
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/button";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Variants
+
+The variant attribute swaps the background + border treatment without
+changing the size or behavior. Pick **primary** for the one
+most-important action in a section, **secondary** for everything else,
+**ghost** for tertiary actions or toolbar-style controls.
+
+<Demo>
+  <fluid-button>Primary</fluid-button>
+  <fluid-button variant="secondary">Secondary</fluid-button>
+  <fluid-button variant="ghost">Ghost</fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button>Primary</fluid-button>
+<fluid-button variant="secondary">Secondary</fluid-button>
+<fluid-button variant="ghost">Ghost</fluid-button>`} />
+
+### Sizes
+
+Three sizes scale font, padding, and minimum height in lockstep. They
+share the same border radius so a row of mixed sizes stays visually
+aligned.
+
+<Demo>
+  <fluid-button size="sm">Small</fluid-button>
+  <fluid-button size="md">Medium</fluid-button>
+  <fluid-button size="lg">Large</fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button size="sm">Small</fluid-button>
+<fluid-button size="md">Medium</fluid-button>
+<fluid-button size="lg">Large</fluid-button>`} />
+
+### Tones
+
+`variant` is the *treatment*; `tone` is the *intent*. They're
+orthogonal, a danger action can be solid, outlined, or ghost. Tones are
+**theme-independent**: switching brand from Default to Midnight recolors
+`tone="brand"` buttons but leaves success / danger / warning / info
+exactly where they were.
+
+<Demo>
+  <fluid-button tone="brand">Brand</fluid-button>
+  <fluid-button tone="neutral">Neutral</fluid-button>
+  <fluid-button tone="success">Success</fluid-button>
+  <fluid-button tone="danger">Danger</fluid-button>
+  <fluid-button tone="warning">Warning</fluid-button>
+  <fluid-button tone="info">Info</fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button tone="danger">Delete</fluid-button>
+<fluid-button variant="secondary" tone="success">Approve</fluid-button>
+<fluid-button variant="ghost" tone="warning">Reset</fluid-button>`} />
+
+When `tone` is omitted, the default is variant-aware: primary defaults
+to **brand**, secondary and ghost default to **neutral**, so existing
+markup keeps its visual identity.
+
+<Aside type="tip">
+  Every tone's base + text pair is audited to meet
+  [WCAG 1.4.3 Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
+  at 4.5:1 for normal text. Warning uses dark text on amber for the
+  same reason Bootstrap and Material do, amber on white doesn't
+  reach 4.5:1.
+</Aside>
+
+### With an icon
+
+Drop a `<fluid-icon>` (or any element) into the `prefix` or `suffix`
+slot. The button auto-spaces the label and the icon so they read as one
+unit.
+
+<Demo>
+  <fluid-button>
+    <fluid-icon slot="prefix" name="download"></fluid-icon>
+    Download
+  </fluid-button>
+  <fluid-button variant="secondary">
+    Settings
+    <fluid-icon slot="suffix" name="settings"></fluid-icon>
+  </fluid-button>
+  <fluid-button variant="ghost" aria-label="More options">
+    <fluid-icon name="ellipsis"></fluid-icon>
+  </fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button>
+  <fluid-icon slot="prefix" name="download"></fluid-icon>
+  Download
+</fluid-button>
+
+<!-- icon-only, give it an aria-label so screen readers can name it -->
+<fluid-button variant="ghost" aria-label="More options">
+  <fluid-icon name="ellipsis"></fluid-icon>
+</fluid-button>`} />
+
+### Disabled
+
+`disabled` blocks clicks and key activation and dims the visual treatment.
+Inside a form, a disabled button won't submit either.
+
+<Demo>
+  <fluid-button disabled>Primary</fluid-button>
+  <fluid-button variant="secondary" disabled>Secondary</fluid-button>
+  <fluid-button variant="ghost" disabled>Ghost</fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button disabled>Primary</fluid-button>
+<fluid-button variant="secondary" disabled>Secondary</fluid-button>
+<fluid-button variant="ghost" disabled>Ghost</fluid-button>`} />
+
+### Loading
+
+`loading` shows an inline spinner and blocks activation while an action is
+in flight. Unlike `disabled`, the button **stays focusable**, it sets
+`aria-disabled` and `aria-busy` rather than the native `disabled` attribute,
+so a screen-reader user isn't dropped out of the tab order mid-task. The
+visible label stays put, so the accessible name never changes.
+
+<Demo>
+  <fluid-button loading>Saving…</fluid-button>
+  <fluid-button variant="secondary" loading>Loading</fluid-button>
+  <fluid-button tone="success" loading>Approving</fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button loading>Saving…</fluid-button>`} />
+
+```js
+// Toggle it around an async action.
+button.loading = true;
+try {
+  await save();
+} finally {
+  button.loading = false;
+}
+```
+
+<Aside type="tip">
+  The spinner honors `prefers-reduced-motion: reduce`, it stops spinning
+  for users who opt out of motion, while still signalling the busy state
+  via `aria-busy`.
+</Aside>
+
+### Toggle
+
+Set `toggle` to turn the button into a binary on/off control, mute/unmute,
+a bold button in a toolbar, a favorite star. It exposes `aria-pressed` and
+flips it on each activation
+([WCAG 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html)),
+paints a subtle inset "pressed" state, and fires a `fluid-change` event with
+`{ pressed }` in `detail`. Use `pressed` to set the initial state.
+
+<Demo>
+  <fluid-button toggle>
+    <fluid-icon slot="prefix" name="star"></fluid-icon>
+    Favorite
+  </fluid-button>
+  <fluid-button toggle pressed>
+    <fluid-icon slot="prefix" name="star"></fluid-icon>
+    Favorited
+  </fluid-button>
+  <fluid-button variant="ghost" toggle pressed aria-label="Notifications">
+    <fluid-icon name="bell"></fluid-icon>
+  </fluid-button>
+</Demo>
+
+<ConformanceCode code={`<fluid-button toggle>Mute</fluid-button>`} />
+
+```js
+document.querySelector("fluid-button").addEventListener("fluid-change", (e) => {
+  console.log("pressed:", e.detail.pressed);
+});
+```
+
+<Aside type="note">
+  A toggle button is for an **in-place** binary action (its label or icon
+  may even change with state). For a settings-style on/off that reads as a
+  form value, prefer [`<fluid-switch>`](/components/switch/) or
+  [`<fluid-checkbox>`](/components/checkbox/).
+</Aside>
+
+### Dropdown trigger
+
+Set `caret` to render a built-in chevron and mark the button as a menu
+trigger, no hand-slotted icon needed. Pair it with a
+[`<fluid-dropdown>`](/components/dropdown/); the chevron rotates while the
+menu is open. A caret with no label collapses to a compact square trigger,
+which is exactly the right-hand half of a
+[split button](/components/button-group/#split-button).
+
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+    <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+    <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+    <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropdown>
+  <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+  <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+  <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+</fluid-dropdown>`} />
+
+## Listening for clicks
+
+A `<fluid-button>` fires a regular DOM `click` event when activated by
+mouse, touch, or keyboard. **Every framework's standard click handler
+works**, you don't need a custom binding.
+
+The tabs below show the same handler in each framework. Setup details
+(TypeScript types, custom-event nuances) live in the
+[Framework integrations guide](/guides/frameworks/).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-button id="save">Save</fluid-button>
+
+    <script type="module">
+      document.getElementById("save").addEventListener("click", (e) => {
+        console.log("clicked", e);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="SaveButton.tsx"
+    import "@fluid-ds/components/define/button";
+
+    export function SaveButton() {
+      return (
+        <fluid-button onClick={(e) => console.log("clicked", e)}>
+          Save
+        </fluid-button>
+      );
+    }
+    ```
+
+    <Aside type="note">
+      `click` is a native DOM event, so `onClick` works in both React 18
+      and 19. The custom `fluid-click` event needs `ref + addEventListener`
+      in React 18 or `onFluidClick` in React 19, see the
+      [framework guide](/guides/frameworks/#react) for details.
+    </Aside>
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="SaveButton.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/button";
+
+    function onSave(e: MouseEvent) {
+      console.log("clicked", e);
+    }
+    </script>
+
+    <template>
+      <fluid-button @click="onSave">
+        Save
+      </fluid-button>
+    </template>
+    ```
+
+    <Aside type="note">
+      Tell Vue that `fluid-*` tags are custom elements (one-time setup):
+      `app.config.compilerOptions.isCustomElement = (tag) => tag.startsWith("fluid-")`.
+    </Aside>
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="save-button.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/button";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "save-button",
+      template: `
+        <fluid-button (click)="onSave($event)">
+          Save
+        </fluid-button>
+      `
+    })
+    export class SaveButton {
+      onSave(e: MouseEvent) {
+        console.log("clicked", e);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="SaveButton.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/button";
+
+      function onSave(e: MouseEvent) {
+        console.log("clicked", e);
+      }
+    </script>
+
+    <fluid-button on:click={onSave}>
+      Save
+    </fluid-button>
+    ```
+  </TabItem>
+</Tabs>
+
+### `click` vs `fluid-click`
+
+The button dispatches both:
+
+- **`click`**: the standard DOM event. Bubbles, works in every
+  framework's idiomatic handler, fires once per activation. **Use this
+  by default.**
+- **`fluid-click`**: a custom event dispatched on activation
+  (`Space`/`Enter` or pointer). Mirrors `click` but is namespaced, so
+  it's safe to listen for at higher scopes (e.g. delegate from a parent)
+  without colliding with non-Fluid clicks. Use this when you want to
+  distinguish Fluid-component activations from arbitrary DOM clicks.
+
+## Inside a form
+
+`<fluid-button>` is form-associated. `type="submit"` submits the
+enclosing form like a native button; `type="reset"` resets it. A
+`disabled` button blocks submission.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.5rem;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Submitted at ' + new Date().toLocaleTimeString();"
+  >
+    <fluid-input name="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
+    <fluid-button type="submit">Subscribe</fluid-button>
+    <output style="align-self:center; font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-input name="email" placeholder="you@example.com" required></fluid-input>
+  <fluid-button type="submit">Subscribe</fluid-button>
+</form>
+```
+
+See the [Forms guide](/guides/forms/) for validation, submission, and
+form-data wiring across frameworks.
+
+## As a link
+
+If the action is **navigation**, use a real `<a>` so right-click,
+middle-click, scroll restoration, and prefetch all keep working. Wrap a
+`<fluid-button>` for the look:
+
+<Demo>
+  <a href="https://github.com/RHeijnen/fluid_ds" style="text-decoration:none;">
+    <fluid-button variant="secondary">
+      View on GitHub
+      <fluid-icon slot="suffix" name="external-link"></fluid-icon>
+    </fluid-button>
+  </a>
+</Demo>
+
+```html
+<a href="/pricing" style="text-decoration:none;">
+  <fluid-button variant="secondary">View pricing</fluid-button>
+</a>
+```
+
+## Theming
+
+Every styled property of the button reads a **component-scoped
+`--fluid-button-*` token that falls back to a main semantic variable**:
+`background: var(--fluid-button-bg, var(--fluid-accent-base))`,
+`border-radius: var(--fluid-button-radius, var(--fluid-radius-md))`, and so on.
+That fall-back chain is the override ladder, and it gives you three levels for
+free:
+
+1. **Brand**: override the main var (`--fluid-accent-base`,
+   `--fluid-radius-md`, …) and *every* component that reads it reflows.
+2. **Component**: override the `--fluid-button-*` token and *all* buttons
+   change, nothing else.
+3. **Instance**: set the `--fluid-button-*` token inline or on a
+   `[data-fluid-id]` and *one* button changes.
+
+The **complete, authoritative list** of both layers lives in the
+[API tables below](#api): **CSS custom properties** is every
+`--fluid-button-*` override knob; **Semantic tokens consumed** is every main
+var those knobs fall back to. The two you'll reach for most are
+`--fluid-button-bg` and `--fluid-button-fg`.
+
+```css title="brand.css"
+/* Re-skin every button under a brand wrapper. */
+[data-fluid-brand="custom"] {
+  --fluid-button-bg: #db2777;
+  --fluid-button-fg: #ffffff;
+}
+
+/* Re-skin one specific instance (after isolating it in the Theme builder). */
+[data-fluid-id="primary-cta"] {
+  --fluid-button-bg: linear-gradient(135deg, #6366f1, #22d3ee);
+}
+```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) (or the playground panel inside this
+  site) lets you tweak these tokens visually and exports the CSS above.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+Tokens cover the *intended* theming knobs. For anything else, a one-off
+property we never tokenized, the inner element is exposed as
+[`part="base"`](#api) (the button also exposes `spinner` and `caret` parts),
+so you can reach it with the standard [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+selector and set **any** CSS:
+
+```css
+/* Round a single corner (no per-corner token needed). */
+fluid-button.tab::part(base) {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+```
+
+Two notes that make per-corner specifically a non-issue:
+
+- `--fluid-button-radius` feeds the `border-radius` **shorthand**, so it already
+  accepts up to four values, `--fluid-button-radius: 12px 12px 0 0` rounds only
+  the top corners with no `::part()` at all.
+- `::part()` is the escape hatch for the long tail (a bespoke shadow, a gradient
+  border, one decoupled corner). Tokens for the common cases **plus** `::part()`
+  for the rest is what makes the system fully open without thousands of tokens:
+  so we deliberately *don't* split every shorthand into sub-tokens.
+
+## When to use
+
+- The **primary action** in a card, modal, or section header.
+- Submitting a form (`type="submit"`).
+- Opening anything: dialog, drawer, popover, dropdown.
+- A toolbar control that's not navigation.
+
+### When *not* to use
+
+- **Navigation**: use a plain `<a>` (optionally wrapped in a button
+  for visual treatment, as shown above).
+- A **settings-style on/off** that reads as a form value: use
+  `<fluid-switch>` or `<fluid-checkbox>`. (For an *in-place* binary action
+  like mute or bold, the [toggle button](#toggle) above is the right tool.)
+- A **destructive confirmation** by itself: pair with `<fluid-dialog>`
+  so the user has a chance to cancel.
+
+## Accessibility
+
+`<fluid-button>` wraps a real native `<button>` in shadow DOM, so it inherits
+the button role, keyboard behavior, and form participation for free, **no
+ARIA `role` is added**. `delegatesFocus` forwards `.focus()` on the host to the
+inner button. The notes below are button-specific; the cross-component
+contract lives in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Move focus in / out, like any focusable control. |
+| <kbd>Space</kbd> | Activate (fires on key-up, native button behavior). |
+| <kbd>Enter</kbd> | Activate (fires on key-down). |
+
+The focus ring is `:focus-visible`, keyboard users see it, pointer users
+don't. Its width + offset read `--fluid-focus-ring-width` / `-offset`, so the
+AAA toggle thickens it without touching the component.
+
+### Names
+
+- The visible label is the accessible name. An **icon-only** button has an
+  empty label slot and a decorative (`aria-hidden`) icon, so it **MUST** carry
+  an `aria-label` on the host, Fluid logs a dev-time `console.warn` if you
+  forget ([SC 4.1.2 Name, Role, Value](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html),
+  [SC 1.1.1 Non-text Content](https://www.w3.org/WAI/WCAG22/Understanding/non-text-content)).
+- The label stays in the DOM in every state (incl. `loading`), so the
+  accessible name never changes out from under a screen reader
+  ([SC 2.5.3 Label in Name](https://www.w3.org/WAI/WCAG22/Understanding/label-in-name)).
+
+### State semantics
+
+- **`disabled`** sets the inner button's native `disabled` (mirrored as
+  `aria-disabled` on the host): blocks pointer + key activation and removes it
+  from the tab order, the conventional choice for a plain action. If you need
+  a disabled control that *stays* focusable so SR users can reach and hear it,
+  use the `aria-disabled` pattern from the
+  [Accessibility guide](/guides/accessibility/).
+- **`loading`** deliberately keeps the button focusable: `aria-busy="true"` +
+  `aria-disabled="true"` (not native `disabled`), so a screen-reader user isn't
+  dropped out of the tab order mid-task. Activation is still blocked.
+- **`toggle`** exposes `aria-pressed` and flips it on each activation
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+  Non-toggle buttons omit `aria-pressed` entirely.
+- **`caret`** forwards `aria-haspopup` / `aria-expanded` / `aria-controls`
+  (stamped by [`<fluid-dropdown>`](/components/dropdown/)) onto the inner
+  button, so the popup state sits on the element carrying the button role.
+
+### Motion & target size
+
+- Motion (the settle-on-press transform, and the loading spinner) is disabled
+  under `prefers-reduced-motion: reduce`.
+- Every pointer target is at least **24×24** CSS px by default
+  ([SC 2.5.8 Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+  AA), enforced even on `size="sm"` and icon-only.
+
+### AA vs AAA
+
+The button ships **WCAG 2.2 Level AA** by default and scales to **AAA** on a
+switch. Flip the **Conformance** toggle at the top of this page, every example
+above resizes, *and the code snippets switch to show the
+`data-fluid-conformance="aaa"` wrapper that produces them*. It's not a mock-up:
+the toggle sets the real attribute on `<html>`, the same switch you'd throw
+app-wide. The button reads conformance tokens, so it scales with zero
+per-component branching:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+```html
+<!-- Opt the whole app (or one region) into AAA, once, on an ancestor. -->
+<html data-fluid-conformance="aaa">
+  …
+  <fluid-button>44×44 target, 3px focus ring</fluid-button>
+</html>
+```
+
+<Aside type="note">
+  Text-contrast enhancement ([SC 1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced),
+  7:1) is a property of the brand color track, not these structural tokens:
+  the default palette targets the AA 4.5:1 floor. Target size and focus
+  appearance are the deltas a component itself owns, and the two this toggle
+  demonstrates.
+</Aside>
+
+## API
+
+<ComponentApi tag="fluid-button" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Button group"
+    href="/components/button-group/"
+    description="Tightly-coupled cluster of buttons for segmented or toolbar layouts."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="Use a button as the trigger for a menu of actions."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Form validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

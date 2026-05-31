@@ -1,0 +1,312 @@
+---
+title: "Tree"
+description: "Hierarchical tree view. WAI-ARIA tree pattern with arrow-key nav and expand/collapse."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-tree>` is the hierarchical list view, file explorers, settings trees,
+navigation drawers with sub-items. Children are `<fluid-tree-item>` elements,
+nested arbitrarily deep. The tree coordinates single selection, manages roving
+focus, and implements the WAI-ARIA tree pattern.
+
+<Demo>
+  <fluid-tree style="width: 100%; max-width: 18rem;">
+    <fluid-tree-item>
+      Documents
+      <fluid-tree-item slot="children">Resume.pdf</fluid-tree-item>
+      <fluid-tree-item slot="children">Cover-letter.pdf</fluid-tree-item>
+    </fluid-tree-item>
+    <fluid-tree-item>Settings.json</fluid-tree-item>
+  </fluid-tree>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tree/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/tree"; // registers tree + tree-item
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-tree style="width: 100%; max-width: 18rem;">
+    <fluid-tree-item>
+      Documents
+      <fluid-tree-item slot="children">Resume.pdf</fluid-tree-item>
+      <fluid-tree-item slot="children">
+        Work
+        <fluid-tree-item slot="children">Q1-report.docx</fluid-tree-item>
+        <fluid-tree-item slot="children">Q2-report.docx</fluid-tree-item>
+      </fluid-tree-item>
+    </fluid-tree-item>
+    <fluid-tree-item>
+      Photos
+      <fluid-tree-item slot="children">2026-01.jpg</fluid-tree-item>
+      <fluid-tree-item slot="children">2026-02.jpg</fluid-tree-item>
+    </fluid-tree-item>
+    <fluid-tree-item>Settings.json</fluid-tree-item>
+  </fluid-tree>
+</Demo>
+
+```html
+<fluid-tree>
+  <fluid-tree-item>
+    Documents
+    <fluid-tree-item slot="children">Resume.pdf</fluid-tree-item>
+    <fluid-tree-item slot="children">
+      Work
+      <fluid-tree-item slot="children">Q1-report.docx</fluid-tree-item>
+    </fluid-tree-item>
+  </fluid-tree-item>
+</fluid-tree>
+```
+
+Nested items go into the parent's `children` slot. The tree assigns
+nesting level automatically.
+
+### Initially expanded
+
+Set `expanded` on any item you want open from the start.
+
+```html
+<fluid-tree-item expanded>
+  Documents
+  <fluid-tree-item slot="children">…</fluid-tree-item>
+</fluid-tree-item>
+```
+
+### Listening for selection
+
+```ts
+const tree = document.querySelector("fluid-tree");
+tree.addEventListener("fluid-select", (e) => {
+  console.log("selected:", e.detail.item.textContent);
+});
+```
+
+### Initial selection by id
+
+```html
+<fluid-tree selected="readme">
+  <fluid-tree-item id="readme">README.md</fluid-tree-item>
+</fluid-tree>
+```
+
+## When to use
+
+- File-explorer-style navigation.
+- Settings or category hierarchies that benefit from inline expansion.
+- For flat top-level navigation, use
+  [`<fluid-tabs>`](/components/tabs/) or
+  [`<fluid-breadcrumb>`](/components/breadcrumb/).
+- For collapsible disclosures that aren't hierarchical, use
+  [`<fluid-accordion>`](/components/accordion/).
+
+## Listening for changes
+
+`<fluid-tree>` fires **`fluid-select`** with `{ item }` in `detail` when a node
+is activated; each item also fires **`fluid-toggle`** (`{ expanded }`) when it
+expands or collapses.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-tree id="files">…</fluid-tree>
+
+    <script type="module">
+      document.getElementById("files").addEventListener("fluid-select", (e) => {
+        console.log("selected:", e.detail.item.textContent);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="FileTree.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/tree";
+
+    export function FileTree() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onSelect = (e: Event) =>
+          console.log((e as CustomEvent).detail.item);
+        el.addEventListener("fluid-select", onSelect);
+        return () => el.removeEventListener("fluid-select", onSelect);
+      }, []);
+      return (
+        <fluid-tree ref={ref}>
+          <fluid-tree-item>Docs</fluid-tree-item>
+        </fluid-tree>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="FileTree.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/tree";
+    const onSelect = (e: CustomEvent) => console.log(e.detail.item);
+    </script>
+
+    <template>
+      <fluid-tree @fluid-select="onSelect">
+        <fluid-tree-item>Docs</fluid-tree-item>
+      </fluid-tree>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="file-tree.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/tree";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "file-tree",
+      template: `
+        <fluid-tree (fluid-select)="onSelect($event)">
+          <fluid-tree-item>Docs</fluid-tree-item>
+        </fluid-tree>
+      `
+    })
+    export class FileTree {
+      onSelect(e: CustomEvent) {
+        console.log(e.detail.item);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="FileTree.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/tree";
+      function onSelect(e: CustomEvent) {
+        console.log(e.detail.item);
+      }
+    </script>
+
+    <fluid-tree on:fluid-select={onSelect}>
+      <fluid-tree-item>Docs</fluid-tree-item>
+    </fluid-tree>
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped token that falls back to a main
+semantic var** (the override ladder): the tree exposes `--fluid-tree-*` and each
+node exposes `--fluid-tree-item-*` (the selected accent falls through to
+`--fluid-accent-base`). The **complete list** is in the [API tables
+below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-tree-indent: 1.25rem;
+  --fluid-tree-item-hover-bg: var(--fluid-surface-muted);
+  --fluid-tree-item-selected-accent: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+Each node exposes [`part="base"`](#api) (the row), `part="label"`, and
+`part="children"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-tree" />
+
+### `<fluid-tree-item>`
+
+<ComponentApi tag="fluid-tree-item" />
+
+## Accessibility
+
+Implements the WAI-ARIA Tree View pattern. The cross-component contract is in
+the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Move between visible items. |
+| <kbd>→</kbd> | Expand the focused item (or move to its first child if already expanded). |
+| <kbd>←</kbd> | Collapse (or move to the parent if already collapsed). |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last visible item. |
+| <kbd>Enter</kbd> | Activate the item (fires `fluid-select`). |
+
+### Names & roles
+
+The host is `role="tree"`; each item is `role="treeitem"` with `aria-expanded`
+(parents), `aria-selected`, and `aria-level`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### Motion & target size
+
+- The chevron rotation honors `prefers-reduced-motion`.
+- Each row floors its height to `--fluid-target-min`: ≥ **24px** (AA) / **44px**
+  (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Accordion"
+    href="/components/accordion/"
+    description="Single-level expand/collapse for prose sections."
+  />
+  <LinkCard
+    title="Breadcrumb"
+    href="/components/breadcrumb/"
+    description="Show the current position in a hierarchy."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="A flat menu of actions instead of a nested view."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-select / fluid-toggle across frameworks."
+  />
+</CardGrid>

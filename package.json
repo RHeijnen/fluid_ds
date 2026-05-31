@@ -1,0 +1,52 @@
+{
+  "name": "fluid-ds",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fluid Design System, framework-agnostic web components",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter=./packages/* build",
+    "build:website": "node scripts/build-website.mjs",
+    "preview:website": "node scripts/preview-website.mjs",
+    "dev": "concurrently --names landing,storybook,playground,docs,demos,wizard --prefix-colors blue,cyan,magenta,yellow,green,red --kill-others-on-fail \"pnpm --filter @fluid-ds/landing dev\" \"pnpm --filter @fluid-ds/storybook dev:open\" \"pnpm --filter @fluid-ds/playground dev:open\" \"pnpm --filter @fluid-ds/docs dev:open\" \"pnpm --filter @fluid-ds/demos dev:open\" \"pnpm --filter @fluid-ds/wizard dev:open\"",
+    "landing": "pnpm --filter @fluid-ds/landing dev",
+    "landing:build": "pnpm --filter @fluid-ds/landing build",
+    "storybook": "pnpm --filter @fluid-ds/storybook dev",
+    "storybook:build": "pnpm --filter @fluid-ds/storybook build",
+    "playground": "pnpm --filter @fluid-ds/playground dev",
+    "docs": "pnpm --filter @fluid-ds/docs dev",
+    "docs:build": "pnpm --filter @fluid-ds/docs build",
+    "demos": "pnpm --filter @fluid-ds/demos dev",
+    "demos:build": "pnpm --filter @fluid-ds/demos build",
+    "wizard": "pnpm --filter @fluid-ds/wizard dev",
+    "wizard:build": "pnpm --filter @fluid-ds/wizard build",
+    "analyze": "pnpm --filter @fluid-ds/components analyze",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @fluid-ds/components test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:coverage": "node scripts/check-component-coverage.mjs",
+    "verify": "pnpm typecheck && pnpm lint && pnpm check:coverage && pnpm test && pnpm build",
+    "publish:dry": "node scripts/dry-run-publish.mjs",
+    "clean": "pnpm -r exec rimraf dist .turbo node_modules/.cache"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.11",
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-lit": "^1.15.0",
+    "eslint-plugin-lit-a11y": "^4.1.4",
+    "eslint-plugin-wc": "^2.2.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.1"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@fluid-ds/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "pnpm --filter @fluid-ds/tokens build && pnpm --filter @fluid-ds/components build && pnpm stubs",
+    "dev": "astro dev",
+    "dev:open": "astro dev --open",
+    "prebuild": "pnpm --filter @fluid-ds/tokens build && pnpm --filter @fluid-ds/components build && pnpm stubs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "stubs": "node scripts/generate-stubs.mjs",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.30.6",
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/themes": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*",
+    "astro": "^5.1.3",
+    "lit": "^3.2.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.7.2"
+  }
+}

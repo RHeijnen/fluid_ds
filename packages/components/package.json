@@ -1,0 +1,95 @@
+{
+  "name": "@fluid-ds/components",
+  "version": "0.0.1-alpha.0",
+  "description": "Framework-agnostic web components for Fluid, ~50 standard custom elements (buttons, inputs, dialogs, drawers, tabs, trees, …). Drop into any HTML page; React/Vue/Angular/Svelte/Solid friendly.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/components"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "design-system",
+    "web-components",
+    "custom-elements",
+    "lit",
+    "framework-agnostic",
+    "accessible",
+    "themable",
+    "typescript",
+    "components"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "customElements": "custom-elements.json",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./define/*": {
+      "types": "./src/components/*/define.ts",
+      "import": "./src/components/*/define.ts"
+    },
+    "./custom-elements.json": "./custom-elements.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./define/*": {
+        "types": "./dist/components/*/define.d.ts",
+        "import": "./dist/components/*/define.js"
+      },
+      "./custom-elements.json": "./custom-elements.json"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "custom-elements.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/define.js",
+    "**/define.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && pnpm analyze",
+    "analyze": "cem analyze",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "web-test-runner --config web-test-runner.config.js",
+    "test:watch": "web-test-runner --config web-test-runner.config.js --watch",
+    "dev": "tsc -p tsconfig.build.json --watch"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.6.13",
+    "@fluid-ds/icons": "workspace:*",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.10.4",
+    "@open-wc/testing": "^4.0.0",
+    "@storybook/web-components": "^8.4.7",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.0",
+    "@web/test-runner-commands": "^0.9.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "playwright": "^1.49.1",
+    "typescript": "^5.7.2"
+  }
+}

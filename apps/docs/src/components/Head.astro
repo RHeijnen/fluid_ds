@@ -1,0 +1,132 @@
+---
+/*
+ * Override of Starlight's default <Head>, wrapping it so we can inject a
+ * single shared script that registers every Fluid web component and the
+ * default icon set.
+ *
+ * Critical: we must explicitly forward Astro.props to the inner default.
+ * Starlight passes page-context (entry, locale, headings, sidebar etc.)
+ * through that prop bag; if we drop it, internal route generation
+ * (notably the static /404 route) destructures an undefined value and the
+ * build fails. We type the spread via Starlight's exported Props alias so
+ * `astro check` doesn't lose track of the bag's shape.
+ *
+ * The inline <script> block is processed by Astro: imports get bundled
+ * into a real module that's emitted once per page, code-split + cached.
+ */
+import Default from "@astrojs/starlight/components/Head.astro";
+import type { Props } from "@astrojs/starlight/props";
+
+const props = Astro.props as Props;
+---
+
+<Default {...props}><slot /></Default>
+
+{/*
+  FOUC-safe sync of Starlight's light/dark toggle into the Fluid
+  token system. Starlight writes `data-theme="light|dark"` on <html>;
+  our @fluid-ds/tokens/dark.css gates on `[data-fluid-theme="dark"]`.
+  Without this mirror, toggling Starlight's button repainted the
+  Starlight chrome but every embedded <fluid-*> component stayed in
+  light mode regardless.
+
+  Also restores the persisted brand preset (default / midnight /
+  corporate) before paint so the first frame matches the user's
+  last choice rather than flashing through the default brand.
+
+  Inline + early so it runs before first paint, avoiding a visible
+  light→dark or default→midnight flicker on load.
+*/}
+<script is:inline>
+  (() => {
+    const html = document.documentElement;
+    const sync = () => {
+      const t = html.dataset.theme === "dark" ? "dark" : "light";
+      if (html.dataset.fluidTheme !== t) html.dataset.fluidTheme = t;
+    };
+    sync();
+    new MutationObserver(sync).observe(html, {
+      attributes: true,
+      attributeFilter: ["data-theme"]
+    });
+    try {
+      const brand = localStorage.getItem("fluid-docs-brand");
+      if (brand && brand !== "default") html.dataset.fluidBrand = brand;
+    } catch {
+      /* localStorage may throw in private modes, ignore */
+    }
+    try {
+      // Restore the AA/AAA conformance choice before paint so the header
+      // toggle + every live example match the user's last choice with no flash.
+      if (localStorage.getItem("fluid-docs-conformance") === "aaa") {
+        html.dataset.fluidConformance = "aaa";
+      }
+    } catch {
+      /* localStorage may throw in private modes, ignore */
+    }
+  })();
+</script>
+
+<script>
+  // Default icon set, chevrons, x, check, search etc.
+  import "@fluid-ds/icons/register-defaults";
+
+  // Main components.
+  import "@fluid-ds/components/define/accordion";
+  import "@fluid-ds/components/define/animation";
+  import "@fluid-ds/components/define/avatar";
+  import "@fluid-ds/components/define/badge";
+  import "@fluid-ds/components/define/breadcrumb";
+  import "@fluid-ds/components/define/button";
+  import "@fluid-ds/components/define/button-group";
+  import "@fluid-ds/components/define/callout";
+  import "@fluid-ds/components/define/card";
+  import "@fluid-ds/components/define/carousel";
+  import "@fluid-ds/components/define/checkbox";
+  import "@fluid-ds/components/define/code-block";
+  import "@fluid-ds/components/define/color-picker";
+  import "@fluid-ds/components/define/comparison";
+  import "@fluid-ds/components/define/copy-button";
+  import "@fluid-ds/components/define/dialog";
+  import "@fluid-ds/components/define/divider";
+  import "@fluid-ds/components/define/drawer";
+  import "@fluid-ds/components/define/dropdown";
+  import "@fluid-ds/components/define/file-input";
+  import "@fluid-ds/components/define/grid";
+  import "@fluid-ds/components/define/mosaic";
+  import "@fluid-ds/components/define/format-bytes";
+  import "@fluid-ds/components/define/format-date";
+  import "@fluid-ds/components/define/format-number";
+  import "@fluid-ds/components/define/icon";
+  import "@fluid-ds/components/define/include";
+  import "@fluid-ds/components/define/input";
+  import "@fluid-ds/components/define/intersection-observer";
+  import "@fluid-ds/components/define/mutation-observer";
+  import "@fluid-ds/components/define/number-input";
+  import "@fluid-ds/components/define/page";
+  import "@fluid-ds/components/define/popover";
+  import "@fluid-ds/components/define/popup";
+  import "@fluid-ds/components/define/progress-bar";
+  import "@fluid-ds/components/define/progress-ring";
+  import "@fluid-ds/components/define/radio";
+  import "@fluid-ds/components/define/rating";
+  import "@fluid-ds/components/define/relative-time";
+  import "@fluid-ds/components/define/resize-observer";
+  import "@fluid-ds/components/define/scroller";
+  import "@fluid-ds/components/define/segmented-control";
+  import "@fluid-ds/components/define/select";
+  import "@fluid-ds/components/define/skeleton";
+  import "@fluid-ds/components/define/slider";
+  import "@fluid-ds/components/define/spinner";
+  import "@fluid-ds/components/define/split-panel";
+  import "@fluid-ds/components/define/stack";
+  import "@fluid-ds/components/define/steps";
+  import "@fluid-ds/components/define/switch";
+  import "@fluid-ds/components/define/tabs";
+  import "@fluid-ds/components/define/tag";
+  import "@fluid-ds/components/define/textarea";
+  import "@fluid-ds/components/define/toast";
+  import "@fluid-ds/components/define/tooltip";
+  import "@fluid-ds/components/define/tree";
+  import "@fluid-ds/components/define/typeahead";
+</script>

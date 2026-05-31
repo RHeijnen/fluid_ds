@@ -1,0 +1,187 @@
+---
+title: "Installation"
+description: "Drop Fluid into any HTML page in 60 seconds, or install via npm for bundled apps."
+---
+
+import { Tabs, TabItem, Steps, Aside } from "@astrojs/starlight/components";
+
+Fluid is a set of **standard web components**. That means it works in any
+HTML page without a framework, without a build step, and without wrappers.
+
+The fastest path is the CDN. Skip down to [Bundlers](#bundlers) if you're
+already using npm + Vite / Webpack / Parcel, or to
+[Frameworks](#frameworks) for React / Vue / Angular specifics.
+
+## The fastest path: CDN + HTML
+
+Paste this into a blank `.html` file and open it in your browser. There is
+no build step, no framework, no package manager, just a few `<script>`
+and `<link>` tags from [jsDelivr](https://www.jsdelivr.com/).
+
+```html title="index.html"
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello, Fluid</title>
+
+    <!-- 1. Design tokens, CSS custom properties -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <!-- 2. Default icons + the components you use (each registers one tag) -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js"></script>
+  </head>
+  <body>
+    <!-- 3. Use the tags like any other HTML element -->
+    <fluid-card style="max-width: 24rem; margin: 4rem auto;">
+      <h3 slot="header" style="margin: 0;">Hello, Fluid</h3>
+      <p>You're rendering real web components straight from a CDN, no build.</p>
+      <fluid-button>Get started</fluid-button>
+    </fluid-card>
+  </body>
+</html>
+```
+
+That's the entire happy path. Drop the file on any static host, open it in
+a browser, or paste the contents into a [CodePen](https://codepen.io). It
+just works.
+
+<Aside type="tip" title="More than two components?">
+  Once you're using more than a handful of tags, switch from individual
+  `<script src>` lines to an [import map](#import-maps), same CDN, less
+  boilerplate.
+</Aside>
+
+<Aside type="caution" title="Packages not yet on npm">
+  Fluid isn't published to npm yet, the URLs above are how it will work
+  once it is. For now, clone the repo and run `pnpm dev` to play locally
+  ([see Development](#local-development)).
+</Aside>
+
+### Import maps
+
+For more than a few components, an import map gives you clean bare imports
+in the rest of your page:
+
+```html title="index.html"
+<script type="importmap">
+  {
+    "imports": {
+      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
+      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
+      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/"
+    }
+  }
+</script>
+
+<script type="module">
+  // Now you can write the same imports the bundler users do.
+  import "@fluid-ds/icons/register-defaults.js";
+  import "@fluid-ds/components/button/define.js";
+  import "@fluid-ds/components/input/define.js";
+  import "@fluid-ds/components/dialog/define.js";
+</script>
+```
+
+Import maps are supported in every modern browser (Chrome 89+, Firefox 108+,
+Safari 16.4+).
+
+### Pin a version for production
+
+`@latest` is convenient while you're tinkering, but for production sites,
+pin to a specific version so a release doesn't change behaviour under you:
+
+```html
+<!-- pinned -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@1.2.3/dist/components/button/define.js"></script>
+
+<!-- the rest of the URL stays identical -->
+```
+
+See [CDN reference](/getting-started/cdn/) for URL patterns, version
+ranges, file paths, and the full list of CDN providers we recommend.
+
+## Bundlers
+
+If you're building with Vite, Webpack, Parcel, Rollup, esbuild, or
+similar, install the packages from npm.
+
+<Tabs syncKey="pkg">
+  <TabItem label="pnpm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    npm install @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```bash
+    yarn add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
+    ```
+  </TabItem>
+</Tabs>
+
+Then in your app entry:
+
+```ts title="src/main.ts"
+// Tokens, plain CSS files, no JS.
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+import "@fluid-ds/tokens/dark.css";
+
+// Default icons + per-component register modules.
+import "@fluid-ds/icons/register-defaults";
+import "@fluid-ds/components/define/button";
+import "@fluid-ds/components/define/input";
+import "@fluid-ds/components/define/card";
+// …add any other components your UI needs
+```
+
+The package roots (`@fluid-ds/components`) export the classes but
+**deliberately do not register the elements**, you opt in via the
+`/define/<name>` side-effect entries so unused components stay shakable.
+
+## Frameworks
+
+The components are standard HTML elements, so you don't need a wrapper:
+but each framework has a few specifics worth knowing about (event
+handling, types, SSR). The short version:
+
+- **React 19**: works natively (custom elements, custom events, props).
+- **React 18**: works for props + native events; for `fluid-*` custom
+  events you'll want a `ref` + `addEventListener`.
+- **Vue 3**: works as `<fluid-button @fluid-click="..." />`. Add
+  `compilerOptions.isCustomElement` to skip the unknown-tag warning.
+- **Angular**: `CUSTOM_ELEMENTS_SCHEMA` in your module, then use the
+  tags directly.
+
+Full per-framework guide: **[Framework integrations](/guides/frameworks/)**.
+
+## Local development
+
+Until the packages are published, you can run the full stack locally:
+
+```bash
+git clone https://github.com/RHeijnen/fluid_ds
+cd fluid_ds
+corepack pnpm install
+corepack pnpm dev   # Storybook + theme builder + this docs site
+```
+
+Then open [http://localhost:6006](http://localhost:6006) (Storybook),
+[http://localhost:5173](http://localhost:5173) (theme builder), or
+[http://localhost:4321](http://localhost:4321) (docs).
+
+## Next steps
+
+- [First component](/getting-started/first-component/): render a button,
+  wire an event handler, theme it with one CSS variable.
+- [CDN reference](/getting-started/cdn/): every URL pattern, pinning
+  strategies, integrity hashes.
+- [Theming basics](/theming/basics/): the three-layer model in one page.

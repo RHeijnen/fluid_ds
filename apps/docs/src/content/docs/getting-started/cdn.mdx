@@ -1,0 +1,194 @@
+---
+title: "CDN reference"
+description: "Every URL pattern, version pinning strategy, file layout, and CDN provider for Fluid."
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+Fluid components are framework-free standard ESM, which means they
+work straight off the wire from any CDN that mirrors npm. The
+recommended provider is [jsDelivr](https://www.jsdelivr.com/), it's
+free, has a global edge network, supports version pinning + ranges, and
+lists package contents at a discoverable URL.
+
+This page is the URL reference. For the paste-and-go quick start, see
+[Installation → CDN](/getting-started/installation/#the-fastest-path-cdn-html).
+
+## URL pattern
+
+Every Fluid asset is one of:
+
+```
+https://cdn.jsdelivr.net/npm/@fluid-ds/{package}@{version}/{file}
+```
+
+For example, `<fluid-button>`'s define module at the latest release:
+
+```
+https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js
+```
+
+<Aside type="caution" title="Packages not yet on npm">
+  Fluid isn't published to npm yet, these URLs document how it will
+  work once it is. Until then, [run the stack locally](/getting-started/installation/#local-development).
+</Aside>
+
+## Version pinning
+
+`@latest` is convenient while you're tinkering. For production sites, pin
+to a real version so a future release doesn't change behaviour under you.
+
+| Spec | Resolves to | When to use |
+| --- | --- | --- |
+| `@latest` | The latest published version | Demos, sandboxes, CodePens |
+| `@1` or `@1.x` | The latest 1.x release | Production, accept patches + features |
+| `@1.2` | The latest 1.2.x release | Production, accept patches only |
+| `@1.2.3` | Exactly 1.2.3 | Reproducible builds, archival |
+
+```html
+<!-- Pin to a specific version in production -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@1.2.3/dist/components/button/define.js"></script>
+```
+
+## File layout per package
+
+The CDN serves whatever is in each package's `dist/`. Notable paths:
+
+### `@fluid-ds/tokens`
+
+```
+dist/
+  base.css, primitives + layout vars (always import first)
+  light.css, semantic vars for light scheme
+  dark.css, semantic vars for dark scheme
+  manifest.json, programmatic catalog (used by the theme builder)
+```
+
+Load as `<link rel="stylesheet">`:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css" />
+```
+
+### `@fluid-ds/icons`
+
+```
+dist/
+  register-defaults.js, registers a curated set of ~50 lucide icons
+  index.js, registry API (registerIcon, getIcon, loadIcon)
+  lucide/<name>.js, per-icon side-effect modules (1500+)
+```
+
+Load defaults plus any extras you need:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/lucide/rocket.js"></script>
+```
+
+### `@fluid-ds/components`
+
+```
+dist/
+  index.js, class exports (does NOT register)
+  custom-elements.json, CEM manifest (consumed by tooling)
+  components/<name>/define.js, side-effect entry that registers <fluid-name>
+  components/<name>/fluid-<name>.js, the class itself
+```
+
+The `define.js` entries are what you load. Each one registers exactly one
+element, so unused components stay out of your page weight:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dialog/define.js"></script>
+```
+
+### Expansion packs
+
+Same pattern, different package roots:
+
+- `@fluid-ds/charts/dist/components/<name>/define.js`
+- `@fluid-ds/markdown/dist/define.js`
+- `@fluid-ds/qr/dist/define.js`
+- `@fluid-ds/media/dist/components/<name>/define.js`
+
+## Import maps
+
+Once you're loading more than two or three components, an import map
+makes the rest of your page much tidier. The map resolves bare
+specifiers to CDN URLs, so the body of the page reads exactly like a
+bundler import.
+
+```html title="<head>"
+<script type="importmap">
+  {
+    "imports": {
+      "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
+      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
+      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/",
+
+      "lit":                   "https://esm.run/lit",
+      "lit/":                  "https://esm.run/lit/",
+      "@floating-ui/dom":      "https://esm.run/@floating-ui/dom"
+    }
+  }
+</script>
+
+<script type="module">
+  import "@fluid-ds/icons/register-defaults.js";
+  import "@fluid-ds/components/button/define.js";
+  import "@fluid-ds/components/input/define.js";
+  import "@fluid-ds/components/dialog/define.js";
+</script>
+```
+
+Note the last three entries. Fluid's component files ship their own bare
+imports: every component imports `lit` (and `lit/...` decorators), and the
+overlay components (tooltip, popover, select, dropdown, dialog, drawer)
+import `@floating-ui/dom`. The browser has no idea what those bare
+specifiers mean, so they **must** be in the map too, otherwise the first
+`define.js` throws "Failed to resolve module specifier". We point them at
+[esm.run](https://esm.run) because it resolves *their* transitive
+dependencies (e.g. `lit-html`, `@lit/reactive-element`) for you, so you only
+list the top-level packages, not the whole graph. (Pin a major, e.g.
+`https://esm.run/lit@3`, once you're past prototyping.)
+
+Import maps are supported in all evergreen browsers (Chrome 89+, Firefox
+108+, Safari 16.4+). If you need to support older browsers, polyfills
+exist (e.g. [es-module-shims](https://github.com/guybedford/es-module-shims))
+but you'll generally have a better time using a bundler instead.
+
+## Other CDN providers
+
+jsDelivr is the recommended default, but any npm-mirroring CDN works:
+
+| CDN | URL pattern | Notes |
+| --- | --- | --- |
+| **[jsDelivr](https://www.jsdelivr.com)** | `https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/...` | Recommended. Free, global, version ranges, file listing at the package root. |
+| **[unpkg](https://unpkg.com)** | `https://unpkg.com/@fluid-ds/components@latest/dist/...` | Free, well-known. No file listing in browsers. |
+| **[esm.sh](https://esm.sh)** | `https://esm.sh/@fluid-ds/components/define/button` | On-demand ESM rewriting; resolves dependencies automatically. Great with import maps. |
+
+## Subresource integrity (SRI)
+
+For high-security contexts you can pin the `integrity` attribute on each
+script/link tag. jsDelivr publishes SRI hashes for every file; replace
+`{file}` in the URL pattern:
+
+```
+https://cdn.jsdelivr.net/npm/@fluid-ds/components@1.2.3/dist/components/button/define.js?meta
+```
+
+The response includes a `sri` field you can paste into the tag:
+
+```html
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@1.2.3/dist/components/button/define.js"
+  integrity="sha384-..."
+  crossorigin="anonymous"
+></script>
+```

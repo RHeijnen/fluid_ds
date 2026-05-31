@@ -1,0 +1,125 @@
+---
+/**
+ * Compact AA ⇄ AAA conformance toggle that lives in the Starlight header
+ * (rendered via the SocialIcons override), so it is PERSISTENT across every
+ * docs page rather than repeated at the top of each component page.
+ *
+ * Flips `data-fluid-conformance` on <html>, which re-declares the AAA delta
+ * tokens (`--fluid-target-min` 24→44, `--fluid-focus-ring-width` 2→3) shipped
+ * in `@fluid-ds/tokens/base.css`. Every live `<fluid-*>` example + every
+ * `<ConformanceCode>` block on the page reads that attribute, so toggling
+ * resizes targets / thickens focus rings and swaps the copyable code in place.
+ *
+ * The choice persists in localStorage (`fluid-docs-conformance`) and is also
+ * restored pre-paint in Head.astro to avoid an AA→AAA flash. The verbose
+ * "what AA/AAA means" explanation now lives in each page's Accessibility
+ * section (the "AA vs AAA" subsection), not here, the header control stays a
+ * minimal switch, matching the brand + theme pickers beside it.
+ *
+ * Documentation control, not a shipped component.
+ */
+---
+
+<starlight-conformance-toggle class="conformance-toggle" role="group" aria-label="WCAG conformance level">
+  <span class="conformance-toggle__label" aria-hidden="true">WCAG</span>
+  <div class="conformance-toggle__seg">
+    <button type="button" data-level="aa" aria-pressed="true">AA</button>
+    <button type="button" data-level="aaa" aria-pressed="false">AAA</button>
+  </div>
+</starlight-conformance-toggle>
+
+<style>
+  /* Shared control height so the toggle lines up with the brand + theme
+     pickers beside it (see SocialIcons.astro, same --ctl-h). */
+  .conformance-toggle {
+    --ctl-h: 2.125rem; /* 34px: also clears the WCAG 2.2 SC 2.5.8 24px min target */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+  }
+  .conformance-toggle__label {
+    font-weight: 600;
+    color: var(--sl-color-gray-3, var(--fluid-text-secondary));
+    letter-spacing: 0.02em;
+  }
+  .conformance-toggle__seg {
+    display: inline-flex;
+    height: var(--ctl-h);
+    border: 1px solid var(--sl-color-hairline, var(--fluid-border-default));
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  .conformance-toggle__seg button {
+    appearance: none;
+    border: 0;
+    margin: 0;
+    /* Flex-center the label and let the fixed height drive the box, so each
+       button is a full 34px target (was 21.7px, under the 24px minimum). */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    padding: 0 0.7rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    background: transparent;
+    color: var(--sl-color-text, var(--fluid-text-secondary));
+    transition: background-color 0.15s, color 0.15s;
+  }
+  .conformance-toggle__seg button + button {
+    border-left: 1px solid var(--sl-color-hairline, var(--fluid-border-default));
+  }
+  /* Active state uses the Fluid accent pair (base + on-accent text), which is
+     contrast-verified by design. Starlight's --sl-color-white resolves to
+     near-black in light mode, which gave the selected button a failing
+     3.43:1 ratio (SC 1.4.3) — the accent-text token fixes that to ~5:1. */
+  .conformance-toggle__seg button[aria-pressed="true"] {
+    background: var(--fluid-accent-base, var(--sl-color-accent));
+    color: var(--fluid-accent-text, #fff);
+  }
+  .conformance-toggle__seg button:focus-visible {
+    outline: 2px solid var(--sl-color-accent, var(--fluid-accent-base));
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  /**
+   * Owns the header conformance switch. Reads the persisted level on connect
+   * (Head.astro already applied the <html> attribute pre-paint), reflects it
+   * on the buttons, and writes it back on click. The attribute is the single
+   * source of truth that the live examples + ConformanceCode blocks react to.
+   */
+  class StarlightConformanceToggle extends HTMLElement {
+    connectedCallback() {
+      const root = document.documentElement;
+      const KEY = "fluid-docs-conformance";
+      const sync = (level: string) => {
+        this.querySelectorAll<HTMLButtonElement>("button[data-level]").forEach((b) => {
+          b.setAttribute("aria-pressed", String(b.dataset.level === level));
+        });
+      };
+      const current = () =>
+        root.getAttribute("data-fluid-conformance") === "aaa" ? "aaa" : "aa";
+      sync(current());
+      this.addEventListener("click", (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-level]");
+        if (!btn) return;
+        const level = btn.dataset.level ?? "aa";
+        if (level === "aaa") root.setAttribute("data-fluid-conformance", "aaa");
+        else root.removeAttribute("data-fluid-conformance");
+        try {
+          localStorage.setItem(KEY, level);
+        } catch {
+          /* private mode, ignore */
+        }
+        sync(level);
+      });
+    }
+  }
+  customElements.define("starlight-conformance-toggle", StarlightConformanceToggle);
+</script>

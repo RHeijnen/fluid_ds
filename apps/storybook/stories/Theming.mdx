@@ -1,0 +1,157 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Guides/Theming" />
+
+# Theming
+
+Fluid is themed through plain CSS custom properties. No build step. Works in vanilla HTML, React, Vue, Svelte, same way everywhere.
+
+## The four levels
+
+1. **Override CSS variables**: re-skin everything globally.
+2. **Use a preset brand**: drop in `@fluid-ds/themes/*`.
+3. **Override per-component**: narrow tweaks via component-specific variables.
+4. **Use `::part()` for deep styling**: when the variables aren't enough.
+
+---
+
+## 1. Override CSS variables
+
+The simplest customization. After loading the base tokens, define your own values on `:root`. They cascade into every component.
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/@fluid-ds/tokens/base.css" />
+<link rel="stylesheet" href="https://unpkg.com/@fluid-ds/tokens/light.css" />
+<script type="module" src="https://unpkg.com/@fluid-ds/components"></script>
+
+<style>
+  :root {
+    --fluid-color-brand-500: rebeccapurple;
+    --fluid-color-brand-600: #5b21b6;
+    --fluid-radius-md: 12px;
+    --fluid-font-family-sans: "Inter", system-ui, sans-serif;
+  }
+</style>
+
+<fluid-button>Click me</fluid-button>
+```
+
+That's it. Everything that consumes `--fluid-color-brand-*` reacts instantly.
+
+### Which variables exist?
+
+- **Primitives** (`base.css`): color scales, the spacing scale, type scale, radii, motion, shadows.
+- **Semantic** (`light.css` / `dark.css`): `--fluid-surface-base`, `--fluid-text-primary`, `--fluid-accent-base`, `--fluid-border-default`, etc. Always reference primitives. Re-define these when you want to remap the meaning (e.g. "accent should be red on holidays").
+
+Rule of thumb: **override semantics for theming, override primitives for branding.**
+
+---
+
+## 2. Use a brand preset
+
+Two ship-with-the-system presets live in `@fluid-ds/themes`:
+
+| Preset      | Vibe                                          |
+| ----------- | --------------------------------------------- |
+| `midnight`  | Moody violet, softer corners, slower motion   |
+| `corporate` | Restrained slate, sharp corners, tight motion |
+
+Each preset is a scoped block. Load the CSS, then activate it by setting `data-fluid-brand` on `<html>` (global) or any subtree:
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/@fluid-ds/themes/midnight.css" />
+<html data-fluid-brand="midnight">
+  <fluid-button>Now I'm violet</fluid-button>
+</html>
+```
+
+Or scope it to a subtree, useful for marketing pages that want a different brand on one section:
+
+```html
+<section data-fluid-brand="corporate">
+  <fluid-button>I'm slate</fluid-button>
+</section>
+<section>
+  <!-- no attribute = default brand -->
+  <fluid-button>I'm blue</fluid-button>
+</section>
+```
+
+> Try it: use the **Brand** toolbar above to flip between presets in any story.
+
+### Writing your own preset
+
+Copy a preset file and edit. The whole contract is "an attribute selector that re-defines variables":
+
+```css
+/* my-brand.css */
+[data-fluid-brand="acme"] {
+  --fluid-color-brand-500: #ff6b35;
+  --fluid-color-brand-600: #e65100;
+  --fluid-radius-md: 0;
+  /* override whatever else you want */
+}
+```
+
+Then load it and tag the relevant subtree with `data-fluid-brand="acme"`. Done.
+
+---
+
+## 3. Per-component overrides
+
+Each component exposes its own CSS variables for narrow control. They take precedence over the global tokens but only for that component.
+
+```css
+/* Reskin one button without touching the global brand */
+.cta-button {
+  --fluid-button-bg: hotpink;
+  --fluid-button-fg: white;
+}
+```
+
+```html
+<fluid-button class="cta-button">Special</fluid-button>
+```
+
+Every component documents its variables in its story's "Docs" tab under the **CSS Custom Properties** table (auto-generated from JSDoc).
+
+---
+
+## 4. Deep styling with `::part()`
+
+When you need to style an internal element, components expose named **parts**. These are a public API: we promise not to rename them between minor versions.
+
+```css
+fluid-button::part(base) {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+```
+
+Parts pierce shadow DOM. Available parts are listed in each component's "Docs" tab under **CSS Shadow Parts**.
+
+> ⚠️ Don't reach into shadow DOM directly. `::part()` is the supported path; querying `shadowRoot.querySelector()` from outside is not.
+
+---
+
+## Cheat sheet: which tool for which job?
+
+| Goal                                        | Use                                        |
+| ------------------------------------------- | ------------------------------------------ |
+| Re-skin the whole app (color, type, radius) | Override variables on `:root`              |
+| Drop in a ready-made brand                  | A preset from `@fluid-ds/themes`           |
+| Multi-brand in one app (e.g. white-label)   | Scoped `data-fluid-brand="..."`            |
+| Style one component instance differently    | Override its CSS variables on that element |
+| Reach inside a component                    | `::part(...)`                              |
+| Add a brand-new variant                     | New CSS class targeting attribute selector |
+| Add a brand-new component                   | Extend `FluidElement` in your own package  |
+
+---
+
+## What we don't recommend
+
+- **Don't fork the source files.** You'll desync from upstream and lose every new release. CSS variables + parts cover ~95% of needs.
+- **Don't override unprefixed variables.** Only `--fluid-*` is our public API; anything else is internal.
+- **Don't override component-internal selectors.** They aren't part of the contract.
+
+If a customization you need isn't possible through these layers, open an issue, that's the signal that we should expose a new variable or part.

@@ -1,0 +1,223 @@
+---
+title: "Tag"
+description: "Stand-alone chips for categories, filters, or selections. Optional remove button."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-tag>` is the chip, a slightly larger, squarer sibling of
+[`<fluid-badge>`](/components/badge/). Same severity variants, but it reads as a
+stand-alone unit and can be `removable`, firing **`fluid-remove`** when the user
+clicks the ×.
+
+<Demo>
+  <fluid-tag removable variant="info">React</fluid-tag>
+  <fluid-tag removable variant="info">TypeScript</fluid-tag>
+  <fluid-tag variant="success">Verified</fluid-tag>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tag/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/tag";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Variants
+
+<Demo>
+  <fluid-tag>Neutral</fluid-tag>
+  <fluid-tag variant="info">Info</fluid-tag>
+  <fluid-tag variant="success">Success</fluid-tag>
+  <fluid-tag variant="warning">Warning</fluid-tag>
+  <fluid-tag variant="danger">Danger</fluid-tag>
+</Demo>
+
+```html
+<fluid-tag variant="success">Active</fluid-tag>
+```
+
+### Sizes
+
+<Demo>
+  <fluid-tag size="sm">Small</fluid-tag>
+  <fluid-tag size="md">Medium</fluid-tag>
+  <fluid-tag size="lg">Large</fluid-tag>
+</Demo>
+
+### Removable
+
+Set `removable` for a × button. Listen for `fluid-remove` to handle the
+click, the host doesn't remove itself, so you decide whether to delete
+it from the DOM, hide it, or revert.
+
+<Demo>
+  <fluid-tag removable variant="info">React</fluid-tag>
+  <fluid-tag removable variant="info">TypeScript</fluid-tag>
+  <fluid-tag removable variant="info">Lit</fluid-tag>
+</Demo>
+
+```html
+<fluid-tag removable>React</fluid-tag>
+
+<script type="module">
+  document.querySelector("fluid-tag").addEventListener("fluid-remove", (e) => {
+    e.target.remove();
+  });
+</script>
+```
+
+### With icons
+
+<Demo>
+  <fluid-tag variant="success">
+    <fluid-icon name="check"></fluid-icon>
+    Verified
+  </fluid-tag>
+</Demo>
+
+## Listening for remove
+
+A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
+**not** remove itself, you decide whether to delete it, hide it, or revert.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-tag removable id="t">React</fluid-tag>
+
+    <script type="module">
+      document.getElementById("t").addEventListener("fluid-remove", (e) => e.target.remove());
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Filters.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/tag";
+
+    export function Filters() {
+      const [tags, setTags] = useState(["React", "Lit"]);
+      return tags.map((t) => (
+        <fluid-tag key={t} removable
+          onfluid-remove={() => setTags((xs) => xs.filter((x) => x !== t))}>
+          {t}
+        </fluid-tag>
+      ));
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Filters.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/tag";
+    const tags = ref(["React", "Lit"]);
+    </script>
+
+    <template>
+      <fluid-tag v-for="t in tags" :key="t" removable
+        @fluid-remove="tags = tags.filter((x) => x !== t)">{{ t }}</fluid-tag>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="filters.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/tag";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-filters",
+      template: `
+        <fluid-tag *ngFor="let t of tags" removable (fluid-remove)="remove(t)">{{ t }}</fluid-tag>
+      `
+    })
+    export class Filters {
+      tags = ["React", "Lit"];
+      remove(t: string) { this.tags = this.tags.filter((x) => x !== t); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Filters.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/tag";
+      let tags = ["React", "Lit"];
+    </script>
+
+    {#each tags as t (t)}
+      <fluid-tag removable on:fluid-remove={() => (tags = tags.filter((x) => x !== t))}>{t}</fluid-tag>
+    {/each}
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Filter chips (selected facets the user can remove).
+- Recipient pills in an email-to field.
+- Categorization labels on cards.
+
+Reach for [`<fluid-badge>`](/components/badge/) when the label is an
+inline annotation that doesn't need to be removable or interactive.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-tag-*` token that falls
+back to a main semantic var or color primitive** (the override ladder); each
+variant has its own `bg` / `fg` / `border`. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-tag-bg: var(--fluid-surface-muted);
+  --fluid-tag-fg: var(--fluid-text-primary);
+  --fluid-tag-border: var(--fluid-border-default);
+  --fluid-tag-info-bg: var(--fluid-color-brand-50);
+  --fluid-tag-info-fg: var(--fluid-color-brand-800);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The chip is [`part="base"`](#api) with `part="remove"` for the × button. Reach
+them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-tag" />
+
+## Accessibility
+
+- The tag itself is a passive label: no implicit role.
+- The remove button (when `removable`) is a real `<button>` with
+  `aria-label="Remove"`. Override `aria-label` on the host (or use a
+  visible label nearby) to add context like "Remove React tag".
+- Focus moves to the next focusable element when you remove the tag
+  from the DOM, make sure your handler doesn't strand focus.

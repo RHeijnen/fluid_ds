@@ -1,0 +1,228 @@
+---
+title: "Animation"
+description: "Declarative Web Animations API wrapper, play named presets or custom keyframes on a slotted element."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-animation>` is the general-purpose motion **primitive**, a thin
+declarative wrapper around the [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API).
+Put an element inside, pick a named preset (or supply your own `keyframes`), and
+control playback with `play` / `start()` / `pause()` / `cancel()`. It renders
+`display: contents`, so it adds nothing to layout.
+
+It's the app-level companion to the standard enter/exit animations already baked
+into the overlay components (dialog, drawer, toast, …), reach for it when *you*
+want to choreograph motion on arbitrary content.
+
+<Demo>
+  <fluid-animation name="pulse" duration="900" iterations="Infinity" play>
+    <div style="width: 64px; height: 64px; border-radius: 12px; background: var(--fluid-accent-base);"></div>
+  </fluid-animation>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/animation/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/animation";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  `<fluid-animation>` moved into core (it's a motion primitive, not a media
+  component). If you were importing it from `@fluid-ds/media`, switch to
+  `@fluid-ds/components/define/animation`.
+</Aside>
+
+## Examples
+
+### Named presets
+
+Built-in presets: `fadeIn`, `fadeOut`, `slideInUp`, `slideInDown`, `pulse`,
+`shake`, `spin`. Set `play` to run on load, or call `start()`.
+
+```html
+<fluid-animation name="slideInUp" duration="500" play>
+  <div class="card">Hello</div>
+</fluid-animation>
+```
+
+### Custom keyframes
+
+For full control, set the `keyframes` property (an array of
+[keyframe objects](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API/Keyframe_Formats)).
+This overrides `name`.
+
+```ts
+const anim = document.querySelector("fluid-animation");
+anim.keyframes = [
+  { transform: "scale(0.8)", opacity: 0 },
+  { transform: "scale(1)", opacity: 1 }
+];
+anim.duration = 400;
+anim.start();
+```
+
+### Controlling playback
+
+```ts
+const anim = document.querySelector("fluid-animation");
+anim.start();   // (re)start
+anim.pause();
+anim.resume();
+anim.cancel();
+```
+
+`iterations="Infinity"`, `direction`, `delay`, `easing`, and `fill` map straight
+through to the underlying `Element.animate()` options.
+
+## Listening for lifecycle events
+
+`<fluid-animation>` emits **`fluid-start`**, **`fluid-finish`**, and
+**`fluid-cancel`**.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-animation id="a" name="fadeIn"><div>hi</div></fluid-animation>
+
+    <script type="module">
+      const a = document.getElementById("a");
+      a.addEventListener("fluid-finish", () => console.log("done"));
+      a.start();
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Reveal.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/animation";
+
+    export function Reveal() {
+      const ref = useRef<any>(null);
+      useEffect(() => {
+        const el = ref.current;
+        const onFinish = () => console.log("done");
+        el.addEventListener("fluid-finish", onFinish);
+        el.start();
+        return () => el.removeEventListener("fluid-finish", onFinish);
+      }, []);
+      return <fluid-animation ref={ref} name="slideInUp"><div>hi</div></fluid-animation>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Reveal.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/animation";
+    const onFinish = () => console.log("done");
+    </script>
+
+    <template>
+      <fluid-animation name="slideInUp" play @fluid-finish="onFinish">
+        <div>hi</div>
+      </fluid-animation>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="reveal.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/animation";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-reveal",
+      template: `<fluid-animation name="slideInUp" play (fluid-finish)="done()"><div>hi</div></fluid-animation>`
+    })
+    export class Reveal { done() { console.log("done"); } }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Reveal.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/animation";
+      const done = () => console.log("done");
+    </script>
+
+    <fluid-animation name="slideInUp" play on:fluid-finish={done}><div>hi</div></fluid-animation>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- One-off, app-driven motion: reveal-on-scroll, attention pulses, success
+  flourishes, looping decorative motion.
+- For component enter/exit (dialogs, drawers, toasts), you don't need this:
+  those animate themselves and expose motion tokens to retune or disable.
+
+## Theming
+
+`<fluid-animation>` is behavioral, it has no surface and reads no design tokens.
+Timing comes from its attributes (`duration`, `easing`, `delay`). To stay
+consistent with the system, pass the motion tokens through:
+
+```html
+<fluid-animation name="slideInUp" style="--d: var(--fluid-duration-slow);"
+  duration="320" easing="cubic-bezier(0.2,0,0,1)">
+  <div>…</div>
+</fluid-animation>
+```
+
+## API
+
+<ComponentApi tag="fluid-animation" />
+
+## Accessibility
+
+- **Respect `prefers-reduced-motion`.** This primitive runs whatever you tell it,
+  so gate decorative motion yourself:
+  ```ts
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce) anim.start();
+  ```
+- Don't convey meaning by motion alone, and avoid looping animation near text
+  content that can't be paused ([SC 2.2.2](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide)).
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Animations guide"
+    href="/guides/animations/"
+    description="The motion system: tokens, standard keyframes, reduced-motion."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="A component that animates its own enter/exit (no wrapper needed)."
+  />
+  <LinkCard
+    title="Intersection observer"
+    href="/components/intersection-observer/"
+    description="Pair with this to trigger animations on scroll-into-view."
+  />
+  <LinkCard
+    title="@fluid-ds/media"
+    href="/expansion/media/"
+    description="Video, playlists, animated images, zoomable frames."
+  />
+</CardGrid>

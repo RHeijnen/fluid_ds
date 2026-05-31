@@ -1,0 +1,60 @@
+---
+title: "@fluid-ds/markdown"
+description: "Themable Markdown rendering web component. Inline text, value property, or remote src."
+---
+
+`<fluid-markdown>` renders Markdown to a themed block in the page,
+backed by [marked](https://marked.js.org/). Headings, code, links,
+blockquotes, and tables all adopt your brand tokens. Expansion pack.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/markdown
+```
+
+```ts
+import "@fluid-ds/markdown/define";
+```
+
+## Use
+
+Three input paths:
+
+```html
+<!-- Inline text -->
+<fluid-markdown>
+  ### Inline heading
+  Some **strong** copy.
+</fluid-markdown>
+
+<!-- value property -->
+<fluid-markdown value="### From a property"></fluid-markdown>
+
+<!-- Remote URL -->
+<fluid-markdown src="/CHANGELOG.md"></fluid-markdown>
+```
+
+## Theming
+
+The rendered output respects the Fluid semantic tokens, heading,
+text, and surface colors flow through without extra work. Override the
+component-level tokens for fine control:
+
+```css
+[data-fluid-brand="custom"] {
+  --fluid-markdown-link-fg: var(--fluid-color-primary);
+  --fluid-markdown-code-bg: var(--fluid-surface-muted);
+}
+```
+
+## When to use
+
+- Rendering user-supplied prose (release notes, comments, help text)
+  with consistent typography.
+- For monospaced code only, reach for
+  [`<fluid-code-block>`](/components/code-block/).
+
+## License
+
+MIT, marked is MIT-licensed.

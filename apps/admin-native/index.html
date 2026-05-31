@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" data-fluid-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Fluid Admin · Native</title>
+
+    <!-- Design tokens. Always base first, then the scheme sheets (they key off
+         [data-fluid-theme] on <html>, which the topbar toggle flips). -->
+    <link rel="stylesheet" href="./vendor/tokens/base.css" />
+    <link rel="stylesheet" href="./vendor/tokens/light.css" />
+    <link rel="stylesheet" href="./vendor/tokens/dark.css" />
+    <!-- Brand presets. Inert until the topbar sets data-fluid-brand on <html>. -->
+    <link rel="stylesheet" href="./vendor/themes/midnight.css" />
+    <link rel="stylesheet" href="./vendor/themes/corporate.css" />
+    <link rel="stylesheet" href="./src/styles.css" />
+
+    <!--
+      Local consumption: the import map points at the bundle that
+      scripts/build-vendor.mjs produced from the LOCAL packages. The app code
+      imports the bare specifier "@fluid-ds/fluid", exactly as it would a CDN.
+
+      To switch to the published packages over a CDN, delete the vendor bundle
+      and replace the map below with:
+
+        {
+          "imports": {
+            "@fluid-ds/fluid": "https://esm.run/@fluid-ds/components",
+            "@fluid-ds/icons": "https://esm.run/@fluid-ds/icons"
+          }
+        }
+
+      and point the three token <link>s at
+      https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/*.css.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@fluid-ds/fluid": "./vendor/fluid.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app" aria-busy="true"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

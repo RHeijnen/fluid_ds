@@ -1,0 +1,25 @@
+@import url("@fluid-ds/tokens/base.css");
+@import url("@fluid-ds/tokens/light.css");
+@import url("@fluid-ds/tokens/dark.css");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-sans);
+  font-size: var(--fluid-font-size-md);
+  line-height: var(--fluid-line-height-normal);
+  min-height: 100vh;
+}
+
+fluid-playground {
+  min-height: 100vh;
+}

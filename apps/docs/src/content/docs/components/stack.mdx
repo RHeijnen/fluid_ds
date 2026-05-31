@@ -1,0 +1,190 @@
+---
+title: "Stack"
+description: "One-dimensional flow layout, a vertical stack or a wrapping horizontal cluster, with consistent gaps."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-stack>` is the one-dimensional flow layout (flexbox), the 1D complement
+to [`<fluid-grid>`](/components/grid/). Vertical by default for an evenly-spaced
+**stack**; switch to `direction="horizontal"` with `wrap` for a **cluster**, a
+row of chips, tags, or buttons that wraps onto new lines while keeping the gap
+uniform.
+
+<Demo>
+  <fluid-stack direction="horizontal" wrap gap="0.5rem" style="max-width: 26rem;">
+    <fluid-tag>Design</fluid-tag>
+    <fluid-tag>Engineering</fluid-tag>
+    <fluid-tag>Marketing</fluid-tag>
+    <fluid-tag>Sales</fluid-tag>
+    <fluid-tag>Support</fluid-tag>
+    <fluid-tag>Finance</fluid-tag>
+  </fluid-stack>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/stack/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/stack";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Vertical stack
+
+The default, items flow down a column with an even `gap`.
+
+<Demo>
+  <fluid-stack gap="0.75rem" style="max-width: 18rem;">
+    <fluid-input placeholder="Name" aria-label="Name"></fluid-input>
+    <fluid-input placeholder="Email" aria-label="Email"></fluid-input>
+    <fluid-button>Continue</fluid-button>
+  </fluid-stack>
+</Demo>
+
+```html
+<fluid-stack gap="0.75rem">
+  <fluid-input placeholder="Name"></fluid-input>
+  <fluid-input placeholder="Email"></fluid-input>
+  <fluid-button>Continue</fluid-button>
+</fluid-stack>
+```
+
+### Horizontal row
+
+<Demo>
+  <fluid-stack direction="horizontal" gap="0.5rem">
+    <fluid-button variant="ghost">Cancel</fluid-button>
+    <fluid-button>Save</fluid-button>
+  </fluid-stack>
+</Demo>
+
+```html
+<fluid-stack direction="horizontal" gap="0.5rem">
+  <fluid-button variant="ghost">Cancel</fluid-button>
+  <fluid-button>Save</fluid-button>
+</fluid-stack>
+```
+
+### Cluster (wrapping)
+
+`direction="horizontal"` + `wrap` keeps a uniform gap as items reflow onto new
+lines, ideal for tags, filters, or button groups.
+
+```html
+<fluid-stack direction="horizontal" wrap gap="0.5rem">
+  <fluid-tag>Design</fluid-tag>
+  <fluid-tag>Engineering</fluid-tag>
+  <fluid-tag>Marketing</fluid-tag>
+</fluid-stack>
+```
+
+### Alignment & distribution
+
+`align` is the cross axis; `justify` is the main axis. Both accept friendly
+aliases (`start` · `center` · `end` · `between` · `around` · `evenly` ·
+`stretch` · `baseline`).
+
+<Demo>
+  <fluid-stack direction="horizontal" justify="between" align="center" style="width: 24rem; border: 1px dashed var(--fluid-border-default); border-radius: var(--fluid-radius-md); padding: 0.75rem;">
+    <span>Left</span>
+    <fluid-button size="sm">Right</fluid-button>
+  </fluid-stack>
+</Demo>
+
+```html
+<fluid-stack direction="horizontal" justify="between" align="center">
+  <span>Left</span>
+  <fluid-button>Right</fluid-button>
+</fluid-stack>
+```
+
+## When to use
+
+- **Forms, toolbars, button rows, tag/chip groups**: anything that flows along
+  a single axis.
+- A wrapping group of items (**cluster**): `direction="horizontal"` + `wrap`.
+
+### When *not* to use
+
+- **Two-dimensional, uniform cells**: use [`<fluid-grid>`](/components/grid/).
+- **Mixed-size tiles that pack densely**: use
+  [`<fluid-mosaic>`](/components/mosaic/).
+
+## Theming
+
+Every layout knob reads a **component-scoped `--fluid-stack-*` token that falls
+back to a main semantic var** (the override ladder); the `gap` / `align` /
+`justify` attributes set the matching token per instance. The **complete list**
+is in the [API table below](#api).
+
+```css title="brand.css"
+fluid-stack {
+  --fluid-stack-gap: var(--fluid-space-6);
+}
+```
+
+## Accessibility
+
+`<fluid-stack>` is a **presentational layout primitive**, it adds no ARIA roles
+and doesn't alter the accessibility tree, so slotted content keeps its own
+semantics.
+
+- **Source order = reading order.** Flow placement is visual only; keep the DOM
+  order matching the intended reading/tab order
+  ([SC 1.3.2](https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence),
+  [SC 2.4.3](https://www.w3.org/WAI/WCAG22/Understanding/focus-order)).
+- **Reflow.** `wrap` lets a horizontal cluster collapse onto new lines instead
+  of forcing horizontal scroll
+  ([SC 1.4.10 Reflow](https://www.w3.org/WAI/WCAG22/Understanding/reflow)).
+
+## API
+
+<ComponentApi tag="fluid-stack" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Grid"
+    href="/components/grid/"
+    description="Two-dimensional uniform columns / cells."
+  />
+  <LinkCard
+    title="Mosaic"
+    href="/components/mosaic/"
+    description="Dense bento layout for mixed-size tiles."
+  />
+  <LinkCard
+    title="Divider"
+    href="/components/divider/"
+    description="Separate stacked sections with a rule."
+  />
+  <LinkCard
+    title="Button group"
+    href="/components/button-group/"
+    description="Fused row of related buttons."
+  />
+</CardGrid>

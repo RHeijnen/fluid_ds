@@ -1,0 +1,26 @@
+{
+  "name": "@fluid-ds/visual-regression",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Playwright-based visual regression tests for Fluid components, driven by Storybook stories.",
+  "scripts": {
+    "prebuild-storybook": "pnpm --filter @fluid-ds/tokens build",
+    "build-storybook": "pnpm --filter @fluid-ds/storybook build",
+    "generate": "node ./scripts/generate-tests.mjs",
+    "pretest": "pnpm run generate",
+    "test": "playwright test",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:update": "playwright test --update-snapshots",
+    "typecheck": "tsc --noEmit",
+    "install-browsers": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.5",
+    "http-server": "^14.1.1",
+    "typescript": "^5.7.2",
+    "wait-on": "^8.0.1"
+  }
+}

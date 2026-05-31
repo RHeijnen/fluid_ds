@@ -1,0 +1,124 @@
+---
+title: "Resize observer"
+description: "Declarative ResizeObserver. Fires events when slotted children change size."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-resize-observer>` wraps the platform `ResizeObserver` in a component.
+Drop something inside, listen for **`fluid-resize`**, and react when its size
+changes, manual container queries, virtual scrollers, canvas resizes, and other
+"render when the box changes" cases.
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/resize-observer/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/resize-observer";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A behavior wrapper, it renders no UI (`display: contents`) and reads no
+  design tokens, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Watch a child
+
+```html
+<fluid-resize-observer>
+  <div id="container">…</div>
+</fluid-resize-observer>
+
+<script type="module">
+  document
+    .querySelector("fluid-resize-observer")
+    .addEventListener("fluid-resize", (e) => {
+      for (const entry of e.detail.entries) {
+        console.log("box:", entry.contentRect);
+      }
+    });
+</script>
+```
+
+### Border-box
+
+`box` follows the spec values: `content-box` (default), `border-box`,
+or `device-pixel-content-box`.
+
+```html
+<fluid-resize-observer box="border-box">…</fluid-resize-observer>
+```
+
+### Pause
+
+```html
+<fluid-resize-observer disabled>…</fluid-resize-observer>
+```
+
+## When to use
+
+- Adapting a component to its container's size (manual container
+  queries).
+- Reflowing canvas / chart contents on resize.
+- For "is this element on screen?", use
+  [`<fluid-intersection-observer>`](/components/intersection-observer/).
+- For DOM-structure changes, use
+  [`<fluid-mutation-observer>`](/components/mutation-observer/).
+
+## Theming
+
+Behavior component, no tokens.
+
+## API
+
+<ComponentApi tag="fluid-resize-observer" />
+
+## Accessibility
+
+- `display: contents`: invisible to layout and to the accessibility
+  tree.
+- The events fire frequently during user-driven resizes. Debounce or
+  throttle in your handler if you're doing layout work per entry.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Intersection observer"
+    href="/components/intersection-observer/"
+    description="React to elements entering / leaving the viewport."
+  />
+  <LinkCard
+    title="Mutation observer"
+    href="/components/mutation-observer/"
+    description="React to DOM attribute / child changes."
+  />
+  <LinkCard
+    title="Chart"
+    href="/components/chart/"
+    description="A common consumer, redraw on container resize."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

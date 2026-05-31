@@ -1,0 +1,318 @@
+---
+title: "Dropdown"
+description: "Menu dropdown, WAI-ARIA menu pattern with arrow nav, type-ahead, and checkbox items."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-dropdown>` is the menu pattern, a trigger that opens a list of actions.
+Items are `<fluid-dropdown-item>` elements in three kinds: `item` (default,
+fires an event), `checkbox` (toggles), or `separator` (a visual rule). The menu
+panel shares its surface with [`<fluid-select>`](/components/select/) and
+[`<fluid-typeahead>`](/components/typeahead/), so every popover menu reads as one
+family.
+
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+    <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+    <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+    <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dropdown/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/dropdown"; // registers dropdown + dropdown-item
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic menu
+
+Give the trigger a [`caret`](/components/button/#dropdown-trigger) so it
+renders the built-in chevron and rotates while the menu is open.
+
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+    <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+    <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+    <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+```html
+<fluid-dropdown>
+  <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+  <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+  <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+  <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+  <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+</fluid-dropdown>
+```
+
+For a primary action fused to a caret menu, see the
+[split button](/components/button-group/#split-button).
+
+### Listening for selection
+
+Each item fires `fluid-select` when activated; the event bubbles to the
+dropdown so you can listen once at the top.
+
+```ts
+const menu = document.querySelector("fluid-dropdown");
+menu.addEventListener("fluid-select", (e) => {
+  console.log("picked", e.detail.item.textContent);
+});
+```
+
+### Checkbox items
+
+`type="checkbox"` items toggle without closing the menu, handy for
+filters and quick settings.
+
+```html
+<fluid-dropdown>
+  <fluid-button slot="trigger">View</fluid-button>
+  <fluid-dropdown-item type="checkbox" checked>Show grid</fluid-dropdown-item>
+  <fluid-dropdown-item type="checkbox">Show rulers</fluid-dropdown-item>
+</fluid-dropdown>
+```
+
+### Placement
+
+The menu uses floating-ui under the hood. Set `placement` to control
+where it opens:
+
+```html
+<fluid-dropdown placement="top-start">…</fluid-dropdown>
+```
+
+Standard placements: `top` `top-start` `top-end` `bottom` `bottom-start`
+(default) `bottom-end` `left` `right` etc. The dropdown auto-flips when
+it would overflow the viewport.
+
+## When to use
+
+- A button that reveals a small list of actions.
+- Quick settings / view toggles.
+
+Reach for [`<fluid-select>`](/components/select/) when you're picking
+**one of a list** as a form value. Use [`<fluid-popover>`](/components/popover/)
+when the panel contains arbitrary content, not just a list of items.
+
+## Listening for changes
+
+`<fluid-dropdown>` fires **`fluid-select`** with `{ value, item }` in `detail`
+when an item is chosen.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-dropdown id="menu">…</fluid-dropdown>
+
+    <script type="module">
+      document.getElementById("menu").addEventListener("fluid-select", (e) => {
+        console.log("chose:", e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Menu.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/dropdown";
+
+    export function Menu() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onSelect = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-select", onSelect);
+        return () => el.removeEventListener("fluid-select", onSelect);
+      }, []);
+      return (
+        <fluid-dropdown ref={ref}>
+          <button slot="trigger">Actions</button>
+          <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+        </fluid-dropdown>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Menu.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/dropdown";
+    const onSelect = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-dropdown @fluid-select="onSelect">
+        <button slot="trigger">Actions</button>
+        <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+      </fluid-dropdown>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="menu.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/dropdown";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-menu",
+      template: `
+        <fluid-dropdown (fluid-select)="onSelect($event)">
+          <button slot="trigger">Actions</button>
+          <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+        </fluid-dropdown>
+      `
+    })
+    export class Menu {
+      onSelect(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Menu.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/dropdown";
+      function onSelect(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-dropdown on:fluid-select={onSelect}>
+      <button slot="trigger">Actions</button>
+      <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+    </fluid-dropdown>
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped token that falls back to a main
+semantic var** (the override ladder): the menu exposes `--fluid-dropdown-*` and
+each item exposes `--fluid-dropdown-item-*`. The menu shares the
+select / typeahead listbox surface. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-dropdown-bg: var(--fluid-surface-base);
+  --fluid-dropdown-border: var(--fluid-border-default);
+  --fluid-dropdown-item-active-accent: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container exposes [`part="base"`](#api) and `part="menu"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-dropdown" />
+
+### `<fluid-dropdown-item>`
+
+<ComponentApi tag="fluid-dropdown-item" />
+
+## Accessibility
+
+Implements the WAI-ARIA Menu pattern. The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Move the active item. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last item. |
+| _type a letter_ | Jump to the next item starting with it. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the item. |
+| <kbd>Escape</kbd> | Close the menu (focus returns to the trigger). |
+| <kbd>Tab</kbd> | Close + advance focus. |
+
+Opening the menu focuses the first non-disabled item; closing returns focus to
+the trigger.
+
+### Names & roles
+
+- The host is `role="menu"`; items are `role="menuitem"` (or
+  `menuitemcheckbox`); the trigger gets `aria-haspopup="menu"` +
+  `aria-expanded`. The menu renders in the **top layer**, so it's never clipped.
+
+### Motion & target size
+
+- The open/close pop honors `prefers-reduced-motion`.
+- Interactive items floor their height to `--fluid-target-min` (≥ **24px** AA /
+  **44px** AAA); separators are exempt.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick a value from a list (shares the menu surface)."
+  />
+  <LinkCard
+    title="Button group"
+    href="/components/button-group/"
+    description="Split buttons that pair a primary action with a menu."
+  />
+  <LinkCard
+    title="Popover"
+    href="/components/popover/"
+    description="Arbitrary content instead of a list of actions."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-select across frameworks."
+  />
+</CardGrid>

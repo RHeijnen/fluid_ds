@@ -1,0 +1,72 @@
+---
+title: Fluid
+description: Framework-agnostic web-component design system. Light, themable, accessible.
+---
+
+import { Card, CardGrid, LinkButton } from "@astrojs/starlight/components";
+
+Standard web components that drop into any HTML page, no framework,
+no build step, no wrappers.
+
+<div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin: 1rem 0 2rem;">
+  <LinkButton href="/getting-started/installation/" icon="right-arrow">
+    Get started
+  </LinkButton>
+  <LinkButton
+    href="https://github.com/RHeijnen/fluid_ds"
+    icon="external"
+    variant="secondary"
+  >
+    View on GitHub
+  </LinkButton>
+</div>
+
+## The fastest demo
+
+Paste this into a blank `.html` file, that's the whole setup.
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+
+<fluid-button>Hello, Fluid</fluid-button>
+```
+
+Full walkthrough → **[First component](/getting-started/first-component/)**.
+
+## Why Fluid
+
+<CardGrid stagger>
+  <Card title="No framework required" icon="seti:html">
+    Real web components. Drop the tags into any HTML page, React, Vue,
+    Angular, Svelte, Solid, plain HTML. The browser handles registration.
+  </Card>
+  <Card title="CDN-first delivery" icon="rocket">
+    Load straight from [jsDelivr](https://www.jsdelivr.com), no build step
+    required for evaluation, prototypes, or static sites. Bundlers
+    welcome too.
+  </Card>
+  <Card title="Token-driven theming" icon="setting">
+    A small palette of semantic CSS variables drives every component.
+    Override at the brand layer, the component layer, or one individual
+    element.
+  </Card>
+  <Card title="Accessibility first" icon="approve-check">
+    Each component ships with the right ARIA pattern, keyboard support,
+    and a [`@open-wc/testing`](https://open-wc.org/) a11y audit in the
+    test suite.
+  </Card>
+</CardGrid>
+
+## Three surfaces
+
+Fluid is documented across three sites that work together:
+
+- **This site**: concepts, tutorials, recipes, per-component pages.
+- **[Storybook](https://example.com)**: interactive props/states/a11y
+  explorer.
+- **[Theme builder](https://example.com)**: live token editor that
+  exports brand CSS you can drop into your app.

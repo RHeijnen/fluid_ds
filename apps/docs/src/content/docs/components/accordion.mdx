@@ -1,0 +1,311 @@
+---
+title: "Accordion"
+description: "Stacked disclosure panels with optional single-open behavior. WAI-ARIA disclosure pattern, keyboard accessible."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-accordion>` groups several `<fluid-details>` disclosures into one stack:
+FAQs, settings groups, any list of "expand to read more" sections. Set `single`
+to enforce one-open-at-a-time. Each disclosure is a standalone `<fluid-details>`
+that also works on its own; the accordion is the orchestration layer on top.
+
+<Demo>
+  <fluid-accordion style="width: 100%;">
+    <fluid-details>
+      <span slot="summary">What is Fluid?</span>
+      A framework-agnostic web-component design system, standard custom elements
+      that work in any framework, or none.
+    </fluid-details>
+    <fluid-details>
+      <span slot="summary">Which browsers are supported?</span>
+      Anything with custom elements + constructable stylesheets, every evergreen
+      browser shipped in the last few years.
+    </fluid-details>
+    <fluid-details>
+      <span slot="summary">Is it tree-shakable?</span>
+      Yes, import only the <code>/define/&lt;name&gt;</code> entry points you need.
+    </fluid-details>
+  </fluid-accordion>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/accordion/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/accordion"; // registers accordion + details
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-accordion style="width: 100%;">
+    <fluid-details>
+      <span slot="summary">What is Fluid?</span>
+      A framework-agnostic web-component design system.
+    </fluid-details>
+    <fluid-details>
+      <span slot="summary">Which browsers are supported?</span>
+      Every evergreen browser with custom elements + constructable stylesheets.
+    </fluid-details>
+  </fluid-accordion>
+</Demo>
+
+<ConformanceCode code={`<fluid-accordion>
+  <fluid-details>
+    <span slot="summary">What is Fluid?</span>
+    A framework-agnostic web-component design system…
+  </fluid-details>
+  <fluid-details>
+    <span slot="summary">Which browsers are supported?</span>
+    Every evergreen browser…
+  </fluid-details>
+</fluid-accordion>`} />
+
+### Single-open mode
+
+`single` keeps only one panel open, opening a new one closes the previous.
+
+<Demo>
+  <fluid-accordion single style="width: 100%;">
+    <fluid-details open><span slot="summary">First section</span>Open by default.</fluid-details>
+    <fluid-details><span slot="summary">Second section</span>Opening this closes the first.</fluid-details>
+    <fluid-details><span slot="summary">Third section</span>Same goes for this one.</fluid-details>
+  </fluid-accordion>
+</Demo>
+
+<ConformanceCode code={`<fluid-accordion single>
+  <fluid-details open>…</fluid-details>
+  <fluid-details>…</fluid-details>
+</fluid-accordion>`} />
+
+### Standalone disclosure
+
+`<fluid-details>` works on its own, no accordion required.
+
+<Demo>
+  <fluid-details style="width: 100%;">
+    <span slot="summary">Show details</span>
+    Useful for one-off expandable sections embedded in prose.
+  </fluid-details>
+</Demo>
+
+<ConformanceCode code={`<fluid-details>
+  <span slot="summary">Show details</span>
+  One-off expandable section.
+</fluid-details>`} />
+
+## Listening for changes
+
+Each `<fluid-details>` fires **`fluid-toggle`** with `{ open }` in `detail` when
+it expands or collapses; the event bubbles, so you can listen on the accordion.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-accordion id="faq">…</fluid-accordion>
+
+    <script type="module">
+      document.getElementById("faq").addEventListener("fluid-toggle", (e) => {
+        console.log("open:", e.detail.open, e.target);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Faq.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/accordion";
+
+    export function Faq() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onToggle = (e: Event) =>
+          console.log((e as CustomEvent).detail.open);
+        el.addEventListener("fluid-toggle", onToggle);
+        return () => el.removeEventListener("fluid-toggle", onToggle);
+      }, []);
+      return (
+        <fluid-accordion ref={ref}>
+          <fluid-details><span slot="summary">Q</span>A</fluid-details>
+        </fluid-accordion>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Faq.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/accordion";
+    const onToggle = (e: CustomEvent) => console.log(e.detail.open);
+    </script>
+
+    <template>
+      <fluid-accordion @fluid-toggle="onToggle">
+        <fluid-details><span slot="summary">Q</span>A</fluid-details>
+      </fluid-accordion>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="faq.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/accordion";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-faq",
+      template: `
+        <fluid-accordion (fluid-toggle)="onToggle($event)">
+          <fluid-details><span slot="summary">Q</span>A</fluid-details>
+        </fluid-accordion>
+      `
+    })
+    export class Faq {
+      onToggle(e: CustomEvent) {
+        console.log(e.detail.open);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Faq.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/accordion";
+      function onToggle(e: CustomEvent) {
+        console.log(e.detail.open);
+      }
+    </script>
+
+    <fluid-accordion on:fluid-toggle={onToggle}>
+      <fluid-details><span slot="summary">Q</span>A</fluid-details>
+    </fluid-accordion>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A list where most items are collapsed and the user expands one (FAQ,
+  changelog, settings groups).
+
+### When *not* to use
+
+- **Peer sections the user flips between**: use
+  [`<fluid-tabs>`](/components/tabs/).
+- **Multi-level navigation**: use [`<fluid-tree>`](/components/tree/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-details-*` token that
+falls back to a main semantic var** (the override ladder); each disclosure
+carries its own tokens. The **complete list** is in the [API tables
+below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-details-border: var(--fluid-border-default);
+  --fluid-details-summary-fg: var(--fluid-text-primary);
+  --fluid-details-body-fg: var(--fluid-text-secondary);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-details` in the [Theme builder](/playground/) to tweak the
+  separator, summary, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+Each disclosure exposes [`part="base"`](#api), `part="summary"`, and
+`part="body"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-accordion" />
+
+### `<fluid-details>`
+
+<ComponentApi tag="fluid-details" />
+
+## Accessibility
+
+Implements the WAI-ARIA Disclosure pattern. The cross-component contract is in
+the [Accessibility guide](/guides/accessibility/).
+
+### Names & roles
+
+- Each summary is a real `<button>` with `aria-expanded` + `aria-controls`; the
+  body is `role="region"` with `aria-labelledby` back to the summary
+  ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- <kbd>Enter</kbd> / <kbd>Space</kbd> toggle the focused summary; disabled
+  disclosures ignore pointer + keyboard.
+
+### Motion & target size
+
+- The chevron rotation honors `prefers-reduced-motion`.
+- Each summary button floors its height to `--fluid-target-min`: ≥ **24px** (AA)
+  / **44px** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
+`[data-fluid-conformance="aaa"]`) lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="Peer sections the user switches between."
+  />
+  <LinkCard
+    title="Tree"
+    href="/components/tree/"
+    description="Multi-level, expand/collapse navigation."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A standalone container when you don't need collapse."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Wiring fluid-toggle across frameworks."
+  />
+</CardGrid>

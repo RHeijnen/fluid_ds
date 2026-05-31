@@ -1,0 +1,272 @@
+---
+title: "Carousel"
+description: "Slide rotator with prev/next, pagination dots, autoplay, swipe, and keyboard nav."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-carousel>` rotates through a stack of slides. It's built on a
+native snap-scroller, so touch swiping comes for free; prev/next buttons,
+pagination dots, autoplay, and arrow-key navigation come built-in.
+
+Children are `<fluid-carousel-item>` elements, one per slide.
+
+<Demo>
+  <fluid-carousel style="max-width: 32rem;">
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">Slide 1</div>
+    </fluid-carousel-item>
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">Slide 2</div>
+    </fluid-carousel-item>
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">Slide 3</div>
+    </fluid-carousel-item>
+  </fluid-carousel>
+</Demo>
+
+## Install
+
+The define module registers **both** `<fluid-carousel>` and
+`<fluid-carousel-item>`.
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/carousel/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/carousel"; // registers carousel + carousel-item
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-carousel style="max-width: 32rem;">
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">Slide 1</div>
+    </fluid-carousel-item>
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">Slide 2</div>
+    </fluid-carousel-item>
+    <fluid-carousel-item>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">Slide 3</div>
+    </fluid-carousel-item>
+  </fluid-carousel>
+</Demo>
+
+```html
+<fluid-carousel>
+  <fluid-carousel-item><img src="/1.jpg" alt="…"></fluid-carousel-item>
+  <fluid-carousel-item><img src="/2.jpg" alt="…"></fluid-carousel-item>
+  <fluid-carousel-item><img src="/3.jpg" alt="…"></fluid-carousel-item>
+</fluid-carousel>
+```
+
+### Autoplay
+
+Set `autoplay` to a millisecond interval. The carousel pauses when the
+pointer is over it (turn off via `pause-on-hover="false"`).
+
+```html
+<fluid-carousel autoplay="4000" loop>
+  …
+</fluid-carousel>
+```
+
+### Hiding nav or pagination
+
+`no-navigation` hides the prev/next buttons. `no-pagination` hides the
+dots. Useful when the surrounding UI provides its own controls.
+
+```html
+<fluid-carousel no-pagination>…</fluid-carousel>
+<fluid-carousel no-navigation>…</fluid-carousel>
+```
+
+### Programmatic control
+
+```ts
+const carousel = document.querySelector("fluid-carousel");
+carousel.next();
+carousel.previous();
+carousel.goTo(2);
+```
+
+## Listening for slide changes
+
+The carousel fires **`fluid-slide-change`** whenever the active slide changes:
+swipe, button, dot, keyboard, or autoplay, with the new index on
+`event.detail.index`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-carousel id="hero">…</fluid-carousel>
+
+    <script type="module">
+      document.getElementById("hero").addEventListener("fluid-slide-change", (e) => {
+        console.log("now showing slide", e.detail.index);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Hero.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/carousel";
+
+    export function Hero() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: any) => console.log(e.detail.index);
+        el.addEventListener("fluid-slide-change", onChange);
+        return () => el.removeEventListener("fluid-slide-change", onChange);
+      }, []);
+      return <fluid-carousel ref={ref}>{/* items */}</fluid-carousel>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Hero.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/carousel";
+    const onChange = (e: any) => console.log(e.detail.index);
+    </script>
+
+    <template>
+      <fluid-carousel @fluid-slide-change="onChange"><!-- items --></fluid-carousel>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="hero.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/carousel";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-hero",
+      template: `<fluid-carousel (fluid-slide-change)="onChange($event)"></fluid-carousel>`
+    })
+    export class Hero {
+      onChange(e: any) { console.log(e.detail.index); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Hero.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/carousel";
+      const onChange = (e: any) => console.log(e.detail.index);
+    </script>
+
+    <fluid-carousel on:fluid-slide-change={onChange}><!-- items --></fluid-carousel>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A small set of related visuals where the user benefits from seeing one
+  at a time (hero rotators, product galleries, before/after stacks).
+- Sparingly. Most carousels are skipped. If the content matters, list it
+  out instead.
+
+For two-image side-by-side comparison, use
+[`<fluid-comparison>`](/components/comparison/). For horizontal lists the
+user can simply scroll, [`<fluid-scroller>`](/components/scroller/) is a
+lighter alternative.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-carousel-*` token that
+falls back to a main semantic var** (the override ladder); the nav buttons and
+dots have their own `bg` / `fg` / `focus-ring` tokens, and the active dot rides
+the accent track. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-carousel-aspect-ratio: 16 / 9;
+  --fluid-carousel-bg: var(--fluid-surface-base);
+  --fluid-carousel-nav-bg: var(--fluid-surface-base);
+  --fluid-carousel-nav-fg: var(--fluid-text-primary);
+  --fluid-carousel-dot-bg: var(--fluid-border-default);
+  --fluid-carousel-dot-active-bg: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The carousel exposes [`part="base"`](#api) plus `part="scroller"`,
+`part="navigation"`, `part="button"`, and `part="pagination"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-carousel" />
+
+### `<fluid-carousel-item>`
+
+<ComponentApi tag="fluid-carousel-item" />
+
+## Accessibility
+
+- The host carries `role="region"` and `aria-roledescription="carousel"`.
+- Each slide is `role="group"` with `aria-roledescription="slide"` and an
+  auto-generated `aria-label` of "Slide N of M".
+- Prev/next buttons have `aria-label`s and are disabled at the ends
+  (unless `loop` is on).
+- Pagination dots are `role="tab"` with `aria-current` reflecting the
+  active slide.
+- Keyboard: <kbd>←</kbd>/<kbd>→</kbd> move between slides;
+  <kbd>Home</kbd>/<kbd>End</kbd> jump to first/last.
+- Autoplay honors `prefers-reduced-motion` and pauses on hover/focus so a
+  moving target never traps a reader.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Comparison"
+    href="/components/comparison/"
+    description="Two images with a draggable before/after wipe."
+  />
+  <LinkCard
+    title="Scroller"
+    href="/components/scroller/"
+    description="A lighter horizontal scroll strip with edge-fade hints."
+  />
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="When slides are really discrete, labelled panels."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="Motion, autoplay, and reduced-motion guidance."
+  />
+</CardGrid>

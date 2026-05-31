@@ -1,0 +1,312 @@
+---
+title: "Checkbox"
+description: "Two- or three-state form checkbox, form-associated, indeterminate-aware, accessible by default."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-checkbox>` is the standard checkbox, on, off, or (optionally)
+indeterminate to indicate "partial selection" of a group. It wraps a native
+checkbox, is **form-associated** (submits / validates like the native element),
+and meets the WCAG 2.2 guarantees (focus ring, target size, name from the
+label). Drop your label as slotted text; the host wires the click target.
+
+<Demo>
+  <fluid-checkbox checked>I agree to the terms</fluid-checkbox>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/checkbox/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/checkbox";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### States
+
+The default slot is the visible label (and accessible name). `checked` sets the
+initial state; `disabled` dims + removes it from the tab order.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
+    <fluid-checkbox>Subscribe to updates</fluid-checkbox>
+    <fluid-checkbox checked>I agree to the terms</fluid-checkbox>
+    <fluid-checkbox disabled>Unavailable</fluid-checkbox>
+    <fluid-checkbox checked disabled>Locked on</fluid-checkbox>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-checkbox name="newsletter">Subscribe to updates</fluid-checkbox>
+<fluid-checkbox name="terms" required>I agree to the terms</fluid-checkbox>`} />
+
+### Indeterminate
+
+Set `indeterminate` for the "some children selected" mixed state (a parent
+checkbox over a group). Clicking always clears it, matching native behavior.
+
+<Demo>
+  <fluid-checkbox indeterminate>Select all items</fluid-checkbox>
+</Demo>
+
+<ConformanceCode code={`<fluid-checkbox indeterminate>Select all items</fluid-checkbox>`} />
+
+### Without a visible label
+
+A label-less checkbox **must** carry an `aria-label`. Its hit target still meets
+24×24 (44×44 under AAA).
+
+<Demo>
+  <fluid-checkbox aria-label="Select row" checked></fluid-checkbox>
+</Demo>
+
+<ConformanceCode code={`<fluid-checkbox aria-label="Select row" checked></fluid-checkbox>`} />
+
+## Listening for changes
+
+Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
+(click, <kbd>Space</kbd>).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-checkbox id="agree">Accept terms</fluid-checkbox>
+
+    <script type="module">
+      document.getElementById("agree").addEventListener("fluid-change", (e) => {
+        console.log("checked:", e.detail.checked);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="AgreeBox.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/checkbox";
+
+    export function AgreeBox() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.checked);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-checkbox ref={ref}>Accept terms</fluid-checkbox>;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="AgreeBox.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/checkbox";
+    const onChange = (e: CustomEvent) => console.log(e.detail.checked);
+    </script>
+
+    <template>
+      <fluid-checkbox @fluid-change="onChange">Accept terms</fluid-checkbox>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="agree-box.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/checkbox";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "agree-box",
+      template: `
+        <fluid-checkbox (fluid-change)="onChange($event)">Accept terms</fluid-checkbox>
+      `
+    })
+    export class AgreeBox {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.checked);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="AgreeBox.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/checkbox";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.checked);
+      }
+    </script>
+
+    <fluid-checkbox on:fluid-change={onChange}>Accept terms</fluid-checkbox>
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+Form-associated: when checked it submits `name=value` (default value `"on"`);
+`required` blocks submission until it's checked.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.75rem; align-items:center;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'agree=' + (new FormData(this).get('agree') ?? '(unchecked)');"
+  >
+    <fluid-checkbox name="agree" value="yes" required>Accept terms</fluid-checkbox>
+    <fluid-button type="submit">Continue</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-checkbox name="agree" value="yes" required>Accept terms</fluid-checkbox>
+  <fluid-button type="submit">Continue</fluid-button>
+</form>
+```
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-checkbox-*` token that
+falls back to a main semantic var** (the override ladder); the checked box is
+the brand accent by default. The three layers (brand → component → instance)
+work like the rest of the system. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-checkbox-bg-on: var(--fluid-success-base);
+  --fluid-checkbox-radius: 6px;
+}
+```
+
+<Aside type="tip">
+  Select a checkbox in the [Theme builder](/playground/) to tweak the box,
+  check, and focus tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The label is [`part="base"`](#api) and the box is `part="control"`. Reach them
+with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
+CSS not covered by a token:
+
+```css
+fluid-checkbox::part(control) { border-radius: 50%; } /* round checkbox */
+```
+
+## When to use
+
+- Boolean opt-ins, multi-select lists, "I agree" gates.
+- The **indeterminate** state for a parent checkbox summarizing a group of
+  children.
+
+### When *not* to use
+
+- **One of many** mutually-exclusive options: use
+  [`<fluid-radio>`](/components/radio/).
+- An **immediate-effect** toggle (applies now, not on submit): use a
+  [`<fluid-switch>`](/components/switch/).
+
+## Accessibility
+
+Wraps a native `<input type="checkbox">`, so it inherits the checkbox role,
+keyboard behavior, and form participation. The notes below are
+checkbox-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Move focus to/from the checkbox. |
+| <kbd>Space</kbd> | Toggle checked / unchecked. |
+
+The focus ring renders around the box and reads `--fluid-focus-ring-width`.
+
+### Names
+
+The accessible name comes from the default slot. A **label-less** checkbox
+**MUST** set `aria-label`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+
+### State semantics
+
+- `aria-checked` reflects **`mixed`** when `indeterminate`, otherwise
+  `true` / `false`.
+- `indeterminate` is visual + ARIA only: `checked` still controls the form
+  value; clicking clears `indeterminate` (native behavior).
+- `required` participates in native validation (the browser's "Please check
+  this box" message on submit).
+
+### Motion & target size
+
+- The check-draw + box transitions honor `prefers-reduced-motion`.
+- The box is small (~18px), so the **clickable `<label>`** carries the target
+  floor: ≥ **24×24** (AA) / **44×44** (AAA) via `--fluid-target-min`, the box
+  graphic stays the same size, the hit area grows.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
+The checkbox reads both conformance tokens (target size matters most for a small
+control):
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-checkbox" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Radio"
+    href="/components/radio/"
+    description="One exclusive choice from a group."
+  />
+  <LinkCard
+    title="Switch"
+    href="/components/switch/"
+    description="Immediate-effect toggle (applies now, not on submit)."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

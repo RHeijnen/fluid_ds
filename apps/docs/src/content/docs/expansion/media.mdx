@@ -1,0 +1,69 @@
+---
+title: "@fluid-ds/media"
+description: "Video, playlists, animated images, and zoomable frames."
+---
+
+Media web components for Fluid, themable video, playlists with
+auto-advance, GIF/APNG with play/pause control, and pan-and-zoom frames.
+Expansion pack.
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  Looking for `<fluid-animation>`? It's a general motion primitive, not a media
+  component, it now lives in core: [Animation](/components/animation/).
+</Aside>
+
+## Install
+
+```bash
+pnpm add @fluid-ds/media
+```
+
+Import only the pieces you use:
+
+```ts
+import "@fluid-ds/media/define/video";
+import "@fluid-ds/media/define/video-playlist";
+import "@fluid-ds/media/define/animated-image";
+import "@fluid-ds/media/define/zoomable-frame";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-video>` | Themed wrapper around native `<video>` with consistent focus rings + control styling. |
+| `<fluid-video-playlist>` | Playlist-driven video player with auto-advance. |
+| `<fluid-animated-image>` | GIF / APNG / animated WebP with play/pause control (canvas-snapshot trick). |
+| `<fluid-zoomable-frame>` | Pan + zoom container for images, iframes, SVG. Scroll wheel + drag. |
+
+## Use
+
+```html
+<fluid-video src="/clip.mp4" controls></fluid-video>
+
+<fluid-animated-image src="/cat.gif"></fluid-animated-image>
+
+<fluid-zoomable-frame>
+  <img src="/diagram.svg" alt="…">
+</fluid-zoomable-frame>
+```
+
+## Theming
+
+Components read from the same `--fluid-*` semantic tokens as the rest of
+the system, focus rings, surface colors, control accents, so themes
+flow through without extra work. Each component has its own
+`@cssproperty`-annotated tokens for fine-grained overrides; see the
+generated tables in each component's reference.
+
+## When to use
+
+- Anywhere you'd reach for native media elements but want consistent
+  styling, focus behavior, and pause / play semantics across browsers
+  and animation formats.
+
+## License
+
+MIT.

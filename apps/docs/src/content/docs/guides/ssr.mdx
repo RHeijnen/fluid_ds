@@ -1,0 +1,282 @@
+---
+title: "Server-side rendering"
+description: "How Fluid components behave under SSR, Next.js, Nuxt, Astro, Remix, SvelteKit, and how to keep the first paint clean."
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+Web components and SSR have a reputation for being awkward together.
+The reality in 2026: it works fine in every major framework, **once you
+know the two rules**. This page covers those rules and the per-framework
+specifics.
+
+## The two rules
+
+### Rule 1: Define components on the client, not the server
+
+Fluid components register themselves with `customElements.define()`,
+which only exists in the browser. Importing
+`@fluid-ds/components/define/button` on the server throws.
+
+Solution: gate the import to client-only modules. Every framework has a
+way to do this, `"use client"`, `<ClientOnly>`, `client:load`,
+`onMounted`, etc.
+
+### Rule 2: The SSR-rendered markup is just HTML
+
+The server emits `<fluid-button>Save</fluid-button>` as plain HTML. The
+browser sees an *unknown* tag at first paint (which is fine, it renders
+as inline by default). When the JS bundle loads on the client and
+`customElements.define()` runs, the tag **upgrades** to a real
+component. From the user's perspective: a tiny flash where the styled
+button replaces a plain one.
+
+This is the only "hydration mismatch" SSR + web components has, and
+it's not really a mismatch, it's an upgrade. Two ways to soften it:
+
+- **Style fallback**: in your global CSS, give unstyled `<fluid-button>`
+  enough styling that it looks roughly like the upgraded version.
+- **`:not(:defined)` hiding**: hide unstyled custom elements until they
+  upgrade.
+
+```css
+fluid-button:not(:defined),
+fluid-input:not(:defined),
+fluid-card:not(:defined) {
+  visibility: hidden;
+}
+```
+
+The `:defined` pseudo-class is widely supported and toggles
+automatically when the element registers.
+
+<Aside type="tip" title="Auto-suppress before upgrade">
+  Wrap the rule in `@layer fallback { ... }` so your own page CSS can
+  unconditionally override it without specificity tricks.
+</Aside>
+
+## Per-framework specifics
+
+### Next.js (app router)
+
+Fluid imports go into a client component. Either tag the file
+itself:
+
+```tsx title="app/RegisterFluid.tsx"
+"use client";
+
+import "@fluid-ds/icons/register-defaults";
+import "@fluid-ds/components/define/button";
+import "@fluid-ds/components/define/input";
+
+export default function RegisterFluid() {
+  return null;
+}
+```
+
+…and mount it in your root layout:
+
+```tsx title="app/layout.tsx"
+import RegisterFluid from "./RegisterFluid";
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <RegisterFluid />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+Pages and components themselves can stay server-rendered, they emit
+`<fluid-button>` as HTML and Next happily streams it.
+
+### Next.js (pages router)
+
+Use a `_app.tsx` that conditionally registers:
+
+```tsx title="pages/_app.tsx"
+import type { AppProps } from "next/app";
+import { useEffect } from "react";
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+
+export default function App({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    void Promise.all([
+      import("@fluid-ds/icons/register-defaults"),
+      import("@fluid-ds/components/define/button"),
+      import("@fluid-ds/components/define/input")
+    ]);
+  }, []);
+  return <Component {...pageProps} />;
+}
+```
+
+### Nuxt 3
+
+Nuxt has built-in client-only support via `.client.ts` suffix or the
+`<ClientOnly>` component, but the cleanest place is a plugin:
+
+```ts title="plugins/fluid-ds.client.ts"
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+import "@fluid-ds/icons/register-defaults";
+import "@fluid-ds/components/define/button";
+
+export default defineNuxtPlugin(() => {});
+```
+
+The `.client.ts` suffix makes Nuxt skip this file on the server.
+
+Add the Vue compiler hint so it stops warning about unknown tags:
+
+```ts title="nuxt.config.ts"
+export default defineNuxtConfig({
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag) => tag.startsWith("fluid-")
+    }
+  }
+});
+```
+
+### Astro
+
+Astro's content-first model is the friendliest of the bunch, Fluid
+DS pages essentially **are** Astro pages. Put the registration in a
+single `<script>` block (Astro bundles + code-splits it):
+
+```astro title="src/layouts/Default.astro"
+---
+import "@fluid-ds/tokens/base.css";
+import "@fluid-ds/tokens/light.css";
+---
+<html>
+  <head>
+    <script>
+      import "@fluid-ds/icons/register-defaults";
+      import "@fluid-ds/components/define/button";
+      import "@fluid-ds/components/define/input";
+    </script>
+  </head>
+  <body><slot /></body>
+</html>
+```
+
+Components render statically in HTML and upgrade on the client. This is
+exactly how the [Fluid docs site itself](/) works.
+
+### Remix
+
+Same pattern as Next pages router, register on the client in a
+`useEffect`:
+
+```tsx title="app/root.tsx"
+import { useEffect } from "react";
+import { Outlet } from "@remix-run/react";
+import "@fluid-ds/tokens/base.css";
+
+export default function App() {
+  useEffect(() => {
+    void Promise.all([
+      import("@fluid-ds/icons/register-defaults"),
+      import("@fluid-ds/components/define/button")
+    ]);
+  }, []);
+  return <Outlet />;
+}
+```
+
+### SvelteKit
+
+Use a `+layout.svelte` with a client-only block:
+
+```svelte title="src/routes/+layout.svelte"
+<script lang="ts">
+  import { onMount } from "svelte";
+  import "@fluid-ds/tokens/base.css";
+
+  onMount(async () => {
+    await Promise.all([
+      import("@fluid-ds/icons/register-defaults"),
+      import("@fluid-ds/components/define/button")
+    ]);
+  });
+</script>
+
+<slot />
+```
+
+### Plain Node + Express + Astro
+
+If you're rendering HTML manually (Express + a templating engine,
+custom SSR), just emit the tags. They render fine; the client picks
+them up after the JS loads.
+
+## Streaming SSR + React 19
+
+React 19 (and Next.js 15+) support **declarative shadow DOM** SSR for
+web components, meaning the shadow tree itself is rendered as
+`<template shadowrootmode="open">` in the SSR HTML. Fluid doesn't
+opt into this yet (it'd require shipping a separate SSR-flavoured
+build), but **standard SSR works fine without it**. The upgrade pattern
+above gets you 99% of the user-visible benefit.
+
+If you have an explicit need for streaming HTML with the shadow tree
+included (no flash of unstyled custom element at all), open an issue:
+we'd take a contribution that adds opt-in DSD output.
+
+## Common gotchas
+
+### "ReferenceError: HTMLElement is not defined"
+
+You imported a Fluid component on the server. Move the import to a
+client-only path (see the per-framework sections above).
+
+### Inputs lose value on hydration
+
+You're controlling a `fluid-input` via React's `value` prop without
+setting the corresponding ref. React 19 handles this; React 18 needs
+a `useRef` + manual assignment. See the
+[React section in Framework integrations](/guides/frameworks/#react).
+
+### Flash of unstyled custom element
+
+The `:not(:defined)` rule above eliminates the unstyled-then-styled
+flash. It's invisible to the user but visible in profiling tools.
+
+### CSS missing on first paint
+
+Make sure the token CSS files are imported at the top of your root
+layout. They have to be in the HTML head, not in a client-only
+component, because the server emits the markup before the client
+loads.
+
+## Hydration timing diagram
+
+```
+   Server                     Network               Browser
+─────────────────────────────────────────────────────────────────
+   render HTML       →        HTML payload    →    parse HTML
+   (unknown tags)                                  (unknown tags
+                                                    rendered as
+                                                    inline boxes)
+                                                          ↓
+                                                    JS bundle loads
+                                                          ↓
+                                                    customElements
+                                                    .define() runs
+                                                          ↓
+                                                    tags upgrade
+                                                    (instant restyling)
+```
+
+The window between "parse HTML" and "tags upgrade" is the FOUC window.
+On a fast connection it's invisible; on a slow connection, the
+`:not(:defined)` rule keeps it invisible too.

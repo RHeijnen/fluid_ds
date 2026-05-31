@@ -1,0 +1,178 @@
+---
+title: "What are web components?"
+description: "Custom elements, the registry, and the three browser standards that make Fluid framework-agnostic."
+---
+
+import { Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Fluid ships **web components**, custom HTML elements the browser
+understands natively, with no framework in the loop. That's why a
+`<fluid-button>` drops into a React app, a Vue app, a plain HTML file, or a
+server-rendered page and behaves the same everywhere.
+
+This page explains what a web component actually is. If you just want to use
+the library, the [Getting started](/getting-started/installation/) guide is
+the faster path, come back here when you want to understand what's happening
+under the hood, or before you [build your own component](/concepts/build-your-own/).
+
+## A custom element, in one breath
+
+A web component is a custom HTML tag, `<fluid-card>`, `<my-widget>`, backed
+by a JavaScript class. You teach the browser the tag once, and from then on it
+treats it like any built-in element: it parses in HTML, you can query it,
+style it, and attach event listeners to it.
+
+```html
+<fluid-card>
+  <h3 slot="header">Hello</h3>
+  <p>A real DOM element, no virtual DOM, no wrapper.</p>
+</fluid-card>
+```
+
+The custom tag name **must contain a hyphen** (`fluid-card`, not `card`). That
+hyphen is the contract that keeps custom elements from ever colliding with a
+current or future native HTML tag.
+
+## The registry
+
+A custom element doesn't work until it's *registered*. You register it by
+calling `customElements.define()` with the tag name and the class:
+
+```ts
+class HelloWorld extends HTMLElement {
+  connectedCallback() {
+    this.textContent = "Hello, world!";
+  }
+}
+
+customElements.define("hello-world", HelloWorld);
+```
+
+After that one call, every `<hello-world>` on the page, now or added
+later, upgrades into an instance of the class. The browser keeps a global
+registry (`window.customElements`) mapping tag names to classes.
+
+In Fluid each component owns a tiny `define.ts` that does exactly this, with
+a guard so importing it twice is harmless:
+
+```ts title="define.ts"
+import { FluidBadge } from "./fluid-badge.js";
+
+if (!customElements.get("fluid-badge")) {
+  customElements.define("fluid-badge", FluidBadge);
+}
+```
+
+That's the whole reason Fluid exposes side-effect `/define/*` entry
+points, importing `@fluid-ds/components/define/badge` *runs* this file and
+registers the element. (See [Build your own](/concepts/build-your-own/) for the
+full entry-point pattern.)
+
+## Why framework-agnostic matters
+
+Because the browser owns the element, no framework has to. The same built
+artifact works in every environment:
+
+- **HTML / no build step**: drop a `<script type="module">` tag and use the
+  element.
+- **React, Vue, Svelte, Angular**: they all render real DOM, so they render
+  custom elements too. See [Framework integrations](/guides/frameworks/).
+- **Server-rendered pages**: the element is just markup until its define
+  module loads and upgrades it.
+
+You write the component once. You don't ship a React build *and* a Vue build
+*and* a vanilla build, there's one element, and the platform is the runtime.
+
+<Aside type="tip">
+  Web components and your framework aren't an either/or. Use Fluid elements
+  as leaf nodes inside React/Vue components, the framework owns layout and
+  data flow, the custom elements own their own rendering and styling.
+</Aside>
+
+## The three pillars
+
+"Web components" is an umbrella over three independent browser standards. You
+can use any of them on their own, but together they're what makes a component
+like `<fluid-button>` self-contained.
+
+1. **Custom Elements**: the API for defining your own tags
+   (`customElements.define`) and hooking into their lifecycle
+   (`connectedCallback`, `attributeChangedCallback`, …). This is the part this
+   page covered.
+
+2. **Shadow DOM**: a private, encapsulated DOM tree attached to the element.
+   Styles inside it don't leak out, and page styles don't leak in. This is how
+   a component guarantees it looks the same no matter what CSS surrounds it.
+
+3. **HTML Templates**: `<template>` and `<slot>` let an element declare inert
+   markup and define *holes* where the consumer's content gets projected.
+
+Fluid builds on all three through [Lit](https://lit.dev), a tiny library
+that handles reactive rendering and the boilerplate so each component is just a
+class with a `render()` method.
+
+<Aside>
+  Lit is an implementation detail, not a dependency you inherit. Consumers
+  import a *web component*, there is no "Lit component" in your app, just a
+  custom element the browser runs.
+</Aside>
+
+## A tiny vanilla example
+
+No Lit, no build, a complete custom element you could paste into an HTML file
+today. It uses all three pillars: a registered tag, a shadow root, and a slot.
+
+```html
+<script type="module">
+  class GreetBox extends HTMLElement {
+    constructor() {
+      super();
+      // Pillar 2: attach a private shadow tree.
+      const root = this.attachShadow({ mode: "open" });
+      // Pillar 3: a <slot> projects the consumer's light-DOM children.
+      // The style block is scoped to this shadow root, it cannot leak out.
+      root.innerHTML = `
+        <style>
+          .box { border: 2px solid hotpink; padding: 8px; border-radius: 8px; }
+        </style>
+        <div class="box">Hi <slot>there</slot>!</div>
+      `;
+    }
+  }
+
+  // Pillar 1: register the tag.
+  customElements.define("greet-box", GreetBox);
+</script>
+
+<greet-box>Ada</greet-box>
+<!-- renders: Hi Ada! inside a pink box -->
+```
+
+The `.box` border colour is invisible to the rest of the page, and the page's
+stylesheet can't reach in to change it, that encapsulation is the next
+page's topic.
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="Slots & shadow DOM"
+    href="/concepts/slots-and-shadow-dom/"
+    description="Encapsulation, default + named slots, ::part() and ::slotted(), and the one thing that crosses the boundary."
+  />
+  <LinkCard
+    title="Build your own component"
+    href="/concepts/build-your-own/"
+    description="Author a fluid-* element the Fluid way, FluidElement, the token ladder, and the define.ts pattern."
+  />
+  <LinkCard
+    title="Installation"
+    href="/getting-started/installation/"
+    description="Add Fluid to a project, CDN or npm."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Use Fluid elements inside React, Vue, Svelte, and Angular."
+  />
+</CardGrid>

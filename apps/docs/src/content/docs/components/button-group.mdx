@@ -1,0 +1,310 @@
+---
+title: "Button group"
+description: "Visually-fused row or column of buttons. Toolbars, segmented actions, split buttons."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-button-group>` fuses two or more `<fluid-button>` elements into one
+shape, interior edges square off and outer corners round normally. It's the
+right wrapper for toolbars, split buttons (primary action + a dropdown
+trigger), and "left | middle | right" segmented actions. Each child stays a
+fully-functional button; the group just marks each member's position so the
+buttons round their own corners.
+
+<Demo>
+  <fluid-button-group aria-label="Text formatting">
+    <fluid-button variant="secondary">Bold</fluid-button>
+    <fluid-button variant="secondary">Italic</fluid-button>
+    <fluid-button variant="secondary">Underline</fluid-button>
+  </fluid-button-group>
+</Demo>
+
+<Aside type="note" title="How the fusion works">
+  The group doesn't restyle its children with `::slotted()`. It stamps a
+  `data-fluid-group="first | inner | last | only"` attribute on each member
+  button, and `<fluid-button>` owns the corner-flattening + border-overlap
+  CSS. That indirection is deliberate: it's the only way a split button's
+  caret trigger, which lives one shadow boundary deep inside a
+  `<fluid-dropdown>`, can fuse with the action button next to it, since
+  `::slotted()` / `::part()` can't reach across that boundary.
+</Aside>
+
+## Install
+
+The group registers the `<fluid-button-group>` tag; you'll almost always load
+`<fluid-button>` alongside it, plus `<fluid-dropdown>` for split buttons.
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button-group/define.js">
+    </script>
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js">
+    </script>
+    <!-- only for split buttons -->
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dropdown/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/button-group";
+    import "@fluid-ds/components/define/button";
+    import "@fluid-ds/components/define/dropdown"; // only for split buttons
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-button-group>
+    <fluid-button variant="secondary">Cut</fluid-button>
+    <fluid-button variant="secondary">Copy</fluid-button>
+    <fluid-button variant="secondary">Paste</fluid-button>
+  </fluid-button-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-button-group>
+  <fluid-button variant="secondary">Cut</fluid-button>
+  <fluid-button variant="secondary">Copy</fluid-button>
+  <fluid-button variant="secondary">Paste</fluid-button>
+</fluid-button-group>`} />
+
+### Split button
+
+Primary action on the left, a caret trigger on the right that opens a menu
+of related options. The action button runs the default action; the caret
+button (`<fluid-button caret>` wrapped in a `<fluid-dropdown>`) opens the
+[same stylised menu](/components/dropdown/) used by `fluid-select` and
+`fluid-typeahead`.
+
+<Demo>
+  <fluid-button-group aria-label="Save options">
+    <fluid-button>Save</fluid-button>
+    <fluid-dropdown placement="bottom-end">
+      <fluid-button slot="trigger" caret aria-label="More save options"></fluid-button>
+      <fluid-dropdown-item value="draft">Save as draft</fluid-dropdown-item>
+      <fluid-dropdown-item value="copy">Save a copy</fluid-dropdown-item>
+      <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+      <fluid-dropdown-item value="template">Save as template…</fluid-dropdown-item>
+    </fluid-dropdown>
+  </fluid-button-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-button-group aria-label="Save options">
+  <fluid-button>Save</fluid-button>
+  <fluid-dropdown placement="bottom-end">
+    <!-- caret renders the built-in chevron; no slotted icon needed -->
+    <fluid-button slot="trigger" caret aria-label="More save options"></fluid-button>
+    <fluid-dropdown-item value="draft">Save as draft</fluid-dropdown-item>
+    <fluid-dropdown-item value="copy">Save a copy</fluid-dropdown-item>
+    <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+    <fluid-dropdown-item value="template">Save as template…</fluid-dropdown-item>
+  </fluid-dropdown>
+</fluid-button-group>`} />
+
+Give the trigger the same `variant` and `tone` as the action button so the
+split reads as one control (e.g. `tone="success"` on both).
+
+### Menu button (no group)
+
+A single `<fluid-button caret>` inside a `<fluid-dropdown>` is a standalone
+menu button, no group, no split. The built-in caret rotates while the menu
+is open.
+
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+    <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+    <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+    <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropdown>
+  <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+  <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+  <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+</fluid-dropdown>`} />
+
+### Vertical
+
+<Demo>
+  <fluid-button-group orientation="vertical">
+    <fluid-button variant="secondary">Top</fluid-button>
+    <fluid-button variant="secondary">Middle</fluid-button>
+    <fluid-button variant="secondary">Bottom</fluid-button>
+  </fluid-button-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-button-group orientation="vertical">
+  <fluid-button variant="secondary">Top</fluid-button>
+  <fluid-button variant="secondary">Middle</fluid-button>
+  <fluid-button variant="secondary">Bottom</fluid-button>
+</fluid-button-group>`} />
+
+### Mixed variants
+
+The group fuses borders, not variants, you can mix as needed.
+
+<Demo>
+  <fluid-button-group>
+    <fluid-button>Confirm</fluid-button>
+    <fluid-button variant="ghost">Cancel</fluid-button>
+  </fluid-button-group>
+</Demo>
+
+<ConformanceCode code={`<fluid-button-group>
+  <fluid-button>Confirm</fluid-button>
+  <fluid-button variant="ghost">Cancel</fluid-button>
+</fluid-button-group>`} />
+
+## Theming
+
+The group draws nothing of its own, so it exposes **no `--fluid-button-group-*`
+tokens**, the "CSS custom properties" table in the [API](#api) below is empty
+on purpose. You theme a group by theming its parts: every member reads the
+[`<fluid-button>` tokens](/components/button/#theming) (`--fluid-button-bg`,
+`--fluid-button-radius`, …) and the split-button menu reads the
+[`<fluid-dropdown>` tokens](/components/dropdown/). The one knob that affects
+the group as a whole is the shared field radius, which rounds its outer
+corners:
+
+```css
+/* Round (or square) every grouped button's outer corners brand-wide. */
+[data-fluid-brand="custom"] {
+  --fluid-field-border-radius: 8px;
+}
+```
+
+<Aside type="tip">
+  Tweak the underlying button + dropdown tokens visually in the
+  [Theme builder](/playground/) and export the CSS.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The group exposes [`part="base"`](#api) (the flex container) for layout tweaks,
+and each member button exposes its own
+[`part="base"`](/components/button/#beyond-tokens-part) for arbitrary CSS, so
+anything not covered by a token is still reachable:
+
+```css
+/* Custom gap between members, and a one-off radius on the action button. */
+fluid-button-group::part(base) { gap: 2px; }
+fluid-button-group > fluid-button:first-child::part(base) {
+  border-radius: 12px 0 0 12px;
+}
+```
+
+## When to use
+
+- Toolbars where actions belong to one functional group.
+- **Split buttons**: a primary action fused to an overflow menu.
+- Pairs of related actions like Confirm / Cancel where the visual fusion
+  helps signal the relationship.
+
+### When *not* to use
+
+- **Mutually-exclusive options** ("Day | Week | Month"): use
+  [`<fluid-segmented-control>`](/components/segmented-control/). Same shape, but
+  it manages the selection state for you.
+- A **single** action: just use a [`<fluid-button>`](/components/button/); the
+  group is for two or more.
+
+## Accessibility
+
+The group is a thin semantic + layout wrapper; the real interactive contract
+lives in its member [`<fluid-button>`](/components/button/#accessibility)s. The
+notes below are group-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Semantics
+
+- The host carries `role="group"`. **Set `aria-label`** on it so screen readers
+  announce the group's purpose (e.g. "Text formatting", "Save options"), a
+  group with no name is just an unlabeled cluster
+  ([SC 1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships)).
+- Corner-fusion is purely visual (`data-fluid-group` + CSS): it changes no
+  semantics, roles, or the accessibility tree.
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Move through the members, each stays an ordinary button. |
+| <kbd>Space</kbd> / <kbd>Enter</kbd> | Activate the focused button. |
+
+The group adds no roving-tabindex or arrow-key model, members are independent
+buttons. (For a single-selection arrow-key picker, that's
+[`<fluid-segmented-control>`](/components/segmented-control/), not this.)
+
+### Split button
+
+In a split button the [caret trigger](/components/button/#dropdown-trigger)
+carries `aria-haspopup="menu"` + `aria-expanded` (forwarded to its inner
+button), and the menu follows the
+[`<fluid-dropdown>`](/components/dropdown/#accessibility) keyboard contract
+(arrow keys, type-ahead, <kbd>Esc</kbd> to close). Give the caret trigger an
+`aria-label` ("More save options") since it has no visible text.
+
+### AA vs AAA
+
+The group has no target of its own, size and focus come from its member
+buttons, so the **Conformance** toggle at the top of this page applies through
+them: switch to **AAA** and every button in the group grows to a 44×44 target
+with a 3px focus ring
+([SC 2.5.5](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) /
+[2.4.13](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)) via
+`data-fluid-conformance="aaa"`. See the button's
+[AA vs AAA section](/components/button/#aa-vs-aaa) for the token-delta table.
+
+## API
+
+<ComponentApi tag="fluid-button-group" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Button"
+    href="/components/button/"
+    description="The members of a group, variants, tones, sizes, loading, toggle, caret."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="The menu engine behind a split button's caret trigger."
+  />
+  <LinkCard
+    title="Segmented control"
+    href="/components/segmented-control/"
+    description="Same fused shape, but manages single-selection state."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

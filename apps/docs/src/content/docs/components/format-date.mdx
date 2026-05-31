@@ -1,0 +1,163 @@
+---
+title: "Format date"
+description: "Locale-aware date and time formatting via Intl.DateTimeFormat."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-format-date>` renders a `Date`, ISO string, or timestamp using
+`Intl.DateTimeFormat`, either the high-level `date-style` / `time-style`
+presets or fine-grained per-part options (`year`, `month`, `day`, `hour`, …),
+both mapping straight onto the platform API.
+
+<Demo>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="long"></fluid-format-date>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/format-date/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/format-date";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  Renders plain inline text and reads no design tokens beyond the inherited
+  text color, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### Date styles
+
+<Demo>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="short"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="medium"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="long"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="full"></fluid-format-date>
+</Demo>
+
+```html
+<fluid-format-date date="2026-05-29T14:30:00Z" date-style="long"></fluid-format-date>
+<!-- → "May 29, 2026" -->
+```
+
+### Date + time
+
+<Demo>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="medium" time-style="short"></fluid-format-date>
+</Demo>
+
+```html
+<fluid-format-date
+  date="2026-05-29T14:30:00Z"
+  date-style="medium"
+  time-style="short"
+></fluid-format-date>
+```
+
+### Per-part options
+
+When the presets don't fit, pass individual fields. They override
+`date-style` / `time-style`.
+
+<Demo>
+  <fluid-format-date
+    date="2026-05-29T14:30:00Z"
+    weekday="long"
+    month="long"
+    day="numeric"
+  ></fluid-format-date>
+</Demo>
+
+```html
+<fluid-format-date
+  date="2026-05-29T14:30:00Z"
+  weekday="long"
+  month="long"
+  day="numeric"
+></fluid-format-date>
+<!-- → "Friday, May 29" -->
+```
+
+### Locale
+
+<Demo>
+  <fluid-format-date date="2026-05-29" date-style="full" locale="fr-FR"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29" date-style="full" locale="ja-JP"></fluid-format-date>
+</Demo>
+
+### Time zone
+
+```html
+<fluid-format-date
+  date="2026-05-29T14:30:00Z"
+  date-style="medium"
+  time-style="short"
+  time-zone="America/Los_Angeles"
+></fluid-format-date>
+```
+
+## When to use
+
+- Static absolute dates ("Published May 29, 2026").
+- For "5 minutes ago" / "in 2 hours", reach for
+  [`<fluid-relative-time>`](/components/relative-time/), it auto-updates
+  and uses `Intl.RelativeTimeFormat`.
+
+## Theming
+
+The element renders inline plain text, no component tokens. Style it
+with surrounding CSS.
+
+## API
+
+<ComponentApi tag="fluid-format-date" />
+
+## Accessibility
+
+- The output is plain text and is announced naturally by screen
+  readers.
+- Invalid `date` values render empty rather than throwing: check your
+  input in development.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Relative time"
+    href="/components/relative-time/"
+    description="“5 minutes ago” / “in 2 hours”, auto-updating."
+  />
+  <LinkCard
+    title="Format number"
+    href="/components/format-number/"
+    description="Locale-aware numbers, currency, percent."
+  />
+  <LinkCard
+    title="Format bytes"
+    href="/components/format-bytes/"
+    description="Human-readable file sizes."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

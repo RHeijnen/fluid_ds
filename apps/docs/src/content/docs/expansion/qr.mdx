@@ -1,0 +1,59 @@
+---
+title: "@fluid-ds/qr"
+description: "QR-code web component rendered as crisp inline SVG. Themes via currentColor."
+---
+
+`<fluid-qr-code>` renders a QR code as inline SVG, so it scales without
+aliasing and inherits color via `currentColor`. Backed by
+[qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator).
+Expansion pack.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/qr
+```
+
+```ts
+import "@fluid-ds/qr/define";
+```
+
+## Use
+
+```html
+<fluid-qr-code value="https://example.com" size="200"></fluid-qr-code>
+```
+
+## Props
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `value` | `""` | The data to encode |
+| `size` | `160` | Pixel size of the rendered code |
+| `ec-level` | `"M"` | Error correction: `L`, `M`, `Q`, `H` |
+| `fill` | `currentColor` | Foreground color |
+| `background` | `transparent` | Background color |
+| `margin` | `2` | Module margin (in modules) |
+
+## Theming
+
+Because the foreground is `currentColor`, one rule themes every QR on
+the page:
+
+```css
+[data-fluid-brand="custom"] fluid-qr-code {
+  color: var(--fluid-color-primary);
+}
+```
+
+## When to use
+
+- Wi-Fi credentials, contact cards, app-store links: anywhere a
+  scannable code shortens the path to "open this on my phone".
+- Higher `ec-level` (`Q` or `H`) tolerates more visual decoration over
+  the code at the cost of denser modules. Use `H` when you want to
+  paste a logo into the center.
+
+## License
+
+MIT, qrcode-generator is MIT-licensed.

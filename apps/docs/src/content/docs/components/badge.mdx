@@ -1,0 +1,178 @@
+---
+title: "Badge"
+description: "Compact pill for status, counts, and tags. Five severity variants plus a dot-only mode."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-badge>` is the small, tinted pill that sits beside something else, a
+"new" marker, a count next to an icon, a status label on a row. Five variants
+signal severity: `neutral` (default), `info`, `success`, `warning`, `danger`.
+Set `dot` for a tiny circular indicator with no text.
+
+<Demo>
+  <fluid-badge variant="success">Active</fluid-badge>
+  <fluid-badge variant="danger">3</fluid-badge>
+  <fluid-badge variant="warning" dot></fluid-badge>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/badge/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/badge";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Variants
+
+<Demo>
+  <fluid-badge>Neutral</fluid-badge>
+  <fluid-badge variant="info">Info</fluid-badge>
+  <fluid-badge variant="success">Success</fluid-badge>
+  <fluid-badge variant="warning">Warning</fluid-badge>
+  <fluid-badge variant="danger">Danger</fluid-badge>
+</Demo>
+
+```html
+<fluid-badge variant="success">Active</fluid-badge>
+<fluid-badge variant="danger">Failed</fluid-badge>
+```
+
+### Sizes
+
+Two sizes, `sm` for dense rows and `md` (default) for general use.
+
+<Demo>
+  <fluid-badge size="sm">Small</fluid-badge>
+  <fluid-badge size="md">Medium</fluid-badge>
+</Demo>
+
+### Counts
+
+<Demo>
+  <fluid-badge variant="danger">3</fluid-badge>
+  <fluid-badge variant="info">42</fluid-badge>
+  <fluid-badge>99+</fluid-badge>
+</Demo>
+
+### Dot only
+
+Set `dot` to render a single colored circle, perfect when you just need
+to signal a state next to an item.
+
+<Demo>
+  <fluid-badge variant="success" dot></fluid-badge>
+  <fluid-badge variant="warning" dot></fluid-badge>
+  <fluid-badge variant="danger" dot></fluid-badge>
+</Demo>
+
+```html
+<fluid-badge variant="success" dot></fluid-badge>
+```
+
+### Anchored to an avatar
+
+Pair with [`<fluid-avatar>`](/components/avatar/) by slotting into its
+`badge` slot.
+
+```html
+<fluid-avatar label="Ada Lovelace">
+  <fluid-badge slot="badge" variant="success" dot></fluid-badge>
+</fluid-avatar>
+```
+
+## When to use
+
+- Status labels: "Active", "Pending", "Failed".
+- Counts next to icons or labels.
+- Tiny inline indicators (the dot mode).
+
+Reach for [`<fluid-tag>`](/components/tag/) when the label is a piece of
+user-supplied data the user can remove (a filter chip, a recipient pill).
+Tags are interactive; badges are not.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-badge-*` token that
+falls back to a main semantic var or color primitive** (the override ladder);
+each variant has its own `bg` / `fg` pair. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-badge-bg: var(--fluid-color-neutral-200);
+  --fluid-badge-fg: var(--fluid-color-neutral-800);
+  --fluid-badge-success-bg: var(--fluid-color-emerald-100);
+  --fluid-badge-success-fg: var(--fluid-color-emerald-800);
+  --fluid-badge-danger-bg: var(--fluid-color-red-100);
+  --fluid-badge-danger-fg: var(--fluid-color-red-800);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The pill is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-badge" />
+
+## Accessibility
+
+- The badge is a passive label: no implicit ARIA role. If the badge
+  conveys a state critical to surrounding content (an unread count,
+  a "live" indicator), wrap it in a parent with an `aria-label` that
+  spells it out, or include explanatory text alongside it.
+- The `dot` mode is purely decorative: the colored circle has no text
+  alternative. Don't rely on color alone; pair it with a visible label
+  or `aria-label` on the enclosing element.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Tag"
+    href="/components/tag/"
+    description="Interactive, removable chips for user-supplied data."
+  />
+  <LinkCard
+    title="Avatar"
+    href="/components/avatar/"
+    description="Anchor a status dot in its badge slot."
+  />
+  <LinkCard
+    title="Callout"
+    href="/components/callout/"
+    description="A full-width status block instead of a compact pill."
+  />
+  <LinkCard
+    title="Icon"
+    href="/components/icon/"
+    description="Pair with a leading symbol inside the badge."
+  />
+</CardGrid>

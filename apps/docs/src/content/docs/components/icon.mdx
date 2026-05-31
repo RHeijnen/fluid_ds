@@ -1,0 +1,164 @@
+---
+title: "Icon"
+description: "Inline SVG icon backed by a registry. Decorative by default; labels make them accessible."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-icon>` renders one icon from the `@fluid-ds/icons` registry. The
+icon system is registry-driven: you register SVGs at bootstrap (or
+on-demand), and components look them up by name. Sizes from
+`currentColor` and `1em` by default, so icons inherit their typography.
+
+Register the default set once at app startup:
+
+```ts
+import "@fluid-ds/icons/register-defaults";
+```
+
+Or register your own:
+
+```ts
+import { registerIcon } from "@fluid-ds/icons";
+registerIcon("rocket", `<svg viewBox="0 0 24 24">…</svg>`);
+```
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module">
+      import "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/icon/define.js";
+      import "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js";
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/icons
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/icon";
+    import "@fluid-ds/icons/register-defaults"; // or registerIcon() your own
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-icon name="home"></fluid-icon>
+  <fluid-icon name="settings"></fluid-icon>
+  <fluid-icon name="user"></fluid-icon>
+  <fluid-icon name="search"></fluid-icon>
+</Demo>
+
+```html
+<fluid-icon name="home"></fluid-icon>
+```
+
+### Sizing
+
+Icons inherit their size from `font-size` via the `1em` default. Override
+with the `--fluid-icon-size` property or the host's `font-size`.
+
+<Demo>
+  <fluid-icon name="rocket" style="font-size: 0.875rem;"></fluid-icon>
+  <fluid-icon name="rocket" style="font-size: 1.5rem;"></fluid-icon>
+  <fluid-icon name="rocket" style="font-size: 3rem;"></fluid-icon>
+</Demo>
+
+```html
+<fluid-icon name="rocket" style="font-size: 3rem;"></fluid-icon>
+```
+
+### Color
+
+Icons use `currentColor` for stroke and fill, set `color` on a wrapper
+or via `--fluid-icon-color`.
+
+<Demo>
+  <fluid-icon name="heart" style="color: var(--fluid-danger-base);"></fluid-icon>
+  <fluid-icon name="heart" style="color: var(--fluid-accent-base);"></fluid-icon>
+</Demo>
+
+### Accessibility: label vs. decorative
+
+Without a `label`, the icon is treated as decorative
+(`aria-hidden="true"`). Use that whenever the icon is paired with
+adjacent text that carries the meaning.
+
+```html
+<fluid-button>
+  <fluid-icon slot="prefix" name="download"></fluid-icon>
+  Download
+</fluid-button>
+```
+
+For an **icon-only** affordance, set `label` so the icon gets
+`role="img"` and a proper accessible name:
+
+```html
+<fluid-icon name="settings" label="Settings"></fluid-icon>
+```
+
+## When to use
+
+- Inline within buttons, inputs, lists: anywhere a small symbol helps.
+- For visual badges with a tinted background, pair this with
+  [`<fluid-badge>`](/components/badge/).
+
+## Theming
+
+```css
+[data-fluid-brand="custom"] {
+  --fluid-icon-size: 1em;
+  --fluid-icon-color: currentColor;
+}
+```
+
+## API
+
+<ComponentApi tag="fluid-icon" />
+
+## Accessibility
+
+- Decorative icons (`label` not set) carry `aria-hidden="true"` and are
+  ignored by screen readers, the right call when the icon sits next to
+  a visible label.
+- Icons with `label` carry `role="img"` and `aria-label`, becoming
+  announceable elements.
+- The icon waits silently until its name is registered: if you see an
+  empty box, double-check that `register-defaults` (or your own
+  `registerIcon` call) has run.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Button"
+    href="/components/button/"
+    description="Icon slots + icon-only buttons with accessible names."
+  />
+  <LinkCard
+    title="Badge"
+    href="/components/badge/"
+    description="Tinted status markers, often paired with an icon."
+  />
+  <LinkCard
+    title="Avatar"
+    href="/components/avatar/"
+    description="Falls back to an icon when no image is set."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="Decorative vs labelled icon semantics."
+  />
+</CardGrid>

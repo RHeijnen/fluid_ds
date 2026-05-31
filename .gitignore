@@ -1,0 +1,27 @@
+node_modules
+dist
+build
+storybook-static
+# Unified deploy artifact assembled by `pnpm build:website`. ~18 MB.
+# Deployment uploads from here; nothing in here is hand-edited.
+website
+# Astro stores its generated content type definitions and route data
+# under .astro/. Regenerated on every `astro dev`/`astro check`, no
+# value in tracking it in git.
+.astro
+.cache
+.turbo
+*.log
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+coverage
+*.tsbuildinfo
+.env
+.env.local
+# Per-machine runtime lock file the Claude Code harness writes when a
+# scheduled task is active. Nothing useful to share across machines.
+.claude/scheduled_tasks.lock

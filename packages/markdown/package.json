@@ -1,0 +1,74 @@
+{
+  "name": "@fluid-ds/markdown",
+  "version": "0.0.1-alpha.0",
+  "description": "Markdown rendering web component for Fluid (expansion pack). Backed by marked; themable, supports inline and src-fetched content.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/markdown"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "markdown",
+    "marked",
+    "web-components",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "provenance": true,
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./define": {
+        "types": "./dist/define.d.ts",
+        "import": "./dist/define.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./define": {
+      "types": "./src/define.ts",
+      "import": "./src/define.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/define.js",
+    "**/define.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "lit": "^3.2.1",
+    "marked": "^14.1.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

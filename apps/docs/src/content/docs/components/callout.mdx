@@ -1,0 +1,281 @@
+---
+title: "Callout"
+description: "Inline info / warning / danger / success blocks for prose pages, settings, and forms."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-callout>` is the inline status block, a tinted card that says "pay
+attention to this." Four variants signal severity: `info` (default), `success`,
+`warning`, `danger`. For ephemeral messages, reach for
+[`<fluid-toast>`](/components/toast/) instead.
+
+<Demo>
+  <fluid-callout variant="info" style="width: 100%;">
+    <span slot="header">Heads up</span>
+    Routine information you'd want a user to read.
+  </fluid-callout>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/callout/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/callout";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Variants
+
+<Demo>
+  <fluid-callout variant="info" style="width: 100%;">
+    <span slot="header">Heads up</span>
+    Routine information you'd want a user to read.
+  </fluid-callout>
+</Demo>
+
+<Demo>
+  <fluid-callout variant="success" style="width: 100%;">
+    <span slot="header">All set</span>
+    Confirmation that an action completed as expected.
+  </fluid-callout>
+</Demo>
+
+<Demo>
+  <fluid-callout variant="warning" style="width: 100%;">
+    <span slot="header">Take care</span>
+    Something to be aware of, but not blocking.
+  </fluid-callout>
+</Demo>
+
+<Demo>
+  <fluid-callout variant="danger" style="width: 100%;">
+    <span slot="header">Error</span>
+    A failure or destructive consequence the user should understand.
+  </fluid-callout>
+</Demo>
+
+```html
+<fluid-callout variant="warning">
+  <span slot="header">Take care</span>
+  Body copy goes here, keep it short.
+</fluid-callout>
+```
+
+### Dismissible
+
+Set `dismissible` to add a close button. Listen for `fluid-hide` if you
+want to persist the dismissal.
+
+```html
+<fluid-callout variant="info" dismissible>
+  <span slot="header">New feature</span>
+  We just shipped the thing.
+</fluid-callout>
+
+<script type="module">
+  document.querySelector("fluid-callout").addEventListener("fluid-hide", () => {
+    localStorage.setItem("seen-new-feature", "1");
+  });
+</script>
+```
+
+### Icon override
+
+Each variant ships a sensible default icon. Override via the `icon`
+slot if you need a different one, pass any [`<fluid-icon>`](/components/icon/).
+
+```html
+<fluid-callout variant="info">
+  <fluid-icon slot="icon" name="rocket"></fluid-icon>
+  <span slot="header">Launching tomorrow</span>
+  …
+</fluid-callout>
+```
+
+## When to use
+
+- **Callout** = persistent, in-page status that stays as long as the
+  user is on the screen.
+- [**Toast**](/components/toast/) = ephemeral status that fades after a
+  few seconds (saved, copied, etc.).
+- [**Dialog**](/components/dialog/) = blocking, the user must respond.
+
+## Listening for dismiss
+
+A `dismissible` callout renders a close button and fires **`fluid-dismiss`** when
+it's clicked, remove the callout (or persist the dismissal) in the handler.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-callout variant="info" dismissible id="c">…</fluid-callout>
+
+    <script type="module">
+      const c = document.getElementById("c");
+      c.addEventListener("fluid-dismiss", () => c.remove());
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Notice.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/callout";
+
+    export function Notice() {
+      const [open, setOpen] = useState(true);
+      if (!open) return null;
+      return (
+        <fluid-callout variant="info" dismissible
+          onfluid-dismiss={() => setOpen(false)}>
+          …
+        </fluid-callout>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Notice.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/callout";
+    const open = ref(true);
+    </script>
+
+    <template>
+      <fluid-callout v-if="open" variant="info" dismissible @fluid-dismiss="open = false">…</fluid-callout>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="notice.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/callout";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-notice",
+      template: `<fluid-callout *ngIf="open" variant="info" dismissible (fluid-dismiss)="open = false">…</fluid-callout>`
+    })
+    export class Notice {
+      open = true;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Notice.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/callout";
+      let open = true;
+    </script>
+
+    {#if open}
+      <fluid-callout variant="info" dismissible on:fluid-dismiss={() => (open = false)}>…</fluid-callout>
+    {/if}
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-callout-*` token that
+falls back to a main semantic var or color primitive** (the override ladder).
+Each variant has its own `bg` / `fg` / `border` token (a soft surface + readable
+text + accent edge); these are **theme-independent** so a warning reads the same
+across brands. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-callout-info-bg: var(--fluid-color-brand-50);
+  --fluid-callout-info-fg: var(--fluid-color-brand-900);
+  --fluid-callout-info-border: var(--fluid-color-brand-500);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api) with `part="icon"`, `part="body"`, and
+`part="close"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-callout" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+callout-specific.
+
+### Names & roles
+
+- The container is `role="status"` (info / success / warning) or `role="alert"`
+  (danger) so screen readers announce it at the right urgency
+  ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
+- Don't rely on color alone: the variant icon + (optional) header carry the
+  meaning too ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+- A dismissible callout's close button is labeled "Dismiss".
+
+### Motion & target size
+
+- The dismiss button floors its hit area to `--fluid-target-min`: ≥ **24×24**
+  (AA) / **44×44** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Toast"
+    href="/components/toast/"
+    description="Transient, auto-dismissing status messages."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="When the message must block until acknowledged."
+  />
+  <LinkCard
+    title="Badge"
+    href="/components/badge/"
+    description="A compact inline status marker."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="status vs alert roles + not-by-color-alone."
+  />
+</CardGrid>

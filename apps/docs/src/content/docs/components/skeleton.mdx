@@ -1,0 +1,179 @@
+---
+title: "Skeleton"
+description: "Pulsing or shimmering placeholder shapes that reserve layout while the real content loads."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-skeleton>` is the placeholder primitive, a tinted rectangle that pulses
+(or sweeps) to signal "loading" while you fetch real content. Size it like any
+block via `width` / `height`; stack several to mock a card, list row, or
+paragraph, then swap in the real markup when the data arrives.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:var(--fluid-space-2); width:100%; max-width:18rem;">
+    <fluid-skeleton style="width: 60%; height: 1.5rem;"></fluid-skeleton>
+    <fluid-skeleton style="width: 100%;"></fluid-skeleton>
+    <fluid-skeleton style="width: 85%;"></fluid-skeleton>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/skeleton/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/skeleton";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+<Demo>
+  <fluid-skeleton style="width: 100%;"></fluid-skeleton>
+</Demo>
+
+```html
+<fluid-skeleton style="width: 12rem;"></fluid-skeleton>
+```
+
+### Sized to mock content
+
+<Demo>
+  <div style="display: flex; flex-direction: column; gap: var(--fluid-space-2); width: 100%;">
+    <fluid-skeleton style="width: 60%; height: 1.5rem;"></fluid-skeleton>
+    <fluid-skeleton style="width: 100%;"></fluid-skeleton>
+    <fluid-skeleton style="width: 90%;"></fluid-skeleton>
+    <fluid-skeleton style="width: 70%;"></fluid-skeleton>
+  </div>
+</Demo>
+
+### Effects
+
+<Demo>
+  <div style="display: grid; gap: var(--fluid-space-3); width: 100%;">
+    <fluid-skeleton effect="pulse"></fluid-skeleton>
+    <fluid-skeleton effect="sheen"></fluid-skeleton>
+    <fluid-skeleton effect="none"></fluid-skeleton>
+  </div>
+</Demo>
+
+```html
+<fluid-skeleton effect="sheen"></fluid-skeleton>
+```
+
+### Card placeholder
+
+<Demo>
+  <fluid-card style="max-width: 20rem;">
+    <div style="display: flex; gap: var(--fluid-space-3); align-items: center;">
+      <fluid-skeleton style="width: 3rem; height: 3rem; border-radius: 999px; flex-shrink: 0;"></fluid-skeleton>
+      <div style="flex: 1;">
+        <fluid-skeleton style="width: 80%; height: 1rem;"></fluid-skeleton>
+        <fluid-skeleton style="width: 50%; height: 0.75rem; margin-top: var(--fluid-space-1);"></fluid-skeleton>
+      </div>
+    </div>
+  </fluid-card>
+</Demo>
+
+## When to use
+
+- Initial page load when the layout shape is known but the data isn't
+  back yet.
+- Anywhere a spinner would tell the user "loading" without telling
+  them what's about to appear.
+- For an indeterminate loader without the layout-reservation aspect,
+  use [`<fluid-spinner>`](/components/spinner/).
+- For known progress, use
+  [`<fluid-progress-bar>`](/components/progress-bar/) or
+  [`<fluid-progress-ring>`](/components/progress-ring/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-skeleton-*` token that
+falls back to a main semantic var** (the override ladder). Size with standard
+`width` / `height`. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-skeleton-color: var(--fluid-color-neutral-200);
+  --fluid-skeleton-radius: 8px;
+  --fluid-skeleton-sheen-color: rgb(255 255 255 / 0.6);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The placeholder is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-skeleton" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+skeleton-specific.
+
+### Names & roles
+
+- The host is `role="status"` + `aria-busy="true"` + `aria-live="polite"` with a
+  default `aria-label` of "Loading", so assistive tech announces "Loading" when
+  skeletons appear and falls silent once they're removed
+  ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
+- Use **one** skeleton (or a single wrapper carrying `aria-busy`) per logical
+  loading region, many `role="status"` nodes get noisy.
+
+### Motion
+
+Both the `pulse` and `sheen` effects honor `prefers-reduced-motion` (they fall
+back to a static placeholder).
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Spinner"
+    href="/components/spinner/"
+    description="Indeterminate loading without reserving layout."
+  />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="When you can show measurable progress instead."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="The container skeletons most often stand in for."
+  />
+  <LinkCard
+    title="Theming guide"
+    href="/guides/theming/"
+    description="How brand, component, and instance tokens compose."
+  />
+</CardGrid>

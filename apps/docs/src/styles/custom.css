@@ -1,0 +1,361 @@
+/*
+ * Docs site theming.
+ *
+ * Three passes:
+ *   1. Load Fluid tokens so any embedded `<fluid-*>` component picks
+ *      up its variables.
+ *   2. Load the brand presets so the in-header brand picker (default /
+ *      midnight / corporate) actually changes anything.
+ *   3. Remap Starlight's own design tokens to ours so the docs chrome
+ *      (sidebar, headings, code blocks, active states) looks like the
+ *      same product as the components themselves.
+ *
+ * Important pairing: `Head.astro` runs an inline script that mirrors
+ * Starlight's `data-theme` attribute onto `data-fluid-theme`, so when
+ * the user toggles dark mode the Fluid tokens flip in lockstep with
+ * Starlight's. Without that script, this CSS would only cover the
+ * Starlight chrome and embedded components would stay light forever.
+ *
+ * The accent track is `--fluid-accent-*` (base / hover / active / text).
+ * There is NO `--fluid-color-primary` token, an earlier version of this
+ * file referenced it, which silently resolved to invalid and let Starlight
+ * fall back to its stock purple. Everything accent-flavored below reads
+ * `--fluid-accent-base` so the docs actually wear the brand.
+ */
+@import "@fluid-ds/tokens/base.css";
+@import "@fluid-ds/tokens/light.css";
+@import "@fluid-ds/tokens/dark.css";
+@import "@fluid-ds/themes/midnight.css";
+@import "@fluid-ds/themes/corporate.css";
+
+/* ------------------------------------------------------------------ */
+/* Starlight token bridge                                              */
+/* ------------------------------------------------------------------ */
+
+:root {
+  /* Type + shape. */
+  --sl-font: var(--fluid-font-family-sans);
+  --sl-font-mono: var(--fluid-font-family-mono);
+  --sl-radius-small: var(--fluid-radius-sm, 6px);
+  --sl-radius-medium: var(--fluid-radius-md, 10px);
+  --sl-radius-large: var(--fluid-radius-lg, 14px);
+
+  /* Shrink Starlight's content max-width a touch so prose lines stay
+     readable next to our wider component demos. */
+  --sl-content-width: 48rem;
+}
+
+:root[data-theme="light"] {
+  /* Accent must live in the theme-scoped block: Starlight defines its
+     own accent under `:root[data-theme=…]` (specificity 0,2,0), which
+     beats a plain `:root` rule, so a `:root`-level override silently
+     loses and the stock Starlight blue wins. */
+  --sl-color-accent-low: color-mix(in srgb, var(--fluid-accent-base) 16%, transparent);
+  --sl-color-accent: var(--fluid-accent-base);
+  --sl-color-accent-high: var(--fluid-accent-active);
+  --sl-color-bg: var(--fluid-surface-base);
+  --sl-color-bg-nav: color-mix(in srgb, var(--fluid-surface-subtle) 70%, var(--fluid-surface-base));
+  --sl-color-bg-sidebar: var(--fluid-surface-subtle);
+  --sl-color-bg-inline-code: var(--fluid-surface-muted);
+  --sl-color-bg-accent: color-mix(in srgb, var(--fluid-accent-base) 12%, var(--fluid-surface-base));
+  --sl-color-text: var(--fluid-text-primary);
+  --sl-color-text-accent: var(--fluid-accent-base);
+  --sl-color-text-invert: var(--fluid-accent-text);
+  --sl-color-hairline-light: var(--fluid-border-default);
+  --sl-color-hairline: var(--fluid-border-default);
+  --sl-color-hairline-shade: var(--fluid-border-default);
+  --sl-color-gray-6: var(--fluid-surface-subtle);
+}
+
+:root[data-theme="dark"] {
+  --sl-color-accent-low: color-mix(in srgb, var(--fluid-accent-base) 22%, transparent);
+  --sl-color-accent: var(--fluid-accent-base);
+  --sl-color-accent-high: var(--fluid-accent-active);
+  --sl-color-bg: var(--fluid-surface-base);
+  --sl-color-bg-nav: color-mix(in srgb, var(--fluid-surface-subtle) 70%, var(--fluid-surface-base));
+  --sl-color-bg-sidebar: var(--fluid-surface-subtle);
+  --sl-color-bg-inline-code: var(--fluid-surface-muted);
+  --sl-color-bg-accent: color-mix(in srgb, var(--fluid-accent-base) 18%, var(--fluid-surface-base));
+  --sl-color-text: var(--fluid-text-primary);
+  --sl-color-text-accent: var(--fluid-accent-base);
+  --sl-color-text-invert: var(--fluid-accent-text);
+  --sl-color-hairline-light: var(--fluid-border-default);
+  --sl-color-hairline: var(--fluid-border-default);
+  --sl-color-hairline-shade: var(--fluid-border-default);
+  --sl-color-gray-6: var(--fluid-surface-subtle);
+}
+
+/* Text selection picks up the brand instead of the OS default. */
+::selection {
+  background: color-mix(in srgb, var(--fluid-accent-base) 28%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Sidebar, branded group headers + active/hover contrast             */
+/* ------------------------------------------------------------------ */
+
+/*
+ * The complaint that kicked off this overhaul: every component group
+ * label started "Components, ", so the sidebar read as a wall of
+ * identical prefixes. The labels now lead with a category emoji (set in
+ * astro.config.mjs); here we give the group heading itself a branded
+ * treatment, uppercase, tracked-out, secondary-colored, so the groups
+ * scan as section dividers, and the emoji is the eye's anchor.
+ */
+.sidebar-content .group-label > .large,
+nav.sidebar-content .group-label > .large {
+  font-size: 0.74rem;
+  font-weight: var(--fluid-font-weight-bold, 700);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fluid-text-secondary);
+}
+
+/* A hairline + breathing room above each group (except the first) turns
+   the flat list into discrete sections. */
+.sidebar-content > ul > li + li {
+  margin-top: var(--fluid-space-4, 1rem);
+  padding-top: var(--fluid-space-3, 0.75rem);
+  border-top: 1px solid color-mix(in srgb, var(--fluid-border-default) 60%, transparent);
+}
+
+/*
+ * Starlight's default active item picked up `--sl-color-accent-low` as a
+ * background but kept the text on the unrelated accent color. Re-skin both
+ * states with a proper pill + accent rail + bold accent text so the
+ * current page is unmistakable; hover gets a subtler tint so it doesn't
+ * fight the active state.
+ */
+.sidebar a[aria-current="page"],
+nav.sidebar-content a[aria-current="page"] {
+  background: color-mix(in srgb, var(--fluid-accent-base) 14%, transparent);
+  color: var(--fluid-accent-base);
+  font-weight: 600;
+  position: relative;
+  border-radius: 6px;
+}
+
+.sidebar a[aria-current="page"]::before,
+nav.sidebar-content a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset: 4px auto 4px 0;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--fluid-accent-base);
+}
+
+.sidebar a:not([aria-current="page"]):hover,
+nav.sidebar-content a:not([aria-current="page"]):hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+
+/* The on-this-page "in view" item on the right rail. */
+starlight-toc a[aria-current="true"] {
+  color: var(--fluid-accent-base);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* Prose links + headings                                              */
+/* ------------------------------------------------------------------ */
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--fluid-accent-base);
+  text-decoration-color: color-mix(in srgb, var(--fluid-accent-base) 40%, transparent);
+  text-underline-offset: 3px;
+}
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  text-decoration-color: var(--fluid-accent-base);
+}
+
+/* A thin accent rule under the page h1 ties the content to the brand. */
+.sl-markdown-content > h1:first-of-type,
+.content-panel h1 {
+  border-bottom: 2px solid color-mix(in srgb, var(--fluid-accent-base) 35%, transparent);
+  padding-bottom: 0.3em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Top header bar, pick up our surface + border so it reads as ours.  */
+/* ------------------------------------------------------------------ */
+
+/* Scope to the <header> BAR element only. The inner content row is a
+   <div class="header sl-flex"> that ALSO carries the `header` class, so a
+   bare `.header` selector painted a second border-bottom + background right
+   under the logo/search (the divider looked glued to the content). The
+   element+class selector hits only the full-height bar, so the divider sits
+   at the bottom of the bar with proper breathing room above it. */
+header.header {
+  background: color-mix(in srgb, var(--fluid-surface-base) 85%, transparent);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero / splash landing, brand the title + primary action.           */
+/* ------------------------------------------------------------------ */
+
+.hero h1 {
+  background: linear-gradient(
+    100deg,
+    var(--fluid-text-primary),
+    var(--fluid-accent-base)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The primary CTA on the splash page wears the accent fill; hover deepens
+   it to the accent-hover step. */
+.hero .actions a.button.primary {
+  background: var(--fluid-accent-base);
+  border-color: var(--fluid-accent-base);
+  color: var(--fluid-accent-text);
+}
+.hero .actions a.button.primary:hover {
+  background: var(--fluid-accent-hover);
+  border-color: var(--fluid-accent-hover);
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards (CardGrid / LinkCard), brand the hover affordance.           */
+/* ------------------------------------------------------------------ */
+
+.sl-markdown-content .card {
+  border-radius: var(--fluid-radius-md, 10px);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.sl-markdown-content .card:hover,
+.sl-markdown-content .sl-link-card:hover {
+  border-color: color-mix(in srgb, var(--fluid-accent-base) 55%, var(--fluid-border-default));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--fluid-accent-base) 30%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Code blocks, rendered by our own <fluid-code-block>.               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Fenced code blocks are highlighted by Shiki and wrapped in
+ * <fluid-code-block> (see src/lib/fluid-code-shiki.mjs). Shiki runs in
+ * dual-theme mode with defaultColor:"light", so each token's `color` is the
+ * light value and a `--shiki-dark` custom property carries the dark value.
+ * Under the dark page theme we swap to it. These spans live in light DOM
+ * (slotted into the component), so this document-level CSS reaches them.
+ */
+:root[data-theme="dark"] fluid-code-block .astro-code,
+:root[data-theme="dark"] fluid-code-block .astro-code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/*
+ * Pre-upgrade fallback: before the custom element registers, give the bare
+ * Shiki <pre> a sensible frame so the first paint isn't a naked block. Once
+ * <fluid-code-block> upgrades, its own chrome (and an ::slotted reset that
+ * strips this <pre>'s background/padding) takes over.
+ */
+fluid-code-block:not(:defined) {
+  display: block;
+}
+fluid-code-block:not(:defined) pre.astro-code {
+  margin: 0;
+  padding: var(--fluid-space-4);
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+  overflow-x: auto;
+}
+
+/* Inline code (single backticks) keeps a subtle hairline. */
+.sl-markdown-content :not(pre) > code {
+  border: 1px solid color-mix(in srgb, var(--fluid-border-default) 70%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Demo block, used by `<Demo>` to wrap an inline component example.  */
+/* ------------------------------------------------------------------ */
+
+.fluid-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fluid-space-3);
+  align-items: center;
+  padding: var(--fluid-space-4);
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+  background: var(--fluid-surface-subtle);
+  margin: 1em 0;
+}
+
+/*
+ * Reset Starlight's prose flow-spacing on direct demo children. The
+ * `not-content` class on the wrapper (see Demo.astro) already opts the
+ * subtree out, but this is the explicit backstop: Starlight gives every
+ * element after the first sibling a top margin, which in a centered
+ * flex row pushed the first demo item ~8px above the rest. Demo items
+ * are laid out by the flex `gap`, never by margins.
+ */
+.fluid-demo > * {
+  margin: 0 !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* API tables emitted by <ComponentApi>                                */
+/* ------------------------------------------------------------------ */
+
+.fluid-api-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875em;
+  margin: 0.75em 0;
+}
+.fluid-api-table th,
+.fluid-api-table td {
+  padding: 0.5em 0.75em;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+.fluid-api-table th {
+  font-weight: var(--fluid-font-weight-semibold);
+  color: var(--fluid-text-secondary);
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.fluid-api-table code {
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.92em;
+  background: var(--fluid-surface-muted);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.fluid-api-empty {
+  font-style: italic;
+  color: var(--fluid-text-secondary);
+  font-size: 0.875em;
+  margin: 0.5em 0 1em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Header control alignment                                            */
+/* The custom WCAG toggle + brand select are 34px tall (see            */
+/* HeaderConformanceToggle / SocialIcons, --ctl-h). Starlight's default */
+/* theme select ("Auto") ships ~44px, leaving the header cluster       */
+/* uneven. Trim its vertical padding to the same height; horizontal    */
+/* padding is preserved so the leading scheme icon + caret stay put.   */
+/* ------------------------------------------------------------------ */
+
+starlight-theme-select > label > select {
+  height: 2.125rem;
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+}

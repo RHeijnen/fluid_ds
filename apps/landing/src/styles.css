@@ -1,0 +1,236 @@
+/*
+ * Landing-only styles. Everything `<fluid-*>` related comes from the
+ * tokens + components packages; this file is just the page chrome:
+ * nav bar, hero spacing, footer, and the styling-comparison strip.
+ */
+
+* { box-sizing: border-box; }
+
+:root {
+  font-family: var(--fluid-font-family-sans);
+  color-scheme: light dark;
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  line-height: 1.55;
+}
+
+a {
+  color: var(--fluid-color-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Top bar */
+
+header.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  background: color-mix(in srgb, var(--fluid-surface-base) 85%, transparent);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--fluid-border-default);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  color: inherit;
+}
+.brand-mark {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: block;
+  flex: none;
+}
+nav.primary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+nav.primary a {
+  text-decoration: none;
+  color: var(--fluid-text-secondary);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  transition: background 100ms ease, color 100ms ease;
+}
+nav.primary a:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero */
+
+.hero {
+  max-width: 56rem;
+  margin: 4rem auto 5rem;
+  text-align: center;
+  padding: 0 1.25rem;
+}
+.hero h1 {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 1.25rem 0 1rem;
+}
+.hero h1 .accent {
+  background: linear-gradient(135deg, var(--fluid-color-primary, #6366f1), #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero p.lead {
+  color: var(--fluid-text-secondary);
+  font-size: 1.15rem;
+  max-width: 38rem;
+  margin: 0 auto 2rem;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Section spacing */
+
+section.row {
+  max-width: 64rem;
+  margin: 0 auto 4.5rem;
+  padding: 0 1.25rem;
+}
+
+section.row h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin: 0 0 0.5rem;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+section.row > p.subhead {
+  text-align: center;
+  color: var(--fluid-text-secondary);
+  max-width: 36rem;
+  margin: 0 auto 2rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Feature grid */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Before/after panes inside <fluid-comparison>.
+ *
+ * The "before" pane wraps its content in `.fluid-comparison-before-isolate`
+ * which strips the Fluid variables so the content renders with raw
+ * browser defaults, same DOM, no styling. The "after" pane uses Fluid
+ * components normally. The visual difference is the entire point.
+ */
+.compare-pane {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  padding: 2.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+}
+.compare-pane.before {
+  background: #f8fafc;
+  color: #1f2937;
+  font-family: "Times New Roman", Times, serif;
+}
+.compare-pane.before label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.compare-pane.before input,
+.compare-pane.before button {
+  font-family: inherit;
+  font-size: inherit;
+}
+.compare-pane.before .label-rough {
+  font-weight: bold;
+  font-style: italic;
+}
+.compare-pane.after {
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+}
+.compare-pane.after fluid-input,
+.compare-pane.after fluid-button,
+.compare-pane.after fluid-switch {
+  /* Components manage their own width; spread them to full-width inside the pane. */
+  width: 100%;
+}
+
+.compare-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.compare-pane .pane-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.compare-pane.before .pane-label {
+  background: #cbd5e1;
+  color: #1e293b;
+}
+.compare-pane.after .pane-label {
+  background: var(--fluid-color-primary);
+  color: white;
+}
+
+/* ------------------------------------------------------------------ */
+/* Footer */
+
+footer.site-footer {
+  border-top: 1px solid var(--fluid-border-default);
+  padding: 2rem 1.25rem;
+  color: var(--fluid-text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+footer.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile tweaks */
+
+@media (max-width: 640px) {
+  nav.primary a:not(.cta) {
+    display: none;
+  }
+}

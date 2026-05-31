@@ -1,0 +1,270 @@
+---
+title: "Build your own component"
+description: "Author a fluid-* component the Fluid way, extend FluidElement, use the component-token override ladder, annotate for the CEM, and ship a define.ts."
+---
+
+import { Aside, Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Fluid components are [web components](/concepts/web-components/) built on
+[Lit](https://lit.dev). Whether you're contributing a component to the library
+or building a private one for your own app, the same conventions apply, and
+following them is what lets a component slot into the theming model and the
+generated docs API tables for free.
+
+This page is the quick tour. The full standard (accessibility, theming across
+three brands, the required story + tests) lives in the
+`component-authoring` skill in the repo; what follows is the shape of the code.
+
+## 1. Extend `FluidElement`
+
+Every component extends `FluidElement`, the shared base class. Today it's a
+thin wrapper over Lit's `LitElement`, but it's the single seam where
+cross-cutting behavior (focus, theming hooks, telemetry) gets added later, so
+extend it, never `LitElement` directly.
+
+```ts title="internal/base-element.ts"
+import { LitElement } from "lit";
+
+/** Base class for every Fluid component. */
+export class FluidElement extends LitElement {}
+```
+
+## 2. The component-token override ladder
+
+This is the convention that matters most. **Every styled property reads a
+component-scoped CSS variable that falls back to a main semantic variable**,
+written as an inline `var()` fallback:
+
+```css
+.base {
+  background: var(--fluid-badge-bg, var(--fluid-color-neutral-200));
+  color: var(--fluid-badge-fg, var(--fluid-color-neutral-800));
+}
+```
+
+That one line gives you **three override levels for free**:
+
+1. **Brand level**: override the semantic var (`--fluid-color-neutral-200`)
+   and every component that reads it reflows.
+2. **Component level**: set `--fluid-badge-bg` and all badges change.
+3. **Instance level**: set `--fluid-badge-bg` inline (or via `data-fluid-id`)
+   and one badge changes.
+
+<Aside type="caution">
+  Write the fallback **inline at the use site**, never as a `:host`
+  declaration. `:host { --fluid-badge-bg: var(--fluid-color-neutral-200) }`
+  pins the value at the host scope, so a wrapping override of the semantic var
+  no longer flows through, it silently breaks brand-level theming. The full
+  rationale is in
+  [`docs/component-token-convention.md`](https://github.com/RHeijnen/fluid_ds/blob/main/docs/component-token-convention.md).
+</Aside>
+
+Naming: component tokens follow `--fluid-<tag-without-prefix>-<role>`:
+`--fluid-card-bg`, `--fluid-card-border`, `--fluid-dialog-header-bg`. Purely
+structural utilities (`--fluid-space-*`, `--fluid-radius-*`,
+`--fluid-font-size-*`) are palette-level and don't need wrapping.
+
+## 3. Annotate for the CEM
+
+Fluid analyzes each component's JSDoc into a **Custom Elements Manifest**,
+which feeds both the generated docs **API tables** and the Theme Builder. An
+un-annotated `var(--fluid-…)` won't appear in either, so the annotations are
+load-bearing, not decoration.
+
+- **`@cssproperty`**: each component token you expose.
+- **`@uses-token`**: each main semantic var the component reads (so the Theme
+  Builder knows the dependency).
+- **`@csspart`**: each internal element you tag with `part="…"`.
+- **`@slot`**: each slot (named or default).
+
+```ts
+/**
+ * A small pill-shaped label for status, counts, or tags.
+ *
+ * @slot - Badge text or icon content.
+ *
+ * @csspart base - The pill container.
+ *
+ * @cssproperty --fluid-badge-bg - Background color override.
+ * @cssproperty --fluid-badge-fg - Foreground color override.
+ *
+ * @uses-token --fluid-color-neutral-200 - Neutral variant background.
+ * @uses-token --fluid-color-neutral-800 - Neutral variant text.
+ */
+```
+
+Expose the inner root as `part="base"` (plus any meaningful sub-parts), so
+consumers get the [`::part()`](/concepts/slots-and-shadow-dom/#part--styling-exposed-internals)
+escape hatch for the styling you didn't tokenize.
+
+## 4. A complete minimal component
+
+Putting it together, a `fluid-tagline` element with one variant prop, the
+token ladder, a slot, and a `base` part.
+
+```ts title="fluid-tagline.ts"
+import { html, css, type TemplateResult } from "lit";
+import { property } from "lit/decorators.js";
+import { FluidElement } from "../../internal/base-element.js";
+
+export type FluidTaglineTone = "neutral" | "accent";
+
+/**
+ * A one-line tagline / eyebrow label.
+ *
+ * @slot - The tagline text.
+ *
+ * @csspart base - The text container.
+ *
+ * @cssproperty --fluid-tagline-fg - Text color (neutral default).
+ * @cssproperty --fluid-tagline-accent-fg - Text color for the accent tone.
+ *
+ * @uses-token --fluid-text-secondary - Neutral tone text.
+ * @uses-token --fluid-accent-base - Accent tone text.
+ */
+export class FluidTagline extends FluidElement {
+  static override styles = css`
+    :host {
+      display: inline-block;
+    }
+    .base {
+      font-family: var(--fluid-font-family-sans);
+      font-size: var(--fluid-font-size-sm);
+      font-weight: var(--fluid-font-weight-medium);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--fluid-tagline-fg, var(--fluid-text-secondary));
+    }
+    .tone-accent {
+      color: var(--fluid-tagline-accent-fg, var(--fluid-accent-base));
+    }
+    /* slotted content inherits the PAGE's CSS, reset stray margins */
+    ::slotted(*) {
+      margin: 0;
+    }
+  `;
+
+  /** Visual tone. */
+  @property({ reflect: true }) tone: FluidTaglineTone = "neutral";
+
+  override render(): TemplateResult {
+    return html`
+      <span part="base" class="base tone-${this.tone}">
+        <slot></slot>
+      </span>
+    `;
+  }
+}
+```
+
+Note the `::slotted(*) { margin: 0 }` reset, slotted content inherits the host
+page's CSS, not your shadow styles, so any component that projects text should
+pin its own typography and neutralize stray margins.
+
+## 5. The `define.ts` entry pattern
+
+Keep the class side-effect free: defining a component in the same file as its
+class would register it the moment anyone imports the type. Instead, a separate
+`define.ts` performs the registration, guarded so a double import is harmless:
+
+```ts title="define.ts"
+import { FluidTagline } from "./fluid-tagline.js";
+
+if (!customElements.get("fluid-tagline")) {
+  customElements.define("fluid-tagline", FluidTagline);
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "fluid-tagline": FluidTagline;
+  }
+}
+```
+
+The `HTMLElementTagNameMap` augmentation is what makes
+`document.querySelector("fluid-tagline")` return the right type in TypeScript.
+Library components expose this file as a `/define/*` entry point so consumers
+import *behavior*, not just types, importing `define` is what actually
+registers the tag (see [What are web components?](/concepts/web-components/#the-registry)).
+
+The file layout for a Fluid component:
+
+```
+packages/components/src/components/<name>/
+  define.ts              # customElements.define("fluid-<name>", …)
+  fluid-<name>.ts        # the FluidElement subclass
+  fluid-<name>.stories.ts
+  fluid-<name>.test.ts
+```
+
+<Aside>
+  A library-grade component isn't "done" until it also has a Storybook story, a
+  docs page, a playground card, and tests (including an accessibility audit):
+  `pnpm verify` fails the build otherwise. The `component-authoring` skill in
+  the repo is the full checklist.
+</Aside>
+
+## Extending an existing component: no fork needed
+
+You usually don't need to author anything. To restyle a stock Fluid
+component, reach for the two doors shadow DOM leaves open, **tokens** and
+**`::part()`**, and never touch the source.
+
+<Tabs>
+  <TabItem label="Tokens">
+    Set component tokens to retheme one component type, or semantic tokens to
+    retheme the whole brand:
+
+    ```css
+    /* every card in this scope */
+    [data-fluid-brand="custom"] {
+      --fluid-card-bg: var(--fluid-surface-base);
+      --fluid-card-border: var(--fluid-border-default);
+      --fluid-card-padding: 1.5rem;
+    }
+    ```
+  </TabItem>
+  <TabItem label="::part()">
+    Reach internals the tokens don't cover:
+
+    ```css
+    fluid-dialog::part(panel) {
+      border-radius: 0;
+      max-width: 40rem;
+    }
+    fluid-card::part(header) {
+      position: sticky;
+      top: 0;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+Both pierce the shadow boundary by design, see
+[Slots & shadow DOM](/concepts/slots-and-shadow-dom/#styling-across-the-wall)
+for why, and [Theming basics](/theming/basics/) for the layered model.
+
+## Next
+
+<CardGrid>
+  <LinkCard
+    title="What are web components?"
+    href="/concepts/web-components/"
+    description="Custom elements, the registry, and the three pillars."
+  />
+  <LinkCard
+    title="Slots & shadow DOM"
+    href="/concepts/slots-and-shadow-dom/"
+    description="Encapsulation, slots, ::part(), ::slotted(), and inherited tokens."
+  />
+  <LinkCard
+    title="Theming basics"
+    href="/theming/basics/"
+    description="The three override layers, end to end."
+  />
+  <LinkCard
+    title="Badge"
+    href="/components/badge/"
+    description="A real minimal component you can read as a reference."
+  />
+</CardGrid>

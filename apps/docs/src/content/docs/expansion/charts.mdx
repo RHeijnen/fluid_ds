@@ -1,0 +1,74 @@
+---
+title: "@fluid-ds/charts"
+description: "Chart web components backed by Chart.js. Bar, line, pie, doughnut, scatter, bubble, radar, polar area, plus a sparkline."
+---
+
+Themable chart web components for Fluid, backed by
+[Chart.js](https://www.chartjs.org/). Expansion pack, install on top of
+`@fluid-ds/components` when you need data viz.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/charts
+```
+
+Import the components you need from their `/define/*` entry points so
+unused chart types stay out of the bundle.
+
+```ts
+import "@fluid-ds/charts/define/bar-chart";
+import "@fluid-ds/charts/define/line-chart";
+import "@fluid-ds/charts/define/sparkline";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-chart>` | Generic Chart.js wrapper. Pass `type` for any Chart.js chart type. |
+| `<fluid-bar-chart>` | Bar (horizontal via Chart.js options). |
+| `<fluid-line-chart>` | Line. |
+| `<fluid-pie-chart>` | Pie. |
+| `<fluid-doughnut-chart>` | Doughnut. |
+| `<fluid-scatter-chart>` | Scatter. |
+| `<fluid-bubble-chart>` | Bubble. |
+| `<fluid-radar-chart>` | Radar. |
+| `<fluid-polar-area-chart>` | Polar area. |
+| `<fluid-sparkline>` | Inline mini-line chart for metric callouts. |
+
+Each typed variant is a thin subclass that locks the chart type, pass
+`data` and `options` exactly as you would to Chart.js.
+
+## Use
+
+```html
+<fluid-bar-chart></fluid-bar-chart>
+
+<script type="module">
+  const chart = document.querySelector("fluid-bar-chart");
+  chart.data = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+    datasets: [{ label: "Revenue", data: [12, 19, 15, 22, 28] }]
+  };
+</script>
+```
+
+Sparklines for inline metric callouts:
+
+```html
+<p>
+  Sessions <strong>2,317</strong>
+  <fluid-sparkline data="[3,5,4,6,8,7,9,8,10]" style="width: 5rem;"></fluid-sparkline>
+</p>
+```
+
+## Theming
+
+Charts pick up the same `--fluid-*` semantic tokens as the rest of the
+system, text color, grid color, and the default palette flow through
+without extra wiring. Customize per-chart via Chart.js's `options`.
+
+## License
+
+MIT, Chart.js is MIT-licensed.

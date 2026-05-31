@@ -1,0 +1,222 @@
+---
+title: "Forms"
+description: "Form-associated web components: how Fluid inputs work with <form>, FormData, validation, and framework form libraries."
+---
+
+import Demo from "../../../components/Demo.astro";
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+Every Fluid form control, `<fluid-input>`, `<fluid-textarea>`,
+`<fluid-checkbox>`, `<fluid-radio>`, `<fluid-switch>`,
+`<fluid-select>`, `<fluid-typeahead>`, `<fluid-slider>`,
+`<fluid-number-input>`, `<fluid-color-picker>`,
+`<fluid-rating>`, `<fluid-file-input>`, is a **form-associated custom
+element**. That means they participate in `<form>` submission, `FormData`,
+`form.elements`, and the browser's validation pipeline the same way
+native `<input>` does. No special wiring, no synthetic form library.
+
+## A complete form
+
+Wrap controls in a regular `<form>` and they show up in `FormData`. The
+`name` attribute on each control becomes the field key, same contract
+as native inputs.
+
+```html
+<form id="signup">
+  <fluid-input name="email" type="email" required placeholder="you@example.com" aria-label="Email"></fluid-input>
+  <fluid-input name="password" type="password" required minlength="8" aria-label="Password"></fluid-input>
+  <fluid-checkbox name="terms" required>I accept the terms</fluid-checkbox>
+  <fluid-button type="submit">Sign up</fluid-button>
+</form>
+
+<script type="module">
+  const form = document.querySelector("#signup");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    console.log(Object.fromEntries(data));
+    // → { email: "...", password: "...", terms: "on" }
+  });
+</script>
+```
+
+The browser will run the standard validation pipeline on submit:
+`required`, `minlength`, `pattern`, `type="email"`, etc. all work
+because they're forwarded to the inner native input.
+
+## Validation
+
+Form controls support every native validation attribute. The DS just
+forwards them, no Fluid-specific syntax to learn.
+
+| Attribute | Works on | Effect |
+| --- | --- | --- |
+| `required` | every input | Empty value fails submission |
+| `minlength` / `maxlength` | text-like inputs | Length bounds |
+| `pattern` | text-like inputs | Regex match |
+| `min` / `max` / `step` | number / slider | Numeric bounds |
+| `type` | `<fluid-input>` | `email`, `url`, `tel`, etc. |
+
+### Inline error messages
+
+Listen for `invalid` events on the form, same pattern as native.
+Fluid controls expose a `validity` getter and `validationMessage`, so
+you can render messages anywhere:
+
+```ts
+const form = document.querySelector("#signup");
+form.addEventListener(
+  "invalid",
+  (e) => {
+    e.preventDefault();
+    const control = e.target;
+    const msg = control.validationMessage;
+    showInlineError(control, msg);
+  },
+  true   // capture, invalid doesn't bubble
+);
+```
+
+### Custom validity
+
+Set custom validation messages with `setCustomValidity()`:
+
+```ts
+const email = document.querySelector("fluid-input[name=email]");
+email.addEventListener("fluid-input", () => {
+  if (email.value.endsWith("@spam.com")) {
+    email.setCustomValidity("We don't accept spam.com addresses.");
+  } else {
+    email.setCustomValidity("");
+  }
+});
+```
+
+## Server submission
+
+Standard `<form action="/path" method="POST">` works because the
+controls expose their values through `FormData` natively. No client-side
+state library required.
+
+```html
+<form action="/api/signup" method="POST">
+  <fluid-input name="email" type="email" required></fluid-input>
+  <fluid-button type="submit">Sign up</fluid-button>
+</form>
+```
+
+The browser submits, your server reads `email` from the request body.
+
+## Framework form libraries
+
+Form-associated custom elements work with framework form libraries
+that build on top of `FormData` or controlled inputs:
+
+<Tabs syncKey="formlib">
+  <TabItem label="React Hook Form">
+    React Hook Form's `register` returns refs + change handlers, works
+    on Fluid controls:
+
+    ```tsx
+    const { register, handleSubmit } = useForm();
+
+    return (
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <fluid-input {...register("email", { required: true })} />
+        <fluid-button type="submit">Submit</fluid-button>
+      </form>
+    );
+    ```
+  </TabItem>
+  <TabItem label="VeeValidate (Vue)">
+    ```vue
+    <Form @submit="onSubmit">
+      <Field name="email" v-slot="{ field }">
+        <fluid-input v-bind="field" type="email" />
+      </Field>
+    </Form>
+    ```
+  </TabItem>
+  <TabItem label="Angular Reactive Forms">
+    ```ts
+    @Component({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      template: `
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <fluid-input formControlName="email" type="email"></fluid-input>
+          <fluid-button type="submit">Submit</fluid-button>
+        </form>
+      `
+    })
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note" title="Why form-associated matters">
+  Older web-component libraries shipped inputs that *looked* like
+  inputs but didn't participate in `<form>`, every consumer ended up
+  re-implementing submission, validation, focus management, and
+  framework integrations. The
+  [`ElementInternals` API](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals)
+  fixed this. Every Fluid form control uses it under the hood, so
+  you get native-grade behavior for free.
+</Aside>
+
+## Controlled vs uncontrolled
+
+Both work, pick whichever your framework prefers.
+
+### Uncontrolled (recommended for vanilla / server-rendered)
+
+Let the browser own the value, read on submit:
+
+```html
+<form>
+  <fluid-input name="email" value="default@example.com"></fluid-input>
+</form>
+```
+
+### Controlled (recommended for SPAs)
+
+Two-way bind via property + event:
+
+```tsx
+const [email, setEmail] = useState("");
+
+<fluid-input
+  .value={email}
+  onFluidInput={(e) => setEmail(e.detail.value)}
+/>
+```
+
+The `fluid-input` event fires on every keystroke (debounced where it
+matters). The `fluid-change` event fires when the input commits a
+value (blur).
+
+## Resetting
+
+`<form>.reset()` resets every form-associated control to its initial
+value. Listen for `reset` if you need to clear additional UI state:
+
+```ts
+form.addEventListener("reset", () => {
+  document.querySelectorAll(".inline-error").forEach((n) => n.remove());
+});
+```
+
+## Per-control references
+
+Each form control has its own page with examples + API:
+
+- [`<fluid-input>`](/components/input/): single-line text
+- [`<fluid-textarea>`](/components/textarea/): multi-line text
+- [`<fluid-checkbox>`](/components/checkbox/): boolean
+- [`<fluid-radio>`](/components/radio/): exclusive choice in a group
+- [`<fluid-switch>`](/components/switch/): immediate-effect toggle
+- [`<fluid-select>`](/components/select/): dropdown chooser
+- [`<fluid-typeahead>`](/components/typeahead/): combobox with search
+- [`<fluid-slider>`](/components/slider/): numeric range
+- [`<fluid-number-input>`](/components/number-input/): number with steppers
+- [`<fluid-color-picker>`](/components/color-picker/): color value
+- [`<fluid-rating>`](/components/rating/): star rating
+- [`<fluid-file-input>`](/components/file-input/): file upload

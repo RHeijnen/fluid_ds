@@ -1,0 +1,162 @@
+---
+title: "Card"
+description: "A surface with header, body, and footer slots. Variants for elevation and outline."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-card>` groups related content into a visual block, header, body,
+optional footer. It's the workhorse surface for dashboards, settings panels,
+and anything that benefits from a clear bounding box. Two visual variants
+(`default` and `outline`) plus a `compact` size let it slot into dense lists
+without overpowering the layout.
+
+<Demo>
+  <fluid-card style="max-width: 22rem;">
+    <h3 slot="header" style="margin: 0;">Hello, world</h3>
+    <p style="margin: 0;">
+      Cards keep your content visually grouped. The header and footer slots are
+      optional, leave them out for a body-only block.
+    </p>
+  </fluid-card>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/card";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Default
+
+<Demo>
+  <fluid-card style="max-width: 22rem;">
+    <h3 slot="header" style="margin: 0;">Hello, world</h3>
+    <p style="margin: 0;">
+      Cards keep your content visually grouped. The header and footer slots are
+      optional, leave them out for a body-only block.
+    </p>
+  </fluid-card>
+</Demo>
+
+### With a footer
+
+<Demo>
+  <fluid-card style="max-width: 22rem;">
+    <h3 slot="header" style="margin: 0;">Delete project</h3>
+    <p style="margin: 0;">
+      This permanently removes the project and its history. There's no undo.
+    </p>
+    <div slot="footer" style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end;">
+      <fluid-button variant="ghost">Cancel</fluid-button>
+      <fluid-button>Delete</fluid-button>
+    </div>
+  </fluid-card>
+</Demo>
+
+### Outline variant
+
+The `outline` variant drops the shadow in favour of a one-pixel border, use
+it when cards are nested or when an extra shadow would feel heavy.
+
+<Demo>
+  <fluid-card variant="outline" style="max-width: 22rem;">
+    <h3 slot="header" style="margin: 0;">No shadow</h3>
+    <p style="margin: 0;">
+      The outline variant suits inset surfaces, settings rows, list items.
+    </p>
+  </fluid-card>
+</Demo>
+
+## When to use
+
+- Grouping multiple related controls or pieces of content.
+- Modal-style or dialog-style blocks that aren't truly modal (use
+  [`<fluid-dialog>`](/components/dialog/) for actual modals).
+- List items where each row needs its own header/footer rhythm.
+
+If you only need a thin separator without grouping, reach for
+[`<fluid-divider>`](/components/divider/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-card-*` token that
+falls back to a main semantic var** (the override ladder), so a brand can
+retune the card without touching the surface track everywhere else. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-card-bg: var(--fluid-surface-base);
+  --fluid-card-border: var(--fluid-border-default);
+  --fluid-card-padding: 1.5rem;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The card exposes [`part="base"`](#api) plus `part="header"`, `part="body"`, and
+`part="footer"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token, e.g. a sticky header inside a scrolling card.
+
+## API
+
+<ComponentApi tag="fluid-card" />
+
+## Accessibility
+
+- The card is a passive grouping surface: no implicit ARIA role. If your
+  card is interactive (e.g. an entire card is clickable), wrap it in a
+  `<button>` or anchor and set a meaningful `aria-label`.
+- Use a proper heading element (`<h2>`, `<h3>`, etc.) inside the header
+  slot so the page's heading outline stays coherent.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="A truly modal surface, focus trap, backdrop, Escape to close."
+  />
+  <LinkCard
+    title="Stack"
+    href="/components/stack/"
+    description="Lay out a column of cards with consistent spacing."
+  />
+  <LinkCard
+    title="Divider"
+    href="/components/divider/"
+    description="A thin separator when grouping into a card is overkill."
+  />
+  <LinkCard
+    title="Callout"
+    href="/components/callout/"
+    description="A tinted, status-flavored block for in-flow messages."
+  />
+</CardGrid>
