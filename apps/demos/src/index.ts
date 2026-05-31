@@ -5,88 +5,59 @@ import { mountDesignOverlay } from "./shared/design-overlay.js";
 const main = mountShell({ title: "Demos", currentRoute: "index" });
 mountDesignOverlay();
 
+interface Tile {
+  href: string;
+  icon: string;
+  title: string;
+  desc: string;
+  tag?: string;
+}
+
+const samples: Tile[] = [
+  { href: "./settings/", icon: "⚙️", title: "Settings dashboard", desc: "A SaaS settings page: profile, notifications, a billing chart, form fields, and a save / cancel footer." },
+  { href: "./admin/", icon: "📊", title: "Admin / data", desc: "A data-table admin: filter bar, rows, a bulk-action dropdown, a confirm-delete dialog, and status badges." }
+];
+
+const portals: Tile[] = [
+  { href: "./native/", icon: "🌐", title: "Native HTML", tag: "no build", desc: "Zero build step. Loaded from the CDN with an import map over plain ES modules and hash routing." },
+  { href: "./react/", icon: "⚛️", title: "React", tag: "React 19", desc: "Props via refs, custom events via native handlers, charts wrapped as components." },
+  { href: "./next/", icon: "▲", title: "Next.js", tag: "App Router", desc: "SSR-safe: the server emits HTML, the client registers the elements. Statically exported." },
+  { href: "./angular/", icon: "🅰️", title: "Angular", tag: "v20", desc: "Standalone, CUSTOM_ELEMENTS_SCHEMA, and [prop] / (event) bindings to the custom elements." }
+];
+
+const tile = (t: Tile) => `
+  <a class="demo-tile" href="${t.href}">
+    <span class="demo-tile-icon" aria-hidden="true">${t.icon}</span>
+    <span class="demo-tile-body">
+      <span class="demo-tile-title">${t.title}${t.tag ? `<fluid-badge size="sm" variant="info">${t.tag}</fluid-badge>` : ""}</span>
+      <span class="demo-tile-desc">${t.desc}</span>
+    </span>
+    <span class="demo-tile-go" aria-hidden="true">Open <fluid-icon name="arrow-right"></fluid-icon></span>
+  </a>`;
+
 main.innerHTML = `
-  <h1 style="margin-top:0;">Fluid · Demos</h1>
-  <p style="color: var(--fluid-text-secondary); max-width: 36rem;">
-    End-to-end demos showing Fluid in real-feeling app shapes.
-    Open one, switch the brand in the top-right header, and watch every
-    component re-theme together.
-  </p>
+  <section class="demo-index">
+    <header class="demo-hero">
+      <fluid-badge variant="info">Live demos</fluid-badge>
+      <h1>Fluid in real apps</h1>
+      <p class="demo-lead">
+        End-to-end apps built entirely from Fluid components. Open one, then flip the brand in the
+        top-right header and watch every control, chart, and surface re-theme together.
+      </p>
+    </header>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">Settings dashboard</h3>
-      <p>SaaS-style settings page. Profile, notifications, billing chart, form fields, save / cancel footer.</p>
-      <div slot="footer">
-        <a href="./settings/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
+    <h2 class="demo-section-title">Sample apps</h2>
+    <div class="demo-grid">${samples.map(tile).join("")}</div>
 
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">Admin / data</h3>
-      <p>Table-style admin: filter bar, data rows, bulk action dropdown, confirm-delete dialog, status badges.</p>
-      <div slot="footer">
-        <a href="./admin/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
-  </div>
+    <h2 class="demo-section-title">The same portal, four frameworks</h2>
+    <p class="demo-section-sub">
+      One admin portal, four builds, the identical components in each. Proof that "framework-agnostic"
+      is real, not a tagline.
+    </p>
+    <div class="demo-grid">${portals.map(tile).join("")}</div>
 
-  <h2 style="margin-top: 2.5rem;">Framework integration portals</h2>
-  <p style="color: var(--fluid-text-secondary); max-width: 38rem;">
-    The same admin portal, built four ways. Each consumes the very same
-    Fluid web components, charts, and tokens — only the host framework
-    differs. Open any two side by side: they're pixel-for-pixel the same.
-  </p>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">Native HTML</h3>
-      <p>Zero build step. Loaded with an import map (CDN-swappable) over plain ES modules and hash routing.</p>
-      <div slot="footer">
-        <a href="./native/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
-
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">React</h3>
-      <p>React 19 + Vite. Custom-element props via refs, events via native handlers, charts wrapped as components.</p>
-      <div slot="footer">
-        <a href="./react/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
-
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">Next.js</h3>
-      <p>Next.js 15 App Router. SSR-safe: the server emits HTML, the client registers the elements. Statically exported.</p>
-      <div slot="footer">
-        <a href="./next/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
-
-    <fluid-card>
-      <h3 slot="header" style="margin: 0;">Angular</h3>
-      <p>Angular 20 standalone with CUSTOM_ELEMENTS_SCHEMA and [prop] / (event) bindings to the custom elements.</p>
-      <div slot="footer">
-        <a href="./angular/" style="text-decoration: none;">
-          <fluid-button>Open</fluid-button>
-        </a>
-      </div>
-    </fluid-card>
-  </div>
-
-  <p style="margin-top: 2rem; color: var(--fluid-text-secondary); font-size: 0.95rem;">
-    Looking for the marketing landing page? That's now the
-    <a href="../" style="color: var(--fluid-color-primary);">site root</a>:
-    it's the real homepage for the whole project.
-  </p>
+    <p class="demo-foot">
+      Looking for the marketing page? That's the <a href="../">site root</a>.
+    </p>
+  </section>
 `;

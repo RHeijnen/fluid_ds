@@ -201,3 +201,68 @@ table tbody tr:hover {
     display: none;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Demos index: hero + clickable tiles                                 */
+/* ------------------------------------------------------------------ */
+.demo-index { max-width: 60rem; }
+.demo-hero { margin-bottom: 2.5rem; }
+.demo-hero h1 { font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -0.02em; margin: 0.75rem 0 0.5rem; }
+.demo-lead { color: var(--fluid-text-secondary); max-width: 40rem; font-size: 1.05rem; margin: 0; }
+
+.demo-section-title { font-size: 1.25rem; margin: 2.25rem 0 0.25rem; letter-spacing: -0.01em; }
+.demo-section-sub { color: var(--fluid-text-secondary); max-width: 40rem; margin: 0 0 1rem; }
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.demo-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 1.1rem 1.15rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--fluid-surface-base);
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+.demo-tile:hover {
+  transform: translateY(-3px);
+  border-color: var(--fluid-accent-base);
+  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--fluid-accent-base) 45%, transparent);
+}
+.demo-tile-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex: none;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.6rem;
+  background: var(--fluid-surface-muted);
+}
+.demo-tile-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.demo-tile-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem; }
+.demo-tile-desc { color: var(--fluid-text-secondary); font-size: 0.92rem; line-height: 1.5; }
+.demo-tile-go {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--fluid-accent-base);
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.demo-foot { margin-top: 2.5rem; color: var(--fluid-text-secondary); font-size: 0.95rem; }
+
+@media (max-width: 560px) {
+  .demo-tile-go { display: none; }
+}
