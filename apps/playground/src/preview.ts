@@ -1,6 +1,7 @@
 import { LitElement, html, css, type TemplateResult } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { themeStore } from "./store.js";
+import { confetti } from "@fluid-ds/animations/effects";
 import "./preview-card.js";
 
 /**
@@ -19,6 +20,30 @@ export class ComponentPreview extends LitElement {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: var(--fluid-space-4);
+      /* Each card takes its own natural height; without this, every card in a
+         row stretches to the tallest one (so a big component bloated its
+         neighbours). */
+      align-items: start;
+    }
+
+    /* fluid-map renders in LIGHT DOM and normally gets its display:block + height
+       from a stylesheet injected into document.head. Here the map lives inside
+       this preview's shadow root, where that global style cannot reach it, so it
+       falls back to display:inline and Leaflet balloons the tile container to
+       ~1600px. These shadow-scoped rules constrain it to a sensible preview size
+       (the map's light DOM is this shadow tree, so the descendant selector works). */
+    fluid-map {
+      display: block;
+    }
+    fluid-map .viewport {
+      height: var(--fluid-map-height, 14rem) !important;
+    }
+
+    /* Cap any genuinely large component (scheduler, calendar, kanban) so a single
+       card never dominates the gallery; the few that exceed this scroll. */
+    .grid > * {
+      max-height: 30rem;
+      overflow: auto;
     }
 
     h3 {
@@ -770,7 +795,15 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
         </preview-card>
 
         <preview-card tag="fluid-qr-code" label="QR code">
-          <fluid-qr-code value="https://fluid-ds.example.com" size="120"></fluid-qr-code>
+          <fluid-qr-code
+            value="https://fluid-ds.example.com"
+            size="140"
+            module-shape="dots"
+            eye-shape="rounded"
+            eye-color="var(--fluid-accent-base)"
+            logo="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%234f46e5'/%3E%3Ctext x='24' y='32' font-size='26' font-family='sans-serif' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"
+            logo-size="0.24"
+          ></fluid-qr-code>
         </preview-card>
 
         <preview-card tag="fluid-animated-image" label="Animated image">
@@ -973,15 +1006,6 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
           </fluid-hero>
         </preview-card>
 
-        <preview-card tag="fluid-form" label="Form">
-          <fluid-form style="max-width: 18rem;">
-          <label>Name <input name="name" required placeholder="Ada Lovelace" /></label>
-          <label>Email <input name="email" type="email" required placeholder="ada@example.com" /></label>
-          <button slot="actions" type="submit">Submit</button>
-          <button slot="actions" type="reset">Reset</button>
-          </fluid-form>
-        </preview-card>
-
         <preview-card tag="fluid-fieldset" label="Fieldset">
           <div class="demo">
           <fluid-fieldset legend="Contact details" description="We will only use this to reach you." style="max-width: 22rem;">
@@ -1128,17 +1152,28 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
         </preview-card>
 
         <preview-card tag="fluid-tour" label="Tour">
-          <div id="pg-tour-anchor" style="display:flex; gap:0.75rem; align-items:center;">
-          <button id="pg-tour-search" style="padding:0.5rem 0.75rem;">Search</button>
-          <button id="pg-tour-new" style="padding:0.5rem 0.75rem;">New</button>
-          <button id="pg-tour-start" style="padding:0.5rem 0.75rem;">Start tour</button>
+          <div id="pg-tour-anchor" style="display:flex; gap:0.75rem; align-items:center;" @click=${(e: Event) => {
+          // The anchors are real <fluid-button>s; resolve the one that was
+          // clicked via composedPath so we catch the host regardless of which
+          // inner node the event bubbled from.
+          const start = e.composedPath().find(
+            (n): n is HTMLElement => n instanceof HTMLElement && n.id === "pg-tour-start"
+          );
+          if (!start) return;
+          // The card lives inside component-preview's shadow root, so resolve
+          // the tour from this handler's own root rather than the document.
+          const root = start.getRootNode() as ShadowRoot | Document;
+          const tour = root.querySelector("#pg-tour") as (HTMLElement & { show(): void }) | null;
+          tour?.show();
+          }}>
+          <fluid-button id="pg-tour-search" variant="secondary" size="sm">Search</fluid-button>
+          <fluid-button id="pg-tour-new" variant="secondary" size="sm">New</fluid-button>
+          <fluid-button id="pg-tour-start" variant="primary" size="sm">Start tour</fluid-button>
           </div>
           <fluid-tour id="pg-tour" .steps=${[
           { target: "#pg-tour-search", title: "Search everything", body: "Jump to anything from here.", placement: "bottom-start" },
           { target: "#pg-tour-new", title: "Create in one click", body: "Start a new project.", placement: "bottom" }
-          ]} @click=${(e: Event) => {
-          if ((e.target as HTMLElement).id === "pg-tour-start") (document.getElementById("pg-tour") as HTMLElement & { show(): void }).show();
-          }}></fluid-tour>
+          ]}></fluid-tour>
         </preview-card>
 
         <preview-card tag="fluid-loading-overlay" label="Loading overlay">
@@ -1218,6 +1253,29 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
 
         <preview-card tag="fluid-theme-toggle" label="Theme toggle">
           <fluid-theme-toggle .brands=${["", "midnight", "corporate"]}></fluid-theme-toggle>
+        </preview-card>
+
+        <preview-card tag="fluid-celebrate" label="Celebrate (confetti)">
+          <fluid-button
+            variant="primary"
+            @click=${(e: Event) => confetti({ origin: e.currentTarget as HTMLElement })}
+            >Complete purchase 🎉</fluid-button
+          >
+        </preview-card>
+
+        <preview-card tag="fluid-file-parser" label="File parser">
+          <fluid-file-parser
+            style="display:block;"
+            .blueprint=${{
+              fields: [
+                { key: "name", label: "Full name", type: "string", required: true },
+                { key: "email", type: "email", required: true, aliases: ["e-mail", "mail"] },
+                { key: "age", type: "integer", min: 0, max: 120 },
+                { key: "role", type: "enum", options: ["engineer", "designer", "manager"], default: "engineer" }
+              ],
+              dedupeBy: "email"
+            }}
+          ></fluid-file-parser>
         </preview-card>
 
       </div>

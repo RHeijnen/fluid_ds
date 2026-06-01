@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/icons",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "description": "Icon registry for Fluid. Curated lucide subset registered by default, ~1500 more available as side-effect modules or via the lazy loadIcon() API.",
   "type": "module",
   "license": "MIT",
@@ -43,7 +43,6 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha",
-    "provenance": true,
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -57,7 +56,8 @@
         "types": "./dist/lucide/*.d.ts",
         "import": "./dist/lucide/*.js"
       }
-    }
+    },
+    "provenance": true
   },
   "files": [
     "dist",

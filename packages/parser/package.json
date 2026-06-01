@@ -1,0 +1,96 @@
+{
+  "name": "@fluid-ds/parser",
+  "version": "0.0.3-alpha.0",
+  "description": "Drop a JSON / CSV / Excel file onto a Fluid file-drop and get validated, typed rows. A declarative blueprint maps + coerces + validates each column, with a mapping UI and an error-preview table. Framework-agnostic, WCAG 2.2 AA.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/parser"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "parser",
+    "csv",
+    "xlsx",
+    "json",
+    "import",
+    "data-import",
+    "validation",
+    "web-components",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "alpha",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./core": {
+        "types": "./dist/core/index.d.ts",
+        "import": "./dist/core/index.js"
+      },
+      "./define/*": {
+        "types": "./dist/components/*/define.d.ts",
+        "import": "./dist/components/*/define.js"
+      }
+    },
+    "provenance": true
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./core": {
+      "types": "./src/core/index.ts",
+      "import": "./src/core/index.ts"
+    },
+    "./define/*": {
+      "types": "./src/components/*/define.ts",
+      "import": "./src/components/*/define.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/define.js",
+    "**/define.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "web-test-runner --config web-test-runner.config.js",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*",
+    "lit": "^3.2.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@storybook/web-components": "^8.4.7",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "playwright": "^1.49.1",
+    "typescript": "^5.7.2"
+  }
+}

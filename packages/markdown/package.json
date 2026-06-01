@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/markdown",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "description": "Markdown rendering web component for Fluid (expansion pack). Backed by marked; themable, supports inline and src-fetched content.",
   "type": "module",
   "license": "MIT",
@@ -24,7 +24,6 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha",
-    "provenance": true,
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -34,7 +33,8 @@
         "types": "./dist/define.d.ts",
         "import": "./dist/define.js"
       }
-    }
+    },
+    "provenance": true
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",

@@ -9,6 +9,18 @@
  * pitch in one interaction.
  */
 import "./register-fluid.js";
+import {
+  confetti,
+  fireworks,
+  emojiBurst,
+  pride,
+  sparkles,
+  snow,
+  stars,
+  hearts,
+  emojiFountain,
+  bubbles
+} from "@fluid-ds/animations/effects";
 
 const GH = "https://github.com/RHeijnen/fluid_ds";
 
@@ -39,9 +51,9 @@ const features = [
 
 const stats = [
   ["101", "components"],
-  ["11", "expansion packs"],
+  ["12", "expansion packs"],
   ["4", "frameworks proven"],
-  ["650+", "tests passing"],
+  ["1,000+", "tests passing"],
   ["AA", "WCAG 2.2 (AAA opt-in)"],
   ["1,500+", "icons available"]
 ];
@@ -56,8 +68,9 @@ const packs = [
   ["@fluid-ds/map", "Themed Leaflet map wrapper with markers."],
   ["@fluid-ds/media", "Video player, playlists, animated images, zoomable frames, audio, lightbox."],
   ["@fluid-ds/markdown", "Render Markdown to themed HTML with one element."],
-  ["@fluid-ds/qr", "Themable QR codes rendered as crisp SVG."],
-  ["@fluid-ds/animations", "Attribute-driven, reduced-motion-aware animation system."]
+  ["@fluid-ds/qr", "Themable QR codes as crisp SVG, including logo-embedded fancy codes."],
+  ["@fluid-ds/parser", "Drag JSON, CSV or Excel onto a file-drop and parse it against a blueprint."],
+  ["@fluid-ds/animations", "Keyframe animations plus event effects like confetti, reduced-motion aware."]
 ];
 
 const surfaces = [
@@ -96,7 +109,7 @@ document.body.innerHTML = `
   <!-- ============================ HERO ============================ -->
   <section class="hero">
     <div class="hero-badges">
-      <fluid-badge variant="info">v0.1 alpha</fluid-badge>
+      <fluid-badge variant="info">v0.3 alpha</fluid-badge>
       <fluid-badge variant="success">WCAG 2.2 AA · AAA-ready</fluid-badge>
       <fluid-badge>npm: @fluid-ds/*@alpha</fluid-badge>
       <fluid-badge>MIT licensed</fluid-badge>
@@ -114,9 +127,7 @@ document.body.innerHTML = `
       <a href="/playground/" style="text-decoration:none;">
         <fluid-button variant="secondary">Open the theme builder</fluid-button>
       </a>
-      <a href="${GH}" target="_blank" rel="noopener" style="text-decoration:none;">
-        <fluid-button variant="ghost"><fluid-icon slot="prefix" name="github"></fluid-icon>Star on GitHub</fluid-button>
-      </a>
+      <fluid-button id="start-tour" variant="ghost"><fluid-icon slot="prefix" name="sparkles"></fluid-icon>Take the tour</fluid-button>
     </div>
 
     <!-- LIVE theme switcher: drives the whole page -->
@@ -228,7 +239,7 @@ document.body.innerHTML = `
       </div>
     </fluid-card>
     <p style="text-align:center; margin-top:1rem;">
-      <a href="/storybook/" style="text-decoration:none;"><fluid-button variant="secondary">See all 57 in Storybook <fluid-icon slot="suffix" name="arrow-right"></fluid-icon></fluid-button></a>
+      <a href="/storybook/" style="text-decoration:none;"><fluid-button variant="secondary">See all 101 in Storybook <fluid-icon slot="suffix" name="arrow-right"></fluid-icon></fluid-button></a>
     </p>
   </section>
 
@@ -255,10 +266,55 @@ document.body.innerHTML = `
     </fluid-callout>
   </section>
 
+  <!-- ====================== WHAT'S NEW (v0.3) ====================== -->
+  <section class="row" id="whatsnew">
+    <h2>New in <span class="accent">v0.3</span></h2>
+    <p class="subhead">Three fresh ways to delight: logo-embedded QR codes, drag-and-drop file parsing, and a celebration effects engine.</p>
+    <div class="whatsnew-grid">
+      <fluid-card variant="outline" class="wn-card">
+        <code class="pack-name">@fluid-ds/qr</code>
+        <p class="wn-blurb">Scannable QR codes with your logo in the centre, dot modules, and recoloured finder eyes.</p>
+        <div class="wn-stage">
+          <fluid-qr-code id="wn-qr" value="https://fluid-web.dev" size="156"
+            module-shape="dots" eye-shape="rounded" eye-color="var(--fluid-accent-base)" logo-size="0.24"></fluid-qr-code>
+        </div>
+      </fluid-card>
+
+      <fluid-card variant="outline" class="wn-card" id="fx-card">
+        <code class="pack-name">@fluid-ds/animations</code>
+        <p class="wn-blurb">A tiny canvas effects engine: confetti, fireworks, emoji bursts, and more. Reduced-motion aware.</p>
+        <div class="wn-stage fx-actions">
+          <fluid-button id="fx-confetti" variant="primary" size="sm"><fluid-icon slot="prefix" name="sparkles"></fluid-icon>Confetti</fluid-button>
+          <fluid-button id="fx-fireworks" variant="secondary" size="sm">Fireworks</fluid-button>
+          <fluid-button id="fx-emoji" variant="secondary" size="sm">Emoji</fluid-button>
+          <fluid-button id="fx-pride" variant="secondary" size="sm">Pride</fluid-button>
+          <fluid-button id="fx-snow" variant="secondary" size="sm">Snow</fluid-button>
+          <fluid-button id="fx-sparkles" variant="secondary" size="sm">Sparkles</fluid-button>
+          <fluid-button id="fx-stars" variant="secondary" size="sm">Stars</fluid-button>
+          <fluid-button id="fx-hearts" variant="secondary" size="sm">Hearts</fluid-button>
+          <fluid-button id="fx-fountain" variant="secondary" size="sm">Fountain</fluid-button>
+          <fluid-button id="fx-bubbles" variant="secondary" size="sm">Bubbles</fluid-button>
+        </div>
+      </fluid-card>
+
+      <fluid-card variant="outline" class="wn-card">
+        <code class="pack-name">@fluid-ds/parser</code>
+        <p class="wn-blurb">Drop a JSON, CSV, or Excel file and parse it against a blueprint: typed, validated rows out.</p>
+        <div class="wn-stage">
+          <div class="wn-parser">
+            <div class="wn-drop"><fluid-icon name="upload"></fluid-icon><span>members.csv</span></div>
+            <fluid-meter value="312" max="320" label="Rows valid" style="width:100%;"></fluid-meter>
+            <span class="wn-parser-note">312 of 320 rows valid &middot; 8 flagged</span>
+          </div>
+        </div>
+      </fluid-card>
+    </div>
+  </section>
+
   <!-- ====================== EXPANSION PACKS ====================== -->
   <section class="row">
     <h2>Lean core, opt-in power</h2>
-    <p class="subhead">Eleven expansion packs keep the base bundle small. Add only what you reach for.</p>
+    <p class="subhead">Twelve expansion packs keep the base bundle small. Add only what you reach for.</p>
     <div class="feature-grid">
       ${packs.map(([name, body]) => `
         <fluid-card variant="outline">
@@ -329,6 +385,9 @@ document.body.innerHTML = `
     </fluid-card>
   </section>
 
+  <!-- Guided tour overlay (steps set + opened from JS). -->
+  <fluid-tour id="page-tour"></fluid-tour>
+
   <!-- ============================ FOOTER ============================ -->
   <footer class="site-footer">
     <div class="footer-links">
@@ -376,4 +435,95 @@ if (dc) {
     labels: ["Common", "Rare", "Epic", "Legendary"],
     datasets: [{ data: [58, 27, 12, 3] }]
   };
+}
+
+/* ---------------------------------------------------------------- */
+/* New in v0.3: live QR logo, the effects engine buttons, a subtle   */
+/* one-time celebration when the section scrolls in, and the tour.   */
+/* ---------------------------------------------------------------- */
+
+// A small inline "F" mark for the QR logo (data URI, brand accent).
+const QR_LOGO =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%234f46e5'/%3E%3Ctext x='24' y='33' font-size='27' font-weight='700' font-family='Inter,system-ui,sans-serif' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E";
+const wnQr = document.getElementById("wn-qr") as (HTMLElement & { logo?: string }) | null;
+if (wnQr) wnQr.logo = QR_LOGO;
+
+// Effects engine, fired from the "New in v0.3" buttons (origin = the button).
+// Bursts (confetti, emoji, fireworks, pride, stars, hearts) self-terminate.
+// Ambient effects (snow, sparkles, fountain, bubbles) stop SPAWNING after their
+// `duration`, then let the particles already on screen finish naturally: each
+// drifts / falls off the viewport and is dropped, and the shared overlay canvas
+// tears itself down once the last particle is gone. No hard stop, so nothing is
+// yanked off screen mid-flight.
+const fromEl = (id: string, run: (el: HTMLElement) => void): void => {
+  const el = document.getElementById(id);
+  el?.addEventListener("click", () => run(el));
+};
+fromEl("fx-confetti", (el) => confetti({ origin: el }));
+fromEl("fx-fireworks", () => fireworks());
+fromEl("fx-emoji", (el) => emojiBurst({ origin: el, emojis: ["🎉", "✨", "💧", "🫧"] }));
+fromEl("fx-pride", (el) => pride({ origin: el }));
+fromEl("fx-stars", (el) => stars({ origin: el }));
+fromEl("fx-hearts", (el) => hearts({ origin: el }));
+fromEl("fx-fountain", (el) => emojiFountain({ origin: el, duration: 2500 }));
+fromEl("fx-snow", () => snow({ duration: 2500 }));
+fromEl("fx-sparkles", (el) => sparkles({ origin: el, duration: 2500 }));
+fromEl("fx-bubbles", () => bubbles({ duration: 2500 }));
+
+// Subtle, one-time delight: when the effects card first scrolls into view,
+// shimmer a few sparkles from it. The engine no-ops under reduced-motion.
+const fxCard = document.getElementById("fx-card");
+if (fxCard && "IntersectionObserver" in window) {
+  let played = false;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !played) {
+          played = true;
+          sparkles({ origin: fxCard, duration: 2200 });
+          io.disconnect();
+        }
+      }
+    },
+    { threshold: 0.6 }
+  );
+  io.observe(fxCard);
+}
+
+/* ---------------------------------------------------------------- */
+/* Guided product tour: walk the hero theme switcher, the new-in-0.3 */
+/* showcase, the dashboards, and the packs. Targets are light-DOM    */
+/* ids, so the tour resolves them via its document fallback.         */
+/* ---------------------------------------------------------------- */
+const tour = document.getElementById("page-tour") as
+  | (HTMLElement & { steps?: unknown; show?: () => void })
+  | null;
+if (tour) {
+  tour.steps = [
+    {
+      target: ".theme-switch",
+      title: "Theme the whole page",
+      body: "Pick a brand or flip dark mode. Every component below, charts included, recolours live from the same tokens.",
+      placement: "bottom"
+    },
+    {
+      target: "#whatsnew",
+      title: "New in v0.3",
+      body: "Logo-embedded QR codes, blueprint-driven file parsing, and a celebration effects engine. Try the confetti.",
+      placement: "top"
+    },
+    {
+      target: "#fx-confetti",
+      title: "A little delight",
+      body: "The effects engine fires from any element and is reduced-motion aware. Go on, press it.",
+      placement: "top"
+    },
+    {
+      target: ".chart-grid",
+      title: "Data viz, on-brand",
+      body: "The charts pack reads the same tokens, so dashboards match your brand for free.",
+      placement: "top"
+    }
+  ];
+  document.getElementById("start-tour")?.addEventListener("click", () => tour.show?.());
 }

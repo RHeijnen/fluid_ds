@@ -23,6 +23,7 @@ import "@fluid-ds/icons/lucide/github";
 import "@fluid-ds/icons/lucide/sparkles";
 import "@fluid-ds/icons/lucide/palette";
 import "@fluid-ds/icons/lucide/blocks";
+import "@fluid-ds/icons/lucide/upload";
 
 import "@fluid-ds/components/define/avatar";
 import "@fluid-ds/components/define/badge";
@@ -49,9 +50,15 @@ import "@fluid-ds/components/define/switch";
 import "@fluid-ds/components/define/tabs";
 import "@fluid-ds/components/define/tag";
 import "@fluid-ds/components/define/tooltip";
+import "@fluid-ds/components/define/tour";
+import "@fluid-ds/components/define/meter";
 
 // Charts expansion pack. The line + doughnut on the page read Fluid tokens and
 // re-theme themselves when the switcher flips the brand.
 import "@fluid-ds/charts/define/line-chart";
 import "@fluid-ds/charts/define/doughnut-chart";
 import "@fluid-ds/charts/define/sparkline";
+
+// New in 0.3: a logo-embedded QR code, shown live in the "What's new" section.
+// The event-effects engine (confetti, fireworks, ...) is imported in main.ts.
+import "@fluid-ds/qr/define";

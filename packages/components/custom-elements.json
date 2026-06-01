@@ -25574,6 +25574,10 @@
               "name": "--fluid-range-slider-thumb-color"
             },
             {
+              "description": "Corner radius of the thumbs and the selected-range fill (they share it so the fill caps match the handles). Falls back to 3px.",
+              "name": "--fluid-range-slider-thumb-radius"
+            },
+            {
               "description": "Track thickness. Falls back to 8px.",
               "name": "--fluid-range-slider-track-size"
             },
@@ -37482,20 +37486,16 @@
               "name": "--fluid-tour-highlight-radius"
             },
             {
-              "description": "Spotlight outline color. Falls back to --fluid-accent-base.",
+              "description": "Spotlight outline color, also the emphasis glow on the primary action. Falls back to --fluid-accent-base.",
               "name": "--fluid-tour-highlight-ring"
             },
             {
-              "description": "Primary button background. Falls back to --fluid-accent-base.",
-              "name": "--fluid-tour-accent-bg"
+              "description": "Width of the emphasis glow around the primary (Next / Done) action. Falls back to 3px.",
+              "name": "--fluid-tour-highlight-ring-width"
             },
             {
-              "description": "Primary button text. Falls back to --fluid-accent-text.",
-              "name": "--fluid-tour-accent-fg"
-            },
-            {
-              "description": "Focus ring width. Falls back to --fluid-focus-ring-width.",
-              "name": "--fluid-tour-focus-ring-width"
+              "description": "Focus ring color for the action buttons. Falls back to --fluid-focus-ring-color.",
+              "name": "--fluid-tour-focus-ring-color"
             }
           ],
           "cssParts": [
@@ -37528,15 +37528,15 @@
               "name": "actions"
             },
             {
-              "description": "The Back button.",
+              "description": "The Back action (a fluid-button).",
               "name": "back"
             },
             {
-              "description": "The Next / Done button.",
+              "description": "The Next / Done action (a fluid-button, the emphasised primary action).",
               "name": "next"
             },
             {
-              "description": "The Skip button. Every styled property reads a component-scoped `--fluid-tour-*` token that falls back to a main semantic var (the override ladder).",
+              "description": "The Skip action (a fluid-button). Every styled property reads a component-scoped `--fluid-tour-*` token that falls back to a main semantic var (the override ladder).",
               "name": "skip"
             }
           ],
@@ -37720,6 +37720,25 @@
             },
             {
               "kind": "method",
+              "name": "resolveTarget",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Resolve a step's CSS selector against the tour's own root node first, then\nfall back to the document. `document.querySelector` never pierces a shadow\nboundary, so a tour rendered inside a shadow root (the theme-builder\nplayground, or any consumer's component) must query its containing root to\nfind the elements it spotlights."
+            },
+            {
+              "kind": "method",
               "name": "applyStep",
               "privacy": "private",
               "return": {
@@ -37744,6 +37763,17 @@
               "kind": "field",
               "name": "handleKeyDown",
               "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "focusables",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement[]"
+                }
+              },
+              "description": "The popover's focusable controls, in DOM order. The action buttons are\n`fluid-button` hosts (delegatesFocus forwards `.focus()` to the inner native\nbutton), so we match those alongside any native focusables."
             },
             {
               "kind": "method",

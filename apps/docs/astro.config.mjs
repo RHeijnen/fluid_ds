@@ -254,7 +254,9 @@ export default defineConfig({
             { label: "@fluid-ds/map", link: "/expansion/map/" },
             { label: "@fluid-ds/markdown", link: "/expansion/markdown/" },
             { label: "@fluid-ds/qr", link: "/expansion/qr/" },
-            { label: "@fluid-ds/media", link: "/expansion/media/" }
+            { label: "@fluid-ds/media", link: "/expansion/media/" },
+            { label: "@fluid-ds/parser", link: "/expansion/parser/" },
+            { label: "@fluid-ds/animations", link: "/expansion/animations-effects/" }
           ]
         },
         {

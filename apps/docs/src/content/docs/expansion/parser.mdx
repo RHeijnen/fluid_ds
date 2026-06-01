@@ -1,0 +1,186 @@
+---
+title: "@fluid-ds/parser"
+description: "Drop a JSON / CSV / Excel file onto a Fluid file-drop and get validated, typed rows out, mapped + coerced + validated against a declarative blueprint."
+---
+
+An opt-in expansion pack for data import. You describe the shape you want with a
+declarative **blueprint** (fields with types, aliases, ranges, and validators);
+the parser sniffs the file format, fuzzy-maps the source columns to your fields,
+coerces and validates every cell, and hands back clean typed rows plus a full
+error report. A mapping UI and an error-preview table come with it.
+
+It splits into a **headless core** (`@fluid-ds/parser/core`, zero UI, runs
+server-side) and two web components built on the core. Standard web components,
+so they drop into React, Vue, Angular, Svelte, or plain HTML. WCAG 2.2 AA.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/parser
+```
+
+```ts
+// UI components (register the custom elements):
+import "@fluid-ds/parser/define/file-parser";
+import "@fluid-ds/parser/define/column-mapper";
+
+// or the headless engine on its own:
+import { parseFile, applyBlueprint } from "@fluid-ds/parser/core";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-file-parser>` | The full flow: dropzone intake, auto-mapping, a validated preview table, confirm, and CSV / JSON download. |
+| `<fluid-column-mapper>` | The source-column to blueprint-field mapping UI, usable on its own. |
+
+## A blueprint
+
+A blueprint is plain data. Each field has a `key` (the output property name), a
+`type`, and optional rules. `aliases` widen the fuzzy auto-map; `required`,
+`min`/`max`, `options`, `pattern`, `transform`, and `validate` drive coercion +
+validation.
+
+```ts
+import type { Blueprint } from "@fluid-ds/parser/core";
+
+const blueprint: Blueprint = {
+  fields: [
+    { key: "name", label: "Full name", type: "string", required: true, aliases: ["name", "full name"] },
+    { key: "email", label: "Email", type: "email", required: true, aliases: ["e-mail", "mail"] },
+    { key: "age", label: "Age", type: "integer", min: 0, max: 120 },
+    { key: "role", label: "Role", type: "enum", options: ["engineer", "designer", "manager"], default: "engineer" },
+    { key: "joined", label: "Joined", type: "date", format: "iso" },
+    { key: "active", label: "Active", type: "boolean", default: true }
+  ],
+  dedupeBy: "email",
+  maxRows: 5000
+};
+```
+
+## `<fluid-file-parser>` wired to a blueprint
+
+Set the blueprint as a property (it is an object, so use property binding in a
+framework, or assign it in script as below). Drop a file: the component reads
+it, auto-maps the columns, shows a mapping step plus a validated preview with
+bad cells highlighted, and emits `fluid-parse` on confirm.
+
+```html
+<fluid-file-parser id="importer"></fluid-file-parser>
+
+<script type="module">
+  import "@fluid-ds/parser/define/file-parser";
+
+  const importer = document.getElementById("importer");
+  importer.blueprint = {
+    fields: [
+      { key: "name", label: "Full name", type: "string", required: true, aliases: ["name"] },
+      { key: "email", type: "email", required: true, aliases: ["e-mail", "mail"] },
+      { key: "age", type: "integer", min: 0, max: 120 },
+      { key: "role", type: "enum", options: ["engineer", "designer", "manager"], default: "engineer" }
+    ],
+    dedupeBy: "email"
+  };
+
+  importer.addEventListener("fluid-file-loaded", (e) => {
+    console.log("read", e.detail.raw.columns); // source column names
+  });
+
+  importer.addEventListener("fluid-parse", (e) => {
+    const { valid, rows, errors, mapping } = e.detail;
+    if (valid) {
+      saveRows(rows); // cleaned, typed rows
+    } else {
+      console.warn(`${errors.length} cell error(s)`, errors);
+    }
+  });
+
+  importer.addEventListener("fluid-parse-error", (e) => {
+    console.error("could not read file:", e.detail.message);
+  });
+</script>
+```
+
+Call `importer.export("csv")` or `importer.export("json")` to download the
+cleaned rows (it also returns the serialized string).
+
+## Headless: `applyBlueprint` with no UI
+
+The whole engine is usable on its own, including server-side, with no custom
+elements registered. `parseFile` turns a `File` into a `RawTable`; `applyBlueprint`
+maps + coerces + validates it.
+
+```ts
+import { parseFile, applyBlueprint, type Blueprint } from "@fluid-ds/parser/core";
+
+const blueprint: Blueprint = {
+  fields: [
+    { key: "sku", label: "SKU", type: "string", required: true, pattern: "^[A-Z]{3}-\\d{4}$" },
+    { key: "price", label: "Price", type: "number", required: true, min: 0 },
+    { key: "stock", label: "In stock", type: "integer", min: 0, default: 0 }
+  ]
+};
+
+const raw = await parseFile(file); // File from a drop / <input type="file">
+const result = applyBlueprint(raw, blueprint);
+
+result.rows;    // [{ sku: "ABC-1234", price: 9.99, stock: 0 }, …]
+result.errors;  // [{ row: 2, field: "price", value: "free", message: 'Price is not a number: "free"' }, …]
+result.mapping; // { sku: "Product Code", price: "Unit Price", stock: null }
+result.stats;   // { total, kept, duplicates, truncated, errorCount }
+```
+
+`parseFile` reads JSON / CSV / TSV natively (with delimiter sniffing and an
+RFC 4180 quoted-field parser) and `.xlsx` via SheetJS, which is imported lazily
+only when an Excel file is actually dropped, so the base bundle stays tiny.
+
+## Field types
+
+`string`, `number`, `integer`, `boolean`, `date`, `email`, `url`, `enum`,
+`json`, `custom`. Per-type options: `min` / `max` (numbers, dates, string
+length), `options` (enum), `format` (date: `iso` / `us` / `eu`), `truthy`
+(boolean), `pattern` (string regex), `default`, `transform(value)`, and
+`validate(value) => true | string`. Blueprint-level: `dedupeBy`, `maxRows`,
+`headerRow`.
+
+## Theming
+
+Both components follow the Fluid override ladder: every styled property reads a
+component token that falls back to a semantic variable, so brand themes flow
+through and you can retheme one instance, one component, or the whole brand.
+
+| Token | Falls back to |
+| --- | --- |
+| `--fluid-parser-table-bg` | `--fluid-surface-base` |
+| `--fluid-parser-table-header-bg` | `--fluid-surface-muted` |
+| `--fluid-parser-table-border` | `--fluid-border-default` |
+| `--fluid-parser-invalid-bg` | a tint of `--fluid-danger-base` |
+| `--fluid-parser-invalid-fg` | `--fluid-danger-text` |
+| `--fluid-mapper-select-bg` | `--fluid-surface-base` |
+| `--fluid-mapper-border` | `--fluid-border-default` |
+| `--fluid-mapper-danger` | `--fluid-danger-base` |
+
+The intake reuses `fluid-dropzone` and the validation summary reuses
+`fluid-callout`, so both inherit their own token ladders too.
+
+## Accessibility
+
+- Intake is the `fluid-dropzone` (a keyboard-operable `role="button"` drop
+  region backed by a hidden file input), so files can be added by keyboard, not
+  just dragged.
+- The preview is a real semantic `<table>` with a `<caption>` and
+  `<th scope="col">` headers; cells that failed validation carry
+  `aria-invalid="true"` and a `title` with the reason.
+- The validation summary is rendered into a live region: `role="status"` /
+  `aria-live="polite"` when everything is valid, and `role="alert"` /
+  `aria-live="assertive"` when there are errors, so the outcome is announced.
+- The column mapper is a list of labelled native `<select>` controls; an
+  unmapped required field is flagged with `aria-invalid` and a visible accent.
+- Interactive targets respect `--fluid-target-min` and focus rings respect
+  `--fluid-focus-ring-width`, so everything scales to AAA sizing when an
+  ancestor opts in. Transitions honor `prefers-reduced-motion: reduce`.
+
+## License
+
+MIT.

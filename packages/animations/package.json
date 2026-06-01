@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/animations",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "description": "Attribute-driven animation system for Fluid. A registry of named keyframes plus a global controller that watches data-fluid-animation attributes on any element.",
   "type": "module",
   "license": "MIT",
@@ -38,6 +38,14 @@
       "types": "./src/define/controller.ts",
       "import": "./src/define/controller.ts"
     },
+    "./define/celebrate": {
+      "types": "./src/define/celebrate.ts",
+      "import": "./src/define/celebrate.ts"
+    },
+    "./effects": {
+      "types": "./src/effects/index.ts",
+      "import": "./src/effects/index.ts"
+    },
     "./animations/*": {
       "types": "./src/animations/*.ts",
       "import": "./src/animations/*.ts"
@@ -46,7 +54,6 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha",
-    "provenance": true,
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -60,11 +67,20 @@
         "types": "./dist/define/controller.d.ts",
         "import": "./dist/define/controller.js"
       },
+      "./define/celebrate": {
+        "types": "./dist/define/celebrate.d.ts",
+        "import": "./dist/define/celebrate.js"
+      },
+      "./effects": {
+        "types": "./dist/effects/index.d.ts",
+        "import": "./dist/effects/index.js"
+      },
       "./animations/*": {
         "types": "./dist/animations/*.d.ts",
         "import": "./dist/animations/*.js"
       }
-    }
+    },
+    "provenance": true
   },
   "files": [
     "dist",
@@ -78,14 +94,23 @@
     "**/animations/*.js",
     "**/animations/*.ts",
     "**/define/controller.js",
-    "**/define/controller.ts"
+    "**/define/controller.ts",
+    "**/define/celebrate.js",
+    "**/define/celebrate.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
+    "test": "web-test-runner --config web-test-runner.config.js",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@storybook/web-components": "^8.4.7",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "playwright": "^1.49.1",
     "typescript": "^5.7.2"
   }
 }

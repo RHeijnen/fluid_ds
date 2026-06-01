@@ -77,7 +77,7 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 - ✅ CDN-first: a `<link>` + `<script>` from jsDelivr/unpkg, no bundler needed.
 - ✅ npm / bundler path with tree-shakable per-component entry points.
 - ✅ **Published**: all `@fluid-ds/*` packages are live on the public npm
-  registry under the `alpha` tag (first release `0.0.1-alpha`). Install with
+  registry under the `alpha` tag (current release `0.0.3-alpha`). Install with
   `npm i @fluid-ds/components@alpha`.
 
 ### Accessibility: WCAG 2.2 ✅ AA / 🔨 AAA
@@ -149,11 +149,21 @@ Kept out of the core so the base bundle stays lean:
 - ✅ `@fluid-ds/kanban`: drag-and-drop board with a full keyboard path.
 - ✅ `@fluid-ds/map`: themed Leaflet map wrapper with markers.
 - ✅ `@fluid-ds/markdown`: markdown rendering.
-- ✅ `@fluid-ds/qr`: QR codes.
+- ✅ `@fluid-ds/qr`: QR codes, including **logo-embedded "fancy" codes** (center
+  logo with auto error-correction H, dot / rounded modules, recolorable finder
+  eyes, gradients, an opt-in artistic image-background mode, and PNG export).
+- ✅ `@fluid-ds/parser`: **blueprint-driven file import**. Drag a JSON / CSV /
+  TSV / Excel file onto a Fluid file-drop and parse it against a declarative
+  schema: fuzzy column auto-mapping, per-type coercion + validation with
+  per-cell errors, and a validated preview with CSV / JSON export. Zero-UI core
+  plus `<fluid-file-parser>` / `<fluid-column-mapper>`. XLSX (SheetJS) is loaded
+  lazily only when an `.xlsx` is dropped.
 - ✅ `@fluid-ds/media`: video / animated image / zoomable frame / audio player /
   lightbox gallery.
-- ✅ `@fluid-ds/animations`: attribute-driven animation system
-  (`data-fluid-animation`), reduced-motion aware.
+- ✅ `@fluid-ds/animations`: attribute-driven keyframe animation system
+  (`data-fluid-animation`) plus an imperative **event-effects** engine
+  (`confetti`, `fireworks`, emoji / image burst + rain, snow, sparkles,
+  streamers, pulse, and a declarative `<fluid-celebrate>`), reduced-motion aware.
 
 ### Documentation & developer surfaces ✅
 - ✅ **Docs site** (Astro Starlight): guides, per-component pages with live
@@ -209,9 +219,10 @@ Kept out of the core so the base bundle stays lean:
 | `@fluid-ds/themes` | Brand presets (Midnight, Corporate) | ✅ |
 | `@fluid-ds/charts` | Charts (opt-in) | ✅ |
 | `@fluid-ds/markdown` | Markdown rendering (opt-in) | ✅ |
-| `@fluid-ds/qr` | QR codes (opt-in) | ✅ |
+| `@fluid-ds/qr` | QR codes, incl. logo-embedded fancy codes (opt-in) | ✅ |
+| `@fluid-ds/parser` | Blueprint-driven JSON / CSV / Excel file import (opt-in) | ✅ |
 | `@fluid-ds/media` | Video / media (opt-in) | ✅ |
-| `@fluid-ds/animations` | Attribute-driven animations (opt-in) | ✅ |
+| `@fluid-ds/animations` | Keyframe animations + event effects, e.g. confetti (opt-in) | ✅ |
 
 ---
 

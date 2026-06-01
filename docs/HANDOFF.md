@@ -32,6 +32,23 @@ to hand off context when you switch machines.
   `index.ts`, playground, and docs sidebar; OG image + marketing counts bumped
   to 101; changeset `core-components-batch-2.md` added.
 - **🚀 Launch status (LIVE on npm; website deploys on next push):**
+  - **v0.0.3-alpha.0 prepared (2026-06-01):** all 16 published `@fluid-ds/*`
+    package versions set to `0.0.3-alpha.0` (now incl. the new `@fluid-ds/parser`
+    pack, 12 packs total); `provenance: true` restored in every publishConfig
+    (the local publish flow strips it, then `git checkout -- packages` restores).
+    Gates green: typecheck, lint, coverage (122/101), test (all packages incl.
+    animations 24 / qr 14 / parser 87), build, docs:build (132 pages),
+    storybook:build. Pending the credentialed publish + Cloudflare deploy. Run
+    `corepack pnpm build:website` before deploying (landing badge now `v0.3
+    alpha`, new playground cards, new docs pages). Not in changesets pre-mode, so
+    versions are set manually (the pending `.changeset/*.md` files document the
+    changes but are NOT consumed by `changeset version`).
+  - **0.0.3 features (this session):** QR logo-embedded "fancy" codes
+    (`@fluid-ds/qr`), an event-effects engine + `<fluid-celebrate>`
+    (`@fluid-ds/animations/effects`), and a new blueprint-driven file-import pack
+    (`@fluid-ds/parser`: `parseFile`/`applyBlueprint` core + `fluid-file-parser`
+    / `fluid-column-mapper`). All built one-agent-per-feature, wired into
+    storybook globs / playground cards / docs sidebar, and browser-verified.
   - Model: **git is the source of truth; npm package + website are two outputs
     of the same commit.** The website consumes `@fluid-ds/*` via `workspace:*`,
     so they can't drift. The *user-facing* references (README/docs CDN snippets,
@@ -276,6 +293,69 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-06-01: landing effects polish + engine wind-down fix (0.0.3-alpha.0 build)
+
+- **Landing "New in v0.3" effect buttons no longer "naked".** The seven newer
+  effect triggers were `variant="ghost"` (transparent, read as unstyled); changed
+  to `secondary` to match the Fireworks / Emoji buttons (Confetti stays primary).
+- **Ambient effects now wind down gracefully instead of being yanked.** The user
+  saw an abrupt removal of all particles. Root cause was twofold:
+  - The landing wiring had a 10s GC `handle.stop()` backstop that cleared every
+    particle at once. **Removed it** entirely: ambient effects (snow, sparkles,
+    fountain, bubbles) now pass only `duration: 2500`, which stops SPAWNING; the
+    particles already on screen drift / fall off-viewport and die naturally, and
+    the shared overlay canvas tears itself down when the last one is gone.
+  - **Real engine bug in `@fluid-ds/animations` effects/engine.ts:** `tick`
+    called each emitter's `update` every frame as long as `!done`, ignoring the
+    documented contract that returning `false` means "spawn no more". So an
+    ambient effect with a `duration` kept respawning forever (the spawn happens
+    before the duration check in `update`) and never wound down. Fixed: the
+    engine tracks emitters whose `update` has returned `false` in a module-level
+    `WeakSet` (`spawnEnded`) and never calls `update` again, just letting the
+    remaining particles play out. New regression test (sparkles with a short
+    `duration` drains to zero emitters on its own, no `stop()`).
+- **Verified in-browser (Chrome DevTools MCP, :5175):** snow coverage rises to a
+  peak while spawning then *gradually* declines (0.28 → 0.23 → 0.15 → 0.06 →
+  0.01) as flakes fall off, and the overlay is removed by ~13s. No abrupt clear.
+  (Needed a Vite dep-cache clear + dev-server restart to pick up the rebuilt
+  animations dist; the optimizeDeps cache had masked the fix.)
+- **Gates:** `pnpm verify` green end-to-end (typecheck → lint → coverage → all
+  package tests incl. animations 28 / scheduler 50 / parser 87 → build + CEM);
+  `pnpm build:website` rebuilt the unified `website/` for deploy. Still pending
+  the credentialed npm publish (16 packages @ `0.0.3-alpha.0`, dist-tag `alpha`)
+  + the local `wrangler pages deploy website --project-name=fluid-25z
+  --branch=main`.
+
+### 2026-06-01: fluid-tour fixes (shadow-root targets + Fluid buttons)
+
+- **Root cause (theme builder):** the tour resolved step targets with
+  `document.querySelector`, which never pierces a shadow boundary. In the
+  playground the tour and its targets both live in `component-preview`'s shadow
+  root, so every selector returned null: no spotlight, popover centred. The
+  playground "Start tour" handler had the same flaw (`document.getElementById`)
+  and was bound to `<fluid-tour>` rather than the anchor row, so the button
+  click never reached it.
+- **Fixes:**
+  - `fluid-tour.ts` now resolves selectors via `resolveTarget()` against
+    `this.getRootNode()` (shadow root or document), falling back to `document`.
+    Correct general fix for any consumer using the tour inside a shadow root.
+  - Action controls are now real `<fluid-button>`s (Skip = ghost, Back =
+    secondary, Next/Done = primary), matching the design system. Focus trap +
+    initial focus updated to treat `fluid-button` hosts as focusables; initial
+    focus lands on the emphasised primary action.
+  - The primary action carries an emphasis glow ring (new
+    `--fluid-tour-highlight-ring-width` token; ring reuses
+    `--fluid-tour-highlight-ring`). JSDoc cssproperty/csspart kept accurate;
+    dropped the now-unused `--fluid-tour-accent-bg/-fg`, added
+    `--fluid-tour-focus-ring-color`.
+  - `apps/playground/src/preview.ts`: moved the start handler onto the anchor
+    row and resolve the tour via `getRootNode()`.
+- **Verified:** 15/15 tour tests green (added shadow-root target-resolution test
+  + fluid-button assertion); components build + CEM clean; playground typecheck
+  clean; lint clean. Browser (Chrome DevTools MCP, :5173): Start opens the tour,
+  spotlight lands on the target, Back/Next/Done advance, buttons are styled
+  `fluid-button`s.
 
 ### 2026-06-01: +26 core components (75 → 101)
 

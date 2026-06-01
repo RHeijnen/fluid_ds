@@ -1,10 +1,13 @@
 ---
 title: "@fluid-ds/qr"
-description: "QR-code web component rendered as crisp inline SVG. Themes via currentColor."
+description: "Fancy, logo-embeddable QR codes rendered as crisp inline SVG, with shaped modules, styled finder eyes, gradients, an artistic image mode, and PNG export."
 ---
 
 `<fluid-qr-code>` renders a QR code as inline SVG, so it scales without
-aliasing and inherits color via `currentColor`. Backed by
+aliasing and prints cleanly. It now goes well beyond plain black squares:
+embed a center logo, reshape the modules and the three finder eyes, paint a
+gradient, drop the whole code over a background image (artistic mode), and
+export to PNG. Backed by
 [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator).
 Expansion pack.
 
@@ -24,35 +27,187 @@ import "@fluid-ds/qr/define";
 <fluid-qr-code value="https://example.com" size="200"></fluid-qr-code>
 ```
 
+## Logo overlay
+
+Set `logo` to an image URL or data URI and a padded quiet area is knocked out
+of the center, with the logo drawn on top. **Setting `logo` automatically
+raises the error-correction level to `H`** (regardless of `ec-level`) so the
+modules the logo covers can still be reconstructed by a scanner. Keep
+`logo-size` at or below the clamped maximum of `0.3` (the default `0.22` is a
+safe, robust choice).
+
+```html
+<fluid-qr-code
+  value="https://example.com"
+  size="220"
+  logo="/brand-mark.svg"
+  logo-size="0.24"
+  logo-padding="0.5"
+  logo-radius="2"
+></fluid-qr-code>
+```
+
+The logo is decorative: the code already encodes `value`. Describe the
+destination for assistive tech via `label` (see [Accessibility](#accessibility)).
+
+## Module and eye styling
+
+`module-shape` reshapes the data modules; `eye-shape` and `eye-color` restyle
+the three finder patterns independently, and you can override a single eye.
+
+```html
+<!-- Soft dots with rounded eyes -->
+<fluid-qr-code
+  value="https://example.com"
+  size="220"
+  module-shape="dots"
+  eye-shape="rounded"
+></fluid-qr-code>
+```
+
+```html
+<!-- Colored eyes, with one corner overridden -->
+<fluid-qr-code
+  value="https://example.com"
+  size="220"
+  module-shape="rounded"
+  eye-shape="circle"
+  eye-color="#4f46e5"
+  eye-color-top-left="#db2777"
+></fluid-qr-code>
+```
+
+A linear gradient fills the modules when both ends are set:
+
+```html
+<fluid-qr-code
+  value="https://example.com"
+  size="220"
+  module-shape="dots"
+  gradient-from="#4f46e5"
+  gradient-to="#db2777"
+  gradient-angle="45"
+></fluid-qr-code>
+```
+
+## Artistic mode
+
+`artistic` renders the provided `logo`/`image` as a full-bleed background and
+draws the data modules as semi-opaque dots on top (a halftone-style overlay).
+It forces `ec-level` to `H` and keeps the finder eyes solid so the code stays
+locatable.
+
+```html
+<fluid-qr-code
+  value="https://example.com"
+  size="240"
+  artistic
+  logo="/photo.jpg"
+  artistic-opacity="0.85"
+></fluid-qr-code>
+```
+
+:::caution
+Artistic codes are decorative-first. Contrast between the dots and the image
+can drop below what some scanners tolerate. Always scan-test an artistic code
+on a real phone (and at the size you will actually print or display it) before
+shipping one.
+:::
+
+## Export to PNG
+
+Two imperative methods rasterize the SVG via a `<canvas>`:
+
+```ts
+const el = document.querySelector("fluid-qr-code");
+
+// Get a PNG data URL (default 2x scale for crisp output).
+const dataUrl = await el.toDataURL();
+
+// Or trigger a browser download.
+await el.download("my-qr.png");
+```
+
+If you embed a cross-origin `logo` without CORS headers the canvas becomes
+tainted and export rejects; serve the image same-origin or with CORS enabled.
+
 ## Props
 
 | Prop | Default | Description |
 | --- | --- | --- |
 | `value` | `""` | The data to encode |
 | `size` | `160` | Pixel size of the rendered code |
-| `ec-level` | `"M"` | Error correction: `L`, `M`, `Q`, `H` |
-| `fill` | `currentColor` | Foreground color |
-| `background` | `transparent` | Background color |
-| `margin` | `2` | Module margin (in modules) |
+| `ec-level` | `"M"` | Error correction: `L`, `M`, `Q`, `H`. Forced to `H` when `logo` is set or `artistic` is on |
+| `fill` | token | Module color (falls back to `--fluid-qr-color`) |
+| `background` | token | Background color (falls back to `--fluid-qr-bg`) |
+| `margin` | `2` | Quiet-zone margin, in modules |
+| `label` | `""` | Accessible name; derived from `value` when empty |
+| `module-shape` | `"square"` | `square`, `dots`, or `rounded` |
+| `eye-shape` | `"square"` | `square`, `rounded`, or `circle` |
+| `eye-color` | token | Finder-eye color (falls back to `--fluid-qr-eye-color`, then the module color) |
+| `eye-color-top-left` | `""` | Per-eye color override |
+| `eye-color-top-right` | `""` | Per-eye color override |
+| `eye-color-bottom-left` | `""` | Per-eye color override |
+| `gradient-from` | `""` | Gradient start color (both ends required) |
+| `gradient-to` | `""` | Gradient end color |
+| `gradient-angle` | `45` | Gradient angle, degrees |
+| `logo` | `""` | Center logo URL / data URI (forces `ec-level=H`) |
+| `logo-size` | `0.22` | Logo size as a fraction of the code (clamped to `0.3`) |
+| `logo-padding` | `0.5` | Knockout padding around the logo, in modules |
+| `logo-background` | token | Knockout plate color (falls back to `--fluid-qr-logo-bg`) |
+| `logo-radius` | `1` | Knockout plate corner radius, in modules |
+| `artistic` | `false` | Render `logo` as a full-bleed background behind dotted modules |
+| `artistic-opacity` | `0.85` | Module opacity in artistic mode |
+
+### Methods
+
+| Method | Returns | Description |
+| --- | --- | --- |
+| `toDataURL(scale?)` | `Promise<string>` | PNG data URL of the rendered code |
+| `download(filename?)` | `Promise<void>` | Rasterize and download a PNG |
+
+## CSS parts and tokens
+
+Every painted role reads a component-scoped token that falls back to a Fluid
+semantic variable, so you can retheme one instance, every QR, or the whole
+brand:
+
+| Token | Falls back to | Role |
+| --- | --- | --- |
+| `--fluid-qr-color` | `--fluid-text-primary` | Module color |
+| `--fluid-qr-bg` | `--fluid-surface-base` | Background |
+| `--fluid-qr-eye-color` | the module color | Finder-eye color |
+| `--fluid-qr-logo-bg` | `--fluid-surface-base` | Logo knockout plate |
+| `--fluid-qr-gap` | `0` (`0.1` for dots) | Inter-module gap, fraction of a module (0 to 0.4) |
+
+Exposed `::part()`s: `base` / `svg`, `background`, `modules`, `module`, `eyes`,
+`eye`, `eye-frame`, `eye-pupil`, `logo`, `logo-image`, `image`.
 
 ## Theming
 
-Because the foreground is `currentColor`, one rule themes every QR on
-the page:
-
 ```css
 [data-fluid-brand="custom"] fluid-qr-code {
-  color: var(--fluid-color-primary);
+  --fluid-qr-color: var(--fluid-color-primary);
+  --fluid-qr-eye-color: var(--fluid-color-primary);
 }
 ```
 
 ## When to use
 
-- Wi-Fi credentials, contact cards, app-store links: anywhere a
-  scannable code shortens the path to "open this on my phone".
-- Higher `ec-level` (`Q` or `H`) tolerates more visual decoration over
-  the code at the cost of denser modules. Use `H` when you want to
-  paste a logo into the center.
+- Wi-Fi credentials, contact cards, app-store links: anywhere a scannable code
+  shortens the path to "open this on my phone".
+- Reach for a `logo`, shaped modules, or a gradient when the code is part of
+  branded collateral (a poster, a business card, a packaging insert).
+- Use `artistic` sparingly and only after scan-testing: it trades reliability
+  for visual impact.
+
+## Accessibility
+
+The SVG carries `role="img"` and an accessible name. By default the name is
+derived from `value`; set `label` to describe the destination in human terms
+(for example `label="Open the Fluid docs"`) so screen-reader users learn where
+the code leads. The embedded logo is decorative and is not separately
+announced, the code still encodes `value`.
 
 ## License
 

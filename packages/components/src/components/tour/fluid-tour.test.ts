@@ -80,20 +80,34 @@ describe("<fluid-tour>", () => {
   it("renders Done (not Next) on the last step", async () => {
     const el = await fixture<FluidTour>(html`<fluid-tour open index="2" .steps=${steps}></fluid-tour>`);
     await elementUpdated(el);
-    expect(el.shadowRoot!.querySelector(".btn-primary")!.textContent!.trim()).to.equal("Done");
+    expect(el.shadowRoot!.querySelector(".action-next")!.textContent!.trim()).to.equal("Done");
   });
 
   it("hides the Back button on the first step", async () => {
     const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
     await elementUpdated(el);
-    expect(el.shadowRoot!.querySelector(".btn-secondary")).to.be.null;
+    expect(el.shadowRoot!.querySelector(".action-back")).to.be.null;
+  });
+
+  it("renders its action controls as fluid-button elements", async () => {
+    const el = await fixture<FluidTour>(html`<fluid-tour open index="1" .steps=${steps}></fluid-tour>`);
+    await elementUpdated(el);
+    const next = el.shadowRoot!.querySelector(".action-next")!;
+    const back = el.shadowRoot!.querySelector(".action-back")!;
+    const skip = el.shadowRoot!.querySelector(".action-skip")!;
+    expect(next.localName).to.equal("fluid-button");
+    expect(back.localName).to.equal("fluid-button");
+    expect(skip.localName).to.equal("fluid-button");
+    // The advance action is the primary (emphasised) variant.
+    expect(next.getAttribute("variant")).to.equal("primary");
   });
 
   it("fires fluid-skip from the Skip button", async () => {
     const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
     await elementUpdated(el);
-    const skip = el.shadowRoot!.querySelector<HTMLButtonElement>(".btn-ghost")!;
-    setTimeout(() => skip.click());
+    const skip = el.shadowRoot!.querySelector<HTMLElement>(".action-skip")!;
+    const innerBtn = skip.shadowRoot!.querySelector<HTMLButtonElement>("button")!;
+    setTimeout(() => innerBtn.click());
     const event = await oneEvent(el, "fluid-skip");
     expect(event).to.exist;
     expect(el.open).to.be.false;
@@ -129,6 +143,33 @@ describe("<fluid-tour>", () => {
     const live = el.shadowRoot!.querySelector('[aria-live="polite"]')!;
     expect(live.textContent).to.contain("Step 1 of 3");
     expect(live.textContent).to.contain("First");
+  });
+
+  it("resolves targets when the tour lives inside a shadow root", async () => {
+    // A host whose shadow root holds BOTH the spotlight target and the tour.
+    // document.querySelector cannot pierce this boundary, so the tour must
+    // resolve selectors against its own root node.
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const shadow = host.attachShadow({ mode: "open" });
+    shadow.innerHTML = `
+      <button id="shadow-target" style="position:fixed;top:40px;left:40px;width:80px;height:30px;">T</button>
+      <fluid-tour id="shadow-tour"></fluid-tour>
+    `;
+    const tour = shadow.querySelector<FluidTour>("#shadow-tour")!;
+    tour.steps = [{ target: "#shadow-target", title: "Hi", body: "Body.", placement: "bottom" }];
+    tour.open = true;
+    await elementUpdated(tour);
+    await aTimeout(50);
+
+    const highlight = tour.shadowRoot!.querySelector<HTMLElement>(".highlight")!;
+    // A resolved target shows the spotlight cutout (display:block); an
+    // unresolved selector hides it (display:none) and centres the popover.
+    expect(highlight.style.display).to.equal("block");
+    expect(parseFloat(highlight.style.width)).to.be.greaterThan(0);
+
+    tour.open = false;
+    host.remove();
   });
 
   it("passes a11y audit", async () => {

@@ -38,6 +38,8 @@ const preview: Preview = {
           "Editor",
           "Kanban",
           "Map",
+          "Parser",
+          "QR",
           "*"
         ]
       }

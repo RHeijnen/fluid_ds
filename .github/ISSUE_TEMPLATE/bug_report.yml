@@ -15,7 +15,7 @@ body:
     attributes:
       label: Package + version
       description: Which Fluid package + version are you using? Run `npm ls @fluid-ds/components` or check your `package.json`.
-      placeholder: "@fluid-ds/components@0.0.1-alpha.3"
+      placeholder: "@fluid-ds/components@0.0.3-alpha.0"
     validations:
       required: true
 

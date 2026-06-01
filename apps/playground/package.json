@@ -28,7 +28,9 @@
     "@fluid-ds/scheduler": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",
-    "lit": "^3.2.1"
+    "lit": "^3.2.1",
+    "@fluid-ds/animations": "workspace:*",
+    "@fluid-ds/parser": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

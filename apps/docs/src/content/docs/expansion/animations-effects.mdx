@@ -1,0 +1,246 @@
+---
+title: "@fluid-ds/animations: effects"
+description: "Imperative canvas celebration effects for Fluid: confetti, fireworks, emoji rain, snow, sparkles, streamers, pulse, and more. Zero dependencies, reduced-motion aware."
+---
+
+The `@fluid-ds/animations` pack ships two systems side by side. The
+[attribute-driven keyframe registry](/guides/animations/) animates elements
+in place; the **effects** subsystem (new in `0.0.3-alpha.0`) adds imperative
+"event" celebrations that paint on a shared overlay canvas: confetti on a
+purchase, fireworks on a milestone, snow over the holidays, a sparkle around a
+premium call to action.
+
+The engine is a tiny self-contained particle system with zero third-party
+dependencies. One pooled full-viewport `<canvas>` (fixed, click-through, top
+layer) is shared by every active burst and driven by a single
+`requestAnimationFrame` loop. The canvas is decorative: it is
+`aria-hidden="true"`, never focusable, and is removed automatically when no
+effect is running.
+
+Every effect honors `prefers-reduced-motion: reduce`. In that mode nothing
+animates: the effect either no-ops or paints a single brief static flash, then
+resolves.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/animations
+```
+
+The effects API is a pure function module (tree-shakable, no side effects):
+
+```ts
+import { confetti, fireworks } from "@fluid-ds/animations/effects";
+```
+
+The declarative element is a side-effect import that registers
+`<fluid-celebrate>`:
+
+```ts
+import "@fluid-ds/animations/define/celebrate";
+```
+
+## The handle
+
+Every effect returns an `EffectHandle`:
+
+```ts
+interface EffectHandle {
+  stop(): void;            // halt now (idempotent)
+  finished: Promise<void>; // resolves when the burst ends, or on stop()
+}
+```
+
+For point bursts (confetti, fireworks) `finished` resolves when the last
+particle dies. For ambient effects (snow, sparkles, emoji rain) it resolves
+when you call `stop()`.
+
+## Effects
+
+| Function | Kind | Notes |
+| --- | --- | --- |
+| `confetti(opts)` | point burst | `origin`, plus a `cannons` two-sided option |
+| `fireworks(opts)` | sequence | rockets launch and explode at their apex |
+| `emojiBurst(opts)` | point burst | custom emoji array OR image URLs |
+| `emojiRain(opts)` | ambient | emoji or images falling from above |
+| `emojiFountain(opts)` | ambient | emoji spraying up from a point and arcing back |
+| `bubbles(opts)` | ambient | translucent bubbles drifting up and popping |
+| `snow(opts)` | ambient | gentle falling flakes, runs until stopped |
+| `sparkles(opts)` | ambient | subtle shimmer around an element |
+| `streamers(opts)` | point burst | fluttering ribbon strips |
+| `pulse(opts)` | one-shot | success ripple expanding from an element |
+| `stars(opts)` | point burst | preset emoji burst of stars |
+| `hearts(opts)` | point burst | preset emoji burst of hearts |
+| `pride(opts)` | point burst | rainbow-palette confetti cannons |
+
+### Origin
+
+Point effects accept an `origin` as an **element** (uses its center), an
+absolute **viewport point** `{ x, y }`, or a **relative point**
+`{ rx, ry }` in `[0, 1]` on each axis. The default is horizontal center,
+near the top.
+
+### Colors
+
+Colors default to the live Fluid brand accent plus the semantic status tones,
+read from CSS custom properties on the document, so a burst always matches the
+active brand and theme. Override per call with a `colors` array.
+
+```ts
+confetti({ colors: ["#ff4d4f", "#ffd166", "#06d6a0"] });
+```
+
+## Examples
+
+### Confetti on purchase
+
+The canonical "order confirmed" celebration, fired from the button the user
+clicked:
+
+```ts
+import { confetti } from "@fluid-ds/animations/effects";
+
+document.querySelector("#buy")?.addEventListener("click", async (e) => {
+  await checkout();
+  confetti({ origin: e.currentTarget as HTMLElement });
+});
+```
+
+Two-sided cannons for a bigger moment:
+
+```ts
+confetti({ cannons: true, count: 160 });
+```
+
+### Fireworks
+
+```ts
+import { fireworks } from "@fluid-ds/animations/effects";
+
+const show = fireworks({ shells: 8, interval: 400 });
+await show.finished; // resolves after the last shell fades
+```
+
+### Emoji rain (and image rain)
+
+```ts
+import { emojiRain } from "@fluid-ds/animations/effects";
+
+// Custom emoji
+const rain = emojiRain({ emojis: ["🎉", "🥳", "🎈"], rate: 30 });
+setTimeout(() => rain.stop(), 5000);
+
+// Or rain your logo: pass loaded images as particles
+const logo = new Image();
+logo.src = "/logo.svg";
+logo.onload = () => emojiRain({ images: [logo], rate: 12, duration: 6000 });
+```
+
+### Custom emoji, randomised per particle
+
+Every emoji effect (`emojiBurst`, `emojiRain`, `emojiFountain`, and the `stars`
+/ `hearts` presets) takes an `emojis` array. Each spawned particle picks one
+glyph at random from the array, so a mixed set reads as a varied shower:
+
+```ts
+import { emojiBurst, emojiFountain } from "@fluid-ds/animations/effects";
+
+// A random mix per particle
+emojiBurst({ emojis: ["🎉", "❤️", "🔥", "⭐", "🫧"] });
+
+// A fountain that sprays up from the bottom and arcs back down
+const jet = emojiFountain({ emojis: ["🎈", "✨"], rate: 26 });
+setTimeout(() => jet.stop(), 4000);
+```
+
+### Snow until stopped
+
+```ts
+import { snow } from "@fluid-ds/animations/effects";
+
+const winter = snow();          // ambient, runs forever
+// ...later
+winter.stop();
+```
+
+### Sparkles around a premium CTA
+
+```ts
+import { sparkles } from "@fluid-ds/animations/effects";
+
+const cta = document.querySelector("#upgrade") as HTMLElement;
+const shimmer = sparkles({ origin: cta });
+// stop on navigation away, or pass { duration: 4000 }
+```
+
+### Success pulse
+
+```ts
+import { pulse } from "@fluid-ds/animations/effects";
+
+saveButton.addEventListener("click", () => {
+  pulse({ origin: saveButton, colors: ["var(--fluid-success-base)"] });
+});
+```
+
+## The `<fluid-celebrate>` component
+
+Prefer declarative? `<fluid-celebrate>` wraps the same presets. It renders
+nothing visible (`display: contents`); the effect draws on the shared canvas.
+
+```ts
+import "@fluid-ds/animations/define/celebrate";
+```
+
+Fire on mount with `auto`:
+
+```html
+<fluid-celebrate effect="confetti" auto></fluid-celebrate>
+```
+
+Fire imperatively and react to the end:
+
+```html
+<fluid-celebrate id="party" effect="fireworks"></fluid-celebrate>
+<script type="module">
+  const party = document.getElementById("party");
+  party.addEventListener("fluid-celebrate-end", () => console.log("done"));
+  document.getElementById("win")?.addEventListener("click", () => party.fire());
+</script>
+```
+
+### Attributes and properties
+
+| Name | Type | Notes |
+| --- | --- | --- |
+| `effect` | attribute | preset name (default `confetti`) |
+| `auto` | boolean attr | fire once on connect |
+| `count` | number attr | particles, forwarded to the preset |
+| `colors` | attr or `.colors` prop | space/comma list, or a JS array |
+| `emojis` | `emojis` attr or `.emojis` prop | glyph list (`"🎉 ❤️ 🔥"`) or a JS array; picked at random per particle |
+| `origin` | attr | `"self"`, `"x,y"`, or relative `"rx,ry"` (both in `[0,1]`) |
+| `cannons` | boolean attr | two-sided confetti / pride |
+| `shells`, `rate`, `duration`, `spread` | number attrs | forwarded where the preset uses them |
+
+### Methods and events
+
+| Member | Description |
+| --- | --- |
+| `fire()` | fires the configured effect once; resolves when it ends |
+| `stop()` | stops the current effect |
+| `fluid-celebrate-end` | event (bubbles, composed) dispatched when a burst finishes |
+
+## Accessibility
+
+The canvas is purely decorative: `aria-hidden="true"`, `pointer-events: none`,
+`tabindex="-1"`, so it never intercepts clicks or focus and is invisible to
+assistive technology. Celebrations carry no information that isn't already
+conveyed elsewhere (the order confirmation, the success toast); the effect is
+an enhancement, not the message.
+
+All effects respect `prefers-reduced-motion: reduce`: they do not animate, and
+ambient effects resolve immediately instead of running indefinitely.
+
+## License
+
+MIT

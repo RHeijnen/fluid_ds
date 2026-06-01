@@ -34,6 +34,7 @@ type Thumb = "min" | "max";
  * @cssproperty --fluid-range-slider-track-color - Unfilled track color. Falls back to --fluid-color-neutral-200.
  * @cssproperty --fluid-range-slider-fill-color - Selected-range color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-range-slider-thumb-color - Thumb color. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-range-slider-thumb-radius - Corner radius of the thumbs and the selected-range fill (they share it so the fill caps match the handles). Falls back to 3px.
  * @cssproperty --fluid-range-slider-track-size - Track thickness. Falls back to 8px.
  * @cssproperty --fluid-range-slider-radius - Track corner radius. Falls back to --fluid-radius-full.
  * @cssproperty --fluid-range-slider-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
@@ -94,12 +95,18 @@ export class FluidRangeSlider extends FluidFormAssociated {
         box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.06);
       }
 
-      /* The selected-range segment between the two thumbs. */
+      /*
+       * The selected-range segment between the two thumbs. It sits on the rail
+       * at the track's thickness (not the full row height), and uses the THUMB's
+       * corner radius (not the rail's pill radius) so its ends read as clean caps
+       * tucked under the handles rather than a fat floating pill.
+       */
       .fill {
         position: absolute;
-        top: 0;
-        bottom: 0;
-        border-radius: var(--fluid-range-slider-radius, var(--fluid-radius-full));
+        top: 50%;
+        height: var(--fluid-range-slider-track-size, 8px);
+        transform: translateY(-50%);
+        border-radius: var(--fluid-range-slider-thumb-radius, 3px);
         background: var(--fluid-range-slider-fill-color, var(--fluid-accent-base));
       }
 
@@ -116,7 +123,7 @@ export class FluidRangeSlider extends FluidFormAssociated {
         background-color: var(--fluid-range-slider-thumb-color, var(--fluid-accent-base));
         background-image: var(--fluid-gradient-glossy);
         border: none;
-        border-radius: 3px;
+        border-radius: var(--fluid-range-slider-thumb-radius, 3px);
         padding: 0;
         cursor: pointer;
         box-shadow:

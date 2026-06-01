@@ -138,7 +138,8 @@ const PREVIEW_EXEMPT = new Set([
   "fluid-intersection-observer",
   "fluid-animation", // motion primitive, display:contents wrapper, no visual surface
   "fluid-hotkey", // non-visual keyboard-shortcut behavior wrapper, renders nothing
-  "fluid-aspect-ratio" // layout primitive (constrains a box to a ratio), nothing to theme/preview
+  "fluid-aspect-ratio", // layout primitive (constrains a box to a ratio), nothing to theme/preview
+  "fluid-form" // non-visual form-coordination wrapper; slots native inputs and has no visual surface of its own
 ]);
 
 /**

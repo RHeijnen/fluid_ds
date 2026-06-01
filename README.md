@@ -28,16 +28,20 @@ accessible out of the box.
 - **101 components** in the core package: buttons, inputs, date pickers, menus,
   command palette, dialogs, drawers, tooltips, tabs, trees, pagination, timeline,
   and a lot more, each one a standard custom element.
-- **Four expansion packs** so the core stays lean:
-  `@fluid-ds/charts` (Chart.js), `@fluid-ds/markdown` (marked),
-  `@fluid-ds/qr` (qrcode-generator), `@fluid-ds/media` (video, animated images,
-  zoomable frames).
+- **12 expansion packs** so the core stays lean: `@fluid-ds/charts` (Chart.js),
+  `@fluid-ds/scheduler` (appointment booking), `@fluid-ds/table` (data grid),
+  `@fluid-ds/calendar` (event calendar), `@fluid-ds/editor` (rich text),
+  `@fluid-ds/kanban` (drag-and-drop board), `@fluid-ds/map` (Leaflet),
+  `@fluid-ds/markdown` (marked), `@fluid-ds/qr` (QR codes, incl. logo-embedded
+  fancy codes), `@fluid-ds/parser` (blueprint-driven file import),
+  `@fluid-ds/media` (video, audio, animated images, zoomable frames, lightbox),
+  and `@fluid-ds/animations` (keyframe animations + event effects).
 - **Three layers of theming.** Override a brand-wide token with one rule,
   scope changes to one component type, or isolate a single instance, they
   compose.
 - **Accessibility first.** Every component carries the right ARIA pattern,
   keyboard support, and a [`@open-wc/testing`][owc] audit in the test suite
-  (380+ tests, all passing).
+  (1,000+ tests, all passing).
 - **A real icon set.** 1,500+ [lucide][lucide] icons available as per-icon
   tree-shakable modules, plus a curated default subset and a
   `loadIcon(name)` lazy loader.
@@ -135,14 +139,22 @@ See [docs → Theming basics][theming] for the full breakdown.
 
 | Package | Purpose |
 | --- | --- |
-| [`@fluid-ds/components`](./packages/components) | The web components themselves. 57 elements, one `/define/<name>` import each so unused components stay shakable. |
+| [`@fluid-ds/components`](./packages/components) | The web components themselves. 101 component families (122 elements), one `/define/<name>` import each so unused components stay shakable. |
 | [`@fluid-ds/tokens`](./packages/tokens) | Design tokens, primitives, semantics (light + dark), generated CSS files, and a JSON manifest the theme builder consumes. |
 | [`@fluid-ds/themes`](./packages/themes) | Pre-baked brand themes (CSS only, no JS). |
 | [`@fluid-ds/icons`](./packages/icons) | Icon registry. Pre-registers a curated lucide subset + exposes `loadIcon(name)` and per-icon modules under `@fluid-ds/icons/lucide/<name>`. |
 | [`@fluid-ds/charts`](./packages/charts) | Chart.js wrappers, bar, line, pie, doughnut, scatter, bubble, radar, polar area, sparkline. |
+| [`@fluid-ds/scheduler`](./packages/scheduler) | Accessible appointment scheduler, time-slot radiogroup, availability editor + engine. |
+| [`@fluid-ds/table`](./packages/table) | Accessible data grid (sortable, selectable, semantic `<table>`). |
+| [`@fluid-ds/calendar`](./packages/calendar) | Event calendar (month view of events). |
+| [`@fluid-ds/editor`](./packages/editor) | Lightweight accessible rich-text editor. |
+| [`@fluid-ds/kanban`](./packages/kanban) | Drag-and-drop board with a full keyboard path. |
+| [`@fluid-ds/map`](./packages/map) | Themed Leaflet map wrapper with markers. |
 | [`@fluid-ds/markdown`](./packages/markdown) | `<fluid-markdown>`, renders Markdown to themed HTML. |
-| [`@fluid-ds/qr`](./packages/qr) | `<fluid-qr-code>`, themable QR code rendered as SVG. |
-| [`@fluid-ds/media`](./packages/media) | Video player, video playlist, animated image, zoomable frame, Web-Animations wrapper. |
+| [`@fluid-ds/qr`](./packages/qr) | `<fluid-qr-code>`, themable QR codes incl. logo-embedded fancy codes. |
+| [`@fluid-ds/parser`](./packages/parser) | Blueprint-driven JSON / CSV / Excel file import (`<fluid-file-parser>` / `<fluid-column-mapper>`). |
+| [`@fluid-ds/media`](./packages/media) | Video player, video playlist, animated image, zoomable frame, audio player, lightbox gallery. |
+| [`@fluid-ds/animations`](./packages/animations) | Attribute-driven keyframe animations + an event-effects engine (confetti, fireworks, `<fluid-celebrate>`). |
 
 ---
 
@@ -187,7 +199,7 @@ pnpm verify
 2. `pnpm lint`: flat-config ESLint with the Lit a11y plugin
 3. `pnpm check:coverage`: enforces every component has a Storybook entry and
    a theme-builder card (or is on the visual-exempt list)
-4. `pnpm test`: `@web/test-runner` + Playwright, 380+ component tests
+4. `pnpm test`: `@web/test-runner` + Playwright, 1,000+ component tests
 5. `pnpm build`: all packages
 
 See **[`docs/HANDOFF.md`](./docs/HANDOFF.md)** for the cross-device session

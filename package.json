@@ -26,7 +26,7 @@
     "wizard:build": "pnpm --filter @fluid-ds/wizard build",
     "analyze": "pnpm --filter @fluid-ds/components analyze",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter @fluid-ds/components --filter @fluid-ds/scheduler --filter @fluid-ds/media --filter @fluid-ds/table --filter @fluid-ds/calendar --filter @fluid-ds/editor --filter @fluid-ds/kanban --filter @fluid-ds/map test",
+    "test": "pnpm --filter @fluid-ds/components --filter @fluid-ds/scheduler --filter @fluid-ds/media --filter @fluid-ds/table --filter @fluid-ds/calendar --filter @fluid-ds/editor --filter @fluid-ds/kanban --filter @fluid-ds/map --filter @fluid-ds/animations --filter @fluid-ds/qr --filter @fluid-ds/parser test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

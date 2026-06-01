@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/kanban",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "description": "Accessible kanban board web component for Fluid (expansion pack): drag-and-drop columns and cards with keyboard moves.",
   "type": "module",
   "license": "MIT",
@@ -26,7 +26,6 @@
   "publishConfig": {
     "access": "public",
     "tag": "alpha",
-    "provenance": true,
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -36,7 +35,8 @@
         "types": "./dist/components/*/define.d.ts",
         "import": "./dist/components/*/define.js"
       }
-    }
+    },
+    "provenance": true
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",

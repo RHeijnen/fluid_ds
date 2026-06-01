@@ -350,6 +350,62 @@ footer.site-footer a {
 }
 
 /* ------------------------------------------------------------------ */
+/* "New in v0.3" showcase */
+
+.whatsnew-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+.wn-card { height: 100%; }
+.wn-blurb {
+  margin: 0.5rem 0 0;
+  color: var(--fluid-text-secondary);
+  font-size: 0.95rem;
+}
+/* A consistent stage at the bottom of each card so the QR, buttons, and
+   parser mock all align to the same baseline regardless of content height. */
+.wn-stage {
+  margin-top: 1.1rem;
+  min-height: 12rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--fluid-radius-md);
+  background: var(--fluid-surface-sunken, var(--fluid-surface-muted));
+  padding: 1rem;
+}
+.fx-actions {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.wn-parser {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 16rem;
+}
+.wn-drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem;
+  border: 1.5px dashed var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+  color: var(--fluid-text-secondary);
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.85rem;
+}
+.wn-parser-note {
+  font-size: 0.8rem;
+  color: var(--fluid-text-secondary);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
 /* Expansion packs + surface/framework cards */
 
 .pack-name {

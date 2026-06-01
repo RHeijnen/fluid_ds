@@ -3,8 +3,15 @@ import { property, state, query } from "lit/decorators.js";
 import { autoUpdate, computePosition, flip, offset, shift, type Placement } from "@floating-ui/dom";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
+// The tour's action controls are real Fluid buttons, so they match the rest of
+// the design system. Side-effect import registers <fluid-button>.
+import "../button/define.js";
 
-/** One stop in the tour. `target` is a CSS selector resolved against the document. */
+/**
+ * One stop in the tour. `target` is a CSS selector resolved against the tour's
+ * own root node (its containing document or shadow root), so a tour that lives
+ * inside a shadow root spotlights elements in that same root.
+ */
 export interface FluidTourStep {
   /** CSS selector for the element to spotlight. */
   target: string;
@@ -46,9 +53,9 @@ let counter = 0;
  * @csspart body - The step body copy.
  * @csspart counter - The "Step n of m" text.
  * @csspart actions - The button row.
- * @csspart back - The Back button.
- * @csspart next - The Next / Done button.
- * @csspart skip - The Skip button.
+ * @csspart back - The Back action (a fluid-button).
+ * @csspart next - The Next / Done action (a fluid-button, the emphasised primary action).
+ * @csspart skip - The Skip action (a fluid-button).
  *
  * Every styled property reads a component-scoped `--fluid-tour-*` token that
  * falls back to a main semantic var (the override ladder).
@@ -63,10 +70,9 @@ let counter = 0;
  * @cssproperty --fluid-tour-font-family - Popover font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-tour-scrim - Scrim color (the dim outside the cutout). Falls back to a translucent black.
  * @cssproperty --fluid-tour-highlight-radius - Spotlight cutout corner radius. Falls back to --fluid-radius-md.
- * @cssproperty --fluid-tour-highlight-ring - Spotlight outline color. Falls back to --fluid-accent-base.
- * @cssproperty --fluid-tour-accent-bg - Primary button background. Falls back to --fluid-accent-base.
- * @cssproperty --fluid-tour-accent-fg - Primary button text. Falls back to --fluid-accent-text.
- * @cssproperty --fluid-tour-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
+ * @cssproperty --fluid-tour-highlight-ring - Spotlight outline color, also the emphasis glow on the primary action. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-tour-highlight-ring-width - Width of the emphasis glow around the primary (Next / Done) action. Falls back to 3px.
+ * @cssproperty --fluid-tour-focus-ring-color - Focus ring color for the action buttons. Falls back to --fluid-focus-ring-color.
  *
  * @uses-token --fluid-surface-base - Popover background.
  * @uses-token --fluid-text-primary - Popover text.
@@ -201,57 +207,30 @@ export class FluidTour extends FluidElement {
         flex: 1;
       }
 
-      .btn {
-        all: unset;
-        box-sizing: border-box;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: max(1.75rem, var(--fluid-target-min, 0px));
-        min-width: max(1.75rem, var(--fluid-target-min, 0px));
-        padding: 0 var(--fluid-space-3, 0.75rem);
-        border-radius: var(--fluid-radius-md, 8px);
-        font-size: var(--fluid-font-size-sm, 0.875rem);
-        font-weight: var(--fluid-font-weight-medium, 500);
-        cursor: pointer;
-        transition: background-color
-          calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1))
-          var(--fluid-easing-standard, ease);
-      }
-      .btn:focus-visible {
-        outline: var(--fluid-tour-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
-          var(--fluid-focus-ring-color, var(--fluid-accent-base));
-        outline-offset: var(--fluid-focus-ring-offset, 2px);
-      }
-
-      .btn-ghost {
-        color: var(--fluid-tour-muted-fg, var(--fluid-text-secondary));
-        padding-inline: var(--fluid-space-2, 0.5rem);
-      }
-      .btn-ghost:hover {
-        background: color-mix(in srgb, currentColor 10%, transparent);
-        color: var(--fluid-tour-fg, var(--fluid-text-primary));
-      }
-
-      .btn-secondary {
-        color: var(--fluid-tour-fg, var(--fluid-text-primary));
-        box-shadow: inset 0 0 0 var(--fluid-tour-border-width, 1px)
-          var(--fluid-tour-border, var(--fluid-border-default));
-      }
-      .btn-secondary:hover {
-        background: color-mix(in srgb, currentColor 8%, transparent);
-      }
-
-      .btn-primary {
-        background: var(--fluid-tour-accent-bg, var(--fluid-accent-base));
-        color: var(--fluid-tour-accent-fg, var(--fluid-accent-text));
-      }
-      .btn-primary:hover {
-        background: color-mix(
-          in srgb,
-          var(--fluid-tour-accent-bg, var(--fluid-accent-base)) 88%,
-          black
+      /*
+       * The action buttons are real <fluid-button>s, so they inherit the design
+       * system's look, sizing, focus ring, and target-size floor. The tour's job
+       * is only to EMPHASISE its own primary action so the user always sees where
+       * to click next: a soft glow ring around the advance (Next / Done) button.
+       * The ring color reads the component-scoped accent token, falling back to
+       * the main accent var (the override ladder), and is suppressed under
+       * reduced-motion-agnostic rules (it is a static ring, no animation).
+       */
+      .action::part(base) {
+        --fluid-button-focus-ring-color: var(
+          --fluid-tour-focus-ring-color,
+          var(--fluid-focus-ring-color, var(--fluid-accent-base))
         );
+      }
+      .action-next {
+        border-radius: var(--fluid-radius-md, 8px);
+        box-shadow:
+          0 0 0 var(--fluid-tour-highlight-ring-width, 3px)
+            color-mix(
+              in srgb,
+              var(--fluid-tour-highlight-ring, var(--fluid-accent-base)) 35%,
+              transparent
+            );
       }
 
       .sr-only {
@@ -390,13 +369,29 @@ export class FluidTour extends FluidElement {
     restore?.focus?.();
   }
 
+  /**
+   * Resolve a step's CSS selector against the tour's own root node first, then
+   * fall back to the document. `document.querySelector` never pierces a shadow
+   * boundary, so a tour rendered inside a shadow root (the theme-builder
+   * playground, or any consumer's component) must query its containing root to
+   * find the elements it spotlights.
+   */
+  private resolveTarget(selector: string): HTMLElement | null {
+    const root = this.getRootNode();
+    if (root instanceof ShadowRoot || root instanceof Document) {
+      const inRoot = root.querySelector<HTMLElement>(selector);
+      if (inRoot) return inRoot;
+    }
+    return document.querySelector<HTMLElement>(selector);
+  }
+
   /** Resolve the current target, place the spotlight + popover, move focus. */
   private async applyStep(): Promise<void> {
     const step = this.currentStep;
     if (!step) return;
     await this.updateComplete;
 
-    const target = document.querySelector<HTMLElement>(step.target);
+    const target = this.resolveTarget(step.target);
     this.currentTarget = target;
 
     // Keep autoUpdate pinned to whatever the active target is.
@@ -411,12 +406,13 @@ export class FluidTour extends FluidElement {
     // Announce the step for assistive tech.
     this.liveMessage = `Step ${this.index + 1} of ${this.steps.length}. ${step.title}. ${step.body}`;
 
-    // Move focus into the popover after it paints.
+    // Move focus into the popover after it paints. Prefer the emphasised
+    // primary action (the Next / Done button) so focus lands on the control we
+    // want the user to act on; otherwise the first focusable control.
     requestAnimationFrame(() => {
-      const focusable = this.panelEl?.querySelector<HTMLElement>(
-        '[autofocus], button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      focusable?.focus();
+      const controls = this.focusables();
+      const preferred = controls.find((c) => c.classList.contains("action-next"));
+      (preferred ?? controls[0])?.focus();
     });
   }
 
@@ -479,21 +475,34 @@ export class FluidTour extends FluidElement {
     }
   };
 
+  /**
+   * The popover's focusable controls, in DOM order. The action buttons are
+   * `fluid-button` hosts (delegatesFocus forwards `.focus()` to the inner native
+   * button), so we match those alongside any native focusables.
+   */
+  private focusables(): HTMLElement[] {
+    if (!this.panelEl) return [];
+    return Array.from(
+      this.panelEl.querySelectorAll<HTMLElement>(
+        'fluid-button:not([disabled]), button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+    );
+  }
+
   /** Keep Tab focus inside the popover (APG Dialog focus trap). */
   private trapFocus(e: KeyboardEvent): void {
     if (!this.panelEl) return;
-    const focusables = Array.from(
-      this.panelEl.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-    );
+    const focusables = this.focusables();
     if (focusables.length === 0) return;
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     if (!first || !last) return;
-    const active = this.panelEl.contains(document.activeElement)
-      ? (document.activeElement as HTMLElement)
-      : null;
+    // Resolve the focused control inside this component's own shadow root. The
+    // action buttons are `fluid-button` hosts, so `shadowRoot.activeElement`
+    // gives us the host element we can compare against `focusables`.
+    const shadow = this.shadowRoot;
+    const focused = shadow?.activeElement as HTMLElement | null;
+    const active = focused && this.panelEl.contains(focused) ? focused : null;
     if (e.shiftKey && active === first) {
       e.preventDefault();
       last.focus();
@@ -531,35 +540,38 @@ export class FluidTour extends FluidElement {
         <p part="body" class="body" id=${bodyId}>${step?.body ?? ""}</p>
 
         <div part="actions" class="actions">
-          <button
+          <fluid-button
             part="skip"
-            class="btn btn-ghost"
-            type="button"
-            @click=${() => this.skip()}
+            class="action action-skip"
+            variant="ghost"
+            size="sm"
+            @fluid-click=${() => this.skip()}
           >
             Skip
-          </button>
+          </fluid-button>
           <span class="spacer"></span>
           ${isFirst
             ? ""
             : html`
-                <button
+                <fluid-button
                   part="back"
-                  class="btn btn-secondary"
-                  type="button"
-                  @click=${() => this.back()}
+                  class="action action-back"
+                  variant="secondary"
+                  size="sm"
+                  @fluid-click=${() => this.back()}
                 >
                   Back
-                </button>
+                </fluid-button>
               `}
-          <button
+          <fluid-button
             part="next"
-            class="btn btn-primary"
-            type="button"
-            @click=${() => this.next()}
+            class="action action-next"
+            variant="primary"
+            size="sm"
+            @fluid-click=${() => this.next()}
           >
             ${isLast ? "Done" : "Next"}
-          </button>
+          </fluid-button>
         </div>
       </div>
 
