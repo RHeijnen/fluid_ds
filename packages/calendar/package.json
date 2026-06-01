@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/calendar",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.3",
   "description": "Accessible event calendar web component for Fluid (expansion pack): month view of events, framework-agnostic.",
   "type": "module",
   "license": "MIT",

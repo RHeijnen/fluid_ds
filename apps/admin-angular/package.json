@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/admin-angular",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Admin-portal demo built with Angular 20 (standalone, no NgModules) and the Fluid web components.",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/qr",
-  "version": "0.0.3-alpha.0",
+  "version": "0.1.0",
   "description": "Themable QR code web component for Fluid (expansion pack), rendered as crisp inline SVG. Backed by qrcode-generator.",
   "type": "module",
   "license": "MIT",
