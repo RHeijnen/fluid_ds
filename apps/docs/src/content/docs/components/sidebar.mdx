@@ -1,0 +1,260 @@
+---
+title: "Sidebar"
+description: "Collapsible side-navigation region. Collapses to an icon rail or overlays the page on narrow viewports."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-sidebar>` is a labelled `<aside>` landmark that holds your primary
+navigation. Toggle `open` to collapse it: when `collapsible` it shrinks to a
+narrow icon rail, otherwise it slides away. On narrow viewports add `overlay`
+to float it over a dismissible backdrop, with Escape-to-close and a focus trap.
+It fires **`fluid-toggle`** whenever the open state changes.
+
+<Demo>
+  <div style="block-size: 300px; display:flex; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;">
+    <fluid-sidebar aria-label="Primary navigation">
+      <strong slot="header">Fluid</strong>
+      <nav aria-label="Primary" style="display:flex; flex-direction:column; gap: var(--fluid-space-1);">
+        <a href="#" aria-current="page">Dashboard</a>
+        <a href="#">Projects</a>
+        <a href="#">Team</a>
+        <a href="#">Settings</a>
+      </nav>
+      <small slot="footer">v1.0.0</small>
+    </fluid-sidebar>
+    <div style="flex:1; padding: var(--fluid-space-5);">Page content</div>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/sidebar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/sidebar";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Slots
+
+Three slots structure the region: `header` (brand or a collapse toggle), the
+default slot (your nav content), and `footer` (account or secondary actions).
+
+```html
+<fluid-sidebar aria-label="Primary navigation">
+  <strong slot="header">Fluid</strong>
+  <nav aria-label="Primary">
+    <a href="/dashboard" aria-current="page">Dashboard</a>
+    <a href="/settings">Settings</a>
+  </nav>
+  <small slot="footer">v1.0.0</small>
+</fluid-sidebar>
+```
+
+### Collapsible rail
+
+With `collapsible`, closing collapses the sidebar to the `mini` width instead of
+hiding it, so icon-only navigation stays visible. Without `collapsible`, closing
+an inline sidebar slides it away entirely.
+
+```html
+<fluid-sidebar collapsible id="sb" aria-label="Primary navigation">…</fluid-sidebar>
+<fluid-button onclick="document.getElementById('sb').toggle()">Toggle</fluid-button>
+```
+
+### Overlay (narrow viewports)
+
+Add `overlay` to float the sidebar above the page over a backdrop. Clicking the
+backdrop or pressing Escape closes it, focus is trapped inside while it is open,
+and focus returns to the trigger on close.
+
+```html
+<fluid-button onclick="document.getElementById('nav').show()">Menu</fluid-button>
+<fluid-sidebar overlay id="nav" aria-label="Primary navigation">
+  <nav aria-label="Primary"><a href="/">Home</a></nav>
+</fluid-sidebar>
+```
+
+### Custom width
+
+`width` sets the expanded size and `mini` the collapsed rail size. Both accept
+any CSS length and feed the `--fluid-sidebar-width` / `--fluid-sidebar-mini-width`
+tokens.
+
+```html
+<fluid-sidebar width="20rem" mini="5rem" collapsible>…</fluid-sidebar>
+```
+
+## Listening for toggle
+
+The sidebar fires **`fluid-toggle`** when its open state changes;
+`event.detail.open` is the new state. The component owns its `open` state, you
+listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-sidebar id="nav" collapsible aria-label="Primary navigation">…</fluid-sidebar>
+
+    <script type="module">
+      document.getElementById("nav").addEventListener("fluid-toggle", (e) => {
+        console.log("open:", e.detail.open);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Shell.tsx"
+    import { useRef } from "react";
+    import "@fluid-ds/components/define/sidebar";
+
+    export function Shell() {
+      const ref = useRef<HTMLElement & { toggle(): void }>(null);
+      return (
+        <>
+          <button onClick={() => ref.current?.toggle()}>Menu</button>
+          <fluid-sidebar ref={ref} overlay aria-label="Primary navigation"
+            onfluid-toggle={(e: CustomEvent) => console.log(e.detail.open)}>
+            <nav aria-label="Primary"><a href="/">Home</a></nav>
+          </fluid-sidebar>
+        </>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Shell.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/sidebar";
+    import { ref } from "vue";
+    const sidebar = ref<HTMLElement & { toggle(): void }>();
+    </script>
+
+    <template>
+      <button @click="sidebar?.toggle()">Menu</button>
+      <fluid-sidebar ref="sidebar" overlay aria-label="Primary navigation"
+        @fluid-toggle="(e) => console.log(e.detail.open)">
+        <nav aria-label="Primary"><a href="/">Home</a></nav>
+      </fluid-sidebar>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="shell.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/sidebar";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-shell",
+      template: `
+        <button (click)="nav.toggle()">Menu</button>
+        <fluid-sidebar #nav overlay aria-label="Primary navigation"
+          (fluid-toggle)="onToggle($event)">
+          <nav aria-label="Primary"><a href="/">Home</a></nav>
+        </fluid-sidebar>
+      `
+    })
+    export class Shell {
+      onToggle(e: CustomEvent) { console.log(e.detail.open); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Shell.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/sidebar";
+      let nav: HTMLElement & { toggle(): void };
+    </script>
+
+    <button on:click={() => nav.toggle()}>Menu</button>
+    <fluid-sidebar bind:this={nav} overlay aria-label="Primary navigation"
+      on:fluid-toggle={(e) => console.log(e.detail.open)}>
+      <nav aria-label="Primary"><a href="/">Home</a></nav>
+    </fluid-sidebar>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- App shells with persistent primary navigation.
+- A collapsible icon rail to reclaim horizontal space.
+- A slide-over navigation drawer on narrow viewports (set `overlay`).
+
+Reach for [`<fluid-drawer>`](/components/drawer/) when the panel is a transient,
+always-modal surface (filters, settings) rather than the app's standing
+navigation. Use [`<fluid-menu>`](/components/menu/) for a contextual action
+list, not standing site navigation.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-sidebar-*` token that
+falls back to a main semantic var** (the override ladder). The **complete list**
+is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] fluid-sidebar {
+  --fluid-sidebar-bg: var(--fluid-surface-subtle);
+  --fluid-sidebar-fg: var(--fluid-text-primary);
+  --fluid-sidebar-border: var(--fluid-border-default);
+  --fluid-sidebar-width: 18rem;
+  --fluid-sidebar-mini-width: 4.5rem;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The aside is [`part="base"`](#api), with `part="header"`, `part="content"`,
+`part="footer"`, and `part="backdrop"` for the overlay scrim. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-sidebar" />
+
+## Accessibility
+
+- The region is a native `<aside>` (a complementary landmark). Always give it a
+  unique accessible name via `aria-label` (or `aria-labelledby`) so multiple
+  landmarks of the same role stay distinct: the component defaults to "Sidebar".
+- Put your links inside a `<nav aria-label="…">` in the default slot, and mark
+  the active link with `aria-current="page"`.
+- **Overlay mode** behaves like a non-modal dialog: focus moves into the sidebar
+  on open, Tab and Shift+Tab are trapped within it, Escape and a backdrop click
+  close it, and focus returns to the previously focused element on close.
+- The collapse transition honors `prefers-reduced-motion` (and the global
+  `--fluid-motion` scalar), so it reduces to near-instant when the user asks.
+
+### AA vs AAA
+
+The sidebar reads the conformance tokens rather than hard-coding sizes, so any
+interactive controls you place in its slots inherit the ancestor's conformance
+level. Under `data-fluid-conformance="aaa"` the focus ring widens to 3px and hit
+targets floor at 44×44 with no per-component branching. Provide visible focus
+styling on your slotted links: the sidebar does not override the page's link
+focus indicator.

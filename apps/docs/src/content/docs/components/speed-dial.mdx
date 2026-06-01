@@ -1,0 +1,260 @@
+---
+title: "Speed dial"
+description: "A floating action button that expands a set of actions, fanning out up, down, left, or right."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-speed-dial>` is a floating action button (FAB) that fans out a small set
+of actions when activated. It implements the WAI-ARIA Menu Button pattern: the
+trigger carries `aria-haspopup="menu"` and `aria-expanded`, and the actions form
+a `role="menu"` of `role="menuitem"` buttons. The dial closes on Esc (returning
+focus to the trigger), on outside click, and after an action fires
+**`fluid-action`**.
+
+<Demo>
+  <div style="display:flex; justify-content:center; padding: 6rem 2rem;">
+    <fluid-speed-dial label="Quick actions" placement="up">
+      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
+      <fluid-button variant="ghost" aria-label="Delete">Delete</fluid-button>
+    </fluid-speed-dial>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/speed-dial/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/speed-dial";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Placement
+
+The `placement` prop (`up` | `down` | `left` | `right`) controls which way the
+actions fan out from the trigger.
+
+<Demo>
+  <div style="display:flex; gap:6rem; justify-content:center; padding: 6rem 2rem;">
+    <fluid-speed-dial label="Fan up" placement="up" open>
+      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
+    </fluid-speed-dial>
+    <fluid-speed-dial label="Fan right" placement="right" open>
+      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
+    </fluid-speed-dial>
+  </div>
+</Demo>
+
+```html
+<fluid-speed-dial label="Quick actions" placement="right">
+  <fluid-button variant="ghost">Share</fluid-button>
+  <fluid-button variant="ghost">Edit</fluid-button>
+</fluid-speed-dial>
+```
+
+### Reacting to an action
+
+Each action is a slotted button. The dial fires **`fluid-action`** when one is
+activated (by click or keyboard); `event.detail.action` is the activated
+element. The dial closes automatically afterward.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-speed-dial id="dial" label="Quick actions">
+      <fluid-button variant="ghost" data-id="share">Share</fluid-button>
+      <fluid-button variant="ghost" data-id="edit">Edit</fluid-button>
+    </fluid-speed-dial>
+
+    <script type="module">
+      document.getElementById("dial").addEventListener("fluid-action", (e) => {
+        console.log("activated", e.detail.action.dataset.id);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Toolbar.tsx"
+    import "@fluid-ds/components/define/speed-dial";
+    import "@fluid-ds/components/define/button";
+
+    export function Toolbar() {
+      return (
+        <fluid-speed-dial
+          label="Quick actions"
+          onfluid-action={(e: CustomEvent) => console.log(e.detail.action)}
+        >
+          <fluid-button variant="ghost" data-id="share">Share</fluid-button>
+          <fluid-button variant="ghost" data-id="edit">Edit</fluid-button>
+        </fluid-speed-dial>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Toolbar.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/speed-dial";
+    import "@fluid-ds/components/define/button";
+    function onAction(e: CustomEvent) {
+      console.log(e.detail.action);
+    }
+    </script>
+
+    <template>
+      <fluid-speed-dial label="Quick actions" @fluid-action="onAction">
+        <fluid-button variant="ghost" data-id="share">Share</fluid-button>
+        <fluid-button variant="ghost" data-id="edit">Edit</fluid-button>
+      </fluid-speed-dial>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="toolbar.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/speed-dial";
+    import "@fluid-ds/components/define/button";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-toolbar",
+      template: `
+        <fluid-speed-dial label="Quick actions" (fluid-action)="onAction($event)">
+          <fluid-button variant="ghost">Share</fluid-button>
+          <fluid-button variant="ghost">Edit</fluid-button>
+        </fluid-speed-dial>
+      `
+    })
+    export class Toolbar {
+      onAction(e: Event) { console.log((e as CustomEvent).detail.action); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Toolbar.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/speed-dial";
+      import "@fluid-ds/components/define/button";
+    </script>
+
+    <fluid-speed-dial label="Quick actions" on:fluid-action={(e) => console.log(e.detail.action)}>
+      <fluid-button variant="ghost">Share</fluid-button>
+      <fluid-button variant="ghost">Edit</fluid-button>
+    </fluid-speed-dial>
+    ```
+  </TabItem>
+</Tabs>
+
+### Custom trigger icon
+
+The trigger shows a `+` glyph that rotates to an × when open. Override it via
+the `trigger-icon` slot.
+
+<Demo>
+  <div style="display:flex; justify-content:center; padding: 6rem 2rem;">
+    <fluid-speed-dial label="Create">
+      <span slot="trigger-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
+      </span>
+      <fluid-button variant="ghost" aria-label="New document">Doc</fluid-button>
+      <fluid-button variant="ghost" aria-label="New folder">Folder</fluid-button>
+    </fluid-speed-dial>
+  </div>
+</Demo>
+
+## When to use
+
+- A small, frequently used set of related actions anchored to a corner of the
+  screen (the classic floating action button).
+- Compact toolbars where the actions should stay out of the way until summoned.
+
+Reach for a plain [`<fluid-button>`](/components/button/) when there is a single
+primary action, and for [`<fluid-select>`](/components/select/) when the user is
+choosing a value rather than triggering an action.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-speed-dial-*` token
+that falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] fluid-speed-dial {
+  --fluid-speed-dial-bg: var(--fluid-accent-base);
+  --fluid-speed-dial-fg: var(--fluid-accent-text);
+  --fluid-speed-dial-size: 4rem;
+  --fluid-speed-dial-gap: var(--fluid-space-4);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The wrapper is [`part="base"`](#api), with `part="trigger"` for the floating
+button and `part="menu"` for the actions container. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-speed-dial" />
+
+## Accessibility
+
+- Implements the
+  [Menu Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/):
+  the trigger is a real `<button>` with `aria-haspopup="menu"` and
+  `aria-expanded`, and the actions are a `role="menu"` of `role="menuitem"`
+  children.
+- The trigger has no visible text, so it carries `aria-label` (set with the
+  `label` prop). Give it a descriptive value like "Quick actions".
+- Keyboard: Enter / Space / the placement-aligned arrow opens the menu and moves
+  focus into it; arrow keys move between actions (roving tabindex); Home / End
+  jump to the first / last action; Esc closes the dial and returns focus to the
+  trigger; Tab closes it.
+- The trigger and every action meet the 24×24 CSS px minimum target size and
+  scale to 44×44 under `data-fluid-conformance="aaa"`.
+- The fan-out animation honors `prefers-reduced-motion` and the `--fluid-motion`
+  scalar.
+
+### AA vs AAA
+
+Under the default AA conformance, the trigger uses its design diameter and a 2px
+focus ring. When an ancestor sets `data-fluid-conformance="aaa"`, the trigger's
+minimum target lifts to 44×44 px (via `--fluid-target-min`) and the focus ring
+widens (via `--fluid-focus-ring-width`), with no per-component changes.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Button" href="/components/button/" description="A single action trigger." />
+  <LinkCard title="Select" href="/components/select/" description="Choose one value from a list." />
+</CardGrid>

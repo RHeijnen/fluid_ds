@@ -136,7 +136,9 @@ const PREVIEW_EXEMPT = new Set([
   "fluid-mutation-observer",
   "fluid-resize-observer",
   "fluid-intersection-observer",
-  "fluid-animation" // motion primitive, display:contents wrapper, no visual surface
+  "fluid-animation", // motion primitive, display:contents wrapper, no visual surface
+  "fluid-hotkey", // non-visual keyboard-shortcut behavior wrapper, renders nothing
+  "fluid-aspect-ratio" // layout primitive (constrains a box to a ratio), nothing to theme/preview
 ]);
 
 /**

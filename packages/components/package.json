@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/components",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.2-alpha.0",
   "description": "Framework-agnostic web components for Fluid, ~50 standard custom elements (buttons, inputs, dialogs, drawers, tabs, trees, …). Drop into any HTML page; React/Vue/Angular/Svelte/Solid friendly.",
   "type": "module",
   "license": "MIT",
@@ -39,6 +39,10 @@
       "types": "./src/components/*/define.ts",
       "import": "./src/components/*/define.ts"
     },
+    "./internal/*": {
+      "types": "./src/internal/*.ts",
+      "import": "./src/internal/*.ts"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "publishConfig": {
@@ -53,6 +57,10 @@
       "./define/*": {
         "types": "./dist/components/*/define.d.ts",
         "import": "./dist/components/*/define.js"
+      },
+      "./internal/*": {
+        "types": "./dist/internal/*.d.ts",
+        "import": "./dist/internal/*.js"
       },
       "./custom-elements.json": "./custom-elements.json"
     }

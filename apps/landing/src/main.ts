@@ -31,26 +31,32 @@ const LOGO = `
   </svg>`;
 
 const features = [
-  ["blocks", "57 components, no framework", "Standard custom elements. Drop the tags into React, Vue, Angular, Svelte, Solid, or a plain HTML file. Same code, same result."],
+  ["blocks", "101 components, no framework", "Standard custom elements. Drop the tags into React, Vue, Angular, Svelte, Solid, or a plain HTML file. Same code, same result."],
   ["palette", "Theme with one variable", "A small palette of semantic tokens drives everything. Override one value, retheme the whole app. Down to a single element if you want."],
   ["circle-check", "Accessible by default", "Every component ships the right ARIA pattern, keyboard support, 24px targets, and an axe audit. AA today, AAA on a switch."],
-  ["sparkles", "Lean core, opt-in power", "The core stays small. Charts, markdown, QR, media, and animations live in separate packages you add only when you need them."]
+  ["sparkles", "Lean core, opt-in power", "The core stays small. Charts, data grids, calendars, a scheduler, a rich-text editor, kanban, maps, media, and more live in separate packages you add only when you need them."]
 ];
 
 const stats = [
-  ["57", "components"],
-  ["5", "expansion packs"],
+  ["101", "components"],
+  ["11", "expansion packs"],
   ["4", "frameworks proven"],
-  ["380+", "tests passing"],
+  ["650+", "tests passing"],
   ["AA", "WCAG 2.2 (AAA opt-in)"],
   ["1,500+", "icons available"]
 ];
 
 const packs = [
   ["@fluid-ds/charts", "Chart.js-backed line, bar, doughnut, sparkline and more, themed by your tokens."],
+  ["@fluid-ds/scheduler", "Appointment scheduler: calendar with bookable time slots, plus an hours editor."],
+  ["@fluid-ds/table", "Accessible data grid: sortable, selectable, semantic table."],
+  ["@fluid-ds/calendar", "Event calendar: a month view of events."],
+  ["@fluid-ds/editor", "Lightweight accessible rich-text editor."],
+  ["@fluid-ds/kanban", "Drag-and-drop board with a full keyboard path."],
+  ["@fluid-ds/map", "Themed Leaflet map wrapper with markers."],
+  ["@fluid-ds/media", "Video player, playlists, animated images, zoomable frames, audio, lightbox."],
   ["@fluid-ds/markdown", "Render Markdown to themed HTML with one element."],
   ["@fluid-ds/qr", "Themable QR codes rendered as crisp SVG."],
-  ["@fluid-ds/media", "Video player, playlists, animated images, zoomable frames."],
   ["@fluid-ds/animations", "Attribute-driven, reduced-motion-aware animation system."]
 ];
 
@@ -91,12 +97,13 @@ document.body.innerHTML = `
   <section class="hero">
     <div class="hero-badges">
       <fluid-badge variant="info">v0.1 alpha</fluid-badge>
+      <fluid-badge variant="success">WCAG 2.2 AA · AAA-ready</fluid-badge>
       <fluid-badge>npm: @fluid-ds/*@alpha</fluid-badge>
-      <fluid-badge variant="success">MIT licensed</fluid-badge>
+      <fluid-badge>MIT licensed</fluid-badge>
     </div>
     <h1>Build it once.<br /><span class="accent">Drop it anywhere.</span></h1>
     <p class="lead">
-      A framework-agnostic design system of <strong>57 standard web components</strong>,
+      A framework-agnostic design system of <strong>101 standard web components</strong>,
       themable down to a single CSS variable and accessible out of the box.
       Works in every framework, and in the page that doesn't have one.
     </p>
@@ -251,7 +258,7 @@ document.body.innerHTML = `
   <!-- ====================== EXPANSION PACKS ====================== -->
   <section class="row">
     <h2>Lean core, opt-in power</h2>
-    <p class="subhead">Five expansion packs keep the base bundle small. Add only what you reach for.</p>
+    <p class="subhead">Eleven expansion packs keep the base bundle small. Add only what you reach for.</p>
     <div class="feature-grid">
       ${packs.map(([name, body]) => `
         <fluid-card variant="outline">

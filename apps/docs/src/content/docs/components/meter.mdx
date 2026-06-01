@@ -1,0 +1,214 @@
+---
+title: "Meter"
+description: "A gauge for a measured value within a known range, with low/high/optimum bands conveyed by status color and accessible text."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-meter>` shows a scalar measurement (disk usage, battery, a score,
+relevance) inside a known range. It mirrors the native `<meter>` element's
+`low` / `high` / `optimum` band algorithm: the fill turns the
+theme-independent success / warning / danger tone for the good / fair / poor
+band, and that band is spelled out in the accessible value text too, so the
+status is never carried by color alone.
+
+<Demo>
+  <div style="max-width: 320px;">
+    <fluid-meter value="72" low="33" high="66" optimum="80" show-value label="Disk usage">
+      Disk usage
+    </fluid-meter>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/meter/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/meter";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Plain gauge
+
+With no `low` / `high` / `optimum`, the meter is a single-region gauge using the
+accent fill. Pair it with a label and `show-value` for context.
+
+<Demo>
+  <div style="max-width: 320px;">
+    <fluid-meter value="64" show-value label="Relevance">Relevance</fluid-meter>
+  </div>
+</Demo>
+
+```html
+<fluid-meter value="64" show-value label="Relevance">Relevance</fluid-meter>
+```
+
+### Bands
+
+Set `low`, `high`, and `optimum` to split the range into three segments. The
+fill color tracks which band the value lands in relative to `optimum`: the
+segment containing `optimum` is **good** (success), an adjacent segment is
+**fair** (warning), and the opposite end is **poor** (danger).
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: 1rem; max-width:320px;">
+    <fluid-meter value="20" low="33" high="66" optimum="90" show-value label="Storage low">Low</fluid-meter>
+    <fluid-meter value="50" low="33" high="66" optimum="90" show-value label="Storage mid">Half</fluid-meter>
+    <fluid-meter value="85" low="33" high="66" optimum="90" show-value label="Storage high">Healthy</fluid-meter>
+  </div>
+</Demo>
+
+```html
+<fluid-meter value="85" low="33" high="66" optimum="90" show-value>Healthy</fluid-meter>
+```
+
+### Optimum at the low end
+
+When less is better (CPU load, error rate), put `optimum` below `low`. Now low
+values are good and high values are the worst band.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: 1rem; max-width:320px;">
+    <fluid-meter value="15" low="40" high="75" optimum="10" show-value label="CPU 15">CPU 15%</fluid-meter>
+    <fluid-meter value="90" low="40" high="75" optimum="10" show-value label="CPU 90">CPU 90%</fluid-meter>
+  </div>
+</Demo>
+
+```html
+<fluid-meter value="90" low="40" high="75" optimum="10" show-value>CPU 90%</fluid-meter>
+```
+
+### Custom range and formatter
+
+`min` / `max` set the bounds, and `valueFormatter` controls the number shown in
+the value text and read out in `aria-valuetext`.
+
+<Demo>
+  <div style="max-width: 320px;">
+    <fluid-meter value="6.2" min="0" max="8" low="2" high="6" optimum="3" show-value label="Battery voltage">
+      Battery voltage
+    </fluid-meter>
+  </div>
+</Demo>
+
+```ts
+const meter = document.querySelector("fluid-meter");
+meter.valueFormatter = (v) => `${v.toFixed(1)} V`;
+```
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-meter-*` token that
+falls back to a main semantic var** (the override ladder), so you can retheme one
+instance, every meter, or the whole brand. The band colors fall back to the
+theme-independent status tones (`--fluid-success-base` / `--fluid-warning-base`
+/ `--fluid-danger-base`). The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+/* Brand-wide: every meter */
+[data-fluid-brand="custom"] {
+  --fluid-meter-track: var(--fluid-color-neutral-200);
+  --fluid-meter-optimum-fill: var(--fluid-success-base);
+  --fluid-meter-low-fill: var(--fluid-warning-base);
+  --fluid-meter-high-fill: var(--fluid-danger-base);
+  --fluid-meter-radius: 4px;
+}
+
+/* One instance */
+[data-fluid-id="score"] {
+  --fluid-meter-height: 1rem;
+}
+```
+
+<Aside type="tip">
+  Dial these in visually with the [Theme builder](/playground/).
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api), with `part="track"`, `part="fill"`,
+`part="label"`, and `part="value"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS
+a token doesn't cover.
+
+## When to use
+
+- A measurement inside a known range: disk usage, battery, score, capacity.
+- A reading that has "good" and "bad" zones you want to surface at a glance.
+- A relevance or quality indicator next to a result.
+
+### When *not* to use
+
+- For the completion of a task (uploading, installing), reach for
+  [`<fluid-progress-bar>`](/components/progress-bar/) or
+  [`<fluid-progress-ring>`](/components/progress-ring/): `role="progressbar"`
+  signals work in progress, `role="meter"` signals a static reading.
+- For a compact count or status label with no range, use
+  [`<fluid-badge>`](/components/badge/) or [`<fluid-tag>`](/components/tag/).
+
+## Accessibility
+
+The host carries `role="meter"` (the WAI-ARIA
+[Meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/)) with
+`aria-valuemin`, `aria-valuemax`, and `aria-valuenow` kept in sync with the
+range. A meter is **not interactive**, so it has no keyboard contract. See the
+[accessibility guide](/guides/accessibility/) for the cross-component contract.
+
+### Names
+
+Set `label` (or `aria-labelledby` to point at visible text) for the accessible
+name; it defaults to "Meter" if you provide neither. Slotted text in the label
+row is visual: give the host its own name so screen readers announce the gauge
+even when the value sits off-screen.
+
+### State semantics
+
+`aria-valuetext` always pairs the number with its range (for example "72 of
+100"), and when banding is configured it appends the qualitative band ("72 of
+100, fair"). That is what keeps the good / fair / poor status from being
+conveyed by color alone (SC 1.4.1 Use of Color): a screen-reader user hears the
+band, and the fill-vs-track boundary carries an inset hairline so the level
+stays visible at 3:1 (SC 1.4.11).
+
+### Motion & target size
+
+The fill width animates on value change and collapses to near-instant under
+`prefers-reduced-motion: reduce`. The meter takes no focus and has no
+interactive target, so there is no target-size or conformance delta.
+
+## API
+
+<ComponentApi tag="fluid-meter" />
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Progress bar" href="/components/progress-bar/" description="Task completion, not a measured reading." />
+  <LinkCard title="Progress ring" href="/components/progress-ring/" description="Circular determinate / indeterminate progress." />
+  <LinkCard title="Badge" href="/components/badge/" description="Compact count or status label." />
+  <LinkCard title="Accessibility guide" href="/guides/accessibility/" description="The cross-component a11y contract." />
+  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+</CardGrid>

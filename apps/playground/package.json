@@ -14,12 +14,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fluid-ds/calendar": "workspace:*",
     "@fluid-ds/charts": "workspace:*",
     "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/editor": "workspace:*",
+    "@fluid-ds/kanban": "workspace:*",
+    "@fluid-ds/map": "workspace:*",
+    "@fluid-ds/table": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
     "@fluid-ds/markdown": "workspace:*",
     "@fluid-ds/media": "workspace:*",
     "@fluid-ds/qr": "workspace:*",
+    "@fluid-ds/scheduler": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",
     "lit": "^3.2.1"

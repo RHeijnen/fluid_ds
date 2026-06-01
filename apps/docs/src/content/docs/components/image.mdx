@@ -1,0 +1,290 @@
+---
+title: "Image"
+description: "Responsive image wrapper that reserves layout space, shows a placeholder, and fades in on load. Lazy by default, with a fallback on error."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-image>` wraps a native `<img>` and reserves its box ahead of the network
+via `aspect-ratio` (or explicit `width`/`height`), so the page does not shift
+when the pixels arrive. It shows a solid `placeholder` color while loading,
+fades the image in once it decodes (the fade respects reduced-motion), and falls
+back to a `fallback` src (or your slotted content) if the load fails. It is lazy
+by default and fires **`fluid-load`** / **`fluid-error`**.
+
+<Demo>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="A scenic mountain landscape at dusk"
+    width="360"
+    aspect-ratio="16/9"
+    placeholder="#e4e4e7"
+  ></fluid-image>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/image/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/image";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Reserve space with aspect-ratio
+
+Set `aspect-ratio` (e.g. `16/9`) so the box is sized before the image loads.
+Combined with a `width`, this is the no-layout-shift recipe.
+
+<Demo>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="Landscape, 16 by 9"
+    width="240"
+    aspect-ratio="16/9"
+  ></fluid-image>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="Square crop"
+    width="160"
+    aspect-ratio="1/1"
+  ></fluid-image>
+</Demo>
+
+```html
+<fluid-image src="/hero.jpg" alt="Product hero" width="360" aspect-ratio="16/9"></fluid-image>
+```
+
+### Fit
+
+`fit="cover"` (the default) fills the box and crops; `fit="contain"` letterboxes
+to show the whole image.
+
+<Demo>
+  <fluid-image src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80" alt="Cover fit" width="200" height="200" fit="cover"></fluid-image>
+  <fluid-image src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80" alt="Contain fit" width="200" height="200" fit="contain"></fluid-image>
+</Demo>
+
+```html
+<fluid-image src="/logo.png" alt="Logo" width="200" height="200" fit="contain"></fluid-image>
+```
+
+### Placeholder
+
+`placeholder` paints a solid color in the reserved box until the image decodes,
+so the layout never flashes empty.
+
+<Demo>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="Loads over a tinted placeholder"
+    width="320"
+    aspect-ratio="16/9"
+    placeholder="#c7d2fe"
+  ></fluid-image>
+</Demo>
+
+```html
+<fluid-image src="/hero.jpg" alt="Hero" aspect-ratio="16/9" placeholder="#c7d2fe"></fluid-image>
+```
+
+### Decorative image
+
+For images that add no information, pass `alt=""` (the default). The inner
+`<img>` is then removed from the accessibility tree.
+
+```html
+<fluid-image src="/divider.svg" alt="" width="320" aspect-ratio="16/9"></fluid-image>
+```
+
+### Fallback on error
+
+Set `fallback` to a backup src. If that also fails, slot custom content into the
+`fallback` slot.
+
+<Demo>
+  <fluid-image
+    src="https://example.com/this-image-does-not-exist.jpg"
+    alt="Could not load"
+    width="320"
+    aspect-ratio="16/9"
+  >
+    <span slot="fallback">Image unavailable</span>
+  </fluid-image>
+</Demo>
+
+```html
+<fluid-image src="/maybe.jpg" fallback="/backup.jpg" alt="Avatar" aspect-ratio="1/1">
+  <span slot="fallback">No image</span>
+</fluid-image>
+```
+
+## Listening for load and error
+
+A `fluid-image` fires **`fluid-load`** when the image decodes and
+**`fluid-error`** when it fails (after the `fallback` src, if any, also fails).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-image id="hero" src="/hero.jpg" alt="Hero" aspect-ratio="16/9"></fluid-image>
+
+    <script type="module">
+      const el = document.getElementById("hero");
+      el.addEventListener("fluid-load", () => console.log("loaded"));
+      el.addEventListener("fluid-error", () => console.log("failed"));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Hero.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/image";
+
+    export function Hero() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const onError = () => console.warn("image failed");
+        el.addEventListener("fluid-error", onError);
+        return () => el.removeEventListener("fluid-error", onError);
+      }, []);
+      return <fluid-image ref={ref} src="/hero.jpg" alt="Hero" aspect-ratio="16/9" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Hero.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/image";
+    </script>
+
+    <template>
+      <fluid-image
+        src="/hero.jpg"
+        alt="Hero"
+        aspect-ratio="16/9"
+        @fluid-load="() => {}"
+        @fluid-error="() => {}"
+      />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="hero.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/image";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-hero",
+      template: `
+        <fluid-image src="/hero.jpg" alt="Hero" aspect-ratio="16/9"
+          (fluid-error)="onError()"></fluid-image>
+      `
+    })
+    export class Hero {
+      onError() { console.warn("image failed"); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Hero.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/image";
+    </script>
+
+    <fluid-image
+      src="/hero.jpg"
+      alt="Hero"
+      aspect-ratio="16/9"
+      on:fluid-error={() => console.warn("image failed")}
+    />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Hero, card, and gallery images where you want zero layout shift.
+- Any image whose load you want to handle (placeholder, fade-in, error fallback).
+- Avatars and logos: pair with `fit="contain"` or a `1/1` aspect ratio.
+
+For a purely decorative background, a CSS `background-image` may be simpler.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-image-*` token that
+falls back to a main semantic var** (the override ladder). The radius and the
+placeholder color are tokenized; the **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-image-radius: var(--fluid-radius-lg);
+  --fluid-image-placeholder-bg: var(--fluid-surface-muted);
+}
+```
+
+The `placeholder` attribute is a per-instance shortcut for
+`--fluid-image-placeholder-bg`.
+
+### Beyond tokens: `::part()`
+
+The wrapper is [`part="base"`](#api) and the inner image is [`part="img"`](#api).
+Reach them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for CSS not covered by a token (for example a custom box-shadow or a grayscale
+filter on the image).
+
+## API
+
+<ComponentApi tag="fluid-image" />
+
+## Accessibility
+
+- The inner native `<img>` carries the accessible name through `alt`. Provide a
+  meaningful `alt` for informative images.
+- A decorative image must use `alt=""` (the default): this removes it from the
+  accessibility tree so screen readers skip it.
+- Reserving space with `aspect-ratio` / `width` / `height` prevents layout shift
+  ([SC 1.3.2], [SC 2.4.3]) and the jarring reflow that can disorient users.
+- The load fade-in honors `prefers-reduced-motion: reduce` and the global
+  `--fluid-motion` scalar ([SC 2.3.3]).
+
+### AA vs AAA
+
+`<fluid-image>` is non-interactive: it has no focusable target, no focus ring,
+and no minimum target size to meet, so the AA and AAA conformance modes render
+it identically. The accessibility obligations are entirely on the author: a
+correct `alt` (informative) or `alt=""` (decorative), and sufficient contrast in
+any text overlaid on the image (`fluid-image` does not overlay text itself).
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Avatar" href="/components/avatar/" description="Circular image for a person or entity, with initials fallback." />
+  <LinkCard title="Card" href="/components/card/" description="Surface that often frames a media image." />
+</CardGrid>

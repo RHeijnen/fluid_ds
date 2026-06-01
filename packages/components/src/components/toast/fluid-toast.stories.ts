@@ -5,7 +5,7 @@ import "../button/define.js";
 import type { FluidToast } from "./fluid-toast.js";
 
 const meta: Meta = {
-  title: "Components/Toast",
+  title: "Components/Feedback/Toast",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

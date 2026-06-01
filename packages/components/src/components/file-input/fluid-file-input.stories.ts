@@ -6,7 +6,7 @@ import type { FluidFileInput } from "./fluid-file-input.js";
 type Args = Pick<FluidFileInput, "accept" | "multiple" | "disabled" | "required">;
 
 const meta: Meta<Args> = {
-  title: "Components/FileInput",
+  title: "Components/Forms/FileInput",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

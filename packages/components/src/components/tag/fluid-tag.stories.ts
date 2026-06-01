@@ -6,7 +6,7 @@ import type { FluidTag } from "./fluid-tag.js";
 type Args = Pick<FluidTag, "variant" | "size" | "removable" | "disabled"> & { text: string };
 
 const meta: Meta<Args> = {
-  title: "Components/Tag",
+  title: "Components/Content/Tag",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

@@ -8,7 +8,7 @@ type Args = Pick<FluidProgressBar, "value" | "indeterminate" | "showValue"> & {
 };
 
 const meta: Meta<Args> = {
-  title: "Components/ProgressBar",
+  title: "Components/Feedback/ProgressBar",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

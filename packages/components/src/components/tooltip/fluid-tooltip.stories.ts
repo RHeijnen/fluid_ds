@@ -7,7 +7,7 @@ import type { FluidTooltip } from "./fluid-tooltip.js";
 type Args = Pick<FluidTooltip, "content" | "placement" | "open" | "disabled">;
 
 const meta: Meta<Args> = {
-  title: "Components/Tooltip",
+  title: "Components/Feedback/Tooltip",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

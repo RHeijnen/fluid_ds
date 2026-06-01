@@ -14,6 +14,10 @@ export default [
       // Unified deploy artifact assembled by `pnpm build:website`.
       "website/**",
       "**/.astro/**",
+      // Per-framework demo build caches / outputs (Angular, Next.js).
+      "**/.angular/**",
+      "**/.next/**",
+      "**/out/**",
       // Playwright HTML reports and test results are generated artifacts
       // (trace JS files, vendor bundles, screenshots). They shouldn't be
       // linted, many wouldn't pass strict rules anyway.
@@ -32,6 +36,8 @@ export default [
       "**/custom-elements.json",
       "**/*.config.js",
       "**/*.config.mjs",
+      // Next.js writes this ambient type file with a triple-slash reference.
+      "**/next-env.d.ts",
       "pnpm-lock.yaml"
     ]
   },
@@ -87,7 +93,7 @@ export default [
     }
   },
   {
-    files: ["apps/**/*.ts", "apps/**/*.tsx"],
+    files: ["apps/**/*.ts", "apps/**/*.tsx", "apps/**/*.js"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node }
     },

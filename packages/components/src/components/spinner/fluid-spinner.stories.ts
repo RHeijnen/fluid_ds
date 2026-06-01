@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Components/Spinner",
+  title: "Components/Feedback/Spinner",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

@@ -6,7 +6,7 @@ import type { FluidTabs } from "./fluid-tabs.js";
 type Args = Pick<FluidTabs, "value" | "activation">;
 
 const meta: Meta<Args> = {
-  title: "Components/Tabs",
+  title: "Components/Navigation/Tabs",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

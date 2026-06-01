@@ -9,7 +9,7 @@ type Args = Pick<
 >;
 
 const meta: Meta<Args> = {
-  title: "Components/Textarea",
+  title: "Components/Forms/Textarea",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

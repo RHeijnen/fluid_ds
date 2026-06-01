@@ -1,0 +1,105 @@
+---
+title: "@fluid-ds/calendar"
+description: "An accessible month view that displays events."
+---
+
+The calendar expansion pack for Fluid. `<fluid-event-calendar>` lays out a
+six-week month grid and drops your events onto the days they fall on, with a
+"+N more" indicator when a day overflows. It is the read-oriented calendar: a
+distinct concern from the booking scheduler, which is about picking a slot.
+Expansion pack.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/calendar
+```
+
+Import only the pieces you use:
+
+```ts
+import "@fluid-ds/calendar/define/event-calendar";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-event-calendar>` | A month grid that displays events as tone-coded chips, with month navigation and day / event click events. |
+
+## Use
+
+```html
+<fluid-event-calendar month="2026-06" week-start="1"></fluid-event-calendar>
+
+<script type="module">
+  import "@fluid-ds/calendar/define/event-calendar";
+
+  const cal = document.querySelector("fluid-event-calendar");
+  cal.events = [
+    { id: "1", date: "2026-06-03", title: "Standup", tone: "accent" },
+    { id: "2", date: "2026-06-10", title: "Release cut", tone: "warning" },
+    { id: "3", date: "2026-06-25", title: "Demo day", tone: "success" }
+  ];
+
+  cal.addEventListener("fluid-day-click", (e) => console.log(e.detail.date));
+  cal.addEventListener("fluid-event-click", (e) => console.log(e.detail.id, e.detail.event));
+  cal.addEventListener("fluid-month-change", (e) => console.log(e.detail.month));
+</script>
+```
+
+`events` is a property carrying an array of `{ id, date, title, tone? }`. It
+also accepts a JSON string attribute, so `events='[{"id":"1",…}]'` works for
+static markup. The `tone` (`accent`, `success`, `warning`, or `danger`) draws
+from the theme-independent `--fluid-<tone>-*` tracks and is never the only
+signal: the chip always renders its title text.
+
+### Properties
+
+| Property / attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `month` | `string` | current month | Visible month as `"YYYY-MM"`. |
+| `events` | `CalendarEvent[]` | `[]` | Events to display. Array property or JSON-string attribute. |
+| `week-start` | `number` (0-6) | `1` (Monday) | First day of the week, `0` Sunday through `6` Saturday. |
+| `locale` | `string` | document locale | BCP-47 locale for month and weekday names. |
+| `max-per-day` | `number` | `3` | Chips shown per day before collapsing into `+N more`. |
+
+### Events
+
+| Event | Detail | When |
+| --- | --- | --- |
+| `fluid-month-change` | `{ month: "YYYY-MM" }` | Previous / Next pressed, or PageUp / PageDown in the grid. |
+| `fluid-day-click` | `{ date: "YYYY-MM-DD" }` | A day cell (or its "+N more") is activated. |
+| `fluid-event-click` | `{ id, event }` | An event chip is activated. |
+
+## Accessibility
+
+The month is a `role="grid"` labelled by its month / year heading. Each week is
+a `role="row"`, each day a `role="gridcell"`, and the weekday headings are
+`role="columnheader"`. Days use roving tabindex: exactly one day is in the tab
+order at a time. Arrow keys move between days, Home and End jump to the start
+and end of a week, PageUp and PageDown step the month, and Enter or Space
+activates a day. Today carries `aria-current="date"`, and each day cell has an
+accessible name combining its full date with its event count. Navigation
+buttons meet the minimum target size and read the focus-ring and target-size
+conformance tokens, so they scale to 44x44 and a thicker ring under
+`data-fluid-conformance="aaa"`.
+
+## Theming
+
+The component reads the same `--fluid-*` semantic tokens as the rest of the
+system (surface, text, border, accent, and the status tracks), so brand and
+light / dark themes flow through without extra work. Each surface has its own
+`@cssproperty`-annotated `--fluid-event-calendar-*` token for fine-grained
+overrides, following the brand to component to instance ladder. For example:
+
+```css
+fluid-event-calendar {
+  --fluid-event-calendar-radius: 1rem;
+  --fluid-event-calendar-today-ring: var(--fluid-accent-base);
+}
+```
+
+## License
+
+MIT.

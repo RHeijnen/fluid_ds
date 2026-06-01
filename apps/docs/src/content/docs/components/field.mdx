@@ -1,0 +1,268 @@
+---
+title: "Field"
+description: "A form-field wrapper that pairs a label, optional description, and an error with a slotted control, wiring the accessible plumbing for you."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-field>` wraps any control: a [`<fluid-input>`](/components/input/), a
+native `<input>`, a select, with a `<label>`, optional description, and an error
+message. It owns the accessible plumbing: it generates ids and sets
+`aria-describedby` on the slotted control (to the description and error), flips
+`aria-invalid` when an `error` is present, and renders a required indicator with
+screen-reader-only "required" text.
+
+<Demo>
+  <fluid-field label="Email" description="We'll never share it." for="hero-email" style="max-width: 22rem;">
+    <fluid-input id="hero-email" type="email" placeholder="you@example.com"></fluid-input>
+  </fluid-field>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/field/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/field";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Label and description
+
+Pass `label` and `description` as attributes. The field links the description to
+the control with `aria-describedby` automatically.
+
+<Demo>
+  <fluid-field label="Display name" description="Shown next to your comments." for="ex-name" style="max-width: 22rem;">
+    <fluid-input id="ex-name"></fluid-input>
+  </fluid-field>
+</Demo>
+
+```html
+<fluid-field label="Display name" description="Shown next to your comments." for="name">
+  <fluid-input id="name"></fluid-input>
+</fluid-field>
+```
+
+### Required
+
+Set `required` for a visual `*` indicator plus screen-reader-only "required"
+text. Mark the control required too, so the field participates in validation.
+
+<Demo>
+  <fluid-field label="Email" required for="ex-req" style="max-width: 22rem;">
+    <fluid-input id="ex-req" type="email" required></fluid-input>
+  </fluid-field>
+</Demo>
+
+```html
+<fluid-field label="Email" required for="email">
+  <fluid-input id="email" type="email" required></fluid-input>
+</fluid-field>
+```
+
+### Error
+
+Set `error` to render a message with `role="alert"`. The control is flagged
+`aria-invalid="true"` and described by the error text.
+
+<Demo>
+  <fluid-field label="Email" error="Enter a valid email address." for="ex-err" style="max-width: 22rem;">
+    <fluid-input id="ex-err" type="email" value="not-an-email"></fluid-input>
+  </fluid-field>
+</Demo>
+
+```html
+<fluid-field label="Email" error="Enter a valid email address." for="email">
+  <fluid-input id="email" type="email"></fluid-input>
+</fluid-field>
+```
+
+### Rich content via slots
+
+Use the `label`, `description`, and `error` slots for markup (links, inline
+formatting). A slot, when filled, overrides the matching attribute.
+
+<Demo>
+  <fluid-field for="ex-rich" required style="max-width: 22rem;">
+    <span slot="label">Password</span>
+    <span slot="description">At least 12 characters.</span>
+    <fluid-input id="ex-rich" type="password"></fluid-input>
+  </fluid-field>
+</Demo>
+
+```html
+<fluid-field for="pw" required>
+  <span slot="label">Password</span>
+  <span slot="description">At least 12 characters.</span>
+  <fluid-input id="pw" type="password"></fluid-input>
+  <span slot="error">Too short.</span>
+</fluid-field>
+```
+
+## Composing with controls
+
+`<fluid-field>` is control-agnostic: slot any focusable control as the default
+child. Pass `for` matching the control's id so the `<label>` associates with it.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-field label="Email" description="We'll send a confirmation." for="email">
+      <fluid-input id="email" type="email"></fluid-input>
+    </fluid-field>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="EmailField.tsx"
+    import "@fluid-ds/components/define/field";
+    import "@fluid-ds/components/define/input";
+
+    export function EmailField({ error }: { error?: string }) {
+      return (
+        <fluid-field label="Email" error={error} required for="email">
+          <fluid-input id="email" type="email" required></fluid-input>
+        </fluid-field>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="EmailField.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/field";
+    import "@fluid-ds/components/define/input";
+    defineProps<{ error?: string }>();
+    </script>
+
+    <template>
+      <fluid-field label="Email" :error="error" required for="email">
+        <fluid-input id="email" type="email" required></fluid-input>
+      </fluid-field>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="email-field.component.ts"
+    import { Component, Input, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/field";
+    import "@fluid-ds/components/define/input";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-email-field",
+      template: `
+        <fluid-field label="Email" [error]="error" required for="email">
+          <fluid-input id="email" type="email" required></fluid-input>
+        </fluid-field>
+      `
+    })
+    export class EmailField {
+      @Input() error = "";
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="EmailField.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/field";
+      import "@fluid-ds/components/define/input";
+      export let error = "";
+    </script>
+
+    <fluid-field label="Email" {error} required for="email">
+      <fluid-input id="email" type="email" required></fluid-input>
+    </fluid-field>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Any standalone form control that needs a label, help text, or an error.
+- Building a form where each row should expose consistent labelling and
+  validation semantics without per-control wiring.
+
+Reach straight for [`<fluid-input>`](/components/input/) (without a field) only
+when the control already carries its own `aria-label` and needs no visible label,
+description, or error row.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-field-*` token that
+falls back to a main semantic var** (the override ladder): label, description,
+error, and the required indicator each have their own color and font-size knob.
+The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-field-gap: var(--fluid-space-2);
+  --fluid-field-label-fg: var(--fluid-text-primary);
+  --fluid-field-description-fg: var(--fluid-text-secondary);
+  --fluid-field-error-fg: var(--fluid-danger-base);
+}
+```
+
+The error and required colors read `--fluid-danger-base`, a
+**theme-independent** status tone: it stays correct across brands and dark mode.
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api) with `part="label"`, `part="required"`,
+`part="control"`, `part="description"`, and `part="error"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-field" />
+
+## Accessibility
+
+- The label is a real `<label>`; pass `for` matching the control's id so a click
+  on the label focuses the control and the accessible name is associated.
+- The description and error are linked to the control via `aria-describedby`,
+  the field generates the ids and updates them as content changes.
+- When `error` is set the control gets `aria-invalid="true"` and the message
+  carries `role="alert"`, so screen readers announce it when it appears.
+- `required` shows a visual `*` (decorative, `aria-hidden`) alongside
+  screen-reader-only "required" text, validity is never conveyed by color alone
+  ([SC 1.4.1]).
+
+### AA vs AAA
+
+- The field renders text only; it inherits the conformance tokens from the
+  control it wraps. Slot an AA/AAA-aware control (like
+  [`<fluid-input>`](/components/input/)) and an ancestor
+  `data-fluid-conformance="aaa"` lifts the target size and focus ring on the
+  control with no change to the field.
+- Label, description, and error text all use the semantic color tokens, which
+  meet the 4.5:1 contrast requirement ([SC 1.4.3]) against the page surface in
+  every brand and theme.
+
+<CardGrid>
+  <LinkCard title="Input" href="/components/input/" description="The text control this field most often wraps." />
+  <LinkCard title="Button" href="/components/button/" description="Submit the form the field belongs to." />
+</CardGrid>

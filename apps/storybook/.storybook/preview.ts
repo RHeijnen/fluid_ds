@@ -20,6 +20,28 @@ import "./preview.css";
 
 const preview: Preview = {
   parameters: {
+    // Sidebar order: core component categories first, then one header per
+    // expansion pack (each `@fluid-ds/*` package gets its own top-level group).
+    options: {
+      storySort: {
+        order: [
+          // Core package first, with its sub-categories ordered.
+          "Components",
+          ["Forms", "Layout", "Navigation", "Feedback", "Content", "Utilities"],
+          // Then one top-level header per expansion pack.
+          "Animations",
+          "Scheduler",
+          "Charts",
+          "Media",
+          "Table",
+          "Calendar",
+          "Editor",
+          "Kanban",
+          "Map",
+          "*"
+        ]
+      }
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

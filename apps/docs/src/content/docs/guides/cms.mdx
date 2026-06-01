@@ -1,0 +1,235 @@
+---
+title: "CMS & server-rendered apps"
+description: "Drop Fluid into Umbraco, WordPress, Laravel, and any server-rendered stack with zero framework integration."
+---
+
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+
+A Fluid component is just **HTML** to a server template engine. Razor,
+Blade, Twig, ERB: none of them know or care that `<fluid-badge>` is a
+custom element. They emit the tag like any other markup, and the browser
+upgrades it once the CDN script registers the definition.
+
+That means Fluid drops into any server-rendered stack with **zero
+framework integration**. No build step, no SPA, no bundler, no wrapper
+package. The server renders the page; the browser does the rest.
+
+## The core idea
+
+There are two halves to it:
+
+1. **The server emits the tag.** Your template engine writes
+   `<fluid-button>Save</fluid-button>` into the response, interpolating
+   model values into attributes and slots exactly as it would for a
+   `<span>` or a `<div>`.
+2. **The browser upgrades it.** A small CDN script registers the
+   `<fluid-*>` element. The moment the definition loads, every matching
+   tag already in the DOM (and any added later) becomes a live component.
+
+The CDN setup is identical to the [CDN reference](/getting-started/cdn/):
+load the `@fluid-ds/tokens` CSS, the `@fluid-ds/icons` register-defaults
+module, and one `define.js` per component you use. Pin `@alpha` while
+Fluid is pre-release.
+
+```html title="<head>"
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js"></script>
+```
+
+<Aside type="tip">
+  Put this block in your site's shared layout (`<head>`) once. Every page
+  the server renders then has access to the tags, no per-page wiring
+  needed.
+</Aside>
+
+The rest of this page shows the same pattern in three common
+server-rendered stacks. The shape is always the same: assets in the
+layout head, tags in the views.
+
+---
+
+## Umbraco (.NET)
+
+### Delivered site
+
+Umbraco renders with Razor. Add the CDN assets to your layout's `<head>`
+once:
+
+```cshtml title="Views/_Layout.cshtml"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@alpha/dist/light.css" />
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/icons@@alpha/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/components@@alpha/dist/components/badge/define.js"></script>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>
+```
+
+In Razor, `@@` is the escape for a literal `@`, so the `@fluid-ds` scope
+in the CDN URLs survives. Then use `<fluid-*>` tags in any view, partial,
+or rich-text output, binding model values straight into attributes and
+slots:
+
+```cshtml title="Views/Product.cshtml"
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<Product>
+
+<h1>@Model.Name</h1>
+
+<fluid-badge variant="@Model.StatusVariant">@Model.Status</fluid-badge>
+
+<fluid-button variant="primary" href="@Model.Url">
+    View details
+</fluid-button>
+```
+
+The Razor expressions resolve server-side to plain strings; the browser
+sees ordinary HTML and upgrades the tags on load.
+
+<Aside type="note" title="Back-office angle">
+  Umbraco's v14+ back-office (codenamed "Project Bellissima") is itself
+  built on Lit and web components. Fluid is the same technology, so its
+  components are at home extending the back-office too: custom dashboards,
+  property editors, and content-app views can render `<fluid-*>` tags
+  directly, with no adapter layer between them and Umbraco's own UI.
+</Aside>
+
+---
+
+## WordPress (PHP)
+
+Enqueue the CDN assets in your theme's `functions.php`. WordPress 6.3+
+supports the `strategy` argument, so you can defer the scripts:
+
+```php title="functions.php"
+add_action( 'wp_enqueue_scripts', function () {
+    // Tokens: plain stylesheets.
+    wp_enqueue_style(
+        'fluid-tokens-base',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css'
+    );
+    wp_enqueue_style(
+        'fluid-tokens-light',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css'
+    );
+
+    // Components + icons: ES modules, registered with defer.
+    wp_enqueue_script(
+        'fluid-icons',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js',
+        array(),
+        null,
+        array( 'strategy' => 'defer' )
+    );
+    wp_enqueue_script(
+        'fluid-badge',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js',
+        array(),
+        null,
+        array( 'strategy' => 'defer' )
+    );
+} );
+```
+
+Fluid's component files are ES modules, so the `<script>` tags must carry
+`type="module"`. Add a `script_loader_tag` filter to set it:
+
+```php title="functions.php"
+add_filter( 'script_loader_tag', function ( $tag, $handle ) {
+    if ( in_array( $handle, array( 'fluid-icons', 'fluid-badge' ), true ) ) {
+        return str_replace( '<script ', '<script type="module" ', $tag );
+    }
+    return $tag;
+}, 10, 2 );
+```
+
+With the assets enqueued, use `<fluid-*>` tags in a theme template, a
+block's `render_callback`, or a shortcode:
+
+```php title="A simple shortcode"
+add_shortcode( 'order_status', function ( $atts ) {
+    $atts = shortcode_atts( array( 'status' => 'pending' ), $atts );
+    $status = esc_html( $atts['status'] );
+    return "<fluid-badge>{$status}</fluid-badge>";
+} );
+```
+
+`[order_status status="Shipped"]` in any post or page then renders a live
+`<fluid-badge>`.
+
+---
+
+## Laravel (Blade)
+
+Add the CDN tags to your Blade layout's `<head>`:
+
+```blade title="resources/views/layouts/app.blade.php"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js"></script>
+</head>
+<body>
+    @yield('content')
+</body>
+</html>
+```
+
+(If you already build front-end assets with Vite, you can `import` the
+same `define` modules from `resources/js/app.js` instead of the CDN tags.
+Either path registers the elements; the CDN is simply the buildless
+option.)
+
+Then use `<fluid-*>` in any `.blade.php` view, interpolating Blade
+expressions into attributes and slots:
+
+```blade title="resources/views/orders/show.blade.php"
+@extends('layouts.app')
+
+@section('content')
+    <h1>Order #{{ $order->id }}</h1>
+
+    <fluid-badge variant="{{ $order->statusVariant }}">
+        {{ $order->status }}
+    </fluid-badge>
+@endsection
+```
+
+Blade's `{{ }}` escapes and substitutes the value server-side; the
+response is plain HTML the browser upgrades.
+
+---
+
+## Why this works
+
+Custom elements are part of the **HTML standard**, not a feature of any
+JavaScript framework. A `<fluid-badge>` tag is valid HTML the moment it
+is written, the same way `<details>` or `<dialog>` are. So any server
+that can emit HTML can emit Fluid components, and the only client-side
+requirement is registering each element once (the `define.js` script).
+
+That registration is what turns inert markup into a live component, and
+it happens in the browser regardless of how the markup got there. The
+server never needs to know Fluid exists.
+
+<Aside type="note">
+  The same pattern covers every other server-rendered stack: Rails (ERB),
+  Django (templates), Symfony (Twig), Flask (Jinja), Spring (Thymeleaf),
+  and so on. Put the CDN assets in the shared layout, write `<fluid-*>`
+  tags in your templates, and let the browser do the upgrade.
+</Aside>

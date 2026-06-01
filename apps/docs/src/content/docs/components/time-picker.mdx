@@ -1,0 +1,376 @@
+---
+title: "Time picker"
+description: "Standalone time field that opens an accessible listbox of times generated from min/max/step. Canonical 24h HH:MM value, 12h or 24h display, form-associated."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-time-picker>` is a form-associated text field that opens a
+`role="listbox"` of time options in a popover. You can type to filter or pick
+from the list; either way the form value is always a canonical 24-hour
+`"HH:MM"` string. The `format` attribute controls only the *visible* text
+("12h" shows `1:30 PM`, "24h" shows `13:30`), never the value, so presentation
+never corrupts what you store.
+
+<Demo>
+  <fluid-time-picker value="09:30" aria-label="Time"></fluid-time-picker>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/time-picker/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/time-picker";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+`value` is a 24h `"HH:MM"` string. Click the field or the clock button to open
+the list; <kbd>↓</kbd> in the field opens it too. Type to filter the options.
+
+<Demo>
+  <fluid-time-picker value="09:30" aria-label="Time"></fluid-time-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker name="time" value="09:30"></fluid-time-picker>`} />
+
+### Placeholder
+
+With no value, the placeholder shows until a time is chosen.
+
+<Demo>
+  <fluid-time-picker placeholder="Pick a time…" aria-label="Time"></fluid-time-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker placeholder="Pick a time…"></fluid-time-picker>`} />
+
+### Display format
+
+`format` accepts `24h` (default) and `12h`. It changes only the text the field
+and options show; the value and form submission stay canonical 24h `HH:MM`.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-time-picker value="13:30" format="24h" aria-label="24 hour"></fluid-time-picker>
+    <fluid-time-picker value="13:30" format="12h" aria-label="12 hour"></fluid-time-picker>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker value="13:30" format="24h"></fluid-time-picker>
+<fluid-time-picker value="13:30" format="12h"></fluid-time-picker>`} />
+
+### Step
+
+`step` (minutes, default 15) controls the spacing between generated options.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-time-picker value="09:00" step="60" aria-label="Hourly"></fluid-time-picker>
+    <fluid-time-picker value="09:30" step="30" aria-label="Half hour"></fluid-time-picker>
+    <fluid-time-picker value="09:05" step="5" aria-label="Five minutes"></fluid-time-picker>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker value="09:00" step="60"></fluid-time-picker>
+<fluid-time-picker value="09:05" step="5"></fluid-time-picker>`} />
+
+### Min and max
+
+`min` and `max` (24h `HH:MM`) bound the generated list; only times within the
+range appear as options.
+
+<Demo>
+  <fluid-time-picker value="10:00" min="09:00" max="17:00" step="30" aria-label="Time"></fluid-time-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker value="10:00" min="09:00" max="17:00" step="30"></fluid-time-picker>`} />
+
+### Sizes
+
+`size` accepts `sm`, `md` (default), and `lg`, matching the input field heights.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-time-picker size="sm" value="09:30" aria-label="Small"></fluid-time-picker>
+    <fluid-time-picker size="md" value="09:30" aria-label="Medium"></fluid-time-picker>
+    <fluid-time-picker size="lg" value="09:30" aria-label="Large"></fluid-time-picker>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker size="sm" value="09:30"></fluid-time-picker>
+<fluid-time-picker size="md" value="09:30"></fluid-time-picker>
+<fluid-time-picker size="lg" value="09:30"></fluid-time-picker>`} />
+
+### Disabled
+
+<Demo>
+  <fluid-time-picker value="09:30" disabled aria-label="Time"></fluid-time-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker value="09:30" disabled></fluid-time-picker>`} />
+
+## Listening for changes
+
+The picker fires **`fluid-change`** with `{ value }` in `detail` when the
+committed time changes (a list pick, or a valid typed entry on <kbd>Enter</kbd>
+/ blur). `value` is the canonical 24h `"HH:MM"` string (or `null` when cleared).
+It also fires `fluid-open` / `fluid-close` around the popover.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-time-picker id="start" aria-label="Start time"></fluid-time-picker>
+
+    <script type="module">
+      document.getElementById("start").addEventListener("fluid-change", (e) => {
+        console.log(e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="StartTime.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/time-picker";
+
+    export function StartTime() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-time-picker ref={ref} aria-label="Start time" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="StartTime.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/time-picker";
+    const onChange = (e: CustomEvent) => console.log(e.detail.value);
+    </script>
+
+    <template>
+      <fluid-time-picker aria-label="Start time" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="start-time.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/time-picker";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "start-time",
+      template: `
+        <fluid-time-picker aria-label="Start time" (fluid-change)="onChange($event)"></fluid-time-picker>
+      `
+    })
+    export class StartTime {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="StartTime.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/time-picker";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.value);
+      }
+    </script>
+
+    <fluid-time-picker aria-label="Start time" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+The picker is form-associated: it submits `name=<24h value>`, and `required`
+blocks submission until a time is chosen. The submitted value is always
+canonical 24h `HH:MM`, independent of the `format` shown.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'start=' + (new FormData(this).get('start') ?? '(none)');"
+  >
+    <fluid-time-picker name="start" required placeholder="Start time" aria-label="Start time"></fluid-time-picker>
+    <fluid-button type="submit">Save</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-time-picker name="start" required></fluid-time-picker>
+  <fluid-button type="submit">Save</fluid-button>
+</form>
+```
+
+See the [Forms guide](/guides/forms/) for validation, submission, and form-data
+wiring across frameworks.
+
+## Theming
+
+Every styled property of the picker reads a **component-scoped
+`--fluid-time-picker-*` token that falls back to a main semantic var** (the
+override ladder); most fall through to the shared `--fluid-input-*` /
+`--fluid-field-*` tokens, so the field matches your inputs by default and only
+the listbox surface and options are picker-specific. The **complete,
+authoritative list** lives in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-time-picker-border-focus: #db2777;
+  --fluid-time-picker-option-selected-bg: #db2777;
+  --fluid-time-picker-listbox-bg: var(--fluid-surface-base);
+}
+```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you tweak the field, listbox, and
+  option tokens visually and exports the CSS above.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The field is [`part="base"`](#api), with `input`, `trigger`, `listbox`, and
+`option` sub-parts. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token:
+
+```css
+/* Widen the popover. */
+fluid-time-picker::part(listbox) {
+  min-width: 12rem;
+}
+```
+
+## When to use
+
+- A **single time of day** in a form: an appointment, a start time, a reminder.
+- Anywhere you need both **typed entry and a pickable list** with one
+  accessible control that submits a clean 24h value.
+
+### When *not* to use
+
+- A **calendar date**: use [`<fluid-date-picker>`](/components/date-picker/).
+- **Free text** that isn't a time: use [`<fluid-input>`](/components/input/).
+
+## Accessibility
+
+`<fluid-time-picker>` follows the WAI-ARIA APG **Combobox** pattern with a
+`role="listbox"` popup. The field stays a text input (`role="combobox"`,
+`aria-haspopup="listbox"`, `aria-expanded`, `aria-controls`); DOM focus stays on
+the input and the active option is tracked with `aria-activedescendant`. The
+notes below are picker-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| _type a time_ | Filter the list; <kbd>Enter</kbd> commits the active option (or a typed match). |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Open the list and move the active option. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last option. |
+| <kbd>Enter</kbd> | Commit the active option and close. |
+| <kbd>Escape</kbd> | Close the popover without changing the value. |
+
+The field's focus ring is `:focus-within` and reads
+`--fluid-time-picker-focus-ring-width` (falling back to
+`--fluid-focus-ring-width`).
+
+### Names & roles
+
+The field needs an accessible name, a visible label wired with
+`aria-labelledby`, or an `aria-label`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). The
+trigger button is named "Choose time", the listbox is labeled, and each option
+carries `aria-selected` to mark the current value.
+
+### State semantics
+
+`required` participates in form validation (a missing value reports
+`valueMissing`). `disabled` removes the field from the tab order and blocks the
+popover. `aria-expanded` on both the field and trigger reflects the open state.
+
+### Motion & target size
+
+- The popover open/close transition honors `prefers-reduced-motion: reduce`.
+- The trigger and every option is at least **24×24** CSS px by default
+  ([SC 2.5.8 Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+  AA), reading `--fluid-target-min` as a floor.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA** and the
+trigger target grows, the option targets grow, and the focus ring thickens. The
+toggle sets the real `data-fluid-conformance` attribute on `<html>`:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-time-picker" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Date picker"
+    href="/components/date-picker/"
+    description="Pick a single calendar date in a popover grid."
+  />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="The text field this picker shares its --fluid-input-* tokens with."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="A listbox of arbitrary options when the choices aren't times."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

@@ -1,0 +1,180 @@
+---
+title: "Pricing table"
+description: "A responsive grid of pricing tiers, with a highlighted featured plan, semantic headings, and a feature list."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-pricing-table>` lays out a responsive grid of `<fluid-pricing-tier>`
+cards. Each tier renders a plan name as a semantic heading, a prominent price
+with an optional billing `period`, a feature list (the default slot), and a CTA
+in the `action` slot. Mark the recommended plan with `featured` to highlight it.
+
+<Demo>
+  <fluid-pricing-table>
+    <fluid-pricing-tier name="Starter" price="$0" period="/mo">
+      <li>1 project</li>
+      <li>Community support</li>
+      <li>1 GB storage</li>
+      <fluid-button slot="action" variant="secondary">Choose Starter</fluid-button>
+    </fluid-pricing-tier>
+    <fluid-pricing-tier name="Pro" price="$29" period="/mo" featured>
+      <li>Unlimited projects</li>
+      <li>Priority support</li>
+      <li>100 GB storage</li>
+      <li>Custom domains</li>
+      <fluid-button slot="action" variant="primary">Choose Pro</fluid-button>
+    </fluid-pricing-tier>
+    <fluid-pricing-tier name="Team" price="$99" period="/mo">
+      <li>Everything in Pro</li>
+      <li>SSO</li>
+      <li>Audit log</li>
+      <fluid-button slot="action" variant="secondary">Choose Team</fluid-button>
+    </fluid-pricing-tier>
+  </fluid-pricing-table>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/pricing-table/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/pricing-table";
+    ```
+  </TabItem>
+</Tabs>
+
+Importing the entry point defines both `<fluid-pricing-table>` and
+`<fluid-pricing-tier>`.
+
+## Examples
+
+### Featured plan
+
+Add `featured` to the recommended tier. It highlights the card with the accent
+surface and shows a badge; the accent foreground/background pair meets WCAG AA
+contrast in every brand and theme.
+
+<Demo>
+  <fluid-pricing-table style="max-width: 24rem;">
+    <fluid-pricing-tier name="Pro" price="$29" period="/mo" featured>
+      <li>Unlimited projects</li>
+      <li>Priority support</li>
+      <fluid-button slot="action" variant="primary">Upgrade</fluid-button>
+    </fluid-pricing-tier>
+  </fluid-pricing-table>
+</Demo>
+
+```html
+<fluid-pricing-table>
+  <fluid-pricing-tier name="Pro" price="$29" period="/mo" featured>
+    <li>Unlimited projects</li>
+    <li>Priority support</li>
+    <fluid-button slot="action" variant="primary">Upgrade</fluid-button>
+  </fluid-pricing-tier>
+</fluid-pricing-table>
+```
+
+### Free or custom pricing
+
+`price` accepts any string, so "Free" or "Custom" work as well as a currency
+amount. Leave `period` off when there is no billing cycle.
+
+<Demo>
+  <fluid-pricing-table>
+    <fluid-pricing-tier name="Hobby" price="Free">
+      <li>1 project</li>
+      <li>Community support</li>
+      <fluid-button slot="action" variant="secondary">Get started</fluid-button>
+    </fluid-pricing-tier>
+    <fluid-pricing-tier name="Enterprise" price="Custom">
+      <li>Custom contract</li>
+      <li>24/7 support</li>
+      <fluid-button slot="action" variant="secondary">Contact sales</fluid-button>
+    </fluid-pricing-tier>
+  </fluid-pricing-table>
+</Demo>
+
+### Heading level
+
+Each tier name renders as a heading. Set `heading-level` (2-6) so the plan
+names fit your page's outline; the default is `3`.
+
+```html
+<fluid-pricing-tier name="Enterprise" price="Custom" heading-level="2">
+  <li>Custom contract</li>
+  <fluid-button slot="action" variant="primary">Contact sales</fluid-button>
+</fluid-pricing-tier>
+```
+
+## When to use
+
+- A plan comparison on a marketing or upgrade page.
+- A small set (two to four) of mutually exclusive subscription tiers.
+- Anywhere you want one option visually recommended over the others.
+
+For a single feature callout or a non-comparative offer, a plain
+[`<fluid-card>`](/components/card/) with a CTA is enough.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-pricing-tier-*` token
+that falls back to a main semantic var** (the override ladder), so you can
+retheme one instance, every tier, or the whole brand. The featured surface
+reuses the accent track, so it follows your brand automatically. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-pricing-tier-bg: var(--fluid-surface-base);
+  --fluid-pricing-tier-border: var(--fluid-border-default);
+  --fluid-pricing-tier-featured-bg: var(--fluid-accent-base);
+  --fluid-pricing-tier-featured-fg: var(--fluid-accent-text);
+  --fluid-pricing-table-gap: var(--fluid-space-5);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The card root is [`part="base"`](#api), with parts for the `header`, `name`,
+`price`, `amount`, `period`, `badge`, `features`, and `action`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-pricing-table" />
+
+<ComponentApi tag="fluid-pricing-tier" />
+
+## Accessibility
+
+- The table is a `role="group"` with an accessible name (`label`), so assistive
+  tech announces the set of plans as a unit.
+- Each plan name renders as a heading with a configurable `aria-level`
+  (`heading-level`), keeping the document outline correct.
+- Features render inside a real `<ul>`; author each item as an `<li>` so screen
+  readers announce the list length.
+- The featured tier conveys its status with a visible text badge, not color
+  alone (SC 1.4.1), and the accent foreground/background pair meets the AA
+  contrast minimum.
+- Put a real interactive control (such as `<fluid-button>`) in the `action`
+  slot so each plan has a keyboard-reachable CTA.

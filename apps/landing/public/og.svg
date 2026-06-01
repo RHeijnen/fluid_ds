@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Fluid: framework-agnostic web components">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#171a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="8" fill="url(#accent)"/>
+  <text x="80" y="180" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="92" font-weight="800" fill="#ffffff">Fluid</text>
+  <text x="80" y="250" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="34" font-weight="500" fill="#c7d2fe">Framework-agnostic web components</text>
+  <text x="80" y="320" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="26" fill="#94a3b8">Drop the tags into React, Vue, Angular, Svelte, or plain HTML.</text>
+
+  <g font-family="Inter, Segoe UI, system-ui, sans-serif">
+    <text x="80" y="470" font-size="64" font-weight="800" fill="url(#accent)">101</text>
+    <text x="80" y="510" font-size="24" fill="#94a3b8">components</text>
+
+    <text x="340" y="470" font-size="64" font-weight="800" fill="url(#accent)">11</text>
+    <text x="340" y="510" font-size="24" fill="#94a3b8">expansion packs</text>
+
+    <text x="650" y="470" font-size="64" font-weight="800" fill="url(#accent)">AA</text>
+    <text x="650" y="510" font-size="24" fill="#94a3b8">WCAG 2.2 (AAA opt-in)</text>
+
+    <text x="980" y="470" font-size="64" font-weight="800" fill="url(#accent)">MIT</text>
+    <text x="980" y="510" font-size="24" fill="#94a3b8">open source</text>
+  </g>
+
+  <text x="80" y="585" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="24" fill="#64748b">fluid-web.dev</text>
+</svg>

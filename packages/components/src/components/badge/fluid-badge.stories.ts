@@ -6,7 +6,7 @@ import type { FluidBadge } from "./fluid-badge.js";
 type Args = Pick<FluidBadge, "variant" | "size" | "dot"> & { content: string };
 
 const meta: Meta<Args> = {
-  title: "Components/Badge",
+  title: "Components/Content/Badge",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

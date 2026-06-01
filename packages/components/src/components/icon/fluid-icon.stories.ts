@@ -8,7 +8,7 @@ import type { FluidIcon } from "./fluid-icon.js";
 type Args = Pick<FluidIcon, "name" | "label">;
 
 const meta: Meta<Args> = {
-  title: "Components/Icon",
+  title: "Components/Content/Icon",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

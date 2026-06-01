@@ -17,13 +17,20 @@ to hand off context when you switch machines.
 ## Current state
 
 - **Branch:** `main`
-- **Last verified:** 2026-05-31: `pnpm verify` green (**~360 component tests**,
-  68 components / 55 families) **and `pnpm docs:build` green**. Browser-checked
-  live (Chrome MCP) this session: the four framework admin portals
-  (native/React/Next/Angular) render 1:1; the Angular dashboard gutter fix
-  (`display:contents` on routed hosts); and the docs header rework
-  (control alignment, WCAG-toggle target-size + contrast a11y fixes, GitHub/
-  brand-select overlap, single bar divider).
+- **Last verified:** 2026-06-01: `pnpm typecheck` + `pnpm lint` +
+  `pnpm check:coverage` + `pnpm test` (854 component tests) + `pnpm build` +
+  `pnpm docs:build` (130 pages) + `pnpm storybook:build` all green.
+  **101 core component families** (122 elements) plus the expansion packs:
+  charts, scheduler, markdown, qr, media (incl. audio + lightbox), table,
+  calendar, editor, kanban, map. This session added **26 more core components**
+  (75 → 101): `fluid-hero` plus a 25-component batch (form, fieldset,
+  range-slider, time-picker, masked-input, transfer, dropzone, app-bar, sidebar,
+  nav-list, anchor-nav, context-menu, meter, popconfirm, result, tour,
+  loading-overlay, image, description-list, list, truncate, countdown,
+  theme-toggle, hotkey, aspect-ratio), each to the full authoring standard
+  (story + docs page + playground card + tests). All wired into the core
+  `index.ts`, playground, and docs sidebar; OG image + marketing counts bumped
+  to 101; changeset `core-components-batch-2.md` added.
 - **🚀 Launch status (LIVE on npm; website deploys on next push):**
   - Model: **git is the source of truth; npm package + website are two outputs
     of the same commit.** The website consumes `@fluid-ds/*` via `workspace:*`,
@@ -38,14 +45,20 @@ to hand off context when you switch machines.
     an OIDC trusted publisher per package on npm, then rewire `release.yml` to
     drop the token + use `id-token` (npm ≥ 11.5.1). NOT done yet, `release.yml`
     still token-shaped (`NODE_AUTH_TOKEN`); revisit before the next publish.
-  - **Hosting = Cloudflare Pages**, Direct Upload project **`fluid-25z`**, temp
-    URL **https://fluid-25z.pages.dev** (custom domain later). `deploy.yml`
-    builds the unified site in GH Actions and `wrangler pages deploy`s it on
-    every push to `main`. Secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID`
-    are set. Astro `site` is set to the temp URL (override via `DOCS_SITE`).
-  - **Next:** push the current batch → first website deploy fires → verify
-    `fluid-25z.pages.dev` (incl. docs search, which only works built). Then:
-    custom domain, and the Trusted-Publishing rewire of `release.yml`.
+  - **Hosting = Cloudflare Pages**, Direct Upload project **`fluid-25z`** (the
+    project keeps that name), served from the custom domain
+    **https://fluid-web.dev**. Astro `site` is set to it (override via
+    `DOCS_SITE`). The site is currently shipped via **local `wrangler pages
+    deploy website --project-name=fluid-25z --branch=main`** (run after
+    `pnpm build:website`).
+  - **CI auto-deploy NOT working yet:** `deploy.yml` builds + deploys on push to
+    `main`, but the Cloudflare token step fails (`wrangler` exit 1). Until that
+    token/permission is fixed, deploy locally with wrangler. (`CLOUDFLARE_API_TOKEN`
+    + `CLOUDFLARE_ACCOUNT_ID` secrets exist; the token likely needs
+    Account → Cloudflare Pages → Edit.)
+  - **Next:** attach `fluid-web.dev` to the `fluid-25z` Pages project in the
+    Cloudflare dashboard (+ DNS), fix the CI deploy token, and the
+    Trusted-Publishing rewire of `release.yml`.
   - Docs search (Pagefind) only indexes at **build**, so it's empty in
     `astro dev`; it works once the site is deployed (or via `pnpm docs:build`).
 - **⚠️ Process note: `pnpm verify` does NOT build the docs site.** `verify`'s
@@ -263,6 +276,176 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-06-01: +26 core components (75 → 101)
+
+- Added `fluid-hero` (a slot-driven marketing masthead: eyebrow / heading /
+  description / actions / media, with `align`, `media-position`, `size`; empty
+  regions collapse) plus a **25-component batch** built one-agent-per-component
+  via the Workflow tool: form, fieldset, range-slider, time-picker,
+  masked-input, transfer, dropzone, app-bar, sidebar, nav-list (+ nav-item),
+  anchor-nav, context-menu, meter, popconfirm, result, tour, loading-overlay,
+  image, description-list (+ description-item), list (+ list-item), truncate,
+  countdown, theme-toggle, hotkey (non-visual), aspect-ratio.
+- Each ships to the full authoring standard: story + docs `.mdx` + playground
+  card + tests (854 component tests pass). `fluid-hotkey` is non-visual, added
+  to `PREVIEW_EXEMPT`.
+- Wired into `packages/components/src/index.ts`, playground `main.ts` +
+  `preview.ts`, docs `Head.astro` + `astro.config.mjs` sidebar.
+- Fix-up: re-architected `fluid-form` to operate over its light-DOM controls
+  (the shadow `<form>` + slot never saw slotted inputs); fixed clashes where
+  `offsetTop`/`title` collided with native `HTMLElement` members; fixed
+  masked-input + range-slider form-value sync; fixed a11y/role issues in
+  dropzone, popconfirm, context-menu, description-item, fieldset; converted two
+  MDX demos (anchor-nav, hotkey/tour) to MDX-safe forms.
+- Counts bumped to **101** in landing copy, OG image (regenerated PNG),
+  FEATURES, README. Changeset `core-components-batch-2.md` added.
+- Gates: typecheck, lint, coverage (122 components / 101 families), test, build,
+  docs:build (130 pages), storybook:build all green.
+- Storybook sidebar now splits **per package**: each expansion pack is its own
+  top-level header (Scheduler, Charts, Media, Table, Calendar, Editor, Kanban,
+  Map) instead of a shared "Expansion" bucket; `storySort` in `.storybook/
+  preview.ts` lists core categories first then the packs. Added the missing
+  charts stories glob to `.storybook/main.ts` + a `Charts/Gallery` story (charts
+  had none), and moved the core `fluid-comparison` story out of the `Media/`
+  group into `Components/`. Also tidied the `fluid-truncate` Lit
+  change-in-update warning (measurement deferred a frame, out of the update
+  cycle). Note: a running Storybook must be **restarted** to pick up new story
+  globs / packages.
+- Subdivided the core `Components/` Storybook bucket into the same categories the
+  docs sidebar uses (Inputs & forms, Layout, Navigation, Feedback, Content,
+  Utilities & motion), derived from `apps/docs/astro.config.mjs` so the two
+  surfaces match. Each core story's `title` prefix was rewritten in place; the
+  `storySort` order in `.storybook/preview.ts` was updated to list those
+  categories first. (A scripted prefix-swap initially mangled a `fluid-tour`
+  step's `title` field, since the first `title:` in that file is data, not the
+  meta: corrected by hand.)
+- Fixed three expansion-pack visual bugs (browser-verified via Storybook +
+  Chrome DevTools; changeset `fix-editor-map-kanban-visuals.md`): editor toolbar
+  icons were invisible (inline SVG path fragments built with the `html` tag, so
+  they were HTML-namespaced, not SVG: now use the `svg` tag); map markers were
+  broken images (Leaflet `Icon.Default` prepends a mis-detected `imagePath` under
+  the ESM build, so the component now uses one explicit `L.icon` with absolute
+  CDN URLs); kanban drag drop-target highlight was clipped by the `overflow:auto`
+  board, now an inset box-shadow ring + accent tint. editor / map / kanban tests
+  still pass (10 / 6 / 8).
+
+### 2026-06-01: expansion program complete (media extras + 5 new packs)
+
+- **Media pack extras**: `fluid-audio` (themed player) + `fluid-lightbox`
+  (gallery + top-layer `<dialog>`). Added a web-test-runner to the media pack.
+- **Five new expansion packs** (scaffolded serially, components built by a
+  multi-agent workflow, then orchestrated wiring + fix-up): **`@fluid-ds/table`**
+  (data grid), **`@fluid-ds/calendar`** (event-calendar), **`@fluid-ds/editor`**
+  (rich-text), **`@fluid-ds/kanban`** (DnD board), **`@fluid-ds/map`** (Leaflet
+  wrapper). Each: component + define + index + story + test + docs page.
+- **Date popover fix**: `fluid-date-picker` + `fluid-date-range-picker` panels
+  now render in the **top layer** (Popover API) so they are never clipped by a
+  transformed/overflow ancestor (the "range picker does nothing" report). Same
+  approach as `fluid-dropdown`. Browser-verified.
+- **Leaflet typing**: the map imports `leaflet/dist/leaflet-src.esm.js` (the
+  UMD main yields an empty namespace under native ESM); types come from a
+  `paths` shim in `tsconfig.base.json` → `types/leaflet-esm.d.ts` re-exporting
+  `@types/leaflet` (added at the repo root). CSS auto-loaded via a CDN `<link>`.
+- **Test ports**: scheduler/media/packs each pin a distinct web-test-runner
+  port (8011, 8012, 8020-8024) so the root `test` script runs them in parallel
+  without colliding on :8000.
+- **Wiring**: root `test`, Storybook glob, playground deps + `main.ts` + preview
+  cards, and the docs Expansion sidebar now cover all 8 packs. Changesets added.
+- **Verify**: `pnpm verify` + `pnpm docs:build` + `pnpm storybook:build` all
+  green. The component-expansion program (`docs/plans/component-expansion.md`)
+  is complete: 15 core components + media extras + 5 new packs.
+
+### 2026-06-01: 15 new core components (60 → 75), multi-agent build
+
+- **Phase A + B + pricing** of the component-expansion program
+  (`docs/plans/component-expansion.md`): **15 new core components** in
+  `@fluid-ds/components`, each to the authoring standard (story + docs page +
+  playground card + tests + AA/AAA tokens):
+  - Navigation/commands: `fluid-menu` (+ item/label), `fluid-command-palette`
+    (⌘K), `fluid-pagination`, `fluid-toolbar`, `fluid-speed-dial`.
+  - Forms: `fluid-field`, `fluid-otp`, `fluid-tag-input` (form-associated).
+  - Content/status: `fluid-timeline` (+ item), `fluid-stat`,
+    `fluid-avatar-group`, `fluid-banner`, `fluid-kbd`, `fluid-empty-state`,
+    `fluid-pricing-table` (+ tier).
+- **How**: kbd/empty-state/stat built by hand; the other 12 via a **multi-agent
+  Workflow** (one subagent per component) returning structured wiring data,
+  which the orchestrator applied to index.ts / playground / docs Head / sidebar.
+  Then an orchestrated fix-up pass (typecheck + lint + 6 flaky/logic test fixes
+  + 1 MDX parse fix in command-palette).
+- **Storybook**: the glob already includes `packages/scheduler`; core stories
+  were already covered. All 15 new stories bundle (`storybook:build` green).
+- **Core change**: `FluidFormAssociated.value` widened to allow `string[]` (for
+  the tag input); a backtick-in-`css\`\`` bug fixed in avatar-group.
+- **Verify**: `pnpm verify` green (580 component tests + 50 scheduler),
+  `pnpm docs:build` green (75 component pages), `pnpm storybook:build` green.
+  Changeset: `.changeset/core-components-expansion.md` (components minor).
+- **Still open** (program plan tasks #224/#225): media `audio` + `lightbox`,
+  and the 5 new expansion packs (`table`, `calendar`, `editor`, `kanban`,
+  `map`). Browser spot-check of the 15 new components is pending (axe audits in
+  their tests pass).
+
+### 2026-06-01: @fluid-ds/scheduler expansion pack (appointment booking)
+
+- **New extension package `@fluid-ds/scheduler`** (mirrors charts/qr/media):
+  - `src/internal/availability.ts`: a pure, framework-free engine
+    (`generateSlots`, `dayState`, full slot model: capacity, buffers,
+    min-notice, max-advance; local-first, tz-ready). 22 unit tests.
+  - `fluid-time-slots`: a single day's slots as a WAI-ARIA radiogroup (roving
+    tabindex, arrows, disabled full/past). 11 tests.
+  - `fluid-scheduler`: form-associated calendar + slot panel; fires
+    `fluid-range-change` (lazy per-month booking fetch), `fluid-day-select`,
+    `fluid-change`; `refresh()` + `loading` overlay. 10 tests.
+  - `fluid-availability-editor`: owner-side weekly-hours grid + closed-dates,
+    emits an `Availability` config. 7 tests.
+  - Stories for all three (the editor↔scheduler "OwnerAndVisitor" story is the
+    live vet-clinic demo); reference docs at `/expansion/scheduler/`.
+- **Additive `fluid-calendar` feature** (`day-state` map): coloured
+  availability dots + auto-disable of closed/unavailable days. Backward
+  compatible (no-op when unset). 3 new calendar tests.
+- **Core now exports `@fluid-ds/components/internal/*`** (FluidElement,
+  FluidFormAssociated, motion) so expansion packs can build on the base classes
+  without pulling the whole barrel.
+- **Wiring:** Storybook glob now includes `packages/scheduler` (the repo's first
+  extension-package stories); playground registers + previews all three;
+  docs sidebar + FEATURES updated. Root `test` script runs the scheduler suite.
+- **Landing:** added a **`WCAG 2.2 AA · AAA-ready`** badge to the hero next to
+  the version tag (accessibility as a headline selling point).
+- **Verify:** `pnpm verify` green (typecheck → lint → coverage → tests → build),
+  `pnpm docs:build` green (84 pages), `pnpm storybook:build` green (all three
+  scheduler stories bundled). Browser-verified the vet-clinic scheduler: dots,
+  closed-day disabling, day select, lunch-break slot gaps, slot selection.
+- Design doc: `docs/plans/scheduler.md`. Changeset: `.changeset/scheduler.md`
+  (scheduler + components patch).
+
+### 2026-06-01: date component family + CMS guide (0.0.2-alpha)
+
+- **New components (full authoring standard):** `fluid-calendar` (WAI-ARIA APG
+  month grid: roving tabindex, arrows/Home/End/PageUp/PageDown/Shift+Page,
+  single + range selection), `fluid-date-picker` (form-associated single date,
+  floating-ui popover, ISO `YYYY-MM-DD`, configurable display format/size), and
+  `fluid-date-range-picker` (form-associated, dual calendars, replaceable/
+  disableable preset column, hover-preview range). Shared engine in
+  `src/internal/date-utils.ts` (timezone-safe local dates, month grid, presets).
+  Each ships stories + `.mdx` + playground card + tests; wired into
+  playground `main.ts`/`preview.ts`, docs `Head.astro`, and the docs sidebar.
+- **CMS & server-rendered guide** (`guides/cms.mdx`): Umbraco (Razor `@@`
+  escaping + Bellissima back-office note), WordPress (`wp_enqueue_*`), Laravel
+  (Blade). Linked under docs → Guides. docs:build 83 pages green.
+- **Real a11y fix found while making the open-audit deterministic:**
+  `fluid-calendar` adjacent-month days were dimmed with an extra `opacity: 0.55`
+  on top of the muted color, blending the text to ~2.98:1 (below AA). These are
+  focusable month-navigation buttons, so the opacity was dropped; they now
+  de-emphasize via the muted color alone. The flaky audit (it ran mid-fade)
+  is now pinned by setting `--fluid-motion: 0` on the test fixture.
+- **ESLint ignores** extended for build artifacts that broke `eslint .`
+  locally: `**/.angular/**`, `**/.next/**`, `**/out/**`, `**/next-env.d.ts`;
+  added `apps/**/*.js` to the browser-globals block (vanilla admin-native demo).
+- **Docs updated:** changeset bumps `@fluid-ds/components` (patch → `0.0.2`);
+  `FEATURES.md`, `README.md`, landing copy bumped 57 → **60 components** and the
+  npm-publish line flipped to ✅ (live at `0.0.1-alpha`).
+- **Verify:** `pnpm verify` green end-to-end (typecheck → lint → coverage →
+  402 tests → build); ran the full suite 15× with zero flakes.
 
 ### 2026-05-31: four framework portals + deploy automation + pre-launch prep
 

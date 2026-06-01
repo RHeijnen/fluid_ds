@@ -7,7 +7,7 @@ import type { FluidAvatar } from "./fluid-avatar.js";
 type Args = Pick<FluidAvatar, "size" | "shape" | "image" | "initials" | "label">;
 
 const meta: Meta<Args> = {
-  title: "Components/Avatar",
+  title: "Components/Content/Avatar",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

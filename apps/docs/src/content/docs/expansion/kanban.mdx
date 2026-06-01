@@ -1,0 +1,106 @@
+---
+title: "@fluid-ds/kanban"
+description: "An accessible drag-and-drop kanban board web component."
+---
+
+A kanban board for Fluid: columns of draggable cards you can rearrange with a
+pointer or, just as fully, with the keyboard. Expansion pack.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/kanban
+```
+
+Import only the piece you use:
+
+```ts
+import "@fluid-ds/kanban/define/kanban";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-kanban>` | A board of columns, each holding an ordered list of cards. Cards move by native HTML5 drag and drop or by keyboard, and every move emits an event. |
+
+## Use
+
+Pass the board data as the `columns` property (an array, so set it as a property,
+not an attribute):
+
+```html
+<fluid-kanban id="board"></fluid-kanban>
+
+<script type="module">
+  import "@fluid-ds/kanban/define/kanban";
+
+  document.getElementById("board").columns = [
+    {
+      id: "todo",
+      title: "To do",
+      cards: [
+        { id: "c1", title: "Draft the spec", description: "Outline scope." },
+        { id: "c2", title: "Set up CI" }
+      ]
+    },
+    { id: "doing", title: "In progress", cards: [] },
+    { id: "done", title: "Done", cards: [] }
+  ];
+
+  document.getElementById("board").addEventListener("fluid-move", (e) => {
+    console.log(e.detail); // { cardId, fromColumn, toColumn, index }
+  });
+</script>
+```
+
+## API
+
+### Properties
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `columns` | `KanbanColumn[]` | `[]` | The board data. Each column is `{ id, title, cards }`, each card is `{ id, title, description? }`. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `moveCard(cardId, toColumn, toIndex)` | Move a card to the target column index, update state, announce, and emit `fluid-move`. Returns the new position or `null`. |
+
+### Events
+
+| Event | Detail | Fired when |
+| --- | --- | --- |
+| `fluid-move` | `{ cardId, fromColumn, toColumn, index }` | A card is moved by drag or keyboard. `fromColumn` and `toColumn` are column ids; `index` is the destination position. |
+
+## Keyboard
+
+The keyboard path is a first-class peer of drag and drop, not a fallback.
+
+| Key | Action |
+| --- | --- |
+| `Tab` | Move focus between cards. |
+| `Space` / `Enter` | Pick up the focused card, or drop a card that is held. |
+| `ArrowLeft` / `ArrowRight` | Move a held card to the previous / next column. |
+| `ArrowUp` / `ArrowDown` | Reorder a held card within its column. |
+| `Escape` | Cancel the current pickup, leaving the card where it was. |
+
+Each column is a labelled `group`; cards live in a `list` with `listitem`
+children, and the held state is reflected with `aria-grabbed`. Every pickup,
+move, drop, and cancel is announced through a polite `aria-live` region.
+
+## Theming
+
+The board reads the same `--fluid-*` semantic tokens as the rest of the system
+(surfaces, text, borders, accent, focus ring), so themes flow through with no
+extra work. For fine-grained control it exposes its own component tokens:
+`--fluid-kanban-column-bg`, `--fluid-kanban-card-bg`, `--fluid-kanban-fg`,
+`--fluid-kanban-border`, `--fluid-kanban-radius`, and `--fluid-kanban-gap`. Each
+falls back to a semantic var, so you can retheme one board, every board, or the
+whole brand. Use `::part(base | column | column-header | list | card)` for any
+styling the tokens do not cover.
+
+## License
+
+MIT.

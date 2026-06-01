@@ -4,7 +4,7 @@ import "./define.js";
 import "../icon/define.js";
 
 const meta: Meta = {
-  title: "Components/Breadcrumb",
+  title: "Components/Navigation/Breadcrumb",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

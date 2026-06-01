@@ -25,9 +25,11 @@ export class FluidFormAssociated extends FluidElement {
 
   /**
    * The current value. Subclasses must declare this as a reactive @property
-   * and call `syncFormValue()` whenever it changes.
+   * and call `syncFormValue()` whenever it changes. Most controls use a string;
+   * multi-value controls (e.g. tag input) may hold a string array and serialize
+   * it to a string in their own `syncFormValue()` before submission.
    */
-  declare value: string | File | FormData | null;
+  declare value: string | string[] | File | FormData | null;
 
   constructor() {
     super();

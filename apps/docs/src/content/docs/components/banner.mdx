@@ -1,0 +1,303 @@
+---
+title: "Banner"
+description: "Full-width announcement bar for site-wide notices, maintenance windows, and consent."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-banner>` is the edge-to-edge notification bar that spans the top of a
+page, section, or app shell. Five variants signal severity: `neutral`, `info`,
+`success`, `warning`, `danger`. For an in-prose status block, reach for
+[`<fluid-callout>`](/components/callout/); for transient toasts, see
+[`<fluid-toast>`](/components/toast/).
+
+<Demo>
+  <fluid-banner variant="info" dismissible style="width: 100%;">
+    We are performing scheduled maintenance this weekend.
+  </fluid-banner>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/banner/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/banner";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Variants
+
+<Demo>
+  <fluid-banner variant="neutral" style="width: 100%;">A neutral announcement.</fluid-banner>
+</Demo>
+
+<Demo>
+  <fluid-banner variant="info" style="width: 100%;">Informational notice for everyone.</fluid-banner>
+</Demo>
+
+<Demo>
+  <fluid-banner variant="success" style="width: 100%;">Your changes were published.</fluid-banner>
+</Demo>
+
+<Demo>
+  <fluid-banner variant="warning" style="width: 100%;">Your trial ends in three days.</fluid-banner>
+</Demo>
+
+<Demo>
+  <fluid-banner variant="danger" style="width: 100%;">A service outage is affecting logins.</fluid-banner>
+</Demo>
+
+```html
+<fluid-banner variant="warning">Your trial ends in three days.</fluid-banner>
+```
+
+### Dismissible
+
+Set `dismissible` for a close button. The banner removes itself from the DOM and
+fires **`fluid-dismiss`**, so you can persist the dismissal.
+
+<Demo>
+  <fluid-banner variant="info" dismissible style="width: 100%;">
+    We just shipped a new feature.
+  </fluid-banner>
+</Demo>
+
+```html
+<fluid-banner variant="info" dismissible id="b">
+  We just shipped a new feature.
+</fluid-banner>
+
+<script type="module">
+  document.getElementById("b").addEventListener("fluid-dismiss", () => {
+    localStorage.setItem("seen-banner", "1");
+  });
+</script>
+```
+
+### With actions
+
+Use the `actions` slot for trailing links or buttons, useful for cookie consent
+or "learn more" calls to action.
+
+<Demo>
+  <fluid-banner variant="info" dismissible style="width: 100%;">
+    We use cookies to improve your experience.
+    <fluid-button slot="actions" variant="ghost" size="sm">Settings</fluid-button>
+    <fluid-button slot="actions" variant="primary" size="sm">Accept</fluid-button>
+  </fluid-banner>
+</Demo>
+
+```html
+<fluid-banner variant="info" dismissible>
+  We use cookies to improve your experience.
+  <fluid-button slot="actions" variant="ghost" size="sm">Settings</fluid-button>
+  <fluid-button slot="actions" size="sm">Accept</fluid-button>
+</fluid-banner>
+```
+
+### Custom region label
+
+By default the bar's accessible name comes from its variant ("Notification" or
+"Alert"). Set `label` for a more specific landmark name.
+
+```html
+<fluid-banner variant="danger" label="Outage notice">
+  Payments are temporarily unavailable while we investigate.
+</fluid-banner>
+```
+
+## When to use
+
+- **Banner** = persistent, full-width, page- or app-level notice (maintenance,
+  consent, outage, promotion).
+- [**Callout**](/components/callout/) = in-prose status block scoped to a
+  section of content.
+- [**Toast**](/components/toast/) = transient status that fades on its own.
+
+## Listening for dismiss
+
+A `dismissible` banner fires **`fluid-dismiss`** when its close button is clicked
+and then removes itself from the DOM. Persist the dismissal in the handler so it
+does not reappear.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-banner variant="info" dismissible id="b">…</fluid-banner>
+
+    <script type="module">
+      document
+        .getElementById("b")
+        .addEventListener("fluid-dismiss", () => localStorage.setItem("seen", "1"));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Notice.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/banner";
+
+    export function Notice() {
+      const [open, setOpen] = useState(true);
+      if (!open) return null;
+      return (
+        <fluid-banner variant="info" dismissible
+          onfluid-dismiss={() => setOpen(false)}>
+          We just shipped a new feature.
+        </fluid-banner>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Notice.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/banner";
+    const open = ref(true);
+    </script>
+
+    <template>
+      <fluid-banner v-if="open" variant="info" dismissible @fluid-dismiss="open = false">…</fluid-banner>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="notice.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/banner";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-notice",
+      template: `<fluid-banner *ngIf="open" variant="info" dismissible (fluid-dismiss)="open = false">…</fluid-banner>`
+    })
+    export class Notice {
+      open = true;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Notice.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/banner";
+      let open = true;
+    </script>
+
+    {#if open}
+      <fluid-banner variant="info" dismissible on:fluid-dismiss={() => (open = false)}>…</fluid-banner>
+    {/if}
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-banner-*` token that
+falls back to a main semantic var or color primitive** (the override ladder).
+Each variant has its own `bg` / `fg` / `border` token; these are
+**theme-independent** so a warning reads the same across brands. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-banner-bg: var(--fluid-surface-muted);
+  --fluid-banner-fg: var(--fluid-text-primary);
+  --fluid-banner-info-bg: var(--fluid-color-brand-50);
+  --fluid-banner-info-fg: var(--fluid-color-brand-900);
+  --fluid-banner-info-border: var(--fluid-color-brand-200);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The bar is [`part="base"`](#api) with `part="content"`, `part="actions"`, and
+`part="dismiss"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-banner" />
+
+## Accessibility
+
+The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+banner-specific.
+
+### Names & roles
+
+- `info` and `success` banners use `role="status"` so a screen reader announces
+  them politely
+  ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
+- `warning`, `danger`, and `neutral` banners use `role="region"` with an
+  `aria-label`, exposing the bar as a landmark a user can navigate to.
+- Set `label` to give the region a meaningful name; otherwise it falls back to
+  "Notification" or "Alert" based on the variant.
+- Don't rely on color alone: the message text carries the meaning too
+  ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+- A dismissible banner's close button is labeled "Dismiss".
+
+### Motion & target size
+
+- The dismiss button floors its hit area to `--fluid-target-min`: ≥ **24×24**
+  (AA) / **44×44** (AAA), and its hover / focus transition collapses under
+  `prefers-reduced-motion: reduce`.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Callout"
+    href="/components/callout/"
+    description="In-prose info / warning / danger blocks."
+  />
+  <LinkCard
+    title="Toast"
+    href="/components/toast/"
+    description="Transient, auto-dismissing status messages."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="When the message must block until acknowledged."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="status vs region roles + not-by-color-alone."
+  />
+</CardGrid>

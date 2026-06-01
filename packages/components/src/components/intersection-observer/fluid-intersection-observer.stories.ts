@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Observers/Intersection observer",
+  title: "Components/Utilities/Intersection observer",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

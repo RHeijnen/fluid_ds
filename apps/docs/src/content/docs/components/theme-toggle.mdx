@@ -1,0 +1,225 @@
+---
+title: "Theme toggle"
+description: "Persisted light/dark switcher with an optional brand cycle. Flips data-fluid-theme on the document root and remembers the choice."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-theme-toggle>` is the icon-only switcher for the document color scheme.
+It shows a sun in light mode and a moon in dark mode, carries
+`aria-label="Toggle dark mode"` with `aria-pressed` reflecting whether dark mode
+is active, and on click flips `data-fluid-theme` between `"light"` and `"dark"`
+on `document.documentElement`. The choice is written to `localStorage`, so it
+survives a reload; on first load it falls back to the OS `prefers-color-scheme`
+when nothing is stored. Each flip emits **`fluid-theme-change`**.
+
+<Demo>
+  <fluid-theme-toggle></fluid-theme-toggle>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/theme-toggle/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/theme-toggle";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Default
+
+Drop it into a header or toolbar. No configuration needed: it restores the saved
+theme (or the system preference) the moment it connects.
+
+<Demo>
+  <fluid-theme-toggle></fluid-theme-toggle>
+</Demo>
+
+```html
+<fluid-theme-toggle></fluid-theme-toggle>
+```
+
+### With a brand cycle
+
+Pass a `brands` array to render a second button that steps `data-fluid-brand`
+on the document root through your presets, letting people sample palettes. An
+empty string in the list maps to the unset (default) brand.
+
+<Demo>
+  <fluid-theme-toggle id="brand-toggle"></fluid-theme-toggle>
+  <script type="module">
+    document.getElementById("brand-toggle").brands = ["", "midnight", "corporate"];
+  </script>
+</Demo>
+
+```html
+<fluid-theme-toggle id="t"></fluid-theme-toggle>
+<script type="module">
+  document.getElementById("t").brands = ["", "midnight", "corporate"];
+</script>
+```
+
+### Reacting to a change
+
+Listen for **`fluid-theme-change`** to sync other state (analytics, a chart
+theme, a server preference) when the scheme flips.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-theme-toggle id="t"></fluid-theme-toggle>
+
+    <script type="module">
+      document.getElementById("t").addEventListener("fluid-theme-change", (e) => {
+        console.log("theme is now", e.detail.theme);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Header.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/theme-toggle";
+
+    export function Header() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current;
+        const onChange = (e: Event) =>
+          console.log("theme", (e as CustomEvent).detail.theme);
+        el?.addEventListener("fluid-theme-change", onChange);
+        return () => el?.removeEventListener("fluid-theme-change", onChange);
+      }, []);
+      return <fluid-theme-toggle ref={ref} />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Header.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/theme-toggle";
+    function onChange(e: CustomEvent) {
+      console.log("theme", e.detail.theme);
+    }
+    </script>
+
+    <template>
+      <fluid-theme-toggle @fluid-theme-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="header.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/theme-toggle";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-header",
+      template: `
+        <fluid-theme-toggle (fluid-theme-change)="onChange($event)"></fluid-theme-toggle>
+      `
+    })
+    export class Header {
+      onChange(e: CustomEvent) { console.log("theme", e.detail.theme); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Header.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/theme-toggle";
+      function onChange(e: CustomEvent) {
+        console.log("theme", e.detail.theme);
+      }
+    </script>
+
+    <fluid-theme-toggle on:fluid-theme-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A persistent dark-mode switch in an app bar, header, or settings panel.
+- A docs or marketing site that respects the visitor's system preference but
+  lets them override it.
+- A theming playground where you also want a quick brand-palette cycle.
+
+For the underlying theming model (the `data-fluid-theme` and `data-fluid-brand`
+attributes this control writes), see the theming guide.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-theme-toggle-*` token
+that falls back to a main semantic var** (the override ladder). The button is
+square, borderless-on-rest, and reads the conformance tokens
+(`--fluid-target-min`, `--fluid-focus-ring-width`) so it scales to a 44x44
+target and an enhanced focus ring under `data-fluid-conformance="aaa"`. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-theme-toggle-fg: var(--fluid-text-primary);
+  --fluid-theme-toggle-hover-bg: var(--fluid-surface-muted);
+  --fluid-theme-toggle-border: var(--fluid-border-default);
+  --fluid-theme-toggle-radius: var(--fluid-radius-full);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The control row is [`part="base"`](#api) with `part="theme-button"`,
+`part="brand-button"`, and `part="icon"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-theme-toggle" />
+
+## Accessibility
+
+- The toggle is a real `<button type="button">` with a constant
+  `aria-label="Toggle dark mode"` and `aria-pressed` that reflects the dark
+  state (`true` in dark mode, `false` in light). This is the WAI-ARIA toggle
+  button pattern: Tab to reach it, Enter or Space to activate.
+- The glyph is rendered with `aria-hidden`, so the accessible name comes only
+  from the stable `aria-label`, not the changing icon ([SC 2.5.3]).
+- The optional brand button carries its own descriptive `aria-label` that names
+  the current brand.
+- Both buttons honor the conformance tokens: the hit target is at least 24x24
+  CSS px (44x44 under AAA) and the focus ring uses the system focus-ring width
+  and offset.
+- Motion: the hover transition is scaled by `--fluid-motion` and collapses under
+  `prefers-reduced-motion: reduce`.
+
+### AA vs AAA
+
+Under the default AA conformance the button is a 36px square (already past the
+24x24 minimum) with a 2px focus ring. Setting `data-fluid-conformance="aaa"` on
+an ancestor raises the minimum target to 44x44 and the focus ring to 3px with no
+per-component change, because the size and ring read `--fluid-target-min`,
+`--fluid-focus-ring-width`, and `--fluid-focus-ring-offset`.

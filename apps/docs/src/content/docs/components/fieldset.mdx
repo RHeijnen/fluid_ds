@@ -1,0 +1,203 @@
+---
+title: "Fieldset"
+description: "Groups related form controls under a shared legend, with an optional description and error, and a disabled flag that propagates to slotted controls."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-fieldset>` groups a set of related controls under a shared caption. It
+renders a real native `<fieldset>` with a `<legend>` (the correct semantic for
+grouping form controls), plus an optional description and a `role="alert"` error
+region. Set `disabled` to disable the whole group: the native `<fieldset>`
+disables nested native controls, and we mirror the state onto every slotted
+control so custom `fluid-*` controls disable too.
+
+<Demo>
+  <fluid-fieldset legend="Contact details" description="We will only use this to reach you about your order." style="max-width: 24rem;">
+    <label style="display:flex; flex-direction:column; gap:0.25rem;">
+      <span>Email</span>
+      <input type="email" name="email" />
+    </label>
+    <label style="display:flex; flex-direction:column; gap:0.25rem;">
+      <span>Phone</span>
+      <input type="tel" name="phone" />
+    </label>
+  </fluid-fieldset>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/fieldset/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/fieldset";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Radio group
+
+A native `<fieldset>` with a `<legend>` is the recommended way to give a radio
+group an accessible name. Slot the radios straight in.
+
+<Demo>
+  <fluid-fieldset legend="Plan" description="Pick the plan that fits your team." style="max-width: 24rem;">
+    <label style="display:flex; gap:0.5rem; align-items:center;">
+      <input type="radio" name="plan" value="free" checked /> Free
+    </label>
+    <label style="display:flex; gap:0.5rem; align-items:center;">
+      <input type="radio" name="plan" value="pro" /> Pro
+    </label>
+    <label style="display:flex; gap:0.5rem; align-items:center;">
+      <input type="radio" name="plan" value="team" /> Team
+    </label>
+  </fluid-fieldset>
+</Demo>
+
+```html
+<fluid-fieldset legend="Plan" description="Pick the plan that fits your team.">
+  <label><input type="radio" name="plan" value="free" checked /> Free</label>
+  <label><input type="radio" name="plan" value="pro" /> Pro</label>
+  <label><input type="radio" name="plan" value="team" /> Team</label>
+</fluid-fieldset>
+```
+
+### Error message
+
+Set `error` for a `role="alert"` message under the group. It is wired into the
+fieldset's `aria-describedby`, so assistive tech announces it with the group.
+
+<Demo>
+  <fluid-fieldset legend="Shipping address" error="Please complete every required field." style="max-width: 24rem;">
+    <label style="display:flex; flex-direction:column; gap:0.25rem;">
+      <span>Street</span>
+      <input type="text" name="street" />
+    </label>
+    <label style="display:flex; flex-direction:column; gap:0.25rem;">
+      <span>City</span>
+      <input type="text" name="city" />
+    </label>
+  </fluid-fieldset>
+</Demo>
+
+```html
+<fluid-fieldset legend="Shipping address" error="Please complete every required field.">
+  <!-- fields -->
+</fluid-fieldset>
+```
+
+### Disabled
+
+`disabled` disables the native fieldset (which disables nested native controls)
+and is also mirrored onto each slotted control, so custom `fluid-*` controls
+disable too. Controls the author disabled independently stay disabled when the
+group is re-enabled.
+
+<Demo>
+  <fluid-fieldset legend="Billing" description="Editing is locked while your payment is processing." disabled style="max-width: 24rem;">
+    <label style="display:flex; flex-direction:column; gap:0.25rem;">
+      <span>Card number</span>
+      <input type="text" name="card" />
+    </label>
+  </fluid-fieldset>
+</Demo>
+
+```html
+<fluid-fieldset legend="Billing" disabled>
+  <!-- every slotted control is disabled -->
+</fluid-fieldset>
+```
+
+### Rich legend
+
+Use the `legend` slot when the caption needs markup instead of plain text.
+
+<Demo>
+  <fluid-fieldset style="max-width: 24rem;">
+    <span slot="legend">Notification preferences</span>
+    <label style="display:flex; gap:0.5rem; align-items:center;">
+      <input type="checkbox" name="email-updates" /> Email updates
+    </label>
+    <label style="display:flex; gap:0.5rem; align-items:center;">
+      <input type="checkbox" name="sms-updates" /> SMS updates
+    </label>
+  </fluid-fieldset>
+</Demo>
+
+## When to use
+
+- Grouping a radio group or a set of checkboxes under one caption.
+- Grouping several related inputs (an address block, contact details) so the
+  group has a single accessible name.
+- Disabling a whole section of a form at once.
+
+Reach for [`<fluid-field>`](/components/field/) when you need a label,
+description, and error around a *single* control rather than a group.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-fieldset-*` token that
+falls back to a main semantic var** (the override ladder), so a consumer can
+retheme one fieldset, all fieldsets, or the whole system. The **complete list**
+is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-fieldset-border: var(--fluid-border-default);
+  --fluid-fieldset-bg: var(--fluid-surface-muted);
+  --fluid-fieldset-legend-fg: var(--fluid-text-primary);
+  --fluid-fieldset-description-fg: var(--fluid-text-secondary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The native fieldset is [`part="base"`](#api), with `part="legend"`,
+`part="description"`, and `part="error"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-fieldset" />
+
+## Accessibility
+
+- The group is a real native `<fieldset>` with a `<legend>`, the platform's own
+  grouping semantic. The legend is the group's accessible name, announced to
+  screen reader users when they enter the group.
+- The error region carries `role="alert"`, so it is announced when it appears,
+  and is referenced from the fieldset's `aria-describedby` alongside the
+  description.
+- `disabled` sets the native `disabled` attribute on the `<fieldset>` (which the
+  platform applies to nested native controls) and mirrors it onto each slotted
+  control so custom controls disable as well.
+
+### AA vs AAA
+
+- Fieldset is a passive grouping container with no interactive target of its
+  own, so the AA target-size criterion (SC 2.5.8, 24×24) and the AAA target size
+  (SC 2.5.5, 44×44) apply to the *controls you slot in*, not to the fieldset.
+- The legend, description, and error text all meet the AA 4.5:1 contrast
+  requirement (SC 1.4.3) against the surface in every brand and theme; the
+  border meets the 3:1 non-text contrast requirement (SC 1.4.11).

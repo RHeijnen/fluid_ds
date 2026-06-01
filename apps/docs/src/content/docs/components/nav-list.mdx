@@ -1,0 +1,304 @@
+---
+title: "Nav list"
+description: "Vertical site navigation: a nav landmark wrapping a list of links with optional icons, badges, and a current-page indicator."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-nav-list>` is a vertical navigation menu: a `<nav>` landmark wrapping a
+`role="list"` of `<fluid-nav-item>` links. Each item is a real `<a>`, so the
+keyboard behaviour is entirely native. Set `current` on the item for the page
+the user is on, it applies `aria-current="page"` and the active style.
+
+This is **page navigation**, not a menu of actions. Reach for
+[`<fluid-menu>`](/components/menu/) when the items run commands, and
+[`<fluid-tree>`](/components/tree/) when the items express a parent/child
+hierarchy.
+
+<Demo>
+  <div style="max-width: 16rem;">
+    <fluid-nav-list label="Main">
+      <fluid-nav-item href="#dashboard" current>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="#projects">Projects</fluid-nav-item>
+      <fluid-nav-item href="#team">Team</fluid-nav-item>
+      <fluid-nav-item href="#settings">Settings</fluid-nav-item>
+    </fluid-nav-list>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/nav-list/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/nav-list";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Give the list a `label` so the `<nav>` landmark has a unique accessible name
+when a page has more than one navigation region.
+
+<Demo>
+  <div style="max-width: 16rem;">
+    <fluid-nav-list label="Main">
+      <fluid-nav-item href="#dashboard" current>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="#projects">Projects</fluid-nav-item>
+      <fluid-nav-item href="#settings">Settings</fluid-nav-item>
+    </fluid-nav-list>
+  </div>
+</Demo>
+
+```html
+<fluid-nav-list label="Main">
+  <fluid-nav-item href="/dashboard" current>Dashboard</fluid-nav-item>
+  <fluid-nav-item href="/projects">Projects</fluid-nav-item>
+  <fluid-nav-item href="/settings">Settings</fluid-nav-item>
+</fluid-nav-list>
+```
+
+### With icons
+
+Slot an icon into the `icon` slot for a leading glyph.
+
+<Demo>
+  <div style="max-width: 16rem;">
+    <fluid-nav-list label="Workspace">
+      <fluid-nav-item href="#home" current>
+        <fluid-icon slot="icon" name="house"></fluid-icon>
+        Home
+      </fluid-nav-item>
+      <fluid-nav-item href="#search">
+        <fluid-icon slot="icon" name="search"></fluid-icon>
+        Search
+      </fluid-nav-item>
+      <fluid-nav-item href="#settings">
+        <fluid-icon slot="icon" name="settings"></fluid-icon>
+        Settings
+      </fluid-nav-item>
+    </fluid-nav-list>
+  </div>
+</Demo>
+
+```html
+<fluid-nav-item href="/home" current>
+  <fluid-icon slot="icon" name="house"></fluid-icon>
+  Home
+</fluid-nav-item>
+```
+
+### With badges
+
+The trailing `badge` slot takes a count or status indicator.
+
+<Demo>
+  <div style="max-width: 16rem;">
+    <fluid-nav-list label="Inbox">
+      <fluid-nav-item href="#all" current>
+        All
+        <fluid-badge slot="badge">128</fluid-badge>
+      </fluid-nav-item>
+      <fluid-nav-item href="#unread">
+        Unread
+        <fluid-badge slot="badge" variant="info">12</fluid-badge>
+      </fluid-nav-item>
+      <fluid-nav-item href="#flagged">Flagged</fluid-nav-item>
+    </fluid-nav-list>
+  </div>
+</Demo>
+
+```html
+<fluid-nav-item href="/unread">
+  Unread
+  <fluid-badge slot="badge" variant="info">12</fluid-badge>
+</fluid-nav-item>
+```
+
+### Current page
+
+Set `current` on exactly one item. It receives `aria-current="page"` and the
+active style.
+
+<Demo>
+  <div style="max-width: 16rem;">
+    <fluid-nav-list label="Docs">
+      <fluid-nav-item href="#start">Getting started</fluid-nav-item>
+      <fluid-nav-item href="#tokens" current>Tokens</fluid-nav-item>
+      <fluid-nav-item href="#components">Components</fluid-nav-item>
+    </fluid-nav-list>
+  </div>
+</Demo>
+
+## Framework usage
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-nav-list label="Main">
+      <fluid-nav-item href="/dashboard" current>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="/projects">Projects</fluid-nav-item>
+    </fluid-nav-list>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Sidebar.tsx"
+    import "@fluid-ds/components/define/nav-list";
+
+    export function Sidebar({ path }: { path: string }) {
+      return (
+        <fluid-nav-list label="Main">
+          <fluid-nav-item href="/dashboard" current={path === "/dashboard" || undefined}>
+            Dashboard
+          </fluid-nav-item>
+          <fluid-nav-item href="/projects" current={path === "/projects" || undefined}>
+            Projects
+          </fluid-nav-item>
+        </fluid-nav-list>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Sidebar.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/nav-list";
+    defineProps<{ path: string }>();
+    </script>
+
+    <template>
+      <fluid-nav-list label="Main">
+        <fluid-nav-item href="/dashboard" :current="path === '/dashboard'">Dashboard</fluid-nav-item>
+        <fluid-nav-item href="/projects" :current="path === '/projects'">Projects</fluid-nav-item>
+      </fluid-nav-list>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="sidebar.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+    import "@fluid-ds/components/define/nav-list";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-sidebar",
+      template: `
+        <fluid-nav-list label="Main">
+          <fluid-nav-item href="/dashboard" [attr.current]="path === '/dashboard' ? '' : null">Dashboard</fluid-nav-item>
+          <fluid-nav-item href="/projects" [attr.current]="path === '/projects' ? '' : null">Projects</fluid-nav-item>
+        </fluid-nav-list>
+      `
+    })
+    export class Sidebar {
+      @Input() path = "";
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Sidebar.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/nav-list";
+      export let path = "";
+    </script>
+
+    <fluid-nav-list label="Main">
+      <fluid-nav-item href="/dashboard" current={path === "/dashboard" || undefined}>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="/projects" current={path === "/projects" || undefined}>Projects</fluid-nav-item>
+    </fluid-nav-list>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A sidebar that links between the top-level sections of an app.
+- An on-page section list (a "what's on this page" rail).
+- Any vertical set of links where one item marks the current location.
+
+Reach for [`<fluid-menu>`](/components/menu/) when the items run actions rather
+than navigate, and [`<fluid-tree>`](/components/tree/) when the items nest into a
+parent/child hierarchy.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-nav-list-*` /
+`--fluid-nav-item-*` token that falls back to a main semantic var** (the override
+ladder). The status tones are theme-independent; brand themes only retune the
+`--fluid-accent-*` track that drives the current-item highlight. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-nav-item-fg: var(--fluid-text-secondary);
+  --fluid-nav-item-hover-bg: var(--fluid-surface-muted);
+  --fluid-nav-item-active-fg: var(--fluid-accent-base);
+  --fluid-nav-item-radius: var(--fluid-radius-md);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The list exposes `part="base"` (the `<nav>`) and `part="list"`; each item exposes
+`part="base"`, `part="link"`, `part="icon"`, `part="label"`, and `part="badge"`.
+Reach them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for any CSS a token does not cover.
+
+## Accessibility
+
+- The list is a `<nav>` landmark. Give it a unique `label` so it carries an
+  accessible name when more than one navigation region exists on the page
+  ([SC 1.3.1], [SC 2.4.1]).
+- The container is `role="list"` and each item is `role="listitem"`, so the
+  count and structure are conveyed to assistive tech.
+- Each item is a real `<a href>`, so Tab / Shift+Tab move between links and
+  Enter follows the link. No special keys to learn ([SC 2.1.1]).
+- The current item carries `aria-current="page"`, conveying location both
+  visually (the active style) and programmatically ([SC 1.3.1]).
+- The focus ring reads the conformance tokens, so it strengthens automatically
+  under `data-fluid-conformance="aaa"`, and the row height floors on
+  `--fluid-target-min` so it lifts to a 44×44 target in AAA ([SC 2.5.8]).
+
+### AA vs AAA
+
+By default the component meets WCAG 2.2 **Level AA**: a visible focus ring, a
+24×24 minimum target, and text contrast at 4.5:1. Set
+`data-fluid-conformance="aaa"` on an ancestor and, with no per-component code,
+the focus ring widens (`--fluid-focus-ring-width`) and each link grows to a
+44×44 target (`--fluid-target-min`) for **Level AAA** target size (SC 2.5.5) and
+focus appearance (SC 2.4.13).
+
+## API
+
+<ComponentApi tag="fluid-nav-list" />
+
+<ComponentApi tag="fluid-nav-item" />
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Menu" href="/components/menu/" description="A list of actions following the APG Menu pattern." />
+  <LinkCard title="Tree" href="/components/tree/" description="A hierarchical, expandable tree of nodes." />
+  <LinkCard title="Breadcrumb" href="/components/breadcrumb/" description="Shows the path to the current page." />
+</CardGrid>

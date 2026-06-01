@@ -1,0 +1,254 @@
+---
+title: "Popconfirm"
+description: "A confirmation prompt anchored to a trigger. Asks the user to confirm a destructive action before it runs."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-popconfirm>` wraps a trigger (typically a delete button in the `trigger`
+slot) and asks the user to confirm before the action runs. Activating the trigger
+opens a small alert dialog in the top layer with a message and **Confirm** /
+**Cancel** buttons. It fires **`fluid-confirm`** or **`fluid-cancel`** and is a
+lighter-weight alternative to a full modal dialog for in-place, low-friction
+confirmations.
+
+<Demo>
+  <fluid-popconfirm message="Delete this item? This cannot be undone." confirm-text="Delete">
+    <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+  </fluid-popconfirm>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/popconfirm/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/popconfirm";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Put the action in the `trigger` slot. The prompt opens on top of the trigger and
+fires `fluid-confirm` when the user proceeds.
+
+<Demo>
+  <fluid-popconfirm message="Delete this item? This cannot be undone." confirm-text="Delete">
+    <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+  </fluid-popconfirm>
+</Demo>
+
+```html
+<fluid-popconfirm message="Delete this item?" confirm-text="Delete">
+  <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+</fluid-popconfirm>
+```
+
+### Tones
+
+`tone` drives the leading icon color and the Confirm button. `danger` is the
+default; `warning`, `brand`, and `neutral` are also available. Status tones are
+theme-independent.
+
+<Demo>
+  <fluid-popconfirm tone="danger" message="Delete this file?" confirm-text="Delete">
+    <fluid-button slot="trigger" variant="secondary" tone="danger">Danger</fluid-button>
+  </fluid-popconfirm>
+  <fluid-popconfirm tone="warning" message="Discard unsaved changes?" confirm-text="Discard">
+    <fluid-button slot="trigger" variant="secondary" tone="warning">Warning</fluid-button>
+  </fluid-popconfirm>
+  <fluid-popconfirm tone="brand" message="Publish this draft now?" confirm-text="Publish">
+    <fluid-button slot="trigger" variant="secondary">Brand</fluid-button>
+  </fluid-popconfirm>
+</Demo>
+
+### Custom labels
+
+<Demo>
+  <fluid-popconfirm
+    tone="warning"
+    message="Sign out of all devices?"
+    confirm-text="Sign out everywhere"
+    cancel-text="Stay signed in"
+  >
+    <fluid-button slot="trigger" variant="secondary">Sign out</fluid-button>
+  </fluid-popconfirm>
+</Demo>
+
+```html
+<fluid-popconfirm
+  tone="warning"
+  message="Sign out of all devices?"
+  confirm-text="Sign out everywhere"
+  cancel-text="Stay signed in"
+>
+  <fluid-button slot="trigger" variant="secondary">Sign out</fluid-button>
+</fluid-popconfirm>
+```
+
+## Handling the result
+
+The host does **not** perform the action itself: listen for `fluid-confirm` to
+run it, and optionally `fluid-cancel` to react to a dismissal. Cancel fires on
+the Cancel button, an outside click, or Escape.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-popconfirm id="pc" message="Delete this row?" confirm-text="Delete">
+      <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+    </fluid-popconfirm>
+
+    <script type="module">
+      document.getElementById("pc").addEventListener("fluid-confirm", () => {
+        // run the destructive action
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Row.tsx"
+    import "@fluid-ds/components/define/popconfirm";
+    import "@fluid-ds/components/define/button";
+
+    export function Row({ onDelete }: { onDelete: () => void }) {
+      return (
+        <fluid-popconfirm message="Delete this row?" confirm-text="Delete"
+          onfluid-confirm={onDelete}>
+          <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+        </fluid-popconfirm>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Row.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/popconfirm";
+    import "@fluid-ds/components/define/button";
+    const emit = defineEmits(["delete"]);
+    </script>
+
+    <template>
+      <fluid-popconfirm message="Delete this row?" confirm-text="Delete"
+        @fluid-confirm="emit('delete')">
+        <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+      </fluid-popconfirm>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="row.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/popconfirm";
+    import "@fluid-ds/components/define/button";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-row",
+      template: `
+        <fluid-popconfirm message="Delete this row?" confirm-text="Delete" (fluid-confirm)="remove()">
+          <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+        </fluid-popconfirm>
+      `
+    })
+    export class Row {
+      remove() { /* run the destructive action */ }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Row.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/popconfirm";
+      import "@fluid-ds/components/define/button";
+      export let onDelete: () => void;
+    </script>
+
+    <fluid-popconfirm message="Delete this row?" confirm-text="Delete" on:fluid-confirm={onDelete}>
+      <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+    </fluid-popconfirm>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Confirming a single destructive action in place (delete a row, remove a tag).
+- Low-friction prompts where a full modal dialog would be heavy-handed.
+
+Reach for a full modal dialog when the confirmation needs a title, longer
+explanatory copy, or more than two actions; reach for a plain
+[`<fluid-button>`](/components/button/) when the action is reversible and needs
+no confirmation at all.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-popconfirm-*` token
+that falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-popconfirm-bg: var(--fluid-surface-base);
+  --fluid-popconfirm-border: var(--fluid-border-default);
+  --fluid-popconfirm-radius: var(--fluid-radius-md);
+  --fluid-popconfirm-width: 20rem;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The panel is [`part="panel"`](#api) with `part="message"`, `part="actions"`,
+`part="confirm-button"`, `part="cancel-button"`, and `part="arrow"`. Reach them
+with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
+CSS not covered by a token.
+
+## Accessibility
+
+- The panel is `role="alertdialog"` with `aria-modal="true"`, the WAI-ARIA APG
+  pattern for a confirmation that interrupts the user to address a destructive
+  action.
+- `aria-describedby` points at the message so it is announced as the dialog's
+  content when it opens.
+- On open, focus moves to **Cancel** (the safe default for a destructive
+  prompt). Focus is restored to the trigger when the prompt closes.
+- **Escape** cancels and closes; a click outside the panel cancels and closes.
+- The trigger gets `aria-haspopup="dialog"` and a reflected `aria-expanded`
+  state.
+
+### AA vs AAA
+
+- Buttons inherit `<fluid-button>`, which reads the conformance tokens
+  (`--fluid-target-min`, `--fluid-focus-ring-width`, `--fluid-focus-ring-offset`),
+  so under `data-fluid-conformance="aaa"` the Confirm / Cancel targets grow to
+  44×44 and the focus ring thickens with zero per-component branding.
+- Every `(foreground, background)` pair (message text on the panel, both
+  buttons, and the focus ring) meets at least **4.5:1** for text and **3:1** for
+  the focus ring in all three brands across light and dark.
+
+## API
+
+<ComponentApi tag="fluid-popconfirm" />

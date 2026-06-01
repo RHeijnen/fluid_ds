@@ -1,0 +1,271 @@
+---
+title: "App bar"
+description: "Top application header bar: a banner landmark with brand, navigation, and actions, optionally sticky, elevated, and with a built-in menu toggle."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-app-bar>` is the header strip at the top of an application: a native
+`<header>` (role `banner`) laid out as a single flex row with three regions,
+brand in `start`, navigation in the default slot, and actions in `end`. It can
+be `sticky` (pinned while the page scrolls) and `elevated` (drop shadow), and
+ships an optional hamburger button that fires **`fluid-menu-toggle`** so you can
+open a drawer without wiring your own control.
+
+<Demo>
+  <fluid-app-bar elevated menu-button>
+    <strong slot="start">Acme</strong>
+    <a href="#" style="color: inherit;">Dashboard</a>
+    <a href="#" style="color: inherit;">Projects</a>
+    <span slot="end">Sign in</span>
+  </fluid-app-bar>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/app-bar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/app-bar";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Regions
+
+The three regions are `start` (brand/logo), the default slot (navigation), and
+`end` (actions). Flexible space sits between nav and end, so actions hug the
+right edge.
+
+<Demo>
+  <fluid-app-bar>
+    <strong slot="start">Acme</strong>
+    <a href="#" style="color: inherit;">Home</a>
+    <a href="#" style="color: inherit;">Docs</a>
+    <span slot="end">Sign in</span>
+  </fluid-app-bar>
+</Demo>
+
+```html
+<fluid-app-bar>
+  <strong slot="start">Acme</strong>
+  <a href="#">Home</a>
+  <a href="#">Docs</a>
+  <span slot="end">Sign in</span>
+</fluid-app-bar>
+```
+
+### Elevated
+
+Add `elevated` for a drop shadow that lifts the bar off the content below.
+
+<Demo>
+  <fluid-app-bar elevated>
+    <strong slot="start">Acme</strong>
+    <a href="#" style="color: inherit;">Home</a>
+    <a href="#" style="color: inherit;">Docs</a>
+    <span slot="end">Sign in</span>
+  </fluid-app-bar>
+</Demo>
+
+```html
+<fluid-app-bar elevated>...</fluid-app-bar>
+```
+
+### Sticky
+
+Add `sticky` to pin the bar to the top of its scroll container. It stays put
+while the page content scrolls underneath.
+
+```html
+<fluid-app-bar sticky elevated>...</fluid-app-bar>
+```
+
+### Built-in menu button
+
+Set `menu-button` to render a hamburger toggle in the start region. It fires
+**`fluid-menu-toggle`** when pressed, with `event.detail.expanded` carrying the
+next intended state. Mirror your drawer's open state back onto `expanded` so the
+button's `aria-expanded` stays correct.
+
+<Demo>
+  <fluid-app-bar elevated menu-button>
+    <strong slot="start">Acme</strong>
+    <a href="#" style="color: inherit;">Dashboard</a>
+    <span slot="end">Profile</span>
+  </fluid-app-bar>
+</Demo>
+
+```html
+<fluid-app-bar menu-button menu-label="Open navigation">
+  <strong slot="start">Acme</strong>
+  <a href="#">Dashboard</a>
+  <span slot="end">Profile</span>
+</fluid-app-bar>
+```
+
+## Listening for the menu toggle
+
+The built-in button does not open anything itself: it announces intent. Wire
+`fluid-menu-toggle` to your own navigation drawer and feed its state back into
+`expanded`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-app-bar menu-button id="bar">
+      <strong slot="start">Acme</strong>
+    </fluid-app-bar>
+
+    <script type="module">
+      const bar = document.getElementById("bar");
+      bar.addEventListener("fluid-menu-toggle", (e) => {
+        bar.expanded = e.detail.expanded;
+        // open or close your drawer with e.detail.expanded
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Shell.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/app-bar";
+
+    export function Shell() {
+      const [open, setOpen] = useState(false);
+      return (
+        <fluid-app-bar menu-button expanded={open}
+          onfluid-menu-toggle={(e) => setOpen(e.detail.expanded)}>
+          <strong slot="start">Acme</strong>
+        </fluid-app-bar>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Shell.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/app-bar";
+    const open = ref(false);
+    </script>
+
+    <template>
+      <fluid-app-bar menu-button :expanded="open"
+        @fluid-menu-toggle="open = $event.detail.expanded">
+        <strong slot="start">Acme</strong>
+      </fluid-app-bar>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="shell.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/app-bar";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-shell",
+      template: `
+        <fluid-app-bar menu-button [expanded]="open" (fluid-menu-toggle)="open = $event.detail.expanded">
+          <strong slot="start">Acme</strong>
+        </fluid-app-bar>
+      `
+    })
+    export class Shell { open = false; }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Shell.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/app-bar";
+      let open = false;
+    </script>
+
+    <fluid-app-bar menu-button expanded={open}
+      on:fluid-menu-toggle={(e) => (open = e.detail.expanded)}>
+      <strong slot="start">Acme</strong>
+    </fluid-app-bar>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- The persistent top chrome of an application shell: logo, primary nav, account
+  actions.
+- A marketing or docs site header that pins on scroll.
+
+Reach for [`<fluid-banner>`](/components/banner/) when you need a transient,
+full-width notice (maintenance, consent, promotion) rather than the standing
+header.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-app-bar-*` token that
+falls back to a main semantic var** (the override ladder): retune one bar, every
+bar, or the whole brand from one place. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-app-bar-bg: var(--fluid-surface-base);
+  --fluid-app-bar-fg: var(--fluid-text-primary);
+  --fluid-app-bar-height: 4rem;
+  --fluid-app-bar-border: var(--fluid-border-default);
+  --fluid-app-bar-shadow: var(--fluid-shadow-md);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The bar is [`part="base"`](#api) with `part="start"`, `part="nav"`,
+`part="end"`, and `part="menu-button"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-app-bar" />
+
+## Accessibility
+
+- The bar renders a native `<header>` with `role="banner"`, the standard
+  top-of-page landmark. Use only one per page (or scope it to a section).
+- Navigation lives in a `<nav>` region inside the bar, so assistive technology
+  exposes it as a navigation landmark.
+- The built-in menu button is a real `<button>` with an accessible name
+  (`menu-label`, default "Open menu") and `aria-expanded` mirrored from the
+  `expanded` property. Keep `expanded` in sync with your drawer so the state is
+  announced correctly.
+- The button reads the conformance tokens, so it grows to a 44×44 target and
+  gains an enhanced focus ring under `data-fluid-conformance="aaa"` with no
+  per-instance changes.
+
+### AA vs AAA
+
+In AA (the default) the menu button is at least 32×32 CSS px with a 2px
+focus ring. Under `data-fluid-conformance="aaa"` it reads `--fluid-target-min`
+(44px) and `--fluid-focus-ring-width`, so the target and focus indicator both
+grow to the enhanced sizes automatically.

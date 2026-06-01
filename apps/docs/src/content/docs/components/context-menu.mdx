@@ -1,0 +1,338 @@
+---
+title: "Context menu"
+description: "Right-click (and Shift+F10) context menu that opens an APG menu at the pointer, in the top layer."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-context-menu>` wraps a `trigger` slot and opens a menu where you
+right-click (or press **Shift+F10** / the **ContextMenu** key while focused). The
+surface renders in the top layer (`popover="manual"`) so an `overflow: hidden`
+ancestor never clips it, and it reuses [`<fluid-menu>`](/components/menu/) for the
+APG Menu pattern: `role="menu"`, roving focus, arrow-key navigation, and
+type-ahead. Selecting an entry fires **`fluid-select`** and closes the menu.
+
+<Demo>
+  <fluid-context-menu
+    aria-label="Item actions"
+    items='[{"label":"Cut","value":"cut"},{"label":"Copy","value":"copy"},{"label":"Paste","value":"paste","disabled":true},{"divider":true,"label":"","value":""},{"label":"Delete","value":"delete"}]'
+  >
+    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+      Right-click here (or Shift+F10)
+    </div>
+  </fluid-context-menu>
+</Demo>
+
+<Aside type="note">
+  The `items` array is passed as a JSON string on the `items` attribute in these
+  docs demos. In a framework, set the `items` **property** to a real array
+  instead.
+</Aside>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/context-menu/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/context-menu";
+    ```
+
+    Registering `context-menu` also registers the [`menu`](/components/menu/)
+    family it composes with.
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### From an items array
+
+Pass `items` (an array of `{ label, value, disabled?, divider? }`) and the
+component renders the menu for you. Set `disabled` to grey out an entry, and
+`divider: true` to draw a separator.
+
+<Demo>
+  <fluid-context-menu
+    aria-label="File actions"
+    items='[{"label":"New file","value":"new"},{"label":"Rename","value":"rename"},{"label":"Duplicate","value":"duplicate"},{"divider":true,"label":"","value":""},{"label":"Move to trash","value":"trash"}]'
+  >
+    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+      document.txt
+    </div>
+  </fluid-context-menu>
+</Demo>
+
+```html
+<fluid-context-menu id="cm" aria-label="File actions">
+  <div slot="trigger" tabindex="0">document.txt</div>
+</fluid-context-menu>
+
+<script type="module">
+  document.getElementById("cm").items = [
+    { label: "New file", value: "new" },
+    { label: "Rename", value: "rename" },
+    { divider: true },
+    { label: "Move to trash", value: "trash" }
+  ];
+</script>
+```
+
+### Custom menu via the slot
+
+For full control (icons, group labels, nested structure) slot your own
+`<fluid-menu>` into the `menu` slot. It overrides the `items` array.
+
+<Demo>
+  <fluid-context-menu aria-label="Account">
+    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+      Avatar
+    </div>
+    <fluid-menu slot="menu" aria-label="Account">
+      <fluid-menu-label>Account</fluid-menu-label>
+      <fluid-menu-item value="profile">Profile</fluid-menu-item>
+      <fluid-menu-item value="settings">Settings</fluid-menu-item>
+      <fluid-menu-label>Session</fluid-menu-label>
+      <fluid-menu-item value="logout">Sign out</fluid-menu-item>
+    </fluid-menu>
+  </fluid-context-menu>
+</Demo>
+
+```html
+<fluid-context-menu aria-label="Account">
+  <div slot="trigger" tabindex="0">Avatar</div>
+  <fluid-menu slot="menu" aria-label="Account">
+    <fluid-menu-label>Account</fluid-menu-label>
+    <fluid-menu-item value="profile">Profile</fluid-menu-item>
+    <fluid-menu-item value="logout">Sign out</fluid-menu-item>
+  </fluid-menu>
+</fluid-context-menu>
+```
+
+### Disabled
+
+Set `disabled` so a right-click falls through to the browser's own menu.
+
+<Demo>
+  <fluid-context-menu disabled aria-label="Disabled"
+    items='[{"label":"Copy","value":"copy"}]'>
+    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+      Right-click falls through (disabled)
+    </div>
+  </fluid-context-menu>
+</Demo>
+
+## Listening for fluid-select
+
+The component fires **`fluid-select`** with `detail.value` when an entry is
+activated (click, Enter, or Space). It then closes and returns focus to the
+trigger.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-context-menu id="cm" aria-label="Actions">
+      <div slot="trigger" tabindex="0">Target</div>
+    </fluid-context-menu>
+
+    <script type="module">
+      const cm = document.getElementById("cm");
+      cm.items = [{ label: "Copy", value: "copy" }, { label: "Delete", value: "delete" }];
+      cm.addEventListener("fluid-select", (e) => console.log(e.detail.value));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="FileRow.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/context-menu";
+
+    export function FileRow() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current as (HTMLElement & { items: unknown[] }) | null;
+        if (el) el.items = [{ label: "Copy", value: "copy" }, { label: "Delete", value: "delete" }];
+      }, []);
+      return (
+        <fluid-context-menu ref={ref} aria-label="Actions"
+          onfluid-select={(e: CustomEvent<{ value: string }>) => console.log(e.detail.value)}>
+          <div slot="trigger" tabIndex={0}>Target</div>
+        </fluid-context-menu>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="FileRow.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/context-menu";
+    const items = [{ label: "Copy", value: "copy" }, { label: "Delete", value: "delete" }];
+    </script>
+
+    <template>
+      <fluid-context-menu aria-label="Actions" :items="items"
+        @fluid-select="(e) => console.log(e.detail.value)">
+        <div slot="trigger" tabindex="0">Target</div>
+      </fluid-context-menu>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="file-row.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/context-menu";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-file-row",
+      template: `
+        <fluid-context-menu aria-label="Actions" [items]="items"
+          (fluid-select)="onSelect($event)">
+          <div slot="trigger" tabindex="0">Target</div>
+        </fluid-context-menu>
+      `
+    })
+    export class FileRow {
+      items = [{ label: "Copy", value: "copy" }, { label: "Delete", value: "delete" }];
+      onSelect(e: CustomEvent<{ value: string }>) { console.log(e.detail.value); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="FileRow.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/context-menu";
+      const items = [{ label: "Copy", value: "copy" }, { label: "Delete", value: "delete" }];
+    </script>
+
+    <fluid-context-menu aria-label="Actions" {items}
+      on:fluid-select={(e) => console.log(e.detail.value)}>
+      <div slot="trigger" tabindex="0">Target</div>
+    </fluid-context-menu>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Per-row or per-item actions on a file list, canvas, table row, or card.
+- A secondary action surface you reach by right-clicking an object.
+
+### When *not* to use
+
+- A button that toggles a menu on click: reach for
+  [`<fluid-menu>`](/components/menu/) inside a [`<fluid-popover>`](/components/popover/),
+  or a dedicated menu button. A context menu is for the right-click gesture.
+- A single confirm/cancel choice: use a [`<fluid-dialog>`](/components/dialog/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-context-menu-*` token
+that falls back to a main semantic var** (the override ladder). Most styling
+delegates to the underlying [`<fluid-menu>`](/components/menu/): the context-menu
+tokens map onto the menu's `--fluid-menu-*` tokens, so retheming the surface
+(`bg`, `border`, `radius`, `shadow`) flows straight through. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-context-menu-bg: var(--fluid-surface-base);
+  --fluid-context-menu-border: var(--fluid-border-default);
+  --fluid-context-menu-radius: var(--fluid-radius-lg);
+  --fluid-context-menu-shadow: var(--fluid-shadow-xl);
+}
+```
+
+<Aside type="tip">
+  Try retheming it live in the [Theme builder](/playground/).
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The popover surface is [`part="base"`](#api) and the generated menu is
+`part="menu"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token, and style the individual rows via the menu's own parts.
+
+## API
+
+<ComponentApi tag="fluid-context-menu" />
+
+## Accessibility
+
+The menu follows the [WAI-ARIA APG Menu pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menu/)
+through [`<fluid-menu>`](/components/menu/): `role="menu"` with `role="menuitem"`
+children and a roving tabindex. See the
+[accessibility guide](/guides/accessibility/) for the cross-component contract.
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| `Shift` + `F10` / `ContextMenu` | Open the menu (keyboard equivalent of right-click) while the trigger is focused |
+| `ArrowDown` / `ArrowUp` | Move between items (wrapping), skipping disabled |
+| `Home` / `End` | Jump to the first / last item |
+| `Enter` / `Space` | Activate the focused item, then close |
+| printable character | Type-ahead to the next matching item |
+| `Escape` | Close the menu and return focus to the trigger |
+
+Focus moves into the menu on open and returns to the trigger on close. The
+focus indicator on each item is `:focus-visible` and reads the focus-ring
+tokens.
+
+### Names
+
+Set `aria-label` on the host to name the menu (it forwards to the inner
+`role="menu"`). The trigger gets `aria-haspopup="menu"` and `aria-expanded`
+wired automatically. Each entry's accessible name is its `label` (or the
+slotted `<fluid-menu-item>` text).
+
+### State semantics
+
+`disabled` on the host suppresses the gesture entirely so the browser's native
+menu shows instead. A per-entry `disabled` maps to `aria-disabled="true"` on the
+`menuitem` and removes it from the roving order.
+
+### Motion & target size
+
+The open transition honors `prefers-reduced-motion`. Menu rows read
+`--fluid-target-min` as a height floor, so they meet the 24×24 AA target and lift
+to 44×44 under AAA.
+
+### AA vs AAA
+
+The component ships WCAG 2.2 AA by default and scales to AAA via
+`data-fluid-conformance="aaa"` on any ancestor. The conformance tokens flow
+through the menu rows:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Menu" href="/components/menu/" description="The list surface this composes with." />
+  <LinkCard title="Popover" href="/components/popover/" description="Click-anchored floating panel." />
+  <LinkCard title="Dialog" href="/components/dialog/" description="Modal for a focused choice." />
+  <LinkCard title="Accessibility guide" href="/guides/accessibility/" description="The cross-component a11y contract." />
+  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+</CardGrid>

@@ -1,0 +1,221 @@
+---
+title: "Countdown"
+description: "Counts down to a target time or across a fixed duration, as labelled segments or a compact clock."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-countdown>` ticks down to a `target` ISO datetime or across a fixed
+`seconds` duration. It renders either labelled day / hour / minute / second
+**segments** or a compact **clock** (`HH:MM:SS`), updating once a second. The
+readout sits in a `role="timer"` region with a throttled `aria-live="polite"`
+announcement, and it emits **`fluid-tick`** every second plus **`fluid-complete`**
+at zero.
+
+<Demo>
+  <fluid-countdown seconds="90061" format="segments"></fluid-countdown>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/countdown/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/countdown";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Segments
+
+The default. Leading units fold away until they're needed, so a 90-second
+countdown shows just minutes and seconds.
+
+<Demo>
+  <fluid-countdown seconds="90" format="segments"></fluid-countdown>
+</Demo>
+
+```html
+<fluid-countdown seconds="90" format="segments"></fluid-countdown>
+```
+
+### Clock
+
+A compact `HH:MM:SS` readout. The hours group only appears when there's at least
+one hour left.
+
+<Demo>
+  <fluid-countdown seconds="3661" format="clock"></fluid-countdown>
+</Demo>
+
+```html
+<fluid-countdown seconds="3661" format="clock"></fluid-countdown>
+```
+
+### Counting to a target
+
+Pass an ISO datetime string as `target` and the countdown ticks toward it,
+re-reading the wall clock each second so it stays accurate even if the tab is
+throttled.
+
+```html
+<fluid-countdown target="2026-12-31T23:59:59Z" format="segments"></fluid-countdown>
+```
+
+### Controlling it
+
+`autostart` is on by default. Set it off to start the countdown yourself, and
+use the `start()`, `pause()`, and `reset()` methods.
+
+```html
+<fluid-countdown id="c" seconds="120" autostart="false"></fluid-countdown>
+
+<script type="module">
+  const c = document.getElementById("c");
+  c.start();
+  // c.pause();
+  // c.reset();
+</script>
+```
+
+## Events
+
+`<fluid-countdown>` fires **`fluid-tick`** on every one-second tick (with
+`detail.remaining`, the whole seconds left) and **`fluid-complete`** once when
+the remaining time reaches zero.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-countdown id="c" seconds="60"></fluid-countdown>
+
+    <script type="module">
+      const c = document.getElementById("c");
+      c.addEventListener("fluid-tick", (e) => console.log(e.detail.remaining));
+      c.addEventListener("fluid-complete", () => console.log("done"));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Sale.tsx"
+    import { useEffect, useRef } from "react";
+    import "@fluid-ds/components/define/countdown";
+
+    export function Sale() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current;
+        const onComplete = () => console.log("done");
+        el?.addEventListener("fluid-complete", onComplete);
+        return () => el?.removeEventListener("fluid-complete", onComplete);
+      }, []);
+      return <fluid-countdown ref={ref} seconds={60} />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Sale.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/countdown";
+    function onComplete() { console.log("done"); }
+    </script>
+
+    <template>
+      <fluid-countdown :seconds="60" @fluid-complete="onComplete" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="sale.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/countdown";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-sale",
+      template: `<fluid-countdown [seconds]="60" (fluid-complete)="done()"></fluid-countdown>`
+    })
+    export class Sale {
+      done() { console.log("done"); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Sale.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/countdown";
+      function done() { console.log("done"); }
+    </script>
+
+    <fluid-countdown seconds={60} on:fluid-complete={done} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A sale or offer that expires at a fixed time.
+- A "resend code" / rate-limit cooldown before an action becomes available.
+- A live-event lobby ticking down to kickoff.
+
+For an open-ended elapsed timer (counting up) or a progress indicator, reach for
+a different component: `<fluid-countdown>` only counts down.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-countdown-*` token
+that falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-countdown-digit-fg: var(--fluid-text-primary);
+  --fluid-countdown-separator-fg: var(--fluid-text-secondary);
+  --fluid-countdown-label-fg: var(--fluid-text-secondary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The region is [`part="base"`](#api), with `part="segment"`, `part="digit"`,
+`part="label"`, and `part="separator"` for the pieces. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-countdown" />
+
+## Accessibility
+
+- The readout lives in a `role="timer"` region with an accessible name (default
+  "Time remaining", override via `aria-label` on the host).
+- A visually hidden `aria-live="polite"` companion carries the spoken update.
+  Announcements are **throttled** to about once every 10 seconds, plus a final
+  one at zero, so a screen reader is not flooded with one update per tick. The
+  visible digits still update every second.
+- The clock separators (`:`) are `aria-hidden`, so the live text reads as a
+  sentence ("1 hour, 1 minute, 1 second remaining") rather than punctuation.
+- Honor `prefers-reduced-motion`: the component has no animation, so there's
+  nothing to suppress.

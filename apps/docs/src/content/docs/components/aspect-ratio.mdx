@@ -1,0 +1,192 @@
+---
+title: "Aspect ratio"
+description: "Constrains slotted media or embeds to a fixed width:height box."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-aspect-ratio>` holds slotted content to a fixed width:height box, so an
+image, video, or embed reserves its space before it loads and never causes a
+layout shift. The slot is stretched to fill the box, and replaced media is
+covered with `object-fit` so it fills cleanly instead of letterboxing.
+
+<Demo>
+  <div style="max-width: 320px;">
+    <fluid-aspect-ratio ratio="16/9">
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">16 / 9</div>
+    </fluid-aspect-ratio>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/aspect-ratio/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/aspect-ratio";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Common ratios
+
+The `ratio` prop accepts the CSS `aspect-ratio` shorthand: `"16/9"`, `"4/3"`,
+`"1/1"` (the default), or a single number like `"1"`. Spaces around the slash
+are fine too.
+
+<Demo>
+  <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: var(--fluid-space-3); max-width: 640px;">
+    <fluid-aspect-ratio ratio="1/1"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">1 / 1</div></fluid-aspect-ratio>
+    <fluid-aspect-ratio ratio="4/3"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">4 / 3</div></fluid-aspect-ratio>
+    <fluid-aspect-ratio ratio="16/9"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">16 / 9</div></fluid-aspect-ratio>
+  </div>
+</Demo>
+
+```html
+<fluid-aspect-ratio ratio="16/9">
+  <div>16 / 9 content</div>
+</fluid-aspect-ratio>
+```
+
+### Covering media
+
+A slotted `<img>`, `<video>`, or `<iframe>` is covered with `object-fit: cover`
+so it fills the box edge to edge without distortion or bars.
+
+<Demo>
+  <div style="max-width: 320px;">
+    <fluid-aspect-ratio ratio="16/9">
+      <img src="https://picsum.photos/seed/fluid/800/300" alt="Landscape sample covered to fill a 16:9 box" />
+    </fluid-aspect-ratio>
+  </div>
+</Demo>
+
+```html
+<fluid-aspect-ratio ratio="16/9">
+  <img src="/cover.jpg" alt="…" />
+</fluid-aspect-ratio>
+```
+
+### Portrait
+
+Ratios smaller than 1 produce a taller-than-wide box.
+
+<Demo>
+  <div style="max-width: 200px;">
+    <fluid-aspect-ratio ratio="3/4">
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">3 / 4</div>
+    </fluid-aspect-ratio>
+  </div>
+</Demo>
+
+```html
+<fluid-aspect-ratio ratio="3/4">…</fluid-aspect-ratio>
+```
+
+## When to use
+
+- Reserving space for an image, video thumbnail, or map before it loads, so the
+  page doesn't shift (Cumulative Layout Shift).
+- Keeping a grid of media cards uniform regardless of the source dimensions.
+- Embedding an `<iframe>` (a video player, a map) that must keep its proportions
+  as the column resizes.
+
+### When *not* to use
+
+- For an image whose intrinsic dimensions should drive its size, set
+  `width`/`height` (or the modern `aspect-ratio` CSS) on the image directly,
+  there's no need to wrap it.
+- For arranging items in a row or column, reach for
+  [`<fluid-stack>`](/components/stack/), which spaces siblings rather than
+  shaping one box.
+
+## Theming
+
+This is a layout primitive: it ships almost no visual styling. The two
+component-scoped tokens it exposes (`--fluid-aspect-ratio-radius` and
+`--fluid-aspect-ratio-overflow`) follow the **override ladder**, each falls back
+to a main semantic var or a sensible default. The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-aspect-ratio-radius: var(--fluid-radius-md);
+}
+```
+
+Set a token per instance for a one-off shape, for example a circular avatar
+crop:
+
+```css
+[data-fluid-id="avatar"] {
+  --fluid-aspect-ratio-radius: var(--fluid-radius-full);
+}
+```
+
+The `ratio` itself is a prop, not a token, because it is an intentional,
+per-instance feature rather than a theme-wide knob.
+
+### Beyond tokens: `::part()`
+
+The wrapper is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-aspect-ratio" />
+
+## Accessibility
+
+`<fluid-aspect-ratio>` is purely presentational: it has no role, takes no focus,
+and adds no ARIA. It only constrains the layout of whatever you slot into it, so
+the accessibility of the result is entirely the slotted content's
+responsibility.
+
+- Give slotted `<img>` a meaningful `alt` (or `alt=""` if it is decorative).
+- Give an embedded `<iframe>` a descriptive `title`.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Stack"
+    href="/components/stack/"
+    description="Even spacing between siblings, the layout primitive for rows and columns."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="A contained surface that often holds a covered media box."
+  />
+  <LinkCard
+    title="Avatar"
+    href="/components/avatar/"
+    description="A circular media crop built on a fixed ratio."
+  />
+  <LinkCard
+    title="Theming guide"
+    href="/guides/theming/"
+    description="How brand, component, and instance tokens compose."
+  />
+</CardGrid>

@@ -9,7 +9,7 @@ import type { FluidButtonGroup } from "./fluid-button-group.js";
 type Args = Pick<FluidButtonGroup, "orientation">;
 
 const meta: Meta<Args> = {
-  title: "Components/ButtonGroup",
+  title: "Components/Forms/ButtonGroup",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" },

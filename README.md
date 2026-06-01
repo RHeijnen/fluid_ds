@@ -25,9 +25,9 @@ accessible out of the box.
 - **No framework required.** Drop a `<script>` tag from a CDN and use the
   `<fluid-*>` tags in any HTML page, React, Vue, Angular, Svelte, Solid,
   or plain HTML. No wrappers, no version coupling.
-- **57 components** in the core package: buttons, inputs, dialogs, drawers,
-  tooltips, tabs, trees, carousels, comparisons, and a lot more, each one a
-  standard custom element.
+- **101 components** in the core package: buttons, inputs, date pickers, menus,
+  command palette, dialogs, drawers, tooltips, tabs, trees, pagination, timeline,
+  and a lot more, each one a standard custom element.
 - **Four expansion packs** so the core stays lean:
   `@fluid-ds/charts` (Chart.js), `@fluid-ds/markdown` (marked),
   `@fluid-ds/qr` (qrcode-generator), `@fluid-ds/media` (video, animated images,
@@ -234,8 +234,8 @@ file is the source of truth for "what's queued next."
   (install with `@alpha` until the first stable release).
 - **Source:** [github.com/RHeijnen/fluid_ds](https://github.com/RHeijnen/fluid_ds)
 - **Author:** [René Heijnen — rheijnen.github.io][portfolio]
-- **Website:** [fluid-25z.pages.dev](https://fluid-25z.pages.dev) — docs + theme
-  builder + Storybook + demos, one deploy (temporary URL; custom domain soon).
+- **Website:** [fluid-web.dev](https://fluid-web.dev) — docs + theme builder +
+  Storybook + demos, one deploy.
 
 ---
 

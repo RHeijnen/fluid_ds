@@ -5,7 +5,7 @@ import "../button/define.js";
 import "../input/define.js";
 
 const meta: Meta = {
-  title: "Components/Popover",
+  title: "Components/Navigation/Popover",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

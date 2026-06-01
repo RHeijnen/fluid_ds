@@ -1,0 +1,234 @@
+---
+title: "Pagination"
+description: "APG-style page navigation with Previous, numbered pages, ellipsis truncation, and Next. Fires fluid-page-change."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-pagination>` is page navigation: a Previous control, numbered page
+buttons with ellipsis truncation around the current page, and a Next control,
+wrapped in a `<nav aria-label="Pagination">`. The current page carries
+`aria-current="page"` and isn't a navigation target. Drive it with an item
+`total` plus `page-size`, or pass `total-pages` directly. It fires
+**`fluid-page-change`** with `{ page }` when the user navigates.
+
+<Demo>
+  <fluid-pagination total-pages="10" page="4"></fluid-pagination>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/pagination/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/pagination";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Few pages
+
+A short list shows every page, no truncation.
+
+<Demo>
+  <fluid-pagination total-pages="4" page="2"></fluid-pagination>
+</Demo>
+
+```html
+<fluid-pagination total-pages="4" page="2"></fluid-pagination>
+```
+
+### Many pages
+
+Long lists collapse the run around the current page into an ellipsis on
+each side. The first and last page stay visible.
+
+<Demo>
+  <fluid-pagination total-pages="20" page="10"></fluid-pagination>
+</Demo>
+
+```html
+<fluid-pagination total-pages="20" page="10"></fluid-pagination>
+```
+
+### From an item total
+
+Pass `total` and `page-size` and the component derives the page count
+(195 items at 20 per page = 10 pages).
+
+<Demo>
+  <fluid-pagination total="195" page-size="20" page="3"></fluid-pagination>
+</Demo>
+
+```html
+<fluid-pagination total="195" page-size="20" page="3"></fluid-pagination>
+```
+
+### Wider window
+
+`siblings` controls how many page numbers sit on each side of the current
+one before the ellipsis takes over.
+
+<Demo>
+  <fluid-pagination total-pages="20" page="10" siblings="2"></fluid-pagination>
+</Demo>
+
+```html
+<fluid-pagination total-pages="20" page="10" siblings="2"></fluid-pagination>
+```
+
+## Listening for page changes
+
+`<fluid-pagination>` fires **`fluid-page-change`** with `detail.page` (the
+1-based page the user moved to) on every Previous, Next, or numbered click.
+The component also updates its own reflected `page`, so you can read it back
+or treat the event as the source of truth and re-render your data list.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-pagination id="p" total-pages="20" page="1"></fluid-pagination>
+
+    <script type="module">
+      document.getElementById("p").addEventListener("fluid-page-change", (e) => {
+        loadPage(e.detail.page);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Results.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/pagination";
+
+    export function Results() {
+      const [page, setPage] = useState(1);
+      return (
+        <fluid-pagination
+          total-pages={20}
+          page={page}
+          onfluid-page-change={(e) => setPage(e.detail.page)}
+        />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Results.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/pagination";
+    const page = ref(1);
+    </script>
+
+    <template>
+      <fluid-pagination
+        :total-pages="20"
+        :page="page"
+        @fluid-page-change="page = $event.detail.page" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="results.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/pagination";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-results",
+      template: `
+        <fluid-pagination [attr.total-pages]="20" [attr.page]="page"
+          (fluid-page-change)="page = $event.detail.page"></fluid-pagination>
+      `
+    })
+    export class Results {
+      page = 1;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Results.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/pagination";
+      let page = 1;
+    </script>
+
+    <fluid-pagination total-pages="20" page={page}
+      on:fluid-page-change={(e) => (page = e.detail.page)}></fluid-pagination>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Splitting a long table or list of results across pages.
+- Search results, where the user jumps to a specific page.
+- Any data set with a known item count and a fixed page size.
+
+When pages load continuously as the user scrolls, reach for an infinite-scroll
+or "Load more" pattern instead, those don't have discrete page targets.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-pagination-*` token
+that falls back to a main semantic var** (the override ladder): resting,
+hover, current page, and the focus ring each have their own knob. The
+**complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-pagination-current-bg: var(--fluid-accent-base);
+  --fluid-pagination-current-fg: var(--fluid-accent-text);
+  --fluid-pagination-hover-bg: var(--fluid-surface-muted);
+  --fluid-pagination-radius: 999px;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The `<nav>` is [`part="base"`](#api), with `part="list"`, `part="item"`,
+`part="button"`, `part="page"`, `part="current"`, `part="prev"`,
+`part="next"`, and `part="ellipsis"` for the inner pieces. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-pagination" />
+
+## Accessibility
+
+- The control is a `<nav aria-label="Pagination">` landmark. With more than
+  one pager on a page, give each a unique `label` so they're distinguishable.
+- Page numbers, Previous, and Next are real `<button>` elements, so they're
+  natively focusable and operable with Enter / Space, in DOM order.
+- The current page carries `aria-current="page"` and is not a navigation
+  target (clicking it is a no-op); every button has an `aria-label`
+  ("Page 4", "Previous page", "Next page").
+- Previous is `disabled` on the first page and Next on the last, so a
+  screen-reader user hears the boundary rather than landing on a dead control.
+- Targets meet **SC 2.5.8** via `--fluid-target-min` (24x24 AA, 44x44 under
+  `data-fluid-conformance="aaa"`), and the focus ring reads the conformance
+  tokens.

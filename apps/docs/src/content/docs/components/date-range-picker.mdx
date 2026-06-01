@@ -1,0 +1,370 @@
+---
+title: "Date range picker"
+description: "Start/end date picker with a preset column and two month grids. Timezone-safe ISO values, an interval form value, form-associated."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-date-range-picker>` is a form-associated field that opens a popover with a
+preset column, two side-by-side [`<fluid-calendar>`](/components/calendar/) grids,
+and Apply / Cancel. `start` and `end` are timezone-safe ISO `YYYY-MM-DD` strings;
+the submitted form value is the ISO interval `start/end`. Common ranges (last 7
+days, this month, and so on) are offered as presets by default.
+
+<Demo>
+  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/date-range-picker/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/date-range-picker"; // registers range picker + calendar
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+`start` and `end` are ISO `YYYY-MM-DD` strings. Click the field to open the two
+grids, pick a start then an end (either order: the picker sorts them), and press
+**Apply**.
+
+<Demo>
+  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-date-range-picker name="stay" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`} />
+
+### Presets
+
+The preset column is **on by default**: it offers common ranges and highlights the
+one matching the current selection. Customize the list via the `.presets` property
+(an array of `{ id, label, getRange }`).
+
+<Demo>
+  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+</Demo>
+
+```js
+// Replace the built-in presets with your own (property, not attribute).
+const picker = document.querySelector("fluid-date-range-picker");
+picker.presets = [
+  {
+    id: "last-30",
+    label: "Last 30 days",
+    getRange: () => {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 29);
+      return { start, end };
+    }
+  }
+];
+```
+
+### No presets
+
+Add `no-presets` to drop the column and show just the two grids.
+
+<Demo>
+  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-presets aria-label="Date range"></fluid-date-range-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-presets></fluid-date-range-picker>`} />
+
+### Min and max
+
+`min` and `max` (ISO) bound both grids; out-of-range days are disabled.
+
+<Demo>
+  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" min="2026-06-01" max="2026-06-30" aria-label="Date range"></fluid-date-range-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" min="2026-06-01" max="2026-06-30"></fluid-date-range-picker>`} />
+
+### Sizes
+
+`size` accepts `sm`, `md` (default), and `lg`, matching the field heights.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem;">
+    <fluid-date-range-picker size="sm" start="2026-06-08" end="2026-06-19" aria-label="Small"></fluid-date-range-picker>
+    <fluid-date-range-picker size="md" start="2026-06-08" end="2026-06-19" aria-label="Medium"></fluid-date-range-picker>
+    <fluid-date-range-picker size="lg" start="2026-06-08" end="2026-06-19" aria-label="Large"></fluid-date-range-picker>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-date-range-picker size="sm" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>
+<fluid-date-range-picker size="lg" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`} />
+
+## Listening for changes
+
+The picker fires **`fluid-change`** with `{ start, end, startDate, endDate }` in
+`detail` when a range is **applied** (`start` / `end` are ISO strings; `startDate`
+/ `endDate` are `Date`s). It also fires `fluid-open` / `fluid-close` around the
+popover.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-date-range-picker id="stay" aria-label="Stay"></fluid-date-range-picker>
+
+    <script type="module">
+      document.getElementById("stay").addEventListener("fluid-change", (e) => {
+        console.log(e.detail.start, e.detail.end);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="StayRange.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/date-range-picker";
+
+    export function StayRange() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) => {
+          const { start, end } = (e as CustomEvent).detail;
+          console.log(start, end);
+        };
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-date-range-picker ref={ref} aria-label="Stay" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="StayRange.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/date-range-picker";
+    const onChange = (e: CustomEvent) => console.log(e.detail.start, e.detail.end);
+    </script>
+
+    <template>
+      <fluid-date-range-picker aria-label="Stay" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="stay-range.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/date-range-picker";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "stay-range",
+      template: `
+        <fluid-date-range-picker aria-label="Stay" (fluid-change)="onChange($event)"></fluid-date-range-picker>
+      `
+    })
+    export class StayRange {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.start, e.detail.end);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="StayRange.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/date-range-picker";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.start, e.detail.end);
+      }
+    </script>
+
+    <fluid-date-range-picker aria-label="Stay" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+The picker is form-associated: it submits `name=<start/end>`, the ISO interval, and
+`required` blocks submission until both ends are set.
+
+<Demo>
+  <form
+    style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;"
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'stay=' + (new FormData(this).get('stay') ?? '(none)');"
+  >
+    <fluid-date-range-picker name="stay" required placeholder="Stay dates" aria-label="Stay dates"></fluid-date-range-picker>
+    <fluid-button type="submit">Book</fluid-button>
+    <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-date-range-picker name="stay" required></fluid-date-range-picker>
+  <fluid-button type="submit">Book</fluid-button>
+</form>
+```
+
+The form value is the interval `start/end` (e.g. `2026-06-08/2026-06-19`). See the
+[Forms guide](/guides/forms/) for validation and submission across frameworks.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-date-range-picker-*`
+token that falls back to a main semantic var** (the override ladder); most fall
+through to the shared `--fluid-input-*` / `--fluid-field-*` tokens so the field
+matches your inputs, while the two grids read the
+[`--fluid-calendar-*`](/components/calendar/#theming) tokens. The
+**complete, authoritative list** lives in the [API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-date-range-picker-dialog-bg: var(--fluid-surface-base);
+  --fluid-date-range-picker-preset-active-bg: color-mix(in srgb, #db2777 15%, transparent);
+  /* The grids inside read the calendar tokens. */
+  --fluid-calendar-range-bg: color-mix(in srgb, #db2777 16%, transparent);
+  --fluid-calendar-selected-bg: #db2777;
+}
+```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you tweak the field, popover, preset, and
+  inner calendar tokens visually and exports the CSS above.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The field is [`part="base"`](#api), with `input`, `trigger`, `dialog`, `presets`,
+`calendars`, and `footer` sub-parts. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token:
+
+```css
+/* Widen the preset column. */
+fluid-date-range-picker::part(presets) {
+  min-width: 12rem;
+}
+```
+
+## When to use
+
+- A **start/end span**: a booking stay, a report window, an analytics date range.
+- Anywhere users pick from **common ranges** often: the preset column saves them
+  two grid clicks.
+
+### When *not* to use
+
+- A **single date**: use [`<fluid-date-picker>`](/components/date-picker/).
+- An **always-visible month** with no field: use
+  [`<fluid-calendar>`](/components/calendar/).
+
+## Accessibility
+
+`<fluid-date-range-picker>` follows the WAI-ARIA APG **Date Picker Dialog** pattern
+over two grids. The field is a `role="combobox"` (`aria-haspopup="dialog"`,
+`aria-expanded`) that opens a `role="dialog"`; each month is a full keyboard
+[calendar grid](/components/calendar/#accessibility), and the preset column is a
+labeled group of buttons. The notes below are range-specific; the cross-component
+contract is in the [Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>↓</kbd> | Open the popover from the field. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | (in a grid) set the focused day as the start, then the end. |
+| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Move focus ±1 day / ±1 week within a grid. |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Move the focused grid ±1 month (Shift = ±1 year). |
+| <kbd>Escape</kbd> | Close the popover (discarding the in-progress selection) and return focus to the field. |
+
+Each preset is a focusable button; activating one fills the start/end and
+highlights the match. The field's focus ring is `:focus-within` and reads
+`--fluid-focus-ring-width`.
+
+### Names & roles
+
+The field needs an accessible name, a visible label wired with `aria-labelledby`,
+or an `aria-label`
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). The
+trigger is named "Choose date range", the dialog is labeled, the preset column is a
+`role="group"` named "Range presets", and the active preset exposes
+`aria-pressed="true"`.
+
+### State semantics
+
+`required` participates in form validation (a missing start or end reports
+`valueMissing`). The footer shows the in-progress selection as live text. **Apply**
+is disabled until both ends are set; it commits the range and fires `fluid-change`,
+while **Cancel** / <kbd>Escape</kbd> discards it.
+
+### Motion & target size
+
+- The popover open/close transition honors `prefers-reduced-motion: reduce`.
+- The trigger, presets, nav, and every day target is at least **24×24** CSS px by
+  default
+  ([SC 2.5.8 Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+  AA), reading `--fluid-target-min` as a floor.
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA** and the trigger,
+presets, day targets, and focus ring all scale up. The toggle sets the real
+`data-fluid-conformance` attribute on `<html>`:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-date-range-picker" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Date picker"
+    href="/components/date-picker/"
+    description="Pick a single date instead of a span."
+  />
+  <LinkCard
+    title="Calendar"
+    href="/components/calendar/"
+    description="The accessible month grid this picker builds on (two of them)."
+  />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="The text field this picker shares its --fluid-input-* tokens with."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Validation + submission patterns across frameworks."
+  />
+</CardGrid>

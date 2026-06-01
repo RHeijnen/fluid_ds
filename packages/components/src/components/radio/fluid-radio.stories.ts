@@ -6,7 +6,7 @@ import type { FluidRadioGroup } from "./fluid-radio-group.js";
 type Args = Pick<FluidRadioGroup, "value" | "orientation" | "required">;
 
 const meta: Meta<Args> = {
-  title: "Components/Radio",
+  title: "Components/Forms/Radio",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

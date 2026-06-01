@@ -6,7 +6,7 @@ import type { FluidSlider } from "./fluid-slider.js";
 type Args = Pick<FluidSlider, "value" | "min" | "max" | "step" | "disabled" | "showValue">;
 
 const meta: Meta<Args> = {
-  title: "Components/Slider",
+  title: "Components/Forms/Slider",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

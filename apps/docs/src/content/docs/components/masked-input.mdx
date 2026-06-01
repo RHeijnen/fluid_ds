@@ -1,0 +1,265 @@
+---
+title: "Masked input"
+description: "A text field that formats input against a mask as the user types. Form-associated, with the raw value exposed separately."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-masked-input>` is a form-associated text field that formats input against
+a fixed-width `mask` as the user types. Mask placeholders accept input (`#` = a
+digit, `A` = a letter, `*` = alphanumeric) and any other character is a literal
+the field inserts automatically. The submitted form value is the formatted
+string; the raw characters the user typed are exposed as the read-only
+`unmaskedValue` property.
+
+<Demo>
+  <fluid-masked-input mask="(###) ###-####" aria-label="Phone number"></fluid-masked-input>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/masked-input/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/masked-input";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Masks
+
+The `mask` string drives everything. Each placeholder token accepts one
+character; literals between them are inserted for the user as they type.
+
+| Token | Accepts |
+| ----- | ------- |
+| `#`   | A digit (0-9) |
+| `A`   | A letter (a-z, A-Z) |
+| `*`   | A letter or a digit |
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
+    <fluid-masked-input mask="(###) ###-####" aria-label="Phone"></fluid-masked-input>
+    <fluid-masked-input mask="##/##/####" aria-label="Date"></fluid-masked-input>
+    <fluid-masked-input mask="#### #### #### ####" aria-label="Card number"></fluid-masked-input>
+    <fluid-masked-input mask="AA-####" aria-label="Postal code"></fluid-masked-input>
+  </div>
+</Demo>
+
+```html
+<fluid-masked-input mask="(###) ###-####"></fluid-masked-input>
+<fluid-masked-input mask="##/##/####"></fluid-masked-input>
+<fluid-masked-input mask="#### #### #### ####"></fluid-masked-input>
+```
+
+### Sizes
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
+    <fluid-masked-input size="sm" mask="(###) ###-####" aria-label="Small"></fluid-masked-input>
+    <fluid-masked-input size="md" mask="(###) ###-####" aria-label="Medium"></fluid-masked-input>
+    <fluid-masked-input size="lg" mask="(###) ###-####" aria-label="Large"></fluid-masked-input>
+  </div>
+</Demo>
+
+```html
+<fluid-masked-input size="sm" mask="(###) ###-####"></fluid-masked-input>
+```
+
+### States
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
+    <fluid-masked-input mask="(###) ###-####" aria-label="Default"></fluid-masked-input>
+    <fluid-masked-input mask="(###) ###-####" value="(555) 123-4567" aria-label="Filled"></fluid-masked-input>
+    <fluid-masked-input mask="(###) ###-####" disabled value="(555) 123-4567" aria-label="Disabled"></fluid-masked-input>
+    <fluid-masked-input mask="(###) ###-####" readonly value="(555) 123-4567" aria-label="Read-only"></fluid-masked-input>
+  </div>
+</Demo>
+
+### Reading the raw value
+
+The form submits the **formatted** string. When you need the digits alone (for an
+API call, say), read the `unmaskedValue` property.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-masked-input id="phone" mask="(###) ###-####"></fluid-masked-input>
+
+    <script type="module">
+      const el = document.getElementById("phone");
+      el.addEventListener("fluid-change", (e) => {
+        console.log(e.detail.value);          // "(555) 123-4567"
+        console.log(e.detail.unmaskedValue);  // "5551234567"
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="PhoneField.tsx"
+    import { useRef } from "react";
+    import "@fluid-ds/components/define/masked-input";
+
+    export function PhoneField() {
+      const ref = useRef<HTMLElement & { unmaskedValue: string }>(null);
+      return (
+        <fluid-masked-input
+          ref={ref}
+          mask="(###) ###-####"
+          onfluid-change={() => console.log(ref.current?.unmaskedValue)}
+        />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="PhoneField.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/masked-input";
+    function onChange(e: CustomEvent) {
+      console.log(e.detail.unmaskedValue);
+    }
+    </script>
+
+    <template>
+      <fluid-masked-input mask="(###) ###-####" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="phone.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/masked-input";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-phone",
+      template: `
+        <fluid-masked-input mask="(###) ###-####" (fluid-change)="onChange($event)" />
+      `
+    })
+    export class PhoneComponent {
+      onChange(e: Event) {
+        console.log((e as CustomEvent).detail.unmaskedValue);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="PhoneField.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/masked-input";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.unmaskedValue);
+      }
+    </script>
+
+    <fluid-masked-input mask="(###) ###-####" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+### In a form
+
+The field participates in `<form>` submission and validation like a native
+`<input>`. Mark it `required` to reject an empty or incomplete value.
+
+<Demo>
+  <form style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
+    <fluid-masked-input name="phone" mask="(###) ###-####" required aria-label="Phone number"></fluid-masked-input>
+    <fluid-masked-input name="expiry" mask="##/##" required aria-label="Card expiry"></fluid-masked-input>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-masked-input name="phone" mask="(###) ###-####" required></fluid-masked-input>
+</form>
+```
+
+## When to use
+
+- Phone numbers, dates, card numbers, and other fixed-format entries where the
+  delimiters are predictable.
+- Codes with a known shape (postal codes, serials) where auto-inserting the
+  separators speeds entry and prevents typos.
+
+Reach for a plain [`<fluid-input>`](/components/input/) when the value is
+free-form or its length varies. For one-time passcodes split across cells, use
+[`<fluid-otp>`](/components/otp/).
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-masked-input-*` token
+that falls back to a main semantic var** (the override ladder), and the field
+mirrors `<fluid-input>`'s field tokens (`--fluid-field-*`) so masked and plain
+fields line up. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-masked-input-bg: var(--fluid-surface-base);
+  --fluid-masked-input-border-focus: var(--fluid-accent-base);
+  --fluid-masked-input-radius: 8px;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The field shell is [`part="base"`](#api) and the inner control is `part="input"`.
+Reach them with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
+for any CSS not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-masked-input" />
+
+## Accessibility
+
+- The field wraps a real `<input>`, so it inherits native keyboard behavior:
+  typing, selection, and **Backspace skips back over inserted literals** to the
+  previous placeholder.
+- Provide an accessible name: set `aria-label` on the host (forwarded to the
+  inner input) or associate a visible `<label>`.
+- `aria-invalid` is always present on the inner input and flips to `true` when a
+  `required` field is left empty or incomplete. Validity is conveyed through the
+  ARIA state, not by border color alone (SC 1.4.1).
+- The invalid border uses the theme-independent `--fluid-danger-base` token, so
+  it keeps a 3:1 contrast against the field across every brand and in dark mode.
+
+### AA vs AAA
+
+The field reads the conformance tokens rather than hard-coding sizes. Under the
+default **AA** mode every size variant keeps its design height (min 24 CSS px
+target). When an ancestor opts into **AAA** with `data-fluid-conformance="aaa"`,
+`--fluid-target-min` lifts the field to a 44×44 target (SC 2.5.5) and
+`--fluid-focus-ring-width` thickens the focus ring, with no per-component
+branching.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Input" href="/components/input/" description="Free-form single-line text field." />
+  <LinkCard title="OTP" href="/components/otp/" description="One-time passcode split across cells." />
+</CardGrid>

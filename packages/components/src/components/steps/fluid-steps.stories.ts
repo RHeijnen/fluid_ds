@@ -6,7 +6,7 @@ import type { FluidSteps } from "./fluid-steps.js";
 type Args = Pick<FluidSteps, "current" | "orientation" | "variant" | "clickable">;
 
 const meta: Meta<Args> = {
-  title: "Components/Steps",
+  title: "Components/Navigation/Steps",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

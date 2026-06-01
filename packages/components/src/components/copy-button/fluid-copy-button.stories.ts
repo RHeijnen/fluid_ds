@@ -6,7 +6,7 @@ import type { FluidCopyButton } from "./fluid-copy-button.js";
 type Args = Pick<FluidCopyButton, "value" | "disabled">;
 
 const meta: Meta<Args> = {
-  title: "Components/CopyButton",
+  title: "Components/Content/CopyButton",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

@@ -9,7 +9,7 @@ type Args = Pick<FluidCallout, "variant" | "dismissible"> & {
 };
 
 const meta: Meta<Args> = {
-  title: "Components/Callout",
+  title: "Components/Feedback/Callout",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

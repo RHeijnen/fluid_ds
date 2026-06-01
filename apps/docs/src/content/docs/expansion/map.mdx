@@ -1,0 +1,102 @@
+---
+title: "@fluid-ds/map"
+description: "A themed Leaflet map web component with markers, framework-agnostic."
+---
+
+A map web component for Fluid: a thin, themed wrapper around
+[Leaflet](https://leafletjs.com/) that renders an interactive tile map with
+optional markers. Drive it with plain properties so it works from any
+framework. Expansion pack.
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  Leaflet needs its global stylesheet and a sized container, neither of which
+  works inside shadow DOM, so `<fluid-map>` renders in LIGHT DOM. Its module
+  imports `leaflet/dist/leaflet.css` for you, you only need `leaflet` installed.
+</Aside>
+
+## Install
+
+```bash
+pnpm add @fluid-ds/map leaflet
+```
+
+`leaflet` is a peer you ship. Import the component definition where you use it:
+
+```ts
+import "@fluid-ds/map/define/map";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-map>` | Themed Leaflet map with markers, move/zoom events, and a labelled region for assistive tech. |
+
+## Use
+
+```html
+<fluid-map label="Map of central London"></fluid-map>
+
+<script type="module">
+  import "@fluid-ds/map/define/map";
+
+  const map = document.querySelector("fluid-map");
+  map.center = [51.505, -0.09];
+  map.zoom = 13;
+  map.markers = [
+    { lat: 51.505, lng: -0.09, label: "Centre" },
+    { lat: 51.51, lng: -0.1, label: "North west" }
+  ];
+
+  map.addEventListener("fluid-marker-click", (e) => {
+    console.log("clicked", e.detail.marker);
+  });
+  map.addEventListener("fluid-move", (e) => {
+    console.log("moved to", e.detail.center, "zoom", e.detail.zoom);
+  });
+</script>
+```
+
+`center`, `zoom`, `markers`, `tile-url`, and `attribution` are all reactive:
+update the property and the map re-syncs in place. The container is a labelled
+`role="region"`, so give every map a meaningful `label`.
+
+### Properties
+
+| Property | Attribute | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `center` | - | `[number, number]` | `[51.505, -0.09]` | Map center as `[lat, lng]`. |
+| `zoom` | `zoom` | `number` | `13` | Zoom level. |
+| `markers` | - | `{ lat, lng, label? }[]` | `[]` | Markers to place. A `label` becomes a popup + tooltip. |
+| `tileUrl` | `tile-url` | `string` | OpenStreetMap tiles | Tile layer URL template. |
+| `attribution` | `attribution` | `string` | OpenStreetMap credit | Tile attribution (HTML allowed). |
+| `label` | `label` | `string` | `"Map"` | Accessible name for the map region. |
+
+### Events
+
+| Event | Detail | When |
+| --- | --- | --- |
+| `fluid-marker-click` | `{ marker }` | A marker is clicked. |
+| `fluid-move` | `{ center, zoom }` | The view finishes moving or zooming. |
+
+## Theming
+
+`<fluid-map>` reads the same `--fluid-*` semantic tokens as the rest of the
+system for its frame (border, radius, focus ring), so themes flow through
+without extra work. Component tokens layer on top for fine-grained control:
+
+| Token | Falls back to | Controls |
+| --- | --- | --- |
+| `--fluid-map-height` | `24rem` | Viewport height. |
+| `--fluid-map-radius` | `--fluid-radius-md` | Viewport corner radius. |
+| `--fluid-map-border` | `1px solid --fluid-border-default` | Viewport border. |
+
+The tiles themselves come from your tile provider, so map imagery is not
+themed by Fluid. Swap `tile-url` for a dark or styled tile set if you want the
+map body to match a dark theme.
+
+## License
+
+MIT.

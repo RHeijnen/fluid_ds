@@ -1,0 +1,223 @@
+---
+title: "Timeline"
+description: "A vertical, ordered list of events: activity feeds, order histories, audit logs, and changelogs."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-timeline>` lays out a vertical, ordered sequence of events. Each
+`<fluid-timeline-item>` shows a marker dot (optionally holding an `icon`), an
+optional `time` stamp, and free-form content, joined by a connecting line. It is
+presentational and semantic: the items form a list, so the timeline exposes
+`role="list"` with each item as `role="listitem"`.
+
+<Demo>
+  <fluid-timeline aria-label="Order history">
+    <fluid-timeline-item>
+      <span slot="time">09:24</span>
+      <strong>Order placed</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="info">
+      <span slot="time">10:02</span>
+      <strong>Payment confirmed</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="success">
+      <span slot="time">14:51</span>
+      <strong>Shipped</strong>
+    </fluid-timeline-item>
+  </fluid-timeline>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/timeline/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/timeline";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Rich content
+
+Put anything in the default slot: a title, a description, links, or other
+components. The `time` slot renders above the content.
+
+<Demo>
+  <fluid-timeline aria-label="Project activity">
+    <fluid-timeline-item>
+      <span slot="time">Mon, 9:24 AM</span>
+      <strong>Repository created</strong>
+      <span>Initialized the monorepo and added the first package.</span>
+    </fluid-timeline-item>
+    <fluid-timeline-item>
+      <span slot="time">Tue, 2:10 PM</span>
+      <strong>First component merged</strong>
+      <span>The button landed with full theming and tests.</span>
+    </fluid-timeline-item>
+    <fluid-timeline-item>
+      <span slot="time">Wed, 4:45 PM</span>
+      <strong>Docs site published</strong>
+      <span>Component pages are now live for the whole team.</span>
+    </fluid-timeline-item>
+  </fluid-timeline>
+</Demo>
+
+```html
+<fluid-timeline aria-label="Project activity">
+  <fluid-timeline-item>
+    <span slot="time">Mon, 9:24 AM</span>
+    <strong>Repository created</strong>
+    <span>Initialized the monorepo and added the first package.</span>
+  </fluid-timeline-item>
+</fluid-timeline>
+```
+
+### Tones
+
+Set `tone` on an item to color its marker. The status tones (info, success,
+warning, danger) are theme-independent: they keep their meaning across brands.
+
+<Demo>
+  <fluid-timeline aria-label="Deployment log">
+    <fluid-timeline-item tone="info">
+      <span slot="time">Step 1</span>
+      <strong>Build started</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="success">
+      <span slot="time">Step 2</span>
+      <strong>Tests passed</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="warning">
+      <span slot="time">Step 3</span>
+      <strong>Slow response detected</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="danger">
+      <span slot="time">Step 4</span>
+      <strong>Rollout halted</strong>
+    </fluid-timeline-item>
+  </fluid-timeline>
+</Demo>
+
+```html
+<fluid-timeline-item tone="success">
+  <span slot="time">Step 2</span>
+  <strong>Tests passed</strong>
+</fluid-timeline-item>
+```
+
+### Marker icons
+
+Fill the marker with a small icon via the `icon` slot.
+
+<Demo>
+  <fluid-timeline aria-label="Account activity">
+    <fluid-timeline-item tone="success">
+      <fluid-icon slot="icon" name="check"></fluid-icon>
+      <span slot="time">Just now</span>
+      <strong>Profile verified</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item tone="info">
+      <fluid-icon slot="icon" name="user"></fluid-icon>
+      <span slot="time">Yesterday</span>
+      <strong>Account created</strong>
+    </fluid-timeline-item>
+  </fluid-timeline>
+</Demo>
+
+```html
+<fluid-timeline-item tone="success">
+  <fluid-icon slot="icon" name="check"></fluid-icon>
+  <span slot="time">Just now</span>
+  <strong>Profile verified</strong>
+</fluid-timeline-item>
+```
+
+### Without time stamps
+
+The `time` slot is optional. Omit it for a plain step list.
+
+<Demo>
+  <fluid-timeline aria-label="Setup steps">
+    <fluid-timeline-item><strong>Clone the repository</strong></fluid-timeline-item>
+    <fluid-timeline-item><strong>Install dependencies</strong></fluid-timeline-item>
+    <fluid-timeline-item><strong>Run the build</strong></fluid-timeline-item>
+  </fluid-timeline>
+</Demo>
+
+## When to use
+
+- Activity feeds and audit logs (who did what, when).
+- Order or shipment status histories.
+- Changelogs and release notes laid out chronologically.
+
+Reach for [`<fluid-steps>`](/components/steps/) instead when the sequence is a
+progress indicator with a single current position, rather than a record of past
+events.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-timeline-*` /
+`--fluid-timeline-item-*` token that falls back to a main semantic var** (the
+override ladder). Override the marker fill, line color, gap, or time-stamp color
+per instance, per component, or per brand. The **complete list** is in the
+[API tables below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-timeline-gap: var(--fluid-space-5);
+  --fluid-timeline-item-marker-bg: var(--fluid-accent-base);
+  --fluid-timeline-item-line-color: var(--fluid-border-default);
+  --fluid-timeline-item-time-fg: var(--fluid-text-secondary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The list is [`part="base"`](#api); each item exposes `part="marker"` and
+`part="content"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## Accessibility
+
+- The timeline is a semantic list: a `role="list"` wrapper with each item as
+  `role="listitem"`, so screen readers announce the count and iterate the
+  events in reading order.
+- Always give the timeline an `aria-label` (or `aria-labelledby`) so the list
+  has an accessible name describing what the events are about.
+- The marker dot and connecting line are decorative (`aria-hidden`): meaning is
+  carried by the slotted content and the time text, not by color. When you use a
+  `tone`, pair it with text so the status is not conveyed by color alone.
+- The component is presentational and non-interactive: there is no keyboard
+  contract beyond the normal tab order of any interactive content you slot in.
+
+## API
+
+### `fluid-timeline`
+
+<ComponentApi tag="fluid-timeline" />
+
+### `fluid-timeline-item`
+
+<ComponentApi tag="fluid-timeline-item" />

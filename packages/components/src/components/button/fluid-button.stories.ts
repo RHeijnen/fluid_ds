@@ -24,7 +24,7 @@ type Args = Pick<
 };
 
 const meta: Meta<Args> = {
-  title: "Components/Button",
+  title: "Components/Forms/Button",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" },

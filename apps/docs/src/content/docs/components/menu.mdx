@@ -1,0 +1,291 @@
+---
+title: "Menu"
+description: "A keyboard-navigable list of actions following the WAI-ARIA Menu pattern. Pair it with your own trigger or a dropdown."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-menu>` is a presentational menu surface: a `role="menu"` container whose
+`<fluid-menu-item>` children are `role="menuitem"`. It owns the roving tabindex,
+arrow-key navigation, Home/End, Enter/Space activation, and type-ahead. Each item
+fires **`fluid-select`** (bubbling) when activated, so you can listen on the item
+or on the menu. Positioning and the trigger are yours (or use a dropdown): this
+is a single-level menu, submenus are out of scope.
+
+<Demo>
+  <fluid-menu aria-label="File actions">
+    <fluid-menu-item value="new">New file</fluid-menu-item>
+    <fluid-menu-item value="open">Open…</fluid-menu-item>
+    <fluid-menu-item value="save">Save</fluid-menu-item>
+    <fluid-menu-item value="delete" disabled>Delete</fluid-menu-item>
+  </fluid-menu>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/menu/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/menu";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### With icons
+
+Each item has an `icon` slot rendered before the label.
+
+<Demo>
+  <fluid-menu aria-label="Edit actions">
+    <fluid-menu-item value="cut">
+      <fluid-icon slot="icon" name="scissors"></fluid-icon>
+      Cut
+    </fluid-menu-item>
+    <fluid-menu-item value="copy">
+      <fluid-icon slot="icon" name="copy"></fluid-icon>
+      Copy
+    </fluid-menu-item>
+    <fluid-menu-item value="paste">
+      <fluid-icon slot="icon" name="clipboard"></fluid-icon>
+      Paste
+    </fluid-menu-item>
+  </fluid-menu>
+</Demo>
+
+```html
+<fluid-menu aria-label="Edit actions">
+  <fluid-menu-item value="copy">
+    <fluid-icon slot="icon" name="copy"></fluid-icon>
+    Copy
+  </fluid-menu-item>
+</fluid-menu>
+```
+
+### Grouped with labels
+
+`<fluid-menu-label>` is a presentational group heading. The menu skips it during
+keyboard navigation, only items are navigable.
+
+<Demo>
+  <fluid-menu aria-label="Account menu">
+    <fluid-menu-label>Account</fluid-menu-label>
+    <fluid-menu-item value="profile">
+      <fluid-icon slot="icon" name="user"></fluid-icon>
+      Profile
+    </fluid-menu-item>
+    <fluid-menu-item value="billing">
+      <fluid-icon slot="icon" name="credit-card"></fluid-icon>
+      Billing
+    </fluid-menu-item>
+    <fluid-menu-label>Session</fluid-menu-label>
+    <fluid-menu-item value="logout">
+      <fluid-icon slot="icon" name="log-out"></fluid-icon>
+      Sign out
+    </fluid-menu-item>
+  </fluid-menu>
+</Demo>
+
+```html
+<fluid-menu aria-label="Account menu">
+  <fluid-menu-label>Account</fluid-menu-label>
+  <fluid-menu-item value="profile">Profile</fluid-menu-item>
+  <fluid-menu-label>Session</fluid-menu-label>
+  <fluid-menu-item value="logout">Sign out</fluid-menu-item>
+</fluid-menu>
+```
+
+### Disabled items
+
+Set `disabled` on an item to skip it in keyboard navigation and block
+activation.
+
+<Demo>
+  <fluid-menu aria-label="With disabled items">
+    <fluid-menu-item value="undo">Undo</fluid-menu-item>
+    <fluid-menu-item value="redo" disabled>Redo</fluid-menu-item>
+    <fluid-menu-item value="cut">Cut</fluid-menu-item>
+    <fluid-menu-item value="paste" disabled>Paste</fluid-menu-item>
+  </fluid-menu>
+</Demo>
+
+## Listening for selection
+
+A `<fluid-menu-item>` fires **`fluid-select`** (with `detail.value`) on click,
+Enter, or Space. The event bubbles, so a listener on the menu hears every item.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-menu aria-label="Actions" id="m">
+      <fluid-menu-item value="copy">Copy</fluid-menu-item>
+      <fluid-menu-item value="paste">Paste</fluid-menu-item>
+    </fluid-menu>
+
+    <script type="module">
+      document.getElementById("m").addEventListener("fluid-select", (e) => {
+        console.log(e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Actions.tsx"
+    import "@fluid-ds/components/define/menu";
+
+    export function Actions() {
+      return (
+        <fluid-menu aria-label="Actions"
+          onfluid-select={(e) => console.log((e as CustomEvent).detail.value)}>
+          <fluid-menu-item value="copy">Copy</fluid-menu-item>
+          <fluid-menu-item value="paste">Paste</fluid-menu-item>
+        </fluid-menu>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Actions.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/menu";
+    function onSelect(e: CustomEvent<{ value: string }>) {
+      console.log(e.detail.value);
+    }
+    </script>
+
+    <template>
+      <fluid-menu aria-label="Actions" @fluid-select="onSelect">
+        <fluid-menu-item value="copy">Copy</fluid-menu-item>
+        <fluid-menu-item value="paste">Paste</fluid-menu-item>
+      </fluid-menu>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="actions.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/menu";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-actions",
+      template: `
+        <fluid-menu aria-label="Actions" (fluid-select)="onSelect($event)">
+          <fluid-menu-item value="copy">Copy</fluid-menu-item>
+          <fluid-menu-item value="paste">Paste</fluid-menu-item>
+        </fluid-menu>
+      `
+    })
+    export class Actions {
+      onSelect(e: any) { console.log(e.detail.value); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Actions.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/menu";
+    </script>
+
+    <fluid-menu aria-label="Actions"
+      on:fluid-select={(e) => console.log(e.detail.value)}>
+      <fluid-menu-item value="copy">Copy</fluid-menu-item>
+      <fluid-menu-item value="paste">Paste</fluid-menu-item>
+    </fluid-menu>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- The action list inside a menu button or dropdown (pair with your own trigger).
+- A right-click / context-style action surface.
+- Any short list of commands that act on the current selection.
+
+Reach for [`<fluid-select>`](/components/select/) when the control picks and
+keeps a value for form submission, a menu performs an action and does not hold
+state.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-menu-*` /
+`--fluid-menu-item-*` / `--fluid-menu-label-*` token that falls back to a main
+semantic var** (the override ladder). The **complete list** is in the
+[API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-menu-bg: var(--fluid-surface-base);
+  --fluid-menu-border: var(--fluid-border-default);
+  --fluid-menu-item-active-bg: color-mix(in srgb, var(--fluid-accent-base) 10%, transparent);
+  --fluid-menu-item-accent: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The surface is [`part="base"`](#api); each item exposes `base`, `icon`, and
+`label`; the label exposes `base`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-menu" />
+
+<ComponentApi tag="fluid-menu-item" />
+
+<ComponentApi tag="fluid-menu-label" />
+
+## Accessibility
+
+`<fluid-menu>` implements the
+[WAI-ARIA APG Menu pattern](https://www.w3.org/WAI/ARIA/apg/patterns/menubar/):
+
+- The surface is `role="menu"` with an accessible name (`aria-label`, default
+  "Menu"). Items are `role="menuitem"`; `<fluid-menu-label>` is
+  `role="presentation"` so it is not announced as an item.
+- **Roving tabindex**: exactly one item is in the Tab sequence at a time. Tab
+  moves into and out of the menu as a single stop; arrow keys move within it.
+- **Keyboard**: ArrowDown / ArrowUp move between items and wrap; Home / End jump
+  to the first / last item; Enter / Space activate the focused item; printable
+  characters type-ahead to the next matching item. Disabled items are skipped.
+- Disabled items carry `aria-disabled="true"` and never activate.
+- Target size: each item is at least 24×24 CSS px and reads `--fluid-target-min`,
+  so an `data-fluid-conformance="aaa"` ancestor lifts rows to 44×44.
+
+### AA vs AAA
+
+The menu reads the conformance tokens rather than hard-coding sizes. At the
+default AA level, item rows use their design height with a 2px focus ring. Under
+`data-fluid-conformance="aaa"`, `--fluid-target-min` rises to 44px (SC 2.5.5
+Target Size) and `--fluid-focus-ring-width` to 3px (SC 2.4.13 Focus Appearance,
+Level AAA), both flow through with no per-component branching. Motion honors
+`prefers-reduced-motion` and the `--fluid-motion` scalar.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Select" href="/components/select/" description="Pick and keep one value for a form." />
+  <LinkCard title="Dropdown" href="/components/dropdown/" description="A trigger plus a popover surface." />
+</CardGrid>

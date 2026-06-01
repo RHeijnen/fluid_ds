@@ -4,7 +4,15 @@ const config: StorybookConfig = {
   stories: [
     "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|ts)",
-    "../../../packages/components/src/**/*.stories.@(js|ts)"
+    "../../../packages/components/src/**/*.stories.@(js|ts)",
+    "../../../packages/charts/src/**/*.stories.@(js|ts)",
+    "../../../packages/scheduler/src/**/*.stories.@(js|ts)",
+    "../../../packages/media/src/**/*.stories.@(js|ts)",
+    "../../../packages/table/src/**/*.stories.@(js|ts)",
+    "../../../packages/calendar/src/**/*.stories.@(js|ts)",
+    "../../../packages/editor/src/**/*.stories.@(js|ts)",
+    "../../../packages/kanban/src/**/*.stories.@(js|ts)",
+    "../../../packages/map/src/**/*.stories.@(js|ts)"
   ],
   addons: [
     "@storybook/addon-essentials",

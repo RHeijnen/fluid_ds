@@ -1,0 +1,262 @@
+---
+title: "Command palette"
+description: "A modal ⌘K launcher: a search input over a filtered, keyboard-driven results list."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-command-palette>` is the "⌘K" launcher: a modal dialog with a search
+input over a filtered results list. Type to filter by substring, move the active
+result with the arrow keys, and run it with **Enter**. It fires
+**`fluid-select`** with `{ id, item }` when an item is chosen and
+**`fluid-close`** when it dismisses. The dialog traps focus, closes on Escape,
+and restores focus to whatever opened it.
+
+```html
+<fluid-button id="cp-trigger">Open command palette</fluid-button>
+<fluid-command-palette id="cp"></fluid-command-palette>
+
+<script type="module">
+  const cp = document.getElementById("cp");
+  cp.items = [
+    { id: "new", label: "New File", hint: "⌘N", group: "File" },
+    { id: "open", label: "Open File…", hint: "⌘O", group: "File" },
+    { id: "copy", label: "Copy", hint: "⌘C", group: "Edit" },
+    { id: "theme", label: "Toggle Dark Theme", group: "View" }
+  ];
+  document.getElementById("cp-trigger").addEventListener("click", () => cp.show());
+  cp.addEventListener("fluid-select", (e) => console.log("ran", e.detail.id));
+</script>
+```
+
+<Aside type="tip">Try it live in [Storybook](https://fluid-web.dev): the palette opens in a focus-trapped modal with full keyboard control.</Aside>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/command-palette/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/command-palette";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Items and groups
+
+`items` is an array of `{ id, label, hint?, group? }`. The `id` is what comes
+back in the `fluid-select` event; the `label` is shown and matched while
+filtering; `hint` is optional trailing text (a shortcut, say); `group` buckets
+items under an uppercase heading.
+
+```html
+<fluid-command-palette id="cp"></fluid-command-palette>
+
+<script type="module">
+  document.getElementById("cp").items = [
+    { id: "new", label: "New File", hint: "⌘N", group: "File" },
+    { id: "open", label: "Open File…", hint: "⌘O", group: "File" },
+    { id: "copy", label: "Copy", hint: "⌘C", group: "Edit" }
+  ];
+</script>
+```
+
+### Opening with ⌘K
+
+Open and close the palette by toggling the `open` property (or call `show()` /
+`hide()`). Bind a global key handler for the classic launcher feel.
+
+```html
+<fluid-command-palette id="cp"></fluid-command-palette>
+
+<script type="module">
+  const cp = document.getElementById("cp");
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      cp.open ? cp.hide() : cp.show();
+    }
+  });
+</script>
+```
+
+### Running a command
+
+```html
+<fluid-command-palette id="cp"></fluid-command-palette>
+
+<script type="module">
+  document.getElementById("cp").addEventListener("fluid-select", (e) => {
+    const { id, item } = e.detail;
+    console.log("ran command", id, item.label);
+  });
+</script>
+```
+
+## Handling selection
+
+The palette is presentational: it does not run anything itself. Listen for
+**`fluid-select`** and dispatch on the returned `id`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-command-palette id="cp"></fluid-command-palette>
+
+    <script type="module">
+      const cp = document.getElementById("cp");
+      cp.items = [{ id: "save", label: "Save" }, { id: "logout", label: "Log out" }];
+      cp.addEventListener("fluid-select", (e) => run(e.detail.id));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Launcher.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/command-palette";
+
+    export function Launcher() {
+      const ref = useRef<HTMLElement & { items: unknown[] }>(null);
+      useEffect(() => {
+        if (ref.current) ref.current.items = [{ id: "save", label: "Save" }];
+      }, []);
+      return (
+        <fluid-command-palette
+          ref={ref}
+          onfluid-select={(e: CustomEvent) => run(e.detail.id)}
+        />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Launcher.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/command-palette";
+    const items = [{ id: "save", label: "Save" }];
+    </script>
+
+    <template>
+      <fluid-command-palette
+        :items.prop="items"
+        @fluid-select="(e) => run(e.detail.id)"
+      />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="launcher.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/command-palette";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-launcher",
+      template: `
+        <fluid-command-palette [items]="items" (fluid-select)="run($event.detail.id)" />
+      `
+    })
+    export class Launcher {
+      items = [{ id: "save", label: "Save" }];
+      run(id: string) { /* … */ }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Launcher.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/command-palette";
+      const items = [{ id: "save", label: "Save" }];
+    </script>
+
+    <fluid-command-palette {items} on:fluid-select={(e) => run(e.detail.id)} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- A global launcher to jump to pages, run actions, or search (the ⌘K pattern).
+- A keyboard-first alternative to a deep navigation menu.
+- A quick action picker over a large, flat set of commands.
+
+Reach for a plain [`<fluid-select>`](/components/select/) when the choice is a
+small, bounded set tied to a form field, not an app-wide action launcher.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-command-palette-*`
+token that falls back to a main semantic var** (the override ladder). The panel,
+the active-row highlight, the hints, and the focus ring each have their own
+token. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-command-palette-bg: var(--fluid-surface-base);
+  --fluid-command-palette-active-bg: var(--fluid-accent-base);
+  --fluid-command-palette-active-fg: var(--fluid-accent-text);
+  --fluid-command-palette-radius: 16px;
+}
+```
+
+The open animation is the shared motion preset
+`--fluid-command-palette-enter-animation` (default `fluid-scale-in`); set it to
+`none`, or set the inherited scalar `--fluid-motion: 0`, to disable it. It also
+collapses automatically under `prefers-reduced-motion: reduce`.
+
+### Beyond tokens: `::part()`
+
+The overlay is `part="base"`, the floating dialog is `part="panel"`, with
+`part="input"`, `part="listbox"`, `part="option"`, `part="group"`, and
+`part="empty"` for the inner pieces. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## Accessibility
+
+- The dialog is `role="dialog"` with `aria-modal="true"` and an `aria-label`
+  (default "Command palette"; override via `aria-label`).
+- The search input is `role="combobox"` with `aria-expanded`, `aria-controls`
+  pointing at the listbox, and `aria-activedescendant` pointing at the active
+  option. DOM focus stays on the input; the active option is tracked with
+  `aria-activedescendant` per the WAI-ARIA Combobox pattern.
+- Results are a `role="listbox"` of `role="option"` rows; the active row carries
+  `aria-selected="true"`.
+- **Keyboard**: ArrowDown / ArrowUp move the active option (wrapping at the
+  ends), Home / End jump to the first / last, Enter runs the active option, and
+  Escape closes. Focus moves into the input on open, is trapped inside the
+  dialog, and is restored to the trigger on close.
+- Motion honors `prefers-reduced-motion: reduce`.
+
+### AA vs AAA
+
+The component reads the conformance tokens rather than hard-coding sizes, so it
+scales without per-component branching. Under `data-fluid-conformance="aaa"`,
+`--fluid-target-min` lifts each option row to a 44×44 target ([SC 2.5.5]) and
+`--fluid-focus-ring-width` thickens the input focus ring ([SC 2.4.13 Focus
+Appearance], a Level AAA criterion). At the default AA level rows meet the
+24×24 minimum ([SC 2.5.8]) and the focus ring is 2px.
+
+## API
+
+<ComponentApi tag="fluid-command-palette" />

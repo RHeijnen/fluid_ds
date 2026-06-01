@@ -42,18 +42,43 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 ### Framework-agnostic component library ✅
 - Built on standard custom elements (Lit 3 + TypeScript): work in every
   framework and in plain HTML.
-- **57 components** across inputs, layout, feedback, navigation,
+- **101 components** across inputs, layout, feedback, navigation,
   content, and format/observer helpers, including a responsive **grid** (column
   / `<fluid-col>`) and a dense bento **mosaic** layout system.
+- **Navigation + command surfaces**: an APG **menu** / menubar, a **command
+  palette** (⌘K), **pagination**, a **toolbar** (roving tabindex), and a
+  **speed-dial** FAB.
+- **Form building blocks**: a **field** wrapper (label + description + error),
+  an **OTP / PIN** input, and a **tag (token) input**, all form-associated.
+- **Content + status**: **timeline**, **stat** (KPI), **avatar group**,
+  **banner**, **kbd**, **empty state**, and a **pricing table**.
+- **App shell + page structure**: a **hero** masthead, an **app bar**, a
+  collapsible **sidebar**, a **nav list**, scroll-spy **anchor nav**, and a
+  right-click **context menu**.
+- **More form controls**: a **form** orchestrator (clean submit event +
+  validity gate), a **fieldset** group, a dual-thumb **range slider**, a
+  **time picker**, a **masked input**, a two-pane **transfer** list, and a
+  **dropzone** (drag-and-drop file intake), all form-associated where relevant.
+- **More feedback + flow**: a **result** page, a **loading overlay**, a
+  **popconfirm**, a guided **tour** (coach marks), and a **meter** gauge.
+- **More content + utility**: a **description list**, a generic **list**, a
+  responsive **image**, a **countdown**, a **truncate** (line-clamp + reveal),
+  an **aspect-ratio** box, a **theme toggle**, and a non-visual **hotkey**
+  (keyboard-shortcut) behavior.
+- **Date family**: an accessible **calendar** (WAI-ARIA APG grid with full
+  keyboard navigation), a form-associated **date picker**, and a **date range
+  picker** with dual calendars and configurable presets. ISO `YYYY-MM-DD`
+  values, locale-aware formatting, min/max bounds.
 - Distributed as scoped `@fluid-ds/*` packages.
 - Side-effect-free imports + per-component `/define/*` entry points, so a
   consumer ships only the components they register.
 
-### Delivery: CDN and npm ✅ (publish 📋)
+### Delivery: CDN and npm ✅
 - ✅ CDN-first: a `<link>` + `<script>` from jsDelivr/unpkg, no bundler needed.
 - ✅ npm / bundler path with tree-shakable per-component entry points.
-- 📋 Public npm publish is set up (CI, changesets, provenance, `alpha` tag) but
-  **not yet executed**, the `@fluid-ds` org exists; first publish is deferred.
+- ✅ **Published**: all `@fluid-ds/*` packages are live on the public npm
+  registry under the `alpha` tag (first release `0.0.1-alpha`). Install with
+  `npm i @fluid-ds/components@alpha`.
 
 ### Accessibility: WCAG 2.2 ✅ AA / 🔨 AAA
 - ✅ Every component built to **WCAG 2.2 Level AA**: semantics from the WAI-ARIA
@@ -111,16 +136,30 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 ### Expansion packs (opt-in) ✅
 Kept out of the core so the base bundle stays lean:
 - ✅ `@fluid-ds/charts`: chart components.
+- ✅ `@fluid-ds/scheduler`: accessible appointment scheduler (calendar with
+  bookable time slots + availability dots), a standalone time-slot radiogroup,
+  an owner-side hours editor, and a framework-free availability engine
+  (server-usable). Form-associated; lazy per-month booking fetch.
+- ✅ `@fluid-ds/table`: accessible data grid (sortable, selectable, semantic
+  `<table>`).
+- ✅ `@fluid-ds/calendar`: event calendar (month view of events; distinct from
+  the booking scheduler).
+- ✅ `@fluid-ds/editor`: lightweight accessible rich-text editor (toolbar +
+  contenteditable).
+- ✅ `@fluid-ds/kanban`: drag-and-drop board with a full keyboard path.
+- ✅ `@fluid-ds/map`: themed Leaflet map wrapper with markers.
 - ✅ `@fluid-ds/markdown`: markdown rendering.
 - ✅ `@fluid-ds/qr`: QR codes.
-- ✅ `@fluid-ds/media`: video / animated image / zoomable frame.
+- ✅ `@fluid-ds/media`: video / animated image / zoomable frame / audio player /
+  lightbox gallery.
 - ✅ `@fluid-ds/animations`: attribute-driven animation system
   (`data-fluid-animation`), reduced-motion aware.
 
 ### Documentation & developer surfaces ✅
 - ✅ **Docs site** (Astro Starlight): guides, per-component pages with live
   examples + framework tabs, auto-generated API tables from the Custom Elements
-  Manifest, theming/forms/a11y/SSR guides.
+  Manifest, theming/forms/a11y/SSR guides, plus a **CMS & server-rendered**
+  guide covering Umbraco (Razor), WordPress, and Laravel (Blade) integration.
 - ✅ **Self-dogfooding code blocks**: every code sample in the docs renders
   through our own `<fluid-code-block>` (Expressive Code disabled). Shiki still
   highlights, dual-theme follows the light/dark toggle, and our header bar

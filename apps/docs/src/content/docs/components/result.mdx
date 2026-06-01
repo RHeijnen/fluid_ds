@@ -1,0 +1,249 @@
+---
+title: "Result"
+description: "A full-width success, error, info, warning, or 404 result block with a status icon, title, subtitle, and call-to-action buttons."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`<fluid-result>` is the full-width status block for the end of a flow: a large
+status icon, a `title`, an optional `subtitle`, extra detail, and a row of
+actions, centered in a column. It is the bigger sibling of
+[`<fluid-empty-state>`](/components/empty-state/), built for confirmation pages,
+error screens, and full-page "not found" views.
+
+The status reads from a text **title** (never color alone) plus a status-tinted
+icon drawn from the theme-independent semantic tokens, so it stays meaningful in
+every brand. Success / info / 404 announce politely (`role="status"`); error /
+warning announce assertively (`role="alert"`).
+
+<Demo>
+  <fluid-result
+    status="success"
+    title="Payment successful"
+    subtitle="Your order is confirmed. A receipt has been emailed to you."
+  >
+    <fluid-button slot="actions" variant="primary">View order</fluid-button>
+    <fluid-button slot="actions" variant="secondary">Back home</fluid-button>
+  </fluid-result>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/result/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/result";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Statuses
+
+Each `status` sets the default icon, its color, and the live-region role.
+
+<Demo>
+  <fluid-result status="error" title="Submission failed" subtitle="We couldn't process your request. Please try again.">
+    <fluid-button slot="actions" variant="primary">Retry</fluid-button>
+  </fluid-result>
+</Demo>
+
+```html
+<fluid-result status="error" title="Submission failed"
+  subtitle="We couldn't process your request. Please try again.">
+  <fluid-button slot="actions" variant="primary">Retry</fluid-button>
+</fluid-result>
+```
+
+### Info and warning
+
+<Demo>
+  <fluid-result status="warning" title="Subscription expiring" subtitle="Your plan ends in 3 days. Renew now to avoid losing access.">
+    <fluid-button slot="actions" variant="primary">Renew plan</fluid-button>
+  </fluid-result>
+</Demo>
+
+### Page not found
+
+<Demo>
+  <fluid-result status="404" title="Page not found" subtitle="The page you're looking for doesn't exist or has moved.">
+    <fluid-button slot="actions" variant="primary">Go home</fluid-button>
+  </fluid-result>
+</Demo>
+
+```html
+<fluid-result status="404" title="Page not found"
+  subtitle="The page you're looking for doesn't exist or has moved.">
+  <fluid-button slot="actions" variant="primary">Go home</fluid-button>
+</fluid-result>
+```
+
+### Custom icon and detail
+
+Override the glyph with the `icon` slot, and add extra detail through the
+default slot.
+
+<Demo>
+  <fluid-result status="success" title="All set" subtitle="Everything is up to date.">
+    <fluid-icon slot="icon" name="check"></fluid-icon>
+    <small>Last synced just now.</small>
+  </fluid-result>
+</Demo>
+
+```html
+<fluid-result status="success" title="All set" subtitle="Everything is up to date.">
+  <fluid-icon slot="icon" name="check"></fluid-icon>
+  <small>Last synced just now.</small>
+</fluid-result>
+```
+
+## Slots
+
+- **`icon`** the status glyph. Defaults to a status-appropriate icon.
+- **default** extra detail rendered below the subtitle.
+- **`actions`** call-to-action buttons below the content.
+
+## Framework usage
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-result status="success" title="Payment successful"
+      subtitle="Your order is confirmed.">
+      <fluid-button slot="actions" variant="primary">View order</fluid-button>
+    </fluid-result>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx
+    import "@fluid-ds/components/define/result";
+
+    export function Confirmation() {
+      return (
+        <fluid-result status="success" title="Payment successful"
+          subtitle="Your order is confirmed.">
+          <fluid-button slot="actions" variant="primary">View order</fluid-button>
+        </fluid-result>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/result";
+    </script>
+
+    <template>
+      <fluid-result status="success" title="Payment successful"
+        subtitle="Your order is confirmed.">
+        <fluid-button slot="actions" variant="primary">View order</fluid-button>
+      </fluid-result>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/result";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-confirmation",
+      template: `
+        <fluid-result status="success" title="Payment successful"
+          subtitle="Your order is confirmed.">
+          <fluid-button slot="actions" variant="primary">View order</fluid-button>
+        </fluid-result>
+      `
+    })
+    export class Confirmation {}
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script lang="ts">
+      import "@fluid-ds/components/define/result";
+    </script>
+
+    <fluid-result status="success" title="Payment successful"
+      subtitle="Your order is confirmed.">
+      <fluid-button slot="actions" variant="primary">View order</fluid-button>
+    </fluid-result>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Confirmation pages after a checkout, sign-up, or submission.
+- Full-page error screens (request failed, access denied).
+- "Not found" / 404 routes.
+
+Reach for [`<fluid-empty-state>`](/components/empty-state/) for the lighter
+"nothing here yet" placeholder inside a list or panel, and
+[`<fluid-callout>`](/components/callout/) for an inline notice that sits in the
+page flow rather than taking over the view.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-result-*` token that
+falls back to a main semantic var** (the override ladder). The status icon
+colors fall back to the theme-independent semantic status tokens
+(`--fluid-success-base`, `--fluid-danger-base`, `--fluid-info-base`,
+`--fluid-warning-base`), so they stay meaningful across brands. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-result-fg: var(--fluid-text-primary);
+  --fluid-result-muted-fg: var(--fluid-text-secondary);
+  --fluid-result-icon-size: 5rem;
+  --fluid-result-success-icon: var(--fluid-success-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The column is [`part="base"`](#api) with `part="icon"`, `part="title"`,
+`part="subtitle"`, `part="content"`, and `part="actions"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-result" />
+
+## Accessibility
+
+- The block is a live region: `role="status"` (polite) for success / info / 404,
+  and `role="alert"` (assertive) for error / warning, so a result rendered after
+  a user action is announced. `aria-atomic="true"` reads the title and subtitle
+  together.
+- Status is never conveyed by color alone (SC 1.4.1): the `title` carries the
+  text, and the icon is a redundant cue.
+- The default status icons are decorative (`aria-hidden`), the title supplies the
+  meaning. If you replace the icon with a meaningful one, give it its own label.
+- Action buttons in the `actions` slot are real focusable controls; keep their
+  labels clear (for example "Retry", not "OK").
+- Honors `prefers-reduced-motion`.

@@ -1,0 +1,124 @@
+---
+title: "@fluid-ds/table"
+description: "An accessible, sortable, selectable data table web component."
+---
+
+The flagship expansion pack: `<fluid-table>` renders a real semantic
+`<table>` with a `<caption>`, `<th scope="col">` headers, and a data-driven
+body. It is sortable (string + numeric aware), optionally selectable with
+checkboxes, fully themable through `--fluid-table-*` tokens, and works in any
+framework.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/table
+```
+
+Import only the piece you use:
+
+```ts
+import "@fluid-ds/table/define/table";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-table>` | Accessible data table: column-driven, sortable headers, optional row selection, themable. |
+
+## Use
+
+Pass `columns` and `rows` as properties (use property binding in your
+framework, or set them in script). Each row is a plain object keyed by
+`column.key`; an `id` field, when present, becomes the stable row key.
+
+```html
+<fluid-table id="people" caption="Contributors" selectable></fluid-table>
+
+<script type="module">
+  import "@fluid-ds/table/define/table";
+
+  const el = document.getElementById("people");
+  el.columns = [
+    { key: "name", label: "Name", sortable: true },
+    { key: "role", label: "Role", sortable: true },
+    { key: "commits", label: "Commits", sortable: true, align: "end" }
+  ];
+  el.rows = [
+    { id: 1, name: "Ada Lovelace", role: "Engineer", commits: 312 },
+    { id: 2, name: "Grace Hopper", role: "Architect", commits: 1290 }
+  ];
+  el.sort = { key: "commits", dir: "desc" };
+
+  el.addEventListener("fluid-sort", (e) => console.log(e.detail)); // { key, dir }
+  el.addEventListener("fluid-selection-change", (e) => console.log(e.detail)); // { selected: [...] }
+</script>
+```
+
+## API
+
+### Properties
+
+| Property | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `columns` | `{ key, label, sortable?, align? }[]` | `[]` | Column definitions. `align` is `"start" \| "center" \| "end"`. |
+| `rows` | `Record<string, unknown>[]` | `[]` | Row data keyed by `column.key`. |
+| `selectable` | `boolean` | `false` | Adds a leading select-all + per-row checkbox column. |
+| `sort` | `{ key, dir: "asc" \| "desc" } \| null` | `null` | Current sort. Set it to control sorting, or let the headers drive it. |
+| `caption` | `string` | `""` | Table caption text. |
+| `hide-caption` | `boolean` | `false` | Keep the caption for screen readers but hide it visually. |
+
+### Events
+
+| Event | Detail | When |
+| --- | --- | --- |
+| `fluid-sort` | `{ key, dir }` | A sortable header was toggled. |
+| `fluid-selection-change` | `{ selected: string[] }` | The selected row keys changed. |
+
+### Parts
+
+`base`, `caption`, `header-row`, `header-cell`, `sort-button`, `row`, `cell`,
+`select-all`, `select-row`.
+
+## Theming
+
+Each styled property reads a component token that falls back to a Fluid
+semantic variable, so brand themes flow through automatically and you can
+override one table, all tables, or a single instance:
+
+| Token | Falls back to |
+| --- | --- |
+| `--fluid-table-bg` | `--fluid-surface-base` |
+| `--fluid-table-fg` | `--fluid-text-primary` |
+| `--fluid-table-header-bg` | `--fluid-surface-muted` |
+| `--fluid-table-header-fg` | `--fluid-text-primary` |
+| `--fluid-table-border` | `--fluid-border-default` |
+| `--fluid-table-row-hover-bg` | `--fluid-surface-muted` |
+| `--fluid-table-selected-bg` | a tint of `--fluid-accent-base` |
+| `--fluid-table-zebra-bg` | `transparent` (zebra off) |
+| `--fluid-table-radius` | `--fluid-radius-md` |
+| `--fluid-table-cell-padding` | `0.625rem 0.75rem` |
+
+Turn on zebra striping by setting `--fluid-table-zebra-bg`.
+
+## Accessibility
+
+- A native `<table>` with `<caption>`, `<thead>`, and `<th scope="col">` gives
+  assistive tech full row and column context for free.
+- Sortable headers host an `aria-sort` of `ascending`, `descending`, or `none`
+  on the `<th>` (not the button), per the WAI-ARIA Table pattern, and the sort
+  control is a real `<button>` so it is keyboard operable.
+- Selection uses native checkboxes with descriptive `aria-label`s; the
+  select-all box reflects an indeterminate state when only some rows are picked.
+- This is a static data table, not an interactive grid: Tab moves between the
+  header buttons and the checkboxes, and cells are not individually focusable.
+  Reach for a Grid when cells must be navigable with arrow keys.
+- Focus rings honor `--fluid-focus-ring-width` and interactive targets respect
+  `--fluid-target-min`, so the table scales to AAA sizing when an ancestor opts
+  in. The sort-icon transition is removed under
+  `prefers-reduced-motion: reduce`.
+
+## License
+
+MIT.

@@ -1,0 +1,55 @@
+---
+title: "Stat"
+description: "A KPI / metric tile with a value and an optional trend indicator."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`<fluid-stat>` shows a single key metric: a label, a prominent value, and an
+optional change with a trend direction. The change text always carries the
+delta (e.g. `+12%`), so direction is never signalled by color alone.
+
+<Demo>
+  <div style="display:flex;gap:2rem;">
+    <fluid-stat label="Revenue" value="$48.2k" change="+12%" trend="up"></fluid-stat>
+    <fluid-stat label="Churn" value="2.1%" change="-0.4pt" trend="down"></fluid-stat>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/stat/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```ts
+    import "@fluid-ds/components/define/stat";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+```html
+<fluid-stat label="Active users" value="9,310" change="+4%" trend="up"></fluid-stat>
+```
+
+`trend` is one of `up`, `down`, or `neutral`; it sets the arrow (↑ ↓ →) and the
+color. Override `--fluid-stat-up-fg` / `--fluid-stat-down-fg` per brand.
+
+## Accessibility
+
+Each tile is a labelled `role="group"` summarising label, value, and change, so
+screen readers announce the metric as a unit. Trend is conveyed by the arrow and
+the signed change text, not color alone (SC 1.4.1).
+
+## API
+
+<ComponentApi tag="fluid-stat" />

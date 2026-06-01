@@ -19,7 +19,7 @@ const BRAND_PRESETS = [
 ];
 
 const meta: Meta<Args> = {
-  title: "Components/ColorPicker",
+  title: "Components/Forms/ColorPicker",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

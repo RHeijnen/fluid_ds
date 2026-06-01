@@ -1,0 +1,254 @@
+---
+title: "Toolbar"
+description: "Roving-tabindex container for a related group of controls. One Tab stop, Arrow keys move between controls."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-toolbar>` groups a related set of frequently-used controls (buttons,
+toggles, links) and implements the WAI-ARIA Toolbar pattern. The whole toolbar
+is a single Tab stop: Tab moves into and out of it, while Arrow keys move
+between the controls inside. Home and End jump to the first and last control.
+
+<Demo>
+  <fluid-toolbar aria-label="Text formatting">
+    <fluid-button variant="ghost">Bold</fluid-button>
+    <fluid-button variant="ghost">Italic</fluid-button>
+    <fluid-button variant="ghost">Underline</fluid-button>
+  </fluid-toolbar>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/toolbar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/toolbar";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="caution" title="Always name the toolbar">
+  Set `aria-label` (or `aria-labelledby`) on the host so assistive tech can
+  announce the group's purpose, for example "Text formatting" or "Playback".
+</Aside>
+
+## Examples
+
+### Horizontal (default)
+
+<Demo>
+  <fluid-toolbar aria-label="Document actions">
+    <fluid-button variant="ghost">Cut</fluid-button>
+    <fluid-button variant="ghost">Copy</fluid-button>
+    <fluid-button variant="ghost">Paste</fluid-button>
+  </fluid-toolbar>
+</Demo>
+
+```html
+<fluid-toolbar aria-label="Document actions">
+  <fluid-button variant="ghost">Cut</fluid-button>
+  <fluid-button variant="ghost">Copy</fluid-button>
+  <fluid-button variant="ghost">Paste</fluid-button>
+</fluid-toolbar>
+```
+
+### Vertical
+
+Set `orientation="vertical"` to stack the controls and switch the Arrow keys to
+Up and Down. The component reflects this to `aria-orientation` for you.
+
+<Demo>
+  <fluid-toolbar orientation="vertical" aria-label="Canvas tools">
+    <fluid-button variant="ghost">Select</fluid-button>
+    <fluid-button variant="ghost">Pen</fluid-button>
+    <fluid-button variant="ghost">Erase</fluid-button>
+  </fluid-toolbar>
+</Demo>
+
+```html
+<fluid-toolbar orientation="vertical" aria-label="Canvas tools">
+  <fluid-button variant="ghost">Select</fluid-button>
+  <fluid-button variant="ghost">Pen</fluid-button>
+  <fluid-button variant="ghost">Erase</fluid-button>
+</fluid-toolbar>
+```
+
+### Disabled controls
+
+Controls that are `disabled` (or `aria-disabled="true"`) are skipped by the
+roving tabindex, so Arrow keys jump straight over them.
+
+<Demo>
+  <fluid-toolbar aria-label="Edit history">
+    <fluid-button variant="ghost">Undo</fluid-button>
+    <fluid-button variant="ghost" disabled>Redo</fluid-button>
+    <fluid-button variant="ghost">Clear</fluid-button>
+  </fluid-toolbar>
+</Demo>
+
+## Keyboard
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-toolbar aria-label="Playback">
+      <fluid-button variant="ghost">Play</fluid-button>
+      <fluid-button variant="ghost">Pause</fluid-button>
+      <a href="#stop">Stop</a>
+    </fluid-toolbar>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="EditorToolbar.tsx"
+    import "@fluid-ds/components/define/toolbar";
+    import "@fluid-ds/components/define/button";
+
+    export function EditorToolbar() {
+      return (
+        <fluid-toolbar aria-label="Text formatting">
+          <fluid-button variant="ghost">Bold</fluid-button>
+          <fluid-button variant="ghost">Italic</fluid-button>
+        </fluid-toolbar>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="EditorToolbar.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/toolbar";
+    import "@fluid-ds/components/define/button";
+    </script>
+
+    <template>
+      <fluid-toolbar aria-label="Text formatting">
+        <fluid-button variant="ghost">Bold</fluid-button>
+        <fluid-button variant="ghost">Italic</fluid-button>
+      </fluid-toolbar>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="editor-toolbar.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/toolbar";
+    import "@fluid-ds/components/define/button";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-editor-toolbar",
+      template: `
+        <fluid-toolbar aria-label="Text formatting">
+          <fluid-button variant="ghost">Bold</fluid-button>
+          <fluid-button variant="ghost">Italic</fluid-button>
+        </fluid-toolbar>
+      `
+    })
+    export class EditorToolbar {}
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="EditorToolbar.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/toolbar";
+      import "@fluid-ds/components/define/button";
+    </script>
+
+    <fluid-toolbar aria-label="Text formatting">
+      <fluid-button variant="ghost">Bold</fluid-button>
+      <fluid-button variant="ghost">Italic</fluid-button>
+    </fluid-toolbar>
+    ```
+  </TabItem>
+</Tabs>
+
+| Key | Action |
+| --- | --- |
+| Tab / Shift+Tab | Move into the toolbar, then out of it (the toolbar is one Tab stop). |
+| Arrow Right / Left | Move between controls in a horizontal toolbar (wraps at the ends). |
+| Arrow Down / Up | Move between controls in a vertical toolbar (wraps at the ends). |
+| Home | Focus the first control. |
+| End | Focus the last control. |
+
+## When to use
+
+- A text editor's formatting controls (bold, italic, alignment).
+- A media player's transport controls (play, pause, skip).
+- A grouped row of actions that all operate on the same context.
+
+Use a plain layout (a [`<fluid-button-group>`](/components/button-group/) or
+flex row) when the controls are not a single composite widget, or are each their
+own Tab stop. Do not nest toolbars: the pattern does not support it.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-toolbar-*` token that
+falls back to a main semantic var** (the override ladder). The **complete list**
+is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-toolbar-bg: var(--fluid-surface-base);
+  --fluid-toolbar-border: var(--fluid-border-default);
+  --fluid-toolbar-radius: var(--fluid-radius-md);
+  --fluid-toolbar-gap: var(--fluid-space-1);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api). Reach it with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
+covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-toolbar" />
+
+## Accessibility
+
+- The container carries `role="toolbar"` and reflects `orientation` to
+  `aria-orientation`.
+- Name the toolbar with `aria-label` (or `aria-labelledby`) on the host: the
+  name is forwarded onto the element with `role="toolbar"`.
+- Focus management uses a **roving tabindex**: exactly one control is in the Tab
+  order at a time, so the toolbar is a single Tab stop and Arrow keys move
+  between controls. Home and End jump to the ends.
+- Disabled controls (native `disabled` or `aria-disabled="true"`) are skipped by
+  Arrow navigation and never receive the tab stop.
+
+### AA vs AAA
+
+The toolbar itself renders no text and sets no fixed target sizes, so it has no
+contrast or target-size obligations of its own: those belong to the controls you
+slot in (use Fluid controls, which read `--fluid-target-min` and the focus-ring
+tokens, so they scale to 44x44 targets and enhanced focus under
+`data-fluid-conformance="aaa"`). The toolbar's only conformance duty, a correct
+single-Tab-stop focus model, is met identically at AA and AAA.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Button" href="/components/button/" description="The control most often placed in a toolbar." />
+  <LinkCard title="Button group" href="/components/button-group/" description="Visually joined buttons when you do not need the toolbar focus model." />
+</CardGrid>

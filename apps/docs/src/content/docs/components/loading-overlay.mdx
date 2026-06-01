@@ -1,0 +1,270 @@
+---
+title: "Loading overlay"
+description: "Blocking busy overlay for an async region: a scrim plus spinner that gates content while it loads."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-loading-overlay>` wraps a region of your UI and, while `active`, covers
+it with a scrim plus a [`<fluid-spinner>`](/components/spinner/) and an optional
+`label`. It traps pointer events so the gated controls cannot be operated and
+marks the host `aria-busy`, announcing the busy state to assistive technology
+via a polite `role="status"` region.
+
+<Demo>
+  <fluid-loading-overlay active label="Loading account…">
+    <div style="width: 320px; padding: 20px; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); background: var(--fluid-surface-base); color: var(--fluid-text-primary);">
+      <h3 style="margin: 0 0 8px;">Account summary</h3>
+      <p style="margin: 0; color: var(--fluid-text-secondary);">Your balance and recent activity load here.</p>
+    </div>
+  </fluid-loading-overlay>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/loading-overlay/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/loading-overlay";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Wrap the content you want to gate in the default slot, then toggle `active`.
+
+<Demo>
+  <fluid-loading-overlay active label="Loading…">
+    <div style="width: 280px; padding: 20px; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); background: var(--fluid-surface-base);">
+      <p style="margin: 0; color: var(--fluid-text-primary);">Gated content</p>
+    </div>
+  </fluid-loading-overlay>
+</Demo>
+
+```html
+<fluid-loading-overlay active label="Loading…">
+  <div class="panel">…</div>
+</fluid-loading-overlay>
+```
+
+### Without a label
+
+Omit `label` for a spinner-only overlay. Assistive technology still hears
+"Loading" because the status region carries a default accessible name.
+
+<Demo>
+  <fluid-loading-overlay active>
+    <div style="width: 280px; padding: 20px; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); background: var(--fluid-surface-base);">
+      <p style="margin: 0; color: var(--fluid-text-primary);">Gated content</p>
+    </div>
+  </fluid-loading-overlay>
+</Demo>
+
+```html
+<fluid-loading-overlay active>
+  <div class="panel">…</div>
+</fluid-loading-overlay>
+```
+
+### Toggling around an async task
+
+Set `active` before the work starts and clear it when the promise settles.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-loading-overlay id="ov" label="Saving…">
+      <form>…</form>
+    </fluid-loading-overlay>
+
+    <script type="module">
+      const ov = document.getElementById("ov");
+      async function save() {
+        ov.active = true;
+        try {
+          await fetch("/api/save", { method: "POST" });
+        } finally {
+          ov.active = false;
+        }
+      }
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Panel.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/loading-overlay";
+
+    export function Panel() {
+      const [busy, setBusy] = useState(false);
+      const save = async () => {
+        setBusy(true);
+        try {
+          await fetch("/api/save", { method: "POST" });
+        } finally {
+          setBusy(false);
+        }
+      };
+      return (
+        <fluid-loading-overlay active={busy} label="Saving…">
+          <form onSubmit={save}>…</form>
+        </fluid-loading-overlay>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Panel.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/loading-overlay";
+    const busy = ref(false);
+    async function save() {
+      busy.value = true;
+      try {
+        await fetch("/api/save", { method: "POST" });
+      } finally {
+        busy.value = false;
+      }
+    }
+    </script>
+
+    <template>
+      <fluid-loading-overlay :active="busy" label="Saving…">
+        <form @submit.prevent="save">…</form>
+      </fluid-loading-overlay>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="panel.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/loading-overlay";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-panel",
+      template: `
+        <fluid-loading-overlay [active]="busy" label="Saving…">
+          <form (submit)="save()">…</form>
+        </fluid-loading-overlay>
+      `
+    })
+    export class Panel {
+      busy = false;
+      async save() {
+        this.busy = true;
+        try { await fetch("/api/save", { method: "POST" }); }
+        finally { this.busy = false; }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Panel.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/loading-overlay";
+      let busy = false;
+      async function save() {
+        busy = true;
+        try { await fetch("/api/save", { method: "POST" }); }
+        finally { busy = false; }
+      }
+    </script>
+
+    <fluid-loading-overlay active={busy} label="Saving…">
+      <form on:submit|preventDefault={save}>…</form>
+    </fluid-loading-overlay>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Gating a panel, card, or form section while it refreshes in place.
+- Blocking interaction with a region during an async submit.
+- Showing a busy state that does not need to interrupt the whole page.
+
+Reach for [`<fluid-dialog>`](/components/dialog/) when the operation must block
+the entire page, and for [`<fluid-skeleton>`](/components/skeleton/) when you are
+showing the shape of content that is loading for the first time rather than
+gating existing content.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-loading-overlay-*`
+token that falls back to a main semantic var** (the override ladder). The scrim
+defaults to a translucent surface so the gated content stays faintly visible
+underneath. The **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] fluid-loading-overlay {
+  --fluid-loading-overlay-scrim: color-mix(in srgb, var(--fluid-surface-base) 80%, transparent);
+  --fluid-loading-overlay-blur: 4px;
+  --fluid-loading-overlay-fg: var(--fluid-text-primary);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The wrapper is [`part="base"`](#api) with `part="overlay"` for the scrim layer,
+`part="spinner"` for the loader, and `part="label"` for the text. Reach them
+with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
+CSS not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-loading-overlay" />
+
+## Accessibility
+
+- The overlay layer is `role="status"`, a polite live region, so the busy
+  state is announced without interrupting the user. The host is also marked
+  `aria-busy="true"` while `active`.
+- The status region carries an accessible name from `label`, falling back to
+  "Loading" when no label is set, so the announcement is never silent.
+- The spinner is `aria-hidden` because the status region already conveys the
+  busy state, this avoids a doubled announcement.
+- While `active`, the overlay sits above the gated content and traps pointer
+  events so the controls underneath cannot be operated.
+- The fade-in honors `prefers-reduced-motion` and the global `--fluid-motion`
+  scalar.
+
+### AA vs AAA
+
+The overlay renders no interactive targets of its own, so target-size criteria
+do not apply to it. Under `data-fluid-conformance="aaa"`, the controls you place
+inside the gated content inherit the enhanced target-size and focus tokens as
+usual; the overlay does not need per-component branching. Ensure the scrim's
+`label` text keeps at least 4.5:1 contrast against the scrim color if you
+retune `--fluid-loading-overlay-scrim` and `--fluid-loading-overlay-fg`.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Spinner" href="/components/spinner/" description="The indeterminate loader the overlay renders." />
+  <LinkCard title="Skeleton" href="/components/skeleton/" description="Placeholder shapes for first-load content." />
+  <LinkCard title="Dialog" href="/components/dialog/" description="Block the whole page instead of a region." />
+</CardGrid>

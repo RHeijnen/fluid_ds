@@ -1,0 +1,52 @@
+---
+title: "Kbd"
+description: "Render a keyboard key or shortcut as a real <kbd> element."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`<fluid-kbd>` wraps its slotted text in a styled `<kbd>`, so keyboard hints and
+shortcuts are announced as keyboard input and theme with the rest of Fluid.
+
+<Demo>
+  <span style="display:inline-flex;align-items:center;gap:.3rem;">
+    <fluid-kbd>Ctrl</fluid-kbd> + <fluid-kbd>K</fluid-kbd>
+  </span>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/kbd/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```ts
+    import "@fluid-ds/components/define/kbd";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Sizes
+
+<Demo>
+  <fluid-kbd size="sm">Esc</fluid-kbd>
+  <fluid-kbd size="md">Enter</fluid-kbd>
+  <fluid-kbd size="lg">Space</fluid-kbd>
+</Demo>
+
+```html
+<fluid-kbd>Ctrl</fluid-kbd> + <fluid-kbd>K</fluid-kbd>
+```
+
+## API
+
+<ComponentApi tag="fluid-kbd" />

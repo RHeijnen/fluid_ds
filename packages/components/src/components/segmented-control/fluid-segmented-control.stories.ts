@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Components/SegmentedControl",
+  title: "Components/Navigation/SegmentedControl",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

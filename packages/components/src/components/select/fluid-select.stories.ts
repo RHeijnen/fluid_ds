@@ -6,7 +6,7 @@ import type { FluidSelect } from "./fluid-select.js";
 type Args = Pick<FluidSelect, "value" | "size" | "placeholder" | "disabled" | "required">;
 
 const meta: Meta<Args> = {
-  title: "Components/Select",
+  title: "Components/Forms/Select",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

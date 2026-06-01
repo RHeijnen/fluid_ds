@@ -1,0 +1,321 @@
+---
+title: "Dropzone"
+description: "A drag-and-drop file upload area with previews, accept and size validation, and a removable file list."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-dropzone>` is a file upload area: a keyboard-focusable region that opens
+the native file dialog on click or Enter / Space and also accepts drag-and-drop.
+It validates each file against `accept` and `maxSize`, lists the accepted files
+with name, size, and a remove button (images get a thumbnail), and reports the
+results through **`fluid-change`** and **`fluid-reject`**. It is not
+form-associated: it hands you the `File` objects so you own the upload.
+
+<Demo>
+  <fluid-dropzone label="Drag files here or click to browse" multiple></fluid-dropzone>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/dropzone/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/dropzone";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Single file
+
+The default accepts one file. Dropping or picking a second replaces the first.
+
+<Demo>
+  <fluid-dropzone label="Drop a file or click to browse"></fluid-dropzone>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropzone label="Drop a file or click to browse"></fluid-dropzone>`} />
+
+### Multiple files
+
+Set `multiple` to accept and stack more than one file.
+
+<Demo>
+  <fluid-dropzone multiple label="Drop one or more files"></fluid-dropzone>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropzone multiple label="Drop one or more files"></fluid-dropzone>`} />
+
+### Restrict the type
+
+`accept` mirrors the native attribute: a comma-separated list of MIME types
+(`image/png`), wildcards (`image/*`), or extensions (`.pdf`). Files that don't
+match fire **`fluid-reject`** with `reason: "type"`. Image files show a
+thumbnail.
+
+<Demo>
+  <fluid-dropzone accept="image/*" multiple label="Drop images here"></fluid-dropzone>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropzone accept="image/*" multiple label="Drop images here"></fluid-dropzone>`} />
+
+### Limit the size
+
+`max-size` is the per-file ceiling in bytes. Oversize files fire
+**`fluid-reject`** with `reason: "size"`.
+
+<Demo>
+  <fluid-dropzone max-size="1048576" label="Up to 1 MB per file"></fluid-dropzone>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropzone max-size="1048576" label="Up to 1 MB per file"></fluid-dropzone>`} />
+
+### Disabled
+
+<Demo>
+  <fluid-dropzone disabled label="Uploads are paused"></fluid-dropzone>
+</Demo>
+
+<ConformanceCode code={`<fluid-dropzone disabled label="Uploads are paused"></fluid-dropzone>`} />
+
+### Custom prompt
+
+Slot your own content to replace the default prompt text.
+
+<Demo>
+  <fluid-dropzone multiple accept="image/*">
+    <strong>Upload your photos</strong><br />
+    PNG or JPG, drag and drop or click
+  </fluid-dropzone>
+</Demo>
+
+```html
+<fluid-dropzone multiple accept="image/*">
+  <strong>Upload your photos</strong><br />
+  PNG or JPG, drag and drop or click
+</fluid-dropzone>
+```
+
+## Listening for fluid-change
+
+`<fluid-dropzone>` fires **`fluid-change`** whenever the accepted-file set
+changes (a successful drop / pick, or a removal). `event.detail.files` is the
+current array of `File` objects. It fires **`fluid-reject`** with
+`{ files, reason }` for anything that fails validation.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-dropzone id="dz" multiple accept="image/*"></fluid-dropzone>
+
+    <script type="module">
+      const dz = document.getElementById("dz");
+      dz.addEventListener("fluid-change", (e) => {
+        console.log(e.detail.files); // [File, File, …]
+      });
+      dz.addEventListener("fluid-reject", (e) => {
+        console.warn(e.detail.reason, e.detail.files); // "type" | "size"
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Uploader.tsx"
+    import { useRef, useEffect, useState } from "react";
+    import "@fluid-ds/components/define/dropzone";
+
+    export function Uploader() {
+      const ref = useRef<HTMLElement>(null);
+      const [files, setFiles] = useState<File[]>([]);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: any) => setFiles(e.detail.files);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-dropzone ref={ref} multiple accept="image/*" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Uploader.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/dropzone";
+    const files = ref<File[]>([]);
+    </script>
+
+    <template>
+      <fluid-dropzone
+        multiple
+        accept="image/*"
+        @fluid-change="files = $event.detail.files"
+      />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="uploader.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/dropzone";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-uploader",
+      template: `
+        <fluid-dropzone multiple accept="image/*"
+          (fluid-change)="files = $event.detail.files"></fluid-dropzone>
+      `
+    })
+    export class Uploader {
+      files: File[] = [];
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Uploader.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/dropzone";
+      let files: File[] = [];
+    </script>
+
+    <fluid-dropzone
+      multiple
+      accept="image/*"
+      on:fluid-change={(e) => (files = e.detail.files)}
+    />
+    ```
+  </TabItem>
+</Tabs>
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-dropzone-*` token that
+falls back to a main semantic var** (the override ladder), so you can retheme
+one instance, every dropzone, or the whole brand. The **complete list** is in
+the [API table below](#api).
+
+```css title="brand.css"
+/* Brand-wide: every dropzone */
+[data-fluid-brand="custom"] {
+  --fluid-dropzone-bg: var(--fluid-surface-base);
+  --fluid-dropzone-border: var(--fluid-border-default);
+  --fluid-dropzone-accent: var(--fluid-accent-base);
+}
+
+/* One instance */
+fluid-dropzone[data-fluid-id="avatar"] {
+  --fluid-dropzone-radius: var(--fluid-radius-full);
+}
+```
+
+<Aside type="tip">
+  Preview and copy token overrides live in the [Theme builder](/playground/).
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The shell is [`part="base"`](#api), with `part="dropzone"` for the focusable
+region, `part="icon"` and `part="label"` for the prompt, `part="list"` /
+`part="file"` for the selected files, `part="thumb"` for the preview, and
+`part="remove"` for each file's remove button. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## When to use
+
+- Avatar / cover image upload with an instant thumbnail.
+- Attaching one or more documents to a form or message.
+- Bulk import (CSV, images) where drag-and-drop is faster than a file picker.
+
+### When *not* to use
+
+- For a single inline file field with no preview, a native
+  [`<fluid-input>`](/components/input/) of `type="file"` (or the platform input)
+  is lighter.
+- To capture free-text tokens / chips, reach for
+  [`<fluid-tag-input>`](/components/tag-input/).
+
+## Accessibility
+
+The drop region maps to the WAI-ARIA **button pattern**: a `role="button"` with
+`tabindex="0"` that activates on Enter and Space, backed by a visually hidden
+native `<input type="file">` that does the actual picking. See the
+[accessibility guide](/guides/accessibility/) for the cross-component contract.
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| `Tab` | Move focus to the drop region, then to each file's remove button. |
+| `Enter` / `Space` | Open the native file dialog. |
+
+The drop region and remove buttons show a `:focus-visible` ring that reads the
+focus-ring tokens. After a file is removed, focus returns to the drop region so
+keyboard users are never stranded.
+
+### Names
+
+The `label` is the drop region's accessible name (`aria-label`) as well as its
+visible prompt; slotted content replaces the visible prompt only. Each remove
+button is named `Remove <filename>`.
+
+### State semantics
+
+`disabled` sets `aria-disabled="true"`, removes the region from the tab order
+(`tabindex="-1"`), and blocks click, keyboard, and drop ingestion. The
+dragover highlight is conveyed by both a color and a border-style change, not by
+color alone.
+
+### Motion & target size
+
+The border / background transition honors `prefers-reduced-motion: reduce` and
+the `--fluid-motion` scalar. The drop region and remove buttons floor on
+`--fluid-target-min`, so they meet the 24×24 (AA) target minimum.
+
+### AA vs AAA
+
+The component ships WCAG 2.2 AA by default and scales to AAA via
+`data-fluid-conformance="aaa"` (the header toggle is live, and the example
+snippets switch with it). It reads the conformance tokens rather than
+hard-coding sizes:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+
+## API
+
+<ComponentApi tag="fluid-dropzone" />
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Input" href="/components/input/" description="Single-line text field, including type=file." />
+  <LinkCard title="Tag input" href="/components/tag-input/" description="Capture free-text tokens as chips." />
+  <LinkCard title="Avatar" href="/components/avatar/" description="Render the uploaded image." />
+  <LinkCard title="Frameworks" href="/guides/frameworks/" description="Use Fluid with React, Vue, Angular, Svelte." />
+</CardGrid>

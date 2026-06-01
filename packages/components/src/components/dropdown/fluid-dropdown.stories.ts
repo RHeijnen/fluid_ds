@@ -4,7 +4,7 @@ import "./define.js";
 import "../button/define.js";
 
 const meta: Meta = {
-  title: "Components/Dropdown",
+  title: "Components/Navigation/Dropdown",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

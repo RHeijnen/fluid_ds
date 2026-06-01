@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Layout/Carousel",
+  title: "Components/Layout/Carousel",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

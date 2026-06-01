@@ -1,0 +1,209 @@
+---
+title: "Hotkey"
+description: "Declarative, cross-platform keyboard shortcuts. Fires an event when a key chord or sequence is pressed."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-hotkey>` registers a keyboard shortcut declaratively. Set `keys`, listen
+for **`fluid-hotkey`**, and react: command palettes, help overlays, "go to"
+navigation, save handlers, and the rest. `mod` resolves to Cmd on macOS and
+Ctrl elsewhere, so a single binding works on every platform.
+
+<Demo>
+  <fluid-hotkey keys="mod+k" prevent-default id="demo-hk"></fluid-hotkey>
+  <p>Press <kbd>mod+k</kbd> anywhere on this page.</p>
+  <p data-out style="font-family: monospace;">No match yet.</p>
+  <script type="module">
+    document.getElementById("demo-hk").addEventListener("fluid-hotkey", (e) =>
+      (e.target.parentElement.querySelector("[data-out]").textContent =
+        "Matched " + e.detail.keys));
+  </script>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/hotkey/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components
+    ```
+
+    ```ts
+    import "@fluid-ds/components/define/hotkey";
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  A behavior wrapper, it renders no UI (`display: none`) and reads no design
+  tokens, so no `@fluid-ds/tokens` stylesheet is required.
+</Aside>
+
+## Examples
+
+### A chord
+
+A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-hotkey keys="mod+k" prevent-default id="palette"></fluid-hotkey>
+
+    <script type="module">
+      document.getElementById("palette").addEventListener("fluid-hotkey", () => {
+        openCommandPalette();
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="App.tsx"
+    import "@fluid-ds/components/define/hotkey";
+
+    export function App() {
+      return (
+        <fluid-hotkey keys="mod+k" prevent-default
+          onfluid-hotkey={() => setPaletteOpen(true)} />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="App.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/hotkey";
+    </script>
+
+    <template>
+      <fluid-hotkey keys="mod+k" prevent-default @fluid-hotkey="paletteOpen = true" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="app.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/hotkey";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-root",
+      template: `<fluid-hotkey keys="mod+k" prevent-default (fluid-hotkey)="open()" />`
+    })
+    export class App { open() { /* ... */ } }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="App.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/hotkey";
+    </script>
+
+    <fluid-hotkey keys="mod+k" prevent-default on:fluid-hotkey={() => (open = true)} />
+    ```
+  </TabItem>
+</Tabs>
+
+### A sequence
+
+Space-separated chords fire only when pressed in order within a short window,
+the Gmail-style `g` then `h` "go home" pattern.
+
+```html
+<fluid-hotkey keys="g h"></fluid-hotkey>
+```
+
+### Shifted characters
+
+Match the produced character, not the raw key. `shift+?` matches the "?" the
+keyboard emits, ideal for a shortcut help overlay.
+
+```html
+<fluid-hotkey keys="shift+?" prevent-default></fluid-hotkey>
+```
+
+### Firing inside text fields
+
+By default a shortcut is ignored when focus is in an `<input>`, `<textarea>`,
+`<select>`, or `contenteditable`, so typing never triggers it. Set `when-input`
+for global actions like save that should fire everywhere.
+
+```html
+<fluid-hotkey keys="mod+s" prevent-default when-input></fluid-hotkey>
+```
+
+### Scoping the listener
+
+`target` is `window` by default. Use `document`, or pass a CSS selector to bind
+the listener to a specific element subtree.
+
+```html
+<fluid-hotkey keys="mod+enter" target="#editor"></fluid-hotkey>
+```
+
+## When to use
+
+- Command palettes (`mod+k`), save (`mod+s`), and other app-level shortcuts.
+- "Go to" navigation sequences (`g h`, `g s`).
+- A help overlay trigger (`shift+?`).
+- For a scrollable list of bindings to show the user, render them with
+  [`<fluid-kbd>`](/components/kbd/).
+
+## Theming
+
+Behavior component, no tokens.
+
+## API
+
+<ComponentApi tag="fluid-hotkey" />
+
+## Accessibility
+
+- `display: none`: the element is invisible to layout and to the accessibility
+  tree, it contributes no semantics of its own.
+- A keyboard shortcut must never be the **only** way to perform an action
+  ([SC 2.1.1 Keyboard]): always pair it with a visible, focusable control.
+- Single-character shortcuts can collide with assistive-technology and
+  speech-input commands ([SC 2.1.4 Character Key Shortcuts]). Prefer a
+  modifier (`mod+k`) or a sequence (`g h`); reserve bare single keys for
+  cases the user can remap or turn off.
+- Surface the binding visibly (a tooltip, menu hint, or a
+  [`<fluid-kbd>`](/components/kbd/) badge) so it is discoverable, not hidden.
+- The default behavior of ignoring text fields prevents shortcuts from
+  hijacking typing; only opt into `when-input` for truly global actions.
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Kbd"
+    href="/components/kbd/"
+    description="Render the key combo visibly so users can discover it."
+  />
+  <LinkCard
+    title="Command palette"
+    href="/components/command-palette/"
+    description="The classic mod+k consumer."
+  />
+  <LinkCard
+    title="Menu"
+    href="/components/menu/"
+    description="Show shortcut hints next to menu items."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+</CardGrid>

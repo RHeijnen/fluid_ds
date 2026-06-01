@@ -1,0 +1,55 @@
+---
+title: "Empty state"
+description: "A centered placeholder for empty lists, no-results, and first-run screens."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`<fluid-empty-state>` is the friendly placeholder for "nothing here yet": an
+optional icon or illustration, a heading, supporting text, and call-to-action
+buttons, centered in a column.
+
+<Demo>
+  <fluid-empty-state heading="No projects yet">
+    <fluid-icon slot="media" name="folder"></fluid-icon>
+    Create your first project to get started.
+    <fluid-button slot="actions" variant="primary">New project</fluid-button>
+  </fluid-empty-state>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/empty-state/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```ts
+    import "@fluid-ds/components/define/empty-state";
+    ```
+  </TabItem>
+</Tabs>
+
+## Slots
+
+- **`media`** an icon or illustration above the heading.
+- **default** the supporting description text.
+- **`actions`** call-to-action buttons.
+
+```html
+<fluid-empty-state heading="No results found">
+  <fluid-icon slot="media" name="search"></fluid-icon>
+  Try a different search term or clear your filters.
+  <fluid-button slot="actions" variant="secondary">Clear filters</fluid-button>
+</fluid-empty-state>
+```
+
+## API
+
+<ComponentApi tag="fluid-empty-state" />

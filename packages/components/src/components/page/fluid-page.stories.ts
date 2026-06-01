@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Layout/Page",
+  title: "Components/Layout/Page",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

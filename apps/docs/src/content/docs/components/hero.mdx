@@ -1,0 +1,130 @@
+---
+title: "Hero"
+description: "A compositional page hero / masthead: eyebrow, heading, description, actions, and optional media."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+`<fluid-hero>` is a layout shell for the top of a landing or section page. It
+arranges an optional eyebrow, your heading, supporting copy, call-to-action
+buttons, and an optional image or illustration beside or behind the content.
+
+It is a container only: you provide the heading in the default slot (an `<h1>`
+or `<h2>`), so the hero never injects its own heading and never disturbs the
+document outline.
+
+<Demo>
+  <fluid-hero>
+    <span slot="eyebrow">New in 0.1</span>
+    <h1>Build interfaces that flow</h1>
+    <p slot="description">
+      A framework-agnostic design system of accessible web components. Theme with
+      one CSS variable.
+    </p>
+    <div slot="actions">
+      <fluid-button variant="primary">Get started</fluid-button>
+      <fluid-button variant="ghost">GitHub</fluid-button>
+    </div>
+  </fluid-hero>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/hero/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```ts
+    import "@fluid-ds/components/define/hero";
+    ```
+  </TabItem>
+</Tabs>
+
+## Slots
+
+- **`eyebrow`** a small kicker line above the heading.
+- **default** the heading: provide your own `<h1>` / `<h2>`.
+- **`description`** supporting copy below the heading.
+- **`actions`** call-to-action buttons.
+- **`media`** an image or illustration shown beside (or behind) the content.
+
+Empty regions collapse automatically, so a text-only hero stays tight.
+
+## Examples
+
+### Media beside the content
+
+```html
+<fluid-hero media-position="end">
+  <span slot="eyebrow">Platform</span>
+  <h1>Ship faster</h1>
+  <p slot="description">Drop the tags into any framework.</p>
+  <div slot="actions"><fluid-button variant="primary">Start</fluid-button></div>
+  <img slot="media" src="/hero.jpg" alt="Product screenshot" />
+</fluid-hero>
+```
+
+Use `media-position="start"` to lead with the visual, or
+`media-position="background"` to place the image behind the content with a
+readable scrim.
+
+### Centered, text-only
+
+```html
+<fluid-hero align="center" size="lg">
+  <h1>Accessible by default</h1>
+  <p slot="description">WCAG 2.2 AA across three brands, light and dark.</p>
+  <div slot="actions"><fluid-button variant="primary">Read the docs</fluid-button></div>
+</fluid-hero>
+```
+
+## Theming
+
+Every painted property reads a `--fluid-hero-*` token that falls back to a main
+semantic variable, so you can retheme one hero, every hero, or the whole brand:
+
+```css
+fluid-hero {
+  --fluid-hero-bg: var(--fluid-surface-sunken);
+  --fluid-hero-eyebrow-fg: var(--fluid-accent-base);
+  --fluid-hero-gap: 4rem;
+}
+```
+
+## When to use
+
+- The masthead of a landing, marketing, or section page.
+- A first-run / welcome panel that needs a headline, copy, and a primary action.
+
+Reach for `fluid-empty-state` instead when the goal is a centered "nothing here
+yet" placeholder inside an app surface.
+
+## Accessibility
+
+- The hero is a layout container. **You** own the heading: place a single `<h1>`
+  in the default slot so the page has exactly one top-level heading and a sane
+  outline.
+- When you use `media-position="background"`, the component paints a scrim over
+  the image so foreground text keeps its contrast. Verify the
+  `(text, scrimmed-image)` pair still meets 4.5:1 for your specific image, and
+  tune `--fluid-hero-overlay` if needed.
+- Decorative background images should use `alt=""`; meaningful media needs real
+  alt text.
+
+### AA vs AAA
+
+Targets and focus rings come from the buttons you slot into `actions`, which
+already scale to 44×44 and an enhanced focus ring when an ancestor sets
+`data-fluid-conformance="aaa"`. The hero itself paints no interactive target, so
+it inherits AAA conformance from its slotted controls with no extra work.
+
+## API
+
+<ComponentApi tag="fluid-hero" />

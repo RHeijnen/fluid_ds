@@ -1,0 +1,227 @@
+---
+title: "OTP input"
+description: "A row of single-character boxes for one-time codes, 2FA tokens, and PINs. Auto-advances, accepts pasted codes, and submits with the form."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-otp>` captures a short code as a row of single-character boxes: an OTP,
+a 2FA token, or a PIN. Typing auto-advances to the next box, Backspace steps
+back, the arrow keys move between boxes, and pasting a full code spreads it
+across them. It is form-associated, so the concatenated `value` submits with the
+enclosing `<form>` under `name`. It fires **`fluid-input`** on every change and
+**`fluid-complete`** once every box is filled.
+
+<Demo>
+  <fluid-otp length="6"></fluid-otp>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/otp/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/otp";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Length
+
+`length` sets how many boxes render (default 6). Four boxes for a PIN, eight for
+a longer token.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: 1rem;">
+    <fluid-otp length="4"></fluid-otp>
+    <fluid-otp length="6"></fluid-otp>
+    <fluid-otp length="8"></fluid-otp>
+  </div>
+</Demo>
+
+```html
+<fluid-otp length="4"></fluid-otp>
+```
+
+### Alphanumeric
+
+`type="number"` (the default) restricts entry to digits and shows the numeric
+keypad on mobile. Use `type="text"` to allow any character.
+
+<Demo>
+  <fluid-otp type="text" length="6"></fluid-otp>
+</Demo>
+
+```html
+<fluid-otp type="text"></fluid-otp>
+```
+
+### Masked
+
+Set `mask` to render the entered characters as dots, for a secret PIN.
+
+<Demo>
+  <fluid-otp mask value="1234" length="4"></fluid-otp>
+</Demo>
+
+```html
+<fluid-otp mask length="4"></fluid-otp>
+```
+
+### Disabled
+
+<Demo>
+  <fluid-otp disabled value="1234" length="4"></fluid-otp>
+</Demo>
+
+```html
+<fluid-otp disabled value="1234" length="4"></fluid-otp>
+```
+
+## Reacting to completion
+
+`<fluid-otp>` fires **`fluid-input`** on every change and **`fluid-complete`**
+when the last box fills. Both carry the concatenated code on
+`event.detail.value`.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-otp id="code" length="6"></fluid-otp>
+
+    <script type="module">
+      document.getElementById("code").addEventListener("fluid-complete", (e) => {
+        verify(e.detail.value);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="VerifyCode.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/otp";
+
+    export function VerifyCode() {
+      const [code, setCode] = useState("");
+      return (
+        <fluid-otp
+          length={6}
+          onfluid-input={(e: CustomEvent) => setCode(e.detail.value)}
+          onfluid-complete={(e: CustomEvent) => verify(e.detail.value)}
+        />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="VerifyCode.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/otp";
+    function onComplete(e: CustomEvent) { verify(e.detail.value); }
+    </script>
+
+    <template>
+      <fluid-otp :length="6" @fluid-complete="onComplete" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="verify-code.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/otp";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-verify-code",
+      template: `<fluid-otp [attr.length]="6" (fluid-complete)="verify($event)"></fluid-otp>`
+    })
+    export class VerifyCode {
+      verify(e: CustomEvent) { /* e.detail.value */ }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="VerifyCode.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/otp";
+      function onComplete(e: CustomEvent) { verify(e.detail.value); }
+    </script>
+
+    <fluid-otp length="6" on:fluid-complete={onComplete} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Email or SMS one-time codes (verification, sign-in).
+- Two-factor authentication tokens.
+- Short numeric PINs.
+
+For a normal multi-character secret (a password, a long key) reach for
+[`<fluid-input>`](/components/input/) instead. The OTP boxes are for fixed-length
+codes the user reads off another device a character at a time.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-otp-*` token that falls
+back to a main semantic var** (the override ladder). The **complete list** is in
+the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-otp-size: 3rem;
+  --fluid-otp-radius: 0.75rem;
+  --fluid-otp-border-focus: var(--fluid-accent-base);
+  --fluid-otp-font-family: var(--fluid-font-family-mono);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The group is [`part="base"`](#api) and every box is `part="input"`. Reach them
+with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
+CSS not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-otp" />
+
+## Accessibility
+
+- The boxes are wrapped in a `role="group"` with an `aria-label` (default
+  "One-time code"), so a screen reader announces them as one labelled control.
+  Override the group name by setting `aria-label` on the host.
+- Each box is a real `<input>` carrying its own `aria-label` like
+  "Digit 1 of 6", so arrow-key and screen-reader navigation behaves like
+  ordinary text fields.
+- Keyboard: typing fills and auto-advances; Backspace clears the current box or,
+  when empty, steps back and clears the previous one; Left / Right arrows move;
+  Home / End jump to the first / last box; pasting a code spreads it across the
+  boxes.
+- The first box advertises `autocomplete="one-time-code"`, so platforms that
+  surface SMS codes can offer to fill it.
+- Each box meets the 24×24 CSS px minimum target ([SC 2.5.8]) and lifts to
+  44×44 under `data-fluid-conformance="aaa"` via `--fluid-target-min`. The focus
+  ring reads `--fluid-focus-ring-width`.

@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Media/Comparison",
+  title: "Components/Content/Comparison",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

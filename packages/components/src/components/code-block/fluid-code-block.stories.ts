@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Components/CodeBlock",
+  title: "Components/Content/CodeBlock",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

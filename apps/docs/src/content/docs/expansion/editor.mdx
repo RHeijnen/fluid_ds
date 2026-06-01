@@ -1,0 +1,129 @@
+---
+title: "@fluid-ds/editor"
+description: "An accessible, framework-agnostic rich-text editor web component."
+---
+
+A lightweight WYSIWYG editor for Fluid: a `contenteditable` region exposed as a
+multi-line textbox with a roving-tabindex toolbar of formatting toggles. No
+external editor library, themable through the same `--fluid-*` tokens as the
+rest of the system. Expansion pack.
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  Formatting uses `document.execCommand`. It is deprecated yet still universally
+  supported across browsers, which keeps this editor tiny and dependency-free.
+</Aside>
+
+## Install
+
+```bash
+pnpm add @fluid-ds/editor
+```
+
+Import only the pieces you use:
+
+```ts
+import "@fluid-ds/editor/define/rich-text-editor";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-rich-text-editor>` | Accessible contenteditable WYSIWYG with a Bold / Italic / Underline / list / link / clear toolbar. |
+
+## Use
+
+```html
+<fluid-rich-text-editor
+  label="Compose a note"
+  placeholder="Start typing your note..."
+></fluid-rich-text-editor>
+```
+
+Set initial content (and read edits back) with the `value` property, which holds
+the editor's HTML:
+
+```html
+<fluid-rich-text-editor id="bio" label="Author bio"></fluid-rich-text-editor>
+
+<script type="module">
+  import "@fluid-ds/editor/define/rich-text-editor";
+
+  const editor = document.getElementById("bio");
+  editor.value = "<p>Hello, <strong>world</strong>.</p>";
+  editor.addEventListener("fluid-change", (e) => {
+    console.log(e.detail.value); // current HTML on every edit
+  });
+</script>
+```
+
+## API
+
+### Properties
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `""` | The editor content as an HTML string. Reading it returns the live HTML; setting it replaces the editable content. |
+| `label` | `string` | `"Rich text editor"` | Accessible name for the editable textbox. |
+| `placeholder` | `string` | `""` | Hint shown while the editor is empty. |
+
+### Events
+
+| Event | Detail | Description |
+| --- | --- | --- |
+| `fluid-change` | `{ value: string }` | Fires on every input with the current HTML. |
+
+### Toolbar
+
+The toolbar is a `role="toolbar"` group with roving tabindex: Tab moves into and
+out of it, while the arrow keys (plus Home and End) move between buttons. The
+toggle buttons (Bold, Italic, Underline, Bullet list, Numbered list) reflect
+`aria-pressed` from the current selection. Link and Clear formatting are action
+buttons. Every button carries an `aria-label`, a minimum target size, and a
+visible focus ring.
+
+### CSS parts
+
+| Part | Description |
+| --- | --- |
+| `base` | The editor root (toolbar plus editable region). |
+| `toolbar` | The formatting toolbar. |
+| `button` | A toolbar button. |
+| `editable` | The contenteditable textbox. |
+
+### CSS custom properties
+
+| Property | Falls back to | Description |
+| --- | --- | --- |
+| `--fluid-editor-bg` | `--fluid-surface-base` | Editable region background. |
+| `--fluid-editor-fg` | `--fluid-text-primary` | Text color. |
+| `--fluid-editor-border` | `--fluid-border-default` | Border color. |
+| `--fluid-editor-toolbar-bg` | `--fluid-surface-muted` | Toolbar background. |
+| `--fluid-editor-radius` | `--fluid-radius-md` | Corner radius. |
+| `--fluid-editor-focus` | `--fluid-accent-base` | Focus ring and active toggle color. |
+
+## Theming
+
+Every styled property reads a component-scoped `--fluid-editor-*` token that
+falls back to a main semantic token, so you can retheme one instance, every
+editor, or the whole brand without touching the component. Setting a semantic
+token (for example `--fluid-accent-base`) flows through automatically.
+
+```html
+<fluid-rich-text-editor
+  style="--fluid-editor-toolbar-bg: #1e1b4b; --fluid-editor-radius: 1rem;"
+  label="Themed editor"
+></fluid-rich-text-editor>
+```
+
+## When to use
+
+- A comment box, note field, or simple article body where users need basic
+  formatting (bold, italic, lists, links) without the weight of a full editor
+  framework.
+
+## License
+
+MIT.

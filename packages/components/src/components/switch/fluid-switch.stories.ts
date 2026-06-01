@@ -6,7 +6,7 @@ import type { FluidSwitch } from "./fluid-switch.js";
 type Args = Pick<FluidSwitch, "checked" | "disabled" | "required"> & { label: string };
 
 const meta: Meta<Args> = {
-  title: "Components/Switch",
+  title: "Components/Forms/Switch",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

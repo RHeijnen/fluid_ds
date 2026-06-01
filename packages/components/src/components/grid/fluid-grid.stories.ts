@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Layout/Grid",
+  title: "Components/Layout/Grid",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

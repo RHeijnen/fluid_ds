@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/animations",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.2-alpha.0",
   "description": "Attribute-driven animation system for Fluid. A registry of named keyframes plus a global controller that watches data-fluid-animation attributes on any element.",
   "type": "module",
   "license": "MIT",

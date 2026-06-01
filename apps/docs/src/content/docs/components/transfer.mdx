@@ -1,0 +1,370 @@
+---
+title: "Transfer"
+description: "Dual list box: move items between a source and a target list. Form-associated, multi-select, full keyboard support."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-transfer>` is a dual list box: pick items in the source list, move them to
+the target list (or back) with the arrow buttons, and the target side becomes the
+control's value. Both lists are multi-selectable `role="listbox"` widgets with the
+full WAI-ARIA keyboard contract, and the control is form-associated: it submits the
+target ids as a comma-joined string.
+
+<Demo>
+  <fluid-transfer
+    source-label="Available"
+    target-label="Selected"
+    items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"},{"id":"angular","label":"Angular"},{"id":"svelte","label":"Svelte"}]'
+    value='["vue"]'
+  ></fluid-transfer>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/transfer/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/transfer";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Pass `items` (an array of `{ id, label }`) and `value` (the ids that start on the
+target side). Both accept a JSON-string attribute or a JS array property.
+
+<Demo>
+  <fluid-transfer
+    source-label="Available"
+    target-label="Selected"
+    items='[{"id":"a","label":"Apple"},{"id":"b","label":"Banana"},{"id":"c","label":"Cherry"}]'
+    value='[]'
+  ></fluid-transfer>
+</Demo>
+
+<ConformanceCode code={`<fluid-transfer
+  name="picks"
+  source-label="Available"
+  target-label="Selected"
+  items='[{"id":"a","label":"Apple"},{"id":"b","label":"Banana"},{"id":"c","label":"Cherry"}]'
+></fluid-transfer>`} />
+
+### Pre-filled target
+
+Ids in `value` render on the target side; everything else stays in the source.
+
+<Demo>
+  <fluid-transfer
+    source-label="All permissions"
+    target-label="Granted"
+    items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"},{"id":"delete","label":"Delete"},{"id":"admin","label":"Administer"}]'
+    value='["read","write"]'
+  ></fluid-transfer>
+</Demo>
+
+<ConformanceCode code={`<fluid-transfer
+  source-label="All permissions"
+  target-label="Granted"
+  items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"},{"id":"delete","label":"Delete"}]'
+  value='["read"]'
+></fluid-transfer>`} />
+
+### Disabled items
+
+An item with `disabled: true` can't be selected or moved, but it still shows on
+whichever side it sits.
+
+<Demo>
+  <fluid-transfer
+    source-label="Available"
+    target-label="Selected"
+    items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"},{"id":"qwik","label":"Qwik","disabled":true}]'
+    value='[]'
+  ></fluid-transfer>
+</Demo>
+
+<ConformanceCode code={`<fluid-transfer
+  items='[{"id":"react","label":"React"},{"id":"qwik","label":"Qwik","disabled":true}]'
+></fluid-transfer>`} />
+
+### Disabled control
+
+<Demo>
+  <fluid-transfer
+    disabled
+    source-label="Available"
+    target-label="Selected"
+    items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"}]'
+    value='["react"]'
+  ></fluid-transfer>
+</Demo>
+
+<ConformanceCode code={`<fluid-transfer disabled value='["react"]'
+  items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"}]'></fluid-transfer>`} />
+
+## Listening for fluid-change
+
+`<fluid-transfer>` fires **`fluid-change`** whenever items move between the lists.
+`event.detail.value` is the current array of target ids.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-transfer id="t"></fluid-transfer>
+
+    <script type="module">
+      const t = document.getElementById("t");
+      t.items = [{ id: "a", label: "Apple" }, { id: "b", label: "Banana" }];
+      t.addEventListener("fluid-change", (e) => console.log(e.detail.value));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Picker.tsx"
+    import { useRef, useState, useEffect } from "react";
+    import "@fluid-ds/components/define/transfer";
+
+    export function Picker() {
+      const ref = useRef<HTMLElement>(null);
+      const [value, setValue] = useState<string[]>([]);
+      useEffect(() => {
+        const el = ref.current!;
+        // @ts-expect-error custom element property
+        el.items = [{ id: "a", label: "Apple" }, { id: "b", label: "Banana" }];
+        const onChange = (e: any) => setValue(e.detail.value);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-transfer ref={ref} />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Picker.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/transfer";
+    const items = [{ id: "a", label: "Apple" }, { id: "b", label: "Banana" }];
+    const value = ref<string[]>([]);
+    </script>
+
+    <template>
+      <fluid-transfer
+        :items.prop="items"
+        @fluid-change="value = $event.detail.value"
+      />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="picker.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/transfer";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-picker",
+      template: `
+        <fluid-transfer [items]="items" (fluid-change)="onChange($event)"></fluid-transfer>
+      `
+    })
+    export class Picker {
+      items = [{ id: "a", label: "Apple" }, { id: "b", label: "Banana" }];
+      onChange(e: any) { console.log(e.detail.value); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Picker.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/transfer";
+      const items = [{ id: "a", label: "Apple" }, { id: "b", label: "Banana" }];
+      let value: string[] = [];
+    </script>
+
+    <fluid-transfer
+      {items}
+      on:fluid-change={(e) => (value = e.detail.value)}
+    />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+`<fluid-transfer>` is form-associated. Give it a `name` and it submits the target
+ids as a comma-joined string (e.g. `picks=read,write`).
+
+<Demo>
+  <form
+    onsubmit="event.preventDefault(); this.querySelector('output').textContent = new FormData(this).get('roles') || '(none)';"
+  >
+    <fluid-transfer
+      name="roles"
+      source-label="Available"
+      target-label="Granted"
+      items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"},{"id":"admin","label":"Administer"}]'
+      value='["read"]'
+    ></fluid-transfer>
+    <div style="margin-top: var(--fluid-space-3); display:flex; gap: var(--fluid-space-2); align-items:center;">
+      <fluid-button type="submit" size="sm">Submit</fluid-button>
+      <span>Submitted: <output>—</output></span>
+    </div>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-transfer name="roles" value='["read"]'
+    items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"}]'></fluid-transfer>
+  <button type="submit">Submit</button>
+</form>
+```
+
+See the [Forms guide](/guides/forms/) for the cross-component contract.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-transfer-*` token that
+falls back to a main semantic var** (the override ladder): override
+`--fluid-accent-base` to retheme the whole brand, `--fluid-transfer-option-selected-bg`
+to restyle every transfer, or set a token inline / via `[data-fluid-id]` to change a
+single instance. The most-reached-for knobs are
+`--fluid-transfer-option-selected-bg` / `-fg`, `--fluid-transfer-border`, and
+`--fluid-transfer-button-bg`. The [API table below](#api) is the complete,
+authoritative list.
+
+```css title="brand.css"
+/* Brand-wide: every transfer */
+[data-fluid-brand="custom"] {
+  --fluid-transfer-option-selected-bg: var(--fluid-accent-base);
+  --fluid-transfer-option-selected-fg: var(--fluid-accent-text);
+  --fluid-transfer-border: var(--fluid-border-default);
+}
+
+/* One instance */
+fluid-transfer[data-fluid-id="roles"] {
+  --fluid-transfer-radius: 12px;
+}
+```
+
+### Beyond tokens: `::part()`
+
+The wrapper is `part="base"`, with `part="pane"`, `part="label"`,
+`part="listbox"`, `part="option"`, `part="controls"`, and `part="button"` for the
+sub-elements. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS a
+token doesn't cover.
+
+<Aside type="tip">
+  Retheme it live in the [Theme builder](/playground/).
+</Aside>
+
+## When to use
+
+- Building a multi-select where the chosen set matters as much as the available
+  set (assigning roles, columns, recipients).
+- The list is long enough that a row of checkboxes would be unwieldy and seeing
+  "chosen" vs "available" side by side helps.
+
+### When *not* to use
+
+- A small fixed set of independent options: reach for a checkbox group or
+  [`<fluid-switch>`](/components/switch/).
+- Free-form, user-created labels rather than a fixed catalog: use
+  [`<fluid-tag-input>`](/components/tag-input/).
+- Choosing exactly one option: use [`<fluid-select>`](/components/select/).
+
+## Accessibility
+
+The control is built from two APG [Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+widgets (`role="listbox"`, `aria-multiselectable="true"`) plus two move buttons with
+explicit `aria-label`s. Each listbox manages an active option with
+`aria-activedescendant` and reflects selection with `aria-selected`. See the
+[Accessibility guide](/guides/accessibility/) for the cross-component contract.
+
+### Keyboard
+
+Tab moves between the two listboxes and the move buttons. Once a listbox has focus:
+
+| Key | Action |
+| --- | --- |
+| Arrow Down / Up | Move the active option within the list |
+| Home / End | Move the active option to the first / last item |
+| Space | Toggle selection on the active option |
+| Shift + Arrow | Extend the selection range from the anchor |
+| Enter | Move the selected items to the other list |
+
+The move buttons activate with Enter / Space (native `<button>`). The focused
+listbox shows a `:focus-visible` ring, and the active option carries an inset ring,
+both read the `--fluid-transfer-focus-ring-*` tokens.
+
+### Names
+
+Each listbox is named by its visible pane label via `aria-labelledby`
+(`source-label` / `target-label`). The move buttons take an `aria-label` built from
+those labels ("Move selected to Granted"), so their purpose is announced even
+though they show only an icon.
+
+### State semantics
+
+`disabled` sets `aria-disabled="true"` on both listboxes, takes them out of the Tab
+order, and disables the move buttons. A per-item `disabled: true` sets
+`aria-disabled="true"` on that option and blocks its selection / move. Selection is
+conveyed by `aria-selected` plus a non-color cue (the inset active ring), not color
+alone.
+
+### Motion & target size
+
+The only motion is a hover background fade, which collapses under
+`prefers-reduced-motion: reduce`. Options and move buttons read
+`--fluid-target-min` as a size floor (24×24 AA, 44×44 AAA).
+
+### AA vs AAA
+
+`<fluid-transfer>` ships WCAG 2.2 AA by default and scales to AAA via
+`data-fluid-conformance="aaa"` on any ancestor (the docs header toggle is live, and
+the snippets above switch with it):
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+
+## API
+
+<ComponentApi tag="fluid-transfer" />
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Tag input" href="/components/tag-input/" description="Free-form token entry instead of a fixed catalog." />
+  <LinkCard title="Select" href="/components/select/" description="Pick one option from a dropdown." />
+  <LinkCard title="Switch" href="/components/switch/" description="Toggle a small set of independent options." />
+  <LinkCard title="Forms guide" href="/guides/forms/" description="How form-associated controls submit." />
+  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+</CardGrid>

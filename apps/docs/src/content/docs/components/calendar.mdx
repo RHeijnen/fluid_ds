@@ -1,0 +1,371 @@
+---
+title: "Calendar"
+description: "Accessible single-month calendar grid: roving-tabindex day selection, full keyboard navigation, ISO YYYY-MM-DD values. The engine behind the date pickers, usable on its own."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-calendar>` renders a single month as an accessible `role="grid"` of day
+buttons, with roving-tabindex focus and the full WAI-ARIA APG keyboard contract.
+It is the engine behind [`<fluid-date-picker>`](/components/date-picker/) and
+[`<fluid-date-range-picker>`](/components/date-range-picker/), and works standalone
+when you want an always-visible month. Every value it reads or emits is a
+timezone-safe ISO `YYYY-MM-DD` string.
+
+<Demo>
+  <fluid-calendar value="2026-06-15"></fluid-calendar>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/calendar/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/calendar";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+`value` is an ISO `YYYY-MM-DD` string. The matching day is filled, today's day
+keeps its outline ring, and the month containing the value is shown.
+
+<Demo>
+  <fluid-calendar value="2026-06-15"></fluid-calendar>
+</Demo>
+
+<ConformanceCode code={`<fluid-calendar value="2026-06-15"></fluid-calendar>`} />
+
+### Min and max
+
+`min` and `max` (both ISO) bound the selectable range. Out-of-range days are
+disabled, and the prev/next nav stops at the boundary month.
+
+<Demo>
+  <fluid-calendar value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-calendar>
+</Demo>
+
+<ConformanceCode code={`<fluid-calendar value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-calendar>`} />
+
+### Week start
+
+`week-start` sets the first column: `0` = Sunday … `6` = Saturday. The default
+is `1` (Monday). Weekday header names follow the `locale`.
+
+<Demo>
+  <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+    <fluid-calendar value="2026-06-15" week-start="1"></fluid-calendar>
+    <fluid-calendar value="2026-06-15" week-start="0"></fluid-calendar>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<!-- Monday-first (default) -->
+<fluid-calendar value="2026-06-15" week-start="1"></fluid-calendar>
+
+<!-- Sunday-first -->
+<fluid-calendar value="2026-06-15" week-start="0"></fluid-calendar>`} />
+
+### Locale
+
+`locale` is any BCP-47 tag; it localizes the month label and weekday names. The
+value stays ISO regardless of locale.
+
+<Demo>
+  <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+    <fluid-calendar value="2026-06-15" locale="en-US"></fluid-calendar>
+    <fluid-calendar value="2026-06-15" locale="fr-FR"></fluid-calendar>
+  </div>
+</Demo>
+
+<ConformanceCode code={`<fluid-calendar value="2026-06-15" locale="fr-FR"></fluid-calendar>`} />
+
+### Range mode
+
+Set `range` and supply `range-start` / `range-end` (ISO) to paint a continuous
+band between two endpoints. This is how the
+[date-range picker](/components/date-range-picker/) drives its two months;
+standalone, it is a read-only highlight unless you wire `fluid-date-activate`.
+
+<Demo>
+  <fluid-calendar range range-start="2026-06-08" range-end="2026-06-19" view="2026-06-15"></fluid-calendar>
+</Demo>
+
+<ConformanceCode code={`<fluid-calendar
+  range
+  range-start="2026-06-08"
+  range-end="2026-06-19"
+  view="2026-06-15"
+></fluid-calendar>`} />
+
+### No nav
+
+`no-nav` hides the month label + prev/next chevrons so a host (like the range
+picker) can drive the displayed month itself via the `view` attribute.
+
+<Demo>
+  <fluid-calendar value="2026-06-15" no-nav></fluid-calendar>
+</Demo>
+
+<ConformanceCode code={`<fluid-calendar value="2026-06-15" no-nav view="2026-06-15"></fluid-calendar>`} />
+
+## Listening for changes
+
+The calendar fires **`fluid-date-activate`** with `{ iso, date }` in `detail`
+when a day is chosen (click or <kbd>Enter</kbd> / <kbd>Space</kbd>). It is a
+controlled grid: read `iso` and assign it back to `value` to confirm the
+selection. `fluid-view-change` fires when the displayed month changes via the
+nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-calendar id="cal"></fluid-calendar>
+
+    <script type="module">
+      const cal = document.getElementById("cal");
+      cal.addEventListener("fluid-date-activate", (e) => {
+        cal.value = e.detail.iso;
+        console.log("picked:", e.detail.iso);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="MonthCalendar.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/calendar";
+
+    export function MonthCalendar() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onPick = (e: Event) => {
+          const { iso } = (e as CustomEvent).detail;
+          (el as any).value = iso;
+        };
+        el.addEventListener("fluid-date-activate", onPick);
+        return () => el.removeEventListener("fluid-date-activate", onPick);
+      }, []);
+      return <fluid-calendar ref={ref} />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="MonthCalendar.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/calendar";
+    const onPick = (e: CustomEvent) => console.log(e.detail.iso);
+    </script>
+
+    <template>
+      <fluid-calendar @fluid-date-activate="onPick" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="month-calendar.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/calendar";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "month-calendar",
+      template: `
+        <fluid-calendar (fluid-date-activate)="onPick($event)"></fluid-calendar>
+      `
+    })
+    export class MonthCalendar {
+      onPick(e: CustomEvent) {
+        console.log(e.detail.iso);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="MonthCalendar.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/calendar";
+      function onPick(e: CustomEvent) {
+        console.log(e.detail.iso);
+      }
+    </script>
+
+    <fluid-calendar on:fluid-date-activate={onPick} />
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="note">
+  The calendar is **not** form-associated. To submit a date as a form value, use
+  [`<fluid-date-picker>`](/components/date-picker/), which wraps this grid in a
+  field and exposes an ISO form value.
+</Aside>
+
+## Theming
+
+Every styled property of the calendar reads a **component-scoped
+`--fluid-calendar-*` token that falls back to a main semantic var** (the override
+ladder), so a calendar tracks your surface, accent, and radius tokens by default.
+The two you'll reach for most are `--fluid-calendar-selected-bg` and
+`--fluid-calendar-range-bg`. The **complete, authoritative list** of both layers
+lives in the [API tables below](#api): **CSS custom properties** is every
+`--fluid-calendar-*` override knob, and **Semantic tokens consumed** is every main
+var those knobs fall back to.
+
+```css title="brand.css"
+/* Re-skin every calendar under a brand wrapper. */
+[data-fluid-brand="custom"] {
+  --fluid-calendar-selected-bg: #db2777;
+  --fluid-calendar-selected-fg: #ffffff;
+  --fluid-calendar-range-bg: color-mix(in srgb, #db2777 16%, transparent);
+}
+
+/* Re-skin one specific instance. */
+[data-fluid-id="booking-cal"] {
+  --fluid-calendar-radius: 999px;
+}
+```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you tweak these tokens visually and
+  exports the CSS above.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+Tokens cover the intended theming knobs. For anything else, the container is
+exposed as [`part="base"`](#api), and the grid exposes `header`, `nav-button`,
+`grid`, `day`, `day-selected`, and `day-today` parts. Reach them with the standard
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) selector for
+CSS not covered by a token:
+
+```css
+/* Make the selected day a pill without a per-corner token. */
+fluid-calendar::part(day-selected) {
+  border-radius: 999px;
+}
+```
+
+## When to use
+
+- An **always-visible month** in a dashboard, booking flow, or sidebar where the
+  grid should stay open rather than live behind a field.
+- The **building block** for a custom date control: listen to `fluid-date-activate`
+  and drive `value` / `view` yourself.
+
+### When *not* to use
+
+- A **compact single-date field** that submits a value: use
+  [`<fluid-date-picker>`](/components/date-picker/).
+- A **start/end range** with presets: use
+  [`<fluid-date-range-picker>`](/components/date-range-picker/).
+
+## Accessibility
+
+`<fluid-calendar>` implements the WAI-ARIA APG **Date Picker (grid)** pattern: a
+`role="grid"` of `gridcell` day buttons with **roving tabindex** (exactly one day
+is tabbable; arrow keys move focus) and a live-region announcement of the focused
+day. The notes below are calendar-specific; the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>←</kbd> / <kbd>→</kbd> | Move focus ±1 day. |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Move focus ±1 week. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last day of the week. |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Move ±1 month. |
+| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | Move ±1 year. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused day (fires `fluid-date-activate`). |
+
+Moving past the edge of the shown month advances the displayed month and keeps
+focus on the new day. The focus ring is `:focus-visible` and reads
+`--fluid-calendar-focus-ring-width` (falling back to `--fluid-focus-ring-width`),
+so the AAA toggle thickens it without touching the component.
+
+### Names & roles
+
+The grid is labeled by its month (`aria-label` on the `role="grid"` table), each
+day button carries a full `aria-label` (weekday, day, month, year), today's day is
+`aria-current="date"`, and selected days expose `aria-selected="true"` on their
+cell. Disabled (out-of-range) days set the native `disabled` attribute.
+
+### State semantics
+
+The displayed month label is an `aria-live="polite"` region, so changing months
+via the nav or keyboard announces the new month. In `range` mode the in-range band
+is purely visual; selection state is still carried per day by `aria-selected`.
+
+### Motion & target size
+
+- The calendar has no animated affordances of its own; month changes are instant.
+- Every day and nav button is at least **24×24** CSS px by default
+  ([SC 2.5.8 Target Size (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html),
+  AA), reading `--fluid-target-min` as a floor.
+
+### AA vs AAA
+
+The calendar ships **WCAG 2.2 Level AA** by default and scales to **AAA** on a
+switch. Flip the **Conformance** toggle at the top of this page: the day and nav
+targets grow and the focus ring thickens. It is not a mock-up: the toggle sets the
+real `data-fluid-conformance` attribute on `<html>`. The calendar reads conformance
+tokens, so it scales with zero per-component branching:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## API
+
+<ComponentApi tag="fluid-calendar" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Date picker"
+    href="/components/date-picker/"
+    description="Single-date field that opens this calendar in a popover and submits an ISO value."
+  />
+  <LinkCard
+    title="Date range picker"
+    href="/components/date-range-picker/"
+    description="Start/end picker with presets, built on two of these grids."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component keyboard and ARIA contract."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

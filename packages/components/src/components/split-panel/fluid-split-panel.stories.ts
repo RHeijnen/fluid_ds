@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Layout/Split panel",
+  title: "Components/Layout/Split panel",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

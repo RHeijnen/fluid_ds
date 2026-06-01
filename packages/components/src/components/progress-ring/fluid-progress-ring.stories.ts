@@ -6,7 +6,7 @@ import type { FluidProgressRing } from "./fluid-progress-ring.js";
 type Args = Pick<FluidProgressRing, "value" | "showValue">;
 
 const meta: Meta<Args> = {
-  title: "Components/ProgressRing",
+  title: "Components/Feedback/ProgressRing",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

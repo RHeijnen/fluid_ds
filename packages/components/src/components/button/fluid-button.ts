@@ -672,7 +672,6 @@ export class FluidButton extends FluidElement {
     if (!isIconOnly) return;
     if (this.ariaLabel) return;
     this.warnedNameless = true;
-    // eslint-disable-next-line no-console
     console.warn(
       "[fluid-button] Icon-only button has no accessible name. Add aria-label on the host so screen readers announce something. SC 4.1.2 Name, Role, Value.",
       this

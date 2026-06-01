@@ -1,0 +1,185 @@
+---
+title: "@fluid-ds/scheduler"
+description: "Accessible appointment scheduler: a calendar with bookable time slots, an owner-side hours editor, and a framework-free availability engine."
+---
+
+An opt-in expansion pack for booking flows: a visitor picks a day on a calendar
+(with per-day availability dots) and then a time slot; the chosen slot is a real
+form value. An owner-side editor defines the open hours, and a pure availability
+engine turns those hours plus existing bookings into concrete slots (it runs
+server-side too, with no DOM).
+
+Built on standard web components, so it drops into React, Vue, Angular, Svelte,
+or plain HTML. WCAG 2.2 AA, AAA-ready.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/scheduler
+```
+
+```ts
+import "@fluid-ds/scheduler/define/scheduler";
+import "@fluid-ds/scheduler/define/time-slots";
+import "@fluid-ds/scheduler/define/availability-editor";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-scheduler>` | The visitor picker: calendar + time-slot panel, form-associated. |
+| `<fluid-time-slots>` | A single day's slots as a radiogroup, usable on its own. |
+| `<fluid-availability-editor>` | The owner-side weekly-hours + closed-dates editor. |
+
+## The availability config
+
+Everything is driven by one plain object. All times are local wall-clock
+(`"HH:MM"`), all dates are `YYYY-MM-DD`, never UTC.
+
+```ts
+const availability = {
+  // Recurring weekly hours, keyed by weekday (0 = Sunday).
+  weekly: {
+    1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
+    2: [{ start: "09:00", end: "17:00" }],
+    6: [{ start: "09:00", end: "12:00" }]
+  },
+  // Date-specific overrides (holidays / special hours).
+  exceptions: [{ date: "2026-12-25", closed: true }],
+  slotMinutes: 30,        // appointment length
+  stepMinutes: 30,        // gap between slot starts (defaults to slotMinutes)
+  bufferMinutes: 0,       // padding reserved after each booking
+  capacity: 1,            // bookings per slot (> 1 = group slots)
+  minNoticeMinutes: 120,  // cannot book within the next 2 hours
+  maxAdvanceDays: 45      // cannot book more than 45 days out
+};
+```
+
+## Use the scheduler
+
+```html
+<fluid-scheduler id="booking" name="appointment"></fluid-scheduler>
+<script type="module">
+  const el = document.getElementById("booking");
+  el.availability = availability;        // the config above
+  el.bookings = [{ start: "2026-06-15T09:00" }]; // already-taken slots
+
+  el.addEventListener("fluid-change", (e) => {
+    console.log("booked", e.detail.value); // "2026-06-15T10:30"
+  });
+
+  // Fetch only the visible month's bookings, lazily:
+  el.addEventListener("fluid-range-change", async (e) => {
+    el.loading = true;
+    el.bookings = await fetchBookings(e.detail.start, e.detail.end);
+    el.loading = false;
+  });
+</script>
+```
+
+### `<fluid-scheduler>` props
+
+| Prop | Default | Description |
+| --- | --- | --- |
+| `availability` | `null` | The config object (or a JSON attribute). |
+| `bookings` | `[]` | Known taken slots, `{ start, end? }[]`. |
+| `value` | `null` | Selected slot, ISO `YYYY-MM-DDTHH:MM` (the form value). |
+| `name` | `""` | Field name for form submission. |
+| `min` / `max` | today / today + `maxAdvanceDays` | Selectable day bounds, `YYYY-MM-DD`. |
+| `week-start` | `1` | First weekday (0 = Sunday). |
+| `locale` | document | BCP-47 locale for labels. |
+| `time-format` | `"24h"` | `"12h"` or `"24h"`. |
+| `size` | `"md"` | `sm` / `md` / `lg`. |
+| `loading` | `false` | Show a spinner overlay on the slot panel. |
+| `disabled` / `required` / `readonly` | `false` | Form control flags. |
+
+### `<fluid-scheduler>` events + methods
+
+| Name | Detail / signature |
+| --- | --- |
+| `fluid-range-change` | `{ start, end }`: the visible month changed (fetch bookings here). |
+| `fluid-day-select` | `{ date }`: a day was chosen. |
+| `fluid-change` | `{ value, start, end }`: a slot was committed. |
+| `refresh()` | Re-generate slots + dots after an out-of-band change. |
+
+## Use the slot list on its own
+
+```html
+<fluid-time-slots date="2026-06-15"></fluid-time-slots>
+<script type="module">
+  document.querySelector("fluid-time-slots").availability = availability;
+</script>
+```
+
+`<fluid-time-slots>` is a WAI-ARIA radiogroup. Pass it a `date` + `availability`
+(it generates the slots) or a pre-built `slots` array. It fires `fluid-change`
+with `{ value, slot }`. Fully-booked and past slots render as disabled radios so
+they are announced but skipped by arrow-key navigation.
+
+## Let owners define the hours
+
+```html
+<fluid-availability-editor></fluid-availability-editor>
+<script type="module">
+  const editor = document.querySelector("fluid-availability-editor");
+  const scheduler = document.querySelector("fluid-scheduler");
+  editor.addEventListener("fluid-change", (e) => {
+    scheduler.availability = e.detail.availability; // wire owner edits to the picker
+  });
+</script>
+```
+
+The editor renders a weekly-hours grid (toggle each day open, add one or more
+time windows), the global slot rules, and a list of closed dates. It emits a
+complete `availability` config on every edit.
+
+## The engine, standalone
+
+The slot logic is pure and exported, so you can generate slots on a server (for
+validation) without any custom elements:
+
+```ts
+import { generateSlots, dayState } from "@fluid-ds/scheduler";
+
+const slots = generateSlots("2026-06-15", availability, bookings);
+// → [{ start, end, remaining, state: "available" | "full" | "past" | "blocked" }]
+
+dayState("2026-06-15", availability, bookings); // "open" | "some" | "full" | "closed" | "unavailable"
+```
+
+## Theming
+
+Each component reads `--fluid-scheduler-*`, `--fluid-time-slots-*`, and
+`--fluid-availability-editor-*` tokens that fall back to the main semantic vars,
+the standard Fluid override ladder. The calendar's availability dots use the
+status track:
+
+```css
+:root {
+  --fluid-calendar-dot-open: var(--fluid-success-base);
+  --fluid-calendar-dot-some: var(--fluid-warning-base);
+  --fluid-calendar-dot-full: var(--fluid-danger-base);
+  --fluid-time-slots-selected-bg: var(--fluid-accent-base);
+}
+```
+
+## Accessibility
+
+- The calendar is the WAI-ARIA APG date-picker grid (roving tabindex, full
+  keyboard support); closed and out-of-horizon days are disabled.
+- The slot list is an APG radio group: arrow keys move between bookable slots,
+  Enter / Space selects, and a live region announces the count for the day.
+- Every control reads the conformance tokens, so it scales to 44x44 targets and
+  thicker focus rings under `data-fluid-conformance="aaa"`.
+
+## When to use
+
+- Appointment booking: clinics, salons, consultations, "book a demo".
+- Class / session sign-ups with limited seats (set `capacity` above 1).
+- Anywhere a visitor must choose from a finite, rule-driven set of times rather
+  than a free-form date.
+
+## License
+
+MIT.

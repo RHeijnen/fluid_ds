@@ -27,6 +27,8 @@ import "@fluid-ds/media/define/video";
 import "@fluid-ds/media/define/video-playlist";
 import "@fluid-ds/media/define/animated-image";
 import "@fluid-ds/media/define/zoomable-frame";
+import "@fluid-ds/media/define/audio";
+import "@fluid-ds/media/define/lightbox";
 ```
 
 ## Components
@@ -37,6 +39,8 @@ import "@fluid-ds/media/define/zoomable-frame";
 | `<fluid-video-playlist>` | Playlist-driven video player with auto-advance. |
 | `<fluid-animated-image>` | GIF / APNG / animated WebP with play/pause control (canvas-snapshot trick). |
 | `<fluid-zoomable-frame>` | Pan + zoom container for images, iframes, SVG. Scroll wheel + drag. |
+| `<fluid-audio>` | Themed audio player: custom play/pause, seek slider with time, mute. |
+| `<fluid-lightbox>` | Thumbnail gallery that opens images in a modal lightbox (top-layer `<dialog>`, prev/next, Escape). |
 
 ## Use
 
@@ -48,7 +52,22 @@ import "@fluid-ds/media/define/zoomable-frame";
 <fluid-zoomable-frame>
   <img src="/diagram.svg" alt="…">
 </fluid-zoomable-frame>
+
+<fluid-audio src="/track.mp3" label="Episode 12"></fluid-audio>
+
+<fluid-lightbox loop>
+  <img src="/a-thumb.jpg" data-full="/a.jpg" alt="Sunrise" />
+  <img src="/b-thumb.jpg" data-full="/b.jpg" alt="Harbour" />
+</fluid-lightbox>
 ```
+
+`<fluid-audio>` wraps a native `<audio>` element for playback but draws its own
+accessible controls (the play button is labelled by state, the scrubber is a
+slider with `aria-valuetext` time, mute toggles `aria-pressed`). `<fluid-lightbox>`
+turns each slotted `<img>` into a focusable button; the lightbox is a native
+modal `<dialog>` so it gets focus trapping, Escape-to-close, and the top layer
+for free. Set `data-full` on a thumbnail to load a higher-resolution source in
+the lightbox.
 
 ## Theming
 

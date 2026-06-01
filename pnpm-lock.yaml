@@ -14,6 +14,9 @@ importers:
       '@eslint/js':
         specifier: ^9.17.0
         version: 9.39.4
+      '@types/leaflet':
+        specifier: ^1.9.12
+        version: 1.9.21
       concurrently:
         specifier: ^9.1.2
         version: 9.2.1
@@ -233,6 +236,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@astrojs/sitemap':
+        specifier: ^3.2.1
+        version: 3.7.3
       '@astrojs/starlight':
         specifier: ^0.30.6
         version: 0.30.6(astro@5.18.2(@types/node@24.12.4)(rollup@4.60.4)(sass@1.90.0)(tsx@4.22.3)(typescript@5.9.3)(yaml@2.9.0))
@@ -298,15 +304,27 @@ importers:
 
   apps/playground:
     dependencies:
+      '@fluid-ds/calendar':
+        specifier: workspace:*
+        version: link:../../packages/calendar
       '@fluid-ds/charts':
         specifier: workspace:*
         version: link:../../packages/charts
       '@fluid-ds/components':
         specifier: workspace:*
         version: link:../../packages/components
+      '@fluid-ds/editor':
+        specifier: workspace:*
+        version: link:../../packages/editor
       '@fluid-ds/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@fluid-ds/kanban':
+        specifier: workspace:*
+        version: link:../../packages/kanban
+      '@fluid-ds/map':
+        specifier: workspace:*
+        version: link:../../packages/map
       '@fluid-ds/markdown':
         specifier: workspace:*
         version: link:../../packages/markdown
@@ -316,6 +334,12 @@ importers:
       '@fluid-ds/qr':
         specifier: workspace:*
         version: link:../../packages/qr
+      '@fluid-ds/scheduler':
+        specifier: workspace:*
+        version: link:../../packages/scheduler
+      '@fluid-ds/table':
+        specifier: workspace:*
+        version: link:../../packages/table
       '@fluid-ds/themes':
         specifier: workspace:*
         version: link:../../packages/themes
@@ -452,6 +476,34 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/calendar:
+    dependencies:
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
+
   packages/charts:
     dependencies:
       chart.js:
@@ -505,6 +557,34 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/editor:
+    dependencies:
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
+
   packages/icons:
     dependencies:
       lucide-static:
@@ -517,6 +597,68 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+
+  packages/kanban:
+    dependencies:
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
+
+  packages/map:
+    dependencies:
+      leaflet:
+        specifier: ^1.9.4
+        version: 1.9.4
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@types/leaflet':
+        specifier: ^1.9.12
+        version: 1.9.21
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
 
   packages/markdown:
     dependencies:
@@ -537,6 +679,24 @@ importers:
         specifier: ^3.2.1
         version: 3.3.3
     devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -553,6 +713,68 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+
+  packages/scheduler:
+    dependencies:
+      '@fluid-ds/components':
+        specifier: workspace:*
+        version: link:../components
+      '@fluid-ds/icons':
+        specifier: workspace:*
+        version: link:../icons
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
+
+  packages/table:
+    dependencies:
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
 
   packages/themes:
     dependencies:
@@ -3240,6 +3462,9 @@ packages:
   '@types/express@5.0.6':
     resolution: {integrity: sha512-sKYVuV7Sv9fbPIt/442koC7+IIwK5olP1KWeD88e/idgoJqDm3JV/YUiPwkoKK92ylff2MGxSz1CSjsXelx0YA==}
 
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
+
   '@types/hast@2.3.10':
     resolution: {integrity: sha512-McWspRw8xx8J9HurkVBfYj0xKoE25tOFlHGdx4MJ5xORQrMGZNqJhVQWaIbm6Oyla5kYOXtDiopzKRJzEOkwJw==}
 
@@ -3275,6 +3500,9 @@ packages:
 
   '@types/koa@2.15.2':
     resolution: {integrity: sha512-CB+iyjjh1uS5N6/CKwXvw0qA7USMS2WVc4Tjf660yCjhdvqzNr8gdFcIawB41zGGptOQ+d1fnpaQWIIUXYxR3w==}
+
+  '@types/leaflet@1.9.21':
+    resolution: {integrity: sha512-TbAd9DaPGSnzp6QvtYngntMZgcRk+igFELwR2N99XZn7RXUdKgsXMR+28bUO0rPsWp8MIu/f47luLIQuSLYv/w==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -5450,6 +5678,9 @@ packages:
   language-tags@1.0.9:
     resolution: {integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==}
     engines: {node: '>=0.10'}
+
+  leaflet@1.9.4:
+    resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -10300,6 +10531,8 @@ snapshots:
       '@types/express-serve-static-core': 5.1.1
       '@types/serve-static': 2.2.0
 
+  '@types/geojson@7946.0.16': {}
+
   '@types/hast@2.3.10':
     dependencies:
       '@types/unist': 2.0.11
@@ -10342,6 +10575,10 @@ snapshots:
       '@types/keygrip': 1.0.6
       '@types/koa-compose': 3.2.9
       '@types/node': 22.19.19
+
+  '@types/leaflet@1.9.21':
+    dependencies:
+      '@types/geojson': 7946.0.16
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -13040,6 +13277,8 @@ snapshots:
   language-tags@1.0.9:
     dependencies:
       language-subtag-registry: 0.3.23
+
+  leaflet@1.9.4: {}
 
   levn@0.4.1:
     dependencies:

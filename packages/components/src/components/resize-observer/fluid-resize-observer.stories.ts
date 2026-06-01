@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Observers/Resize observer",
+  title: "Components/Utilities/Resize observer",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

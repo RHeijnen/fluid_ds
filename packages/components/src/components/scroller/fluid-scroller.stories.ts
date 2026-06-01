@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Layout/Scroller",
+  title: "Components/Layout/Scroller",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import sitemap from "@astrojs/sitemap";
 import { fluidCodeBlockTransformer } from "./src/lib/fluid-code-shiki.mjs";
 
 /**
@@ -33,10 +34,9 @@ const base = process.env.DOCS_BASE ?? "/";
 
 /**
  * `site` is the production origin, used for canonical URLs + the sitemap.
- * Temporary Cloudflare Pages host for now; override via DOCS_SITE (or just
- * change this default) once a custom domain is attached.
+ * Override via DOCS_SITE if needed (e.g. to build for a preview host).
  */
-const site = process.env.DOCS_SITE ?? "https://fluid-25z.pages.dev";
+const site = process.env.DOCS_SITE ?? "https://fluid-web.dev";
 
 export default defineConfig({
   site,
@@ -54,6 +54,7 @@ export default defineConfig({
     }
   },
   integrations: [
+    sitemap(),
     starlight({
       title: "Fluid",
       // Turn off Starlight's Expressive Code code blocks; we render our own.
@@ -126,12 +127,26 @@ export default defineConfig({
             { label: "Slider", link: "/components/slider/" },
             { label: "Color picker", link: "/components/color-picker/" },
             { label: "Rating", link: "/components/rating/" },
-            { label: "File input", link: "/components/file-input/" }
+            { label: "File input", link: "/components/file-input/" },
+            { label: "Calendar", link: "/components/calendar/" },
+            { label: "Date picker", link: "/components/date-picker/" },
+            { label: "Date range picker", link: "/components/date-range-picker/" },
+            { label: "Field", link: "/components/field/" },
+            { label: "OTP input", link: "/components/otp/" },
+            { label: "Tag input", link: "/components/tag-input/" },
+            { label: "Form", link: "/components/form/" },
+            { label: "Fieldset", link: "/components/fieldset/" },
+            { label: "Range slider", link: "/components/range-slider/" },
+            { label: "Time picker", link: "/components/time-picker/" },
+            { label: "Masked input", link: "/components/masked-input/" },
+            { label: "Transfer", link: "/components/transfer/" },
+            { label: "Dropzone", link: "/components/dropzone/" }
           ]
         },
         {
           label: "🧱 Layout",
           items: [
+            { label: "Hero", link: "/components/hero/" },
             { label: "Page", link: "/components/page/" },
             { label: "Grid", link: "/components/grid/" },
             { label: "Mosaic", link: "/components/mosaic/" },
@@ -140,7 +155,8 @@ export default defineConfig({
             { label: "Split panel", link: "/components/split-panel/" },
             { label: "Scroller", link: "/components/scroller/" },
             { label: "Divider", link: "/components/divider/" },
-            { label: "Carousel", link: "/components/carousel/" }
+            { label: "Carousel", link: "/components/carousel/" },
+            { label: "Aspect ratio", link: "/components/aspect-ratio/" }
           ]
         },
         {
@@ -154,13 +170,25 @@ export default defineConfig({
             { label: "Progress bar", link: "/components/progress-bar/" },
             { label: "Progress ring", link: "/components/progress-ring/" },
             { label: "Spinner", link: "/components/spinner/" },
-            { label: "Skeleton", link: "/components/skeleton/" }
+            { label: "Skeleton", link: "/components/skeleton/" },
+            { label: "Empty state", link: "/components/empty-state/" },
+            { label: "Banner", link: "/components/banner/" },
+            { label: "Meter", link: "/components/meter/" },
+            { label: "Result", link: "/components/result/" },
+            { label: "Loading overlay", link: "/components/loading-overlay/" },
+            { label: "Popconfirm", link: "/components/popconfirm/" },
+            { label: "Tour", link: "/components/tour/" }
           ]
         },
         {
           label: "🧭 Navigation",
           items: [
             { label: "Tabs", link: "/components/tabs/" },
+            { label: "App bar", link: "/components/app-bar/" },
+            { label: "Sidebar", link: "/components/sidebar/" },
+            { label: "Nav list", link: "/components/nav-list/" },
+            { label: "Anchor nav", link: "/components/anchor-nav/" },
+            { label: "Context menu", link: "/components/context-menu/" },
             { label: "Breadcrumb", link: "/components/breadcrumb/" },
             { label: "Tree", link: "/components/tree/" },
             { label: "Dropdown", link: "/components/dropdown/" },
@@ -168,7 +196,12 @@ export default defineConfig({
             { label: "Popup", link: "/components/popup/" },
             { label: "Accordion", link: "/components/accordion/" },
             { label: "Segmented control", link: "/components/segmented-control/" },
-            { label: "Steps", link: "/components/steps/" }
+            { label: "Steps", link: "/components/steps/" },
+            { label: "Menu", link: "/components/menu/" },
+            { label: "Pagination", link: "/components/pagination/" },
+            { label: "Toolbar", link: "/components/toolbar/" },
+            { label: "Command palette", link: "/components/command-palette/" },
+            { label: "Speed dial", link: "/components/speed-dial/" }
           ]
         },
         {
@@ -177,17 +210,29 @@ export default defineConfig({
             { label: "Avatar", link: "/components/avatar/" },
             { label: "Badge", link: "/components/badge/" },
             { label: "Tag", link: "/components/tag/" },
+            { label: "Stat", link: "/components/stat/" },
+            { label: "Kbd", link: "/components/kbd/" },
             { label: "Icon", link: "/components/icon/" },
             { label: "Copy button", link: "/components/copy-button/" },
             { label: "Code block", link: "/components/code-block/" },
             { label: "Comparison", link: "/components/comparison/" },
-            { label: "Include", link: "/components/include/" }
+            { label: "Include", link: "/components/include/" },
+            { label: "Avatar group", link: "/components/avatar-group/" },
+            { label: "Timeline", link: "/components/timeline/" },
+            { label: "Pricing table", link: "/components/pricing-table/" },
+            { label: "Image", link: "/components/image/" },
+            { label: "Description list", link: "/components/description-list/" },
+            { label: "List", link: "/components/list/" },
+            { label: "Truncate", link: "/components/truncate/" },
+            { label: "Countdown", link: "/components/countdown/" }
           ]
         },
         {
           label: "⚙️ Utilities & motion",
           items: [
             { label: "Animation", link: "/components/animation/" },
+            { label: "Theme toggle", link: "/components/theme-toggle/" },
+            { label: "Hotkey", link: "/components/hotkey/" },
             { label: "Format bytes", link: "/components/format-bytes/" },
             { label: "Format number", link: "/components/format-number/" },
             { label: "Format date", link: "/components/format-date/" },
@@ -201,6 +246,12 @@ export default defineConfig({
           label: "📦 Expansion packs",
           items: [
             { label: "@fluid-ds/charts", link: "/expansion/charts/" },
+            { label: "@fluid-ds/scheduler", link: "/expansion/scheduler/" },
+            { label: "@fluid-ds/table", link: "/expansion/table/" },
+            { label: "@fluid-ds/calendar", link: "/expansion/calendar/" },
+            { label: "@fluid-ds/editor", link: "/expansion/editor/" },
+            { label: "@fluid-ds/kanban", link: "/expansion/kanban/" },
+            { label: "@fluid-ds/map", link: "/expansion/map/" },
             { label: "@fluid-ds/markdown", link: "/expansion/markdown/" },
             { label: "@fluid-ds/qr", link: "/expansion/qr/" },
             { label: "@fluid-ds/media", link: "/expansion/media/" }
@@ -213,6 +264,7 @@ export default defineConfig({
             { label: "Accessibility model", link: "/guides/accessibility/" },
             { label: "Animations", link: "/guides/animations/" },
             { label: "Framework wrappers", link: "/guides/frameworks/" },
+            { label: "CMS & server-rendered", link: "/guides/cms/" },
             { label: "SSR", link: "/guides/ssr/" }
           ]
         }

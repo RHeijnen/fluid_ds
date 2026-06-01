@@ -8,7 +8,7 @@ import type { FluidCard } from "./fluid-card.js";
 type Args = Pick<FluidCard, "variant">;
 
 const meta: Meta<Args> = {
-  title: "Components/Card",
+  title: "Components/Layout/Card",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

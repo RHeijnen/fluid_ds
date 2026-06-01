@@ -1,0 +1,274 @@
+---
+title: "Form"
+description: "A thin wrapper around a native form that coordinates Fluid controls, validates on submit, and emits a clean fluid-submit event with the collected values."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-form>` wraps a real `<form>` and coordinates the controls inside it. On
+submit it runs `checkValidity()` across the form, focuses the first invalid
+control, and emits **`fluid-submit`** with the collected `{ values }` only when
+everything is valid. Otherwise it emits **`fluid-invalid`**. It stays thin and
+standards-based: the browser still collects values via `FormData`, this element
+just adds the validation gate and a clean event so your host decides what
+happens next.
+
+<Demo>
+  <fluid-form style="max-width: 22rem;">
+    <label>
+      Name
+      <input name="name" required placeholder="Ada Lovelace" />
+    </label>
+    <label>
+      Email
+      <input name="email" type="email" required placeholder="ada@example.com" />
+    </label>
+    <button slot="actions" type="submit">Submit</button>
+    <button slot="actions" type="reset">Reset</button>
+  </fluid-form>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/form/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/form";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Fields go in the default slot. Put submit / reset buttons in the `actions` slot.
+The native submit is always prevented: subscribe to `fluid-submit` to handle it.
+
+<Demo>
+  <fluid-form style="max-width: 22rem;">
+    <label>
+      Username
+      <input name="username" required placeholder="ada" />
+    </label>
+    <button slot="actions" type="submit">Save</button>
+    <button slot="actions" type="reset">Reset</button>
+  </fluid-form>
+</Demo>
+
+```html
+<fluid-form id="signup">
+  <label>Username <input name="username" required /></label>
+  <button slot="actions" type="submit">Save</button>
+</fluid-form>
+
+<script type="module">
+  document.getElementById("signup").addEventListener("fluid-submit", (e) => {
+    console.log(e.detail.values); // { username: "ada" }
+  });
+</script>
+```
+
+### Skip validation with `novalidate`
+
+Set `novalidate` to bypass the validity gate. `fluid-submit` then fires on every
+submit, regardless of control validity, mirroring the native `<form novalidate>`
+attribute.
+
+```html
+<fluid-form novalidate>
+  <label>Email <input name="email" type="email" required /></label>
+  <button slot="actions" type="submit">Submit anyway</button>
+</fluid-form>
+```
+
+### With Fluid form controls
+
+Fluid form-associated controls (like `<fluid-slider>`) participate through their
+`ElementInternals`, so their `name`/`value` land in `e.detail.values` and their
+validity is part of the gate, no extra wiring.
+
+<Demo>
+  <fluid-form style="max-width: 22rem;">
+    <label>
+      Username
+      <input name="username" required placeholder="ada" />
+    </label>
+    <label>
+      Volume
+      <fluid-slider name="volume" value="40" aria-label="Volume"></fluid-slider>
+    </label>
+    <button slot="actions" type="submit">Save</button>
+  </fluid-form>
+</Demo>
+
+## Handling submit
+
+`fluid-submit` carries `detail.values`, a plain object derived from the form's
+`FormData`. Repeated field names collapse into a string array. `fluid-invalid`
+carries `detail.invalid`, the first invalid element (already focused).
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-form id="f">
+      <label>Email <input name="email" type="email" required /></label>
+      <button slot="actions" type="submit">Send</button>
+    </fluid-form>
+
+    <script type="module">
+      const f = document.getElementById("f");
+      f.addEventListener("fluid-submit", (e) => sendToServer(e.detail.values));
+      f.addEventListener("fluid-invalid", (e) => console.warn("fix", e.detail.invalid));
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Signup.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/form";
+
+    export function Signup() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onSubmit = (e: Event) =>
+          console.log((e as CustomEvent).detail.values);
+        el.addEventListener("fluid-submit", onSubmit);
+        return () => el.removeEventListener("fluid-submit", onSubmit);
+      }, []);
+      return (
+        <fluid-form ref={ref}>
+          <label>Email <input name="email" type="email" required /></label>
+          <button slot="actions" type="submit">Send</button>
+        </fluid-form>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Signup.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/form";
+    function onSubmit(e: CustomEvent) {
+      console.log(e.detail.values);
+    }
+    </script>
+
+    <template>
+      <fluid-form @fluid-submit="onSubmit">
+        <label>Email <input name="email" type="email" required /></label>
+        <button slot="actions" type="submit">Send</button>
+      </fluid-form>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="signup.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/form";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-signup",
+      template: `
+        <fluid-form (fluid-submit)="onSubmit($event)">
+          <label>Email <input name="email" type="email" required /></label>
+          <button slot="actions" type="submit">Send</button>
+        </fluid-form>
+      `
+    })
+    export class Signup {
+      onSubmit(e: CustomEvent) { console.log(e.detail.values); }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Signup.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/form";
+      function onSubmit(e: CustomEvent) {
+        console.log(e.detail.values);
+      }
+    </script>
+
+    <fluid-form on:fluid-submit={onSubmit}>
+      <label>Email <input name="email" type="email" required /></label>
+      <button slot="actions" type="submit">Send</button>
+    </fluid-form>
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Any form where you want one clean `fluid-submit` event with the values
+  already collected, instead of wiring up `FormData` by hand.
+- Forms that mix native inputs and Fluid form-associated controls and want a
+  single validity gate over both.
+- When you want submission to stay in your control (fetch, router) rather than a
+  full-page navigation.
+
+Reach for a plain `<form>` when you genuinely want native submission and a page
+navigation with no JavaScript in between.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-form-*` token that
+falls back to a main semantic var** (the override ladder). The form only owns
+layout spacing: the field gap and the actions region. The **complete list** is
+in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-form-gap: var(--fluid-space-4);
+  --fluid-form-actions-gap: var(--fluid-space-2);
+  --fluid-form-actions-margin: var(--fluid-space-2);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The inner `<form>` is [`part="base"`](#api) and the actions region is
+`part="actions"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-form" />
+
+## Accessibility
+
+- The element renders a real `<form>`, so assistive tech sees a standard form
+  landmark and native submit semantics. Give it an accessible name with
+  `aria-label` / `aria-labelledby` on the host if you have multiple forms on a
+  page.
+- Validation focuses the **first invalid control** so a keyboard or
+  screen-reader user is taken straight to what needs fixing ([SC 3.3.1 Error
+  Identification]). Pair each control with a visible `<label>` so the error is
+  understandable.
+- The native form carries `novalidate` internally so the browser never silently
+  blocks submission: `<fluid-form>` runs the validity gate itself and reports it
+  through `fluid-invalid`, keeping error handling in one place.
+- Buttons in the `actions` slot are real `<button>` elements, so `type="submit"`
+  and `type="reset"` behave natively (Enter submits from any field).

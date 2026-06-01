@@ -6,7 +6,7 @@ import type { FluidSkeleton } from "./fluid-skeleton.js";
 type Args = Pick<FluidSkeleton, "effect">;
 
 const meta: Meta<Args> = {
-  title: "Components/Skeleton",
+  title: "Components/Feedback/Skeleton",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {

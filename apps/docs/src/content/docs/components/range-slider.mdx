@@ -1,0 +1,242 @@
+---
+title: "Range slider"
+description: "A dual-thumb slider for picking a numeric min/max range. Form-associated, keyboard accessible, thumbs cannot cross."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-range-slider>` lets a user pick a **range** (a low and a high value)
+with two draggable thumbs on one rail. The selected span is filled between the
+thumbs, the thumbs can never cross, and it submits its value as
+`"valueMin,valueMax"` like any native form control. It is the two-handled
+sibling of [`<fluid-slider>`](/components/slider/).
+
+<Demo>
+  <div style="max-width: 360px;">
+    <fluid-range-slider value-min="25" value-max="75"></fluid-range-slider>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/range-slider/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/range-slider";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Default
+
+A 0–100 rail with the thumbs at 25 and 75.
+
+<Demo>
+  <div style="max-width: 360px;">
+    <fluid-range-slider value-min="25" value-max="75"></fluid-range-slider>
+  </div>
+</Demo>
+
+```html
+<fluid-range-slider value-min="25" value-max="75"></fluid-range-slider>
+```
+
+### Custom bounds and step
+
+Set `min`, `max`, and `step` for any numeric scale, including negative ranges.
+
+<Demo>
+  <div style="max-width: 360px;">
+    <fluid-range-slider min="-50" max="50" step="5" value-min="-20" value-max="30"></fluid-range-slider>
+  </div>
+</Demo>
+
+```html
+<fluid-range-slider min="-50" max="50" step="5" value-min="-20" value-max="30"></fluid-range-slider>
+```
+
+### Disabled
+
+<Demo>
+  <div style="max-width: 360px;">
+    <fluid-range-slider disabled value-min="30" value-max="60"></fluid-range-slider>
+  </div>
+</Demo>
+
+```html
+<fluid-range-slider disabled value-min="30" value-max="60"></fluid-range-slider>
+```
+
+## Reacting to changes
+
+Both thumbs report through two events:
+
+- **`fluid-input`** fires on every change during a drag or key press.
+- **`fluid-change`** fires once the change is committed (pointer release or key
+  press).
+
+Both carry `detail: { min, max }` with the current thumb values.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-range-slider id="price" min="0" max="1000" step="10"
+      value-min="200" value-max="800"></fluid-range-slider>
+
+    <script type="module">
+      document.getElementById("price").addEventListener("fluid-change", (e) => {
+        console.log(e.detail.min, e.detail.max);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="PriceFilter.tsx"
+    import { useState } from "react";
+    import "@fluid-ds/components/define/range-slider";
+
+    export function PriceFilter() {
+      const [range, setRange] = useState({ min: 200, max: 800 });
+      return (
+        <fluid-range-slider
+          min={0} max={1000} step={10}
+          value-min={range.min} value-max={range.max}
+          onfluid-input={(e: CustomEvent) => setRange(e.detail)}
+        />
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="PriceFilter.vue"
+    <script setup lang="ts">
+    import { ref } from "vue";
+    import "@fluid-ds/components/define/range-slider";
+    const range = ref({ min: 200, max: 800 });
+    </script>
+
+    <template>
+      <fluid-range-slider :min="0" :max="1000" :step="10"
+        :value-min="range.min" :value-max="range.max"
+        @fluid-input="range = $event.detail" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="price-filter.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/range-slider";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-price-filter",
+      template: `
+        <fluid-range-slider [min]="0" [max]="1000" [step]="10"
+          [attr.value-min]="range.min" [attr.value-max]="range.max"
+          (fluid-input)="range = $event.detail"></fluid-range-slider>
+      `
+    })
+    export class PriceFilter {
+      range = { min: 200, max: 800 };
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="PriceFilter.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/range-slider";
+      let range = { min: 200, max: 800 };
+    </script>
+
+    <fluid-range-slider min="0" max="1000" step="10"
+      value-min={range.min} value-max={range.max}
+      on:fluid-input={(e) => (range = e.detail)} />
+    ```
+  </TabItem>
+</Tabs>
+
+## When to use
+
+- Price, date, or numeric **range** filters (between a low and a high bound).
+- Any "from X to Y" selection where both ends are adjustable.
+
+Reach for [`<fluid-slider>`](/components/slider/) when you only need a single
+value, not a span.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-range-slider-*` token
+that falls back to a main semantic var** (the override ladder): the rail, the
+selected-range fill, and the thumbs each have their own token. The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-range-slider-track-color: var(--fluid-surface-muted);
+  --fluid-range-slider-fill-color: var(--fluid-accent-base);
+  --fluid-range-slider-thumb-color: var(--fluid-accent-base);
+}
+```
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api) with `track`, `fill`, `thumb` (both
+thumbs), and the individual `thumb-min` / `thumb-max` parts. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
+not covered by a token.
+
+## API
+
+<ComponentApi tag="fluid-range-slider" />
+
+## Accessibility
+
+Built to the WAI-ARIA APG
+[Multi-Thumb Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider-multithumb/)
+pattern.
+
+- Each thumb is its own `role="slider"` with `aria-valuemin`, `aria-valuemax`,
+  and `aria-valuenow`. The names are **"Minimum"** and **"Maximum"** so screen
+  readers can tell the two apart.
+- The thumbs cannot cross: the minimum thumb's `aria-valuemax` is the current
+  maximum value and the maximum thumb's `aria-valuemin` is the current minimum,
+  so assistive tech always announces the true allowed range.
+- **Keyboard**: Tab moves between thumbs. On a focused thumb, Arrow Right / Up
+  increase and Arrow Left / Down decrease by `step`; Page Up / Page Down move by
+  a larger step; Home / End jump to that thumb's allowed bound.
+- Set `valueFormatter` to surface a human-readable `aria-valuetext` (for
+  example `$200`) on both thumbs.
+
+### AA vs AAA
+
+The thumb pointer-target row reads `--fluid-target-min`, so it grows from the
+AA 24×24 floor to a 44×44 hit area when an ancestor opts into
+`data-fluid-conformance="aaa"`, and the focus ring widens via
+`--fluid-focus-ring-width`. No per-instance change is needed.
+
+## Related
+
+<CardGrid>
+  <LinkCard title="Slider" href="/components/slider/" description="Single-value numeric input." />
+</CardGrid>

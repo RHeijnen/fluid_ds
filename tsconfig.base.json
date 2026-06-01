@@ -17,6 +17,9 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "paths": {
+      "leaflet/dist/leaflet-src.esm.js": ["./types/leaflet-esm.d.ts"]
+    }
   }
 }

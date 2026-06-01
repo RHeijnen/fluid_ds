@@ -4,7 +4,7 @@ import "./define.js";
 import "../button/define.js";
 
 const meta: Meta = {
-  title: "Components/Dialog",
+  title: "Components/Feedback/Dialog",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Observers/Mutation observer",
+  title: "Components/Utilities/Mutation observer",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } }
 };

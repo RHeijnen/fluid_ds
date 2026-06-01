@@ -3,7 +3,7 @@ import { html } from "lit";
 import "./define.js";
 
 const meta: Meta = {
-  title: "Components/Typeahead",
+  title: "Components/Forms/Typeahead",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

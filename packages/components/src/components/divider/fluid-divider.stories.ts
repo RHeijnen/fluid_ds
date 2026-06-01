@@ -6,7 +6,7 @@ import type { FluidDivider } from "./fluid-divider.js";
 type Args = Pick<FluidDivider, "orientation">;
 
 const meta: Meta<Args> = {
-  title: "Components/Divider",
+  title: "Components/Layout/Divider",
   tags: ["autodocs"],
   parameters: {
     status: { type: "experimental" }

@@ -6,7 +6,7 @@ import type { FluidRating } from "./fluid-rating.js";
 type Args = Pick<FluidRating, "value" | "max" | "precision" | "readonly" | "disabled">;
 
 const meta: Meta<Args> = {
-  title: "Components/Rating",
+  title: "Components/Forms/Rating",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
   argTypes: {
