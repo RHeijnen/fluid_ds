@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
           registry-url: "https://registry.npmjs.org"
 
@@ -48,12 +48,12 @@ jobs:
       #   2. If the merge that triggered this run was the Version Packages
       #      PR, run `publish` to push the bumped packages to npm.
       #
-      # We pass `--tag alpha` to keep pre-release versions off the default
-      # dist-tag until we cut a stable line.
+      # Stable packages are published to npm's default `latest` dist-tag.
+      # Prerelease versions remain identifiable by their semver suffix.
       - name: Create release PR or publish
         uses: changesets/action@v1
         with:
-          publish: pnpm exec changeset publish --tag alpha
+          publish: pnpm exec changeset publish --tag latest
           version: pnpm exec changeset version
           commit: "chore(release): version packages"
           title: "chore(release): version packages"
@@ -70,8 +70,7 @@ jobs:
           # alias for any tooling/scripts that look for it.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # npm provenance: requires id-token write permission (declared
-          # above) + the OIDC token from GH Actions. The `provenance: true`
-          # in each package's publishConfig opts us in. Provenance proves
-          # the package was built from a specific commit of this repo.
+          # npm provenance requires the id-token permission declared above
+          # and the OIDC token provided by GitHub Actions. The environment
+          # flag opts every package published by this job into provenance.
           NPM_CONFIG_PROVENANCE: "true"
