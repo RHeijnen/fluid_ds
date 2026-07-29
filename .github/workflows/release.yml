@@ -19,7 +19,7 @@ jobs:
       id-token: write   # needed for npm provenance
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0   # changesets reads tags
 
@@ -27,11 +27,15 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
           cache: pnpm
           registry-url: "https://registry.npmjs.org"
+
+      # npm 11.5.1+ is required for OIDC trusted publishing.
+      - name: Setup npm with trusted publishing support
+        run: npm install --global npm@12.0.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -59,18 +63,3 @@ jobs:
           title: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NPM_TOKEN must be a granular *automation* access token scoped to
-          # the @fluid-ds/* packages with read+write, generated at
-          # https://www.npmjs.com/settings/<user>/tokens, stored under
-          # repo Settings → Secrets and variables → Actions.
-          #
-          # `actions/setup-node` (with registry-url, above) wrote an .npmrc
-          # that reads the token from NODE_AUTH_TOKEN, so that is the variable
-          # npm/changeset actually authenticates with. NPM_TOKEN is kept as an
-          # alias for any tooling/scripts that look for it.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          # npm provenance requires the id-token permission declared above
-          # and the OIDC token provided by GitHub Actions. The environment
-          # flag opts every package published by this job into provenance.
-          NPM_CONFIG_PROVENANCE: "true"
