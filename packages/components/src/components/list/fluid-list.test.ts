@@ -28,6 +28,20 @@ describe("<fluid-list>", () => {
     expect(el.shadowRoot!.querySelector(".base")!.hasAttribute("aria-label")).to.be.false;
   });
 
+  it("honors the --fluid-font-line-height-normal token (no phantom var)", async () => {
+    // The real design-system token must drive line-height; the previously used
+    // --fluid-line-height-normal is a phantom var and would leave this dead.
+    const wrapper = await fixture(html`
+      <div style="font-size: 16px; --fluid-font-line-height-normal: 3;">
+        <fluid-list><fluid-list-item>One</fluid-list-item></fluid-list>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidList>("fluid-list")!;
+    await elementUpdated(el);
+    // 3 (unitless) * 16px font-size => 48px resolved line-height.
+    expect(getComputedStyle(el).lineHeight).to.equal("48px");
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture(html`
       <div
@@ -110,6 +124,21 @@ describe("<fluid-list-item>", () => {
     );
     expect(el.shadowRoot!.querySelector("a.base")).to.exist;
     expect(el.shadowRoot!.querySelector("button.base")).to.be.null;
+  });
+
+  it("honors the --fluid-font-line-height-normal token on the row (no phantom var)", async () => {
+    // Regression: the row previously read phantom --fluid-line-height-normal, so
+    // the design-system token could never retheme it.
+    const wrapper = await fixture(html`
+      <div style="font-size: 16px; --fluid-font-line-height-normal: 3;">
+        <fluid-list-item>One</fluid-list-item>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidListItem>("fluid-list-item")!;
+    await elementUpdated(el);
+    const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
+    // 3 (unitless) * 16px font-size => 48px resolved line-height.
+    expect(getComputedStyle(base).lineHeight).to.equal("48px");
   });
 
   it("exposes leading, description, and trailing slots", async () => {

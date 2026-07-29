@@ -61,6 +61,27 @@ import "@fluid-ds/media/define/lightbox";
 </fluid-lightbox>
 ```
 
+`<fluid-video-playlist>` is driven by its `entries` **property** (a JavaScript
+array, not an HTML attribute), so set it from script after the element upgrades:
+
+```html
+<fluid-video-playlist auto-advance></fluid-video-playlist>
+
+<script type="module">
+  import "@fluid-ds/media/define/video-playlist";
+
+  const playlist = document.querySelector("fluid-video-playlist");
+  playlist.entries = [
+    { src: "/intro.mp4", title: "Intro" },
+    { src: "/chapter-1.mp4", title: "Chapter 1" },
+    { src: "/chapter-2.mp4", title: "Chapter 2" },
+  ];
+</script>
+```
+
+When `auto-advance` is set, the playlist plays the next entry once the current
+one ends.
+
 `<fluid-audio>` wraps a native `<audio>` element for playback but draws its own
 accessible controls (the play button is labelled by state, the scrubber is a
 slider with `aria-valuetext` time, mute toggles `aria-pressed`). `<fluid-lightbox>`
@@ -76,6 +97,10 @@ the system, focus rings, surface colors, control accents, so themes
 flow through without extra work. Each component has its own
 `@cssproperty`-annotated tokens for fine-grained overrides; see the
 generated tables in each component's reference.
+
+`<fluid-video-playlist>` highlights the active entry with
+`--fluid-video-playlist-active-accent`, which falls back to
+`--fluid-accent-base`. The generated token table reflects this fallback.
 
 ## When to use
 

@@ -31,6 +31,22 @@ describe("<fluid-meter>", () => {
     expect(el.getAttribute("aria-label")).to.equal("Score");
   });
 
+  it("derives the accessible name from a slotted label instead of the generic fallback", async () => {
+    const el = await fixture<FluidMeter>(
+      html`<fluid-meter low="33" high="66" optimum="90">Disk usage</fluid-meter>`
+    );
+    await elementUpdated(el);
+    // No `label` attr and no aria-labelledby: the visible slot text must win,
+    // not the generic "Meter" fallback (visible-label / accessible-name match).
+    expect(el.getAttribute("aria-label")).to.equal("Disk usage");
+  });
+
+  it("falls back to 'Meter' only when there is no slotted label and no label prop", async () => {
+    const el = await fixture<FluidMeter>(html`<fluid-meter value="40"></fluid-meter>`);
+    await elementUpdated(el);
+    expect(el.getAttribute("aria-label")).to.equal("Meter");
+  });
+
   it("clamps the value into [min, max]", async () => {
     const el = await fixture<FluidMeter>(
       html`<fluid-meter value="150" min="0" max="100" label="x"></fluid-meter>`

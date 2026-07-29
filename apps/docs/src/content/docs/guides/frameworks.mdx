@@ -34,7 +34,7 @@ canonical reference for the per-framework patterns documented below.
   but the code is identical to consuming the published packages: the native
   demo loads via an import map (point it at the CDN), and the framework apps
   `import "@fluid-ds/..."` exactly as you would after
-  `npm i @fluid-ds/components@alpha`.
+  `npm i @fluid-ds/components@latest`.
 </Aside>
 
 ---
@@ -286,11 +286,11 @@ npm install required. This is handy for prototypes, framework
 documentation embedded examples, or storybooks.
 
 ```html title="index.html, same as a vanilla app"
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
 ```
 
 The framework still owns the rest of the page; it just renders against

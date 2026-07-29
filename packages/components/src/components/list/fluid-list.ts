@@ -30,6 +30,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @uses-token --fluid-surface-base - Surface background.
  * @uses-token --fluid-text-primary - Primary text color.
+ * @uses-token --fluid-font-line-height-normal - Surface text line-height.
  * @uses-token --fluid-border-default - Outer border and dividers.
  * @uses-token --fluid-radius-md - Outer corner radius.
  */
@@ -40,7 +41,7 @@ export class FluidList extends FluidElement {
       :host {
         display: block;
         font-family: var(--fluid-font-family-sans);
-        line-height: var(--fluid-line-height-normal, 1.5);
+        line-height: var(--fluid-font-line-height-normal, 1.5);
         color: var(--fluid-list-fg, var(--fluid-text-primary));
       }
 

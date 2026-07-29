@@ -12,8 +12,12 @@ import { Aside } from "@astrojs/starlight/components";
 
 <Aside type="note">
   Leaflet needs its global stylesheet and a sized container, neither of which
-  works inside shadow DOM, so `<fluid-map>` renders in LIGHT DOM. Its module
-  imports `leaflet/dist/leaflet.css` for you, you only need `leaflet` installed.
+  works inside shadow DOM, so `<fluid-map>` renders in LIGHT DOM. The component
+  injects Leaflet's stylesheet once from the CDN (unpkg) at runtime as a `<link>`
+  on the document head, so no bundler CSS handling is required: you only need
+  `leaflet` installed. To self-host instead, add your own Leaflet stylesheet
+  `<link>` (or one carrying `data-fluid-map-leaflet-css`) before the element
+  upgrades, and the auto-load is skipped.
 </Aside>
 
 ## Install
@@ -63,13 +67,82 @@ import "@fluid-ds/map/define/map";
 update the property and the map re-syncs in place. The container is a labelled
 `role="region"`, so give every map a meaningful `label`.
 
+## Custom markers
+
+Each marker can be a plain pin, a semantic **tone** pin, or a fully **custom
+icon** (an image or any HTML / emoji). Precedence is `icon` > `tone` > default
+pin.
+
+### Semantic tone pins
+
+Give a marker a `tone` (`info` / `success` / `warning` / `danger` / `neutral`)
+to render a coloured Fluid pin. Tones read the semantic tokens
+(`--fluid-info-base`, `--fluid-danger-base`, etc.), so they re-tint with the
+active theme and brand:
+
+```ts
+map.markers = [
+  { lat: 51.505, lng: -0.09, label: "All good", tone: "success" },
+  { lat: 51.51, lng: -0.1, label: "Heads up", tone: "warning" },
+  { lat: 51.5, lng: -0.08, label: "Problem", tone: "danger" }
+];
+```
+
+### Custom image icons
+
+Point `icon.iconUrl` at any image (PNG, SVG, or a data URI). `iconAnchor` is the
+pixel of the image that sits on the coordinate and defaults to the bottom centre
+(the classic "pin tip"):
+
+```ts
+map.markers = [
+  {
+    lat: 51.505,
+    lng: -0.09,
+    label: "Head office",
+    icon: {
+      iconUrl: "/markers/office.png",
+      iconRetinaUrl: "/markers/office@2x.png", // optional
+      iconSize: [32, 40],
+      iconAnchor: [16, 40] // bottom centre
+    }
+  }
+];
+```
+
+### HTML / emoji icons
+
+Pass `icon.html` for an emoji, inline SVG, or styled element (rendered via
+Leaflet's `divIcon`). It defaults to a transparent, centred box anchored at its
+centre:
+
+```ts
+map.markers = [
+  { lat: 51.505, lng: -0.09, label: "Coffee", icon: { html: "☕" } },
+  { lat: 51.51, lng: -0.1, label: "Star", icon: { html: "⭐", iconSize: [40, 40] } },
+  {
+    lat: 51.5,
+    lng: -0.08,
+    icon: {
+      html: '<span style="font-size:28px">🏠</span>',
+      iconSize: [32, 32],
+      className: "" // drop the default wrapper class for full control
+    }
+  }
+];
+```
+
+The HTML wrapper carries the `fluid-map-marker` class (transparent, centred);
+override it with your own `className`, or pass `className: ""` for Leaflet's bare
+div.
+
 ### Properties
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `center` | - | `[number, number]` | `[51.505, -0.09]` | Map center as `[lat, lng]`. |
 | `zoom` | `zoom` | `number` | `13` | Zoom level. |
-| `markers` | - | `{ lat, lng, label? }[]` | `[]` | Markers to place. A `label` becomes a popup + tooltip. |
+| `markers` | - | `{ lat, lng, label?, tone?, icon? }[]` | `[]` | Markers to place. `label` becomes a popup + tooltip; `tone` renders a coloured Fluid pin; `icon` is a fully custom image or HTML / emoji marker (wins over `tone`). |
 | `tileUrl` | `tile-url` | `string` | OpenStreetMap tiles | Tile layer URL template. |
 | `attribution` | `attribution` | `string` | OpenStreetMap credit | Tile attribution (HTML allowed). |
 | `label` | `label` | `string` | `"Map"` | Accessible name for the map region. |

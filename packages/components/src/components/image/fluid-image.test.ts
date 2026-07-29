@@ -71,6 +71,37 @@ describe("<fluid-image>", () => {
     expect(el.shadowRoot!.querySelector('slot[name="fallback"]')).to.exist;
   });
 
+  it("exposes a distinct part='fallback' (not part='img') on the error wrapper", async () => {
+    const el = await fixture<FluidImage>(
+      html`<fluid-image src=${badSrc} alt="Test"
+        ><span slot="fallback">nope</span></fluid-image
+      >`
+    );
+    await oneEvent(el, "fluid-error");
+    await elementUpdated(el);
+    // The error wrapper carries its own part name...
+    const fallback = el.shadowRoot!.querySelector('[part="fallback"]');
+    expect(fallback).to.exist;
+    expect(fallback!.querySelector('slot[name="fallback"]')).to.exist;
+    // ...so a consumer's ::part(img) rule never hits the fallback box.
+    expect(el.shadowRoot!.querySelector('[part="img"]')).to.not.exist;
+  });
+
+  it("collapses the load fade under reduced motion (--fluid-motion:0)", async () => {
+    const el = await fixture<FluidImage>(html`
+      <div style="--fluid-motion:0;">
+        <fluid-image src=${okSrc} alt="Test"></fluid-image>
+      </div>
+    `);
+    const image = el.querySelector<FluidImage>("fluid-image")!;
+    await elementUpdated(image);
+    const img = image.shadowRoot!.querySelector<HTMLImageElement>("img")!;
+    const duration = getComputedStyle(img).transitionDuration;
+    // calc(... * 0) collapses the fade to 0s.
+    const ms = parseFloat(duration) * (duration.endsWith("ms") ? 1 : 1000);
+    expect(ms).to.be.closeTo(0, 1);
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture<FluidImage>(html`
       <div

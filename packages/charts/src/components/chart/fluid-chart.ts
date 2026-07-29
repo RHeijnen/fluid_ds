@@ -69,12 +69,14 @@ interface FluidTheme {
  * @cssproperty --fluid-chart-height - Default height of the chart. Falls back to 16rem.
  *
  * @uses-token --fluid-accent-base - Primary series + area-fill gradient.
+ * @uses-token --fluid-color-brand-200 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-300 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-400 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-500 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-600 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-700 - Categorical series palette (brand ramp).
  * @uses-token --fluid-color-brand-800 - Categorical series palette (brand ramp).
+ * @uses-token --fluid-color-brand-900 - Categorical series palette (brand ramp).
  * @uses-token --fluid-text-primary - Legend text + tooltip foreground.
  * @uses-token --fluid-text-secondary - Axis ticks + default text color.
  * @uses-token --fluid-border-default - Grid lines + axis borders.

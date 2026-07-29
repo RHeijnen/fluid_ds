@@ -189,6 +189,7 @@ export class FluidPopconfirm extends FluidElement {
   @query(".panel") private panelEl!: HTMLElement;
   @query(".arrow") private arrowEl!: HTMLElement;
   @query(".cancel") private cancelEl?: HTMLElement;
+  @query(".confirm") private confirmEl?: HTMLElement;
 
   /** Open state. */
   @property({ type: Boolean, reflect: true }) open = false;
@@ -219,6 +220,7 @@ export class FluidPopconfirm extends FluidElement {
   private trigger: HTMLElement | null = null;
   private cleanup?: () => void;
   private previouslyFocused: HTMLElement | null = null;
+  private hasOpened = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -239,8 +241,15 @@ export class FluidPopconfirm extends FluidElement {
 
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
-      if (this.open) void this.handleOpen();
-      else this.handleClose();
+      if (this.open) {
+        this.hasOpened = true;
+        void this.handleOpen();
+      } else if (this.hasOpened) {
+        // Only close on a genuine open->closed transition. Lit reports the
+        // default open=false as 'changed' on the first updated(); without this
+        // guard every popconfirm would emit a spurious fluid-hide on mount.
+        this.handleClose();
+      }
     }
   }
 
@@ -345,11 +354,40 @@ export class FluidPopconfirm extends FluidElement {
   };
 
   private handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape" && this.open) {
+    if (!this.open) return;
+    if (e.key === "Escape") {
       e.stopPropagation();
       this.cancel();
+    } else if (e.key === "Tab") {
+      this.trapFocus(e);
     }
   };
+
+  /**
+   * Keep keyboard focus inside the panel while open. The panel is
+   * role="alertdialog" aria-modal="true", so per the WAI-ARIA APG Alert Dialog
+   * pattern Tab/Shift+Tab must wrap between the first and last focusable
+   * controls (Cancel/Confirm) rather than walking out into the page behind it.
+   */
+  private trapFocus(e: KeyboardEvent): void {
+    const focusables = [this.cancelEl, this.confirmEl].filter(
+      (el): el is HTMLElement => !!el
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0]!;
+    const last = focusables[focusables.length - 1]!;
+    const active = (this.getRootNode() as Document | ShadowRoot)
+      .activeElement as HTMLElement | null;
+    if (e.shiftKey) {
+      if (active === first || !active || !focusables.includes(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else if (active === last || !active || !focusables.includes(active)) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
 
   private confirm = () => {
     if (!this.open) return;

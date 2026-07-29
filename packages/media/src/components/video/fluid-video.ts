@@ -98,7 +98,7 @@ export class FluidVideo extends LitElement {
         ?controls=${this.controls}
         ?autoplay=${this.autoplay}
         ?loop=${this.loop}
-        ?muted=${this.muted}
+        .muted=${this.muted}
         ?playsinline=${this.playsInline}
         preload=${this.preload}
         @play=${this.onPlay}

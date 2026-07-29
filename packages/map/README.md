@@ -2,7 +2,7 @@
 
 Themed map web component for Fluid (expansion pack): a Leaflet wrapper with markers, framework-agnostic.
 
-> Alpha. Install with `npm i @fluid-ds/map@alpha`.
+Install with `npm i @fluid-ds/map@latest`.
 
 ## License
 

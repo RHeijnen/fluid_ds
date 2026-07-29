@@ -93,6 +93,51 @@ describe("<fluid-form>", () => {
     expect(input.value).to.equal("Ada");
   });
 
+  it("clicking a type=reset action button restores controls to their initial values", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="first" value="Ada" />
+        <button slot="actions" type="reset">Reset</button>
+      </fluid-form>
+    `);
+    const input = el.querySelector<HTMLInputElement>("input")!;
+    input.value = "Grace";
+    el.querySelector<HTMLButtonElement>("button[type='reset']")!.click();
+    expect(input.value).to.equal("Ada");
+  });
+
+  it("pressing Enter in a text input emits fluid-submit", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="first" value="Ada" />
+      </fluid-form>
+    `);
+    const input = el.querySelector<HTMLInputElement>("input")!;
+    setTimeout(() =>
+      input.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+      )
+    );
+    const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
+    expect(event.detail.values).to.deep.equal({ first: "Ada" });
+  });
+
+  it("does not fire fluid-submit from a former submit button after removal", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="first" value="Ada" />
+        <button slot="actions" type="submit">Go</button>
+      </fluid-form>
+    `);
+    const button = el.querySelector<HTMLButtonElement>("button")!;
+    let submitted = false;
+    el.addEventListener("fluid-submit", () => (submitted = true));
+    el.remove();
+    button.click();
+    await aTimeout(20);
+    expect(submitted).to.be.false;
+  });
+
   it("checkValidity() reflects child control validity", async () => {
     const el = await fixture<FluidForm>(html`
       <fluid-form>

@@ -18,6 +18,40 @@ describe("<fluid-file-input>", () => {
     expect(clicked).to.be.true;
   });
 
+  it("the visible drop zone is the keyboard focus target", async () => {
+    const el = await fixture<FluidFileInput>(html`<fluid-file-input></fluid-file-input>`);
+    const zone = el.shadowRoot!.querySelector<HTMLElement>(".dropzone")!;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    // The styled label is in the tab order; the 1px hidden input is removed from it.
+    expect(zone.getAttribute("tabindex")).to.equal("0");
+    expect(zone.getAttribute("role")).to.equal("button");
+    expect(input.getAttribute("tabindex")).to.equal("-1");
+    el.focus();
+    expect(el.shadowRoot!.activeElement).to.equal(zone);
+  });
+
+  it("Enter and Space on the drop zone activate the file input", async () => {
+    const el = await fixture<FluidFileInput>(html`<fluid-file-input></fluid-file-input>`);
+    const zone = el.shadowRoot!.querySelector<HTMLElement>(".dropzone")!;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    let clicks = 0;
+    input.addEventListener("click", () => (clicks += 1));
+    zone.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    zone.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    expect(clicks).to.equal(2);
+  });
+
+  it("disabled drops the drop zone out of the tab order and ignores keys", async () => {
+    const el = await fixture<FluidFileInput>(html`<fluid-file-input disabled></fluid-file-input>`);
+    const zone = el.shadowRoot!.querySelector<HTMLElement>(".dropzone")!;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    expect(zone.getAttribute("tabindex")).to.equal("-1");
+    let clicked = false;
+    input.addEventListener("click", () => (clicked = true));
+    zone.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(clicked).to.be.false;
+  });
+
   it("emits fluid-change when files are dropped", async () => {
     const el = await fixture<FluidFileInput>(
       html`<fluid-file-input multiple></fluid-file-input>`

@@ -22,7 +22,7 @@ export class FluidFormatBytes extends FluidElement {
   /** The byte count to format. */
   @property({ type: Number }) value = 0;
 
-  /** Use binary (1024) or decimal (1000) units. */
+  /** Measure in bytes or bits. */
   @property() unit: "byte" | "bit" = "byte";
 
   /** Notation style. */
@@ -35,26 +35,73 @@ export class FluidFormatBytes extends FluidElement {
   @property() base: "binary" | "decimal" = "decimal";
 
   override render(): TemplateResult {
-    const factor = this.base === "binary" ? 1024 : 1000;
+    return html`${this.base === "binary"
+      ? this.formatBinary()
+      : this.formatDecimal()}`;
+  }
+
+  /** Decimal (SI) base: 1000-based with locale-aware Intl unit names. */
+  private formatDecimal(): string {
     const units =
       this.unit === "bit"
         ? ["bit", "kilobit", "megabit", "gigabit", "terabit"]
         : ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"];
     let value = Math.abs(this.value);
     let i = 0;
-    while (value >= factor && i < units.length - 1) {
-      value /= factor;
+    while (value >= 1000 && i < units.length - 1) {
+      value /= 1000;
       i++;
     }
     const sign = this.value < 0 ? -1 : 1;
     const unit = units[i];
-    if (!unit) return html``;
+    if (!unit) return "";
     const formatter = new Intl.NumberFormat(this.locale ?? undefined, {
       style: "unit",
       unit,
       unitDisplay: this.display,
       maximumFractionDigits: i === 0 ? 0 : 1
     });
-    return html`${formatter.format(sign * value)}`;
+    return formatter.format(sign * value);
+  }
+
+  /**
+   * Binary (IEC) base: 1024-based. `Intl.NumberFormat` has no kibibyte/
+   * mebibyte units, so the number is formatted plainly (locale-aware) and an
+   * honest IEC suffix (KiB, MiB, Kibit, ...) is appended by hand.
+   */
+  private formatBinary(): string {
+    const isBit = this.unit === "bit";
+    // [short, long, narrow] suffix per magnitude (index 0 = base unit).
+    const table: ReadonlyArray<readonly [string, string, string]> = isBit
+      ? [
+          ["bit", "bits", "bit"],
+          ["Kibit", "kibibits", "Kibit"],
+          ["Mibit", "mebibits", "Mibit"],
+          ["Gibit", "gibibits", "Gibit"],
+          ["Tibit", "tebibits", "Tibit"]
+        ]
+      : [
+          ["B", "bytes", "B"],
+          ["KiB", "kibibytes", "KiB"],
+          ["MiB", "mebibytes", "MiB"],
+          ["GiB", "gibibytes", "GiB"],
+          ["TiB", "tebibytes", "TiB"]
+        ];
+    let value = Math.abs(this.value);
+    let i = 0;
+    while (value >= 1024 && i < table.length - 1) {
+      value /= 1024;
+      i++;
+    }
+    const sign = this.value < 0 ? -1 : 1;
+    const row = table[i];
+    if (!row) return "";
+    const suffix = this.display === "long" ? row[1] : this.display === "narrow" ? row[2] : row[0];
+    const formatter = new Intl.NumberFormat(this.locale ?? undefined, {
+      maximumFractionDigits: i === 0 ? 0 : 1
+    });
+    const num = formatter.format(sign * value);
+    // Narrow display omits the space, matching Intl's "narrow" unit style.
+    return this.display === "narrow" ? `${num}${suffix}` : `${num} ${suffix}`;
   }
 }

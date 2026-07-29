@@ -85,4 +85,17 @@ describe("<fluid-rating>", () => {
     const star = el.shadowRoot!.querySelector<HTMLElement>(".star")!;
     expect(star.getBoundingClientRect().width).to.be.greaterThanOrEqual(44);
   });
+
+  it("spreads the reduced-motion guard so the hover-scale transition collapses", async () => {
+    const el = await fixture<FluidRating>(html`<fluid-rating></fluid-rating>`);
+    await el.updateComplete;
+    // The shared `reducedMotion` fragment must be adopted into the shadow root
+    // so `prefers-reduced-motion: reduce` neutralizes the .star hover-scale
+    // transition. Assert the guard rule is present in the component's styles.
+    const cssText = el.shadowRoot!.adoptedStyleSheets
+      .flatMap((sheet) => Array.from(sheet.cssRules, (rule) => rule.cssText))
+      .join("\n");
+    expect(cssText).to.match(/prefers-reduced-motion:\s*reduce/);
+    expect(cssText).to.match(/transition-duration:\s*0\.01ms/);
+  });
 });

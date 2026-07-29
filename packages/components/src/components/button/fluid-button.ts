@@ -511,6 +511,14 @@ export class FluidButton extends FluidElement {
       .button:active:not([aria-disabled="true"]) {
         transform: none;
       }
+      /*
+       * The loading spinner is an infinite rotation: vestibular-sensitive
+       * users should not get a fast continuous spin. Slow it down markedly
+       * so it still communicates "busy" without the rapid motion.
+       */
+      .spinner {
+        animation-duration: 1.5s;
+      }
     }
   `;
 

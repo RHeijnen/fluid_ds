@@ -9,9 +9,20 @@ describe("<fluid-kbd>", () => {
     expect(el.textContent?.trim()).to.equal("Ctrl");
   });
 
+  it("defaults size to md", async () => {
+    const el = await fixture<FluidKbd>(html`<fluid-kbd>K</fluid-kbd>`);
+    expect(el.size).to.equal("md");
+  });
+
   it("reflects size", async () => {
     const el = await fixture<FluidKbd>(html`<fluid-kbd size="lg">K</fluid-kbd>`);
     expect(el.getAttribute("size")).to.equal("lg");
+  });
+
+  it("reflects size sm", async () => {
+    const el = await fixture<FluidKbd>(html`<fluid-kbd size="sm">K</fluid-kbd>`);
+    expect(el.size).to.equal("sm");
+    expect(el.getAttribute("size")).to.equal("sm");
   });
 
   it("passes the a11y audit", async () => {

@@ -5,6 +5,8 @@ import {
   fireworks,
   emojiBurst,
   emojiRain,
+  emojiFountain,
+  bubbles,
   snow,
   sparkles,
   streamers,
@@ -60,6 +62,8 @@ const oneShot: ButtonSpec[] = [
 const ambient: ButtonSpec[] = [
   { label: "❄️ Snow", fire: () => snow(), ambient: true },
   { label: "🌧️ Emoji rain", fire: () => emojiRain(), ambient: true },
+  { label: "⛲ Emoji fountain", fire: (o) => emojiFountain({ origin: o }), ambient: true },
+  { label: "🫧 Bubbles", fire: () => bubbles(), ambient: true },
   { label: "✨ Sparkles", fire: (o) => sparkles({ origin: o }), ambient: true }
 ];
 
@@ -67,8 +71,8 @@ function makeButton(spec: ButtonSpec): HTMLButtonElement {
   const btn = document.createElement("button");
   btn.textContent = spec.label;
   btn.style.cssText =
-    "padding:.6rem 1rem;border-radius:.5rem;border:1px solid var(--fluid-border-base,#d4d4d8);" +
-    "background:var(--fluid-surface-raised,#fff);color:var(--fluid-text-base,#18181b);" +
+    "padding:.6rem 1rem;border-radius:.5rem;border:1px solid var(--fluid-border-default,#d4d4d8);" +
+    "background:var(--fluid-surface-base,#fff);color:var(--fluid-text-primary,#18181b);" +
     "font:inherit;cursor:pointer;";
   let handle: EffectHandle | undefined;
   btn.addEventListener("click", () => {

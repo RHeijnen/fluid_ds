@@ -27,7 +27,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-comparison-handle-fg - Handle icon color.
  * @cssproperty --fluid-comparison-focus-ring - Focus ring color.
  *
- * @uses-token --fluid-color-primary - Default divider color.
+ * @uses-token --fluid-accent-base - Default divider color.
  * @uses-token --fluid-surface-base - Default handle background.
  * @uses-token --fluid-focus-ring-color - Focus ring.
  *
@@ -70,7 +70,7 @@ export class FluidComparison extends FluidElement {
       bottom: 0;
       left: calc(var(--_pos) * 1%);
       width: 2px;
-      background: var(--fluid-comparison-divider-color, var(--fluid-color-primary));
+      background: var(--fluid-comparison-divider-color, var(--fluid-accent-base));
       transform: translateX(-1px);
       pointer-events: none;
     }
@@ -84,12 +84,12 @@ export class FluidComparison extends FluidElement {
       height: 2.5rem;
       border-radius: 50%;
       background: var(--fluid-comparison-handle-bg, var(--fluid-surface-base));
-      border: 2px solid var(--fluid-comparison-divider-color, var(--fluid-color-primary));
+      border: 2px solid var(--fluid-comparison-divider-color, var(--fluid-accent-base));
       cursor: ew-resize;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--fluid-comparison-handle-fg, var(--fluid-color-primary));
+      color: var(--fluid-comparison-handle-fg, var(--fluid-accent-base));
       box-shadow: var(--fluid-shadow-md);
       touch-action: none;
     }

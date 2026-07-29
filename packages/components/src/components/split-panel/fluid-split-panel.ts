@@ -26,7 +26,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-border-default - Default divider color.
  * @uses-token --fluid-focus-ring-color - Focus ring on the divider.
  *
- * @fires fluid-reposition - Fired while the user drags the divider; detail = { position }.
+ * @fires fluid-reposition - Fired whenever the split changes (pointer drag or keyboard); detail = { position }.
  */
 export class FluidSplitPanel extends FluidElement {
   static override styles = css`
@@ -59,7 +59,7 @@ export class FluidSplitPanel extends FluidElement {
     }
     .divider:hover,
     .divider[data-dragging] {
-      background: var(--fluid-split-divider-active-color, var(--fluid-color-primary, var(--fluid-border-strong)));
+      background: var(--fluid-split-divider-active-color, var(--fluid-accent-base, var(--fluid-border-strong)));
     }
     .divider:focus-visible {
       outline: 2px solid var(--fluid-split-divider-focus-ring, var(--fluid-focus-ring-color));
@@ -88,12 +88,33 @@ export class FluidSplitPanel extends FluidElement {
   /** Max position percent. */
   @property({ type: Number, attribute: "max-position" }) maxPosition = 100;
 
+  /** Accessible name for the divider, announced by screen readers. */
+  @property() label = "Resize panels";
+
   @query(".divider") private divider!: HTMLDivElement;
 
   @state() private dragging = false;
 
   private clamp(p: number) {
     return Math.min(this.maxPosition, Math.max(this.minPosition, p));
+  }
+
+  /**
+   * Clamp, assign, and (only when the value actually changes) fire
+   * `fluid-reposition`. Shared by the pointer-drag and keyboard paths so both
+   * emit the event, as the docs promise.
+   */
+  private setPosition(next: number) {
+    const clamped = this.clamp(next);
+    if (clamped === this.position) return;
+    this.position = clamped;
+    this.dispatchEvent(
+      new CustomEvent("fluid-reposition", {
+        detail: { position: clamped },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private onPointerDown = (e: PointerEvent) => {
@@ -110,17 +131,7 @@ export class FluidSplitPanel extends FluidElement {
       this.orientation === "vertical"
         ? ((e.clientY - rect.top) / rect.height) * 100
         : ((e.clientX - rect.left) / rect.width) * 100;
-    const next = this.clamp(pct);
-    if (next !== this.position) {
-      this.position = next;
-      this.dispatchEvent(
-        new CustomEvent("fluid-reposition", {
-          detail: { position: next },
-          bubbles: true,
-          composed: true
-        })
-      );
-    }
+    this.setPosition(pct);
   };
 
   private onPointerUp = (e: PointerEvent) => {
@@ -137,16 +148,16 @@ export class FluidSplitPanel extends FluidElement {
     const increment = this.orientation === "vertical" ? "ArrowDown" : "ArrowRight";
     if (e.key === decrement) {
       e.preventDefault();
-      this.position = this.clamp(this.position - step);
+      this.setPosition(this.position - step);
     } else if (e.key === increment) {
       e.preventDefault();
-      this.position = this.clamp(this.position + step);
+      this.setPosition(this.position + step);
     } else if (e.key === "Home") {
       e.preventDefault();
-      this.position = this.clamp(this.minPosition);
+      this.setPosition(this.minPosition);
     } else if (e.key === "End") {
       e.preventDefault();
-      this.position = this.clamp(this.maxPosition);
+      this.setPosition(this.maxPosition);
     }
   };
 
@@ -163,6 +174,7 @@ export class FluidSplitPanel extends FluidElement {
         class="divider"
         role="separator"
         tabindex=${this.disabled ? -1 : 0}
+        aria-label=${this.label}
         aria-orientation=${this.orientation === "vertical" ? "horizontal" : "vertical"}
         aria-valuemin=${this.minPosition}
         aria-valuemax=${this.maxPosition}

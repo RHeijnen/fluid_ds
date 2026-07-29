@@ -116,4 +116,38 @@ describe("<fluid-dropdown>", () => {
     await sep.updateComplete;
     expect(sep.getBoundingClientRect().height).to.be.lessThan(44);
   });
+
+  /* Lifecycle: disconnect must tear down the document listener + autoUpdate. */
+
+  it("disconnect tears down outside-click handling and autoUpdate cleanup", async () => {
+    const el = await fixture<FluidDropdown>(sample);
+    el.open = true;
+    await el.updateComplete;
+    await aTimeout(40);
+    expect(el.open).to.be.true;
+
+    // autoUpdate returned a cleanup that the component stored privately; wrap it
+    // so we can assert disconnect invokes it.
+    let cleanupCalls = 0;
+    const original = (el as unknown as { cleanup?: () => void }).cleanup;
+    expect(original, "autoUpdate cleanup should be registered while open").to.be.a("function");
+    (el as unknown as { cleanup?: () => void }).cleanup = () => {
+      cleanupCalls += 1;
+      original?.();
+    };
+
+    el.remove();
+
+    // (b) autoUpdate's cleanup ran on disconnect.
+    expect(cleanupCalls).to.be.greaterThan(0);
+
+    // (a) the captured document pointerdown listener was removed. If it were
+    // still registered, this pointerdown (its path excludes the detached
+    // element + trigger) would invoke handleOutsideClick -> hide(), flipping
+    // open to false. It stays true, proving the listener is gone, and nothing
+    // throws.
+    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
+    await aTimeout(20);
+    expect(el.open, "outside-click listener should be removed on disconnect").to.be.true;
+  });
 });

@@ -179,7 +179,16 @@ export class FluidNumberInput extends FluidFormAssociated {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      /*
+       * Each stepper must stay a real pointer target (SC 2.5.8 AA = 24px,
+       * SC 2.5.5 AAA = 44px). Two steppers stack and split the field height,
+       * so its own min-height reads the --fluid-target-min floor (no /2): the
+       * column then grows to fit both, lifting the field under AAA. Width
+       * likewise floors to the target so it never drops below the design 28px.
+       */
       width: 1.75rem;
+      min-width: max(1.75rem, var(--fluid-target-min, 0px));
+      min-height: var(--fluid-target-min, 0px);
       flex: 1 1 0;
       cursor: pointer;
       color: var(--fluid-number-input-stepper-fg, var(--fluid-text-secondary));

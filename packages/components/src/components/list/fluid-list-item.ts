@@ -44,6 +44,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-list-item-padding - Row inner padding. Falls back to --fluid-space-3.
  *
  * @uses-token --fluid-text-primary - Primary text color.
+ * @uses-token --fluid-font-line-height-normal - Row text line-height.
  * @uses-token --fluid-text-secondary - Description text color.
  * @uses-token --fluid-surface-muted - Hover/focus background.
  * @uses-token --fluid-radius-sm - Row corner radius.
@@ -86,7 +87,7 @@ export class FluidListItem extends FluidElement {
         color: var(--fluid-list-item-fg, var(--fluid-text-primary));
         font-family: inherit;
         font-size: var(--fluid-font-size-sm);
-        line-height: var(--fluid-line-height-normal, 1.5);
+        line-height: var(--fluid-font-line-height-normal, 1.5);
         text-align: left;
         text-decoration: none;
       }

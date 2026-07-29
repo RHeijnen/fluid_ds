@@ -4,6 +4,10 @@ import "../bar-chart/define.js";
 import "../line-chart/define.js";
 import "../pie-chart/define.js";
 import "../doughnut-chart/define.js";
+import "../scatter-chart/define.js";
+import "../bubble-chart/define.js";
+import "../radar-chart/define.js";
+import "../polar-area-chart/define.js";
 import "../sparkline/define.js";
 
 /**
@@ -69,6 +73,79 @@ export const Doughnut: Story = {
           datasets: [{ data: [12, 7, 24] }]
         }}
       ></fluid-doughnut-chart>
+    </div>
+  `
+};
+
+export const Scatter: Story = {
+  render: () => html`
+    <div style="height: 16rem; max-width: 32rem;">
+      <fluid-scatter-chart
+        .data=${{
+          datasets: [
+            {
+              label: "Sessions",
+              data: [
+                { x: 12, y: 19 },
+                { x: 18, y: 24 },
+                { x: 24, y: 14 },
+                { x: 31, y: 36 },
+                { x: 36, y: 28 },
+                { x: 42, y: 41 }
+              ]
+            }
+          ]
+        }}
+      ></fluid-scatter-chart>
+    </div>
+  `
+};
+
+export const Bubble: Story = {
+  render: () => html`
+    <div style="height: 16rem; max-width: 32rem;">
+      <fluid-bubble-chart
+        .data=${{
+          datasets: [
+            {
+              label: "Accounts",
+              data: [
+                { x: 12, y: 19, r: 8 },
+                { x: 18, y: 24, r: 14 },
+                { x: 24, y: 14, r: 6 },
+                { x: 31, y: 36, r: 18 },
+                { x: 36, y: 28, r: 10 }
+              ]
+            }
+          ]
+        }}
+      ></fluid-bubble-chart>
+    </div>
+  `
+};
+
+export const Radar: Story = {
+  render: () => html`
+    <div style="height: 16rem; max-width: 22rem;">
+      <fluid-radar-chart
+        .data=${{
+          labels: ["Speed", "Reliability", "Comfort", "Safety", "Efficiency", "Price"],
+          datasets: [{ label: "Model A", data: [65, 80, 70, 90, 60, 75] }]
+        }}
+      ></fluid-radar-chart>
+    </div>
+  `
+};
+
+export const PolarArea: Story = {
+  render: () => html`
+    <div style="height: 16rem; max-width: 22rem;">
+      <fluid-polar-area-chart
+        .data=${{
+          labels: ["Direct", "Referral", "Social", "Email", "Organic"],
+          datasets: [{ data: [38, 24, 22, 16, 30] }]
+        }}
+      ></fluid-polar-area-chart>
     </div>
   `
 };

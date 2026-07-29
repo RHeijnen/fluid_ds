@@ -144,6 +144,63 @@ describe("<fluid-dropzone>", () => {
     expect(zone.classList.contains("dragover")).to.be.true;
   });
 
+  it("revokes the thumbnail object URL when an image file is removed", async () => {
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const origCreate = URL.createObjectURL;
+    const origRevoke = URL.revokeObjectURL;
+    let counter = 0;
+    URL.createObjectURL = () => {
+      const url = `blob:mock-${(counter += 1)}`;
+      created.push(url);
+      return url;
+    };
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+    };
+    try {
+      const el = await fixture<FluidDropzone>(html`<fluid-dropzone></fluid-dropzone>`);
+      dropFiles(el, [makeFile("photo.png", "image/png", 10)]);
+      await elementUpdated(el);
+      expect(created).to.have.lengthOf(1);
+      const remove = el.shadowRoot!.querySelector<HTMLButtonElement>(".remove")!;
+      remove.click();
+      await elementUpdated(el);
+      expect(revoked).to.include(created[0]);
+    } finally {
+      URL.createObjectURL = origCreate;
+      URL.revokeObjectURL = origRevoke;
+    }
+  });
+
+  it("revokes outstanding thumbnail object URLs on disconnect", async () => {
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const origCreate = URL.createObjectURL;
+    const origRevoke = URL.revokeObjectURL;
+    let counter = 0;
+    URL.createObjectURL = () => {
+      const url = `blob:mock-${(counter += 1)}`;
+      created.push(url);
+      return url;
+    };
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+    };
+    try {
+      const el = await fixture<FluidDropzone>(html`<fluid-dropzone></fluid-dropzone>`);
+      dropFiles(el, [makeFile("photo.png", "image/png", 10)]);
+      await elementUpdated(el);
+      expect(created).to.have.lengthOf(1);
+      // Remove before the image ever fires `load`: the URL must still be freed.
+      el.remove();
+      expect(revoked).to.include(created[0]);
+    } finally {
+      URL.createObjectURL = origCreate;
+      URL.revokeObjectURL = origRevoke;
+    }
+  });
+
   it("passes a11y audit", async () => {
     const wrapper = await fixture(html`
       <div style=${TOKENS}>

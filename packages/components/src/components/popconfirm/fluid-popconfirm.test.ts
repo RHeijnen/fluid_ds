@@ -101,6 +101,53 @@ describe("<fluid-popconfirm>", () => {
     expect(el.shadowRoot!.querySelector(".cancel")!.textContent?.trim()).to.equal("Nope");
   });
 
+  it("does not fire fluid-hide on initial mount of a closed popconfirm", async () => {
+    let hideFired = false;
+    const el = await fixture<FluidPopconfirm>(html`
+      <fluid-popconfirm><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
+    `);
+    el.addEventListener("fluid-hide", () => {
+      hideFired = true;
+    });
+    // Force the first updated() with the default open=false to flush.
+    await elementUpdated(el);
+    await aTimeout(20);
+    expect(hideFired).to.be.false;
+  });
+
+  it("fires fluid-hide on a genuine open->closed transition", async () => {
+    const el = await fixture<FluidPopconfirm>(html`
+      <fluid-popconfirm><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
+    `);
+    await open(el);
+    setTimeout(() => el.hide());
+    await oneEvent(el, "fluid-hide");
+    expect(el.open).to.be.false;
+  });
+
+  it("traps Tab focus inside the modal alertdialog", async () => {
+    const el = await fixture<FluidPopconfirm>(html`
+      <fluid-popconfirm><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
+    `);
+    await open(el);
+    const cancel = el.shadowRoot!.querySelector<HTMLElement>(".cancel")!;
+    const confirm = el.shadowRoot!.querySelector<HTMLElement>(".confirm")!;
+
+    // From the last control, Tab wraps back to the first (Cancel).
+    confirm.focus();
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+    await elementUpdated(el);
+    expect(el.shadowRoot!.activeElement).to.equal(cancel);
+
+    // From the first control, Shift+Tab wraps to the last (Confirm).
+    cancel.focus();
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true })
+    );
+    await elementUpdated(el);
+    expect(el.shadowRoot!.activeElement).to.equal(confirm);
+  });
+
   it("passes a11y audit when open", async () => {
     const wrapper = await fixture<HTMLDivElement>(html`
       <div style=${TOKENS}>

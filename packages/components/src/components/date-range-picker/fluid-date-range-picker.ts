@@ -305,6 +305,19 @@ export class FluidDateRangePicker extends FluidFormAssociated {
     }
     this.cleanup = autoUpdate(this.baseEl, this.dialogEl, () => this.reposition());
     void this.reposition();
+    // Per the WAI-ARIA APG Date Picker Dialog pattern, move focus into the
+    // popover. popover="manual" gives no native focus management and the input
+    // is readonly, so without this a keyboard user would have to Tab through the
+    // page to reach the grid. Focus the active preset if there is one, otherwise
+    // the dialog container itself (tabindex=-1); from there the user Tabs/arrows
+    // into the grid. We deliberately do NOT reach into the calendar's nested
+    // shadow root (fragile + the focus would escape this dialog's subtree).
+    requestAnimationFrame(() => {
+      const activePreset = this.dialogEl?.querySelector<HTMLButtonElement>(
+        ".preset[aria-pressed='true']"
+      );
+      (activePreset ?? this.dialogEl)?.focus();
+    });
   }
   private onClose(): void {
     this.cleanup?.();
@@ -441,7 +454,7 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       </div>
 
       <div part="dialog" id=${this.dialogId} class="dialog" role="dialog" aria-label="Choose date range"
-        popover="manual" @keydown=${this.onDialogKeydown}>
+        tabindex="-1" popover="manual" @keydown=${this.onDialogKeydown}>
         ${this.noPresets || !this.presets.length
           ? null
           : html`

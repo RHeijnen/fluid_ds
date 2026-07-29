@@ -114,6 +114,31 @@ describe("<fluid-timeline-item>", () => {
     expect(time.classList.contains("empty")).to.be.false;
   });
 
+  it("colors the warning marker with the theme-independent warning text token", async () => {
+    const el = await fixture<FluidTimelineItem>(html`
+      <div
+        style="
+          --fluid-warning-base:#b45309;
+          --fluid-warning-text:#1a2b00;
+          --fluid-accent-text:#ffffff;
+        "
+      >
+        <fluid-timeline-item tone="warning">
+          <span slot="icon">!</span>
+          Heads up
+        </fluid-timeline-item>
+      </div>
+    `);
+    const item = el.querySelector<FluidTimelineItem>("fluid-timeline-item")!;
+    await elementUpdated(item);
+    const marker = item.shadowRoot!.querySelector<HTMLElement>(".marker")!;
+    const color = getComputedStyle(marker).color;
+    // The warning marker must pair with --fluid-warning-text (#1a2b00),
+    // not the brand-retuned --fluid-accent-text (#ffffff).
+    expect(color).to.equal("rgb(26, 43, 0)");
+    expect(color).to.not.equal("rgb(255, 255, 255)");
+  });
+
   it("keeps the marker decorative (aria-hidden)", async () => {
     const el = await fixture<FluidTimelineItem>(html`
       <fluid-timeline-item>Event</fluid-timeline-item>

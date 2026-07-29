@@ -35,11 +35,11 @@ happens next.
 <Tabs syncKey="install">
   <TabItem label="CDN">
     ```html
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
     <script type="module"
-      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/form/define.js">
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/form/define.js">
     </script>
     ```
   </TabItem>
@@ -270,5 +270,8 @@ not covered by a token.
 - The native form carries `novalidate` internally so the browser never silently
   blocks submission: `<fluid-form>` runs the validity gate itself and reports it
   through `fluid-invalid`, keeping error handling in one place.
-- Buttons in the `actions` slot are real `<button>` elements, so `type="submit"`
-  and `type="reset"` behave natively (Enter submits from any field).
+- Buttons in the `actions` slot are real `<button>` elements. Because the native
+  `<form>` lives in the shadow root, these slotted buttons are not associated
+  with it, so `<fluid-form>` wires them up itself: clicking a `type="submit"`
+  button runs the validity gate, clicking a `type="reset"` button calls
+  `reset()`, and pressing Enter in a single-line text field submits.

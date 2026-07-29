@@ -162,6 +162,45 @@ describe("<fluid-speed-dial>", () => {
     expect(el.open).to.be.false;
   });
 
+  it("removes the document pointerdown listener on disconnect", async () => {
+    const wrapper = await fixture<HTMLElement>(html`
+      <div>
+        <fluid-speed-dial label="Actions">${actions}</fluid-speed-dial>
+        <span class="outside">outside</span>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidSpeedDial>("fluid-speed-dial")!;
+    el.open = true;
+    await elementUpdated(el);
+
+    // FluidElement provides no automatic teardown, so disconnect must remove
+    // the capture-phase document listener registered in connectedCallback.
+    // Spy on document.removeEventListener to lock in the cleanup contract.
+    const originalRemove = document.removeEventListener.bind(document);
+    let removedPointerdown = false;
+    document.removeEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions
+    ) => {
+      if (type === "pointerdown") removedPointerdown = true;
+      return originalRemove(type, listener, options);
+    }) as typeof document.removeEventListener;
+
+    el.remove();
+    document.removeEventListener = originalRemove;
+    expect(removedPointerdown).to.be.true;
+
+    // After disconnect, a document pointerdown must not invoke handleOutsideClick
+    // (no error, and the detached element's state is untouched).
+    el.open = true;
+    document.dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, composed: true })
+    );
+    await aTimeout(0);
+    expect(el.open).to.be.true;
+  });
+
   it("placement reflects to an attribute", async () => {
     const el = await fixture<FluidSpeedDial>(html`
       <fluid-speed-dial label="Actions" placement="right">${actions}</fluid-speed-dial>

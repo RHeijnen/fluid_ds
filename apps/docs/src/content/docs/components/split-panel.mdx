@@ -24,11 +24,11 @@ from the start edge, so it scales as the parent resizes.
 <Tabs syncKey="install">
   <TabItem label="CDN">
     ```html
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
     <script type="module"
-      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/split-panel/define.js">
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/split-panel/define.js">
     </script>
     ```
   </TabItem>
@@ -215,6 +215,9 @@ not covered by a token, e.g. a grip texture on the divider.
     (vertical) move 1%.
   - <kbd>Shift</kbd>+arrow moves 10%.
   - <kbd>Home</kbd>/<kbd>End</kbd> snap to 0% / 100%.
+- The divider has an accessible name (`label`, default `"Resize panels"`)
+  exposed as `aria-label`; override it to describe what is being resized,
+  e.g. `label="Resize sidebar"`.
 - The divider has a visible focus ring; the panels themselves are
   ordinary regions you should label appropriately.
 

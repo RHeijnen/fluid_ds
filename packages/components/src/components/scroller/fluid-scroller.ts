@@ -106,6 +106,8 @@ export class FluidScroller extends FluidElement {
   @state() private showStart = false;
   @state() private showEnd = false;
 
+  private resizeObserver?: ResizeObserver;
+
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("resize", this.updateFades);
@@ -114,6 +116,8 @@ export class FluidScroller extends FluidElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("resize", this.updateFades);
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
   }
 
   protected override firstUpdated(): void {
@@ -128,6 +132,7 @@ export class FluidScroller extends FluidElement {
     for (const child of Array.from(this.container.children)) {
       observer.observe(child);
     }
+    this.resizeObserver = observer;
   }
 
   private updateFades = () => {

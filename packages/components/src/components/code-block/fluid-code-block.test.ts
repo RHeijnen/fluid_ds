@@ -1,4 +1,4 @@
-import { expect, fixture, html, oneEvent } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, aTimeout } from "@open-wc/testing";
 import "./define.js";
 import type { FluidCodeBlock } from "./fluid-code-block.js";
 
@@ -67,6 +67,112 @@ describe("<fluid-code-block>", () => {
     await el.updateComplete;
     const label = el.shadowRoot!.querySelector(".label");
     expect(label?.textContent?.trim()).to.equal("ts");
+  });
+
+  it("copies the slotted text content when no code prop is set", async () => {
+    let written = "";
+    const original = navigator.clipboard?.writeText;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          written = text;
+        }
+      }
+    });
+    try {
+      const el = await fixture<FluidCodeBlock>(html`
+        <fluid-code-block>slotted code</fluid-code-block>
+      `);
+      await el.updateComplete;
+      const copyBtn = el.shadowRoot!.querySelector<HTMLElement>(".copy")!;
+      setTimeout(() => copyBtn.click());
+      const event = (await oneEvent(el, "fluid-copy")) as CustomEvent;
+      expect(event.detail.text).to.equal("slotted code");
+      expect(written).to.equal("slotted code");
+    } finally {
+      if (original) {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: { writeText: original }
+        });
+      }
+    }
+  });
+
+  it("swaps the copy icon to 'check' while copied, then back", async () => {
+    const original = navigator.clipboard?.writeText;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => undefined }
+    });
+    try {
+      const el = await fixture<FluidCodeBlock>(html`
+        <fluid-code-block code="x"></fluid-code-block>
+      `);
+      await el.updateComplete;
+      const icon = () => el.shadowRoot!.querySelector("fluid-icon")!;
+      expect(icon().getAttribute("name")).to.equal("copy");
+
+      el.shadowRoot!.querySelector<HTMLElement>(".copy")!.click();
+      await oneEvent(el, "fluid-copy");
+      await el.updateComplete;
+      expect(icon().getAttribute("name")).to.equal("check");
+
+      await aTimeout(1600);
+      await el.updateComplete;
+      expect(icon().getAttribute("name")).to.equal("copy");
+    } finally {
+      if (original) {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: { writeText: original }
+        });
+      }
+    }
+  });
+
+  it("clears the copy-reset timer on disconnect so it does not fire on a detached element", async () => {
+    const original = navigator.clipboard?.writeText;
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => undefined }
+    });
+    try {
+      const el = await fixture<FluidCodeBlock>(html`
+        <fluid-code-block code="x"></fluid-code-block>
+      `);
+      await el.updateComplete;
+
+      el.shadowRoot!.querySelector<HTMLElement>(".copy")!.click();
+      await oneEvent(el, "fluid-copy");
+      await el.updateComplete;
+
+      // Track any reactive update requested after the element is detached. If
+      // the timer is cleared on disconnect, the 1.5s reset callback must never
+      // run, so requestUpdate must not be called from it.
+      let updatedAfterRemoval = false;
+      const proto = el as unknown as { requestUpdate: () => void };
+      const realRequestUpdate = proto.requestUpdate.bind(el);
+      proto.requestUpdate = (...args: unknown[]) => {
+        updatedAfterRemoval = true;
+        return (realRequestUpdate as (...a: unknown[]) => void)(...args);
+      };
+
+      // Remove the element within the 1.5s reset window.
+      el.remove();
+
+      // Wait past the reset timeout.
+      await aTimeout(1700);
+      expect(updatedAfterRemoval).to.be.false;
+    } finally {
+      if (original) {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: { writeText: original }
+        });
+      }
+    }
   });
 
   it("passes a11y audit", async () => {

@@ -171,6 +171,10 @@ async function main() {
     "# Each entry is `source → destination status`.",
     "# 200 = silent rewrite (URL bar stays). 301/302 = visible redirect.",
     "",
+    "# Browsers + crawlers probe /favicon.ico by default; serve the SVG there",
+    "# (200 rewrite, URL bar unchanged) so that default request never 404s.",
+    "/favicon.ico       /favicon.svg                  200",
+    "",
     "# Aliases so the bare name works (e.g. /docs → /docs/).",
     "/docs              /docs/                        301",
     "/storybook         /storybook/                   301",
@@ -197,8 +201,16 @@ async function main() {
   ].join("\n");
   await writeFile(join(websiteDir, "_redirects"), redirects, "utf8");
 
-  // 8. Long-cache headers for hashed assets.
+  // 8. Long-cache headers for hashed assets, plus site-wide security headers.
   const headers = [
+    "# Site-wide security headers.",
+    "/*",
+    // Force HTTPS for two years incl. subdomains; eligible for the HSTS preload list.
+    "  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload",
+    // Stop browsers MIME-sniffing responses away from their declared type.
+    "  X-Content-Type-Options: nosniff",
+    // Don't leak full URLs to third-party origins.
+    "  Referrer-Policy: strict-origin-when-cross-origin",
     "/assets/*",
     "  Cache-Control: public, max-age=31536000, immutable",
     "/docs/_astro/*",
@@ -218,6 +230,56 @@ async function main() {
     ""
   ].join("\n");
   await writeFile(join(websiteDir, "_headers"), headers, "utf8");
+
+  // 9. Branded 404. Cloudflare Pages serves /404.html for any unmatched path.
+  //    Self-contained (inline CSS, no hashed-bundle dependency), theme-aware.
+  const notFound = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Page not found: Fluid</title>
+    <style>
+      :root { color-scheme: light dark; --bg: #ffffff; --fg: #0f172a; --muted: #64748b; --accent: #4f46e5; --border: #e2e8f0; }
+      @media (prefers-color-scheme: dark) {
+        :root { --bg: #0b1020; --fg: #e2e8f0; --muted: #94a3b8; --accent: #818cf8; --border: #1e293b; }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center;
+        background: var(--bg); color: var(--fg);
+        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        padding: 2rem;
+      }
+      main { max-width: 32rem; text-align: center; }
+      .code { font-size: 5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--accent); margin: 0; }
+      h1 { font-size: 1.5rem; margin: 0.25rem 0 0.5rem; }
+      p { color: var(--muted); margin: 0 0 1.75rem; }
+      .links { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+      a {
+        display: inline-block; padding: 0.6rem 1.1rem; border-radius: 0.6rem;
+        text-decoration: none; font-weight: 600; border: 1px solid var(--border); color: var(--fg);
+      }
+      a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="code">404</p>
+      <h1>This page drifted away</h1>
+      <p>The page you were looking for is not here. It may have moved, or the link was mistyped.</p>
+      <div class="links">
+        <a class="primary" href="/">Back to home</a>
+        <a href="/docs/">Documentation</a>
+        <a href="/playground/">Theme builder</a>
+      </div>
+    </main>
+  </body>
+</html>
+`;
+  await writeFile(join(websiteDir, "404.html"), notFound, "utf8");
 
   console.log(`\n✓ website built at ${websiteDir}`);
   console.log("  upload that directory to Cloudflare Pages / Netlify / any static host.");

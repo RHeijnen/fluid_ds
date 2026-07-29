@@ -17,7 +17,7 @@ Chart.register(...registerables);
  * @cssproperty --fluid-sparkline-fill - Area fill color.
  * @cssproperty --fluid-sparkline-height - Default height.
  *
- * @uses-token --fluid-color-primary - Default stroke color.
+ * @uses-token --fluid-accent-base - Default stroke color.
  */
 export class FluidSparkline extends LitElement {
   static override styles = css`
@@ -73,7 +73,7 @@ export class FluidSparkline extends LitElement {
     const styles = getComputedStyle(this);
     const stroke =
       styles.getPropertyValue("--fluid-sparkline-color").trim() ||
-      styles.getPropertyValue("--fluid-color-primary").trim() ||
+      styles.getPropertyValue("--fluid-accent-base").trim() ||
       "#3b82f6";
     const fill =
       styles.getPropertyValue("--fluid-sparkline-fill").trim() ||

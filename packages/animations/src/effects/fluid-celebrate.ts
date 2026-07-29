@@ -68,7 +68,19 @@ const PRESETS: Record<string, EffectFn> = {
 
 export class FluidCelebrate extends HTMLElement {
   static get observedAttributes(): string[] {
-    return ["effect", "auto", "emojis", "colors", "count"];
+    return [
+      "effect",
+      "auto",
+      "emojis",
+      "colors",
+      "count",
+      "origin",
+      "cannons",
+      "shells",
+      "rate",
+      "duration",
+      "spread"
+    ];
   }
 
   /** Color override, settable as a JS property (array) or `colors` attr. */
@@ -146,7 +158,9 @@ export class FluidCelebrate extends HTMLElement {
 
   /**
    * Fire the configured effect once. Resolves when the burst ends, having
-   * dispatched `fluid-celebrate-end`.
+   * dispatched `fluid-celebrate-end`, unless the element was disconnected
+   * mid-burst (e.g. via `stop()` from `disconnectedCallback`), in which case
+   * the end event is suppressed because it could not reach delegated listeners.
    */
   async fire(): Promise<void> {
     const fn = PRESETS[this.effect] ?? confetti;
@@ -156,6 +170,10 @@ export class FluidCelebrate extends HTMLElement {
     this.#handle = handle;
     await handle.finished;
     if (this.#handle === handle) this.#handle = undefined;
+    // If the element was removed mid-burst (disconnectedCallback -> stop()
+    // resolves handle.finished), don't dispatch on a detached node: the event
+    // wouldn't bubble to the document and delegated listeners would miss it.
+    if (!this.isConnected) return;
     this.dispatchEvent(
       new CustomEvent("fluid-celebrate-end", { bubbles: true, composed: true })
     );

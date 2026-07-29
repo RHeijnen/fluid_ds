@@ -31,6 +31,8 @@ export type FluidImageLoading = "eager" | "lazy";
  *
  * @csspart base - The wrapper element that reserves space.
  * @csspart img - The inner native `<img>`.
+ * @csspart fallback - The wrapper shown in place of the image when it fails to
+ *   load (hosts the `fallback` slot).
  *
  * @cssproperty --fluid-image-radius - Corner radius of the wrapper and image.
  * @cssproperty --fluid-image-placeholder-bg - Solid color shown until the image
@@ -175,7 +177,7 @@ export class FluidImage extends FluidElement {
     return html`
       <div part="base" class="base" style=${hostStyle}>
         ${this.errored
-          ? html`<div class="fallback" part="img"><slot name="fallback"></slot></div>`
+          ? html`<div class="fallback" part="fallback"><slot name="fallback"></slot></div>`
           : html`
               <img
                 part="img"

@@ -45,6 +45,10 @@ export type FluidTagSize = "sm" | "md" | "lg";
  * @uses-token --fluid-surface-muted - Neutral background.
  * @uses-token --fluid-text-primary - Neutral text.
  * @uses-token --fluid-border-default - Outline border.
+ * @uses-token --fluid-color-brand-50 - Info variant default background.
+ * @uses-token --fluid-color-brand-200 - Info variant default border.
+ * @uses-token --fluid-color-brand-800 - Info variant default text.
+ * @uses-token --fluid-target-min - Remove button minimum hit-target size.
  *
  * @fires fluid-remove - Dispatched when the user clicks the remove button.
  *   Consumers should remove the tag from their data model on this event.
@@ -116,6 +120,13 @@ export class FluidTag extends FluidElement {
       justify-content: center;
       width: 1em;
       height: 1em;
+      /*
+       * SC 2.5.8 Target Size. The visible glyph is ~0.75em, far below the
+       * 24px AA minimum, so the clickable <button> reads --fluid-target-min
+       * as a floor for its hit area without enlarging the close icon itself.
+       */
+      min-width: var(--fluid-target-min, 0px);
+      min-height: var(--fluid-target-min, 0px);
       margin-right: -0.25em;
       cursor: pointer;
       border-radius: var(--fluid-radius-full);

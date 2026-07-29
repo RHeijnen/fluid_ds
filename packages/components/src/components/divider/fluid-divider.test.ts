@@ -1,4 +1,4 @@
-import { expect, fixture, html } from "@open-wc/testing";
+import { expect, fixture, html, elementUpdated } from "@open-wc/testing";
 import "./define.js";
 import type { FluidDivider } from "./fluid-divider.js";
 
@@ -19,6 +19,14 @@ describe("<fluid-divider>", () => {
       html`<fluid-divider orientation="vertical"></fluid-divider>`
     );
     expect(el.orientation).to.equal("vertical");
+    expect(el.getAttribute("aria-orientation")).to.equal("vertical");
+  });
+
+  it("re-syncs aria-orientation when orientation changes at runtime", async () => {
+    const el = await fixture<FluidDivider>(html`<fluid-divider></fluid-divider>`);
+    expect(el.getAttribute("aria-orientation")).to.equal("horizontal");
+    el.orientation = "vertical";
+    await elementUpdated(el);
     expect(el.getAttribute("aria-orientation")).to.equal("vertical");
   });
 

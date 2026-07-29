@@ -94,6 +94,29 @@ describe("<fluid-tooltip>", () => {
     await expect(el).to.be.accessible();
   });
 
+  it("does not fire fluid-show or leak timers after disconnect", async () => {
+    const el = await fixture<FluidTooltip>(html`
+      <fluid-tooltip content="Hi" show-delay="50"><button>Trigger</button></fluid-tooltip>
+    `);
+    await el.updateComplete;
+    const button = el.querySelector("button")!;
+    expect(button.getAttribute("aria-describedby")).to.match(/^fluid-tooltip-\d+$/);
+
+    let shown = false;
+    el.addEventListener("fluid-show", () => (shown = true));
+
+    // Schedule a show, then remove before the show-delay elapses.
+    button.focus();
+    el.remove();
+
+    // Advance well past show-delay; the cleared timer must never fire.
+    await aTimeout(120);
+    expect(shown).to.be.false;
+    expect(el.shadowRoot!.querySelector(".popover")!.classList.contains("visible")).to.be.false;
+    // detachAnchor() must have stripped the description on disconnect.
+    expect(button.hasAttribute("aria-describedby")).to.be.false;
+  });
+
   /* Rework: override ladder. */
 
   it("popover background reads the --fluid-tooltip-* override ladder", async () => {

@@ -109,9 +109,9 @@ document.body.innerHTML = `
   <!-- ============================ HERO ============================ -->
   <section class="hero">
     <div class="hero-badges">
-      <fluid-badge variant="info">v0.3 alpha</fluid-badge>
+      <fluid-badge variant="info">stable 0.x</fluid-badge>
       <fluid-badge variant="success">WCAG 2.2 AA · AAA-ready</fluid-badge>
-      <fluid-badge>npm: @fluid-ds/*@alpha</fluid-badge>
+      <fluid-badge>npm: @fluid-ds/*@latest</fluid-badge>
       <fluid-badge>MIT licensed</fluid-badge>
     </div>
     <h1>Build it once.<br /><span class="accent">Drop it anywhere.</span></h1>
@@ -358,14 +358,14 @@ document.body.innerHTML = `
   <section class="row">
     <h2>Five-line setup</h2>
     <p class="subhead">Paste into any HTML page. No bundler, no framework, no build step.</p>
-    <fluid-code-block language="html" code='<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <fluid-code-block language="html" code='<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
 
 <fluid-button>Hello, Fluid</fluid-button>'></fluid-code-block>
-    <p class="subhead" style="margin-top:1rem;">Prefer npm? <code>npm i @fluid-ds/components@alpha</code>. Full <a href="/docs/getting-started/installation/">installation guide</a>.</p>
+    <p class="subhead" style="margin-top:1rem;">Prefer npm? <code>npm i @fluid-ds/components@latest</code>. Full <a href="/docs/getting-started/installation/">installation guide</a>.</p>
   </section>
 
   <!-- ====================== OPEN SOURCE CTA ====================== -->

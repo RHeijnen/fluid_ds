@@ -66,4 +66,31 @@ describe("<fluid-progress-bar>", () => {
     const indicator = el.shadowRoot!.querySelector<HTMLElement>(".indicator")!;
     expect(getComputedStyle(indicator).backgroundColor).to.equal("rgb(1, 2, 3)");
   });
+
+  /* Indeterminate animation / reduced-motion. */
+
+  it("runs the indeterminate loop animation when value is null", async () => {
+    const el = await fixture<FluidProgressBar>(html`<fluid-progress-bar></fluid-progress-bar>`);
+    el.value = null;
+    await el.updateComplete;
+    expect(el.hasAttribute("indeterminate")).to.be.true;
+    const indicator = el.shadowRoot!.querySelector<HTMLElement>(".indicator")!;
+    const style = getComputedStyle(indicator);
+    expect(style.animationName).to.equal("progress-loop");
+    expect(style.animationIterationCount).to.equal("infinite");
+  });
+
+  it("keeps the indeterminate loop running (slowed, not stopped) under reduced motion", async () => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const el = await fixture<FluidProgressBar>(html`<fluid-progress-bar></fluid-progress-bar>`);
+    el.value = null;
+    await el.updateComplete;
+    const indicator = el.shadowRoot!.querySelector<HTMLElement>(".indicator")!;
+    const style = getComputedStyle(indicator);
+    // The reduced-motion branch slows the loop to 6s rather than removing it,
+    // so the animation must still be present and infinite either way.
+    expect(style.animationName).to.equal("progress-loop");
+    expect(style.animationIterationCount).to.equal("infinite");
+    expect(style.animationDuration).to.equal(reduced ? "6s" : "1.5s");
+  });
 });

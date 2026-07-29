@@ -22,11 +22,11 @@ form-associated, so the selected files submit with the parent `<form>`.
 <Tabs syncKey="install">
   <TabItem label="CDN">
     ```html
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
     <script type="module"
-      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/file-input/define.js">
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/file-input/define.js">
     </script>
     ```
   </TabItem>
@@ -222,9 +222,12 @@ not covered by a token.
 
 ## Accessibility
 
-The drop zone is a `<label>` wrapping a real `<input type="file">`, so it
-inherits native semantics. The notes below are file-input-specific; the
-cross-component contract is in the [Accessibility guide](/guides/accessibility/).
+The visible drop zone is the single, keyboard-reachable control: it carries
+`role="button"` and `tabindex="0"`, so focus lands on the styled region (and its
+focus ring) rather than on the visually hidden native `<input type="file">`,
+which is taken out of the tab order. The notes below are file-input-specific;
+the cross-component contract is in the
+[Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
@@ -232,6 +235,11 @@ cross-component contract is in the [Accessibility guide](/guides/accessibility/)
 | --- | --- |
 | <kbd>Tab</kbd> | Focus the drop zone, then each remove button. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Open the system file picker. |
+
+Focus is always on the visible drop zone, so the focus indicator
+(`--fluid-file-input-focus-ring`) is the ring you see, never a hidden element.
+A `disabled` picker is removed from the tab order and ignores
+<kbd>Enter</kbd> / <kbd>Space</kbd>.
 
 Drag-and-drop sets a `dragging` state for visual feedback; the underlying input
 still handles selection.

@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, nothing, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -29,6 +29,12 @@ export type FluidBadgeSize = "sm" | "md";
  * @uses-token --fluid-color-neutral-800 - Neutral variant text.
  * @uses-token --fluid-color-brand-100 - Info variant background.
  * @uses-token --fluid-color-brand-800 - Info variant text.
+ * @uses-token --fluid-color-emerald-100 - Success variant background.
+ * @uses-token --fluid-color-emerald-800 - Success variant text.
+ * @uses-token --fluid-color-amber-100 - Warning variant background.
+ * @uses-token --fluid-color-amber-800 - Warning variant text.
+ * @uses-token --fluid-color-red-100 - Danger variant background.
+ * @uses-token --fluid-color-red-800 - Danger variant text.
  */
 export class FluidBadge extends FluidElement {
   static override styles = css`
@@ -70,16 +76,16 @@ export class FluidBadge extends FluidElement {
       color: var(--fluid-badge-info-fg, var(--fluid-color-brand-800));
     }
     .variant-success {
-      background: var(--fluid-badge-success-bg, #dcfce7);
-      color: var(--fluid-badge-success-fg, #166534);
+      background: var(--fluid-badge-success-bg, var(--fluid-color-emerald-100));
+      color: var(--fluid-badge-success-fg, var(--fluid-color-emerald-800));
     }
     .variant-warning {
-      background: var(--fluid-badge-warning-bg, #fef3c7);
-      color: var(--fluid-badge-warning-fg, #92400e);
+      background: var(--fluid-badge-warning-bg, var(--fluid-color-amber-100));
+      color: var(--fluid-badge-warning-fg, var(--fluid-color-amber-800));
     }
     .variant-danger {
-      background: var(--fluid-badge-danger-bg, #fee2e2);
-      color: var(--fluid-badge-danger-fg, #991b1b);
+      background: var(--fluid-badge-danger-bg, var(--fluid-color-red-100));
+      color: var(--fluid-badge-danger-fg, var(--fluid-color-red-800));
     }
 
     .dot {
@@ -101,8 +107,19 @@ export class FluidBadge extends FluidElement {
   @property({ type: Boolean, reflect: true }) dot = false;
 
   override render(): TemplateResult {
+    // A dot-only badge has no rendered text, so status would be conveyed by
+    // color alone (WCAG 1.4.1) with no accessible name (4.1.2). Forward any
+    // author-supplied aria-label from the host onto the base span and expose a
+    // status role so the dot carries that name. A visible text label should
+    // still accompany the dot where possible.
+    const dotLabel = this.dot ? this.getAttribute("aria-label") : null;
     return html`
-      <span part="base" class="base variant-${this.variant} size-${this.size}">
+      <span
+        part="base"
+        class="base variant-${this.variant} size-${this.size}"
+        role=${this.dot && dotLabel ? "status" : nothing}
+        aria-label=${this.dot && dotLabel ? dotLabel : nothing}
+      >
         ${this.dot ? html`<span class="dot" aria-hidden="true"></span>` : html`<slot></slot>`}
       </span>
     `;

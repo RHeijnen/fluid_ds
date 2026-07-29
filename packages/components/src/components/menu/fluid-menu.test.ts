@@ -126,6 +126,38 @@ describe("<fluid-menu>", () => {
     expect(items(el).find((i) => i.active)!.value).to.equal("delete");
   });
 
+  it("clears the type-ahead timer on disconnect (no stray timer)", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    await elementUpdated(el);
+    el.focus();
+    // Start the 500ms type-ahead timer.
+    await sendKeys({ press: "d" });
+    const cleared: ReturnType<typeof setTimeout>[] = [];
+    const realClearTimeout = window.clearTimeout;
+    window.clearTimeout = ((id: ReturnType<typeof setTimeout>) => {
+      cleared.push(id);
+      return realClearTimeout(id);
+    }) as typeof window.clearTimeout;
+    try {
+      el.remove();
+    } finally {
+      window.clearTimeout = realClearTimeout;
+    }
+    // disconnectedCallback must clear the pending type-ahead timer.
+    expect(cleared.length).to.be.greaterThan(0);
+    // Wait past the 500ms window: the timer must not run after teardown.
+    await aTimeout(550);
+    // Genuinely re-attach (appendChild fires connectedCallback) so focus + keys
+    // reach the element; the type-ahead buffer must start clean, so a fresh "o"
+    // selects "open" rather than continuing the stale "d" -> "delete" match.
+    document.body.appendChild(el);
+    await elementUpdated(el);
+    el.focus();
+    await sendKeys({ press: "o" });
+    expect(items(el).find((i) => i.active)!.value).to.equal("open");
+    el.remove();
+  });
+
   it("treats fluid-menu-label as presentational (skipped)", async () => {
     const el = await fixture<FluidMenu>(html`
       <fluid-menu aria-label="Grouped">

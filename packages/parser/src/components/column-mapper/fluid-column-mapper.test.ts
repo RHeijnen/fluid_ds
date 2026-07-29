@@ -52,6 +52,31 @@ describe("fluid-column-mapper", () => {
     expect(event.detail.mapping.email).to.equal(null);
   });
 
+  it("does not clobber a user-edited mapping when columns change", async () => {
+    const el = await mount();
+    // Auto-map seeded the initial mapping. Simulate a user override.
+    el.mapping = { ...el.mapping, name: "Email Address" };
+    await el.updateComplete;
+    // New columns arrive: the hasMapping guard must keep the edited mapping.
+    el.columns = ["Name", "Email Address", "Phone"];
+    await el.updateComplete;
+    expect(el.mapping.name).to.equal("Email Address");
+  });
+
+  it("seeds the mapping when columns arrive with an empty mapping", async () => {
+    const el = await fixture<FluidColumnMapper>(
+      html`<fluid-column-mapper></fluid-column-mapper>`
+    );
+    el.blueprint = blueprint;
+    el.mapping = {};
+    await el.updateComplete;
+    // Empty mapping + columns means the auto-map should seed it.
+    el.columns = ["Name", "Email Address"];
+    await el.updateComplete;
+    expect(el.mapping.name).to.equal("Name");
+    expect(el.mapping.email).to.equal("Email Address");
+  });
+
   it("marks an unmapped required field as invalid", async () => {
     const el = await fixture<FluidColumnMapper>(html`<fluid-column-mapper></fluid-column-mapper>`);
     el.blueprint = blueprint;

@@ -103,6 +103,44 @@ describe("<fluid-otp>", () => {
     expect(el.shadowRoot!.activeElement).to.equal(bs[1]);
   });
 
+  it("truncates the value when length shrinks at runtime", async () => {
+    const el = await fixture<FluidOtp>(html`<fluid-otp length="6" value="123456"></fluid-otp>`);
+    el.length = 4;
+    await elementUpdated(el);
+    expect(el.value).to.equal("1234");
+    // The submitted form value must not carry the stale extra characters.
+    const form = await fixture<HTMLFormElement>(html`<form></form>`);
+    const el2 = await fixture<FluidOtp>(
+      html`<fluid-otp name="code" length="6" value="123456"></fluid-otp>`
+    );
+    form.append(el2);
+    el2.length = 4;
+    await elementUpdated(el2);
+    expect(new FormData(form).get("code")).to.equal("1234");
+  });
+
+  it("Home / End jump to the first / last box", async () => {
+    const el = await fixture<FluidOtp>(html`<fluid-otp length="4"></fluid-otp>`);
+    const bs = boxes(el);
+    bs[2]!.focus();
+    await sendKeys({ press: "Home" });
+    expect(el.shadowRoot!.activeElement).to.equal(bs[0]);
+    await sendKeys({ press: "End" });
+    expect(el.shadowRoot!.activeElement).to.equal(bs[3]);
+  });
+
+  it("Delete clears the focused box", async () => {
+    const el = await fixture<FluidOtp>(html`<fluid-otp length="4" value="1234"></fluid-otp>`);
+    const bs = boxes(el);
+    bs[1]!.focus();
+    await sendKeys({ press: "Delete" });
+    await elementUpdated(el);
+    // Delete clears box 1 and the value collapses ("1"+""+"3"+"4" -> "134"),
+    // so the boxes re-render from "134": box 1 now shows the next char, "3".
+    expect(el.value).to.equal("134");
+    expect(bs[1]!.value).to.equal("3");
+  });
+
   it("ArrowLeft / ArrowRight move between boxes", async () => {
     const el = await fixture<FluidOtp>(html`<fluid-otp length="4"></fluid-otp>`);
     const bs = boxes(el);

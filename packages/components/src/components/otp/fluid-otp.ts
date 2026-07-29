@@ -262,6 +262,13 @@ export class FluidOtp extends FluidFormAssociated {
   }
 
   protected override updated(changed: PropertyValues<this>): void {
+    // When `length` shrinks at runtime, the boxes render only the first
+    // `length` chars (via the `chars` getter), but `this.value` still holds the
+    // longer string, so the form would submit (and fluid-complete checks would
+    // see) stale extra characters. Re-clamp the stored value to the new length.
+    if (changed.has("length") && this.value.length > this.length) {
+      this.setValue(this.value.slice(0, this.length));
+    }
     if (changed.has("value") || changed.has("required")) {
       this.refreshValidity();
     }

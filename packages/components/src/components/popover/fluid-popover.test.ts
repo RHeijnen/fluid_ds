@@ -91,6 +91,53 @@ describe("<fluid-popover>", () => {
     expect(el.open).to.be.false;
   });
 
+  it("does not fire fluid-hide on first render of a closed popover", async () => {
+    let hidden = false;
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover @fluid-hide=${() => (hidden = true)}>
+        <button slot="trigger">Open</button>
+        <p>Content</p>
+      </fluid-popover>
+    `);
+    await el.updateComplete;
+    await aTimeout(0);
+    expect(hidden).to.be.false;
+  });
+
+  it("tears down document listeners and autoUpdate on disconnect", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">Open</button>
+        <p>Content</p>
+      </fluid-popover>
+    `);
+    await el.updateComplete;
+    el.show();
+    await oneEvent(el, "fluid-show");
+
+    // Track that the autoUpdate cleanup callback is invoked on disconnect.
+    let cleanupCalled = false;
+    const originalCleanup = (el as unknown as { cleanup?: () => void }).cleanup;
+    (el as unknown as { cleanup?: () => void }).cleanup = () => {
+      cleanupCalled = true;
+      originalCleanup?.();
+    };
+
+    let leaked = false;
+    el.addEventListener("fluid-hide", () => (leaked = true));
+
+    el.remove();
+    expect(cleanupCalled).to.be.true;
+
+    // Document listeners must be gone: these should not reopen/close anything.
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    document.dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, composed: true })
+    );
+    await aTimeout(20);
+    expect(leaked).to.be.false;
+  });
+
   /* Rework: override ladder. */
 
   it("panel background reads the --fluid-popover-* override ladder", async () => {

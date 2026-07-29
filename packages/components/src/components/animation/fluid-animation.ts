@@ -17,6 +17,12 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @summary Web Animations API wrapper.
  *
+ * Web Animations API animations are not affected by the CSS
+ * `prefers-reduced-motion` query, so this component checks it directly: when the
+ * user prefers reduced motion it jumps straight to the final keyframe instead of
+ * running the (possibly looping) animation. Set the `ignore-reduced-motion`
+ * attribute to opt out for animations that are essential rather than decorative.
+ *
  * @slot - The element to animate (the first slotted element is the target).
  *
  * @fires fluid-start - Fired when the animation starts.
@@ -82,6 +88,21 @@ export class FluidAnimation extends FluidElement {
     spin: [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }]
   };
 
+  /**
+   * Opt out of the reduced-motion guard and run the animation even when the
+   * user prefers reduced motion. Use only for essential (non-decorative) motion.
+   */
+  @property({ type: Boolean, attribute: "ignore-reduced-motion" })
+  ignoreReducedMotion = false;
+
+  private static prefersReducedMotion(): boolean {
+    return (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+  }
+
   /** Trigger animation programmatically. */
   start(): void {
     this.cancel();
@@ -89,6 +110,23 @@ export class FluidAnimation extends FluidElement {
     if (!target) return;
     const frames = this.keyframes ?? FluidAnimation.presets[this.name ?? "fadeIn"] ?? null;
     if (!frames) return;
+
+    // WAAPI animations are not governed by the CSS reduced-motion query, so
+    // honor the user's preference here. Rather than run a ticking/looping
+    // animation, jump straight to the final keyframe and report start+finish.
+    if (!this.ignoreReducedMotion && FluidAnimation.prefersReducedMotion()) {
+      this.animation = target.animate(frames, {
+        duration: 0,
+        delay: 0,
+        iterations: 1,
+        direction: this.direction,
+        fill: this.fill
+      });
+      this.dispatchEvent(new CustomEvent("fluid-start", { bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent("fluid-finish", { bubbles: true, composed: true }));
+      return;
+    }
+
     this.animation = target.animate(frames, {
       duration: this.duration,
       easing: this.easing,
@@ -125,6 +163,13 @@ export class FluidAnimation extends FluidElement {
       if (this.play) this.start();
       else this.cancel();
     }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    // FluidElement does no auto-cleanup, so cancel any in-flight WAAPI
+    // animation (which keeps ticking otherwise) when we leave the DOM.
+    this.cancel();
   }
 
   override render(): TemplateResult {

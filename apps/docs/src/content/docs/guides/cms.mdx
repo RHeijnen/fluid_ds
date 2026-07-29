@@ -28,16 +28,16 @@ There are two halves to it:
 
 The CDN setup is identical to the [CDN reference](/getting-started/cdn/):
 load the `@fluid-ds/tokens` CSS, the `@fluid-ds/icons` register-defaults
-module, and one `define.js` per component you use. Pin `@alpha` while
-Fluid is pre-release.
+module, and one `define.js` per component you use. The examples use `@latest`;
+pin an exact version for repeatable production deployments.
 
 ```html title="<head>"
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/badge/define.js"></script>
 ```
 
 <Aside type="tip">
@@ -64,11 +64,11 @@ once:
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fluid-ds/tokens@@latest/dist/light.css" />
 
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/icons@@alpha/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/components@@alpha/dist/components/badge/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/icons@@latest/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@@fluid-ds/components@@latest/dist/components/badge/define.js"></script>
 </head>
 <body>
     @RenderBody()
@@ -116,24 +116,24 @@ add_action( 'wp_enqueue_scripts', function () {
     // Tokens: plain stylesheets.
     wp_enqueue_style(
         'fluid-tokens-base',
-        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css'
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css'
     );
     wp_enqueue_style(
         'fluid-tokens-light',
-        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css'
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css'
     );
 
     // Components + icons: ES modules, registered with defer.
     wp_enqueue_script(
         'fluid-icons',
-        'https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js',
         array(),
         null,
         array( 'strategy' => 'defer' )
     );
     wp_enqueue_script(
         'fluid-badge',
-        'https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js',
+        'https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/badge/define.js',
         array(),
         null,
         array( 'strategy' => 'defer' )
@@ -178,11 +178,11 @@ Add the CDN tags to your Blade layout's `<head>`:
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/badge/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/badge/define.js"></script>
 </head>
 <body>
     @yield('content')

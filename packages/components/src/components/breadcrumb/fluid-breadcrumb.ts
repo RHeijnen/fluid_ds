@@ -31,11 +31,6 @@ export class FluidBreadcrumb extends FluidElement {
       align-items: center;
       gap: var(--fluid-space-1) var(--fluid-breadcrumb-gap, var(--fluid-space-2));
     }
-
-    /* Hide the separator on the visually-last item. */
-    ::slotted(fluid-breadcrumb-item:last-of-type)::part(separator) {
-      display: none;
-    }
   `;
 
   /**
@@ -58,6 +53,13 @@ export class FluidBreadcrumb extends FluidElement {
     if (!anyExplicit) {
       items[items.length - 1]!.current = true;
     }
+    // Mark the visually-last item so it can hide its trailing separator.
+    // (`::slotted()::part()` cannot reach a part in the nested shadow tree,
+    // so the item itself owns the hide rule keyed off this attribute.)
+    items.forEach((item, index) => {
+      if (index === items.length - 1) item.setAttribute("data-fluid-last", "");
+      else item.removeAttribute("data-fluid-last");
+    });
   };
 
   override render(): TemplateResult {

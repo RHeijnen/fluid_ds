@@ -79,7 +79,7 @@ export class FluidStep extends FluidElement {
       --_conn-size: var(--fluid-step-connector-size, 2px);
       display: block;
       font-family: var(--fluid-font-family-sans);
-      line-height: var(--fluid-line-height-normal, 1.5);
+      line-height: var(--fluid-font-line-height-normal, 1.5);
     }
 
     :host([hidden]) {

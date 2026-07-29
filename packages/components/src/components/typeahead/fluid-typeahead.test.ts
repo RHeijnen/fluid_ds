@@ -82,6 +82,34 @@ describe("<fluid-typeahead>", () => {
     expect(active?.textContent?.trim()).to.equal("Apricot");
   });
 
+  it("marks the aria-activedescendant option as aria-selected (APG contract)", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead aria-label="Fruit" .options=${FRUITS}></fluid-typeahead>
+    `);
+    el.focus();
+    const input = el.shadowRoot!.querySelector("input")!;
+    // Open and move the active highlight to the second option.
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await el.updateComplete;
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await el.updateComplete;
+
+    const activeId = input.getAttribute("aria-activedescendant");
+    expect(activeId).to.be.a("string");
+    const activeOption = el.shadowRoot!.querySelector(`#${activeId}`)!;
+    // The option referenced by aria-activedescendant must be aria-selected.
+    expect(activeOption.getAttribute("aria-selected")).to.equal("true");
+    expect(activeOption).to.have.class("active");
+
+    // Every other option must report aria-selected="false".
+    const others = Array.from(el.shadowRoot!.querySelectorAll(".option")).filter(
+      (o) => o.id !== activeId
+    );
+    for (const o of others) {
+      expect(o.getAttribute("aria-selected")).to.equal("false");
+    }
+  });
+
   it("supports objects with {value, label}", async () => {
     const el = await fixture<FluidTypeahead>(html`
       <fluid-typeahead

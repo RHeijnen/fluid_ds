@@ -53,11 +53,17 @@ regenerate it from this list.
 
 - `pnpm dev`: Storybook + playground together.
 - `pnpm build` / `pnpm typecheck` / `pnpm test`.
-- `pnpm verify`: full gate of typecheck → lint → check:coverage → test → build.
+- `pnpm verify`: full gate of typecheck → lint → check:coverage → check:tokens →
+  test → build.
 - `pnpm check:coverage`: every component must have a `.stories.ts`, a docs
   `.mdx` page (`apps/docs/src/content/docs/components/<name>.mdx`), AND appear in
   the playground preview (`apps/playground/src/preview.ts`). Missing any of the
   three fails the build.
+- `pnpm check:tokens`: every `var(--fluid-*)` (and JS `getPropertyValue`) must
+  resolve to a real token. Catches **phantom tokens** (a typo'd semantic var like
+  `--fluid-color-primary` or `--fluid-line-height-normal` that silently paints
+  its fallback and ignores theme overrides). Component knobs only need to resolve
+  when referenced bare; primitive/semantic namespaces must always resolve.
 
 ## Building or reworking a component: read this first
 
@@ -84,6 +90,15 @@ get long.
 
 - Components live in `packages/components/src/components/<name>/` as `define.ts`,
   `fluid-<name>.ts`, `.stories.ts`, `.test.ts`. All extend `FluidElement`.
+- **Tear down every side effect on disconnect.** Any `setInterval` /
+  `setTimeout` / `requestAnimationFrame` / observer / external `addEventListener`
+  / Web-Animation started in a component must be undone in
+  `disconnectedCallback`, or it leaks (and keeps running in Storybook when you
+  switch stories). `FluidElement` provides opt-in helpers so you can't forget:
+  `this.registerCleanup(() => clearInterval(id))`, `this.listen(target, type, fn)`
+  (auto-removed on disconnect), and `this.disconnectSignal` (an `AbortSignal` for
+  `addEventListener`/`fetch`). Also honor `prefers-reduced-motion` for any
+  auto/looping/decorative motion.
 - Component-scoped tokens use inline `var()` fallback, e.g.
   `var(--fluid-button-bg, var(--fluid-accent-base))`, never a `:host` declaration
   (it pins the value and breaks global overrides). This override ladder

@@ -59,8 +59,13 @@ Sparklines for inline metric callouts:
 ```html
 <p>
   Sessions <strong>2,317</strong>
-  <fluid-sparkline data="[3,5,4,6,8,7,9,8,10]" style="width: 5rem;"></fluid-sparkline>
+  <fluid-sparkline id="sessions-trend" style="width: 5rem;"></fluid-sparkline>
 </p>
+
+<script type="module">
+  // `values` is a property (attribute: false), so set it in script.
+  document.querySelector("#sessions-trend").values = [3, 5, 4, 6, 8, 7, 9, 8, 10];
+</script>
 ```
 
 ## Theming

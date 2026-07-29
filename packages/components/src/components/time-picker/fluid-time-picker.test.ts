@@ -145,6 +145,27 @@ describe("<fluid-time-picker>", () => {
     expect(el.validity.valueMissing).to.be.true;
   });
 
+  it("disconnect tears down the document pointerdown listener and floating-ui autoUpdate", async () => {
+    const el = await fixture<FluidTimePicker>(
+      html`<fluid-time-picker min="09:00" max="10:00" step="30"></fluid-time-picker>`
+    );
+    // Open the listbox so openListbox() assigns the autoUpdate cleanup.
+    el.open = true;
+    await elementUpdated(el);
+    await aTimeout(20);
+
+    // Remove the element: disconnectedCallback must run the manual teardown
+    // (the base class does nothing), so it should not throw.
+    expect(() => el.remove()).to.not.throw();
+
+    // The outside-pointerdown handler is detached: an outside pointerdown
+    // must no longer flip `open` back to false or error.
+    el.open = true;
+    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
+    await aTimeout(0);
+    expect(el.open).to.be.true;
+  });
+
   it("passes a11y audit (closed)", async () => {
     const el = await fixture<FluidTimePicker>(
       html`<fluid-time-picker aria-label="Time"></fluid-time-picker>`

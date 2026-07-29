@@ -97,6 +97,13 @@ export class FluidTabs extends FluidElement {
   @query(".nav") private navEl!: HTMLElement;
   @query(".indicator") private indicatorEl!: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  /**
+   * True once the value change originates from user interaction (click /
+   * keyboard) or an explicit external `value` set, as opposed to the initial
+   * auto-select in firstUpdated(). Guards the `fluid-change` dispatch so an
+   * uncontrolled <fluid-tabs> doesn't emit on mount.
+   */
+  private hasInteracted = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -124,13 +131,17 @@ export class FluidTabs extends FluidElement {
     if (changed.has("value")) {
       this.syncSelection();
       this.positionIndicator(true);
-      this.dispatchEvent(
-        new CustomEvent("fluid-change", {
-          detail: { value: this.value },
-          bubbles: true,
-          composed: true
-        })
-      );
+      // Don't emit for the initial auto-select in firstUpdated(); only after a
+      // user interaction or an explicit value change has occurred.
+      if (this.hasInteracted) {
+        this.dispatchEvent(
+          new CustomEvent("fluid-change", {
+            detail: { value: this.value },
+            bubbles: true,
+            composed: true
+          })
+        );
+      }
     }
   }
 
@@ -192,6 +203,7 @@ export class FluidTabs extends FluidElement {
   private handleNavClick = (e: Event) => {
     const tab = (e.target as HTMLElement).closest("fluid-tab") as FluidTab | null;
     if (!tab || tab.disabled) return;
+    this.hasInteracted = true;
     this.value = tab.panel;
   };
 
@@ -217,7 +229,10 @@ export class FluidTabs extends FluidElement {
       case " ":
         if (this.activation === "manual") {
           const focused = tabs.find((t) => t === document.activeElement);
-          if (focused) this.value = focused.panel;
+          if (focused) {
+            this.hasInteracted = true;
+            this.value = focused.panel;
+          }
         }
         return;
       default:
@@ -226,6 +241,7 @@ export class FluidTabs extends FluidElement {
     e.preventDefault();
     tabs[nextIndex]?.focus();
     if (this.activation === "auto") {
+      this.hasInteracted = true;
       this.value = tabs[nextIndex]!.panel;
     }
   };

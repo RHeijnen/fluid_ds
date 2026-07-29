@@ -196,6 +196,43 @@ describe("<fluid-button>", () => {
     expect(el.textContent!.trim()).to.equal("Save");
   });
 
+  /*
+   * Reduced motion: the infinite spinner rotation must be slowed (not left at
+   * the fast 0.6s continuous spin) for vestibular-sensitive users. The reduce
+   * media query overrides .spinner animation-duration to 1.5s.
+   */
+  it("loading: spinner slows under prefers-reduced-motion", async () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) =>
+      ({
+        matches: query.includes("prefers-reduced-motion"),
+        media: query,
+        onchange: null,
+        addEventListener() {},
+        removeEventListener() {},
+        addListener() {},
+        removeListener() {},
+        dispatchEvent: () => false
+      }) as unknown as MediaQueryList) as typeof window.matchMedia;
+    try {
+      const el = await fixture<FluidButton>(html`<fluid-button loading>Save</fluid-button>`);
+      const spinner = el.shadowRoot!.querySelector(".spinner")!;
+      // The reduce block targets .spinner animation-duration. WTR runs in a
+      // real Chromium, so the media query + emulation may not be active here;
+      // assert the stylesheet carries the slowed override regardless by reading
+      // the matching rule from the component's CSS.
+      const sheet = el.shadowRoot!.adoptedStyleSheets[0];
+      const cssText = Array.from(sheet.cssRules)
+        .map((r) => r.cssText)
+        .join("\n");
+      expect(cssText).to.match(/prefers-reduced-motion/);
+      expect(cssText).to.match(/\.spinner\s*\{[^}]*animation-duration:\s*1\.5s/);
+      expect(spinner).to.exist;
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
+
   /* Toggle button, aria-pressed reflects + flips, fires fluid-change. */
   it("toggle: reflects aria-pressed and flips on activation", async () => {
     const el = await fixture<FluidButton>(html`<fluid-button toggle>Mute</fluid-button>`);
@@ -257,5 +294,34 @@ describe("<fluid-button>", () => {
     expect(inner.getAttribute("aria-haspopup")).to.equal("menu");
     expect(inner.getAttribute("aria-expanded")).to.equal("true");
     expect(inner.getAttribute("aria-controls")).to.equal("menu-1");
+  });
+
+  /*
+   * Lifecycle: the aria MutationObserver set up in connectedCallback must be
+   * disconnected in disconnectedCallback. After remove(), mutating an observed
+   * attribute (aria-expanded) must NOT trigger another requestUpdate / render.
+   * Locks in the cleanup contract on the empty FluidElement base.
+   */
+  it("disconnect: aria observer stops firing after the element is removed", async () => {
+    const el = await fixture<FluidButton>(html`<fluid-button caret>Trigger</fluid-button>`);
+    await el.updateComplete;
+
+    el.remove();
+    // Let any pending microtasks settle so the removal is complete.
+    await el.updateComplete;
+
+    let updated = false;
+    const orig = el.requestUpdate.bind(el);
+    el.requestUpdate = ((...args: unknown[]) => {
+      updated = true;
+      return (orig as (...a: unknown[]) => unknown)(...args);
+    }) as typeof el.requestUpdate;
+
+    // Mutate an observed attribute; a live observer would call requestUpdate.
+    el.setAttribute("aria-expanded", "true");
+    // Give a disconnected observer a chance to (incorrectly) fire.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(updated).to.be.false;
   });
 });

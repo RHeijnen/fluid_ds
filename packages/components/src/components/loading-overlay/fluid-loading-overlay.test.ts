@@ -81,6 +81,24 @@ describe("<fluid-loading-overlay>", () => {
     );
   });
 
+  it("collapses the fade-in duration when --fluid-motion is 0", async () => {
+    const wrapper = await fixture(html`
+      <div style="--fluid-motion:0;">
+        <fluid-loading-overlay active label="Loading"
+          ><p>Content</p></fluid-loading-overlay
+        >
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidLoadingOverlay>(
+      "fluid-loading-overlay"
+    )!;
+    await elementUpdated(el);
+    const overlay = el.shadowRoot!.querySelector(".overlay")!;
+    const duration = getComputedStyle(overlay).animationDuration;
+    // calc(var(--fluid-duration-fast) * 0) must resolve to a zero-length time.
+    expect(parseFloat(duration)).to.equal(0);
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture(html`
       <div

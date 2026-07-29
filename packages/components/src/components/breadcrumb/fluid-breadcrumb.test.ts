@@ -53,6 +53,25 @@ describe("<fluid-breadcrumb>", () => {
     await expect(el).to.be.accessible();
   });
 
+  it("hides the trailing separator on the last item only", async () => {
+    const el = await fixture<FluidBreadcrumb>(html`
+      <fluid-breadcrumb>
+        <fluid-breadcrumb-item href="/">Home</fluid-breadcrumb-item>
+        <fluid-breadcrumb-item href="/docs">Docs</fluid-breadcrumb-item>
+        <fluid-breadcrumb-item>API</fluid-breadcrumb-item>
+      </fluid-breadcrumb>
+    `);
+    await el.updateComplete;
+    const items = Array.from(el.querySelectorAll<FluidBreadcrumbItem>("fluid-breadcrumb-item"));
+    await Promise.all(items.map((i) => i.updateComplete));
+
+    const lastSep = items[items.length - 1]!.shadowRoot!.querySelector<HTMLElement>(".separator")!;
+    const middleSep = items[1]!.shadowRoot!.querySelector<HTMLElement>(".separator")!;
+
+    expect(getComputedStyle(lastSep).display).to.equal("none");
+    expect(getComputedStyle(middleSep).display).to.not.equal("none");
+  });
+
   /* Rework: override ladder. */
 
   it("link color reads the --fluid-breadcrumb-item-* override ladder", async () => {

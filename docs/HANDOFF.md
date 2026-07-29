@@ -16,6 +16,17 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **TODO (next session): drop the `@floating-ui/dom` dependency, make
+> positioning fully in-house.** Floating UI is our only runtime positioning
+> dep; it's pulled in by every overlay component (tooltip, popover, popup,
+> dropdown, select, typeahead, menu, context-menu, date pickers, etc.) and is
+> the bare `import "@floating-ui/dom"` the docs CDN import-map has to shim.
+> Goal: a small internal `positioning` util in `packages/components/src/internal`
+> (anchor rect + placement + flip/shift/offset/arrow) replacing
+> `computePosition`/`autoUpdate`, so the design system ships zero third-party
+> positioning code. Audit usages first (`grep -r "@floating-ui/dom"`), keep the
+> same call sites, swap the implementation, re-verify overlays in-browser.
+
 - **Branch:** `main`
 - **Last verified:** 2026-06-01: `pnpm typecheck` + `pnpm lint` +
   `pnpm check:coverage` + `pnpm test` (854 component tests) + `pnpm build` +
@@ -293,6 +304,94 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-06-01: roadmap P0 infra, phantom-token gate + FluidElement teardown helpers
+
+Built the systemic guards from the hardening roadmap so the two worst recurring
+bug classes can't come back:
+
+- **`pnpm check:tokens`** (`scripts/check-tokens.mjs`, wired into `pnpm verify`):
+  fails the build on any `var(--fluid-*)` / `getPropertyValue` reference that
+  doesn't resolve to a real token. Primitive/semantic namespaces always must
+  resolve; component knobs only when referenced bare (so the override-ladder
+  fallbacks don't false-positive). It immediately caught **4 more phantoms** the
+  fix sweep missed: `--fluid-line-height-normal` in anchor-nav / description-list
+  / step / timeline (→ `--fluid-font-line-height-normal`) and
+  `--fluid-border-base` / `--fluid-surface-raised` / `--fluid-text-base` in the
+  animations effects story.
+- **`FluidElement` teardown helpers** (`packages/components/src/internal/base-element.ts`):
+  `registerCleanup(fn)`, `listen(target, type, handler)` (auto-removed via the
+  disconnect signal), `disconnectSignal` (an `AbortSignal`), and
+  `changedAfterFirstRender(changed, key)` (first-render event guard). All
+  additive + opt-in (non-adopters behave like a plain `LitElement`); run/aborted
+  in the base `disconnectedCallback`. New `base-element.test.ts` proves cleanups
+  run, listeners detach, the signal aborts + remints on reconnect, a throwing
+  cleanup doesn't strand the others, and mount events are suppressed.
+- Documented both in `CLAUDE.md` (commands + the "tear down on disconnect"
+  convention) and marked the items done in
+  [`docs/plans/component-animation-roadmap.md`](plans/component-animation-roadmap.md).
+- **Gates green:** `pnpm verify` (now typecheck → lint → check:coverage →
+  check:tokens → test → build) end-to-end; all 110 components unaffected by the
+  base-class change (it only adds an additive `disconnectedCallback`).
+- **Remaining roadmap follow-ups:** a reduced-motion test helper wired into the
+  coverage gate, and incremental migration of existing lifecycle / spurious-event
+  call sites onto the new `FluidElement` helpers (one component per session).
+- **In-house positioning engine built** (toward dropping `@floating-ui/dom`,
+  task #227): `packages/components/src/internal/position.ts` re-implements the
+  Floating-UI subset the 11 overlay components use (`computePosition` +
+  `autoUpdate` + `offset`/`flip`/`shift`/`size`/`arrow`) with a drop-in API and 8
+  deterministic unit tests. It is **NOT wired into any component yet** (inert,
+  zero risk). Migration is one component per session, browser-verified, per
+  [`docs/plans/in-house-positioning.md`](plans/in-house-positioning.md); the real
+  risk to check is the strategy / offset-parent math for shadow-DOM
+  absolutely-positioned floats (prefer `strategy: "fixed"`).
+
+### 2026-06-01: full component + animation audit, fix + test sweep
+
+- **Exhaustive multi-agent audit** of every component + the animation engine (a
+  Workflow run: 23 parallel auditors → adversarial per-bug verification → roadmap
+  synthesis; 89 agents). Found **54 confirmed bugs, 55 test-gaps, 21 doc-gaps,
+  17 future ideas**. Dominant classes: **lifecycle leaks** (timers / observers /
+  WAAPI animations / fetches / object-URLs never torn down, because `FluidElement`
+  is an empty base) and **phantom tokens** (CSS vars that don't exist, so themed
+  surfaces silently render the wrong color).
+- **Fix sweep** via a second Workflow (68 agents, one per component directory):
+  74 fixes + ~100 regression tests applied. Then a hand-driven `pnpm verify`
+  stabilization pass fixed everything the agents left broken:
+  - Phantom tokens: `--fluid-color-primary` (6 files) → `--fluid-accent-base`;
+    bare `--fluid-line-height-*` → `--fluid-font-line-height-*`.
+  - Lifecycle: `fluid-animation` cancels its WAAPI animation + honors
+    reduced-motion (jump-to-end, `ignore-reduced-motion` opt-out); scroller
+    ResizeObserver, tree-item MutationObserver, include fetch (AbortController),
+    code-block / dropzone / celebrate / tour cleanups; `fluid-menu` resets its
+    type-ahead **buffer** (not just the timer) on disconnect.
+  - Reduced-motion: `fluid-spinner` now sets `animation: none` (was only slowed).
+  - a11y: `fluid-file-input` rebuilt so the visible drop zone is a real
+    `div[role=button]` (focus target) with the `<input>` as an `aria-hidden`
+    sibling, killing the `nested-interactive` + `aria-allowed-role` axe
+    violations; `fluid-carousel` scroller is the single keyboard-reachable tab
+    stop (`scrollable-region-focusable`); date-range-picker focuses the dialog
+    on open.
+  - Correctness: `fluid-form` reset button wired; `fluid-video` binds `.muted`
+    as a property (attribute alone never set it); spurious mount events guarded
+    (video-playlist, details, tabs, segmented-control, popover, popconfirm).
+  - **Security:** `@fluid-ds/markdown` now sanitizes `marked` output before
+    `innerHTML` (strips script/style/iframe/object/embed/link/meta, `on*`
+    handlers, `javascript:` + control-char-obfuscated URLs); opt out with
+    `trusted`. Wired markdown's missing test infra (web-test-runner + devDeps +
+    tsconfig exclude + root `test` filter).
+  - Re-found two recurring gotchas the agents reintroduced: a backtick inside a
+    `css\`\`` **comment** terminates the template (breadcrumb-item); a `dataset`
+    key can't contain a hyphen (`pointerenter-bound` → switched the animation
+    controller to a `WeakMap`). The controller also now only re-plays a one-shot
+    animation when the attribute value actually **changed** (echo guard).
+- **Roadmap written:** [`docs/plans/component-animation-roadmap.md`](plans/component-animation-roadmap.md)
+  (P0/P1/P2 themes + net-new infra: a teardown mixin on `FluidElement`, a
+  build-time phantom-token validator, a reduced-motion test helper, a
+  first-render event guard).
+- **Gates:** `pnpm verify` green end-to-end (typecheck → lint → coverage → all
+  package tests incl. the new regressions → build) and `pnpm docs:build` green
+  (132 pages). ~51 source files + ~65 test files changed.
 
 ### 2026-06-01: landing effects polish + engine wind-down fix (0.0.3-alpha.0 build)
 

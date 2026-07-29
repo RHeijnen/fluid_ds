@@ -26,10 +26,10 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @cssproperty --fluid-grid-gap - Gap between cells. Falls back to --fluid-space-4.
  * @cssproperty --fluid-grid-min-col - Minimum column width in intrinsic mode. Falls back to 16rem.
- * @cssproperty --fluid-grid-align - Block-axis item alignment (align-items). Falls back to stretch.
- * @cssproperty --fluid-grid-justify - Inline-axis item alignment (justify-items). Falls back to stretch.
+ * @cssproperty --fluid-grid-align - Block-axis item alignment (align-items). Falls back to the literal CSS keyword `stretch` (no semantic alignment token exists), not a semantic var.
+ * @cssproperty --fluid-grid-justify - Inline-axis item alignment (justify-items). Falls back to the literal CSS keyword `stretch` (no semantic alignment token exists), not a semantic var.
  *
- * @uses-token --fluid-space-4 - Default gap between cells.
+ * @uses-token --fluid-space-4 - Default gap between cells. (align/justify have no semantic backing by design and intentionally fall back to literal `stretch`.)
  */
 export class FluidGrid extends FluidElement {
   static override styles = css`

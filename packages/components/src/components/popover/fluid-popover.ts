@@ -111,6 +111,7 @@ export class FluidPopover extends FluidElement {
   private trigger: HTMLElement | null = null;
   private cleanup?: () => void;
   private previouslyFocused: HTMLElement | null = null;
+  private hasOpened = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -131,8 +132,12 @@ export class FluidPopover extends FluidElement {
 
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
-      if (this.open) this.handleOpen();
-      else this.handleClose();
+      if (this.open) {
+        this.hasOpened = true;
+        this.handleOpen();
+      } else if (this.hasOpened) {
+        this.handleClose();
+      }
     }
   }
 

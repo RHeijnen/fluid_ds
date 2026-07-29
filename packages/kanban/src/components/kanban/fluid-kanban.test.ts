@@ -34,6 +34,31 @@ function card(el: FluidKanban, id: string): HTMLElement {
   return el.shadowRoot!.querySelector<HTMLElement>(`[data-card-id="${id}"]`)!;
 }
 
+function column(el: FluidKanban, index: number): HTMLElement {
+  return el.shadowRoot!.querySelectorAll<HTMLElement>('[part="column"]')[index]!;
+}
+
+/** Minimal DataTransfer stub backed by an in-memory string store. */
+function dataTransfer(): DataTransfer {
+  const store: Record<string, string> = {};
+  return {
+    effectAllowed: "none",
+    dropEffect: "none",
+    setData(format: string, value: string) {
+      store[format] = value;
+    },
+    getData(format: string) {
+      return store[format] ?? "";
+    }
+  } as unknown as DataTransfer;
+}
+
+function dragEvent(type: string, dt: DataTransfer): DragEvent {
+  const ev = new Event(type, { bubbles: true, cancelable: true });
+  Object.defineProperty(ev, "dataTransfer", { value: dt, configurable: true });
+  return ev as DragEvent;
+}
+
 describe("<fluid-kanban>", () => {
   it("renders each column as a labelled group with a card list", async () => {
     const el = await board();
@@ -114,6 +139,45 @@ describe("<fluid-kanban>", () => {
     await elementUpdated(el);
     expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
     expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c1", "c2"]);
+  });
+
+  it("pointer drag and drop moves a card and emits fluid-move", async () => {
+    const el = await board();
+    const dt = dataTransfer();
+
+    // dragstart on the card stashes its id on the dataTransfer.
+    card(el, "c1").dispatchEvent(dragEvent("dragstart", dt));
+    expect(dt.getData("text/plain")).to.equal("c1");
+
+    // dragover on the target column highlights it via .drop-target.
+    column(el, 1).dispatchEvent(dragEvent("dragover", dt));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(true);
+
+    // drop on the target column moves the card and fires fluid-move.
+    setTimeout(() => column(el, 1).dispatchEvent(dragEvent("drop", dt)));
+    const ev = await oneEvent(el, "fluid-move");
+    expect(ev.detail.cardId).to.equal("c1");
+    expect(ev.detail.fromColumn).to.equal("todo");
+    expect(ev.detail.toColumn).to.equal("doing");
+    expect(ev.detail.index).to.equal(1);
+
+    await elementUpdated(el);
+    // Drop clears the highlight and relocates the card to the end of "doing".
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(false);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2"]);
+    expect(el.columns[1]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1"]);
+  });
+
+  it("dragleave clears the drop-target highlight", async () => {
+    const el = await board();
+    const dt = dataTransfer();
+    column(el, 1).dispatchEvent(dragEvent("dragover", dt));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(true);
+    column(el, 1).dispatchEvent(new Event("dragleave", { bubbles: true }));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(false);
   });
 
   it("passes the a11y audit", async () => {

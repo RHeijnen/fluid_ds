@@ -1,4 +1,4 @@
-import { LitElement, html, css, type TemplateResult } from "lit";
+import { LitElement, html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../video/define.js";
 import type { FluidVideo } from "../video/fluid-video.js";
@@ -26,7 +26,7 @@ export interface PlaylistEntry {
  * @cssproperty --fluid-video-playlist-item-hover-bg - Hover background for inactive rows.
  * @cssproperty --fluid-video-playlist-active-accent - Active row accent color.
  *
- * @uses-token --fluid-color-primary - Active row tint.
+ * @uses-token --fluid-accent-base - Active row tint.
  * @uses-token --fluid-surface-base - Default background.
  * @uses-token --fluid-border-default - Row separator.
  *
@@ -64,13 +64,13 @@ export class FluidVideoPlaylist extends LitElement {
     .item:hover {
       background: var(--fluid-video-playlist-item-hover-bg, var(--fluid-surface-muted));
     }
-    .item[aria-current="true"] {
+    .item[aria-pressed="true"] {
       background: color-mix(
         in srgb,
-        var(--fluid-video-playlist-active-accent, var(--fluid-color-primary)) 15%,
+        var(--fluid-video-playlist-active-accent, var(--fluid-accent-base)) 15%,
         transparent
       );
-      color: var(--fluid-video-playlist-active-accent, var(--fluid-color-primary));
+      color: var(--fluid-video-playlist-active-accent, var(--fluid-accent-base));
       font-weight: var(--fluid-font-weight-medium);
     }
 
@@ -104,14 +104,22 @@ export class FluidVideoPlaylist extends LitElement {
     this.videoEl?.removeEventListener("fluid-ended", this.onEnded);
   }
 
-  protected override updated(): void {
-    this.dispatchEvent(
-      new CustomEvent("fluid-change", {
-        detail: { index: this.activeIndex, entry: this.entries[this.activeIndex] },
-        bubbles: true,
-        composed: true
-      })
-    );
+  protected override updated(changed: PropertyValues<this>): void {
+    // Fire fluid-change only on a genuine activeIndex change, never on initial
+    // mount: on the first render Lit records activeIndex with an undefined old
+    // value (hasUpdated is already true inside updated(), so it can't gate this).
+    // activeIndex is private @state, so read changed as a plain Map to sidestep
+    // the keyof-this key constraint.
+    const ch = changed as Map<PropertyKey, unknown>;
+    if (ch.has("activeIndex") && ch.get("activeIndex") !== undefined) {
+      this.dispatchEvent(
+        new CustomEvent("fluid-change", {
+          detail: { index: this.activeIndex, entry: this.entries[this.activeIndex] },
+          bubbles: true,
+          composed: true
+        })
+      );
+    }
   }
 
   private onEnded = () => {
@@ -142,14 +150,13 @@ export class FluidVideoPlaylist extends LitElement {
         muted
         plays-inline
       ></fluid-video>
-      <div part="list" class="list" role="listbox" aria-label="Playlist">
+      <div part="list" class="list" role="group" aria-label="Playlist">
         ${this.entries.map(
           (e, i) => html`
             <button
               part="item"
               class="item"
-              role="option"
-              aria-current=${i === this.activeIndex ? "true" : "false"}
+              aria-pressed=${i === this.activeIndex ? "true" : "false"}
               @click=${() => this.goTo(i)}
             >
               ${e.title ?? `Track ${i + 1}`}

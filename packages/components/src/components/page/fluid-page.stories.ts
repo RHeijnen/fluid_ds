@@ -43,7 +43,12 @@ export const HeaderAndMainOnly: Story = {
 export const WithBanner: Story = {
   render: () => html`
     <fluid-page style="min-height: 22rem; border: 1px solid var(--fluid-border-default);">
-      <div slot="banner">${region("Banner, system status", "var(--fluid-color-warning-soft)")}</div>
+      <div slot="banner">
+        ${region(
+          "Banner, system status",
+          "color-mix(in srgb, var(--fluid-warning-base) 15%, transparent)"
+        )}
+      </div>
       <div slot="header">${region("Header", "var(--fluid-surface-subtle)")}</div>
       ${region("Main", "var(--fluid-surface-base)")}
     </fluid-page>

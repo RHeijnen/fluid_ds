@@ -123,6 +123,10 @@ export class FluidMenu extends FluidElement {
     super.disconnectedCallback();
     this.removeEventListener("pointermove", this.handlePointerMove);
     clearTimeout(this.typeaheadTimer);
+    // Reset the type-ahead buffer too: the pending timer that would have
+    // cleared it is now cancelled, so without this the stale buffer leaks into
+    // the next session if the element is re-attached.
+    this.typeaheadBuffer = "";
   }
 
   /** All non-disabled-aware menu item children, in DOM order. */

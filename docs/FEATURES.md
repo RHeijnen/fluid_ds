@@ -77,8 +77,8 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 - ✅ CDN-first: a `<link>` + `<script>` from jsDelivr/unpkg, no bundler needed.
 - ✅ npm / bundler path with tree-shakable per-component entry points.
 - ✅ **Published**: all `@fluid-ds/*` packages are live on the public npm
-  registry under the `alpha` tag (current release `0.0.3-alpha`). Install with
-  `npm i @fluid-ds/components@alpha`.
+  registry under the stable `latest` channel. Install with
+  `npm i @fluid-ds/components@latest`.
 
 ### Accessibility: WCAG 2.2 ✅ AA / 🔨 AAA
 - ✅ Every component built to **WCAG 2.2 Level AA**: semantics from the WAI-ARIA

@@ -67,6 +67,45 @@ describe("<fluid-details>", () => {
     expect(body.getAttribute("aria-labelledby")).to.equal(summary.id);
   });
 
+  it("does not fire fluid-toggle on initial mount (closed)", async () => {
+    let fired = false;
+    const el = await fixture<FluidDetails>(html`
+      <fluid-details>
+        <span slot="summary">Q</span>
+        <p>A</p>
+      </fluid-details>
+    `);
+    el.addEventListener("fluid-toggle", () => (fired = true));
+    // Let any post-connect updates settle.
+    await el.updateComplete;
+    expect(fired).to.be.false;
+  });
+
+  it("does not fire fluid-toggle on initial mount (open)", async () => {
+    let fired = false;
+    const el = await fixture<FluidDetails>(html`
+      <fluid-details open>
+        <span slot="summary">Q</span>
+        <p>A</p>
+      </fluid-details>
+    `);
+    el.addEventListener("fluid-toggle", () => (fired = true));
+    await el.updateComplete;
+    expect(fired).to.be.false;
+  });
+
+  it("fires fluid-toggle only on a real open/close transition", async () => {
+    const el = await fixture<FluidDetails>(html`
+      <fluid-details>
+        <span slot="summary">Q</span>
+        <p>A</p>
+      </fluid-details>
+    `);
+    setTimeout(() => (el.open = true));
+    const event = (await oneEvent(el, "fluid-toggle")) as CustomEvent;
+    expect(event.detail.open).to.be.true;
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture<FluidDetails>(html`
       <fluid-details>

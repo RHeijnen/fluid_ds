@@ -146,16 +146,25 @@ export class FluidTreeItem extends FluidElement {
   /** @internal Whether any direct-child tree items exist. */
   @state() private hasChildren = false;
 
+  /** @internal Observes light-DOM child changes to re-route nested items. */
+  private childObserver?: MutationObserver;
+
   override connectedCallback(): void {
     super.connectedCallback();
     if (!this.hasAttribute("role")) this.setAttribute("role", "treeitem");
     this.tabIndex = -1;
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.childObserver?.disconnect();
+    this.childObserver = undefined;
+  }
+
   protected override firstUpdated(): void {
     this.routeChildren();
-    const mo = new MutationObserver(() => this.routeChildren());
-    mo.observe(this, { childList: true });
+    this.childObserver = new MutationObserver(() => this.routeChildren());
+    this.childObserver.observe(this, { childList: true });
   }
 
   protected override updated(changed: PropertyValues<this>): void {

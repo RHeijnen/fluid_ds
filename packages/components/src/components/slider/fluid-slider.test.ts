@@ -33,6 +33,19 @@ describe("<fluid-slider>", () => {
     expect(el.value).to.equal("42");
   });
 
+  it("fires fluid-change when the user commits a change", async () => {
+    const el = await fixture<FluidSlider>(html`
+      <fluid-slider value="10" aria-label="Volume"></fluid-slider>
+    `);
+    const input = el.shadowRoot!.querySelector("input")!;
+    input.value = "75";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    setTimeout(() => input.dispatchEvent(new Event("change", { bubbles: true })));
+    const event = (await oneEvent(el, "fluid-change")) as CustomEvent;
+    expect(event.detail.value).to.equal("75");
+    expect(el.value).to.equal("75");
+  });
+
   it("respects min/max/step", async () => {
     const el = await fixture<FluidSlider>(html`
       <fluid-slider min="-50" max="50" step="5" value="0" aria-label="Range"></fluid-slider>

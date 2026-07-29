@@ -107,6 +107,12 @@ export class FluidSegmentedControl extends FluidElement {
    */
   private valueChangePending = false;
   private valueChangeTimer?: ReturnType<typeof setTimeout>;
+  /**
+   * True only when `value` was changed by a user gesture (click / keyboard).
+   * Guards the `fluid-change` dispatch so auto-seeding the default value on
+   * first render does not emit a change the user never made.
+   */
+  private userInitiated = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -138,13 +144,18 @@ export class FluidSegmentedControl extends FluidElement {
       clearTimeout(this.valueChangeTimer);
       this.valueChangeTimer = setTimeout(() => (this.valueChangePending = false), 0);
       this.positionThumb(true);
-      this.dispatchEvent(
-        new CustomEvent("fluid-change", {
-          detail: { value: this.value },
-          bubbles: true,
-          composed: true
-        })
-      );
+      // Only emit for user-initiated changes. Auto-seeding the default value in
+      // syncSelection() also lands here, but the user never made that choice.
+      if (this.userInitiated) {
+        this.userInitiated = false;
+        this.dispatchEvent(
+          new CustomEvent("fluid-change", {
+            detail: { value: this.value },
+            bubbles: true,
+            composed: true
+          })
+        );
+      }
     }
   }
 
@@ -195,6 +206,7 @@ export class FluidSegmentedControl extends FluidElement {
   private handleClick = (e: Event) => {
     const seg = (e.target as HTMLElement).closest("fluid-segment") as FluidSegment | null;
     if (!seg || seg.disabled) return;
+    if (seg.value !== this.value) this.userInitiated = true;
     this.value = seg.value;
   };
 
@@ -222,6 +234,7 @@ export class FluidSegmentedControl extends FluidElement {
         return;
     }
     e.preventDefault();
+    if (segments[next]!.value !== this.value) this.userInitiated = true;
     this.value = segments[next]!.value;
     segments[next]!.focus();
   };

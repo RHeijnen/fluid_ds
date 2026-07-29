@@ -43,9 +43,25 @@ component-level tokens for fine control:
 
 ```css
 [data-fluid-brand="custom"] {
-  --fluid-markdown-link-fg: var(--fluid-color-primary);
+  --fluid-markdown-link-fg: var(--fluid-accent-base);
   --fluid-markdown-code-bg: var(--fluid-surface-muted);
 }
+```
+
+## Security
+
+Rendered HTML is sanitized by default. `marked` does not strip raw HTML, and
+`src` can fetch untrusted remote content, so `<fluid-markdown>` removes
+`script`, `style`, `iframe`, `object`, `embed`, `link`, and `meta` elements,
+`on*` event-handler attributes, and `javascript:` URLs before inserting the
+output.
+
+```html
+<!-- Sanitized (default) -->
+<fluid-markdown src="/release-notes.md"></fluid-markdown>
+
+<!-- Opt out only for fully trusted source -->
+<fluid-markdown trusted value="### Trusted content"></fluid-markdown>
 ```
 
 ## When to use

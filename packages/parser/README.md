@@ -10,7 +10,7 @@ and hands back clean typed rows plus a full error report. A mapping UI and an
 error-preview table come with it. Built on standard web components: works in
 React, Vue, Angular, Svelte, or plain HTML.
 
-> Alpha. Install with the `alpha` tag: `npm i @fluid-ds/parser@alpha`.
+Install with `npm i @fluid-ds/parser@latest`.
 
 ## What's inside
 

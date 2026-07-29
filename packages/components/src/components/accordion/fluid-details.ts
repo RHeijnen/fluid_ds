@@ -143,13 +143,18 @@ export class FluidDetails extends FluidElement {
         if (this.open) this.bodyEl.removeAttribute("hidden");
         else this.bodyEl.setAttribute("hidden", "");
       }
-      this.dispatchEvent(
-        new CustomEvent("fluid-toggle", {
-          detail: { open: this.open },
-          bubbles: true,
-          composed: true
-        })
-      );
+      // Only dispatch on a real open/close transition. On the first update Lit
+      // includes `open` in `changed` with an `undefined` previous value, which
+      // would otherwise fire a spurious toggle on mount for every details.
+      if (changed.get("open") !== undefined) {
+        this.dispatchEvent(
+          new CustomEvent("fluid-toggle", {
+            detail: { open: this.open },
+            bubbles: true,
+            composed: true
+          })
+        );
+      }
     }
   }
 

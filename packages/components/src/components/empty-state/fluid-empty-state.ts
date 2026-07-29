@@ -1,5 +1,5 @@
 import { html, css, type TemplateResult } from "lit";
-import { property } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
 /**
@@ -72,9 +72,6 @@ export class FluidEmptyState extends FluidElement {
       justify-content: center;
       margin-top: 0.25rem;
     }
-    .actions:not(:has(*))::slotted(*) {
-      display: none;
-    }
     [hidden] {
       display: none !important;
     }
@@ -83,13 +80,23 @@ export class FluidEmptyState extends FluidElement {
   /** The heading text. (Use the default slot for longer descriptions.) */
   @property() heading = "";
 
+  /** Whether the actions slot currently has assigned content. */
+  @state() private hasActions = false;
+
+  private onActionsSlotChange(event: Event): void {
+    const slot = event.target as HTMLSlotElement;
+    this.hasActions = slot.assignedNodes({ flatten: true }).length > 0;
+  }
+
   override render(): TemplateResult {
     return html`
       <div part="base" class="base">
         <span part="media" class="media"><slot name="media"></slot></span>
         ${this.heading ? html`<p part="heading" class="heading">${this.heading}</p>` : ""}
         <div class="description"><slot></slot></div>
-        <div part="actions" class="actions"><slot name="actions"></slot></div>
+        <div part="actions" class="actions" ?hidden=${!this.hasActions}>
+          <slot name="actions" @slotchange=${this.onActionsSlotChange}></slot>
+        </div>
       </div>
     `;
   }

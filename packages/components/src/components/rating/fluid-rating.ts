@@ -1,6 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { reducedMotion } from "../../internal/motion.js";
 
 /**
  * Star rating control. Form-associated. Supports half steps, custom symbols
@@ -68,7 +69,9 @@ export class FluidRating extends FluidElement {
   formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
   }
-  static override styles = css`
+  static override styles = [
+    reducedMotion,
+    css`
     :host {
       display: inline-flex;
     }
@@ -147,7 +150,8 @@ export class FluidRating extends FluidElement {
       height: 100%;
       display: inline-block;
     }
-  `;
+  `
+  ];
 
   /** Current value (0 to `max`). Supports decimal values when `precision` < 1. */
   @property({ type: Number }) value = 0;

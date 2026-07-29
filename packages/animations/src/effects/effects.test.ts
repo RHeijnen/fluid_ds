@@ -5,6 +5,8 @@ import {
   fireworks,
   emojiBurst,
   emojiRain,
+  emojiFountain,
+  bubbles,
   snow,
   sparkles,
   streamers,
@@ -64,6 +66,8 @@ describe("effects: API contract", () => {
     ["fireworks", () => fireworks({ shells: 2, interval: 10 })],
     ["emojiBurst", () => emojiBurst()],
     ["emojiRain", () => emojiRain()],
+    ["emojiFountain", () => emojiFountain({ duration: 100 })],
+    ["bubbles", () => bubbles({ duration: 100 })],
     ["snow", () => snow()],
     ["sparkles", () => sparkles()],
     ["streamers", () => streamers()],
@@ -234,6 +238,62 @@ describe("<fluid-celebrate>", () => {
     );
     el.emojis = ["⭐", "✨"];
     expect(el.emojis).to.deep.equal(["⭐", "✨"]);
+  });
+
+  it("observes the config attributes that #readOptions consumes so live changes refire", () => {
+    const Ctor = customElements.get("fluid-celebrate") as typeof FluidCelebrate;
+    const observed = Ctor.observedAttributes;
+    for (const attr of ["origin", "cannons", "shells", "rate", "duration", "spread"]) {
+      expect(observed).to.include(attr);
+    }
+  });
+
+  it("re-fires on connect when an observed config attribute changes under auto", async () => {
+    const el = document.createElement("fluid-celebrate") as FluidCelebrate;
+    el.setAttribute("effect", "confetti");
+    el.setAttribute("count", "6");
+    el.setAttribute("auto", "");
+    document.body.appendChild(el);
+    try {
+      // First (deferred) auto-fire.
+      await waitUntil(() => activeEmitterCount() > 0, "initial auto fire never ran", {
+        timeout: 1000
+      });
+      el.stop();
+      await waitUntil(() => activeEmitterCount() === 0, "did not drain");
+      // Changing a config-only attribute must drive attributeChangedCallback -> refire.
+      el.setAttribute("duration", "100");
+      await waitUntil(() => activeEmitterCount() > 0, "duration change did not refire", {
+        timeout: 1000
+      });
+      el.stop();
+    } finally {
+      el.remove();
+      await waitUntil(() => activeEmitterCount() === 0, "did not drain");
+    }
+  });
+
+  it("does not dispatch fluid-celebrate-end after the element is removed mid-burst", async () => {
+    const el = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate effect="snow"></fluid-celebrate>`
+    );
+    // Listen on the document so we'd catch a (bubbling) end event from anywhere.
+    let endFired = false;
+    const onEnd = (): void => {
+      endFired = true;
+    };
+    document.addEventListener("fluid-celebrate-end", onEnd);
+    try {
+      const fired = el.fire();
+      // Remove mid-burst: disconnectedCallback -> stop() resolves finished.
+      el.remove();
+      await fired;
+      expect(el.isConnected).to.equal(false);
+      expect(endFired).to.equal(false);
+    } finally {
+      document.removeEventListener("fluid-celebrate-end", onEnd);
+      await waitUntil(() => activeEmitterCount() === 0, "did not drain");
+    }
   });
 
   it("auto fires on connect and ends", async () => {

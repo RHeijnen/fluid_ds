@@ -295,7 +295,12 @@ export class FluidMeter extends FluidElement {
     this.setAttribute("aria-valuenow", String(value));
     this.setAttribute("aria-valuetext", this.valueText(value));
     if (!this.hasAttribute("aria-labelledby")) {
-      this.setAttribute("aria-label", this.label ?? "Meter");
+      // Don't clobber a visible slotted label with the generic fallback: when
+      // slot text is present (and no explicit `label`), derive the accessible
+      // name from it so the visible label and the accessible name match.
+      const slotted = this.label ? "" : this.textContent?.trim();
+      const name = this.label ?? (slotted || "Meter");
+      this.setAttribute("aria-label", name);
     }
   }
 

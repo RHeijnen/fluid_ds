@@ -84,6 +84,33 @@ describe("<fluid-tabs>", () => {
     expect(el.value).to.equal("a");
   });
 
+  it("does not emit fluid-change on the initial auto-select", async () => {
+    let fired = 0;
+    const onChange = () => {
+      fired += 1;
+    };
+    // Attach the listener before the element finishes its first update so any
+    // mount-time auto-select emission would be observed.
+    const el = await fixture<FluidTabs>(html`
+      <fluid-tabs @fluid-change=${onChange}>
+        <fluid-tab slot="nav" panel="a">A</fluid-tab>
+        <fluid-tab slot="nav" panel="b">B</fluid-tab>
+        <fluid-tab-panel name="a">A</fluid-tab-panel>
+        <fluid-tab-panel name="b">B</fluid-tab-panel>
+      </fluid-tabs>
+    `);
+    await el.updateComplete;
+    // The auto-select picks the first tab but must not announce a change.
+    expect(el.value).to.equal("a");
+    expect(fired).to.equal(0);
+
+    // A real user interaction should still emit.
+    const second = el.querySelector<HTMLElement>('fluid-tab[panel="b"]')!;
+    second.click();
+    await el.updateComplete;
+    expect(fired).to.equal(1);
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture<FluidTabs>(sample);
     await el.updateComplete;

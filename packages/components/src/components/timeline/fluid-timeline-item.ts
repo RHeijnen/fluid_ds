@@ -48,6 +48,7 @@ export type FluidTimelineItemTone = "default" | "info" | "success" | "warning" |
  * @uses-token --fluid-danger-base - Danger tone marker fill.
  * @uses-token --fluid-danger-text - Danger tone marker icon color.
  * @uses-token --fluid-warning-base - Warning tone marker fill.
+ * @uses-token --fluid-warning-text - Warning tone marker icon color.
  * @uses-token --fluid-info-base - Info tone marker fill.
  * @uses-token --fluid-info-text - Info tone marker icon color.
  * @uses-token --fluid-surface-base - Ring color separating the marker from the line.
@@ -115,7 +116,7 @@ export class FluidTimelineItem extends FluidElement {
     }
     :host([tone="warning"]) .marker {
       background: var(--fluid-timeline-item-marker-bg, var(--fluid-warning-base));
-      color: var(--fluid-timeline-item-marker-fg, var(--fluid-accent-text));
+      color: var(--fluid-timeline-item-marker-fg, var(--fluid-warning-text));
     }
     :host([tone="danger"]) .marker {
       background: var(--fluid-timeline-item-marker-bg, var(--fluid-danger-base));

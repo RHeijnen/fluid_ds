@@ -3,6 +3,53 @@ import { property, state } from "lit/decorators.js";
 import { marked, type MarkedOptions } from "marked";
 
 /**
+ * Dependency-free HTML sanitizer. Parses the markup, strips dangerous
+ * elements (script/style/iframe/object/embed/link/meta), and removes
+ * event-handler attributes (on*) and `javascript:` URLs from href/src.
+ * Returns sanitized HTML safe to assign via innerHTML.
+ */
+function sanitizeHtml(dirty: string): string {
+  const template = document.createElement("template");
+  template.innerHTML = dirty;
+
+  const DANGEROUS_TAGS = new Set([
+    "SCRIPT",
+    "STYLE",
+    "IFRAME",
+    "OBJECT",
+    "EMBED",
+    "LINK",
+    "META"
+  ]);
+
+  const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_ELEMENT);
+  const toRemove: Element[] = [];
+  let node: Node | null;
+  while ((node = walker.nextNode())) {
+    const el = node as Element;
+    if (DANGEROUS_TAGS.has(el.tagName)) {
+      toRemove.push(el);
+      continue;
+    }
+    for (const attr of Array.from(el.attributes)) {
+      const name = attr.name.toLowerCase();
+      // Strip whitespace + C0 control chars so obfuscated schemes
+      // ("java\tscript:", "java script:") cannot slip past the prefix test.
+      // eslint-disable-next-line no-control-regex
+      const value = attr.value.replace(/[\u0000-\u0020]+/g, "").toLowerCase();
+      if (name.startsWith("on")) {
+        el.removeAttribute(attr.name);
+      } else if ((name === "href" || name === "src") && value.startsWith("javascript:")) {
+        el.removeAttribute(attr.name);
+      }
+    }
+  }
+  for (const el of toRemove) el.remove();
+
+  return template.innerHTML;
+}
+
+/**
  * Renders Markdown to HTML inside the shadow DOM. Provide source in one
  * of three ways:
  *
@@ -12,6 +59,11 @@ import { marked, type MarkedOptions } from "marked";
  *
  * Powered by [marked](https://marked.js.org/). Pass `marked` options via
  * the `options` property if you need GFM, breaks, etc.
+ *
+ * Rendered HTML is sanitized by default (script/style/iframe/object/embed/
+ * link/meta elements, `on*` handlers, and `javascript:` URLs are stripped)
+ * since `marked` does not sanitize and `src` can fetch untrusted remote
+ * content. Set `trusted` to bypass sanitization for known-safe input.
  *
  * @summary Markdown renderer.
  *
@@ -75,7 +127,7 @@ export class FluidMarkdown extends LitElement {
       margin: 1em 0;
     }
     .content a {
-      color: var(--fluid-markdown-link-fg, var(--fluid-color-primary, inherit));
+      color: var(--fluid-markdown-link-fg, var(--fluid-accent-base, inherit));
     }
     .content table {
       border-collapse: collapse;
@@ -96,6 +148,12 @@ export class FluidMarkdown extends LitElement {
   /** Pass-through options for marked. */
   @property({ attribute: false }) options: MarkedOptions = { gfm: true, breaks: false };
 
+  /**
+   * Skip HTML sanitization. Only set this when the markdown source is fully
+   * trusted: it allows raw script/iframe/event-handler markup to execute.
+   */
+  @property({ type: Boolean }) trusted = false;
+
   @state() private rendered = "";
 
   override connectedCallback(): void {
@@ -107,7 +165,13 @@ export class FluidMarkdown extends LitElement {
   }
 
   protected override updated(changed: PropertyValues<this>): void {
-    if (changed.has("value") || changed.has("src") || changed.has("options")) this.refresh();
+    if (
+      changed.has("value") ||
+      changed.has("src") ||
+      changed.has("options") ||
+      changed.has("trusted")
+    )
+      this.refresh();
   }
 
   private async refresh(): Promise<void> {
@@ -121,7 +185,8 @@ export class FluidMarkdown extends LitElement {
         return;
       }
     }
-    this.rendered = await marked.parse(source, this.options);
+    const parsed = await marked.parse(source, this.options);
+    this.rendered = this.trusted ? parsed : sanitizeHtml(parsed);
     this.dispatchEvent(new CustomEvent("fluid-render", { bubbles: true, composed: true }));
   }
 

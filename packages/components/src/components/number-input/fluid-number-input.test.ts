@@ -106,4 +106,21 @@ describe("<fluid-number-input>", () => {
     const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
     expect(base.getBoundingClientRect().height).to.be.greaterThanOrEqual(60);
   });
+
+  it("each stepper button honors --fluid-target-min as its own pointer-target floor", async () => {
+    const el = await fixture<FluidNumberInput>(
+      html`<fluid-number-input aria-label="x"></fluid-number-input>`
+    );
+    // Lift to an AAA-style 44px target floor.
+    el.style.setProperty("--fluid-target-min", "44px");
+    await el.updateComplete;
+    const up = el.shadowRoot!.querySelector<HTMLButtonElement>('[part="stepper-up"]')!;
+    const down = el.shadowRoot!.querySelector<HTMLButtonElement>('[part="stepper-down"]')!;
+    for (const btn of [up, down]) {
+      const rect = btn.getBoundingClientRect();
+      // Each stepper must reach the target floor on both axes (no /2 split).
+      expect(rect.height).to.be.greaterThanOrEqual(44);
+      expect(rect.width).to.be.greaterThanOrEqual(44);
+    }
+  });
 });

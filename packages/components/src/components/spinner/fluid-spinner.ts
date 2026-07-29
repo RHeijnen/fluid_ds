@@ -57,8 +57,13 @@ export class FluidSpinner extends FluidElement {
 
     @media (prefers-reduced-motion: reduce) {
       .base {
-        /* Show progress without spinning for users who opt out of motion. */
-        animation-duration: 6s;
+        /* Stop the rotation entirely for users who opt out of motion. */
+        animation: none;
+      }
+
+      /* Convey "busy" statically with a dashed ring instead of a spinning arc. */
+      .indicator {
+        stroke-dasharray: 4 6;
       }
     }
   `;

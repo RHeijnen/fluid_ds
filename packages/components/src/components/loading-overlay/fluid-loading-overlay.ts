@@ -95,7 +95,7 @@ export class FluidLoadingOverlay extends FluidElement {
       .label {
         font-size: var(--fluid-font-size-sm);
         font-weight: var(--fluid-font-weight-medium);
-        line-height: var(--fluid-line-height-tight, 1.25);
+        line-height: var(--fluid-font-line-height-tight, 1.2);
         text-align: center;
       }
 

@@ -85,9 +85,13 @@ export class FluidBreadcrumbItem extends FluidElement {
       user-select: none;
     }
 
-    /* Hide separator on the last child, owned by the parent breadcrumb's
-       :last-child selector via slot assignment. Implementation simplification:
-       the parent removes the separator slot on the last item. */
+    /* Hide the trailing separator on the visually-last item. The parent
+       breadcrumb stamps the [data-fluid-last] attribute in its slotchange
+       handler; the item owns the hide rule because a parent
+       ::slotted() ::part() selector cannot reach this nested part. */
+    :host([data-fluid-last]) .separator {
+      display: none;
+    }
   `;
 
   /** Link target. Omit for the current/non-clickable segment. */

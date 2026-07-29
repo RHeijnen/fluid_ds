@@ -65,4 +65,29 @@ describe("<fluid-tree>", () => {
     const row = el.shadowRoot!.querySelector<HTMLElement>(".row")!;
     expect(row.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
   });
+
+  /* Lifecycle: the child MutationObserver is torn down on removal. */
+
+  it("stops observing child mutations after the item is removed (regression: observer leak)", async () => {
+    const el = await fixture<FluidTreeItem>(html`<fluid-tree-item>parent</fluid-tree-item>`);
+    await el.updateComplete;
+
+    // Spy on routeChildren via the observable side effect: adding a child
+    // tree-item gets routed to the children slot while connected.
+    const live = document.createElement("fluid-tree-item");
+    el.appendChild(live);
+    // Let the MutationObserver microtask flush.
+    await new Promise((r) => setTimeout(r, 0));
+    expect(live.getAttribute("slot")).to.equal("children");
+
+    // Remove the item: disconnectedCallback must disconnect the observer.
+    el.remove();
+    await new Promise((r) => setTimeout(r, 0));
+
+    // A child added after removal must NOT be routed (observer is dead).
+    const stale = document.createElement("fluid-tree-item");
+    el.appendChild(stale);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stale.getAttribute("slot")).to.equal(null);
+  });
 });

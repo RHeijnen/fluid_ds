@@ -41,7 +41,7 @@ registerIcon(
  * @cssproperty --fluid-carousel-dot-focus-ring - Pagination dot focus ring color.
  *
  * @uses-token --fluid-surface-base - Default scroller background.
- * @uses-token --fluid-color-primary - Active pagination dot.
+ * @uses-token --fluid-accent-base - Active pagination dot.
  * @uses-token --fluid-border-default - Inactive pagination dot color.
  *
  * @fires fluid-slide-change - Fired when the active slide changes; detail = { index }.
@@ -121,7 +121,7 @@ export class FluidCarousel extends FluidElement {
       transition: background 120ms ease, transform 120ms ease;
     }
     .dot[aria-current="true"] {
-      background: var(--fluid-carousel-dot-active-bg, var(--fluid-color-primary));
+      background: var(--fluid-carousel-dot-active-bg, var(--fluid-accent-base));
       transform: scale(1.3);
     }
     .dot:focus-visible {
@@ -167,6 +167,8 @@ export class FluidCarousel extends FluidElement {
       this.setAttribute("aria-roledescription", "carousel");
     this.addEventListener("mouseenter", this.onMouseEnter);
     this.addEventListener("mouseleave", this.onMouseLeave);
+    this.addEventListener("focusin", this.onFocusIn);
+    this.addEventListener("focusout", this.onFocusOut);
     this.addEventListener("keydown", this.onKeyDown);
   }
 
@@ -175,11 +177,15 @@ export class FluidCarousel extends FluidElement {
     this.stopAutoplay();
     this.removeEventListener("mouseenter", this.onMouseEnter);
     this.removeEventListener("mouseleave", this.onMouseLeave);
+    this.removeEventListener("focusin", this.onFocusIn);
+    this.removeEventListener("focusout", this.onFocusOut);
     this.removeEventListener("keydown", this.onKeyDown);
   }
 
   protected override firstUpdated(): void {
-    this.tabIndex = 0;
+    // The scrollable .scroller carries tabindex=0 (it is the keyboard-reachable
+    // scroll region, satisfying axe scrollable-region-focusable); the host is a
+    // labelled region landmark and should not itself be a tab stop.
     this.refreshSlides();
     this.startAutoplay();
   }
@@ -263,6 +269,13 @@ export class FluidCarousel extends FluidElement {
     if (this.pauseOnHover) this.paused = false;
   };
 
+  private onFocusIn = () => {
+    if (this.pauseOnHover) this.paused = true;
+  };
+  private onFocusOut = () => {
+    if (this.pauseOnHover) this.paused = false;
+  };
+
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
@@ -286,6 +299,7 @@ export class FluidCarousel extends FluidElement {
       <div
         part="scroller"
         class="scroller"
+        tabindex="0"
         @scroll=${this.onScroll}
         @slotchange=${this.refreshSlides}
       >
@@ -313,7 +327,7 @@ export class FluidCarousel extends FluidElement {
           <fluid-icon name="chevron-right"></fluid-icon>
         </button>
       </div>
-      <div part="pagination" class="pagination" role="tablist" aria-label="Slides">
+      <div part="pagination" class="pagination" role="group" aria-label="Slides">
         ${Array.from(
           { length: this.slideCount },
           (_, i) => html`
@@ -321,7 +335,6 @@ export class FluidCarousel extends FluidElement {
               part="dot"
               class="dot"
               type="button"
-              role="tab"
               aria-current=${i === this.activeIndex ? "true" : "false"}
               aria-label=${`Go to slide ${i + 1}`}
               @click=${() => this.goTo(i)}

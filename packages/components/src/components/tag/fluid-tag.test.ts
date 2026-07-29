@@ -36,6 +36,16 @@ describe("<fluid-tag>", () => {
     expect(fired).to.be.false;
   });
 
+  it("the remove button respects --fluid-target-min (hit area)", async () => {
+    const el = await fixture<FluidTag>(html`<fluid-tag removable>Beta</fluid-tag>`);
+    el.style.setProperty("--fluid-target-min", "44px");
+    await el.updateComplete;
+    const button = el.shadowRoot!.querySelector<HTMLButtonElement>(".remove")!;
+    const rect = button.getBoundingClientRect();
+    expect(rect.width).to.be.greaterThanOrEqual(44);
+    expect(rect.height).to.be.greaterThanOrEqual(44);
+  });
+
   it("passes a11y audit", async () => {
     const el = await fixture<FluidTag>(html`<fluid-tag removable>Removable</fluid-tag>`);
     await expect(el).to.be.accessible();

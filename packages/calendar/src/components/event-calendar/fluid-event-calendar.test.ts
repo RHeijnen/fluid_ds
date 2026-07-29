@@ -63,6 +63,89 @@ describe("<fluid-event-calendar>", () => {
     expect(tabbable.length).to.equal(1);
   });
 
+  it("keeps event chips and overflow buttons out of the tab order", async () => {
+    // Use a low max so the 4-event day shows chips AND a "+N more" button.
+    const el = await cal({ maxPerDay: 2 });
+    // The only natural tab stop in the grid is the single roving gridcell:
+    // chips and the overflow button must carry tabindex=-1.
+    const focusable = el.shadowRoot!.querySelectorAll(
+      '[role="grid"] [tabindex]:not([tabindex="-1"])'
+    );
+    expect(focusable.length).to.equal(1);
+    expect((focusable[0] as HTMLElement).getAttribute("role")).to.equal("gridcell");
+    // Spot-check the inner buttons explicitly.
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-10"]')!;
+    for (const chip of cell.querySelectorAll('[part="event"]')) {
+      expect(chip.getAttribute("tabindex")).to.equal("-1");
+    }
+    expect(cell.querySelector('[part="more"]')!.getAttribute("tabindex")).to.equal("-1");
+  });
+
+  it("moves the roving tab stop with arrow keys, Home and End", async () => {
+    const el = await cal();
+    const start = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-15"]')!;
+    start.focus();
+    const press = (key: string) =>
+      start.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+
+    // 2026-06-15 is a Monday; ArrowRight -> Tuesday the 16th.
+    press("ArrowRight");
+    await elementUpdated(el);
+    let active = el.shadowRoot!.querySelector('[role="gridcell"][tabindex="0"]')!;
+    expect(active.getAttribute("data-iso")).to.equal("2026-06-16");
+
+    // ArrowDown from the 16th -> a week later, the 23rd.
+    const cur = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-16"]')!;
+    cur.focus();
+    cur.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await elementUpdated(el);
+    active = el.shadowRoot!.querySelector('[role="gridcell"][tabindex="0"]')!;
+    expect(active.getAttribute("data-iso")).to.equal("2026-06-23");
+
+    // Home jumps to the start of that week (Monday the 22nd, week-start=1).
+    const wk = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-23"]')!;
+    wk.focus();
+    wk.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    await elementUpdated(el);
+    active = el.shadowRoot!.querySelector('[role="gridcell"][tabindex="0"]')!;
+    expect(active.getAttribute("data-iso")).to.equal("2026-06-22");
+
+    // End jumps to the end of the week (Sunday the 28th).
+    const home = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-22"]')!;
+    home.focus();
+    home.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await elementUpdated(el);
+    active = el.shadowRoot!.querySelector('[role="gridcell"][tabindex="0"]')!;
+    expect(active.getAttribute("data-iso")).to.equal("2026-06-28");
+
+    // Exactly one cell is ever the roving tab stop.
+    expect(
+      el.shadowRoot!.querySelectorAll('[role="gridcell"][tabindex="0"]').length
+    ).to.equal(1);
+  });
+
+  it("steps the month with PageDown", async () => {
+    const el = await cal();
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-15"]')!;
+    cell.focus();
+    setTimeout(() =>
+      cell.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown", bubbles: true }))
+    );
+    const ev = await oneEvent(el, "fluid-month-change");
+    expect(ev.detail.month).to.equal("2026-07");
+  });
+
+  it("activates a day with Enter via the keyboard", async () => {
+    const el = await cal();
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-15"]')!;
+    cell.focus();
+    setTimeout(() =>
+      cell.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }))
+    );
+    const ev = await oneEvent(el, "fluid-day-click");
+    expect(ev.detail.date).to.equal("2026-06-15");
+  });
+
   it("emits fluid-day-click with the cell date", async () => {
     const el = await cal();
     const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-15"]')!;

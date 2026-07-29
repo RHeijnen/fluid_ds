@@ -9,7 +9,7 @@ The selected slot is a real form value, so it drops into any intake or checkout
 form. Built on standard web components: works in React, Vue, Angular, Svelte, or
 plain HTML.
 
-> Alpha. Install with the `alpha` tag: `npm i @fluid-ds/scheduler@alpha`.
+Install with `npm i @fluid-ds/scheduler@latest`.
 
 ## What's inside
 

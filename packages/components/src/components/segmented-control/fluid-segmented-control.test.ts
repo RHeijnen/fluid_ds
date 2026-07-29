@@ -28,6 +28,21 @@ describe("<fluid-segmented-control>", () => {
     expect(el.value).to.equal("list");
   });
 
+  it("does not fire fluid-change when the default value is auto-seeded on mount", async () => {
+    let fired = false;
+    const el = await fixture<FluidSegmentedControl>(html`
+      <fluid-segmented-control aria-label="View" @fluid-change=${() => (fired = true)}>
+        <fluid-segment value="list">List</fluid-segment>
+        <fluid-segment value="grid">Grid</fluid-segment>
+      </fluid-segmented-control>
+    `);
+    await el.updateComplete;
+    // The control seeds value="list" (first enabled segment) internally, but the
+    // user never made that choice, so no change event should be emitted.
+    expect(el.value).to.equal("list");
+    expect(fired).to.equal(false);
+  });
+
   it("ArrowRight cycles to next non-disabled segment", async () => {
     const el = await fixture<FluidSegmentedControl>(sample);
     await el.updateComplete;

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/tokens",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.3",
   "description": "Design tokens for Fluid, typed source, generates CSS + a programmatic manifest. Drop the CSS files in your <head> or import them in your bundler.",
   "type": "module",
   "license": "MIT",
@@ -24,8 +24,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "tag": "alpha",
-    "provenance": true
+    "tag": "latest"
   },
   "exports": {
     ".": "./dist/base.css",

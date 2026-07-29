@@ -149,12 +149,26 @@ export class FluidCodeBlock extends FluidElement {
 
   @state() private copied = false;
 
+  private copyResetTimer?: ReturnType<typeof setTimeout>;
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this.copyResetTimer !== undefined) {
+      clearTimeout(this.copyResetTimer);
+      this.copyResetTimer = undefined;
+    }
+  }
+
   private async handleCopy() {
     const text = this.code || this.textContent?.trim() || "";
     try {
       await navigator.clipboard.writeText(text);
       this.copied = true;
-      setTimeout(() => (this.copied = false), 1500);
+      if (this.copyResetTimer !== undefined) clearTimeout(this.copyResetTimer);
+      this.copyResetTimer = setTimeout(() => {
+        this.copied = false;
+        this.copyResetTimer = undefined;
+      }, 1500);
       this.dispatchEvent(
         new CustomEvent("fluid-copy", {
           detail: { text },

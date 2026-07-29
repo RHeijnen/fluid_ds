@@ -64,7 +64,11 @@ export function startAnimationController(root: Document | ShadowRoot = document)
     for (const rec of records) {
       if (rec.type === "attributes" && rec.target instanceof HTMLElement) {
         if (rec.attributeName?.startsWith("data-fluid-animation")) {
-          settled.delete(rec.target); // attribute changed → allow a re-play
+          // Only a real value CHANGE allows a re-play; a same-value echo
+          // (setAttribute with the existing value) still fires a mutation but
+          // must not retrigger a settled one-shot animation.
+          const newValue = rec.attributeName ? rec.target.getAttribute(rec.attributeName) : null;
+          if (rec.oldValue !== newValue) settled.delete(rec.target);
           handleElement(rec.target);
         }
       } else if (rec.type === "childList") {
@@ -83,6 +87,7 @@ export function startAnimationController(root: Document | ShadowRoot = document)
     childList: true,
     subtree: true,
     attributes: true,
+    attributeOldValue: true,
     attributeFilter: [
       ATTR,
       ATTR_TRIGGER,
@@ -143,10 +148,18 @@ function handleElement(el: HTMLElement): void {
       if (!settled.has(el)) inViewObserver.observe(el);
       return;
     case "hover":
-      attachOnce(el, "pointerenter", () => play(el, def));
+      // Resolve the current def at fire time: the listener is bound once, but
+      // the animation name can change live, so we must not capture `def` here.
+      attachOnce(el, "pointerenter", () => {
+        const d = getAnimation(el.getAttribute(ATTR) ?? "");
+        if (d) play(el, d);
+      });
       return;
     case "click":
-      attachOnce(el, "click", () => play(el, def));
+      attachOnce(el, "click", () => {
+        const d = getAnimation(el.getAttribute(ATTR) ?? "");
+        if (d) play(el, d);
+      });
       return;
     default:
       return;
@@ -210,14 +223,21 @@ function prefersReducedMotion(): boolean {
     !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
 
+// Tracks which (element, event-type) pairs already have a listener wired, so
+// the MutationObserver re-invoking handleElement on attribute changes does not
+// re-bind. A WeakMap keyed by element keeps this off the DOM (a dataset key
+// can't hold the event type verbatim: "pointerenter-bound" is not a valid
+// DOMStringMap property name).
+const boundEvents = new WeakMap<HTMLElement, Set<string>>();
+
 function attachOnce(el: HTMLElement, type: string, handler: () => void): void {
-  // The MutationObserver re-invokes handleElement on attribute changes, so
-  // we'd otherwise re-bind on every render. A WeakMap-keyed bookkeeping
-  // set tracks which (element, event) pairs we've already wired so the
-  // listener is attached exactly once per (element, type).
-  const key = `${type}-bound`;
-  if (el.dataset[key]) return;
-  el.dataset[key] = "1";
+  let bound = boundEvents.get(el);
+  if (!bound) {
+    bound = new Set<string>();
+    boundEvents.set(el, bound);
+  }
+  if (bound.has(type)) return;
+  bound.add(type);
   el.addEventListener(type, () => handler(), { passive: true });
 }
 

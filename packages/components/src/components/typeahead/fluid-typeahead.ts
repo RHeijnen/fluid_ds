@@ -741,7 +741,7 @@ export class FluidTypeahead extends FluidFormAssociated {
                       })}
                       role="option"
                       id=${`${this.listboxId}-opt-${i}`}
-                      aria-selected=${opt.value === this.selectedValue ? "true" : "false"}
+                      aria-selected=${i === this.activeIndex ? "true" : "false"}
                       data-index=${i}
                     >
                       ${this.renderLabel(opt.label)}

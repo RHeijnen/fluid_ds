@@ -5,7 +5,7 @@
 <h1 align="center">Fluid</h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@fluid-ds/components"><img src="https://img.shields.io/npm/v/@fluid-ds/components/alpha?color=6366f1&amp;label=npm%20%40fluid-ds%2Fcomponents" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@fluid-ds/components"><img src="https://img.shields.io/npm/v/@fluid-ds/components?color=6366f1&amp;label=npm%20%40fluid-ds%2Fcomponents" alt="npm version" /></a>
   <a href="https://github.com/RHeijnen/fluid_ds/actions/workflows/verify.yml"><img src="https://github.com/RHeijnen/fluid_ds/actions/workflows/verify.yml/badge.svg" alt="CI status" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/npm/l/@fluid-ds/components?color=blue" alt="License" /></a>
 </p>
@@ -15,8 +15,9 @@ into React, Vue, Angular, Svelte, or plain HTML, no wrappers, no version
 coupling. Light by default, fully themable via CSS custom properties, and
 accessible out of the box.
 
-> Status: **alpha** — published to npm under the `alpha` dist-tag (install with
-> `@alpha`). APIs may shift before the first stable release.
+> Status: **early stable (0.x)** — published to npm under the `latest` dist-tag.
+> APIs follow semantic versioning; minor releases may still contain breaking
+> changes until 1.0.
 
 ---
 
@@ -62,12 +63,12 @@ step, no framework, no package manager.
 <!doctype html>
 <html>
   <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@alpha/dist/light.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
 
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@alpha/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/button/define.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@alpha/dist/components/card/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js"></script>
   </head>
   <body>
     <fluid-card style="max-width: 24rem; margin: 4rem auto;">
@@ -79,14 +80,13 @@ step, no framework, no package manager.
 </html>
 ```
 
-> **Status note:** Fluid is in **alpha**, published under npm's `alpha`
-> dist-tag. The URLs above pin `@alpha`; a bare `@latest` won't resolve until
-> the first stable release.
+> The URLs above use the stable `latest` channel. Pin an exact version in
+> production when you need fully repeatable builds.
 
 ### With a bundler
 
 ```bash
-pnpm add @fluid-ds/components@alpha @fluid-ds/tokens@alpha @fluid-ds/icons@alpha
+pnpm add @fluid-ds/components@latest @fluid-ds/tokens@latest @fluid-ds/icons@latest
 ```
 
 ```ts
@@ -242,8 +242,7 @@ file is the source of truth for "what's queued next."
 
 ## Links
 
-- **npm:** [`@fluid-ds/components`][npm] and the rest of the `@fluid-ds/*` scope
-  (install with `@alpha` until the first stable release).
+- **npm:** [`@fluid-ds/components`][npm] and the rest of the `@fluid-ds/*` scope.
 - **Source:** [github.com/RHeijnen/fluid_ds](https://github.com/RHeijnen/fluid_ds)
 - **Author:** [René Heijnen — rheijnen.github.io][portfolio]
 - **Website:** [fluid-web.dev](https://fluid-web.dev) — docs + theme builder +

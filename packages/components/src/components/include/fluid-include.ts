@@ -37,17 +37,33 @@ export class FluidInclude extends FluidElement {
 
   @state() private status: "idle" | "loading" | "loaded" | "error" = "idle";
 
+  /** Aborts the in-flight fetch on teardown or when a new load supersedes it. */
+  private loadController: AbortController | null = null;
+
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("src") && this.src) this.load();
   }
 
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.loadController?.abort();
+    this.loadController = null;
+  }
+
   private async load(): Promise<void> {
     if (!this.src) return;
+    // Supersede any in-flight request before starting a new one.
+    this.loadController?.abort();
+    const controller = new AbortController();
+    this.loadController = controller;
     this.status = "loading";
     try {
-      const response = await fetch(this.src, { mode: this.mode });
+      const response = await fetch(this.src, { mode: this.mode, signal: controller.signal });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const text = await response.text();
+      // Bail out if we were disconnected (or superseded) during the await: never
+      // write markup or run scripts into a detached / stale element.
+      if (!this.isConnected || this.loadController !== controller) return;
       const container = this.shadowRoot?.querySelector(".content") as HTMLDivElement | null;
       if (!container) return;
       container.innerHTML = text;
@@ -57,6 +73,8 @@ export class FluidInclude extends FluidElement {
         new CustomEvent("fluid-load", { detail: { src: this.src }, bubbles: true, composed: true })
       );
     } catch (err) {
+      // An aborted fetch is an intentional teardown, not a load failure.
+      if ((err as Error)?.name === "AbortError") return;
       this.status = "error";
       this.dispatchEvent(
         new CustomEvent("fluid-error", {

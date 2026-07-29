@@ -34,7 +34,7 @@ export const Default: Story = {
 export const ErrorState: Story = {
   render: () => html`
     <fluid-include src="https://this-host-definitely-does-not-exist.invalid/fragment.html">
-      <div style="color: var(--fluid-color-danger);">Fallback shown when the include fails.</div>
+      <div style="color: var(--fluid-danger-base);">Fallback shown when the include fails.</div>
     </fluid-include>
   `
 };

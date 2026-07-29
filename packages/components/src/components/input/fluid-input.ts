@@ -472,7 +472,7 @@ export class FluidInput extends FluidFormAssociated {
           minlength=${ifDefined(this.minlength)}
           maxlength=${ifDefined(this.maxlength)}
           pattern=${ifDefined(this.pattern)}
-          autocomplete=${this.autocomplete ?? "off"}
+          autocomplete=${ifDefined(this.autocomplete)}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
           aria-invalid=${this.invalid ? "true" : "false"}
           @input=${this.handleInput}

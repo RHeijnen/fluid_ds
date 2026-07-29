@@ -141,6 +141,22 @@ describe("<fluid-input>", () => {
     expect(prefix.hasAttribute("hidden")).to.be.true;
   });
 
+  it("does not force autocomplete='off'; omits the attribute unless set", async () => {
+    const el = await fixture<FluidInput>(html`<fluid-input aria-label="x"></fluid-input>`);
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.hasAttribute("autocomplete")).to.be.false;
+  });
+
+  it("reflects a consumer-set autocomplete onto the inner input", async () => {
+    const el = await fixture<FluidInput>(
+      html`<fluid-input aria-label="x" autocomplete="username"></fluid-input>`
+    );
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.getAttribute("autocomplete")).to.equal("username");
+  });
+
   it("always exposes aria-invalid on the inner input", async () => {
     const el = await fixture<FluidInput>(html`<fluid-input aria-label="x"></fluid-input>`);
     expect(el.shadowRoot!.querySelector("input")!.getAttribute("aria-invalid")).to.equal(

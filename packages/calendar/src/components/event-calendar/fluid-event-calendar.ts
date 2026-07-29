@@ -536,6 +536,7 @@ export class FluidEventCalendar extends LitElement {
                   part="event"
                   class="event tone-${tone}"
                   type="button"
+                  tabindex="-1"
                   title=${ev.title}
                   @click=${(e: Event) => this.onEventClick(ev, e)}
                 >
@@ -549,6 +550,7 @@ export class FluidEventCalendar extends LitElement {
               part="more"
               class="more"
               type="button"
+              tabindex="-1"
               aria-label=${`Show all ${count} events on ${dateLabel}`}
               @click=${(e: Event) => {
                 e.stopPropagation();

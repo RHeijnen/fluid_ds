@@ -169,7 +169,7 @@ export class FluidDropzone extends FluidElement {
 
       .label {
         font-size: var(--fluid-font-size-sm);
-        line-height: var(--fluid-line-height-normal, 1.5);
+        line-height: var(--fluid-font-line-height-normal, 1.5);
       }
 
       .input {
@@ -306,9 +306,45 @@ export class FluidDropzone extends FluidElement {
 
   @state() private dragover = false;
 
+  /**
+   * Object URLs minted for image thumbnails, keyed by file. Created once when a
+   * file is accepted and revoked when the file is removed/cleared or the element
+   * is disconnected, so a fresh URL is not leaked on every render.
+   */
+  private thumbUrls = new Map<File, string>();
+
   /** Read-only view of the accepted files. */
   get selectedFiles(): readonly File[] {
     return this.files;
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.revokeAllThumbUrls();
+  }
+
+  private thumbUrlFor(file: File): string {
+    let url = this.thumbUrls.get(file);
+    if (url === undefined) {
+      url = URL.createObjectURL(file);
+      this.thumbUrls.set(file, url);
+    }
+    return url;
+  }
+
+  private revokeThumbUrl(file: File): void {
+    const url = this.thumbUrls.get(file);
+    if (url !== undefined) {
+      URL.revokeObjectURL(url);
+      this.thumbUrls.delete(file);
+    }
+  }
+
+  private revokeAllThumbUrls(): void {
+    for (const url of this.thumbUrls.values()) {
+      URL.revokeObjectURL(url);
+    }
+    this.thumbUrls.clear();
   }
 
   private openDialog(): void {
@@ -434,7 +470,8 @@ export class FluidDropzone extends FluidElement {
   private removeFile(index: number): void {
     if (this.disabled) return;
     const next = this.files.slice();
-    next.splice(index, 1);
+    const [removed] = next.splice(index, 1);
+    if (removed) this.revokeThumbUrl(removed);
     this.files = next;
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
@@ -451,6 +488,7 @@ export class FluidDropzone extends FluidElement {
 
   /** Clear all selected files. Does not emit. */
   clear(): void {
+    this.revokeAllThumbUrls();
     this.files = [];
   }
 
@@ -469,16 +507,12 @@ export class FluidDropzone extends FluidElement {
 
   private renderFile(file: File, index: number): TemplateResult {
     const isImage = file.type.startsWith("image/");
-    const thumbUrl = isImage ? URL.createObjectURL(file) : "";
+    const thumbUrl = isImage ? this.thumbUrlFor(file) : "";
     return html`
       <li part="file" class="file">
         <span part="thumb" class="thumb">
           ${isImage
-            ? html`<img
-                src=${thumbUrl}
-                alt=""
-                @load=${() => URL.revokeObjectURL(thumbUrl)}
-              />`
+            ? html`<img src=${thumbUrl} alt="" />`
             : html`<fluid-icon name="dropzone-file"></fluid-icon>`}
         </span>
         <span class="meta">

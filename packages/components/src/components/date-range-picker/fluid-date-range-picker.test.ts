@@ -96,6 +96,29 @@ describe("<fluid-date-range-picker>", () => {
     expect(el.open).to.be.false;
   });
 
+  it("moves focus into the dialog when opened", async () => {
+    const el = await fixture<FluidDateRangePicker>(
+      html`<fluid-date-range-picker aria-label="Range"></fluid-date-range-picker>`
+    );
+    el.open = true;
+    await elementUpdated(el);
+    // Focus is moved in a requestAnimationFrame after the calendars render.
+    await aTimeout(40);
+
+    const dialog = el.shadowRoot!.querySelector('[role="dialog"]')!;
+    // Active element resolves through shadow roots; walk to the deepest one.
+    let active: Element | null = document.activeElement;
+    while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
+    expect(active, "focus should land inside the open dialog").to.not.be.null;
+    // The focused element is either the active preset / first day inside the
+    // dialog, or the dialog container itself as a fallback.
+    const focusedInDialog =
+      active === dialog ||
+      dialog.contains(active) ||
+      Boolean(el.shadowRoot!.querySelector("fluid-calendar")?.contains(active));
+    expect(focusedInDialog, "focused element should be within the dialog").to.be.true;
+  });
+
   it("passes a11y audit (closed)", async () => {
     const el = await fixture<FluidDateRangePicker>(
       html`<fluid-date-range-picker aria-label="Range"></fluid-date-range-picker>`

@@ -25,6 +25,9 @@ let counter = 0;
  * @cssproperty --fluid-option-accent - Accent color used for the active rail and tint.
  * @cssproperty --fluid-option-selected-bg - Selected option background.
  * @cssproperty --fluid-option-selected-fg - Selected option text color.
+ *
+ * @uses-token --fluid-text-primary - Default option/selected text color.
+ * @uses-token --fluid-accent-base - Active rail and active/selected tint base.
  */
 export class FluidOption extends FluidElement {
   static override styles = css`
@@ -80,8 +83,14 @@ export class FluidOption extends FluidElement {
     }
 
     :host([selected]) {
-      background: var(--fluid-option-selected-bg, var(--fluid-color-brand-50));
-      color: var(--fluid-option-selected-fg, var(--fluid-color-brand-800));
+      /* Theme-aware accent tint (resolves per light/dark) instead of raw
+         brand primitives. text-primary keeps contrast against the tint in
+         both themes. Same accent ladder as the active state above. */
+      background: var(
+        --fluid-option-selected-bg,
+        color-mix(in srgb, var(--fluid-accent-base) 16%, transparent)
+      );
+      color: var(--fluid-option-selected-fg, var(--fluid-text-primary));
       font-weight: var(--fluid-font-weight-medium);
     }
 

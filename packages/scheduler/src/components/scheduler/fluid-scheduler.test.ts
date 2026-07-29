@@ -42,6 +42,22 @@ describe("<fluid-scheduler>", () => {
     el.remove();
   });
 
+  it("re-emits fluid-range-change when the visible month changes (lazy-fetch hook)", async () => {
+    const el = await schedulerFixture();
+    const cal = el.shadowRoot!.querySelector("fluid-calendar")!;
+    // Navigate to a different month; the inner calendar reports via fluid-view-change.
+    const NEXT_MONTH = "2035-07-15";
+    setTimeout(() =>
+      cal.dispatchEvent(
+        new CustomEvent("fluid-view-change", { detail: { view: NEXT_MONTH }, bubbles: true, composed: true })
+      )
+    );
+    const ev = await oneEvent(el, "fluid-range-change");
+    // July 2035 has 31 days: first and last day of the newly visible month.
+    expect(ev.detail.start).to.equal("2035-07-01");
+    expect(ev.detail.end).to.equal("2035-07-31");
+  });
+
   it("passes a day-state map to the inner calendar", async () => {
     const el = await schedulerFixture();
     const cal = el.shadowRoot!.querySelector("fluid-calendar") as HTMLElement & { dayState: Record<string, string> | null };

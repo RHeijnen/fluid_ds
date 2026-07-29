@@ -208,6 +208,14 @@ export class FluidForm extends FluidElement {
     if (submitter && this.contains(submitter)) {
       event.preventDefault();
       this.triggerSubmit();
+      return;
+    }
+    // The slotted reset button lives in our light DOM, not inside the shadow
+    // `<form>`, so the platform never wires it up. Drive our own reset() here.
+    const resetter = target?.closest?.("[type='reset']");
+    if (resetter && this.contains(resetter)) {
+      event.preventDefault();
+      this.reset();
     }
   };
 
@@ -215,8 +223,9 @@ export class FluidForm extends FluidElement {
     if (event.key !== "Enter" || event.defaultPrevented) return;
     const target = event.target as Element | null;
     // Mirror native implicit submission: Enter in a single-line text input
-    // submits the form; Enter in a textarea inserts a newline.
-    if (target instanceof HTMLInputElement && target.type !== "textarea") {
+    // submits the form. Textareas are HTMLTextAreaElement, not
+    // HTMLInputElement, so they are already excluded by the instanceof check.
+    if (target instanceof HTMLInputElement) {
       event.preventDefault();
       this.triggerSubmit();
     }

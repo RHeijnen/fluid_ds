@@ -25,6 +25,9 @@ import { property, query } from "lit/decorators.js";
  * @uses-token --fluid-surface-base - Button background.
  * @uses-token --fluid-text-primary - Button color.
  * @uses-token --fluid-focus-ring-color - Focus ring.
+ * @uses-token --fluid-shadow-sm - Zoom button elevation.
+ * @uses-token --fluid-space-3 - Controls strip inset from the edges.
+ * @uses-token --fluid-space-2 - Gap between zoom buttons.
  *
  * @fires fluid-zoom - Fired when the zoom level changes; detail = { scale }.
  */

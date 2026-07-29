@@ -253,6 +253,8 @@ export class FluidFileInput extends FluidFormAssociated {
   }
 
   override focus(options?: FocusOptions): void {
+    // The visible drop zone carries tabindex="0" and is the real focus target;
+    // the native input is removed from the tab order (tabindex="-1").
     this.shadowRoot?.querySelector<HTMLElement>(".dropzone")?.focus(options);
   }
 
@@ -350,9 +352,15 @@ export class FluidFileInput extends FluidFormAssociated {
   override render(): TemplateResult {
     return html`
       <div part="base" class="base">
-        <label
+        <div
           part="label"
           class=${classMap({ dropzone: true, dragging: this.dragging, disabled: this.disabled })}
+          role="button"
+          tabindex=${this.disabled ? -1 : 0}
+          aria-label=${this.ariaLabel ?? "File input"}
+          aria-disabled=${this.disabled ? "true" : "false"}
+          @click=${this.handleClick}
+          @keydown=${this.handleKey}
           @dragover=${this.handleDragOver}
           @dragleave=${this.handleDragLeave}
           @drop=${this.handleDrop}
@@ -366,17 +374,20 @@ export class FluidFileInput extends FluidFormAssociated {
               ${this.multiple ? "Multiple files supported" : "One file at a time"}
             </slot>
           </div>
-          <input
-            part="input"
-            type="file"
-            accept=${this.accept}
-            aria-label=${this.ariaLabel ?? "File input"}
-            ?multiple=${this.multiple}
-            ?disabled=${this.disabled}
-            ?required=${this.required}
-            @change=${this.handleChange}
-          />
-        </label>
+        </div>
+        <!-- The real file input is visually hidden and removed from the a11y
+             tree + tab order; the drop zone above is the accessible control. -->
+        <input
+          part="input"
+          type="file"
+          tabindex="-1"
+          aria-hidden="true"
+          accept=${this.accept}
+          ?multiple=${this.multiple}
+          ?disabled=${this.disabled}
+          ?required=${this.required}
+          @change=${this.handleChange}
+        />
         ${this.files.length
           ? html`
               <div part="file-list" class="file-list">

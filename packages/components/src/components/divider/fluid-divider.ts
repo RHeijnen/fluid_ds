@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -47,7 +47,11 @@ export class FluidDivider extends FluidElement {
   override connectedCallback(): void {
     super.connectedCallback();
     if (!this.hasAttribute("role")) this.setAttribute("role", "separator");
-    if (!this.hasAttribute("aria-orientation")) {
+    this.setAttribute("aria-orientation", this.orientation);
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    if (changed.has("orientation")) {
       this.setAttribute("aria-orientation", this.orientation);
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/parser",
-  "version": "0.0.3-alpha.0",
+  "version": "0.1.1",
   "description": "Drop a JSON / CSV / Excel file onto a Fluid file-drop and get validated, typed rows. A declarative blueprint maps + coerces + validates each column, with a mapping UI and an error-preview table. Framework-agnostic, WCAG 2.2 AA.",
   "type": "module",
   "license": "MIT",
@@ -28,7 +28,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "tag": "alpha",
+    "tag": "latest",
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -42,8 +42,7 @@
         "types": "./dist/components/*/define.d.ts",
         "import": "./dist/components/*/define.js"
       }
-    },
-    "provenance": true
+    }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
