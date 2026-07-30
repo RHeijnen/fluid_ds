@@ -282,6 +282,47 @@ export class ComponentPreview extends LitElement {
         </fluid-card>
 
         <fluid-card>
+          <h3 slot="header">Infinite table</h3>
+          <fluid-infinite-table
+            caption="Operational terminals"
+            hide-caption
+            configurable
+            scroll-mode="container"
+            style="--fluid-infinite-table-height:22rem"
+            .columns=${[
+              {
+                key: "terminal",
+                label: "Terminal",
+                width: "13rem",
+                renderCell: ({ row }) =>
+                  html`<strong>${row.terminal}</strong><br /><small>${row.serial}</small>`
+              },
+              { key: "site", label: "Site", width: "10rem" },
+              {
+                key: "status",
+                label: "Status",
+                width: "7rem",
+                renderCell: ({ row }) =>
+                  html`<fluid-badge tone=${row.online ? "success" : "danger"}>
+                    ${row.online ? "Online" : "Offline"}
+                  </fluid-badge>`
+              }
+            ]}
+            .rows=${Array.from({ length: 20 }, (_, index) => ({
+              id: index,
+              terminal: `Apollo ${index + 1}`,
+              serial: `APL2026${String(index + 1).padStart(5, "0")}`,
+              site: ["Amsterdam", "Rotterdam", "Utrecht"][index % 3],
+              online: index % 6 !== 0
+            }))}
+            .total=${640}
+            has-more
+          >
+            <span slot="filters">Projected filters</span>
+          </fluid-infinite-table>
+        </fluid-card>
+
+        <fluid-card>
           <h3 slot="header">Event calendar</h3>
           <fluid-event-calendar
             .month=${"2026-06"}

@@ -1,13 +1,16 @@
 ---
 title: "@fluid-ds/table"
-description: "An accessible, sortable, selectable data table web component."
+description: "Accessible tables for static and asynchronously loaded operational data."
 ---
 
-The flagship expansion pack: `<fluid-table>` renders a real semantic
+The table expansion pack provides two deliberately separate components.
+`<fluid-table>` renders a compact semantic
 `<table>` with a `<caption>`, `<th scope="col">` headers, and a data-driven
 body. It is sortable (string + numeric aware), optionally selectable with
 checkboxes, fully themable through `--fluid-table-*` tokens, and works in any
-framework.
+framework. `<fluid-infinite-table>` handles large asynchronously loaded
+datasets with rich cell templates, sticky projected filters and headers,
+windowed rows, column configuration, and an infinite-load event.
 
 ## Install
 
@@ -19,6 +22,7 @@ Import only the piece you use:
 
 ```ts
 import "@fluid-ds/table/define/table";
+import "@fluid-ds/table/define/infinite-table";
 ```
 
 ## Components
@@ -26,6 +30,7 @@ import "@fluid-ds/table/define/table";
 | Tag | Use |
 | --- | --- |
 | `<fluid-table>` | Accessible data table: column-driven, sortable headers, optional row selection, themable. |
+| `<fluid-infinite-table>` | Template-driven operational table: infinite loading, row windowing, sticky filters and headers, and configurable columns. |
 
 ## Use
 
@@ -55,6 +60,104 @@ framework, or set them in script). Each row is a plain object keyed by
   el.addEventListener("fluid-selection-change", (e) => console.log(e.detail)); // { selected: [...] }
 </script>
 ```
+
+## Infinite and template-driven data
+
+Use `<fluid-infinite-table>` when the server owns paging and sorting, or when
+cells need to render complete components instead of string values. A cell
+renderer receives `{ row, rowIndex, column, value }`. It can return a Lit
+template, custom element, native element, or plain value.
+
+```ts
+import { html } from "lit";
+import "@fluid-ds/table/define/infinite-table";
+
+const table = document.querySelector("fluid-infinite-table");
+
+table.columns = [
+  {
+    key: "terminal",
+    label: "Terminal",
+    width: "16rem",
+    sortable: true,
+    renderCell: ({ row }) => html`
+      <a href="/terminals/${row.id}">
+        <strong>${row.name}</strong>
+        <small>${row.serialNumber}</small>
+      </a>
+    `
+  },
+  {
+    key: "status",
+    label: "Status",
+    width: "9rem",
+    renderCell: ({ row }) => html`
+      <fluid-badge tone=${row.online ? "success" : "danger"}>
+        ${row.online ? "Online" : "Offline"}
+      </fluid-badge>
+    `
+  },
+  { key: "site", path: "site.name", label: "Site", width: "12rem" }
+];
+
+table.rows = firstPage.documents;
+table.total = firstPage.count;
+table.hasMore = table.rows.length < table.total;
+
+table.addEventListener("fluid-load-more", async (event) => {
+  const nextPage = await loadTerminals(event.detail.offset);
+  table.rows = [...table.rows, ...nextPage.documents];
+});
+
+table.addEventListener("fluid-column-layout-change", (event) => {
+  savePreference("terminal-table", event.detail.layout);
+});
+```
+
+Project application-owned filters into the sticky toolbar:
+
+```html
+<fluid-infinite-table
+  caption="Terminal fleet"
+  hide-caption
+  configurable
+  scroll-mode="container"
+  style="--fluid-infinite-table-height: 42rem"
+>
+  <payter-filter-bar slot="filters"></payter-filter-bar>
+</fluid-infinite-table>
+```
+
+Fluid emits serializable layout data but does not choose a persistence
+mechanism. Applications can store it in a user profile, local storage, a
+database, or another preference service.
+
+### Infinite table properties
+
+| Property | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `columns` | `FluidInfiniteTableColumn[]` | `[]` | Supports nested `path`, width, visibility, sorting, and header/cell renderers. |
+| `rows` | `Record<string, unknown>[]` | `[]` | Currently loaded records. |
+| `total` | `number` | `0` | Total matching records reported by the data source. |
+| `available-total` | `number` | `0` | Optional unfiltered total shown after the matching count. |
+| `loading` | `boolean` | `false` | Announces the loading state. |
+| `has-more` | `boolean` | `false` | Enables the infinite-load sentinel. |
+| `virtual` | `boolean` | `true` | Windows loaded rows to bound DOM size. |
+| `row-height` | `number` | `64` | Fixed row height used by the windowing calculation. |
+| `overscan` | `number` | `6` | Extra rows rendered above and below the viewport. |
+| `scroll-mode` | `"document" \| "container"` | `"document"` | Uses page scrolling or a constrained component viewport. |
+| `configurable` | `boolean` | `false` | Exposes the column visibility and ordering dialog. |
+| `clickable` | `boolean` | `false` | Makes rows keyboard-focusable and emits row activation from Enter or Space. |
+| `layout` | `FluidInfiniteTableLayoutItem[]` | `[]` | Restores a previously saved layout. |
+
+### Infinite table events
+
+| Event | Detail | When |
+| --- | --- | --- |
+| `fluid-load-more` | `{ offset }` | The load sentinel approaches the viewport. |
+| `fluid-sort` | `{ key, dir }` | A sortable header is activated. |
+| `fluid-column-layout-change` | `{ layout }` | Visibility or ordering changes. |
+| `fluid-row-click` | `{ row, rowIndex, originalEvent }` | A non-interactive row area is activated. |
 
 ## API
 

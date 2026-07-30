@@ -123,6 +123,7 @@ import "@fluid-ds/media/define/zoomable-frame";
 import "@fluid-ds/media/define/audio";
 import "@fluid-ds/media/define/lightbox";
 import "@fluid-ds/table/define/table";
+import "@fluid-ds/table/define/infinite-table";
 import "@fluid-ds/calendar/define/event-calendar";
 import "@fluid-ds/editor/define/rich-text-editor";
 import "@fluid-ds/kanban/define/kanban";

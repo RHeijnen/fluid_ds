@@ -80,7 +80,7 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @uses-token --fluid-duration-fast - Hover/press transition duration.
  * @uses-token --fluid-easing-standard - Hover/press transition easing.
  *
- * @fires fluid-click - Dispatched on activation (click or Enter/Space).
+ * @fires fluid-click - Cancelable event dispatched before the requested form action.
  * @fires fluid-change - Dispatched by a toggle button when `pressed` flips;
  *   `detail` is `{ pressed: boolean }`.
  */
@@ -623,12 +623,23 @@ export class FluidButton extends FluidElement {
   }
 
   protected override updated(changed: PropertyValues<this>): void {
+    const changedProperties = changed as Map<PropertyKey, unknown>;
     if (changed.has("disabled")) {
       this.setAttribute("aria-disabled", String(this.disabled));
     }
     if (changed.has("ariaLabel")) {
       // Reset the dev-warning guard so toggling aria-label re-checks.
       this.warnedNameless = false;
+    }
+    if (
+      changed.has("ariaLabel") ||
+      changedProperties.has("hasPrefix") ||
+      changedProperties.has("hasSuffix") ||
+      changedProperties.has("hasLabel")
+    ) {
+      // Evaluate after Lit has batched every slotchange. Prefix/suffix slots
+      // can report before the default label slot during first render; warning
+      // from the slot handler itself therefore produced false positives.
       this.warnIfNamelessIconOnly();
     }
     if (changed.has("tone") || changed.has("variant")) {
@@ -658,7 +669,6 @@ export class FluidButton extends FluidElement {
     if (slot.name === "prefix") this.hasPrefix = populated;
     else if (slot.name === "suffix") this.hasSuffix = populated;
     else this.hasLabel = populated;
-    this.warnIfNamelessIconOnly();
   };
 
   /**
@@ -706,7 +716,26 @@ export class FluidButton extends FluidElement {
         })
       );
     }
-    this.dispatchEvent(new CustomEvent("fluid-click", { bubbles: true, composed: true }));
+
+    const activation = new CustomEvent("fluid-click", {
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    });
+    this.dispatchEvent(activation);
+    if (activation.defaultPrevented) return;
+
+    // The native button lives in this component's shadow root, so its native
+    // submit/reset behavior cannot discover a form in the host's light-DOM
+    // tree. Forward the requested action explicitly while keeping the inner
+    // button type="button" to avoid two competing form algorithms.
+    const form = this.closest("form");
+    if (this.type === "submit") {
+      form?.requestSubmit();
+    } else if (this.type === "reset") {
+      form?.reset();
+    }
+
   };
 
   override render() {
@@ -727,7 +756,7 @@ export class FluidButton extends FluidElement {
             !this.hasLabel && (this.hasPrefix || this.hasSuffix || this.caret),
           "is-loading": this.loading
         })}
-        type=${this.type}
+        type="button"
         ?disabled=${this.disabled}
         aria-disabled=${this.disabled || this.loading ? "true" : "false"}
         aria-busy=${this.loading ? "true" : nothing}

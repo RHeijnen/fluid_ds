@@ -1,5 +1,16 @@
 # @fluid-ds/table
 
+## Unreleased
+
+### Minor Changes
+
+- Add `fluid-infinite-table`, a separate advanced table for asynchronously
+  loaded operational datasets. It provides rich cell and header renderers,
+  nested property paths, projected sticky filters, sticky headers, fixed-height
+  row windowing, an infinite-load sentinel, server-controlled sorting, and a
+  serializable column visibility and ordering dialog. The existing
+  `fluid-table` remains unchanged.
+
 ## 0.0.3
 
 ### Patch Changes

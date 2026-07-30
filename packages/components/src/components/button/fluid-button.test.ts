@@ -36,6 +36,61 @@ describe("<fluid-button>", () => {
     expect(event).to.exist;
     expect(event.bubbles).to.be.true;
     expect(event.composed).to.be.true;
+    expect(event.cancelable).to.be.true;
+  });
+
+  it("submits the nearest light-DOM form when type=submit", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fluid-button type="submit">Save</fluid-button>
+      </form>
+    `);
+    const el = form.querySelector("fluid-button") as FluidButton;
+    let submitted = false;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitted = true;
+    });
+
+    el.shadowRoot!.querySelector("button")!.click();
+
+    expect(submitted).to.be.true;
+    expect(el.shadowRoot!.querySelector("button")!.type).to.equal("button");
+  });
+
+  it("allows fluid-click to cancel a requested form action", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fluid-button type="submit">Save</fluid-button>
+      </form>
+    `);
+    const el = form.querySelector("fluid-button") as FluidButton;
+    let submitted = false;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitted = true;
+    });
+    el.addEventListener("fluid-click", (event) => event.preventDefault());
+
+    el.shadowRoot!.querySelector("button")!.click();
+
+    expect(submitted).to.be.false;
+  });
+
+  it("resets the nearest light-DOM form when type=reset", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <input name="name" value="original" />
+        <fluid-button type="reset">Reset</fluid-button>
+      </form>
+    `);
+    const input = form.querySelector("input")!;
+    const el = form.querySelector("fluid-button") as FluidButton;
+    input.value = "changed";
+
+    el.shadowRoot!.querySelector("button")!.click();
+
+    expect(input.value).to.equal("original");
   });
 
   it("does not fire fluid-click when disabled", async () => {
@@ -86,6 +141,24 @@ describe("<fluid-button>", () => {
     );
     const inner = el.shadowRoot!.querySelector("button")!;
     expect(inner.getAttribute("aria-label")).to.equal("More options");
+  });
+
+  it("does not warn for an icon plus visible label while slots initialize", async () => {
+    const originalWarn = console.warn;
+    const warnings: unknown[][] = [];
+    console.warn = (...args: unknown[]) => warnings.push(args);
+    try {
+      const el = await fixture<FluidButton>(html`
+        <fluid-button>
+          <fluid-icon slot="prefix" name="download"></fluid-icon>
+          Download
+        </fluid-button>
+      `);
+      await el.updateComplete;
+      expect(warnings).to.have.length(0);
+    } finally {
+      console.warn = originalWarn;
+    }
   });
 
   /*

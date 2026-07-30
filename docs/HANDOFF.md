@@ -16,6 +16,16 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **2026-07-30 local work:** branch `codex/fluid-table-infinite` adds a separate
+> `fluid-infinite-table` to `@fluid-ds/table`. The existing `fluid-table` is
+> untouched. The new component has rich cell/header render callbacks, nested
+> paths, windowed infinite rows, sticky projected filters and headers,
+> document/container scrolling, server-controlled sorting, keyboard row
+> activation, loaded/matching/available counts, and serializable column
+> visibility/order. Package tests (15), typecheck, lint, token gate, build,
+> docs build, light/dark Storybook rendering and sticky geometry are verified.
+> It is not committed, pushed, published, or integrated into TMS yet.
+>
 > **TODO (next session): drop the `@floating-ui/dom` dependency, make
 > positioning fully in-house.** Floating UI is our only runtime positioning
 > dep; it's pulled in by every overlay component (tooltip, popover, popup,
@@ -304,6 +314,14 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-07-30: advanced infinite table started
+
+Added `fluid-infinite-table` as a separate expansion component after comparing
+the legacy TMS and mypayter Angular tables. Preserved their rich template
+contract while replacing Angular `TemplateRef` with framework-neutral renderer
+callbacks and serializable layout events. Browser verification caught and fixed
+a 65 px sticky-header gap and an overlong checkbox accessible name.
 
 ### 2026-06-01: roadmap P0 infra, phantom-token gate + FluidElement teardown helpers
 

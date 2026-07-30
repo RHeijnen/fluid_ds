@@ -140,8 +140,10 @@ Kept out of the core so the base bundle stays lean:
   bookable time slots + availability dots), a standalone time-slot radiogroup,
   an owner-side hours editor, and a framework-free availability engine
   (server-usable). Form-associated; lazy per-month booking fetch.
-- ✅ `@fluid-ds/table`: accessible data grid (sortable, selectable, semantic
-  `<table>`).
+- ✅ `@fluid-ds/table`: accessible semantic tables for compact and large
+  operational datasets, including sortable and selectable static tables plus
+  template-driven infinite loading, sticky filters and headers, row windowing,
+  and configurable columns.
 - ✅ `@fluid-ds/calendar`: event calendar (month view of events; distinct from
   the booking scheduler).
 - ✅ `@fluid-ds/editor`: lightweight accessible rich-text editor (toolbar +
