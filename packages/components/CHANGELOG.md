@@ -1,5 +1,13 @@
 # @fluid-ds/components
 
+## 0.1.2
+
+### Patch Changes
+
+- b134248: Make `fluid-button` submit and reset the nearest light-DOM form when its
+  `type` is `submit` or `reset`, and avoid false icon-only warnings while slots
+  are still initializing.
+
 ## 0.1.1
 
 ### Patch Changes

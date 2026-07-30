@@ -1,5 +1,13 @@
 # @fluid-ds/table
 
+## 0.1.0
+
+### Minor Changes
+
+- b134248: Add a separate `fluid-infinite-table` for large operational datasets with rich
+  cell templates, infinite loading, row windowing, sticky projected filters and
+  headers, server-controlled sorting, and configurable serializable columns.
+
 ## Unreleased
 
 ### Minor Changes

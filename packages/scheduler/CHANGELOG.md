@@ -1,5 +1,12 @@
 # @fluid-ds/scheduler
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [b134248]
+  - @fluid-ds/components@0.1.2
+
 ## 0.0.4
 
 ### Patch Changes
