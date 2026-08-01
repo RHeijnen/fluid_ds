@@ -83,3 +83,22 @@ export const WithDisabledOption: Story = {
     </fluid-select>
   `
 };
+
+/** Regression fixture: the option list must escape this deliberately short,
+ * overflow-hidden container instead of being cropped at its lower edge. */
+export const InsideClippingContainer: Story = {
+  render: () => html`
+    <div
+      style="height: 8rem; max-width: 360px; overflow: hidden; padding: var(--fluid-space-4); border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-lg);"
+    >
+      <p style="margin: 0 0 var(--fluid-space-5);">Clipping boundary</p>
+      <fluid-select aria-label="Deployment action" placeholder="Choose an action">
+        <fluid-option value="deploy">Deploy configuration</fluid-option>
+        <fluid-option value="force">Force deploy configuration</fluid-option>
+        <fluid-option value="restart">Restart terminals</fluid-option>
+        <fluid-option value="cancel">Cancel pending deployment</fluid-option>
+        <fluid-option value="current">Use current terminal configuration</fluid-option>
+      </fluid-select>
+    </div>
+  `
+};

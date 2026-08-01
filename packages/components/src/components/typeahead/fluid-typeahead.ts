@@ -5,6 +5,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
 import { autoUpdate, computePosition, flip, offset, size } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 
 let counter = 0;
 
@@ -214,13 +215,14 @@ export class FluidTypeahead extends FluidFormAssociated {
     }
 
     /*
-     * position: fixed lets the listbox escape ancestor clipping (cards, modals).
-     * floating-ui strategy matches in reposition(). Width is pinned to the
-     * input width by the size middleware, no min-width:100% here because
-     * with position:fixed that resolves against the viewport, not the input.
+     * The Popover API promotes the listbox to the browser top layer so cards,
+     * modals and transformed containers cannot clip it. position:fixed and
+     * floating-ui still own viewport placement and provide the fallback.
      */
     .listbox {
       position: fixed;
+      inset: auto;
+      margin: 0;
       top: 0;
       left: 0;
       z-index: 1000;
@@ -403,6 +405,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     super.disconnectedCallback();
     document.removeEventListener("pointerdown", this.handleOutsideClick, true);
     this.cleanupAutoUpdate?.();
+    hideFromTopLayer(this.listboxEl);
     clearTimeout(this.debounceTimer);
   }
 
@@ -472,6 +475,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     if (!this.wrapEl || !this.listboxEl) return;
     // Anchor to the input-wrap (the bordered shell) so the listbox aligns
     // with the visible field edge, not the inner native input.
+    showInTopLayer(this.listboxEl);
     this.cleanupAutoUpdate = autoUpdate(this.wrapEl, this.listboxEl, () => this.reposition());
     await this.reposition();
     this.scrollActiveIntoView();
@@ -480,6 +484,7 @@ export class FluidTypeahead extends FluidFormAssociated {
   private closeListbox(): void {
     this.cleanupAutoUpdate?.();
     this.cleanupAutoUpdate = undefined;
+    hideFromTopLayer(this.listboxEl);
     this.activeIndex = -1;
     this.removeAttribute("data-placement");
   }
@@ -493,8 +498,10 @@ export class FluidTypeahead extends FluidFormAssociated {
         // Sit flush against the input so the two read as a single shape.
         offset(0),
         // Decide flip based on the viewport, not the nearest scrollable card.
-        flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }),
+        flip({ boundary: document.documentElement, rootBoundary: "viewport" }),
         size({
+          boundary: document.documentElement,
+          rootBoundary: "viewport",
           apply: ({ rects, elements }) => {
             // Pin width exactly to the input so the fused shape stays aligned.
             elements.floating.style.width = `${rects.reference.width}px`;
@@ -722,6 +729,7 @@ export class FluidTypeahead extends FluidFormAssociated {
           class="listbox"
           id=${this.listboxId}
           role="listbox"
+          popover="manual"
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
           @click=${this.handleOptionClick}
           @pointermove=${this.handleOptionHover}

@@ -4,6 +4,7 @@ import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { autoUpdate, computePosition, flip, offset, size } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 import "../icon/define.js";
 import { registerIcon } from "@fluid-ds/icons";
 
@@ -173,12 +174,16 @@ export class FluidSelect extends FluidFormAssociated {
      * keeps the bordering line at the seam; the listbox drops its matching
      * side so we don't get a double-stroke.
      *
-     * position: fixed lets the listbox escape ancestor clipping (cards,
-     * modals, anywhere with overflow: hidden). Floating-ui's strategy is set
-     * to "fixed" to match, see reposition().
+     * The Popover API promotes the listbox to the browser top layer, which is
+     * what actually lets it escape clipping cards, modals and transformed
+     * containers. position:fixed + floating-ui still own viewport placement
+     * and provide a graceful fallback for browsers without Popover support.
      */
     .listbox {
       position: fixed;
+      /* Reset the UA popover centring so floating-ui's coordinates win. */
+      inset: auto;
+      margin: 0;
       top: 0;
       left: 0;
       z-index: 1000;
@@ -305,6 +310,7 @@ export class FluidSelect extends FluidFormAssociated {
     super.disconnectedCallback();
     document.removeEventListener("pointerdown", this.handleOutsideClick, true);
     this.cleanupAutoUpdate?.();
+    hideFromTopLayer(this.listboxEl);
     clearTimeout(this.typeaheadTimer);
   }
 
@@ -383,6 +389,7 @@ export class FluidSelect extends FluidFormAssociated {
       this.activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
     }
     this.applyActive();
+    showInTopLayer(this.listboxEl);
     this.cleanupAutoUpdate = autoUpdate(this.triggerEl, this.listboxEl, () =>
       this.reposition()
     );
@@ -393,6 +400,7 @@ export class FluidSelect extends FluidFormAssociated {
   private closeListbox(): void {
     this.cleanupAutoUpdate?.();
     this.cleanupAutoUpdate = undefined;
+    hideFromTopLayer(this.listboxEl);
     this.activeIndex = -1;
     this.applyActive();
     this.removeAttribute("data-placement");
@@ -408,8 +416,10 @@ export class FluidSelect extends FluidFormAssociated {
         offset(0),
         // Use the viewport as the boundary so cards/modals with overflow:hidden
         // don't force an unnecessary flip. Only flip when we'd truly go off-screen.
-        flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }),
+        flip({ boundary: document.documentElement, rootBoundary: "viewport" }),
         size({
+          boundary: document.documentElement,
+          rootBoundary: "viewport",
           apply: ({ rects, elements, availableHeight }) => {
             // `minWidth`, not `width`: the listbox should be at least as
             // wide as the trigger so the fused shape's left/right edges
@@ -643,6 +653,7 @@ export class FluidSelect extends FluidFormAssociated {
           class="listbox"
           id=${this.listboxId}
           role="listbox"
+          popover="manual"
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
           @click=${this.handleOptionClick}
           @pointermove=${this.handleOptionHover}

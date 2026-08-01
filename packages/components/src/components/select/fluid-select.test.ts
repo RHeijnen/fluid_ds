@@ -42,6 +42,7 @@ describe("<fluid-select>", () => {
     el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!.click();
     await el.updateComplete;
     expect(el.open).to.be.true;
+    expect(el.shadowRoot!.querySelector(".listbox")!.getAttribute("popover")).to.equal("manual");
   });
 
   it("selects an option by clicking it", async () => {

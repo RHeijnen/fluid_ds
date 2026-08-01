@@ -9,6 +9,7 @@ import {
   type Placement
 } from "@floating-ui/dom";
 import { FluidElement } from "../../internal/base-element.js";
+import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 import type { FluidDropdownItem } from "./fluid-dropdown-item.js";
 
 let counter = 0;
@@ -171,6 +172,7 @@ export class FluidDropdown extends FluidElement {
     super.disconnectedCallback();
     document.removeEventListener("pointerdown", this.handleOutsideClick, true);
     this.cleanup?.();
+    hideFromTopLayer(this.menuEl);
     clearTimeout(this.typeaheadTimer);
   }
 
@@ -231,7 +233,7 @@ export class FluidDropdown extends FluidElement {
     // chrome and escapes every clipping / stacking context. Guarded: throws if
     // already open or if the API is unavailable (very old browsers degrade to
     // the position:fixed + z-index fallback).
-    this.showMenuPopover();
+    showInTopLayer(this.menuEl);
     this.cleanup = autoUpdate(this.trigger, this.menuEl, () => this.reposition());
     await this.reposition();
     // Focus the first enabled item so arrow keys work immediately.
@@ -246,35 +248,13 @@ export class FluidDropdown extends FluidElement {
   private handleClose(): void {
     this.cleanup?.();
     this.cleanup = undefined;
-    this.hideMenuPopover();
+    hideFromTopLayer(this.menuEl);
     if (this.trigger) {
       this.trigger.setAttribute("aria-expanded", "false");
       (this.trigger as HTMLElement).focus();
     }
     this.clearActive();
     this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
-  }
-
-  /** Show the menu in the top layer. No-ops if unsupported or already shown. */
-  private showMenuPopover(): void {
-    const menu = this.menuEl as HTMLElement & { showPopover?: () => void };
-    if (typeof menu.showPopover !== "function") return;
-    try {
-      menu.showPopover();
-    } catch {
-      /* already open or not connected, ignore */
-    }
-  }
-
-  /** Remove the menu from the top layer. No-ops if unsupported or not shown. */
-  private hideMenuPopover(): void {
-    const menu = this.menuEl as HTMLElement & { hidePopover?: () => void };
-    if (typeof menu?.hidePopover !== "function") return;
-    try {
-      menu.hidePopover();
-    } catch {
-      /* not currently open, ignore */
-    }
   }
 
   private async reposition(): Promise<void> {
