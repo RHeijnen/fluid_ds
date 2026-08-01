@@ -136,8 +136,8 @@ export class FluidStep extends FluidElement {
       outline-offset: 2px;
     }
 
-    /* Indicator + connector live in a small "rail" so the connector can run from
-       the previous indicator into this one along the layout axis. */
+    /* The two half-connectors keep every indicator centered in an equal-width
+       segment while forming one continuous rail between sibling steps. */
     .rail {
       flex: 0 0 auto;
       display: flex;
@@ -156,22 +156,33 @@ export class FluidStep extends FluidElement {
       flex: 1 1 auto;
       background: var(--fluid-step-connector-color, var(--fluid-border-default));
     }
-    :host([orientation="horizontal"]) .connector {
+    :host([orientation="horizontal"]) .connector.before {
       height: var(--_conn-size);
       margin-inline-end: var(--fluid-step-gap, var(--fluid-space-2));
     }
-    :host([orientation="vertical"]) .connector {
+    :host([orientation="horizontal"]) .connector.after {
+      height: var(--_conn-size);
+      margin-inline-start: var(--fluid-step-gap, var(--fluid-space-2));
+    }
+    :host([orientation="vertical"]) .connector.before {
       width: var(--_conn-size);
       min-height: var(--fluid-space-4);
       margin-block-end: var(--fluid-step-gap, var(--fluid-space-2));
     }
-    /* A completed segment (this step is complete OR current) rides the accent. */
-    :host([state="complete"]) .connector,
-    :host([state="current"]) .connector {
+    :host([orientation="vertical"]) .connector.after {
+      width: var(--_conn-size);
+      min-height: var(--fluid-space-4);
+      margin-block-start: var(--fluid-step-gap, var(--fluid-space-2));
+    }
+    /* The incoming half reaches complete/current steps; the outgoing half is
+       complete only when the following step has already been reached. */
+    :host([state="complete"]) .connector.before,
+    :host([state="current"]) .connector.before,
+    :host([state="complete"]) .connector.after {
       background: var(--fluid-step-connector-complete-color, var(--fluid-accent-base));
     }
     .connector.hidden {
-      display: none;
+      visibility: hidden;
     }
 
     .indicator {
@@ -316,6 +327,9 @@ export class FluidStep extends FluidElement {
   /** True for the first step (suppresses the leading connector). Set by the parent. */
   @property({ type: Boolean }) first = false;
 
+  /** True for the last step (suppresses the trailing connector). Set by the parent. */
+  @property({ type: Boolean }) last = false;
+
   @state() private hasDescriptionSlot = false;
 
   override connectedCallback(): void {
@@ -342,17 +356,23 @@ export class FluidStep extends FluidElement {
   }
 
   private renderRail(): TemplateResult {
-    // The connector runs INTO this step from the previous one, so its color
-    // reflects this step's own state (complete/current = filled accent). The
-    // first step has no leading connector.
     return html`
       <span class="rail">
-        <span part="connector" class="connector ${this.first ? "hidden" : ""}" aria-hidden="true"></span>
+        <span
+          part="connector"
+          class="connector before ${this.first ? "hidden" : ""}"
+          aria-hidden="true"
+        ></span>
         <span part="indicator" class="indicator">
           ${this.isComplete
             ? html`<fluid-icon name="check" aria-hidden="true"></fluid-icon>`
             : html`${this.index || nothing}`}
         </span>
+        <span
+          part="connector"
+          class="connector after ${this.last ? "hidden" : ""}"
+          aria-hidden="true"
+        ></span>
       </span>
     `;
   }
@@ -376,9 +396,7 @@ export class FluidStep extends FluidElement {
 
   override render(): TemplateResult {
     return this.clickable
-      ? html`<button type="button" part="base" class="base clickable">
-          ${this.renderBody()}
-        </button>`
+      ? html`<button type="button" part="base" class="base clickable">${this.renderBody()}</button>`
       : html`<div part="base" class="base">${this.renderBody()}</div>`;
   }
 }

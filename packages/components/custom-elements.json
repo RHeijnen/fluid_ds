@@ -4891,7 +4891,7 @@
           ],
           "events": [
             {
-              "description": "Dispatched on activation (click or Enter/Space).",
+              "description": "Cancelable event dispatched before the requested form action.",
               "name": "fluid-click"
             },
             {
@@ -44928,6 +44928,16 @@
             },
             {
               "kind": "field",
+              "name": "last",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "True for the last step (suppresses the trailing connector). Set by the parent.",
+              "attribute": "last"
+            },
+            {
+              "kind": "field",
               "name": "hasDescriptionSlot",
               "type": {
                 "text": "boolean"
@@ -45165,6 +45175,15 @@
               "default": "false",
               "description": "True for the first step (suppresses the leading connector). Set by the parent.",
               "fieldName": "first"
+            },
+            {
+              "name": "last",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "True for the last step (suppresses the trailing connector). Set by the parent.",
+              "fieldName": "last"
             }
           ],
           "superclass": {
@@ -45247,7 +45266,7 @@
           "name": "FluidSteps",
           "cssProperties": [
             {
-              "description": "Gap between steps. Falls back to --fluid-space-2 (horizontal) / --fluid-space-4 (vertical).",
+              "description": "Gap between steps. Falls back to 0 (horizontal) / --fluid-space-4 (vertical).",
               "name": "--fluid-steps-gap"
             }
           ],

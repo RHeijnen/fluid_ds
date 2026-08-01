@@ -27,7 +27,7 @@ export type FluidStepsVariant = "default" | "chip";
  *
  * @csspart base - The list wrapper (role="list").
  *
- * @cssproperty --fluid-steps-gap - Gap between steps. Falls back to --fluid-space-2 (horizontal) / --fluid-space-4 (vertical).
+ * @cssproperty --fluid-steps-gap - Gap between steps. Falls back to 0 (horizontal) / --fluid-space-4 (vertical).
  *
  * @uses-token --fluid-space-2 - Default gap between steps (horizontal).
  * @uses-token --fluid-space-4 - Default gap between steps (vertical).
@@ -40,31 +40,31 @@ export class FluidSteps extends FluidElement {
       display: block;
     }
 
-      .base {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: flex;
-      }
+    .base {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
 
-      .base.horizontal {
-        flex-direction: row;
-        align-items: flex-start;
-        gap: var(--fluid-steps-gap, var(--fluid-space-2));
-      }
+    .base.horizontal {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--fluid-steps-gap, 0);
+    }
 
-      .base.vertical {
-        flex-direction: column;
-        gap: var(--fluid-steps-gap, var(--fluid-space-4));
-      }
+    .base.vertical {
+      flex-direction: column;
+      gap: var(--fluid-steps-gap, var(--fluid-space-4));
+    }
 
-      /* Chip variant: a wrapping row of pills. */
-      :host([variant="chip"]) .base {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--fluid-steps-gap, var(--fluid-space-2));
-      }
+    /* Chip variant: a wrapping row of pills. */
+    :host([variant="chip"]) .base {
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--fluid-steps-gap, var(--fluid-space-2));
+    }
   `;
 
   /** 0-based index of the active (current) step. */
@@ -124,6 +124,7 @@ export class FluidSteps extends FluidElement {
     steps.forEach((step, i) => {
       step.index = i + 1;
       step.first = i === 0;
+      step.last = i === steps.length - 1;
       step.orientation = this.orientation;
       step.variant = this.variant;
       step.clickable = this.clickable;

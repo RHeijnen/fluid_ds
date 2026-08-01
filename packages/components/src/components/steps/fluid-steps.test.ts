@@ -46,16 +46,28 @@ describe("<fluid-steps>", () => {
     expect(currentIndicator.textContent!.trim()).to.equal("2");
   });
 
-  it("first step suppresses its leading connector", async () => {
+  it("centers steps with visible connectors only between sibling indicators", async () => {
     const el = await fixture<FluidSteps>(sample);
     await el.updateComplete;
     const steps = el.querySelectorAll<FluidStep>("fluid-step");
-    await steps[0]!.updateComplete;
-    await steps[1]!.updateComplete;
-    expect(steps[0]!.shadowRoot!.querySelector(".connector")!.classList.contains("hidden")).to.be
-      .true;
-    expect(steps[1]!.shadowRoot!.querySelector(".connector")!.classList.contains("hidden")).to.be
-      .false;
+    await Promise.all(Array.from(steps, (step) => step.updateComplete));
+
+    const firstBefore = steps[0]!.shadowRoot!.querySelector(".connector.before")!;
+    const firstAfter = steps[0]!.shadowRoot!.querySelector(".connector.after")!;
+    const middleBefore = steps[1]!.shadowRoot!.querySelector(".connector.before")!;
+    const middleAfter = steps[1]!.shadowRoot!.querySelector(".connector.after")!;
+    const lastBefore = steps[3]!.shadowRoot!.querySelector(".connector.before")!;
+    const lastAfter = steps[3]!.shadowRoot!.querySelector(".connector.after")!;
+
+    expect(steps[0]!.first).to.be.true;
+    expect(steps[0]!.last).to.be.false;
+    expect(firstBefore.classList.contains("hidden")).to.be.true;
+    expect(firstAfter.classList.contains("hidden")).to.be.false;
+    expect(middleBefore.classList.contains("hidden")).to.be.false;
+    expect(middleAfter.classList.contains("hidden")).to.be.false;
+    expect(lastBefore.classList.contains("hidden")).to.be.false;
+    expect(lastAfter.classList.contains("hidden")).to.be.true;
+    expect(steps[3]!.last).to.be.true;
   });
 
   it("presentational by default: steps render no <button>", async () => {
