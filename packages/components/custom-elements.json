@@ -39278,6 +39278,10 @@
               "name": "--fluid-segment-font-size"
             },
             {
+              "description": "Space between adjacent segment content such as an icon and label. Falls back to --fluid-space-2.",
+              "name": "--fluid-segment-gap"
+            },
+            {
               "description": "Focus ring color. Falls back to --fluid-focus-ring-color.",
               "name": "--fluid-segment-focus-ring"
             },
@@ -39528,6 +39532,10 @@
             {
               "name": "--fluid-font-size-sm",
               "description": "Font size."
+            },
+            {
+              "name": "--fluid-space-2",
+              "description": "Default gap between adjacent segment content."
             },
             {
               "name": "--fluid-shadow-sm",

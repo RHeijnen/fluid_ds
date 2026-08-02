@@ -87,6 +87,19 @@ describe("<fluid-segmented-control>", () => {
     expect(getComputedStyle(thumb).backgroundColor).to.equal("rgb(1, 2, 3)");
   });
 
+  it("spaces adjacent icon and label content with the segment gap token", async () => {
+    const el = await fixture<FluidSegmentedControl>(html`
+      <fluid-segmented-control aria-label="View" value="list">
+        <fluid-segment value="list"><fluid-icon name="list"></fluid-icon>List</fluid-segment>
+        <fluid-segment value="grid"><fluid-icon name="grid"></fluid-icon>Grid</fluid-segment>
+      </fluid-segmented-control>
+    `);
+    const segment = el.querySelector<HTMLElement>("fluid-segment")!;
+    segment.style.setProperty("--fluid-segment-gap", "11px");
+
+    expect(getComputedStyle(segment).gap).to.equal("11px");
+  });
+
   it("each segment respects --fluid-target-min (AAA hit area)", async () => {
     const el = await fixture<FluidSegmentedControl>(sample);
     el.style.setProperty("--fluid-target-min", "44px");

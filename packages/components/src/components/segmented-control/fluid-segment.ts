@@ -21,6 +21,7 @@ let counter = 0;
  * @cssproperty --fluid-segment-radius - Corner radius. Falls back to --fluid-radius-md.
  * @cssproperty --fluid-segment-font-family - Font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-segment-font-size - Font size. Falls back to --fluid-font-size-sm.
+ * @cssproperty --fluid-segment-gap - Space between adjacent segment content such as an icon and label. Falls back to --fluid-space-2.
  * @cssproperty --fluid-segment-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-segment-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
@@ -33,6 +34,7 @@ let counter = 0;
  * @uses-token --fluid-radius-md - Corner radius.
  * @uses-token --fluid-font-family-sans - Font family.
  * @uses-token --fluid-font-size-sm - Font size.
+ * @uses-token --fluid-space-2 - Default gap between adjacent segment content.
  * @uses-token --fluid-shadow-sm - Selected-segment elevation.
  */
 export class FluidSegment extends FluidElement {
@@ -42,6 +44,7 @@ export class FluidSegment extends FluidElement {
       flex: 1 1 0;
       align-items: center;
       justify-content: center;
+      gap: var(--fluid-segment-gap, var(--fluid-space-2));
       /* SC 2.5.8 Target Size, floor the segment to --fluid-target-min. */
       min-height: var(--fluid-target-min, 0px);
       padding: var(--fluid-space-1) var(--fluid-space-3);
