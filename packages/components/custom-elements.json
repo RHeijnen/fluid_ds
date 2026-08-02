@@ -15869,28 +15869,6 @@
             },
             {
               "kind": "method",
-              "name": "showMenuPopover",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Show the menu in the top layer. No-ops if unsupported or already shown."
-            },
-            {
-              "kind": "method",
-              "name": "hideMenuPopover",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "description": "Remove the menu from the top layer. No-ops if unsupported or not shown."
-            },
-            {
-              "kind": "method",
               "name": "reposition",
               "privacy": "private",
               "return": {
@@ -59686,6 +59664,66 @@
           "declaration": {
             "name": "size",
             "module": "src/internal/position.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/internal/top-layer.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "hideFromTopLayer",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "element",
+              "type": {
+                "text": "HTMLElement | undefined"
+              }
+            }
+          ],
+          "description": "Remove a floating surface from the browser top layer when supported."
+        },
+        {
+          "kind": "function",
+          "name": "showInTopLayer",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "element",
+              "type": {
+                "text": "HTMLElement | undefined"
+              }
+            }
+          ],
+          "description": "Promote a floating surface to the browser top layer when the Popover API is\navailable. Keeping this in one place makes every Fluid overlay degrade to\nits fixed-position fallback in older/test browsers without duplicating the\ndefensive API checks."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "hideFromTopLayer",
+          "declaration": {
+            "name": "hideFromTopLayer",
+            "module": "src/internal/top-layer.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "showInTopLayer",
+          "declaration": {
+            "name": "showInTopLayer",
+            "module": "src/internal/top-layer.ts"
           }
         }
       ]

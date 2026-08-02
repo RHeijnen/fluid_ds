@@ -703,8 +703,10 @@ export class FluidTypeahead extends FluidFormAssociated {
           })}
         >
           <input
+            id="input"
             part="input"
             type="text"
+            name=${ifDefined(this.name || undefined)}
             role="combobox"
             aria-haspopup="listbox"
             aria-expanded=${this.open ? "true" : "false"}

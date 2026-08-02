@@ -458,6 +458,7 @@ export class FluidCommandPalette extends FluidElement {
         >
           <div part="search" class="search">
             <input
+              id="command-search"
               part="input"
               class="input"
               type="text"

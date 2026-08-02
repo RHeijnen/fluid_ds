@@ -18,6 +18,16 @@ describe("<fluid-input>", () => {
     expect(input.value).to.equal("hello");
   });
 
+  it("forwards its form name to the internal input for autofill metadata", async () => {
+    const el = await fixture<FluidInput>(
+      html`<fluid-input name="username" aria-label="Username"></fluid-input>`
+    );
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.id).to.equal("input");
+    expect(input.name).to.equal("username");
+  });
+
   it("fires fluid-input on user typing", async () => {
     const el = await fixture<FluidInput>(html`<fluid-input></fluid-input>`);
     el.focus();

@@ -459,8 +459,10 @@ export class FluidInput extends FluidFormAssociated {
           <slot name="prefix" @slotchange=${this.handlePrefixChange}></slot>
         </span>
         <input
+          id="input"
           part="input"
           type=${this.type}
+          name=${ifDefined(this.name || undefined)}
           .value=${live(this.value)}
           placeholder=${this.placeholder}
           ?disabled=${this.disabled}

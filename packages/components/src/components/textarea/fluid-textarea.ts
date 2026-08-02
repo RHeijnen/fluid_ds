@@ -290,7 +290,9 @@ export class FluidTextarea extends FluidFormAssociated {
         })}
       >
         <textarea
+          id="textarea"
           part="textarea"
+          name=${ifDefined(this.name || undefined)}
           .value=${live(this.value)}
           placeholder=${this.placeholder}
           rows=${this.rows}

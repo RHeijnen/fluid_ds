@@ -5,6 +5,16 @@ import type { FluidTypeahead } from "./fluid-typeahead.js";
 const FRUITS = ["Apple", "Apricot", "Banana", "Blackberry", "Cherry", "Cranberry", "Date"];
 
 describe("<fluid-typeahead>", () => {
+  it("forwards its form name to the internal combobox for autofill metadata", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead name="domain" aria-label="Domain" .options=${FRUITS}></fluid-typeahead>
+    `);
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.id).to.equal("input");
+    expect(input.name).to.equal("domain");
+  });
+
   it("accepts options as an array property", async () => {
     const el = await fixture<FluidTypeahead>(html`
       <fluid-typeahead aria-label="Fruit" .options=${FRUITS}></fluid-typeahead>

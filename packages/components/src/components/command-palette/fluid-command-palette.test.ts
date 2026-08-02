@@ -53,6 +53,7 @@ describe("<fluid-command-palette>", () => {
     const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
     await open(el);
     const combobox = input(el);
+    expect(combobox.id).to.equal("command-search");
     expect(combobox.getAttribute("role")).to.equal("combobox");
     expect(combobox.getAttribute("aria-expanded")).to.equal("true");
     const listboxId = el.shadowRoot!.querySelector('[role="listbox"]')!.id;

@@ -18,6 +18,16 @@ describe("<fluid-textarea>", () => {
     expect(el.shadowRoot!.querySelector("textarea")!.value).to.equal("hello");
   });
 
+  it("forwards its form name to the internal textarea for autofill metadata", async () => {
+    const el = await fixture<FluidTextarea>(
+      html`<fluid-textarea name="comment" aria-label="Comment"></fluid-textarea>`
+    );
+    await el.updateComplete;
+    const textarea = el.shadowRoot!.querySelector("textarea")!;
+    expect(textarea.id).to.equal("textarea");
+    expect(textarea.name).to.equal("comment");
+  });
+
   it("fires fluid-input on typing", async () => {
     const el = await fixture<FluidTextarea>(
       html`<fluid-textarea aria-label="x"></fluid-textarea>`
