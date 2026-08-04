@@ -22,6 +22,31 @@ export interface TypeaheadOption {
 type RawOption = string | TypeaheadOption;
 
 /**
+ * What a row renderer is told about the row it is drawing.
+ */
+export interface TypeaheadOptionContext {
+  /** Position in the filtered list. */
+  index: number;
+  /** True while the row is the keyboard-active one. */
+  active: boolean;
+  /** True when the row is the current value. */
+  selected: boolean;
+  /** The current query, already trimmed. */
+  query: string;
+  /**
+   * Marks the query inside a piece of text, the same way the default row does.
+   * A custom row usually still wants the match highlighted somewhere.
+   */
+  highlight: (text: string) => TemplateResult;
+}
+
+/** Draws one option row. Anything Lit can render is accepted. */
+export type TypeaheadOptionRenderer = (
+  option: TypeaheadOption,
+  context: TypeaheadOptionContext
+) => TemplateResult | string;
+
+/**
  * An autocomplete / typeahead input.
  *
  * Four ways to feed it options:
@@ -48,6 +73,11 @@ type RawOption = string | TypeaheadOption;
  *      <fluid-option value="us">United States</fluid-option>
  *    </fluid-typeahead>
  *    ```
+ *
+ * Options supplied as data render as a highlighted label. Pass `renderOption`
+ * to draw the row yourself: checkboxes, trailing metadata, avatars, anything.
+ * The row is a flex container, so `margin-inline-start: auto` right-aligns a
+ * trailing element.
  *
  * Implements the WAI-ARIA combobox pattern. Form-associated.
  *
@@ -354,6 +384,29 @@ export class FluidTypeahead extends FluidFormAssociated {
 
   /** Maximum number of options shown in the listbox (after filtering). */
   @property({ type: Number, attribute: "max-options" }) maxOptions = 50;
+
+  /**
+   * Draws each option row, replacing the default highlighted label.
+   *
+   * Options fed as data are the only ones that could not carry their own
+   * markup: a slotted `<fluid-option>` may contain anything, while an array or
+   * an async loader could only ever supply a string. That left rows built by
+   * pasting fields into one label with separators, which cannot align a value
+   * to the right, cannot carry a checkbox, and reads as one run of text to a
+   * screen reader.
+   *
+   * The row is a flex container, so `margin-inline-start: auto` on a trailing
+   * element pushes it to the end.
+   *
+   * ```ts
+   * .renderOption=${(option, { highlight }) => html`
+   *   <fluid-checkbox ?checked=${picked.has(option.value)}></fluid-checkbox>
+   *   ${highlight(option.label)}
+   *   <small style="margin-inline-start:auto">${option.data.domain}</small>
+   * `}
+   * ```
+   */
+  @property({ attribute: false }) renderOption?: TypeaheadOptionRenderer;
 
   /** Current input value. Submitted with the form. */
   @property() override value = "";
@@ -754,7 +807,15 @@ export class FluidTypeahead extends FluidFormAssociated {
                       aria-selected=${i === this.activeIndex ? "true" : "false"}
                       data-index=${i}
                     >
-                      ${this.renderLabel(opt.label)}
+                      ${this.renderOption
+                        ? this.renderOption(opt, {
+                            index: i,
+                            active: i === this.activeIndex,
+                            selected: opt.value === this.selectedValue,
+                            query: this.value.trim(),
+                            highlight: (text: string) => this.renderLabel(text)
+                          })
+                        : this.renderLabel(opt.label)}
                     </div>
                   `
                 )}

@@ -124,6 +124,42 @@ describe("<fluid-tour>", () => {
     expect(event).to.exist;
   });
 
+  it("fires fluid-skip when a press lands outside the popover", async () => {
+    const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
+    await elementUpdated(el);
+    await aTimeout(20);
+    // The scrim does not take pointer events, so a press outside reaches the
+    // page underneath. Left alone, the tour survived a click that had already
+    // moved the user somewhere else.
+    setTimeout(() => document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true })));
+    const event = await oneEvent(el, "fluid-skip");
+    expect(event).to.exist;
+    expect(el.open).to.be.false;
+  });
+
+  it("survives a press on its own popover", async () => {
+    const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
+    await elementUpdated(el);
+    await aTimeout(20);
+    const panel = el.shadowRoot!.querySelector<HTMLElement>(".panel")!;
+    panel.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
+    await aTimeout(20);
+    expect(el.open).to.be.true;
+  });
+
+  it("stops listening for outside presses once closed", async () => {
+    const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
+    await elementUpdated(el);
+    await aTimeout(20);
+    el.skip();
+    await elementUpdated(el);
+    let skipped = false;
+    el.addEventListener("fluid-skip", () => (skipped = true));
+    document.body.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
+    await aTimeout(20);
+    expect(skipped).to.be.false;
+  });
+
   it("steps forward / back with arrow keys", async () => {
     const el = await fixture<FluidTour>(html`<fluid-tour open .steps=${steps}></fluid-tour>`);
     await elementUpdated(el);

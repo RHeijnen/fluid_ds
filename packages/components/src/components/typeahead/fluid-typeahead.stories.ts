@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import "../badge/define.js";
 
 const meta: Meta = {
   title: "Components/Forms/Typeahead",
@@ -81,6 +82,46 @@ export const StrictSelection: Story = {
       style="margin-top: var(--fluid-space-2); color: var(--fluid-text-secondary); font-size: var(--fluid-font-size-sm);"
     >
       Free text clears on blur, only options from the list are accepted.
+    </p>
+  `
+};
+
+const TERMINALS = [
+  { value: "t1", label: "APO0Q25L017092", data: { product: "Apollo CLO Dev", domain: "CURO" } },
+  { value: "t2", label: "APO20204800024", data: { product: "Apollo CLO Dev", domain: "PAYTER_RD" } },
+  { value: "t3", label: "APO20204800068", data: { product: "Apollo CLO Dev", domain: "CURO" } },
+  { value: "t4", label: "APO20213900004", data: { product: "Apollo CLO Dev", domain: "PAYTER" } },
+  { value: "t5", label: "APO20222000120", data: { product: "Apollo CLO Dev", domain: "M6" } }
+];
+
+export const CustomRows: Story = {
+  name: "Custom option rows",
+  render: () => html`
+    <fluid-typeahead
+      aria-label="Terminal"
+      placeholder="Search terminals…"
+      .options=${TERMINALS}
+      .renderOption=${(
+        option: { label: string; data?: unknown },
+        context: { highlight: (text: string) => unknown }
+      ) => {
+        const meta = option.data as { product: string; domain: string };
+        return html`
+          <span>${context.highlight(option.label)}</span>
+          <small style="margin-inline-start: var(--fluid-space-2); color: var(--fluid-text-secondary);"
+            >${meta.product}</small
+          >
+          <fluid-badge style="margin-inline-start: auto;">${meta.domain}</fluid-badge>
+        `;
+      }}
+      style="max-width: 520px;"
+    ></fluid-typeahead>
+    <p
+      style="margin-top: var(--fluid-space-2); color: var(--fluid-text-secondary); font-size: var(--fluid-font-size-sm);"
+    >
+      Options fed as data render a plain label by default. Pass renderOption to draw the row
+      instead, so fields stay separate elements rather than one string joined with separators. The
+      row is a flex container, so margin-inline-start: auto pushes the trailing badge to the end.
     </p>
   `
 };

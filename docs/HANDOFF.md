@@ -37,6 +37,13 @@ to hand off context when you switch machines.
 > positioning code. Audit usages first (`grep -r "@floating-ui/dom"`), keep the
 > same call sites, swap the implementation, re-verify overlays in-browser.
 
+> **2026-08-04:** uncommitted on `main`: `fluid-tour` now skips when a press
+> lands outside its popover, and `fluid-typeahead` takes a `renderOption`
+> callback so rows fed as data can carry checkboxes, trailing metadata and
+> right-aligned content. Components tests (1054), typecheck and lint are green
+> for both. Neither is published: TMS pins 0.1.2 and cannot see them until a
+> release goes out.
+
 - **Branch:** `main`
 - **Last verified:** 2026-06-01: `pnpm typecheck` + `pnpm lint` +
   `pnpm check:coverage` + `pnpm test` (854 component tests) + `pnpm build` +
@@ -314,6 +321,26 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-08-04: tour dismisses on outside press, typeahead rows are templatable
+
+Two fixes found while building a knowledge base on top of Fluid in TMS.
+
+`fluid-tour` survived a press outside its popover. The scrim takes no pointer
+events so the spotlit control stays usable, which also means an outside press
+lands on the page underneath: a click on a link navigated away and left
+coachmarks anchored to a screen that had gone. It now skips, the pointer
+equivalent of the Escape it already handled, without swallowing the press.
+
+`fluid-typeahead` gained `renderOption`. Options fed as an array or from a
+loader could only ever be a string, so consumers were joining fields into one
+label with separators: no right alignment, no checkbox, and one run of text to
+a screen reader. Slotted `<fluid-option>` children could always carry markup,
+so this closes the gap for the data-driven path only. The callback is handed
+the index, active and selected state, the query, and the same highlighter the
+default row uses.
+
+Not published. TMS pins 0.1.2 and needs a release to pick either of these up.
 
 ### 2026-07-30: advanced infinite table started
 

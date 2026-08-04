@@ -44,6 +44,9 @@ let counter = 0;
  * Keyboard: ArrowRight / ArrowLeft step forward / back, Escape skips the tour,
  * Tab is trapped inside the popover.
  *
+ * Pointer: a press outside the popover skips the tour, the pointer equivalent
+ * of Escape. The press is not swallowed, so the spotlit control stays usable.
+ *
  * @summary Step-by-step guided product tour with spotlight coachmarks.
  *
  * @csspart base - The popover dialog.
@@ -89,7 +92,7 @@ let counter = 0;
  *
  * @fires fluid-step-change - The active step changed. `detail: { index }`.
  * @fires fluid-finish - The tour completed (Done on the last step).
- * @fires fluid-skip - The tour was dismissed (Skip or Escape).
+ * @fires fluid-skip - The tour was dismissed (Skip, Escape, or a press outside the popover).
  */
 export class FluidTour extends FluidElement {
   static override styles = [
@@ -339,6 +342,7 @@ export class FluidTour extends FluidElement {
     const root = this.getRootNode() as Document | ShadowRoot;
     this.previouslyFocused = root.activeElement as HTMLElement | null;
     document.addEventListener("keydown", this.handleKeyDown, true);
+    document.addEventListener("pointerdown", this.handlePointerDown, true);
     await this.updateComplete;
     const scrim = this.scrimEl as HTMLElement & { showPopover?: () => void };
     const panel = this.panelEl as HTMLElement & { showPopover?: () => void };
@@ -355,6 +359,7 @@ export class FluidTour extends FluidElement {
     this.cleanup?.();
     this.cleanup = undefined;
     document.removeEventListener("keydown", this.handleKeyDown, true);
+    document.removeEventListener("pointerdown", this.handlePointerDown, true);
     const scrim: (HTMLElement & { hidePopover?: () => void }) | null = this.scrimEl ?? null;
     const panel: (HTMLElement & { hidePopover?: () => void }) | null = this.panelEl ?? null;
     try {
@@ -450,6 +455,24 @@ export class FluidTour extends FluidElement {
       this.panelEl.style.transform = "translate(-50%, -50%)";
     }
   }
+
+  /**
+   * A press anywhere outside the popover dismisses the tour.
+   *
+   * The scrim is `pointer-events: none` so the spotlit control stays usable,
+   * which also means a press outside lands on the page underneath. Without
+   * this the tour outlived a click that had already taken the user somewhere
+   * else, leaving coachmarks anchored to a screen that was no longer there.
+   *
+   * The press is dismissed, not swallowed: it still does whatever it normally
+   * would. Escape already skips the tour and this is its pointer equivalent.
+   */
+  private handlePointerDown = (e: PointerEvent): void => {
+    if (!this.open) return;
+    const panel = this.panelEl;
+    if (panel && e.composedPath().includes(panel)) return;
+    this.skip();
+  };
 
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (!this.open) return;

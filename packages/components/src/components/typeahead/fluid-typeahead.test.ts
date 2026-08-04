@@ -224,4 +224,88 @@ describe("<fluid-typeahead>", () => {
     const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
     expect(wrap.getBoundingClientRect().height).to.be.greaterThanOrEqual(60);
   });
+  describe("renderOption", () => {
+    const TERMINALS = [
+      { value: "t1", label: "APO0Q25L017092", data: { product: "Apollo CLO Dev", domain: "CURO" } },
+      { value: "t2", label: "APO20204800024", data: { product: "Apollo CLO Dev", domain: "PAYTER_RD" } }
+    ];
+
+    const open = async (el: FluidTypeahead, query: string) => {
+      const input = el.shadowRoot!.querySelector("input")!;
+      input.value = query;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      await aTimeout(260);
+      await el.updateComplete;
+    };
+
+    it("draws each row from the callback instead of the label", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead
+          aria-label="Terminal"
+          debounce="0"
+          .options=${TERMINALS}
+          .renderOption=${(option: { label: string; data?: unknown }) => html`
+            <span class="serial">${option.label}</span>
+            <small class="domain">${(option.data as { domain: string }).domain}</small>
+          `}
+        ></fluid-typeahead>
+      `);
+      await open(el, "APO");
+      const rows = el.shadowRoot!.querySelectorAll(".option");
+      expect(rows).to.have.lengthOf(2);
+      expect(rows[0].querySelector(".serial")!.textContent).to.equal("APO0Q25L017092");
+      // Data an option carries alongside its label is what a row is usually
+      // built from; pasting it into the label was the only way before.
+      expect(rows[0].querySelector(".domain")!.textContent).to.equal("CURO");
+    });
+
+    it("hands the row its position, state and the query", async () => {
+      const seen: Array<Record<string, unknown>> = [];
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead
+          aria-label="Terminal"
+          debounce="0"
+          .options=${TERMINALS}
+          .renderOption=${(option: { label: string }, context: Record<string, unknown>) => {
+            seen.push({ label: option.label, index: context.index, active: context.active, query: context.query });
+            return html`${option.label}`;
+          }}
+        ></fluid-typeahead>
+      `);
+      await open(el, "APO");
+      // The renderer runs on every render, so only the most recent pass
+      // describes what is on screen now.
+      const latest = seen.slice(-TERMINALS.length);
+      expect(latest.map((row) => row.index)).to.deep.equal([0, 1]);
+      expect(latest.every((row) => row.query === "APO")).to.be.true;
+      expect(latest.filter((row) => row.active)).to.have.lengthOf(1);
+    });
+
+    it("offers the same match highlighting the default row uses", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead
+          aria-label="Terminal"
+          debounce="0"
+          .options=${TERMINALS}
+          .renderOption=${(option: { label: string }, context: { highlight: (t: string) => unknown }) =>
+            html`<span class="wrapped">${context.highlight(option.label)}</span>`}
+        ></fluid-typeahead>
+      `);
+      await open(el, "APO");
+      // A custom row still wants the query marked somewhere, so the highlighter
+      // is handed over rather than reimplemented by every consumer.
+      const match = el.shadowRoot!.querySelector(".option .wrapped .match")!;
+      expect(match.textContent).to.equal("APO");
+    });
+
+    it("falls back to the highlighted label when no callback is given", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead aria-label="Fruit" debounce="0" .options=${FRUITS}></fluid-typeahead>
+      `);
+      await open(el, "Ap");
+      const row = el.shadowRoot!.querySelector(".option")!;
+      expect(row.textContent!.trim()).to.equal("Apple");
+      expect(row.querySelector(".match")!.textContent).to.equal("Ap");
+    });
+  });
 });
