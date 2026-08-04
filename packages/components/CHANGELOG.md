@@ -1,5 +1,35 @@
 # @fluid-ds/components
 
+## 0.1.3
+
+### Patch Changes
+
+- 81660d1: Forward form-control names to the native input, textarea, and typeahead controls and give internal search controls stable shadow-root identifiers so browser autofill and form-field diagnostics recognize them correctly.
+- 68ed464: Render select and typeahead option lists in the browser top layer so they are
+  not clipped by cards, modals, drawers, or other overflow-constrained layouts.
+  The shared top-layer behavior now also backs dropdown menus.
+- 2ff7a1e: Apply the documented spacing token between adjacent segmented-control content,
+  including leading icons and their labels.
+- b799cb8: Dismiss a tour when a press lands outside its popover, the pointer equivalent
+  of the Escape it already handled. The scrim takes no pointer events so the
+  spotlit control stays usable, which also meant an outside press reached the
+  page underneath: a click on a link navigated away and left the coachmarks
+  anchored to a screen that was gone. The press is not swallowed, so it still
+  does whatever it normally would.
+
+  Add `renderOption` to the typeahead, so an option list fed as data can draw its
+  own rows. A slotted `fluid-option` has always been free to contain anything,
+  but options supplied as an array or from an async loader could only ever be a
+  string, leaving consumers to join fields into one label with separators. That
+  cannot right-align a value, cannot hold a checkbox, and reads as a single run
+  of text to a screen reader. The callback receives the index, the active and
+  selected state, the query, and the same highlighter the default row uses, since
+  a custom row usually still wants the match marked somewhere.
+
+- 9836631: Center horizontal step indicators on an evenly distributed rail and render
+  continuous connector halves between sibling steps. This removes the oversized
+  gap after the first step while preserving first and last edge alignment.
+
 ## 0.1.2
 
 ### Patch Changes
