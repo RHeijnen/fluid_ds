@@ -325,6 +325,21 @@ Things true across machines (machine-specific quirks go in private memory):
 
 Newest first. One short entry per working session.
 
+### 2026-08-04: option lists respect the scroll position
+
+`fluid-select` and `fluid-typeahead` named `document.documentElement` as the
+overflow boundary, which measures in document coordinates while the trigger is
+measured in viewport ones. A scrolled page therefore kept the placement it
+would have had at scroll zero, and a control near the bottom of a long page
+opened upwards with hundreds of pixels free below it. The boundary existed to
+stop a clipping ancestor forcing a flip; the top layer already prevents that, so
+the viewport is the only boundary now.
+
+Found in TMS, then isolated by opening one select at two scroll offsets: same
+element, same document position, identical placement both times.
+
+Versioned locally to 0.1.5 so the release publishes without a PR to merge.
+
 ### 2026-08-04: typeahead keep-open for multi-pick
 
 `fluid-typeahead` takes `keep-open`. A combobox closes on select because

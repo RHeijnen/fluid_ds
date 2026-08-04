@@ -1,5 +1,19 @@
 # @fluid-ds/components
 
+## 0.1.5
+
+### Patch Changes
+
+- Place select and typeahead option lists by where the trigger is on screen
+  rather than where it sits in the document. Naming `document.documentElement` as
+  the overflow boundary measured against document coordinates while the trigger
+  was measured against the viewport, so a scrolled page kept whatever placement
+  it would have had at scroll zero: a control near the bottom of a long page
+  opened upwards even once it had been scrolled to the top of the screen, over
+  several hundred pixels of empty space. The boundary was there to stop a
+  clipping ancestor forcing a flip, which the top layer already handles, so the
+  viewport is now the only boundary.
+
 ## 0.1.4
 
 ### Patch Changes

@@ -569,9 +569,15 @@ export class FluidTypeahead extends FluidFormAssociated {
         // Sit flush against the input so the two read as a single shape.
         offset(0),
         // Decide flip based on the viewport, not the nearest scrollable card.
-        flip({ boundary: document.documentElement, rootBoundary: "viewport" }),
+        // The viewport is the only boundary that matters: the listbox renders in
+        // the top layer, so no ancestor can clip it. Naming
+        // document.documentElement as the boundary measured overflow in
+        // document coordinates while the reference was measured in viewport
+        // ones, so a scrolled page kept the placement it would have had at
+        // scroll zero: a control near the bottom of a long page opened
+        // upwards even after being scrolled to the top of the screen.
+        flip({ rootBoundary: "viewport" }),
         size({
-          boundary: document.documentElement,
           rootBoundary: "viewport",
           apply: ({ rects, elements }) => {
             // Pin width exactly to the input so the fused shape stays aligned.

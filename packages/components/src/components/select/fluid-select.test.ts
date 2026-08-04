@@ -179,4 +179,29 @@ describe("<fluid-select>", () => {
     const trigger = el.shadowRoot!.querySelector<HTMLElement>(".trigger")!;
     expect(trigger.getBoundingClientRect().height).to.be.greaterThanOrEqual(60);
   });
+  it("places the listbox by where the trigger is on screen, not in the document", async () => {
+    const holder = document.createElement("div");
+    holder.style.cssText = "position:absolute;top:1800px;left:20px;width:260px;height:2400px";
+    document.body.append(holder);
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select><fluid-option value="a">Alpha</fluid-option></fluid-select>
+    `);
+    holder.append(el);
+
+    // Scrolled so the trigger is high on screen with room below it. Measuring
+    // overflow in document coordinates kept the placement it would have had at
+    // scroll zero, so it opened upwards over an empty screen.
+    window.scrollTo(0, 1700);
+    await aTimeout(60);
+    el.open = true;
+    await el.updateComplete;
+    await aTimeout(80);
+
+    expect(window.innerHeight - el.getBoundingClientRect().bottom).to.be.greaterThan(200);
+    expect(el.getAttribute("data-placement")).to.equal("bottom");
+
+    el.open = false;
+    window.scrollTo(0, 0);
+    holder.remove();
+  });
 });

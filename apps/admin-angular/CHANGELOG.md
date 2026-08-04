@@ -1,5 +1,12 @@
 # @fluid-ds/admin-angular
 
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @fluid-ds/components@0.1.5
+
 ## 0.0.5
 
 ### Patch Changes

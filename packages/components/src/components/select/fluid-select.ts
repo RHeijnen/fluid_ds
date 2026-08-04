@@ -416,9 +416,15 @@ export class FluidSelect extends FluidFormAssociated {
         offset(0),
         // Use the viewport as the boundary so cards/modals with overflow:hidden
         // don't force an unnecessary flip. Only flip when we'd truly go off-screen.
-        flip({ boundary: document.documentElement, rootBoundary: "viewport" }),
+        // The viewport is the only boundary that matters: the listbox renders in
+        // the top layer, so no ancestor can clip it. Naming
+        // document.documentElement as the boundary measured overflow in
+        // document coordinates while the reference was measured in viewport
+        // ones, so a scrolled page kept the placement it would have had at
+        // scroll zero: a control near the bottom of a long page opened
+        // upwards even after being scrolled to the top of the screen.
+        flip({ rootBoundary: "viewport" }),
         size({
-          boundary: document.documentElement,
           rootBoundary: "viewport",
           apply: ({ rects, elements, availableHeight }) => {
             // `minWidth`, not `width`: the listbox should be at least as
