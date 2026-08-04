@@ -224,6 +224,73 @@ describe("<fluid-typeahead>", () => {
     const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
     expect(wrap.getBoundingClientRect().height).to.be.greaterThanOrEqual(60);
   });
+  describe("keep-open", () => {
+    const openWith = async (el: FluidTypeahead, query: string) => {
+      const input = el.shadowRoot!.querySelector("input")!;
+      input.value = query;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      await aTimeout(260);
+      await el.updateComplete;
+    };
+    const pickFirst = async (el: FluidTypeahead) => {
+      el.shadowRoot!.querySelector<HTMLElement>(".option")!.click();
+      await el.updateComplete;
+    };
+
+    it("closes and adopts the label by default", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead aria-label="Fruit" debounce="0" .options=${FRUITS}></fluid-typeahead>
+      `);
+      await openWith(el, "Ap");
+      await pickFirst(el);
+      expect(el.open).to.be.false;
+      expect(el.value).to.equal("Apple");
+    });
+
+    it("stays open and leaves the query alone when gathering several", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+      `);
+      await openWith(el, "Ap");
+      await pickFirst(el);
+      // Closing after every pick would mean reopening and retyping to add the
+      // next one, and taking the label would throw away the search that found
+      // this one.
+      expect(el.open).to.be.true;
+      expect(el.value).to.equal("Ap");
+      expect(el.shadowRoot!.querySelectorAll(".option").length).to.be.greaterThan(0);
+    });
+
+    it("still reports every pick", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+      `);
+      await openWith(el, "Ap");
+      const picked: string[] = [];
+      el.addEventListener("fluid-change", (event) => {
+        picked.push((event as CustomEvent<{ value: string }>).detail.value);
+      });
+      const rows = el.shadowRoot!.querySelectorAll<HTMLElement>(".option");
+      rows[0].click();
+      await el.updateComplete;
+      rows[1].click();
+      await el.updateComplete;
+      expect(picked).to.deep.equal(["Apple", "Apricot"]);
+    });
+
+    it("still closes on Escape", async () => {
+      const el = await fixture<FluidTypeahead>(html`
+        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+      `);
+      await openWith(el, "Ap");
+      const input = el.shadowRoot!.querySelector("input")!;
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      await el.updateComplete;
+      // Staying open is about picking, not about refusing to be dismissed.
+      expect(el.open).to.be.false;
+    });
+  });
+
   describe("renderOption", () => {
     const TERMINALS = [
       { value: "t1", label: "APO0Q25L017092", data: { product: "Apollo CLO Dev", domain: "CURO" } },

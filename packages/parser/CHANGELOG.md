@@ -1,5 +1,12 @@
 # @fluid-ds/parser
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @fluid-ds/components@0.1.4
+
 ## 0.1.3
 
 ### Patch Changes

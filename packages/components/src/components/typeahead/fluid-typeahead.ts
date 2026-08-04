@@ -74,6 +74,9 @@ export type TypeaheadOptionRenderer = (
  *    </fluid-typeahead>
  *    ```
  *
+ * Set `keep-open` to gather several values: the list stays open after a choice
+ * and the query is left alone, with each pick reported through `fluid-change`.
+ *
  * Options supplied as data render as a highlighted label. Pass `renderOption`
  * to draw the row yourself: checkboxes, trailing metadata, avatars, anything.
  * The row is a flex container, so `margin-inline-start: auto` right-aligns a
@@ -408,6 +411,21 @@ export class FluidTypeahead extends FluidFormAssociated {
    */
   @property({ attribute: false }) renderOption?: TypeaheadOptionRenderer;
 
+  /**
+   * Keeps the list open after a choice, and leaves the query alone.
+   *
+   * A combobox closes on select because picking one value is the whole
+   * interaction. A picker that gathers several is a different thing: closing
+   * after every pick makes the user reopen and retype to add the next one, and
+   * replacing the query with the chosen label throws away the search that
+   * found it.
+   *
+   * The chosen value is still reported through `fluid-change` each time, so
+   * what is selected stays the consumer's to hold. Pair it with
+   * `renderOption` to show that state on the rows.
+   */
+  @property({ type: Boolean, reflect: true, attribute: "keep-open" }) keepOpen = false;
+
   /** Current input value. Submitted with the form. */
   @property() override value = "";
 
@@ -614,9 +632,13 @@ export class FluidTypeahead extends FluidFormAssociated {
   }
 
   private commitOption(opt: TypeaheadOption): void {
-    this.value = opt.label;
+    // Gathering several: the query is what found this row and will find the
+    // next one, so it survives, and the list stays where it is.
+    if (!this.keepOpen) {
+      this.value = opt.label;
+      this.open = false;
+    }
     this.selectedValue = opt.value;
-    this.open = false;
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
         detail: { value: opt.value, label: opt.label, option: opt },

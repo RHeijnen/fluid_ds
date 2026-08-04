@@ -1,5 +1,13 @@
 # @fluid-ds/landing
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @fluid-ds/components@0.1.4
+  - @fluid-ds/parser@0.1.4
+
 ## 0.0.4
 
 ### Patch Changes

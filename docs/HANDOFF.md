@@ -37,12 +37,15 @@ to hand off context when you switch machines.
 > positioning code. Audit usages first (`grep -r "@floating-ui/dom"`), keep the
 > same call sites, swap the implementation, re-verify overlays in-browser.
 
-> **2026-08-04:** uncommitted on `main`: `fluid-tour` now skips when a press
-> lands outside its popover, and `fluid-typeahead` takes a `renderOption`
-> callback so rows fed as data can carry checkboxes, trailing metadata and
-> right-aligned content. Components tests (1054), typecheck and lint are green
-> for both. Neither is published: TMS pins 0.1.2 and cannot see them until a
-> release goes out.
+> **2026-08-04:** 0.1.3 published (tour dismisses on an outside press,
+> typeahead `renderOption`), and TMS is on it. 0.1.4 is versioned and ready to
+> push: the typeahead takes `keep-open` for pickers that gather several values.
+> Components tests (1058), typecheck and lint green.
+>
+> **Release flow:** run `changeset version` locally and commit the bump with
+> the change. CI then finds no pending changesets and publishes straight away.
+> Leaving the changeset for CI to consume is what opens a "Version Packages"
+> PR that has to be merged by hand, which is how PR #1 came about.
 
 - **Branch:** `main`
 - **Last verified:** 2026-06-01: `pnpm typecheck` + `pnpm lint` +
@@ -321,6 +324,17 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-08-04: typeahead keep-open for multi-pick
+
+`fluid-typeahead` takes `keep-open`. A combobox closes on select because
+choosing one value is the interaction; a picker gathering a set is not, and
+closing after every pick means reopening and retyping. The query survives too,
+since it is what found the row and will find the next one. Escape and Tab still
+dismiss.
+
+Versioned locally to 0.1.4 rather than leaving the changeset for CI, so the
+release publishes without a PR to merge.
 
 ### 2026-08-04: tour dismisses on outside press, typeahead rows are templatable
 

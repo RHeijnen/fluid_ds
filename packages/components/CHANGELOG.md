@@ -1,5 +1,18 @@
 # @fluid-ds/components
 
+## 0.1.4
+
+### Patch Changes
+
+- Add `keep-open` to the typeahead, for picking several values in one go. A
+  combobox closes on select because choosing one value is the whole interaction;
+  a picker that gathers a set is a different thing, and closing after every pick
+  means reopening and retyping to add the next one. With `keep-open` the list
+  stays put and the query is left alone, since the query is what found this row
+  and will find the next one. Each pick is still reported through `fluid-change`,
+  so what is selected remains the consumer's to hold, and Escape and Tab still
+  dismiss the list.
+
 ## 0.1.3
 
 ### Patch Changes
