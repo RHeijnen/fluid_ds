@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/scheduler",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Accessible appointment / availability scheduler web components for Fluid (expansion pack): a calendar with bookable time slots, plus an owner-side hours editor. Framework-agnostic, form-associated, WCAG 2.2 AA.",
   "type": "module",
   "license": "MIT",

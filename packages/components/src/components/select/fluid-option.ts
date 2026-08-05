@@ -50,12 +50,23 @@ export class FluidOption extends FluidElement {
       user-select: none;
       border-radius: var(--fluid-radius-sm);
       position: relative;
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
       transition:
         background-color var(--fluid-duration-fast) var(--fluid-easing-standard),
         color var(--fluid-duration-fast) var(--fluid-easing-standard);
+    }
+
+    /*
+     * The label truncates, not the host. text-overflow wants a block container
+     * and the host is a flex one, so a label longer than the listbox was cut
+     * mid-glyph with no ellipsis to say it had been.
+     */
+    .label {
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     :host([hidden]) {
@@ -133,6 +144,19 @@ export class FluidOption extends FluidElement {
   }
 
   override render(): TemplateResult {
-    return html`<slot></slot>`;
+    return html`<span part="label" class="label"><slot @slotchange=${this.carryFullLabel}></slot></span>`;
   }
+
+  /**
+   * Keeps the whole label reachable once it is too long to show.
+   *
+   * Whether it is truncated depends on the listbox's width, which is not known
+   * until it opens, so the title is set from the label unconditionally rather
+   * than measured. An author who wants something else on hover keeps it.
+   */
+  private authoredTitle: string | null = null;
+  private carryFullLabel = (): void => {
+    this.authoredTitle ??= this.getAttribute("title") ?? "";
+    if (!this.authoredTitle) this.title = this.label;
+  };
 }

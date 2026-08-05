@@ -1,5 +1,17 @@
 # @fluid-ds/components
 
+## 0.1.6
+
+### Patch Changes
+
+- Keep a select's listbox the width of its trigger, and let a typeahead reopen onto a fresh list.
+
+  The select's listbox grew to fit its longest label. One long option among eighty was enough to make the list read as a second, unrelated panel instead of the continuation of the trigger the borders are drawn to suggest, and once it was wide enough to reach the edge of the viewport, flip answered by re-aligning it to the right, so the two no longer even shared an edge. It matches the trigger now, the way typeahead's already did. A label that does not fit truncates with an ellipsis and carries the whole of itself on the option's title.
+
+  A typeahead dropped every reload of its options where the value had changed by any route other than typing. The staleness guard that discards a slow request's results could not tell "this is not the last thing typed" from "this was not typed at all", so picking an option — or having a value set from outside — left the list on whatever the previous keystroke had narrowed it to. Reopening after choosing showed one row: the row already chosen.
+
+  A typeahead also opens on click now. Focus alone still only pre-warms, because focus happens on the way past while tabbing through a form, but a click is not on the way to anywhere — which is what lets a field with `min-query="0"` behave like a select that can also be typed into.
+
 ## 0.1.5
 
 ### Patch Changes

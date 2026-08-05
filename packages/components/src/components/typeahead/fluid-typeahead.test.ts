@@ -376,3 +376,56 @@ describe("<fluid-typeahead>", () => {
     });
   });
 });
+
+describe("<fluid-typeahead> opening onto the whole list", () => {
+  it("opens on click so a zero min-query field behaves like a select", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead aria-label="Fruit" min-query="0" .options=${FRUITS}></fluid-typeahead>
+    `);
+    const input = el.shadowRoot!.querySelector("input")!;
+    input.dispatchEvent(new Event("focus"));
+    await el.updateComplete;
+    // Focus alone does not open: tabbing through a form would drop a list on
+    // every field it passed.
+    expect(el.open).to.be.false;
+
+    input.click();
+    await el.updateComplete;
+    expect(el.open).to.be.true;
+    expect(el.shadowRoot!.querySelectorAll(".option").length).to.equal(FRUITS.length);
+  });
+
+  it("asks for the list again after one has been chosen", async () => {
+    // The chosen label sits in the field, and the field is the query. Loading
+    // is guarded against results for anything but the last thing typed, and a
+    // label arriving by selection rather than by keystroke used to fail that
+    // guard, so the reload was dropped: reopening showed whatever the last
+    // keystroke had narrowed the list to, however the value had changed since.
+    const asked: string[] = [];
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead aria-label="Fruit" min-query="0" debounce="0"
+        .loadOptions=${(query: string) => {
+          asked.push(query);
+          return FRUITS.filter((fruit) => fruit.toLowerCase().includes(query.trim().toLowerCase()));
+        }}
+      ></fluid-typeahead>
+    `);
+    const input = el.shadowRoot!.querySelector("input")!;
+    input.value = "Ban";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await aTimeout(20);
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelectorAll(".option").length).to.equal(1);
+
+    (el.shadowRoot!.querySelector(".option") as HTMLElement).click();
+    await el.updateComplete;
+    expect(el.value).to.equal("Banana");
+
+    asked.length = 0;
+    input.click();
+    await aTimeout(20);
+    await el.updateComplete;
+    expect(el.open).to.be.true;
+    expect(asked).to.deep.equal(["Banana"]);
+  });
+});

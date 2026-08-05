@@ -205,3 +205,46 @@ describe("<fluid-select>", () => {
     holder.remove();
   });
 });
+
+describe("<fluid-select> listbox width", () => {
+  it("stays the width of the trigger however long an option is", async () => {
+    // A listbox that grew to its longest label read as a second, unrelated
+    // panel rather than the continuation of the trigger the borders draw, and
+    // once it was wide enough to reach the edge of the viewport, flip answered
+    // by re-aligning it to the right, so the two no longer shared an edge.
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Firmware" style="width: 220px">
+        <fluid-option value="short">Short</fluid-option>
+        <fluid-option value="long">
+          Update Apollo modem firmware to SWI9X07H_00.09.10.00 everywhere
+        </fluid-option>
+      </fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector(".trigger") as HTMLElement;
+    (el.shadowRoot!.querySelector(".trigger") as HTMLElement).click();
+    await el.updateComplete;
+    await aTimeout(50);
+    const listbox = el.shadowRoot!.querySelector(".listbox") as HTMLElement;
+    expect(listbox.getBoundingClientRect().width).to.be.closeTo(
+      trigger.getBoundingClientRect().width,
+      1
+    );
+  });
+
+  it("truncates a label it cannot fit and keeps the whole of it on the title", async () => {
+    const label = "Update Apollo modem firmware to SWI9X07H_00.09.10.00 everywhere";
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Firmware" style="width: 220px">
+        <fluid-option value="long">${label}</fluid-option>
+      </fluid-select>
+    `);
+    (el.shadowRoot!.querySelector(".trigger") as HTMLElement).click();
+    await el.updateComplete;
+    await aTimeout(50);
+    const option = el.querySelector("fluid-option")!;
+    const text = option.shadowRoot!.querySelector(".label") as HTMLElement;
+    expect(text.scrollWidth).to.be.greaterThan(text.clientWidth);
+    expect(getComputedStyle(text).textOverflow).to.equal("ellipsis");
+    expect(option.getAttribute("title")).to.equal(label);
+  });
+});

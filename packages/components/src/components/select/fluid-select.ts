@@ -427,13 +427,19 @@ export class FluidSelect extends FluidFormAssociated {
         size({
           rootBoundary: "viewport",
           apply: ({ rects, elements, availableHeight }) => {
-            // `minWidth`, not `width`: the listbox should be at least as
-            // wide as the trigger so the fused shape's left/right edges
-            // line up, but grow if an option's label is wider than the
-            // trigger (the way native <select> dropdowns behave). Pinning
-            // to exactly the trigger's width clipped longer options and
-            // forced a horizontal scrollbar to appear at the bottom.
-            elements.floating.style.minWidth = `${rects.reference.width}px`;
+            // The trigger's width exactly, the way typeahead does it. Letting
+            // the listbox grow to the longest label read as a second, unrelated
+            // panel rather than the continuation of the trigger the borders are
+            // drawn to suggest, and one long option among eighty was enough to
+            // do it: the list widened past the trigger, that pushed it toward
+            // the edge of the viewport, and flip answered by re-aligning it to
+            // the right, so the two no longer even shared an edge.
+            //
+            // A label longer than the trigger truncates instead. That is what
+            // the extra width was bought to avoid, but it costs one label its
+            // tail rather than costing every list its shape, and the full text
+            // is on the option's title.
+            elements.floating.style.width = `${rects.reference.width}px`;
             // Cap height to the available space below/above the trigger
             // so the listbox never spills past the viewport edge.
             elements.floating.style.maxHeight = `${Math.min(availableHeight, 288)}px`;

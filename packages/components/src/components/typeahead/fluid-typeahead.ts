@@ -675,15 +675,44 @@ export class FluidTypeahead extends FluidFormAssociated {
     }
   };
 
+  /**
+   * Brings the list up to date with whatever the value is now.
+   *
+   * scheduleLoad drops a query that is not the last one typed, which is how a
+   * stale result from a slow request is discarded. But the value also changes
+   * without being typed — an option is picked, or it is set from outside — and
+   * the guard could not tell the two apart, so every refresh after one of those
+   * was thrown away and the list stayed on whatever the last keystroke had
+   * narrowed it to. Reopening after choosing showed one row: the row already
+   * chosen. Announcing the query first is what makes it the current one.
+   */
+  private refreshOptions(): void {
+    if (this.value.length < this.minQuery) return;
+    this.lastQuery = this.value;
+    if (this.loadOptions) this.scheduleLoad(this.value);
+    else this.recomputeFiltered(this.value);
+  }
+
   private handleFocus = () => {
     this.focused = true;
     // Pre-warm the filtered list so the listbox opens instantly when the user
     // hits ArrowDown, but don't auto-open on bare focus (would intrude on
     // tab-through-form flows).
-    if (this.value.length >= this.minQuery) {
-      if (this.loadOptions) this.scheduleLoad(this.value);
-      else this.recomputeFiltered(this.value);
-    }
+    this.refreshOptions();
+  };
+
+  /**
+   * A pointer on the field asks to see the choices.
+   *
+   * Focus alone only pre-warms, because focus also happens on the way past
+   * while tabbing through a form and a list opening then would be in the way.
+   * A click is not on the way to anywhere, so with a min-query of zero this is
+   * what makes the field behave like a select that can also be typed into.
+   */
+  private handleClick = () => {
+    if (this.disabled) return;
+    this.refreshOptions();
+    if (this.value.length >= this.minQuery) this.open = true;
   };
 
   private handleBlur = () => {
@@ -700,6 +729,10 @@ export class FluidTypeahead extends FluidFormAssociated {
       case "ArrowDown":
         e.preventDefault();
         if (!this.open) {
+          // Opening from the keyboard without leaving the field never passes
+          // through focus, so this is the only chance to catch up with a value
+          // that changed since the last keystroke.
+          this.refreshOptions();
           this.open = true;
           this.activeIndex = this.filteredOptions.length ? 0 : -1;
           this.scrollActiveIntoView();
@@ -803,6 +836,7 @@ export class FluidTypeahead extends FluidFormAssociated {
             ?required=${this.required}
             @input=${this.handleInput}
             @focus=${this.handleFocus}
+            @click=${this.handleClick}
             @blur=${this.handleBlur}
             @keydown=${this.handleKeyDown}
           />
