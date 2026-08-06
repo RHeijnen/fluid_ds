@@ -80,6 +80,28 @@ export const DocumentScroll: Story = {
   `
 };
 
+/**
+ * Headers a reader can arrange: drag the grab handle to reorder, drag the
+ * trailing grip to resize, double-click the grip to fit a column to its
+ * contents. Both handles are reachable from the keyboard, and both report the
+ * same layout, so persisting a hidden column persists these too.
+ */
+export const ArrangeableColumns: Story = {
+  render: () => html`
+    <fluid-infinite-table
+      caption="Terminal fleet"
+      hide-caption
+      reorderable-columns
+      resizable-columns
+      scroll-mode="container"
+      style="--fluid-infinite-table-height:24rem"
+      .columns=${columns}
+      .rows=${rows}
+      .total=${80}
+    ></fluid-infinite-table>
+  `
+};
+
 export const Loading: Story = {
   render: () => html`
     <fluid-infinite-table

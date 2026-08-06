@@ -325,6 +325,21 @@ Things true across machines (machine-specific quirks go in private memory):
 
 Newest first. One short entry per working session.
 
+### 2026-08-06: the infinite table's columns can be arranged
+
+`fluid-infinite-table` gained `reorderable-columns` and `resizable-columns`,
+version bumped to 0.1.1 (committed, not pushed, not published). A header now
+carries a grab handle (drag, or Enter to pick up, arrows to move, Escape to put
+back) and a trailing resize grip (drag, double-click or Enter to auto-fit,
+arrows to step, Home to restore the declared width). Order and width ride the
+existing `layout` and leave in the existing `fluid-column-layout-change`, so a
+consumer that already persists a hidden column persists these for free. The
+handles sit beside the sort control rather than inside it, and the two accessible
+names plus the move announcement are properties, because the application knows
+what language its reader speaks. Package tests (23), typecheck, lint and the
+token gate are green. TMS wires the flags through `payter-data-table` but cannot
+use them until 0.1.1 is published.
+
 ### 2026-08-04: option lists respect the scroll position
 
 `fluid-select` and `fluid-typeahead` named `document.documentElement` as the

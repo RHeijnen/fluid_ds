@@ -24,6 +24,11 @@ export interface FluidInfiniteTableColumn<
   visible?: boolean;
   configurable?: boolean;
   sortable?: boolean;
+  /**
+   * Set false to pin this column's width. Defaults to true when the table is
+   * resizable: a column somebody can see is a column somebody can size.
+   */
+  resizable?: boolean;
   align?: "start" | "center" | "end";
   renderCell?: (context: FluidInfiniteTableCellContext<Row>) => unknown;
   renderHeader?: (column: FluidInfiniteTableColumn<Row>) => unknown;
@@ -54,11 +59,23 @@ export interface FluidInfiniteTableSort {
  * cells retain their native keyboard behavior. The table itself does not use
  * the ARIA Grid pattern and does not add cell-level arrow-key navigation.
  *
+ * Order and width are the same kind of fact as visibility, so all three travel
+ * in one `layout` and leave in one `fluid-column-layout-change`. A consumer
+ * that already persists a layout persists a resize and a reorder for free.
+ *
+ * With `reorderable-columns`, each header carries a grab handle: drag it, or
+ * focus it and press Enter or Space to pick the column up, arrow keys to move
+ * it, Enter to drop and Escape to put it back. With `resizable-columns`, each
+ * header carries a grip on its trailing edge: drag it, double-click (or press
+ * Enter) to fit the column to its contents, arrow keys to size it a step at a
+ * time (Shift for a bigger step), and Home to restore the declared width.
+ *
  * @summary Infinite, windowed and template-driven semantic data table.
  *
  * @fires fluid-load-more - Requests the next result page.
  * @fires fluid-sort - Requests sorting. `detail: { key, dir }`.
- * @fires fluid-column-layout-change - Column visibility or order changed.
+ * @fires fluid-column-layout-change - Column visibility, order or width
+ *   changed. `detail: { layout }`, complete and ready to persist.
  * @fires fluid-row-click - A non-interactive part of a row was activated.
  *
  * @slot filters - Application-owned filter controls rendered above the header.
@@ -75,6 +92,8 @@ export interface FluidInfiniteTableSort {
  * @csspart cell - Data cells.
  * @csspart sentinel - Infinite-load sentinel.
  * @csspart column-dialog - Column configuration dialog.
+ * @csspart column-grip - Resize handle on a header cell's trailing edge.
+ * @csspart column-grab - Reorder handle inside a header cell.
  *
  * @cssproperty --fluid-infinite-table-bg - Table background.
  * @cssproperty --fluid-infinite-table-fg - Table foreground.
@@ -86,6 +105,10 @@ export interface FluidInfiniteTableSort {
  * @cssproperty --fluid-infinite-table-cell-padding - Cell padding.
  * @cssproperty --fluid-infinite-table-height - Container-scroll height.
  * @cssproperty --fluid-infinite-table-sticky-offset - Offset below app chrome.
+ * @cssproperty --fluid-infinite-table-grip-color - Resting colour of a resize
+ *   grip and a reorder handle.
+ * @cssproperty --fluid-infinite-table-grip-active-color - Colour of a grip
+ *   being hovered, focused or dragged, and of the drop indicator.
  *
  * @uses-token --fluid-surface-base
  * @uses-token --fluid-surface-muted
@@ -241,6 +264,10 @@ export class FluidInfiniteTable extends LitElement {
       text-overflow: ellipsis;
       vertical-align: middle;
     }
+    /*
+     * Sticky already makes a header cell a containing block, so the grip and
+     * the drop indicator can be pinned to its edges without a second one.
+     */
     thead th {
       position: sticky;
       top: calc(
@@ -294,6 +321,124 @@ export class FluidInfiniteTable extends LitElement {
     th[aria-sort="descending"] .sort-mark {
       opacity: 1;
       color: var(--fluid-accent-base, #4f46e5);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+    .header-inner > :not(.grab) {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    /*
+     * Both handles are quiet until the header is pointed at or something in it
+     * is focused. A grid with a permanent grip on every column reads as chrome
+     * rather than as data.
+     */
+    .grab {
+      display: inline-grid;
+      flex: 0 0 auto;
+      width: max(1.5rem, var(--fluid-target-min, 0px));
+      min-width: 0;
+      height: max(1.5rem, var(--fluid-target-min, 0px));
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(
+        --fluid-infinite-table-grip-color,
+        var(--fluid-text-secondary, #52525b)
+      );
+      opacity: 0;
+      cursor: grab;
+      place-items: center;
+      transition: opacity 120ms ease;
+    }
+    .grab:hover {
+      border: 0;
+    }
+    th:hover .grab,
+    th:focus-within .grab,
+    .grab[aria-pressed="true"] {
+      opacity: 1;
+    }
+    .grab[aria-pressed="true"] {
+      color: var(
+        --fluid-infinite-table-grip-active-color,
+        var(--fluid-accent-base, #4f46e5)
+      );
+      cursor: grabbing;
+    }
+    .grip {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 0;
+      width: 0.9rem;
+      cursor: col-resize;
+      touch-action: none;
+      user-select: none;
+    }
+    .grip::before {
+      content: "";
+      position: absolute;
+      inset-block: 25%;
+      inset-inline-end: 0.35rem;
+      width: 2px;
+      border-radius: var(--fluid-radius-sm, 0.25rem);
+      background: var(
+        --fluid-infinite-table-grip-color,
+        var(--fluid-border-default, #e4e4e7)
+      );
+      transition: background-color 120ms ease, inset-block 120ms ease;
+    }
+    .grip:hover::before,
+    .grip:focus-visible::before,
+    .grip[data-dragging]::before {
+      inset-block: 8%;
+      background: var(
+        --fluid-infinite-table-grip-active-color,
+        var(--fluid-accent-base, #4f46e5)
+      );
+    }
+    .grip:focus-visible {
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-accent-base, #4f46e5);
+      /* The header clips its overflow, so the ring is drawn inside it. */
+      outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
+    }
+    th[data-drop]::after {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      width: 3px;
+      background: var(
+        --fluid-infinite-table-grip-active-color,
+        var(--fluid-accent-base, #4f46e5)
+      );
+    }
+    th[data-drop="start"]::after {
+      inset-inline-start: 0;
+    }
+    th[data-drop="end"]::after {
+      inset-inline-end: 0;
+    }
+    th[data-grabbed] {
+      outline: var(--fluid-focus-ring-width, 2px) dashed
+        var(--fluid-accent-base, #4f46e5);
+      outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
+    }
+    th[data-dragging] {
+      opacity: 0.55;
+    }
+    /*
+     * Auto-fit measures a column against its own contents, which only reports
+     * the intrinsic width while nothing is allowed to wrap.
+     */
+    table[data-measuring] th,
+    table[data-measuring] td {
+      white-space: nowrap;
     }
     .spacer td {
       height: var(--_spacer-height);
@@ -382,6 +527,10 @@ export class FluidInfiniteTable extends LitElement {
       * {
         scroll-behavior: auto !important;
       }
+      .grab,
+      .grip::before {
+        transition: none;
+      }
     }
   `;
 
@@ -405,19 +554,75 @@ export class FluidInfiniteTable extends LitElement {
   @property({ type: String }) error = "";
   @property({ type: Object }) sort: FluidInfiniteTableSort | null = null;
   @property({ type: String, attribute: "row-key" }) rowKey = "id";
+  /** Columns can be dragged, or moved from the keyboard, into another order. */
+  @property({ type: Boolean, attribute: "reorderable-columns" })
+  reorderableColumns = false;
+  /** Column widths can be dragged, auto-fitted, or stepped from the keyboard. */
+  @property({ type: Boolean, attribute: "resizable-columns" })
+  resizableColumns = false;
+  /**
+   * Accessible names for the two handles and for the move announcement.
+   * `{column}`, `{position}` and `{count}` are substituted. They are properties
+   * rather than fixed strings because the application, not the table, knows
+   * what language its reader speaks.
+   */
+  @property({ type: String, attribute: "resize-column-label" })
+  resizeColumnLabel = "Resize {column}";
+  @property({ type: String, attribute: "reorder-column-label" })
+  reorderColumnLabel = "Reorder {column}";
+  @property({ type: String, attribute: "column-position-label" })
+  columnPositionLabel = "{column}, column {position} of {count}";
 
   @state() private viewScrollTop = 0;
   @state() private viewportHeight = 800;
   @state() private internalLayout: FluidInfiniteTableLayoutItem[] = [];
+  /** The column a keyboard user has picked up, if any. */
+  @state() private grabbedKey: string | null = null;
+  @state() private draggingKey: string | null = null;
+  @state() private dropTarget: { key: string; edge: "start" | "end" } | null =
+    null;
+  @state() private announcement = "";
+  /**
+   * What each column currently measures, for the grip to report.
+   *
+   * Measured on a layout change and on a resize of the table rather than on
+   * every render, because rendering happens on every scroll frame and reading
+   * a rectangle there would force a reflow per frame.
+   */
+  @state() private columnWidths: Record<string, number> = {};
 
   @query(".viewport") private viewport?: HTMLElement;
   @query(".toolbar") private toolbar?: HTMLElement;
   @query(".sentinel") private sentinel?: HTMLElement;
   @query("dialog") private columnDialog?: HTMLDialogElement;
+  @query("table") private table?: HTMLTableElement;
 
   private intersectionObserver?: IntersectionObserver;
   private resizeObserver?: ResizeObserver;
   private frame = 0;
+  private measureFrame = 0;
+  /** Where a column sat before it was picked up, so Escape can put it back. */
+  private grabSnapshot: FluidInfiniteTableLayoutItem[] | null = null;
+  private resizing: {
+    key: string;
+    pointerId: number;
+    startX: number;
+    startWidth: number;
+    width: number;
+    grip: HTMLElement;
+  } | null = null;
+  /**
+   * A keyboard resize is a burst of keystrokes, and a consumer persists every
+   * layout it is handed. One event per burst rather than one per keypress.
+   */
+  private emitTimer = 0;
+
+  /** No drag or keystroke may leave a column too narrow to read. */
+  private static readonly minColumnWidth = 56;
+  /** Auto-fit stops here; a single long value should not own the table. */
+  private static readonly maxColumnWidth = 640;
+  private static readonly resizeStep = 16;
+  private static readonly resizeStepLarge = 64;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -432,6 +637,9 @@ export class FluidInfiniteTable extends LitElement {
     this.resizeObserver?.disconnect();
     this.viewport?.removeEventListener("scroll", this.onContainerScroll);
     cancelAnimationFrame(this.frame);
+    cancelAnimationFrame(this.measureFrame);
+    clearTimeout(this.emitTimer);
+    this.resizing = null;
     super.disconnectedCallback();
   }
 
@@ -439,6 +647,7 @@ export class FluidInfiniteTable extends LitElement {
     this.observeGeometry();
     this.observeSentinel();
     this.onDocumentScroll();
+    this.scheduleMeasure();
   }
 
   protected override willUpdate(changed: Map<PropertyKey, unknown>): void {
@@ -453,6 +662,42 @@ export class FluidInfiniteTable extends LitElement {
       changed.has("scrollMode")
     ) {
       this.observeSentinel();
+    }
+    if (changed.has("internalLayout") || changed.has("columns")) {
+      this.scheduleMeasure();
+    }
+  }
+
+  /**
+   * Refreshes what the grips report, without churning renders.
+   *
+   * Off the update cycle, because measuring during it and then writing the
+   * result back is the render loop Lit warns about.
+   */
+  private scheduleMeasure(): void {
+    if (!this.resizableColumns) return;
+    cancelAnimationFrame(this.measureFrame);
+    this.measureFrame = requestAnimationFrame(() => this.measureColumnWidths());
+  }
+
+  private measureColumnWidths(): void {
+    if (!this.resizableColumns) return;
+    const measured: Record<string, number> = {};
+    let changed = false;
+    for (const cell of this.renderRoot.querySelectorAll<HTMLElement>(
+      "th[data-column]"
+    )) {
+      const key = cell.dataset["column"];
+      if (!key) continue;
+      const width = Math.round(cell.getBoundingClientRect().width);
+      measured[key] = width;
+      if (this.columnWidths[key] !== width) changed = true;
+    }
+    if (
+      changed ||
+      Object.keys(measured).length !== Object.keys(this.columnWidths).length
+    ) {
+      this.columnWidths = measured;
     }
   }
 
@@ -477,6 +722,7 @@ export class FluidInfiniteTable extends LitElement {
       const toolbarHeight = this.toolbar?.getBoundingClientRect().height ?? 0;
       this.style.setProperty("--_fluid-toolbar-height", `${toolbarHeight}px`);
       this.measureScroll();
+      this.scheduleMeasure();
     });
     if (this.viewport) this.resizeObserver.observe(this.viewport);
     if (this.toolbar) this.resizeObserver.observe(this.toolbar);
@@ -644,6 +890,301 @@ export class FluidInfiniteTable extends LitElement {
     );
   }
 
+  /**
+   * One layout event per gesture rather than one per keystroke, because the
+   * consumer on the other end of it is usually writing to a server.
+   */
+  private scheduleLayoutEmit(): void {
+    clearTimeout(this.emitTimer);
+    this.emitTimer = setTimeout(() => this.emitLayout(), 400) as unknown as number;
+  }
+
+  private columnFor(key: string): FluidInfiniteTableColumn | undefined {
+    return this.columns.find((column) => column.key === key);
+  }
+
+  /** A column that cannot be configured cannot be dragged out of its place. */
+  private canReorder(key: string): boolean {
+    return (
+      this.reorderableColumns && this.columnFor(key)?.configurable !== false
+    );
+  }
+
+  private canResize(key: string): boolean {
+    return this.resizableColumns && this.columnFor(key)?.resizable !== false;
+  }
+
+  private label(template: string, values: Record<string, string | number>): string {
+    return Object.entries(values).reduce(
+      (text, [token, value]) => text.split(`{${token}}`).join(String(value)),
+      template
+    );
+  }
+
+  private headerCell(key: string): HTMLElement | undefined {
+    return [
+      ...this.renderRoot.querySelectorAll<HTMLElement>("th[data-column]")
+    ].find((cell) => cell.dataset["column"] === key);
+  }
+
+  private columnElement(key: string): HTMLElement | undefined {
+    return [
+      ...this.renderRoot.querySelectorAll<HTMLElement>("col[data-column]")
+    ].find((element) => element.dataset["column"] === key);
+  }
+
+  /**
+   * Width is stored on the layout item beside visibility and order, so a
+   * resize persists through whatever already persists a hidden column.
+   * `undefined` puts the column back on the width it was declared with.
+   */
+  private setColumnWidth(
+    key: string,
+    width: string | undefined,
+    debounce = false
+  ): void {
+    this.internalLayout = this.internalLayout.map((item) =>
+      item.key === key ? { ...item, width } : item
+    );
+    if (debounce) this.scheduleLayoutEmit();
+    else {
+      clearTimeout(this.emitTimer);
+      this.emitLayout();
+    }
+  }
+
+  private measuredWidth(key: string): number {
+    return (
+      this.headerCell(key)?.getBoundingClientRect().width ??
+      FluidInfiniteTable.minColumnWidth
+    );
+  }
+
+  /** Which way "wider" points, so a right-to-left reader drags the same way. */
+  private get direction(): 1 | -1 {
+    return getComputedStyle(this).direction === "rtl" ? -1 : 1;
+  }
+
+  private readonly onGripPointerDown = (event: PointerEvent, key: string): void => {
+    if (event.button !== 0) return;
+    const grip = event.currentTarget as HTMLElement;
+    try {
+      grip.setPointerCapture(event.pointerId);
+    } catch {
+      // No live pointer behind this event (a synthesized one, for instance).
+      // Capture is an improvement on the drag, not a condition of it.
+    }
+    grip.setAttribute("data-dragging", "");
+    const startWidth = this.measuredWidth(key);
+    this.resizing = {
+      key,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startWidth,
+      width: startWidth,
+      grip
+    };
+    // Otherwise the drag selects the header text on its way across the table.
+    event.preventDefault();
+  };
+
+  private readonly onGripPointerMove = (event: PointerEvent): void => {
+    const state = this.resizing;
+    if (!state || event.pointerId !== state.pointerId) return;
+    const moved = (event.clientX - state.startX) * this.direction;
+    state.width = Math.max(
+      FluidInfiniteTable.minColumnWidth,
+      state.startWidth + moved
+    );
+    // Written straight to the column rather than through a render, so the
+    // column follows the pointer instead of the frame after it.
+    const column = this.columnElement(state.key);
+    if (column) column.style.width = `${Math.round(state.width)}px`;
+  };
+
+  private readonly onGripPointerUp = (event: PointerEvent): void => {
+    const state = this.resizing;
+    if (!state || event.pointerId !== state.pointerId) return;
+    this.resizing = null;
+    if (state.grip.hasPointerCapture?.(event.pointerId)) {
+      state.grip.releasePointerCapture(event.pointerId);
+    }
+    state.grip.removeAttribute("data-dragging");
+    this.setColumnWidth(state.key, `${Math.round(state.width)}px`);
+  };
+
+  /**
+   * The column's own contents decide its width.
+   *
+   * Measured with wrapping switched off and the column collapsed, because a
+   * cell that has already been given room reports the room rather than the
+   * content, and auto-fit would then only ever grow a column.
+   */
+  private autoFitColumn(key: string): void {
+    const index = this.visibleColumns.findIndex((column) => column.key === key);
+    const table = this.table;
+    const column = this.columnElement(key);
+    if (index < 0 || !table || !column) return;
+    const previous = column.style.width;
+    table.setAttribute("data-measuring", "");
+    column.style.width = "1px";
+    let widest = 0;
+    for (const row of table.querySelectorAll<HTMLElement>(
+      "thead tr, tbody tr[data-row]"
+    )) {
+      const cell = row.children[index] as HTMLElement | undefined;
+      if (cell) widest = Math.max(widest, cell.scrollWidth);
+    }
+    column.style.width = previous;
+    table.removeAttribute("data-measuring");
+    if (!widest) return;
+    this.setColumnWidth(
+      key,
+      `${Math.min(
+        FluidInfiniteTable.maxColumnWidth,
+        Math.max(FluidInfiniteTable.minColumnWidth, Math.ceil(widest) + 2)
+      )}px`
+    );
+  }
+
+  private onGripKeydown(event: KeyboardEvent, key: string): void {
+    const step = event.shiftKey
+      ? FluidInfiniteTable.resizeStepLarge
+      : FluidInfiniteTable.resizeStep;
+    const wider = this.direction === 1 ? "ArrowRight" : "ArrowLeft";
+    const narrower = this.direction === 1 ? "ArrowLeft" : "ArrowRight";
+    if (event.key === wider || event.key === narrower) {
+      event.preventDefault();
+      const delta = event.key === wider ? step : -step;
+      const next = Math.max(
+        FluidInfiniteTable.minColumnWidth,
+        this.measuredWidth(key) + delta
+      );
+      this.setColumnWidth(key, `${Math.round(next)}px`, true);
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      this.autoFitColumn(key);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      this.setColumnWidth(key, undefined);
+    }
+  }
+
+  /** Puts `key` on the near or far side of `targetKey`, and reports it. */
+  private reorderColumn(
+    key: string,
+    targetKey: string,
+    edge: "start" | "end"
+  ): void {
+    if (key === targetKey || !this.canReorder(key) || !this.canReorder(targetKey)) {
+      return;
+    }
+    const moved = this.internalLayout.find((item) => item.key === key);
+    if (!moved) return;
+    const next = this.internalLayout.filter((item) => item.key !== key);
+    const at = next.findIndex((item) => item.key === targetKey);
+    if (at < 0) return;
+    next.splice(edge === "end" ? at + 1 : at, 0, moved);
+    this.internalLayout = next.map((item, order) => ({ ...item, order }));
+    clearTimeout(this.emitTimer);
+    this.emitLayout();
+    this.announceColumn(key);
+  }
+
+  /** One place along the row of visible columns, for the keyboard path. */
+  private moveColumnStep(key: string, delta: -1 | 1): void {
+    const visible = this.visibleColumns.map((column) => column.key);
+    const index = visible.indexOf(key);
+    const neighbour = visible[index + delta];
+    // A fixed column is a wall rather than something to jump over: a selection
+    // box that has wandered into the middle of a table is a broken table.
+    if (index < 0 || neighbour === undefined || !this.canReorder(neighbour)) {
+      return;
+    }
+    this.reorderColumn(key, neighbour, delta === 1 ? "end" : "start");
+  }
+
+  private announceColumn(key: string): void {
+    const visible = this.visibleColumns;
+    const index = visible.findIndex((column) => column.key === key);
+    if (index < 0) return;
+    this.announcement = this.label(this.columnPositionLabel, {
+      column: visible[index]!.label,
+      position: index + 1,
+      count: visible.length
+    });
+  }
+
+  private onGrabKeydown(event: KeyboardEvent, key: string): void {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (this.grabbedKey === key) {
+        this.grabbedKey = null;
+        this.grabSnapshot = null;
+      } else {
+        this.grabbedKey = key;
+        this.grabSnapshot = this.internalLayout.map((item) => ({ ...item }));
+        this.announceColumn(key);
+      }
+      return;
+    }
+    if (this.grabbedKey !== key) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (this.grabSnapshot) {
+        this.internalLayout = this.grabSnapshot;
+        clearTimeout(this.emitTimer);
+        this.emitLayout();
+      }
+      this.grabbedKey = null;
+      this.grabSnapshot = null;
+      this.announceColumn(key);
+      return;
+    }
+    const forward = this.direction === 1 ? "ArrowRight" : "ArrowLeft";
+    const backward = this.direction === 1 ? "ArrowLeft" : "ArrowRight";
+    if (event.key === forward || event.key === backward) {
+      event.preventDefault();
+      this.moveColumnStep(key, event.key === forward ? 1 : -1);
+    }
+  }
+
+  private onGrabDragStart(event: DragEvent, key: string): void {
+    this.draggingKey = key;
+    event.dataTransfer?.setData("text/plain", key);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+  }
+
+  private onHeaderDragOver(event: DragEvent, key: string): void {
+    const dragged = this.draggingKey;
+    if (!dragged || dragged === key || !this.canReorder(key)) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+    const cell = event.currentTarget as HTMLElement;
+    const rect = cell.getBoundingClientRect();
+    const past = (event.clientX - rect.left) / (rect.width || 1) > 0.5;
+    const edge: "start" | "end" =
+      (this.direction === 1 ? past : !past) ? "end" : "start";
+    if (this.dropTarget?.key !== key || this.dropTarget.edge !== edge) {
+      this.dropTarget = { key, edge };
+    }
+  }
+
+  private onHeaderDrop(event: DragEvent, key: string): void {
+    const dragged = this.draggingKey ?? event.dataTransfer?.getData("text/plain");
+    const edge = this.dropTarget?.edge ?? "start";
+    this.dropTarget = null;
+    this.draggingKey = null;
+    if (!dragged) return;
+    event.preventDefault();
+    this.reorderColumn(dragged, key, edge);
+  }
+
+  private readonly onDragEnd = (): void => {
+    this.draggingKey = null;
+    this.dropTarget = null;
+  };
+
   private handleRowClick(event: MouseEvent, row: FluidInfiniteTableRow, index: number): void {
     if (!this.clickable) return;
     const target = event.composedPath()[0];
@@ -702,6 +1243,66 @@ export class FluidInfiniteTable extends LitElement {
           </span>
         </button>`
       : content;
+  }
+
+  /**
+   * The header content, with whichever handles this column has earned.
+   *
+   * The handles sit beside the sort control rather than inside it: a grip
+   * nested in a button is a button that cannot be pressed and a grip that
+   * cannot be dragged.
+   */
+  private renderHeaderContent(column: FluidInfiniteTableColumn): unknown {
+    const reorderable = this.canReorder(column.key);
+    const resizable = this.canResize(column.key);
+    if (!reorderable && !resizable) return this.renderHeader(column);
+    return html`
+      <div class="header-inner">
+        ${reorderable
+          ? html`<button
+              part="column-grab"
+              class="grab"
+              type="button"
+              draggable="true"
+              aria-pressed=${this.grabbedKey === column.key}
+              aria-label=${this.label(this.reorderColumnLabel, {
+                column: column.label
+              })}
+              @dragstart=${(event: DragEvent) =>
+                this.onGrabDragStart(event, column.key)}
+              @dragend=${this.onDragEnd}
+              @keydown=${(event: KeyboardEvent) =>
+                this.onGrabKeydown(event, column.key)}
+            >
+              <span aria-hidden="true">⠿</span>
+            </button>`
+          : nothing}
+        ${this.renderHeader(column)}
+      </div>
+      ${resizable
+        ? html`<span
+            part="column-grip"
+            class="grip"
+            role="separator"
+            tabindex="0"
+            aria-orientation="vertical"
+            aria-label=${this.label(this.resizeColumnLabel, {
+              column: column.label
+            })}
+            aria-valuemin=${FluidInfiniteTable.minColumnWidth}
+            aria-valuenow=${this.columnWidths[column.key] ??
+            FluidInfiniteTable.minColumnWidth}
+            @pointerdown=${(event: PointerEvent) =>
+              this.onGripPointerDown(event, column.key)}
+            @pointermove=${this.onGripPointerMove}
+            @pointerup=${this.onGripPointerUp}
+            @pointercancel=${this.onGripPointerUp}
+            @dblclick=${() => this.autoFitColumn(column.key)}
+            @keydown=${(event: KeyboardEvent) =>
+              this.onGripKeydown(event, column.key)}
+          ></span>`
+        : nothing}
+    `;
   }
 
   private renderColumnsDialog(): TemplateResult {
@@ -810,7 +1411,10 @@ export class FluidInfiniteTable extends LitElement {
             <colgroup>
               ${columns.map(
                 (column) =>
-                  html`<col style=${column.width ? `width:${column.width}` : ""} />`
+                  html`<col
+                    data-column=${column.key}
+                    style=${column.width ? `width:${column.width}` : ""}
+                  />`
               )}
             </colgroup>
             <thead>
@@ -820,12 +1424,31 @@ export class FluidInfiniteTable extends LitElement {
                     <th
                       part="header-cell"
                       scope="col"
+                      data-column=${column.key}
+                      data-drop=${this.dropTarget?.key === column.key
+                        ? this.dropTarget.edge
+                        : nothing}
+                      data-grabbed=${this.grabbedKey === column.key
+                        ? ""
+                        : nothing}
+                      data-dragging=${this.draggingKey === column.key
+                        ? ""
+                        : nothing}
                       aria-sort=${column.sortable
                         ? this.columnAriaSort(column)
                         : nothing}
                       style=${`--_cell-align:${column.align ?? "start"};`}
+                      @dragover=${(event: DragEvent) =>
+                        this.onHeaderDragOver(event, column.key)}
+                      @dragleave=${() => {
+                        if (this.dropTarget?.key === column.key) {
+                          this.dropTarget = null;
+                        }
+                      }}
+                      @drop=${(event: DragEvent) =>
+                        this.onHeaderDrop(event, column.key)}
                     >
-                      ${this.renderHeader(column)}
+                      ${this.renderHeaderContent(column)}
                     </th>
                   `
                 )}
@@ -891,6 +1514,13 @@ export class FluidInfiniteTable extends LitElement {
           : !this.loading && !this.rows.length
             ? html`<div class="state"><slot name="empty">No results</slot></div>`
             : nothing}
+        <!--
+          Where a moved column landed. A drag is self-evident on screen and
+          silent to a screen reader, so the keyboard path says it out loud.
+        -->
+        <div class="sr-only" role="status" aria-live="polite">
+          ${this.announcement}
+        </div>
         <div part="sentinel" class="sentinel" role="status">
           ${this.loading
             ? "Loading more results"

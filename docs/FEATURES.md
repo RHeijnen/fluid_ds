@@ -143,7 +143,8 @@ Kept out of the core so the base bundle stays lean:
 - ✅ `@fluid-ds/table`: accessible semantic tables for compact and large
   operational datasets, including sortable and selectable static tables plus
   template-driven infinite loading, sticky filters and headers, row windowing,
-  and configurable columns.
+  and configurable columns: shown, ordered (drag or keyboard) and sized (drag,
+  double-click to auto-fit, or keyboard) through one persistable layout.
 - ✅ `@fluid-ds/calendar`: event calendar (month view of events; distinct from
   the booking scheduler).
 - ✅ `@fluid-ds/editor`: lightweight accessible rich-text editor (toolbar +
