@@ -63,6 +63,12 @@ let counter = 0;
  * @cssproperty --fluid-command-palette-border-width - Search separator + option border width. Falls back to 1px.
  * @cssproperty --fluid-command-palette-border - Search separator color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-command-palette-input-fg - Input text color. Falls back to --fluid-text-primary.
+ * @cssproperty --fluid-command-palette-input-bg - Search field fill. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-command-palette-input-border - Search field border color. Falls back to --fluid-border-default.
+ * @cssproperty --fluid-command-palette-input-border-width - Search field border width. Falls back to --fluid-field-border-width.
+ * @cssproperty --fluid-command-palette-input-border-hover - Search field border color on hover. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-command-palette-input-border-focus - Search field border color when focused. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-command-palette-input-radius - Search field corner radius. Falls back to --fluid-field-border-radius.
  * @cssproperty --fluid-command-palette-placeholder-fg - Input placeholder color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-command-palette-hint-fg - Trailing hint + group heading color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-command-palette-active-bg - Active option background. Falls back to --fluid-accent-base.
@@ -76,7 +82,10 @@ let counter = 0;
  * @uses-token --fluid-surface-base - Default panel background.
  * @uses-token --fluid-text-primary - Default panel + input text.
  * @uses-token --fluid-text-secondary - Placeholder, hints, group headings.
- * @uses-token --fluid-border-default - Search separator + option separators.
+ * @uses-token --fluid-border-default - Search separator, field border, option separators.
+ * @uses-token --fluid-border-strong - Search field border on hover.
+ * @uses-token --fluid-field-border-width - Search field border width.
+ * @uses-token --fluid-field-border-radius - Search field corner radius.
  * @uses-token --fluid-accent-base - Active option background.
  * @uses-token --fluid-accent-text - Active option text.
  * @uses-token --fluid-focus-ring-color - Input focus ring color.
@@ -148,6 +157,18 @@ export class FluidCommandPalette extends FluidElement {
           var(--fluid-command-palette-border, var(--fluid-border-default));
       }
 
+      /*
+       * A field, not a bare caret.
+       *
+       * The reset left the search with no resting appearance at all: it was
+       * invisible until focused, and then showed a hard outline around bounds
+       * nothing had drawn. Every other text entry in Fluid is a bordered,
+       * filled box, so the same design system asked for text in two different
+       * ways depending on which component you were in.
+       *
+       * The treatment below is fluid-input's, through the same tokens, so a
+       * theme that restyles fields restyles this one too.
+       */
       .input {
         all: unset;
         box-sizing: border-box;
@@ -156,18 +177,35 @@ export class FluidCommandPalette extends FluidElement {
         font: inherit;
         font-size: var(--fluid-font-size-lg);
         line-height: 1.5;
-        padding: var(--fluid-space-1) 0;
+        padding: var(--fluid-space-2) var(--fluid-space-3);
         color: var(--fluid-command-palette-input-fg, var(--fluid-text-primary));
+        background: var(--fluid-command-palette-input-bg, var(--fluid-surface-base));
+        border: var(--fluid-command-palette-input-border-width, var(--fluid-field-border-width))
+          solid var(--fluid-command-palette-input-border, var(--fluid-border-default));
+        border-radius: var(--fluid-command-palette-input-radius, var(--fluid-field-border-radius));
+      }
+      .input:hover:not(:focus-visible) {
+        border-color: var(--fluid-command-palette-input-border-hover, var(--fluid-border-strong));
       }
       .input::placeholder {
         color: var(--fluid-command-palette-placeholder-fg, var(--fluid-text-secondary));
         opacity: 1;
       }
+      /*
+       * The ring fluid-input draws: the border takes the accent and a soft ring
+       * sits outside it. A hard outline at an offset reads as the browser
+       * default, which is what this looked like.
+       */
       .input:focus-visible {
-        outline: var(--fluid-command-palette-focus-ring-width, var(--fluid-focus-ring-width))
-          solid var(--fluid-command-palette-focus-ring, var(--fluid-focus-ring-color));
-        outline-offset: 2px;
-        border-radius: var(--fluid-radius-sm);
+        outline: none;
+        border-color: var(--fluid-command-palette-input-border-focus, var(--fluid-accent-base));
+        box-shadow: 0 0 0
+          var(--fluid-command-palette-focus-ring-width, var(--fluid-focus-ring-width))
+          color-mix(
+            in srgb,
+            var(--fluid-command-palette-focus-ring, var(--fluid-focus-ring-color)) 35%,
+            transparent
+          );
       }
 
       .listbox {
