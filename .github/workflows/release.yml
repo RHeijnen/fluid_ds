@@ -3,6 +3,11 @@ name: release
 on:
   push:
     branches: [main]
+  # Runnable by hand as well. A push that does not reach the event -- pushed
+  # with a token whose events do not re-trigger workflows, for instance --
+  # otherwise leaves a version sitting on main, committed and unpublished, with
+  # no way to release it but another push that may not fire either.
+  workflow_dispatch:
 
 # Don't compete with verify on the same SHA, let it finish first.
 concurrency:
