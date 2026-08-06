@@ -14,6 +14,16 @@ export interface FluidCommandItem {
   hint?: string;
   /** Optional group heading the item is bucketed under. */
   group?: string;
+  /**
+   * Kept in the results whatever the query says.
+   *
+   * For entries a consumer resolved *from* the query rather than listed ahead
+   * of it — a looked-up record, a parsed identifier, an action that only makes
+   * sense for what was just typed. Without this such an entry survives only
+   * while its label happens to contain the search text, which makes the result
+   * list depend on how the label was worded.
+   */
+  pinned?: boolean;
 }
 
 let counter = 0;
@@ -80,6 +90,7 @@ let counter = 0;
  * @fires fluid-open - Fired when the palette opens.
  * @fires fluid-close - Fired when the palette closes (Escape, backdrop, or programmatically).
  * @fires fluid-select - Fired when an item is chosen. `event.detail` = `{ id, item }`.
+ * @fires fluid-query - Fired as the search text changes. `event.detail` = `{ query }`.
  */
 export class FluidCommandPalette extends FluidElement {
   static override styles = [
@@ -269,7 +280,9 @@ export class FluidCommandPalette extends FluidElement {
   private get filteredItems(): FluidCommandItem[] {
     const q = this.query.trim().toLowerCase();
     if (!q) return this.items;
-    return this.items.filter((item) => item.label.toLowerCase().includes(q));
+    return this.items.filter(
+      (item) => item.pinned || item.label.toLowerCase().includes(q)
+    );
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
@@ -343,6 +356,18 @@ export class FluidCommandPalette extends FluidElement {
   private handleInput = (e: Event) => {
     this.query = (e.target as HTMLInputElement).value;
     this.activeIndex = 0;
+    // What was typed, for consumers that can answer a query the static item
+    // list cannot: a pasted identifier, a lookup, anything resolved rather than
+    // listed. They react by setting `items`, and the filter above keeps
+    // whichever of them match, so a resolved entry has to carry the query in
+    // its label like every other item.
+    this.dispatchEvent(
+      new CustomEvent("fluid-query", {
+        detail: { query: this.query },
+        bubbles: true,
+        composed: true
+      })
+    );
   };
 
   private handleInputKeydown = (e: KeyboardEvent) => {

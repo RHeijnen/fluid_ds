@@ -111,6 +111,34 @@ describe("<fluid-command-palette>", () => {
     expect(opts[opts.length - 1]!.getAttribute("aria-selected")).to.equal("true");
   });
 
+  it("fires fluid-query as the search text changes", async () => {
+    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    await open(el);
+    const combobox = input(el);
+    combobox.value = "cop";
+    setTimeout(() => combobox.dispatchEvent(new Event("input", { bubbles: true })));
+    const event = await oneEvent(el, "fluid-query");
+    expect(event.detail.query).to.equal("cop");
+  });
+
+  it("keeps a pinned item whatever the query says", async () => {
+    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    el.items = [
+      { id: "resolved", label: "Manage the thing", pinned: true },
+      ...items
+    ];
+    el.open = true;
+    await elementUpdated(el);
+    const combobox = input(el);
+    // Text that matches nothing in any label, including the pinned one.
+    combobox.value = "zzzzz";
+    combobox.dispatchEvent(new Event("input", { bubbles: true }));
+    await elementUpdated(el);
+    const labels = options(el).map((option) => option.textContent?.trim() ?? "");
+    expect(labels.some((label) => label.includes("Manage the thing"))).to.be.true;
+    expect(labels.some((label) => label.includes("Copy"))).to.be.false;
+  });
+
   it("Enter fires fluid-select with { id, item } and closes", async () => {
     const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
     await open(el);

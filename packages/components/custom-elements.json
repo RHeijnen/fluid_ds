@@ -40052,6 +40052,21 @@
             },
             {
               "kind": "field",
+              "name": "authoredTitle",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Keeps the whole label reachable once it is too long to show.\n\nWhether it is truncated depends on the listbox's width, which is not known\nuntil it opens, so the title is set from the label unconditionally rather\nthan measured. An author who wants something else on hover keeps it."
+            },
+            {
+              "kind": "field",
+              "name": "carryFullLabel",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "#cleanups",
               "privacy": "private",
               "default": "new Set<() => void>()",
@@ -53098,7 +53113,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A guided product tour (coachmarks). Given an ordered list of `steps`, it walks\nthe user through your UI one step at a time: it spotlights the current step's\ntarget element (a full-page scrim with a transparent cutout punched out via a\nlarge box-shadow on a positioned highlight) and shows a popover anchored to\nthat target with the step title, body, a \"Step n of m\" counter, and the\nBack / Next / Done plus Skip controls.\n\nAccessibility: the popover is the WAI-ARIA APG Dialog (Modal) pattern. It is\n`role=\"dialog\"` with `aria-modal=\"true\"`, labelled by its heading and\ndescribed by its body. Focus moves into the popover on open and is trapped\n(Tab wraps); each step's text is mirrored into an `aria-live` region so a\nscreen reader announces the change. The scrim and popover render in the top\nlayer (`popover=\"manual\"`) so they are never clipped by an ancestor's\noverflow, transform, or containment.\n\nKeyboard: ArrowRight / ArrowLeft step forward / back, Escape skips the tour,\nTab is trapped inside the popover.",
+          "description": "A guided product tour (coachmarks). Given an ordered list of `steps`, it walks\nthe user through your UI one step at a time: it spotlights the current step's\ntarget element (a full-page scrim with a transparent cutout punched out via a\nlarge box-shadow on a positioned highlight) and shows a popover anchored to\nthat target with the step title, body, a \"Step n of m\" counter, and the\nBack / Next / Done plus Skip controls.\n\nAccessibility: the popover is the WAI-ARIA APG Dialog (Modal) pattern. It is\n`role=\"dialog\"` with `aria-modal=\"true\"`, labelled by its heading and\ndescribed by its body. Focus moves into the popover on open and is trapped\n(Tab wraps); each step's text is mirrored into an `aria-live` region so a\nscreen reader announces the change. The scrim and popover render in the top\nlayer (`popover=\"manual\"`) so they are never clipped by an ancestor's\noverflow, transform, or containment.\n\nKeyboard: ArrowRight / ArrowLeft step forward / back, Escape skips the tour,\nTab is trapped inside the popover.\n\nPointer: a press outside the popover skips the tour, the pointer equivalent\nof Escape. The press is not swallowed, so the spotlit control stays usable.",
           "name": "FluidTour",
           "cssProperties": [
             {
@@ -53417,6 +53432,12 @@
             },
             {
               "kind": "field",
+              "name": "handlePointerDown",
+              "privacy": "private",
+              "description": "A press anywhere outside the popover dismisses the tour.\n\nThe scrim is `pointer-events: none` so the spotlit control stays usable,\nwhich also means a press outside lands on the page underneath. Without\nthis the tour outlived a click that had already taken the user somewhere\nelse, leaving coachmarks anchored to a screen that was no longer there.\n\nThe press is dismissed, not swallowed: it still does whatever it normally\nwould. Escape already skips the tour and this is its pointer equivalent."
+            },
+            {
+              "kind": "field",
               "name": "handleKeyDown",
               "privacy": "private"
             },
@@ -53603,7 +53624,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "The tour was dismissed (Skip or Escape)."
+              "description": "The tour was dismissed (Skip, Escape, or a press outside the popover)."
             }
           ],
           "attributes": [
@@ -55907,7 +55928,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An autocomplete / typeahead input.\n\nFour ways to feed it options:\n\n1. **Property (array)**: for React/Vue/Lit consumers with dynamic data:\n   ```html\n   <fluid-typeahead .options=${[\"Apple\",\"Banana\"]}></fluid-typeahead>\n   ```\n\n2. **JSON-string attribute**: for vanilla HTML with static data:\n   ```html\n   <fluid-typeahead options='[\"Apple\",\"Banana\"]'></fluid-typeahead>\n   ```\n\n3. **Async loader**: for remote suggestions; called with the current query\n   (debounced via the `debounce` attribute):\n   ```html\n   <fluid-typeahead .loadOptions=${async (q) => fetch(...)}></fluid-typeahead>\n   ```\n\n4. **Slotted children**: for richer option markup:\n   ```html\n   <fluid-typeahead>\n     <fluid-option value=\"us\">United States</fluid-option>\n   </fluid-typeahead>\n   ```\n\nImplements the WAI-ARIA combobox pattern. Form-associated.",
+          "description": "An autocomplete / typeahead input.\n\nFour ways to feed it options:\n\n1. **Property (array)**: for React/Vue/Lit consumers with dynamic data:\n   ```html\n   <fluid-typeahead .options=${[\"Apple\",\"Banana\"]}></fluid-typeahead>\n   ```\n\n2. **JSON-string attribute**: for vanilla HTML with static data:\n   ```html\n   <fluid-typeahead options='[\"Apple\",\"Banana\"]'></fluid-typeahead>\n   ```\n\n3. **Async loader**: for remote suggestions; called with the current query\n   (debounced via the `debounce` attribute):\n   ```html\n   <fluid-typeahead .loadOptions=${async (q) => fetch(...)}></fluid-typeahead>\n   ```\n\n4. **Slotted children**: for richer option markup:\n   ```html\n   <fluid-typeahead>\n     <fluid-option value=\"us\">United States</fluid-option>\n   </fluid-typeahead>\n   ```\n\nSet `keep-open` to gather several values: the list stays open after a choice\nand the query is left alone, with each pick reported through `fluid-change`.\n\nOptions supplied as data render as a highlighted label. Pass `renderOption`\nto draw the row yourself: checkboxes, trailing metadata, avatars, anything.\nThe row is a flex container, so `margin-inline-start: auto` right-aligns a\ntrailing element.\n\nImplements the WAI-ARIA combobox pattern. Form-associated.",
           "name": "FluidTypeahead",
           "cssProperties": [
             {
@@ -56080,6 +56101,25 @@
               "default": "50",
               "description": "Maximum number of options shown in the listbox (after filtering).",
               "attribute": "max-options"
+            },
+            {
+              "kind": "field",
+              "name": "renderOption",
+              "type": {
+                "text": "TypeaheadOptionRenderer | undefined"
+              },
+              "description": "Draws each option row, replacing the default highlighted label.\n\nOptions fed as data are the only ones that could not carry their own\nmarkup: a slotted `<fluid-option>` may contain anything, while an array or\nan async loader could only ever supply a string. That left rows built by\npasting fields into one label with separators, which cannot align a value\nto the right, cannot carry a checkbox, and reads as one run of text to a\nscreen reader.\n\nThe row is a flex container, so `margin-inline-start: auto` on a trailing\nelement pushes it to the end.\n\n```ts\n.renderOption=${(option, { highlight }) => html`\n  <fluid-checkbox ?checked=${picked.has(option.value)}></fluid-checkbox>\n  ${highlight(option.label)}\n  <small style=\"margin-inline-start:auto\">${option.data.domain}</small>\n`}\n```"
+            },
+            {
+              "kind": "field",
+              "name": "keepOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Keeps the list open after a choice, and leaves the query alone.\n\nA combobox closes on select because picking one value is the whole\ninteraction. A picker that gathers several is a different thing: closing\nafter every pick makes the user reopen and retype to add the next one, and\nreplacing the query with the chosen label throws away the search that\nfound it.\n\nThe chosen value is still reported through `fluid-change` each time, so\nwhat is selected stays the consumer's to hold. Pair it with\n`renderOption` to show that state on the rows.",
+              "attribute": "keep-open",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -56481,9 +56521,26 @@
               "privacy": "private"
             },
             {
+              "kind": "method",
+              "name": "refreshOptions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Brings the list up to date with whatever the value is now.\n\nscheduleLoad drops a query that is not the last one typed, which is how a\nstale result from a slow request is discarded. But the value also changes\nwithout being typed — an option is picked, or it is set from outside — and\nthe guard could not tell the two apart, so every refresh after one of those\nwas thrown away and the list stayed on whatever the last keystroke had\nnarrowed it to. Reopening after choosing showed one row: the row already\nchosen. Announcing the query first is what makes it the current one."
+            },
+            {
               "kind": "field",
               "name": "handleFocus",
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "handleClick",
+              "privacy": "private",
+              "description": "A pointer on the field asks to see the choices.\n\nFocus alone only pre-warms, because focus also happens on the way past\nwhile tabbing through a form and a list opening then would be in the way.\nA click is not on the way to anywhere, so with a min-query of zero this is\nwhat makes the field behave like a select that can also be typed into."
             },
             {
               "kind": "field",
@@ -56895,6 +56952,15 @@
               "default": "50",
               "description": "Maximum number of options shown in the listbox (after filtering).",
               "fieldName": "maxOptions"
+            },
+            {
+              "name": "keep-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Keeps the list open after a choice, and leaves the query alone.\n\nA combobox closes on select because picking one value is the whole\ninteraction. A picker that gathers several is a different thing: closing\nafter every pick makes the user reopen and retype to add the next one, and\nreplacing the query with the chosen label throws away the search that\nfound it.\n\nThe chosen value is still reported through `fluid-change` each time, so\nwhat is selected stays the consumer's to hold. Pair it with\n`renderOption` to show that state on the rows.",
+              "fieldName": "keepOpen"
             },
             {
               "name": "value",
