@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/charts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Chart web components for Fluid (expansion pack), backed by Chart.js. Bar, line, pie, doughnut, scatter, bubble, radar, polar area, and inline sparkline.",
   "type": "module",
   "license": "MIT",

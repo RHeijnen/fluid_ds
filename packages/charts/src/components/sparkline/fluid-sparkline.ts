@@ -75,9 +75,12 @@ export class FluidSparkline extends LitElement {
       styles.getPropertyValue("--fluid-sparkline-color").trim() ||
       styles.getPropertyValue("--fluid-accent-base").trim() ||
       "#3b82f6";
+    // color-mix rather than a hex alpha suffix: a brand token is any CSS
+    // color — color-mix() included — and "<color>22" is only a color when
+    // the token happened to be six hex digits.
     const fill =
       styles.getPropertyValue("--fluid-sparkline-fill").trim() ||
-      `${stroke}22`;
+      `color-mix(in srgb, ${stroke} 13%, transparent)`;
     this.chart = new Chart(ctx, {
       type: "line",
       data: {
