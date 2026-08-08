@@ -1,6 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import "../button/define.js";
 
 /** One sampled point of a stroke, in CSS pixels with the pointer's pressure. */
 interface SignaturePoint {
@@ -33,12 +34,14 @@ interface SignaturePoint {
  * Every styled property reads a component-scoped `--fluid-signature-pad-*`
  * token that falls back to a main semantic var (the override ladder).
  *
- * @cssproperty --fluid-signature-pad-height - Drawing surface height. Falls back to 9rem.
+ * @cssproperty --fluid-signature-pad-height - Drawing surface height. Falls back to 10rem.
+ * @cssproperty --fluid-signature-pad-max-width - Widest the pad will draw. Falls back to 32rem.
  * @cssproperty --fluid-signature-pad-ink - Stroke color. Falls back to --fluid-text-primary.
- * @cssproperty --fluid-signature-pad-bg - Surface color. Falls back to --fluid-surface-subtle.
+ * @cssproperty --fluid-signature-pad-bg - Surface color. Falls back to --fluid-surface-base.
  * @cssproperty --fluid-signature-pad-border - Border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-signature-pad-radius - Corner radius. Falls back to --fluid-radius-sm.
- * @cssproperty --fluid-signature-pad-guideline - Baseline rule color. Falls back to --fluid-border-default.
+ * @cssproperty --fluid-signature-pad-guideline - Baseline rule color. Falls back to --fluid-text-secondary.
+ * @csspart actions - The undo/clear button group shown while signed.
  *
  * @uses-token --fluid-text-primary - Default ink.
  * @uses-token --fluid-surface-subtle - Default surface.
@@ -65,6 +68,14 @@ export class FluidSignaturePad extends FluidElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
   /** True while at least one stroke of ink is on the pad. Read-only. */
   @property({ type: Boolean, reflect: true }) signed = false;
+  /**
+   * Invitation shown while the pad is empty. Copy comes in through properties
+   * rather than a catalogue - the application knows what language its reader
+   * speaks - with English defaults so a bare tag is already usable.
+   */
+  @property() placeholder = "Sign here";
+  @property({ attribute: "clear-label" }) clearLabel = "Clear";
+  @property({ attribute: "undo-label" }) undoLabel = "Undo";
 
   @state() private strokes: SignaturePoint[][] = [];
   @query("canvas") private canvas?: HTMLCanvasElement;
@@ -75,17 +86,25 @@ export class FluidSignaturePad extends FluidElement {
   static override styles = css`
     :host {
       display: block;
+      max-width: var(--fluid-signature-pad-max-width, 32rem);
     }
     .base {
       position: relative;
       border: 1px dashed
         var(--fluid-signature-pad-border, var(--fluid-border-default, #d5dbe3));
       border-radius: var(--fluid-signature-pad-radius, var(--fluid-radius-sm, 0.5rem));
-      background: var(--fluid-signature-pad-bg, var(--fluid-surface-subtle, #f6f8fa));
+      background: var(--fluid-signature-pad-bg, var(--fluid-surface-base, #fff));
+      /* A whisper of depth reads as a writable surface rather than a gap. */
+      box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.04);
       overflow: hidden;
+      transition: border-color var(--fluid-duration-fast, 120ms) ease;
+    }
+    .base:hover {
+      border-color: var(--fluid-accent-base, #4f46e5);
     }
     :host([signed]) .base {
       border-style: solid;
+      border-color: var(--fluid-accent-base, #4f46e5);
     }
     :host([disabled]) .base {
       opacity: 0.55;
@@ -94,7 +113,7 @@ export class FluidSignaturePad extends FluidElement {
     canvas {
       display: block;
       width: 100%;
-      height: var(--fluid-signature-pad-height, 9rem);
+      height: var(--fluid-signature-pad-height, 10rem);
       touch-action: none;
       cursor: crosshair;
     }
@@ -104,17 +123,43 @@ export class FluidSignaturePad extends FluidElement {
       outline-offset: -2px;
     }
     /*
-     * The baseline gives an empty pad the affordance of a paper form's
-     * signature line; it is drawn in CSS rather than in ink so it never
-     * appears in the exported image.
+     * The paper-form affordance: a cross by a baseline. Drawn in CSS, not
+     * ink, so none of it appears in the exported image; hidden once signed so
+     * the scenery never competes with the signature.
      */
-    .guideline {
+    .guide {
       position: absolute;
-      inset-inline: 12%;
-      bottom: 28%;
+      inset-inline: 8%;
+      bottom: 22%;
+      display: flex;
+      align-items: flex-end;
+      gap: var(--fluid-space-2, 0.5rem);
       border-bottom: 1px solid
-        var(--fluid-signature-pad-guideline, var(--fluid-border-default, #d5dbe3));
+        var(--fluid-signature-pad-guideline, var(--fluid-text-secondary, #5b6b7b));
+      opacity: 0.45;
       pointer-events: none;
+    }
+    .guide .cross {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--fluid-text-secondary, #5b6b7b);
+    }
+    .hint {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--fluid-text-secondary, #5b6b7b);
+      font-size: var(--fluid-font-size-sm, 0.85rem);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .actions {
+      position: absolute;
+      top: var(--fluid-space-2, 0.5rem);
+      inset-inline-end: var(--fluid-space-2, 0.5rem);
+      display: flex;
+      gap: var(--fluid-space-1, 0.25rem);
     }
   `;
 
@@ -325,7 +370,12 @@ export class FluidSignaturePad extends FluidElement {
   override render(): TemplateResult {
     return html`
       <div class="base" part="base">
-        ${this.signed ? "" : html`<div class="guideline"></div>`}
+        ${this.signed
+          ? ""
+          : html`
+              <div class="hint">${this.placeholder}</div>
+              <div class="guide"><span class="cross">✕</span></div>
+            `}
         <canvas
           part="canvas"
           role="img"
@@ -336,6 +386,18 @@ export class FluidSignaturePad extends FluidElement {
           @pointerup=${this.onPointerUp}
           @pointercancel=${this.onPointerUp}
         ></canvas>
+        ${this.signed
+          ? html`
+              <div class="actions" part="actions">
+                <fluid-button size="sm" variant="ghost" @click=${() => this.undo()}>
+                  ${this.undoLabel}
+                </fluid-button>
+                <fluid-button size="sm" variant="ghost" @click=${() => this.clear()}>
+                  ${this.clearLabel}
+                </fluid-button>
+              </div>
+            `
+          : ""}
       </div>
     `;
   }

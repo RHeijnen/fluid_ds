@@ -42263,15 +42263,19 @@
           "name": "FluidSignaturePad",
           "cssProperties": [
             {
-              "description": "Drawing surface height. Falls back to 9rem.",
+              "description": "Drawing surface height. Falls back to 10rem.",
               "name": "--fluid-signature-pad-height"
+            },
+            {
+              "description": "Widest the pad will draw. Falls back to 32rem.",
+              "name": "--fluid-signature-pad-max-width"
             },
             {
               "description": "Stroke color. Falls back to --fluid-text-primary.",
               "name": "--fluid-signature-pad-ink"
             },
             {
-              "description": "Surface color. Falls back to --fluid-surface-subtle.",
+              "description": "Surface color. Falls back to --fluid-surface-base.",
               "name": "--fluid-signature-pad-bg"
             },
             {
@@ -42283,7 +42287,7 @@
               "name": "--fluid-signature-pad-radius"
             },
             {
-              "description": "Baseline rule color. Falls back to --fluid-border-default.",
+              "description": "Baseline rule color. Falls back to --fluid-text-secondary.",
               "name": "--fluid-signature-pad-guideline"
             }
           ],
@@ -42295,6 +42299,10 @@
             {
               "description": "The drawing surface. Every styled property reads a component-scoped `--fluid-signature-pad-*` token that falls back to a main semantic var (the override ladder).",
               "name": "canvas"
+            },
+            {
+              "description": "The undo/clear button group shown while signed.",
+              "name": "actions"
             }
           ],
           "members": [
@@ -42346,6 +42354,34 @@
               "description": "True while at least one stroke of ink is on the pad. Read-only.",
               "attribute": "signed",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Sign here\"",
+              "description": "Invitation shown while the pad is empty. Copy comes in through properties\r\nrather than a catalogue - the application knows what language its reader\r\nspeaks - with English defaults so a bare tag is already usable.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "clearLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Clear\"",
+              "attribute": "clear-label"
+            },
+            {
+              "kind": "field",
+              "name": "undoLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Undo\"",
+              "attribute": "undo-label"
             },
             {
               "kind": "field",
@@ -42781,6 +42817,31 @@
               "default": "false",
               "description": "True while at least one stroke of ink is on the pad. Read-only.",
               "fieldName": "signed"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Sign here\"",
+              "description": "Invitation shown while the pad is empty. Copy comes in through properties\r\nrather than a catalogue - the application knows what language its reader\r\nspeaks - with English defaults so a bare tag is already usable.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "clear-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Clear\"",
+              "fieldName": "clearLabel"
+            },
+            {
+              "name": "undo-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Undo\"",
+              "fieldName": "undoLabel"
             }
           ],
           "superclass": {

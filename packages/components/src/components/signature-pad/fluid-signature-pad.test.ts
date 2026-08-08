@@ -73,6 +73,28 @@ describe("<fluid-signature-pad>", () => {
     expect(pad.toDataURL()).to.match(/^data:image\/png/);
   });
 
+  it("offers undo and clear as buttons once signed", async () => {
+    const pad = await fixture<FluidSignaturePad>(html`
+      <fluid-signature-pad></fluid-signature-pad>
+    `);
+    expect(pad.shadowRoot!.querySelector(".actions")).to.equal(null);
+    draw(pad, [[20, 40], [60, 60]]);
+    draw(pad, [[30, 70], [80, 20]]);
+    // The controls arrive with the render that follows the signing, not in
+    // the same tick as the pointer.
+    await pad.updateComplete;
+    const buttons = pad.shadowRoot!.querySelectorAll(".actions fluid-button");
+    expect(buttons.length).to.equal(2);
+    (buttons[0] as HTMLElement).click();
+    expect(pad.signed).to.equal(true);
+    (buttons[1] as HTMLElement).click();
+    expect(pad.signed).to.equal(false);
+    await pad.updateComplete;
+    // With the ink gone the controls go too, and the invitation returns.
+    expect(pad.shadowRoot!.querySelector(".actions")).to.equal(null);
+    expect(pad.shadowRoot!.querySelector(".hint")).to.not.equal(null);
+  });
+
   it("ignores the pointer while disabled", async () => {
     const pad = await fixture<FluidSignaturePad>(html`
       <fluid-signature-pad disabled></fluid-signature-pad>
