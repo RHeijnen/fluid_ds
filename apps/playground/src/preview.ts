@@ -1285,6 +1285,17 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
           </div>
         </preview-card>
 
+        <preview-card tag="fluid-fold" label="Fold">
+          <div style="max-width: 28rem;">
+          <p style="margin: 0 0 var(--fluid-space-3);">The part of the page everyone needs.</p>
+          <fluid-fold label="Show more" open-label="Show less">
+          <p style="margin: var(--fluid-space-3) 0 0; color: var(--fluid-text-secondary);">
+          The details a reader only sometimes needs, folded away until asked for.
+          </p>
+          </fluid-fold>
+          </div>
+        </preview-card>
+
         <preview-card tag="fluid-countdown" label="Countdown">
           <div style="display:flex; flex-direction:column; gap: var(--fluid-space-4);">
           <fluid-countdown seconds="90061" format="segments"></fluid-countdown>

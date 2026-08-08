@@ -21,6 +21,7 @@ import "@fluid-ds/components/define/comparison";
 import "@fluid-ds/components/define/copy-button";
 import "@fluid-ds/components/define/dialog";
 import "@fluid-ds/components/define/divider";
+import "@fluid-ds/components/define/fold";
 import "@fluid-ds/components/define/drawer";
 import "@fluid-ds/components/define/dropdown";
 import "@fluid-ds/components/define/file-input";

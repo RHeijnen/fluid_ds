@@ -63,6 +63,7 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
   **popconfirm**, a guided **tour** (coach marks), and a **meter** gauge.
 - **More content + utility**: a **description list**, a generic **list**, a
   responsive **image**, a **countdown**, a **truncate** (line-clamp + reveal),
+  a **fold** (a divider with a "Show more" disclosure at its centre),
   an **aspect-ratio** box, a **theme toggle**, and a non-visual **hotkey**
   (keyboard-shortcut) behavior.
 - **Date family**: an accessible **calendar** (WAI-ARIA APG grid with full

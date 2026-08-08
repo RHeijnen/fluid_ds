@@ -16,15 +16,16 @@ to hand off context when you switch machines.
 
 ## Current state
 
-> **2026-07-30 local work:** branch `codex/fluid-table-infinite` adds a separate
-> `fluid-infinite-table` to `@fluid-ds/table`. The existing `fluid-table` is
-> untouched. The new component has rich cell/header render callbacks, nested
-> paths, windowed infinite rows, sticky projected filters and headers,
-> document/container scrolling, server-controlled sorting, keyboard row
-> activation, loaded/matching/available counts, and serializable column
-> visibility/order. Package tests (15), typecheck, lint, token gate, build,
-> docs build, light/dark Storybook rendering and sticky geometry are verified.
-> It is not committed, pushed, published, or integrated into TMS yet.
+> **2026-08-08:** the TMS finance page drove a burst of table and chart work.
+> Published: table **0.1.2** (headers align with cells, real ellipsis, exact
+> resize via a trailing filler column, one-column resize, live reorder
+> preview) and charts **0.0.4** (sparkline fill via `color-mix()` so any brand
+> token works). Bumped locally, not yet committed: table **0.1.3** (rendered
+> cell content truncates, `grid-auto-columns` clamps stacked two-line cells)
+> and components **0.2.2** with the new **`fluid-fold`** (a divider with a
+> "Show more" disclosure at its centre, full authoring standard). TMS's
+> finance page now uses `@fluid-ds/charts` for its bar, doughnut and
+> sparklines, and folds its analytics row behind `fluid-fold`.
 >
 > **TODO (next session): drop the `@floating-ui/dom` dependency, make
 > positioning fully in-house.** Floating UI is our only runtime positioning
@@ -36,16 +37,12 @@ to hand off context when you switch machines.
 > `computePosition`/`autoUpdate`, so the design system ships zero third-party
 > positioning code. Audit usages first (`grep -r "@floating-ui/dom"`), keep the
 > same call sites, swap the implementation, re-verify overlays in-browser.
-
-> **2026-08-04:** 0.1.3 published (tour dismisses on an outside press,
-> typeahead `renderOption`), and TMS is on it. 0.1.4 is versioned and ready to
-> push: the typeahead takes `keep-open` for pickers that gather several values.
-> Components tests (1058), typecheck and lint green.
 >
-> **Release flow:** run `changeset version` locally and commit the bump with
-> the change. CI then finds no pending changesets and publishes straight away.
-> Leaving the changeset for CI to consume is what opens a "Version Packages"
-> PR that has to be merged by hand, which is how PR #1 came about.
+> **Release flow:** bump the package version in the change commit itself (no
+> changeset files). CI then finds no pending changesets and publishes straight
+> away. Leaving a changeset for CI to consume is what opens a "Version
+> Packages" PR that has to be merged by hand, which is how PR #1 and PR #2
+> came about.
 
 - **Branch:** `main`
 - **Last verified:** 2026-06-01: `pnpm typecheck` + `pnpm lint` +
@@ -324,6 +321,26 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-08-08: table gestures steadied, TMS adopts charts, fluid-fold added
+
+Driven by the TMS finance page, three packages moved. Table 0.1.2
+(published): the reorder grab handle overlays the header instead of pushing
+its label out of line with the cells, the header itself is the drag surface,
+labels and cells truncate with a real ellipsis, a trailing filler column
+banks spare width so a resized column renders exactly what was asked,
+starting a resize pins the flexible columns so one drag moves one edge, and
+a pointer reorder rearranges live as a preview (drop commits, cancel
+restores, only the drop is reported). Table 0.1.3 (bumped, uncommitted):
+rendered cell content truncates too, via zero-specificity descendant rules
+plus `grid-auto-columns: minmax(0,1fr)` for the stacked two-line cells every
+TMS list draws. Charts 0.0.4 (published): the sparkline's soft fill uses
+`color-mix()` so it holds for any brand token, not only six-digit hex.
+Components 0.2.2 (bumped, uncommitted): new `fluid-fold`, a divider with a
+"Show more" disclosure at its centre, to the full authoring standard (8
+tests incl. a11y audits, story, docs page, playground card, CEM). TMS's
+finance page swapped its hand-rolled bar, doughnut and sparkline for
+`@fluid-ds/charts` and folds its analytics row behind `fluid-fold`.
 
 ### 2026-08-06: the infinite table's columns can be arranged
 

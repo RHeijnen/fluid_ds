@@ -9012,7 +9012,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A command launcher (the \"⌘K\" pattern): a modal dialog containing a search\ninput and a filtered results list. The dialog traps focus, closes on Escape,\nand restores focus to whatever was focused before it opened. The input is a\ncombobox driving a listbox of results; the user filters by typing, moves the\nactive result with ArrowUp / ArrowDown, and runs it with Enter.\n\nClosest WAI-ARIA APG analog: the Combobox pattern with `aria-activedescendant`\nmanaging the active option, wrapped in the Dialog (Modal) pattern for the\noverlay, focus trap, and focus restoration. DOM focus stays on the input; the\nactive option is tracked with `aria-activedescendant`.",
+          "description": "A command launcher (the \"⌘K\" pattern): a modal dialog containing a search\r\ninput and a filtered results list. The dialog traps focus, closes on Escape,\r\nand restores focus to whatever was focused before it opened. The input is a\r\ncombobox driving a listbox of results; the user filters by typing, moves the\r\nactive result with ArrowUp / ArrowDown, and runs it with Enter.\r\n\r\nClosest WAI-ARIA APG analog: the Combobox pattern with `aria-activedescendant`\r\nmanaging the active option, wrapped in the Dialog (Modal) pattern for the\r\noverlay, focus trap, and focus restoration. DOM focus stays on the input; the\r\nactive option is tracked with `aria-activedescendant`.",
           "name": "FluidCommandPalette",
           "cssProperties": [
             {
@@ -9050,6 +9050,30 @@
             {
               "description": "Input text color. Falls back to --fluid-text-primary.",
               "name": "--fluid-command-palette-input-fg"
+            },
+            {
+              "description": "Search field fill. Falls back to --fluid-surface-base.",
+              "name": "--fluid-command-palette-input-bg"
+            },
+            {
+              "description": "Search field border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-command-palette-input-border"
+            },
+            {
+              "description": "Search field border width. Falls back to --fluid-field-border-width.",
+              "name": "--fluid-command-palette-input-border-width"
+            },
+            {
+              "description": "Search field border color on hover. Falls back to --fluid-border-strong.",
+              "name": "--fluid-command-palette-input-border-hover"
+            },
+            {
+              "description": "Search field border color when focused. Falls back to --fluid-accent-base.",
+              "name": "--fluid-command-palette-input-border-focus"
+            },
+            {
+              "description": "Search field corner radius. Falls back to --fluid-field-border-radius.",
+              "name": "--fluid-command-palette-input-radius"
             },
             {
               "description": "Input placeholder color. Falls back to --fluid-text-secondary.",
@@ -9538,6 +9562,10 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when an item is chosen. `event.detail` = `{ id, item }`."
+            },
+            {
+              "description": "Fired as the search text changes. `event.detail` = `{ query }`.",
+              "name": "fluid-query"
             }
           ],
           "attributes": [
@@ -9598,7 +9626,19 @@
             },
             {
               "name": "--fluid-border-default",
-              "description": "Search separator + option separators."
+              "description": "Search separator, field border, option separators."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Search field border on hover."
+            },
+            {
+              "name": "--fluid-field-border-width",
+              "description": "Search field border width."
+            },
+            {
+              "name": "--fluid-field-border-radius",
+              "description": "Search field corner radius."
             },
             {
               "name": "--fluid-accent-base",
@@ -19091,6 +19131,437 @@
           "declaration": {
             "name": "FluidFileInput",
             "module": "src/components/file-input/fluid-file-input.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/fold/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-fold",
+          "declaration": {
+            "name": "FluidFold",
+            "module": "/src/components/fold/fluid-fold.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/fold/fluid-fold.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A fold line: a horizontal rule with a disclosure control at its centre.\n\nWhere `<fluid-details>` is a section that announces itself with a heading,\nthe fold is the opposite gesture: a page that reads complete on its own,\nwith more available underneath for whoever asks. The line reads as a\nnatural end of the page, and the label in the middle of it says there is\nmore to unfold.\n\nFollows the WAI-ARIA disclosure pattern: a native button carrying\n`aria-expanded` and `aria-controls`, in front of a labelled region.",
+          "name": "FluidFold",
+          "cssProperties": [
+            {
+              "description": "Rule color. Falls back to --fluid-border-default.",
+              "name": "--fluid-fold-line-color"
+            },
+            {
+              "description": "Rule thickness. Falls back to 1px.",
+              "name": "--fluid-fold-line-width"
+            },
+            {
+              "description": "Label and chevron color. Falls back to --fluid-text-secondary.",
+              "name": "--fluid-fold-fg"
+            },
+            {
+              "description": "Label and chevron color under the pointer. Falls back to --fluid-text-primary.",
+              "name": "--fluid-fold-fg-hover"
+            },
+            {
+              "description": "Label font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-fold-font-family"
+            },
+            {
+              "description": "Label font size. Falls back to --fluid-font-size-sm.",
+              "name": "--fluid-fold-font-size"
+            },
+            {
+              "description": "Space between the lines and the label. Falls back to --fluid-space-3.",
+              "name": "--fluid-fold-gap"
+            },
+            {
+              "description": "Focus-ring corner radius on the label. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-fold-radius"
+            },
+            {
+              "description": "Keyboard focus ring color. Falls back to --fluid-focus-ring-color.",
+              "name": "--fluid-fold-focus-ring"
+            },
+            {
+              "description": "Focus ring width. Falls back to --fluid-focus-ring-width.",
+              "name": "--fluid-fold-focus-ring-width"
+            },
+            {
+              "description": "Body reveal animation. Another preset or `none`.",
+              "name": "--fluid-fold-enter-animation",
+              "default": "fluid-slide-in-down"
+            },
+            {
+              "description": "Body reveal duration (scaled by --fluid-motion).",
+              "name": "--fluid-fold-enter-duration",
+              "default": "var(--fluid-duration-fast)"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer container.",
+              "name": "base"
+            },
+            {
+              "description": "The full-width disclosure button, lines included.",
+              "name": "toggle"
+            },
+            {
+              "description": "The unfolded region. Every styled property reads a component-scoped `--fluid-fold-*` token that falls back to a main semantic var (the override ladder).",
+              "name": "body"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The content shown when unfolded.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the folded content is shown.",
+              "attribute": "open",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disabled state, clicks and keyboard are ignored.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Show more\"",
+              "description": "What the toggle says while folded.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "openLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "What the toggle says while unfolded. Falls back to `label`.",
+              "attribute": "open-label"
+            },
+            {
+              "kind": "field",
+              "name": "toggleId",
+              "privacy": "private",
+              "default": "`fluid-fold-toggle-${++counter}`"
+            },
+            {
+              "kind": "field",
+              "name": "bodyId",
+              "privacy": "private",
+              "default": "`fluid-fold-body-${counter}`"
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Unfold the content."
+            },
+            {
+              "kind": "method",
+              "name": "hide",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Fold the content away."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Toggle folded/unfolded."
+            },
+            {
+              "kind": "field",
+              "name": "handleToggleClick",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "#cleanups",
+              "privacy": "private",
+              "default": "new Set<() => void>()",
+              "description": "Teardown callbacks, each run once on disconnect.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#abort",
+              "privacy": "private",
+              "type": {
+                "text": "AbortController | undefined"
+              },
+              "description": "Aborted on disconnect; a fresh one is minted on the next access.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disconnectSignal",
+              "type": {
+                "text": "AbortSignal"
+              },
+              "privacy": "protected",
+              "description": "An `AbortSignal` that aborts when the element disconnects. Pass it to\n`addEventListener(type, handler, { signal })`, `fetch(url, { signal })`, an\n`IntersectionObserver`, etc. so the subscription tears down automatically.\nA fresh signal is minted after a reconnect.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "registerCleanup",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "() => void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "fn",
+                  "type": {
+                    "text": "() => void"
+                  }
+                }
+              ],
+              "description": "Register a callback to run once when the element disconnects, e.g.\n`registerCleanup(() => clearInterval(id))`,\n`registerCleanup(() => observer.disconnect())`,\n`registerCleanup(() => animation.cancel())`. Returns a disposer that runs\nthe callback early and unregisters it.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "listen",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "() => void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "EventTarget"
+                  }
+                },
+                {
+                  "name": "type",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "handler",
+                  "type": {
+                    "text": "EventListenerOrEventListenerObject"
+                  }
+                },
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "AddEventListenerOptions"
+                  }
+                }
+              ],
+              "description": "Add an event listener that is automatically removed on disconnect (it is\nwired to disconnectSignal). Returns a disposer to remove it early.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "changedAfterFirstRender",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "changed",
+                  "type": {
+                    "text": "Map<PropertyKey, unknown>"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "PropertyKey"
+                  }
+                }
+              ],
+              "description": "True only when `key` changed to a genuinely new value, NOT on the initial\nrender. Lit records every reactive property in the first `changedProperties`\nwith an `undefined` old value (and `this.hasUpdated` is already `true`\ninside `updated()`), so `changed.has(key)` alone fires public change events\nat mount. Gate `fluid-change` / `fluid-toggle` / `fluid-hide` with this so\nthey only fire on real, user-driven transitions:\n\n  if (this.changedAfterFirstRender(changed, \"value\")) this.emitChange();",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-toggle",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the open state changes. `event.detail.open`."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Whether the folded content is shown.",
+              "fieldName": "open"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disabled state, clicks and keyboard are ignored.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Show more\"",
+              "description": "What the toggle says while folded.",
+              "fieldName": "label"
+            },
+            {
+              "name": "open-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "What the toggle says while unfolded. Falls back to `label`.",
+              "fieldName": "openLabel"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "module": "/src/internal/base-element.js"
+          },
+          "summary": "Divider with a click-to-unfold region at its centre.",
+          "usesTokens": [
+            {
+              "name": "--fluid-border-default",
+              "description": "Rule color."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Resting label color."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Hovered label color."
+            },
+            {
+              "name": "--fluid-focus-ring-color",
+              "description": "Keyboard focus indicator color."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-focus-ring-offset",
+              "description": "Focus ring offset."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum toggle hit-target height (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-font-family-sans",
+              "description": "Label font family."
+            },
+            {
+              "name": "--fluid-font-size-sm",
+              "description": "Label font size."
+            },
+            {
+              "name": "--fluid-radius-sm",
+              "description": "Focus-ring corner radius."
+            },
+            {
+              "name": "--fluid-space-3",
+              "description": "Space between the lines and the label."
+            }
+          ],
+          "tagName": "fluid-fold",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidFold",
+          "declaration": {
+            "name": "FluidFold",
+            "module": "src/components/fold/fluid-fold.ts"
           }
         }
       ]
@@ -57577,6 +58048,14 @@
           "declaration": {
             "name": "FluidFileInput",
             "module": "./components/file-input/fluid-file-input.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidFold",
+          "declaration": {
+            "name": "FluidFold",
+            "module": "./components/fold/fluid-fold.js"
           }
         },
         {

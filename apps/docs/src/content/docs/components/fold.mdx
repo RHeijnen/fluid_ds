@@ -1,0 +1,203 @@
+---
+title: "Fold"
+description: "A divider with a disclosure control at its centre: the page reads complete, and more unfolds for whoever asks."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+`<fluid-fold>` is a fold line: a horizontal rule with a "Show more" control in
+the middle of it. Where an accordion announces a section by heading, the fold
+is the opposite gesture. The page above it reads complete on its own, the line
+reads as its natural end, and the label says there is more underneath for
+whoever wants it: device attributes, raw identifiers, a row of secondary
+charts.
+
+<Demo>
+  <div style="width: 100%;">
+    <p style="margin: 0 0 var(--fluid-space-3);">The part of the page everyone needs.</p>
+    <fluid-fold label="Show more" open-label="Show less">
+      <p style="margin: var(--fluid-space-3) 0 0; color: var(--fluid-text-secondary);">
+        The details a reader only sometimes needs, folded away until asked for.
+      </p>
+    </fluid-fold>
+  </div>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/fold/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/fold";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Default
+
+<Demo>
+  <div style="width: 100%;">
+    <fluid-fold>
+      <p style="margin: var(--fluid-space-3) 0 0;">Unfolded content.</p>
+    </fluid-fold>
+  </div>
+</Demo>
+
+```html
+<fluid-fold>
+  <p>Unfolded content.</p>
+</fluid-fold>
+```
+
+### Its own label, open and closed
+
+The toggle says `label` while folded. Give it `open-label` and it changes its
+mind once open; omit it and the label stays put.
+
+<Demo>
+  <div style="width: 100%;">
+    <fluid-fold label="Show all device details" open-label="Hide device details">
+      <p style="margin: var(--fluid-space-3) 0 0;">Serial number, firmware, uptime.</p>
+    </fluid-fold>
+  </div>
+</Demo>
+
+```html
+<fluid-fold label="Show all device details" open-label="Hide device details">
+  <p>Serial number, firmware, uptime.</p>
+</fluid-fold>
+```
+
+### Open by default
+
+<Demo>
+  <div style="width: 100%;">
+    <fluid-fold open label="Show more" open-label="Show less">
+      <p style="margin: var(--fluid-space-3) 0 0;">Already unfolded.</p>
+    </fluid-fold>
+  </div>
+</Demo>
+
+```html
+<fluid-fold open>
+  <p>Already unfolded.</p>
+</fluid-fold>
+```
+
+### Listening for the toggle
+
+```ts
+const fold = document.querySelector("fluid-fold");
+fold.addEventListener("fluid-toggle", (event) => {
+  console.log(event.detail.open ? "unfolded" : "folded");
+});
+```
+
+## When to use
+
+- The long tail of a detail page: attributes, identifiers, diagnostics that
+  belong on the page but not in everyone's way.
+- A row of secondary panels (charts, summaries) beneath the content that
+  answers most visits on its own.
+
+If the hidden content is one of several labelled sections, reach for
+[`<fluid-accordion>`](/components/accordion/) instead: a fold has no heading,
+so two folds in a row read as two identical lines. If nothing needs hiding,
+[`<fluid-divider>`](/components/divider/) is the plain rule.
+
+## Theming
+
+Every styled property reads a **component-scoped `--fluid-fold-*` token that
+falls back to a main semantic var** (the override ladder). The **complete
+list** is in the [API table below](#api).
+
+```css title="brand.css"
+[data-fluid-brand="custom"] {
+  --fluid-fold-line-color: var(--fluid-border-default);
+  --fluid-fold-fg: var(--fluid-text-secondary);
+}
+```
+
+### Beyond tokens
+
+The toggle (lines included) is `::part(toggle)`, the unfolded region is
+`::part(body)`:
+
+```css
+fluid-fold::part(toggle) {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+```
+
+## API
+
+<ComponentApi tag="fluid-fold" />
+
+## Accessibility
+
+- Follows the WAI-ARIA **disclosure** pattern: a native `<button>` carrying
+  `aria-expanded` and `aria-controls`, in front of a `role="region"` labelled
+  by that button.
+- The whole line is the button, not only the words, so the target is as wide
+  as the page.
+- Folded content carries `hidden`, so it is out of the accessibility tree and
+  cannot be tabbed into while folded.
+- The reveal animation honors `prefers-reduced-motion`.
+
+### AA vs AAA
+
+The fold ships **WCAG 2.2 Level AA** by default and scales to **AAA** on a
+switch: it reads the conformance tokens rather than hard-coding sizes, so an
+ancestor setting `data-fluid-conformance="aaa"` grows the toggle's hit target
+to 44px and the focus ring to 3px with zero per-component branching.
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="Accordion"
+    href="/components/accordion/"
+    description="Labelled, headed sections that expand, for more than one."
+  />
+  <LinkCard
+    title="Divider"
+    href="/components/divider/"
+    description="The plain rule, when nothing needs hiding."
+  />
+  <LinkCard
+    title="Truncate"
+    href="/components/truncate/"
+    description="The same bargain for a run of text: clamp, then reveal."
+  />
+  <LinkCard
+    title="Theming guide"
+    href="/guides/theming/"
+    description="How brand, component, and instance tokens compose."
+  />
+</CardGrid>

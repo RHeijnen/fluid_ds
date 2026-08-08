@@ -22,6 +22,7 @@ export { FluidDialog } from "./components/dialog/fluid-dialog.js";
 export type { FluidDialogSize } from "./components/dialog/fluid-dialog.js";
 export { FluidDivider } from "./components/divider/fluid-divider.js";
 export type { FluidDividerOrientation } from "./components/divider/fluid-divider.js";
+export { FluidFold } from "./components/fold/fluid-fold.js";
 export { FluidDrawer } from "./components/drawer/fluid-drawer.js";
 export type { FluidDrawerPlacement } from "./components/drawer/fluid-drawer.js";
 export { FluidDropdown } from "./components/dropdown/fluid-dropdown.js";
