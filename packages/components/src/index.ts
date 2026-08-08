@@ -68,6 +68,7 @@ export { FluidProgressRing } from "./components/progress-ring/fluid-progress-rin
 export { FluidRadio } from "./components/radio/fluid-radio.js";
 export { FluidRadioGroup } from "./components/radio/fluid-radio-group.js";
 export { FluidRating } from "./components/rating/fluid-rating.js";
+export { FluidSignaturePad } from "./components/signature-pad/fluid-signature-pad.js";
 export { FluidPopover } from "./components/popover/fluid-popover.js";
 export { FluidPopup } from "./components/popup/fluid-popup.js";
 export { FluidOption } from "./components/select/fluid-option.js";

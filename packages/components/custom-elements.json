@@ -42240,6 +42240,597 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/signature-pad/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-signature-pad",
+          "declaration": {
+            "name": "FluidSignaturePad",
+            "module": "/src/components/signature-pad/fluid-signature-pad.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/signature-pad/fluid-signature-pad.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A drawn signature, captured as ink rather than as a picture.\r\n\r\nStrokes are recorded as point sequences and the canvas is only ever a\r\nrendering of them: the pad can therefore redraw losslessly when it is\r\nresized or when the display scale changes, undo a stroke instead of only\r\nwiping everything, and export crisp bitmaps at the device's real\r\nresolution. Line width follows pointer pressure where the hardware reports\r\nit and falls back to stroke velocity where it does not, which is what makes\r\na mouse signature look drawn rather than plotted.\r\n\r\nForm-associated: the submitted value is a PNG data URL of the ink, empty\r\nwhile nothing has been drawn.",
+          "name": "FluidSignaturePad",
+          "cssProperties": [
+            {
+              "description": "Drawing surface height. Falls back to 9rem.",
+              "name": "--fluid-signature-pad-height"
+            },
+            {
+              "description": "Stroke color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-signature-pad-ink"
+            },
+            {
+              "description": "Surface color. Falls back to --fluid-surface-subtle.",
+              "name": "--fluid-signature-pad-bg"
+            },
+            {
+              "description": "Border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-signature-pad-border"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-signature-pad-radius"
+            },
+            {
+              "description": "Baseline rule color. Falls back to --fluid-border-default.",
+              "name": "--fluid-signature-pad-guideline"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer container.",
+              "name": "base"
+            },
+            {
+              "description": "The drawing surface. Every styled property reads a component-scoped `--fluid-signature-pad-*` token that falls back to a main semantic var (the override ladder).",
+              "name": "canvas"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "internals",
+              "type": {
+                "text": "ElementInternals"
+              },
+              "privacy": "protected",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabel",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Accessible name for the drawing surface.",
+              "attribute": "aria-label"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "signed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "True while at least one stroke of ink is on the pad. Read-only.",
+              "attribute": "signed",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "strokes",
+              "type": {
+                "text": "SignaturePoint[][]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "canvas",
+              "type": {
+                "text": "HTMLCanvasElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "active",
+              "type": {
+                "text": "SignaturePoint[] | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "resizeObserver",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "form",
+              "type": {
+                "text": "HTMLFormElement | null"
+              },
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "toDataURL",
+              "return": {
+                "type": {
+                  "text": "string | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "type",
+                  "default": "\"image/png\""
+                }
+              ],
+              "description": "The ink as a PNG data URL at device resolution, or undefined when empty."
+            },
+            {
+              "kind": "method",
+              "name": "undo",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Removes the most recent stroke; a tremored start deserves better than a full clear."
+            },
+            {
+              "kind": "method",
+              "name": "clear",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "syncInk",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "effectivePressure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "point",
+                  "type": {
+                    "text": "SignaturePoint"
+                  }
+                },
+                {
+                  "name": "previous",
+                  "optional": true,
+                  "type": {
+                    "text": "SignaturePoint"
+                  }
+                }
+              ],
+              "description": "Pressure a pointer did not report, recovered from how fast it moved.\r\n\r\nMice and many touchscreens say 0 or a constant 0.5; a signature drawn at\r\nuniform width from those reads as plotted line art. Fast movement thins\r\nthe line and slow movement thickens it — the same relationship a real pen\r\nhas — clamped so neither a flick nor a pause leaves artifacts."
+            },
+            {
+              "kind": "method",
+              "name": "strokeWidth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "pressure",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "ink",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "drawStroke",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "context",
+                  "type": {
+                    "text": "CanvasRenderingContext2D"
+                  }
+                },
+                {
+                  "name": "stroke",
+                  "type": {
+                    "text": "SignaturePoint[]"
+                  }
+                }
+              ],
+              "description": "Draws one stroke as quadratic segments through midpoints.\r\n\r\nRaw pointer samples are a polyline, and a polyline's corners are visible\r\nat signature speeds. Curving through midpoints uses each sample as a\r\ncontrol point instead of a vertex, which is the standard smoothing that\r\nmakes captured ink look continuous. Width is interpolated per segment."
+            },
+            {
+              "kind": "method",
+              "name": "redraw",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Sizes the backing store to the device and replays every stroke."
+            },
+            {
+              "kind": "method",
+              "name": "samplePoint",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "SignaturePoint"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onPointerDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onPointerMove",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onPointerUp",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#cleanups",
+              "privacy": "private",
+              "default": "new Set<() => void>()",
+              "description": "Teardown callbacks, each run once on disconnect.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#abort",
+              "privacy": "private",
+              "type": {
+                "text": "AbortController | undefined"
+              },
+              "description": "Aborted on disconnect; a fresh one is minted on the next access.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "disconnectSignal",
+              "type": {
+                "text": "AbortSignal"
+              },
+              "privacy": "protected",
+              "description": "An `AbortSignal` that aborts when the element disconnects. Pass it to\n`addEventListener(type, handler, { signal })`, `fetch(url, { signal })`, an\n`IntersectionObserver`, etc. so the subscription tears down automatically.\nA fresh signal is minted after a reconnect.",
+              "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "registerCleanup",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "() => void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "fn",
+                  "type": {
+                    "text": "() => void"
+                  }
+                }
+              ],
+              "description": "Register a callback to run once when the element disconnects, e.g.\n`registerCleanup(() => clearInterval(id))`,\n`registerCleanup(() => observer.disconnect())`,\n`registerCleanup(() => animation.cancel())`. Returns a disposer that runs\nthe callback early and unregisters it.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "listen",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "() => void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "EventTarget"
+                  }
+                },
+                {
+                  "name": "type",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "handler",
+                  "type": {
+                    "text": "EventListenerOrEventListenerObject"
+                  }
+                },
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "AddEventListenerOptions"
+                  }
+                }
+              ],
+              "description": "Add an event listener that is automatically removed on disconnect (it is\nwired to disconnectSignal). Returns a disposer to remove it early.",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "changedAfterFirstRender",
+              "privacy": "protected",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "changed",
+                  "type": {
+                    "text": "Map<PropertyKey, unknown>"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "PropertyKey"
+                  }
+                }
+              ],
+              "description": "True only when `key` changed to a genuinely new value, NOT on the initial\nrender. Lit records every reactive property in the first `changedProperties`\nwith an `undefined` old value (and `this.hasUpdated` is already `true`\ninside `updated()`), so `changed.has(key)` alone fires public change events\nat mount. Gate `fluid-change` / `fluid-toggle` / `fluid-hide` with this so\nthey only fire on real, user-driven transitions:\n\n  if (this.changedAfterFirstRender(changed, \"value\")) this.emitChange();",
+              "inheritedFrom": {
+                "name": "FluidElement",
+                "module": "src/internal/base-element.ts"
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the ink changes: a stroke completed, an undo, or a clear. `detail.signed` says whether any ink remains; `detail.strokes` is the stroke count."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "aria-label",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Accessible name for the drawing surface.",
+              "fieldName": "ariaLabel"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "signed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "True while at least one stroke of ink is on the pad. Read-only.",
+              "fieldName": "signed"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "module": "/src/internal/base-element.js"
+          },
+          "summary": "Pointer-drawn signature capture with pressure, undo and export.",
+          "usesTokens": [
+            {
+              "name": "--fluid-text-primary",
+              "description": "Default ink."
+            },
+            {
+              "name": "--fluid-surface-subtle",
+              "description": "Default surface."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Default border and baseline rule."
+            },
+            {
+              "name": "--fluid-radius-sm",
+              "description": "Default corner radius."
+            },
+            {
+              "name": "--fluid-focus-ring-color",
+              "description": "Keyboard focus indicator color."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width."
+            }
+          ],
+          "tagName": "fluid-signature-pad",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidSignaturePad",
+          "declaration": {
+            "name": "FluidSignaturePad",
+            "module": "src/components/signature-pad/fluid-signature-pad.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/skeleton/define.ts",
       "declarations": [],
       "exports": [
@@ -58536,6 +59127,14 @@
           "declaration": {
             "name": "FluidSidebar",
             "module": "./components/sidebar/fluid-sidebar.js"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidSignaturePad",
+          "declaration": {
+            "name": "FluidSignaturePad",
+            "module": "./components/signature-pad/fluid-signature-pad.js"
           }
         },
         {

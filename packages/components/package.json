@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/components",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Framework-agnostic web components for Fluid, ~50 standard custom elements (buttons, inputs, dialogs, drawers, tabs, trees, …). Drop into any HTML page; React/Vue/Angular/Svelte/Solid friendly.",
   "type": "module",
   "license": "MIT",
