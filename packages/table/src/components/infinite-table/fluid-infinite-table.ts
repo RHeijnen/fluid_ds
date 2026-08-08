@@ -221,6 +221,74 @@ export class FluidInfiniteTable extends LitElement {
       max-width: 100%;
       overflow: visible;
     }
+    /*
+     * Clip, not scroll. An auto overflow would make this box the scroll
+     * container for every sticky descendant, and the header would stick to it
+     * instead of to the page. Clip hides the overhang without becoming
+     * anything, and the strip below does the actual moving.
+     */
+    :host([column-scroll]) .table-scroll {
+      overflow-x: clip;
+    }
+    :host([column-scroll]) table {
+      transform: translateX(calc(-1 * var(--_fluid-column-scroll, 0px)));
+    }
+    /*
+     * The strip only exists while there is somewhere to go. Hidden rather than
+     * unrendered so appearing on a resize is a style change, not a relayout of
+     * the header.
+     */
+    .column-scroll-row {
+      display: none;
+    }
+    :host([column-scroll][data-columns-overflow]) .column-scroll-row {
+      display: table-row;
+    }
+    .column-scroll-cell {
+      position: sticky;
+      top: calc(
+        var(--fluid-infinite-table-sticky-offset, 0px) +
+          var(--_fluid-toolbar-height, 0px) +
+          var(--_fluid-header-height, 0px)
+      );
+      z-index: 3;
+      padding: 0;
+      border-bottom: 1px solid
+        var(
+          --fluid-infinite-table-border,
+          var(--fluid-border-default, #e2e8f0)
+        );
+      background: var(
+        --fluid-infinite-table-header-bg,
+        var(--fluid-surface-muted, #f8fafc)
+      );
+    }
+    /*
+     * The strip is a child of the transformed table, so it is carried left as
+     * the columns go — countered here with the same variable, which pins it to
+     * the clip box while everything around it moves. Its width is the clip
+     * box's, measured rather than inherited, because inside a table "100%"
+     * means the table's own, translated width.
+     */
+    /*
+     * Both parts of the strip undo the cell-content ellipsis rule above: that
+     * rule clamps every div in a td to its cell so labels truncate, and the
+     * strip is the one div in a td that exists precisely to be wider than its
+     * box. Zero-specificity there (:where) means these plain classes win.
+     */
+    .column-scroll {
+      max-width: none;
+      width: var(--_fluid-clip-width, 100%);
+      height: max(0.85rem, var(--fluid-scrollbar-size, 0.85rem));
+      overflow-x: auto;
+      overflow-y: hidden;
+      transform: translateX(var(--_fluid-column-scroll, 0px));
+    }
+    .column-scroll-spacer {
+      max-width: none;
+      width: var(--_fluid-table-width, 0px);
+      height: 1px;
+    }
     table {
       width: 100%;
       min-width: max-content;
@@ -308,6 +376,23 @@ export class FluidInfiniteTable extends LitElement {
       );
       font-weight: 700;
       white-space: nowrap;
+    }
+    /*
+     * Rendered cell content truncates the way plain content does. The cell's
+     * own text-overflow only reaches its direct inline content, so each
+     * text element a renderer put inside carries the ellipsis itself, and
+     * grid-auto-columns clamps the workspace's stacked two-line cells — an
+     * implicit grid track otherwise sizes to its longest line and no line
+     * ever overflows its own box. :where() keeps every declaration at zero
+     * specificity, so a renderer that wants different behaviour just says so.
+     */
+    td :where(div, span, p, a, strong, em, small, code) {
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      grid-auto-columns: minmax(0, 1fr);
     }
     tbody tr[data-row]:hover td {
       background: var(
@@ -614,6 +699,24 @@ export class FluidInfiniteTable extends LitElement {
   reorderColumnLabel = "Reorder {column}";
   @property({ type: String, attribute: "column-position-label" })
   columnPositionLabel = "{column}, column {position} of {count}";
+  /**
+   * Columns wider than the container scroll instead of bursting out of it.
+   *
+   * Opt-in, because it changes what "too many columns" means: without it the
+   * table trusts its container to scroll or grow, with it the table owns the
+   * problem and offers a horizontal scrollbar of its own. The scrollbar lives
+   * between the header and the rows — a bar at the bottom of a windowed list
+   * is wherever the list currently ends, which is nowhere to look for it —
+   * and it moves the header and the rows together, because columns that shear
+   * against their own headers stop being columns.
+   *
+   * The mechanics are deliberate: the wrapper *clips* rather than scrolls,
+   * and the table is moved with a transform driven by the strip. An
+   * `overflow-x: auto` wrapper would become the scroll container for every
+   * sticky descendant, and the header would stop following the page.
+   */
+  @property({ type: Boolean, attribute: "column-scroll", reflect: true })
+  columnScroll = false;
 
   @state() private viewScrollTop = 0;
   @state() private viewportHeight = 800;
@@ -636,11 +739,15 @@ export class FluidInfiniteTable extends LitElement {
   @query(".sentinel") private sentinel?: HTMLElement;
   @query("dialog") private columnDialog?: HTMLDialogElement;
   @query("table") private table?: HTMLTableElement;
+  @query(".column-scroll") private columnScrollStrip?: HTMLElement;
+  @query(".table-scroll") private tableScroll?: HTMLElement;
 
   private intersectionObserver?: IntersectionObserver;
   private resizeObserver?: ResizeObserver;
   private frame = 0;
   private measureFrame = 0;
+  private columnOverflowFrame = 0;
+  private columnOverflowMeasured = "";
   /** Where a column sat before it was picked up, so Escape can put it back. */
   private grabSnapshot: FluidInfiniteTableLayoutItem[] | null = null;
   /**
@@ -683,8 +790,10 @@ export class FluidInfiniteTable extends LitElement {
     this.intersectionObserver?.disconnect();
     this.resizeObserver?.disconnect();
     this.viewport?.removeEventListener("scroll", this.onContainerScroll);
+    this.viewport?.removeEventListener("wheel", this.onColumnWheel);
     cancelAnimationFrame(this.frame);
     cancelAnimationFrame(this.measureFrame);
+    cancelAnimationFrame(this.columnOverflowFrame);
     clearTimeout(this.emitTimer);
     this.resizing = null;
     super.disconnectedCallback();
@@ -769,14 +878,87 @@ export class FluidInfiniteTable extends LitElement {
       const toolbarHeight = this.toolbar?.getBoundingClientRect().height ?? 0;
       this.style.setProperty("--_fluid-toolbar-height", `${toolbarHeight}px`);
       this.measureScroll();
+      this.measureColumnOverflow();
       this.scheduleMeasure();
     });
     if (this.viewport) this.resizeObserver.observe(this.viewport);
     if (this.toolbar) this.resizeObserver.observe(this.toolbar);
+    // The table's own width moves when a column is resized, shown or hidden,
+    // and each of those can change whether there is any overflow to offer.
+    if (this.table) this.resizeObserver.observe(this.table);
     this.viewport?.addEventListener("scroll", this.onContainerScroll, {
       passive: true
     });
+    this.viewport?.addEventListener("wheel", this.onColumnWheel, {
+      passive: false
+    });
   }
+
+  /**
+   * Whether the columns outgrow the container, and by how much.
+   *
+   * Written as host state and custom properties rather than Lit state: this
+   * runs from a ResizeObserver, and the strip's geometry is the only thing
+   * that depends on it — pushing it through a render would re-draw every row
+   * to move a scrollbar.
+   */
+  private measureColumnOverflow(): void {
+    if (!this.columnScroll || !this.table || !this.tableScroll) return;
+    const clipWidth = this.tableScroll.clientWidth;
+    const tableWidth = Math.ceil(this.table.getBoundingClientRect().width);
+    const headerHeight = Math.round(
+      this.renderRoot
+        .querySelector('[part~="header-row"]')
+        ?.getBoundingClientRect().height ?? 0
+    );
+    /*
+     * Writing the strip's geometry resizes the strip, and the strip lives in
+     * the observed table — an observer that mutates what it watches in the
+     * same frame is a loop the browser reports as an error. Unchanged numbers
+     * are therefore not written at all, and changed ones land on the next
+     * frame, after this delivery has finished.
+     */
+    const measured = `${clipWidth}:${tableWidth}:${headerHeight}`;
+    if (measured === this.columnOverflowMeasured) return;
+    this.columnOverflowMeasured = measured;
+    cancelAnimationFrame(this.columnOverflowFrame);
+    this.columnOverflowFrame = requestAnimationFrame(() => {
+      this.style.setProperty("--_fluid-clip-width", `${clipWidth}px`);
+      this.style.setProperty("--_fluid-table-width", `${tableWidth}px`);
+      this.style.setProperty("--_fluid-header-height", `${headerHeight}px`);
+      const overflowing = tableWidth - clipWidth > 1;
+      this.toggleAttribute("data-columns-overflow", overflowing);
+      if (!overflowing) {
+        // Columns pulled left by a scroll that no longer exists would leave
+        // the table cropped on a container that now fits it.
+        this.style.setProperty("--_fluid-column-scroll", "0px");
+        if (this.columnScrollStrip) this.columnScrollStrip.scrollLeft = 0;
+      }
+    });
+  }
+
+  private readonly onColumnStripScroll = (event: Event): void => {
+    const strip = event.currentTarget as HTMLElement;
+    this.style.setProperty("--_fluid-column-scroll", `${strip.scrollLeft}px`);
+  };
+
+  /**
+   * A trackpad swipe over the rows reaches the columns.
+   *
+   * The clip box is not a scroll container, so the gesture that scrolls every
+   * other wide surface would otherwise do nothing here. Forwarded to the strip
+   * so the strip stays the one owner of the position; vertical wheel is left
+   * alone for the page.
+   */
+  private readonly onColumnWheel = (event: WheelEvent): void => {
+    if (!this.columnScroll || !this.hasAttribute("data-columns-overflow")) return;
+    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    const strip = this.columnScrollStrip;
+    if (!strip) return;
+    const before = strip.scrollLeft;
+    strip.scrollLeft += event.deltaX;
+    if (strip.scrollLeft !== before) event.preventDefault();
+  };
 
   private readonly onContainerScroll = (): void => {
     if (this.scrollMode !== "container") return;
@@ -1101,7 +1283,7 @@ export class FluidInfiniteTable extends LitElement {
     column.style.width = "1px";
     let widest = 0;
     for (const row of table.querySelectorAll<HTMLElement>(
-      "thead tr, tbody tr[data-row]"
+      'thead tr[part~="header-row"], tbody tr[data-row]'
     )) {
       const cell = row.children[index] as HTMLElement | undefined;
       if (cell) widest = Math.max(widest, cell.scrollWidth);
@@ -1604,6 +1786,19 @@ export class FluidInfiniteTable extends LitElement {
                 )}
                 <td class="filler" aria-hidden="true"></td>
               </tr>
+              ${this.columnScroll
+                ? html`<tr class="column-scroll-row" aria-hidden="true">
+                    <td class="column-scroll-cell" colspan=${columns.length + 1}>
+                      <div
+                        part="column-scroll"
+                        class="column-scroll"
+                        @scroll=${this.onColumnStripScroll}
+                      >
+                        <div class="column-scroll-spacer"></div>
+                      </div>
+                    </td>
+                  </tr>`
+                : nothing}
             </thead>
             <tbody>
               ${window.top

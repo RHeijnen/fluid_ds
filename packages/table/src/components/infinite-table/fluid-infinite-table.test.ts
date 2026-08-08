@@ -207,6 +207,52 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
     expect(cell.scrollWidth).to.be.greaterThan(cell.clientWidth);
   });
 
+  it("truncates a stacked two-line cell a renderer drew itself", async () => {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table
+        caption="Terminals"
+        resizable-columns
+        .columns=${[
+          {
+            key: "terminal",
+            label: "Terminal",
+            renderCell: ({ row }) => litHtml`<span style="display:grid">
+              <strong>${row["name"]}</strong>
+              <small>${row["serial"]}</small>
+            </span>`
+          },
+          { key: "domain", label: "Domain" }
+        ] as FluidInfiniteTableColumn[]}
+        .rows=${[
+          {
+            id: 1,
+            name: "[DO NOT USE] A name far too long for the column",
+            serial: "APM20242200232-EXTENDED",
+            domain: "CURO"
+          }
+        ]}
+        .layout=${[
+          { key: "terminal", visible: true, order: 0, width: "100px" },
+          { key: "domain", visible: true, order: 1 }
+        ]}
+      ></fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    const cell = element.shadowRoot!.querySelector<HTMLElement>(
+      "tbody tr[data-row] td"
+    )!;
+    const line = cell.querySelector("strong")!;
+    // The implicit grid track is clamped to the cell instead of sizing to
+    // its longest line, so each line overflows its own box and ellipsizes.
+    expect(line.getBoundingClientRect().width).to.be.at.most(
+      cell.getBoundingClientRect().width
+    );
+    expect(getComputedStyle(line).textOverflow).to.equal("ellipsis");
+    expect(line.scrollWidth).to.be.greaterThan(line.clientWidth);
+    const sub = cell.querySelector("small")!;
+    expect(sub.scrollWidth).to.be.greaterThan(sub.clientWidth);
+  });
+
   it("renders a column at exactly the width it was given, and banks the slack", async () => {
     const element = await arrangeable();
     element.layout = [
@@ -593,5 +639,88 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
   it("is accessible with both handles present", async () => {
     const element = await arrangeable();
     await expect(element).to.be.accessible();
+  });
+
+  describe("column scrolling", () => {
+    async function overflowing(): Promise<FluidInfiniteTable> {
+      const element = await fixture<FluidInfiniteTable>(html`
+        <div style="width: 320px">
+          <fluid-infinite-table
+            column-scroll
+            .columns=${[
+              { key: "a", label: "A", width: "200px" },
+              { key: "b", label: "B", width: "200px" },
+              { key: "c", label: "C", width: "200px" }
+            ] as FluidInfiniteTableColumn[]}
+            .rows=${[{ id: 1, a: "1", b: "2", c: "3" }]}
+          ></fluid-infinite-table>
+        </div>
+      `).then((wrapper) => wrapper.querySelector("fluid-infinite-table")!);
+      await elementUpdated(element);
+      // Geometry lands via a ResizeObserver tick and a deferred frame, not the
+      // render — so the fixture is ready when the table says so, not after a
+      // guessed number of frames.
+      for (let i = 0; i < 40 && !element.hasAttribute("data-columns-overflow"); i += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+      return element;
+    }
+
+    it("offers the strip between header and rows only while columns overflow", async () => {
+      const element = await overflowing();
+      expect(element.hasAttribute("data-columns-overflow")).to.equal(true);
+      const row = element.shadowRoot!.querySelector(".column-scroll-row")!;
+      expect(row).to.exist;
+      // Between the header and the rows: the strip is the header row's next
+      // sibling inside the table head.
+      const header = element.shadowRoot!.querySelector('[part~="header-row"]')!;
+      expect(header.nextElementSibling).to.equal(row);
+      expect(getComputedStyle(row).display).to.not.equal("none");
+    });
+
+    it("moves the columns and the rows together as the strip scrolls", async () => {
+      const element = await overflowing();
+      const strip = element.shadowRoot!.querySelector<HTMLElement>(".column-scroll")!;
+      const table = element.shadowRoot!.querySelector("table")!;
+      const headerBefore = element
+        .shadowRoot!.querySelector('[part~="header-cell"]')!
+        .getBoundingClientRect().left;
+      const cellBefore = element
+        .shadowRoot!.querySelector('[part~="cell"]')!
+        .getBoundingClientRect().left;
+      strip.scrollLeft = 120;
+      strip.dispatchEvent(new Event("scroll"));
+      await elementUpdated(element);
+      const shift = Math.round(strip.scrollLeft);
+      expect(shift).to.be.greaterThan(0);
+      expect(getComputedStyle(table).transform).to.not.equal("none");
+      const headerAfter = element
+        .shadowRoot!.querySelector('[part~="header-cell"]')!
+        .getBoundingClientRect().left;
+      const cellAfter = element
+        .shadowRoot!.querySelector('[part~="cell"]')!
+        .getBoundingClientRect().left;
+      // Header and body moved by the same amount: columns stay columns.
+      expect(Math.round(headerBefore - headerAfter)).to.equal(shift);
+      expect(Math.round(cellBefore - cellAfter)).to.equal(shift);
+    });
+
+    it("stays out of the way when the columns fit", async () => {
+      const element = await fixture<FluidInfiniteTable>(html`
+        <fluid-infinite-table
+          column-scroll
+          .columns=${[{ key: "a", label: "A" }] as FluidInfiniteTableColumn[]}
+          .rows=${[{ id: 1, a: "1" }]}
+        ></fluid-infinite-table>
+      `);
+      await elementUpdated(element);
+      await new Promise((resolve) => requestAnimationFrame(() =>
+        requestAnimationFrame(resolve)
+      ));
+      expect(element.hasAttribute("data-columns-overflow")).to.equal(false);
+      const row = element.shadowRoot!.querySelector(".column-scroll-row")!;
+      expect(getComputedStyle(row).display).to.equal("none");
+    });
   });
 });
