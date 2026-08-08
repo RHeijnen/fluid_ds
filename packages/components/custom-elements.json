@@ -42385,12 +42385,56 @@
             },
             {
               "kind": "field",
+              "name": "uploadLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Upload\"",
+              "attribute": "upload-label"
+            },
+            {
+              "kind": "field",
+              "name": "fitLabel",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Fit\"",
+              "attribute": "fit-label"
+            },
+            {
+              "kind": "field",
               "name": "strokes",
               "type": {
                 "text": "SignaturePoint[][]"
               },
               "privacy": "private",
               "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "placed",
+              "type": {
+                "text": "ImageBitmap | HTMLImageElement | undefined"
+              },
+              "privacy": "private",
+              "description": "A prepared signature, placed rather than drawn.\r\n\r\nPlenty of people keep a scanned signature on their machine; forcing them\r\nto re-draw a worse one with a mouse would be the pad insisting on its own\r\nmechanism. The image is a layer beneath the strokes — initials can still\r\nbe added over it — and it lives in the model like the strokes do, so\r\nresize replays it and the export includes it."
+            },
+            {
+              "kind": "field",
+              "name": "placement",
+              "type": {
+                "text": "{ x: number; y: number; width: number; height: number } | undefined"
+              },
+              "privacy": "private",
+              "description": "Where the placed image sits, in CSS pixels of the pad.\r\n\r\nA scan rarely arrives at the right size, so the placed layer stays\r\nadjustable: drag to move it, pull the corner handle to scale it. The\r\nrectangle is the one source of truth — the on-screen overlay and the\r\nexported bitmap both draw from it, so what is adjusted is what is\r\nsubmitted."
+            },
+            {
+              "kind": "field",
+              "name": "adjusting",
+              "type": {
+                "text": "{\r\n    mode: \"move\" | \"resize\";\r\n    startX: number;\r\n    startY: number;\r\n    origin: { x: number; y: number; width: number; height: number };\r\n  } | undefined"
+              },
+              "privacy": "private"
             },
             {
               "kind": "field",
@@ -42448,7 +42492,7 @@
                   "text": "void"
                 }
               },
-              "description": "Removes the most recent stroke; a tremored start deserves better than a full clear."
+              "description": "Steps back through the ink: the most recent stroke first, the placed\r\nimage once no strokes remain. A tremored start deserves better than a\r\nfull clear."
             },
             {
               "kind": "method",
@@ -42458,6 +42502,66 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "placeImage",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "Blob | string"
+                  }
+                }
+              ],
+              "description": "Places a prepared signature image onto the pad.\r\n\r\nAccepts whatever the file input or a drop hands over. The image is fitted\r\ninside the pad with a margin, centred, never upscaled past its own size —\r\na 200px scan on a 500px pad should read as a signature, not as wallpaper."
+            },
+            {
+              "kind": "method",
+              "name": "containFit",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "image",
+                  "type": {
+                    "text": "{ width: number; height: number }"
+                  }
+                }
+              ],
+              "description": "Fitted inside the pad with a margin, centred, never upscaled."
+            },
+            {
+              "kind": "method",
+              "name": "refit",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Puts the placed image back to its centred contain-fit."
+            },
+            {
+              "kind": "method",
+              "name": "decodeImage",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<ImageBitmap | HTMLImageElement | undefined>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "Blob | string"
+                  }
+                }
+              ]
             },
             {
               "kind": "method",
@@ -42602,6 +42706,142 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "field",
+              "name": "onDrop",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "pickFile",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onFilePicked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onPlaced",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Whether a canvas point falls on the placed image."
+            },
+            {
+              "kind": "method",
+              "name": "onHandle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Whether a canvas point falls on the resize corner of the placed image."
+            },
+            {
+              "kind": "method",
+              "name": "beginAdjust",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                },
+                {
+                  "name": "mode",
+                  "type": {
+                    "text": "\"move\" | \"resize\""
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "adjust",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "endAdjust",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "method",
@@ -42788,7 +43028,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the ink changes: a stroke completed, an undo, or a clear. `detail.signed` says whether any ink remains; `detail.strokes` is the stroke count."
+              "description": "Fired when the ink changes: a stroke completed, an image placed, an undo, or a clear. `detail.signed` says whether any ink remains; `detail.strokes` is the stroke count."
             }
           ],
           "attributes": [
@@ -42842,6 +43082,22 @@
               },
               "default": "\"Undo\"",
               "fieldName": "undoLabel"
+            },
+            {
+              "name": "upload-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Upload\"",
+              "fieldName": "uploadLabel"
+            },
+            {
+              "name": "fit-label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"Fit\"",
+              "fieldName": "fitLabel"
             }
           ],
           "superclass": {
@@ -42869,10 +43125,6 @@
             {
               "name": "--fluid-focus-ring-color",
               "description": "Keyboard focus indicator color."
-            },
-            {
-              "name": "--fluid-focus-ring-width",
-              "description": "Focus ring width."
             }
           ],
           "tagName": "fluid-signature-pad",

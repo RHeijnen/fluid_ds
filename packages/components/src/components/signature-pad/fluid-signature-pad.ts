@@ -50,9 +50,16 @@ interface SignaturePoint {
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width.
  *
+ * A prepared signature can be placed instead of drawn: the Upload control and
+ * dragging an image onto the pad both call `placeImage`, which layers the
+ * bitmap beneath any strokes, fits it inside the pad without upscaling, and
+ * includes it in the export. The placed layer stays adjustable — drag it to
+ * move, pull the corner grip to scale, Fit to return to the centred
+ * contain-fit — and the outline chrome is DOM, never exported ink.
+ *
  * @fires fluid-change - Fired when the ink changes: a stroke completed, an
- *   undo, or a clear. `detail.signed` says whether any ink remains;
- *   `detail.strokes` is the stroke count.
+ *   image placed, an undo, or a clear. `detail.signed` says whether any ink
+ *   remains; `detail.strokes` is the stroke count.
  */
 export class FluidSignaturePad extends FluidElement {
   static formAssociated = true;
@@ -76,8 +83,36 @@ export class FluidSignaturePad extends FluidElement {
   @property() placeholder = "Sign here";
   @property({ attribute: "clear-label" }) clearLabel = "Clear";
   @property({ attribute: "undo-label" }) undoLabel = "Undo";
+  @property({ attribute: "upload-label" }) uploadLabel = "Upload";
+  @property({ attribute: "fit-label" }) fitLabel = "Fit";
 
   @state() private strokes: SignaturePoint[][] = [];
+  /**
+   * A prepared signature, placed rather than drawn.
+   *
+   * Plenty of people keep a scanned signature on their machine; forcing them
+   * to re-draw a worse one with a mouse would be the pad insisting on its own
+   * mechanism. The image is a layer beneath the strokes — initials can still
+   * be added over it — and it lives in the model like the strokes do, so
+   * resize replays it and the export includes it.
+   */
+  @state() private placed?: ImageBitmap | HTMLImageElement;
+  /**
+   * Where the placed image sits, in CSS pixels of the pad.
+   *
+   * A scan rarely arrives at the right size, so the placed layer stays
+   * adjustable: drag to move it, pull the corner handle to scale it. The
+   * rectangle is the one source of truth — the on-screen overlay and the
+   * exported bitmap both draw from it, so what is adjusted is what is
+   * submitted.
+   */
+  @state() private placement?: { x: number; y: number; width: number; height: number };
+  private adjusting?: {
+    mode: "move" | "resize";
+    startX: number;
+    startY: number;
+    origin: { x: number; y: number; width: number; height: number };
+  };
   @query("canvas") private canvas?: HTMLCanvasElement;
 
   private active?: SignaturePoint[];
@@ -147,6 +182,7 @@ export class FluidSignaturePad extends FluidElement {
     .hint {
       position: absolute;
       inset: 0;
+      padding-top: 1.5rem;
       display: grid;
       place-items: center;
       color: var(--fluid-text-secondary, #5b6b7b);
@@ -161,6 +197,27 @@ export class FluidSignaturePad extends FluidElement {
       display: flex;
       gap: var(--fluid-space-1, 0.25rem);
     }
+    /*
+     * The adjustable layer's chrome: an outline and a corner grip over the
+     * placed image. DOM rather than ink, so the export never carries it; no
+     * pointer events of its own, so the canvas underneath handles the drag.
+     */
+    .frame {
+      position: absolute;
+      border: 1px dashed var(--fluid-accent-base, #4f46e5);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .frame .grip {
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      width: 10px;
+      height: 10px;
+      border: 1px solid var(--fluid-surface-base, #fff);
+      border-radius: 2px;
+      background: var(--fluid-accent-base, #4f46e5);
+    }
   `;
 
   get form(): HTMLFormElement | null {
@@ -173,19 +230,96 @@ export class FluidSignaturePad extends FluidElement {
     return this.canvas.toDataURL(type);
   }
 
-  /** Removes the most recent stroke; a tremored start deserves better than a full clear. */
+  /**
+   * Steps back through the ink: the most recent stroke first, the placed
+   * image once no strokes remain. A tremored start deserves better than a
+   * full clear.
+   */
   undo(): void {
-    if (!this.strokes.length) return;
-    this.strokes = this.strokes.slice(0, -1);
+    if (this.strokes.length) {
+      this.strokes = this.strokes.slice(0, -1);
+    } else if (this.placed) {
+      this.placed = undefined;
+      this.placement = undefined;
+    } else {
+      return;
+    }
     this.redraw();
     this.syncInk();
   }
 
   clear(): void {
-    if (!this.strokes.length) return;
+    if (!this.strokes.length && !this.placed) return;
     this.strokes = [];
+    this.placed = undefined;
+    this.placement = undefined;
     this.redraw();
     this.syncInk();
+  }
+
+  /**
+   * Places a prepared signature image onto the pad.
+   *
+   * Accepts whatever the file input or a drop hands over. The image is fitted
+   * inside the pad with a margin, centred, never upscaled past its own size —
+   * a 200px scan on a 500px pad should read as a signature, not as wallpaper.
+   */
+  async placeImage(source: Blob | string): Promise<void> {
+    if (this.disabled) return;
+    const image = await this.decodeImage(source);
+    if (!image) return;
+    this.placed = image;
+    this.placement = this.containFit(image);
+    this.redraw();
+    this.syncInk();
+  }
+
+  /** Fitted inside the pad with a margin, centred, never upscaled. */
+  private containFit(image: { width: number; height: number }) {
+    const rect = this.canvas?.getBoundingClientRect() ?? { width: 480, height: 160 };
+    const margin = 12;
+    const fit = Math.min(
+      1,
+      (rect.width - margin * 2) / image.width,
+      (rect.height - margin * 2) / image.height
+    );
+    const width = image.width * fit;
+    const height = image.height * fit;
+    return {
+      x: (rect.width - width) / 2,
+      y: (rect.height - height) / 2,
+      width,
+      height
+    };
+  }
+
+  /** Puts the placed image back to its centred contain-fit. */
+  refit(): void {
+    if (!this.placed) return;
+    this.placement = this.containFit(this.placed);
+    this.redraw();
+  }
+
+  private async decodeImage(
+    source: Blob | string
+  ): Promise<ImageBitmap | HTMLImageElement | undefined> {
+    try {
+      if (typeof createImageBitmap === "function" && typeof source !== "string") {
+        return await createImageBitmap(source);
+      }
+      const url = typeof source === "string" ? source : URL.createObjectURL(source);
+      const image = new Image();
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error("undecodable image"));
+        image.src = url;
+      });
+      if (typeof source !== "string") URL.revokeObjectURL(url);
+      return image;
+    } catch {
+      // An undecodable file places nothing; the pad stays as it was.
+      return undefined;
+    }
   }
 
   formResetCallback(): void {
@@ -206,7 +340,7 @@ export class FluidSignaturePad extends FluidElement {
   }
 
   private syncInk(): void {
-    this.signed = this.strokes.length > 0;
+    this.signed = this.strokes.length > 0 || this.placed !== undefined;
     this.internals.setFormValue(this.toDataURL() ?? "");
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
@@ -319,6 +453,15 @@ export class FluidSignaturePad extends FluidElement {
     if (!context) return;
     context.setTransform(scale, 0, 0, scale, 0, 0);
     context.clearRect(0, 0, rect.width, rect.height);
+    if (this.placed && this.placement) {
+      context.drawImage(
+        this.placed,
+        this.placement.x,
+        this.placement.y,
+        this.placement.width,
+        this.placement.height
+      );
+    }
     for (const stroke of this.strokes) this.drawStroke(context, stroke);
   }
 
@@ -332,8 +475,106 @@ export class FluidSignaturePad extends FluidElement {
     };
   }
 
+  private readonly onDrop = (event: DragEvent): void => {
+    if (this.disabled) return;
+    const file = event.dataTransfer?.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    event.preventDefault();
+    void this.placeImage(file);
+  };
+
+  private pickFile(): void {
+    this.renderRoot.querySelector<HTMLInputElement>(".file")?.click();
+  }
+
+  private onFilePicked(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = "";
+    if (file) void this.placeImage(file);
+  }
+
+  /** Whether a canvas point falls on the placed image. */
+  private onPlaced(x: number, y: number): boolean {
+    const p = this.placement;
+    return !!p && x >= p.x && x <= p.x + p.width && y >= p.y && y <= p.y + p.height;
+  }
+
+  /** Whether a canvas point falls on the resize corner of the placed image. */
+  private onHandle(x: number, y: number): boolean {
+    const p = this.placement;
+    if (!p) return false;
+    const grip = 14;
+    return Math.abs(x - (p.x + p.width)) <= grip && Math.abs(y - (p.y + p.height)) <= grip;
+  }
+
+  private beginAdjust(event: PointerEvent, mode: "move" | "resize"): void {
+    if (!this.placement || !this.canvas) return;
+    // Capture keeps the drag alive past the pad's edge; a pointer that
+    // vanished between down and here (or a synthetic one) is no reason to
+    // refuse the drag that is still happening on-screen.
+    try {
+      this.canvas.setPointerCapture(event.pointerId);
+    } catch {
+      /* uncapturable pointer; the drag still works while it stays inside */
+    }
+    const { x, y } = this.samplePoint(event);
+    this.adjusting = { mode, startX: x, startY: y, origin: { ...this.placement } };
+  }
+
+  private adjust(event: PointerEvent): void {
+    if (!this.adjusting || !this.placement || !this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const { x, y } = this.samplePoint(event);
+    const { mode, startX, startY, origin } = this.adjusting;
+    if (mode === "move") {
+      const nx = origin.x + (x - startX);
+      const ny = origin.y + (y - startY);
+      this.placement = {
+        ...this.placement,
+        x: Math.min(Math.max(nx, -origin.width * 0.5), rect.width - origin.width * 0.5),
+        y: Math.min(Math.max(ny, -origin.height * 0.5), rect.height - origin.height * 0.5)
+      };
+    } else {
+      // Uniform scale from the anchor corner, floored so the image can never
+      // be shrunk into something unclickable.
+      const scale = Math.max(
+        24 / origin.width,
+        Math.min(
+          (origin.width + (x - startX)) / origin.width,
+          (origin.height + (y - startY)) / origin.height
+        )
+      );
+      this.placement = {
+        x: origin.x,
+        y: origin.y,
+        width: origin.width * scale,
+        height: origin.height * scale
+      };
+    }
+    this.redraw();
+  }
+
+  private endAdjust(): void {
+    if (!this.adjusting) return;
+    this.adjusting = undefined;
+    // The composite changed even though no stroke did.
+    this.syncInk();
+  }
+
   private onPointerDown(event: PointerEvent): void {
     if (this.disabled || !this.canvas) return;
+    const { x, y } = this.samplePoint(event);
+    if (this.onHandle(x, y)) {
+      event.preventDefault();
+      this.beginAdjust(event, "resize");
+      return;
+    }
+    if (this.onPlaced(x, y)) {
+      event.preventDefault();
+      this.beginAdjust(event, "move");
+      return;
+    }
     // Pointer capture keeps the stroke alive when the pen wanders past the
     // edge mid-word; the stroke ends when the pointer lifts, not when it
     // leaves.
@@ -343,6 +584,10 @@ export class FluidSignaturePad extends FluidElement {
   }
 
   private onPointerMove(event: PointerEvent): void {
+    if (this.adjusting) {
+      this.adjust(event);
+      return;
+    }
     if (!this.active) return;
     // Coalesced events carry the samples the compositor batched between
     // frames; using them is the difference between 60 points a second and the
@@ -358,6 +603,10 @@ export class FluidSignaturePad extends FluidElement {
   }
 
   private onPointerUp(): void {
+    if (this.adjusting) {
+      this.endAdjust();
+      return;
+    }
     if (!this.active) return;
     // A bare tap leaves a dot, which is deliberate: initials and diacritics
     // are dots, and rejecting them makes the pad argue with real signatures.
@@ -369,12 +618,24 @@ export class FluidSignaturePad extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <div class="base" part="base">
+      <div
+        class="base"
+        part="base"
+        @dragover=${(event: DragEvent) => {
+          if (!this.disabled) event.preventDefault();
+        }}
+        @drop=${this.onDrop}
+      >
         ${this.signed
           ? ""
           : html`
               <div class="hint">${this.placeholder}</div>
               <div class="guide"><span class="cross">✕</span></div>
+              <div class="actions" part="actions">
+                <fluid-button size="sm" variant="ghost" @click=${this.pickFile}>
+                  ${this.uploadLabel}
+                </fluid-button>
+              </div>
             `}
         <canvas
           part="canvas"
@@ -389,6 +650,11 @@ export class FluidSignaturePad extends FluidElement {
         ${this.signed
           ? html`
               <div class="actions" part="actions">
+                ${this.placed
+                  ? html`<fluid-button size="sm" variant="ghost" @click=${() => this.refit()}>
+                      ${this.fitLabel}
+                    </fluid-button>`
+                  : ""}
                 <fluid-button size="sm" variant="ghost" @click=${() => this.undo()}>
                   ${this.undoLabel}
                 </fluid-button>
@@ -398,6 +664,23 @@ export class FluidSignaturePad extends FluidElement {
               </div>
             `
           : ""}
+        ${this.placed && this.placement
+          ? html`
+              <div
+                class="frame"
+                style=${`left:${this.placement.x}px;top:${this.placement.y}px;width:${this.placement.width}px;height:${this.placement.height}px;`}
+              >
+                <span class="grip"></span>
+              </div>
+            `
+          : ""}
+        <input
+          class="file"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          hidden
+          @change=${this.onFilePicked}
+        />
       </div>
     `;
   }
