@@ -4,6 +4,11 @@ import { classMap } from "lit/directives/class-map.js";
 import { live } from "lit/directives/live.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import {
+  fieldChromeStyles,
+  fieldHelpDescribedBy,
+  renderFieldChrome
+} from "../../internal/field-chrome.js";
 
 export type FluidInputType = "text" | "number" | "email" | "password" | "search" | "tel" | "url";
 export type FluidInputSize = "sm" | "md" | "lg";
@@ -16,9 +21,17 @@ export type FluidInputSize = "sm" | "md" | "lg";
  *
  * @summary Text-style input with prefix/suffix slots.
  *
+ * A visible label and help text can be attached directly with the `label` and
+ * `help-text` attributes; the label is a real `<label for>` inside the shadow
+ * root and the help text is wired to the input via `aria-describedby`. For rich
+ * label content, error messages, or a required indicator, wrap the control in
+ * `fluid-field` instead.
+ *
  * @slot prefix - Rendered before the input (icons, labels, etc.).
  * @slot suffix - Rendered after the input.
  *
+ * @csspart label - The visible label (present only when `label` is set).
+ * @csspart help-text - The help text (present only when `help-text` is set).
  * @csspart base - The outer container (the bordered field shell).
  * @csspart input - The internal `<input>` element. Reach it with `::part()`
  *   for any CSS not covered by a token (the escape hatch).
@@ -79,7 +92,9 @@ export type FluidInputSize = "sm" | "md" | "lg";
  * @fires fluid-change - Fired when the input loses focus after a value change.
  */
 export class FluidInput extends FluidFormAssociated {
-  static override styles = css`
+  static override styles = [
+    fieldChromeStyles,
+    css`
     :host {
       display: inline-flex;
       width: 100%;
@@ -274,9 +289,16 @@ export class FluidInput extends FluidFormAssociated {
     ::slotted([slot="suffix"]) {
       margin: 0;
     }
-  `;
+  `
+  ];
 
   @query("input") private inputEl!: HTMLInputElement;
+
+  /** Visible label rendered above the field (a real label/for association). */
+  @property() label = "";
+
+  /** Help text rendered below the field, announced via aria-describedby. */
+  @property({ attribute: "help-text" }) helpText = "";
 
   /** Input type. */
   @property({ reflect: true }) type: FluidInputType = "text";
@@ -440,7 +462,9 @@ export class FluidInput extends FluidFormAssociated {
   };
 
   override render(): TemplateResult {
-    return html`
+    return renderFieldChrome(
+      { label: this.label, helpText: this.helpText, for: "input" },
+      html`
       <div
         part="base"
         class=${classMap({
@@ -476,6 +500,7 @@ export class FluidInput extends FluidFormAssociated {
           pattern=${ifDefined(this.pattern)}
           autocomplete=${ifDefined(this.autocomplete)}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
           aria-invalid=${this.invalid ? "true" : "false"}
           @input=${this.handleInput}
           @change=${this.handleChange}
@@ -490,7 +515,8 @@ export class FluidInput extends FluidFormAssociated {
           <slot name="suffix" @slotchange=${this.handleSuffixChange}></slot>
         </span>
       </div>
-    `;
+    `
+    );
   }
 }
 

@@ -62,6 +62,19 @@ type Story = StoryObj<Args>;
 
 export const Default: Story = {};
 
+export const WithLabelAndHelpText: Story = {
+  render: () => html`
+    <div style="display:flex; flex-direction:column; gap: var(--fluid-space-4); max-width: 320px;">
+      <fluid-input label="Serial number" placeholder="APO-100001"></fluid-input>
+      <fluid-input
+        label="Terminal serials"
+        help-text="One serial number per line, resolved against the active domain."
+        placeholder="APO-100001"
+      ></fluid-input>
+    </div>
+  `
+};
+
 export const Sizes: Story = {
   render: () => html`
     <div

@@ -16,6 +16,22 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **2026-08-09 (uncommitted working tree):** form controls gained first-class
+> `label` and `help-text` attributes: a shared internal helper
+> (`src/internal/field-chrome.ts`) renders a visible label above and help text
+> below the control, with a real `<label for>` inside the shadow root and
+> `aria-describedby` on the input. Wired into input, textarea, select,
+> date-picker, time-picker, and typeahead (file-input keeps its dropzone label
+> slot; `fluid-field` stays the rich wrapper). The chrome reuses the
+> `--fluid-field-*` tokens so one ladder themes both. `fluid-dialog` also
+> gained a `heading` slot alias (nested slot fallback of `label`) because TMS
+> passes `slot="heading"` everywhere and titles silently never rendered.
+> Version bumped 0.3.1 -> 0.3.2 in the working tree; tests (1085), typecheck,
+> check:tokens, cem analyze all green; verified live in the TMS operations app
+> (notification editor now shows every label, help text, and the dialog
+> title). NOT committed on purpose (user instruction); commit + push + publish
+> and point TMS manifests at 0.3.2 when ready.
+>
 > **2026-08-08:** the TMS finance page drove a burst of table and chart work.
 > Published: table **0.1.2** (headers align with cells, real ellipsis, exact
 > resize via a trailing filler column, one-column resize, live reorder

@@ -4,6 +4,11 @@ import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { autoUpdate, computePosition, flip, offset, size } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import {
+  fieldChromeStyles,
+  fieldHelpDescribedBy,
+  renderFieldChrome
+} from "../../internal/field-chrome.js";
 import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 import "../icon/define.js";
 import { registerIcon } from "@fluid-ds/icons";
@@ -35,6 +40,15 @@ let counter = 0;
  *
  * @slot - One or more `<fluid-option>` elements.
  *
+ *
+ * A visible label and help text can be attached directly with the `label` and
+ * `help-text` attributes; the label is a real `<label for>` inside the shadow
+ * root and the help text is announced via `aria-describedby`. For rich label
+ * content, error messages, or a required indicator, wrap the control in
+ * `fluid-field` instead.
+ *
+ * @csspart label - The visible label (present only when `label` is set).
+ * @csspart help-text - The help text (present only when `help-text` is set).
  * @csspart base - The outer wrapper.
  * @csspart trigger - The combobox trigger button.
  * @csspart listbox - The popover listbox.
@@ -78,7 +92,9 @@ let counter = 0;
  * @fires fluid-change - Fired when the selected value changes. `event.detail.value`.
  */
 export class FluidSelect extends FluidFormAssociated {
-  static override styles = css`
+  static override styles = [
+    fieldChromeStyles,
+    css`
     :host {
       display: inline-flex;
       width: 100%;
@@ -264,7 +280,8 @@ export class FluidSelect extends FluidFormAssociated {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
-  `;
+  `
+  ];
 
   @query(".trigger") private triggerEl!: HTMLButtonElement;
   @query(".listbox") private listboxEl!: HTMLElement;
@@ -292,6 +309,12 @@ export class FluidSelect extends FluidFormAssociated {
 
   /** Accessible label. */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
+
+  /** Visible label rendered above the trigger (a real label/for association). */
+  @property() label = "";
+
+  /** Help text rendered below the trigger, announced via aria-describedby. */
+  @property({ attribute: "help-text" }) helpText = "";
 
   @state() private focused = false;
   @state() private activeIndex = -1;
@@ -632,9 +655,12 @@ export class FluidSelect extends FluidFormAssociated {
 
   override render(): TemplateResult {
     const label = this.selectedLabel;
-    return html`
+    return renderFieldChrome(
+      { label: this.label, helpText: this.helpText, for: "trigger" },
+      html`
       <div part="base" style="position:relative; width:100%;">
         <button
+          id="trigger"
           part="trigger"
           type="button"
           role="combobox"
@@ -643,6 +669,7 @@ export class FluidSelect extends FluidFormAssociated {
           aria-controls=${this.listboxId}
           aria-activedescendant=${ifDefined(this.open ? this.activeId : undefined)}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
           ?disabled=${this.disabled}
           class=${classMap({
             trigger: true,
@@ -673,6 +700,7 @@ export class FluidSelect extends FluidFormAssociated {
           <slot @slotchange=${this.handleSlotChange}></slot>
         </div>
       </div>
-    `;
+    `
+    );
   }
 }

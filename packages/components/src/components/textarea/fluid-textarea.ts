@@ -4,6 +4,11 @@ import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import {
+  fieldChromeStyles,
+  fieldHelpDescribedBy,
+  renderFieldChrome
+} from "../../internal/field-chrome.js";
 
 export type FluidTextareaResize = "none" | "vertical" | "horizontal" | "both" | "auto";
 
@@ -13,6 +18,13 @@ export type FluidTextareaResize = "none" | "vertical" | "horizontal" | "both" | 
  *
  * @summary Multi-line text input with optional auto-resize.
  *
+ * A visible label and help text can be attached directly with the `label` and
+ * `help-text` attributes; the label is a real `<label for>` inside the shadow
+ * root and the help text is wired to the textarea via `aria-describedby`. For
+ * rich label content or error messages, wrap the control in `fluid-field`.
+ *
+ * @csspart label - The visible label (present only when `label` is set).
+ * @csspart help-text - The help text (present only when `help-text` is set).
  * @csspart base - The outer container.
  * @csspart textarea - The internal <textarea>.
  * @csspart counter - The character counter (when maxlength is set).
@@ -64,7 +76,9 @@ export type FluidTextareaResize = "none" | "vertical" | "horizontal" | "both" | 
  * @fires fluid-change - Fired on blur after a value change.
  */
 export class FluidTextarea extends FluidFormAssociated {
-  static override styles = css`
+  static override styles = [
+    fieldChromeStyles,
+    css`
     :host {
       display: block;
       width: 100%;
@@ -159,9 +173,16 @@ export class FluidTextarea extends FluidFormAssociated {
     .counter.over {
       color: var(--fluid-textarea-counter-over-fg, var(--fluid-danger-base));
     }
-  `;
+  `
+  ];
 
   @query("textarea") private inputEl!: HTMLTextAreaElement;
+
+  /** Visible label rendered above the field (a real label/for association). */
+  @property() label = "";
+
+  /** Help text rendered below the field, announced via aria-describedby. */
+  @property({ attribute: "help-text" }) helpText = "";
 
   /** Current value. */
   @property() override value = "";
@@ -275,6 +296,13 @@ export class FluidTextarea extends FluidFormAssociated {
   };
 
   override render(): TemplateResult {
+    return renderFieldChrome(
+      { label: this.label, helpText: this.helpText, for: "textarea" },
+      this.renderControl()
+    );
+  }
+
+  private renderControl(): TemplateResult {
     const len = this.value.length;
     const max = this.maxlength;
     const counterState =
@@ -302,6 +330,7 @@ export class FluidTextarea extends FluidFormAssociated {
           minlength=${ifDefined(this.minlength)}
           maxlength=${ifDefined(this.maxlength)}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
           aria-invalid=${this.invalid ? "true" : "false"}
           @input=${this.handleInput}
           @change=${this.handleChange}

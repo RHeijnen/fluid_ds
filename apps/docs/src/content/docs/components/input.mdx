@@ -69,6 +69,24 @@ on-screen keyboard and native validation.
 <fluid-input type="password" value="hunter2" aria-label="Password"></fluid-input>
 <fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>`} />
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-input label="Serial number" help-text="One serial number per line." placeholder="APO-100001"></fluid-input>
+</Demo>
+
+<ConformanceCode code={`<fluid-input
+  label="Serial number"
+  help-text="One serial number per line."
+  placeholder="APO-100001"
+></fluid-input>`} />
+
 ### Sizes
 
 Three sizes scale font + height together. Each meets the AA 24×24 target floor

@@ -20,6 +20,7 @@ export type FluidDialogSize = "sm" | "md" | "lg" | "xl" | "fullscreen";
  * @summary Modal dialog that interrupts the main page flow.
  *
  * @slot label - Title row (heading).
+ * @slot heading - Alias for the label slot; renders in the title row when no label content is slotted.
  * @slot - Main body content.
  * @slot footer - Footer actions (typically buttons).
  *
@@ -267,7 +268,7 @@ export class FluidDialog extends FluidElement {
       >
         <div part="panel" class="panel">
           <div part="header" class="header">
-            <div class="label"><slot name="label"></slot></div>
+            <div class="label"><slot name="label"><slot name="heading"></slot></slot></div>
             ${this.noCloseButton
               ? ""
               : html`

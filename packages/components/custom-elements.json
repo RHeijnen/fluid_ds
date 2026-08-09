@@ -11525,6 +11525,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The field container.",
               "name": "base"
             },
@@ -11712,6 +11720,26 @@
                 "text": "HTMLInputElement"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -12373,13 +12401,31 @@
               "default": "false",
               "description": "Whether the calendar popover is open.",
               "fieldName": "open"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "fieldName": "helpText"
             }
           ],
           "superclass": {
             "name": "FluidFormAssociated",
             "module": "/src/internal/form-associated.js"
           },
-          "summary": "Pick a single date.",
+          "summary": "Pick a single date.\n\n\nA visible label and help text can be attached directly with the `label` and\n`help-text` attributes; the label is a real `<label for>` inside the shadow\nroot and the help text is announced via `aria-describedby`. For rich label\ncontent, error messages, or a required indicator, wrap the control in\n`fluid-field` instead.",
           "usesTokens": [
             {
               "name": "--fluid-surface-base",
@@ -14215,6 +14261,10 @@
             {
               "description": "Title row (heading).",
               "name": "label"
+            },
+            {
+              "description": "Alias for the label slot; renders in the title row when no label content is slotted.",
+              "name": "heading"
             },
             {
               "description": "Main body content.",
@@ -23666,6 +23716,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The outer container (the bordered field shell).",
               "name": "base"
             },
@@ -23700,6 +23758,26 @@
                 "text": "HTMLInputElement"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -24395,6 +24473,24 @@
           ],
           "attributes": [
             {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "fieldName": "helpText"
+            },
+            {
               "name": "type",
               "type": {
                 "text": "FluidInputType"
@@ -24536,7 +24632,7 @@
             "name": "FluidFormAssociated",
             "module": "/src/internal/form-associated.js"
           },
-          "summary": "Text-style input with prefix/suffix slots.",
+          "summary": "Text-style input with prefix/suffix slots.\n\nA visible label and help text can be attached directly with the `label` and\n`help-text` attributes; the label is a real `<label for>` inside the shadow\nroot and the help text is wired to the input via `aria-describedby`. For rich\nlabel content, error messages, or a required indicator, wrap the control in\n`fluid-field` instead.",
           "usesTokens": [
             {
               "name": "--fluid-surface-base",
@@ -40793,6 +40889,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The outer wrapper.",
               "name": "base"
             },
@@ -40807,7 +40911,7 @@
           ],
           "slots": [
             {
-              "description": "One or more `<fluid-option>` elements.",
+              "description": "One or more `<fluid-option>` elements. A visible label and help text can be attached directly with the `label` and `help-text` attributes; the label is a real `<label for>` inside the shadow root and the help text is announced via `aria-describedby`. For rich label content, error messages, or a required indicator, wrap the control in `fluid-field` instead.",
               "name": ""
             }
           ],
@@ -40920,6 +41024,26 @@
               "default": "null",
               "description": "Accessible label.",
               "attribute": "aria-label"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the trigger (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the trigger, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -41630,6 +41754,24 @@
               "default": "null",
               "description": "Accessible label.",
               "fieldName": "ariaLabel"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the trigger (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the trigger, announced via aria-describedby.",
+              "fieldName": "helpText"
             }
           ],
           "superclass": {
@@ -49975,6 +50117,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The outer container.",
               "name": "base"
             },
@@ -49995,6 +50145,26 @@
                 "text": "HTMLTextAreaElement"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -50256,6 +50426,16 @@
               "kind": "field",
               "name": "handleBlur",
               "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "renderControl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
             },
             {
               "kind": "field",
@@ -50590,6 +50770,24 @@
           ],
           "attributes": [
             {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "fieldName": "helpText"
+            },
+            {
               "name": "value",
               "type": {
                 "text": "string"
@@ -50691,7 +50889,7 @@
             "name": "FluidFormAssociated",
             "module": "/src/internal/form-associated.js"
           },
-          "summary": "Multi-line text input with optional auto-resize.",
+          "summary": "Multi-line text input with optional auto-resize.\n\nA visible label and help text can be attached directly with the `label` and\n`help-text` attributes; the label is a real `<label for>` inside the shadow\nroot and the help text is wired to the textarea via `aria-describedby`. For\nrich label content or error messages, wrap the control in `fluid-field`.",
           "usesTokens": [
             {
               "name": "--fluid-surface-base",
@@ -51304,6 +51502,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The field container.",
               "name": "base"
             },
@@ -51486,6 +51692,26 @@
                 "text": "HTMLInputElement"
               },
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -52197,13 +52423,31 @@
               "default": "false",
               "description": "Whether the listbox popover is open.",
               "fieldName": "open"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "fieldName": "helpText"
             }
           ],
           "superclass": {
             "name": "FluidFormAssociated",
             "module": "/src/internal/form-associated.js"
           },
-          "summary": "Pick a time from a generated list.",
+          "summary": "Pick a time from a generated list.\n\n\nA visible label and help text can be attached directly with the `label` and\n`help-text` attributes; the label is a real `<label for>` inside the shadow\nroot and the help text is announced via `aria-describedby`. For rich label\ncontent, error messages, or a required indicator, wrap the control in\n`fluid-field` instead.",
           "usesTokens": [
             {
               "name": "--fluid-surface-base",
@@ -57369,6 +57613,14 @@
           ],
           "cssParts": [
             {
+              "description": "The visible label (present only when `label` is set).",
+              "name": "label"
+            },
+            {
+              "description": "The help text (present only when `help-text` is set).",
+              "name": "help-text"
+            },
+            {
               "description": "The outer wrapper.",
               "name": "base"
             },
@@ -57387,7 +57639,7 @@
           ],
           "slots": [
             {
-              "description": "Optional `<fluid-option>` children with extra markup.",
+              "description": "Optional `<fluid-option>` children with extra markup. A visible label and help text can be attached directly with the `label` and `help-text` attributes; the label is a real `<label for>` inside the shadow root and the help text is announced via `aria-describedby`. For rich label content, error messages, or a required indicator, wrap the control in `fluid-field` instead.",
               "name": ""
             }
           ],
@@ -57588,6 +57840,26 @@
               "default": "null",
               "description": "Accessible label.",
               "attribute": "aria-label"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "attribute": "help-text"
             },
             {
               "kind": "field",
@@ -58408,6 +58680,24 @@
               "default": "null",
               "description": "Accessible label.",
               "fieldName": "ariaLabel"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible label rendered above the field (a real label/for association).",
+              "fieldName": "label"
+            },
+            {
+              "name": "help-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Help text rendered below the field, announced via aria-describedby.",
+              "fieldName": "helpText"
             },
             {
               "name": "strict",
@@ -60429,6 +60719,128 @@
           "declaration": {
             "name": "weekdayNames",
             "module": "src/internal/date-utils.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/internal/field-chrome.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "FIELD_HELP_ID",
+          "type": {
+            "text": "string"
+          },
+          "default": "\"field-help\"",
+          "description": "Shared \"field chrome\" for form controls: an optional visible label above the\ncontrol and optional help text below it, rendered inside the control's own\nshadow root.\n\n`fluid-field` remains the composition wrapper for rich content (slotted\nlabels, error messages, required indicators). This helper covers the common\ncase where a consumer just wants `label=\"Name\" help-text=\"...\"` directly on\nthe control, the way most component libraries allow. Because the label and\nthe control live in the same shadow root, the association is a real\n`<label for>` reference, with no cross-boundary mirroring needed.\n\nStyling reuses the `--fluid-field-*` tokens documented on `fluid-field`, so\none override ladder themes both the wrapper component and this inline chrome.\n\nIds are fixed (`field-label` / `field-help`): each control renders at most\none chrome, and ids are scoped to that control's shadow root."
+        },
+        {
+          "kind": "variable",
+          "name": "fieldChromeStyles",
+          "default": "css` .field-chrome { display: flex; flex-direction: column; gap: var(--fluid-field-gap, var(--fluid-space-1)); width: 100%; min-width: 0; } .field-chrome-label { margin: 0; color: var(--fluid-field-label-fg, var(--fluid-text-primary)); font-size: var(--fluid-field-label-font-size, var(--fluid-font-size-sm)); font-weight: var(--fluid-field-label-font-weight, var(--fluid-font-weight-medium)); line-height: var(--fluid-font-line-height-normal); } .field-chrome-help { margin: 0; color: var(--fluid-field-description-fg, var(--fluid-text-secondary)); font-size: var(--fluid-field-description-font-size, var(--fluid-font-size-sm)); line-height: var(--fluid-font-line-height-normal); } `"
+        },
+        {
+          "kind": "function",
+          "name": "fieldHelpDescribedBy",
+          "return": {
+            "type": {
+              "text": "string | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "`aria-describedby` value for a control whose chrome shows help text, else undefined."
+        },
+        {
+          "kind": "function",
+          "name": "hasFieldHelp",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "helpText",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "True when the given help text should render (and be referenced by aria-describedby)."
+        },
+        {
+          "kind": "function",
+          "name": "renderFieldChrome",
+          "return": {
+            "type": {
+              "text": "TemplateResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "options",
+              "type": {
+                "text": "FieldChromeOptions"
+              }
+            },
+            {
+              "name": "control",
+              "type": {
+                "text": "TemplateResult"
+              }
+            }
+          ],
+          "description": "Wrap a control's template with label and help rows. When neither is set the\ncontrol template is returned untouched, so existing markup and styling are\ncompletely unaffected for consumers that do not use the feature."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FIELD_HELP_ID",
+          "declaration": {
+            "name": "FIELD_HELP_ID",
+            "module": "src/internal/field-chrome.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fieldChromeStyles",
+          "declaration": {
+            "name": "fieldChromeStyles",
+            "module": "src/internal/field-chrome.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fieldHelpDescribedBy",
+          "declaration": {
+            "name": "fieldHelpDescribedBy",
+            "module": "src/internal/field-chrome.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hasFieldHelp",
+          "declaration": {
+            "name": "hasFieldHelp",
+            "module": "src/internal/field-chrome.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "renderFieldChrome",
+          "declaration": {
+            "name": "renderFieldChrome",
+            "module": "src/internal/field-chrome.ts"
           }
         }
       ]

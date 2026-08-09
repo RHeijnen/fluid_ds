@@ -67,4 +67,16 @@ describe("<fluid-dialog>", () => {
     const close = el.shadowRoot!.querySelector<HTMLElement>(".close")!;
     expect(close.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
   });
+
+  it("renders slot=heading content in the title row as a label alias", async () => {
+    const el = await fixture<FluidDialog>(html`
+      <fluid-dialog open><h2 slot="heading">Settings</h2><p>Body</p></fluid-dialog>
+    `);
+    const labelSlot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="label"]')!;
+    const flattened = labelSlot.assignedNodes({ flatten: true });
+    const hasHeading = flattened.some(
+      (n) => n instanceof HTMLElement && n.textContent === "Settings"
+    );
+    expect(hasHeading).to.equal(true);
+  });
 });

@@ -173,4 +173,29 @@ describe("<fluid-input>", () => {
       "false"
     );
   });
+
+  it("renders no field chrome by default", async () => {
+    const el = await fixture<FluidInput>(html`<fluid-input></fluid-input>`);
+    expect(el.shadowRoot!.querySelector(".field-chrome")).to.equal(null);
+    expect(el.shadowRoot!.querySelector("label")).to.equal(null);
+  });
+
+  it("renders a visible label associated with the input", async () => {
+    const el = await fixture<FluidInput>(html`<fluid-input label="Serial number"></fluid-input>`);
+    const label = el.shadowRoot!.querySelector("label")!;
+    expect(label.textContent).to.contain("Serial number");
+    expect(label.getAttribute("for")).to.equal("input");
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.id).to.equal("input");
+  });
+
+  it("renders help text and wires it to the input via aria-describedby", async () => {
+    const el = await fixture<FluidInput>(
+      html`<fluid-input label="Name" help-text="One per line"></fluid-input>`
+    );
+    const help = el.shadowRoot!.querySelector("#field-help")!;
+    expect(help.textContent).to.contain("One per line");
+    const input = el.shadowRoot!.querySelector("input")!;
+    expect(input.getAttribute("aria-describedby")).to.equal("field-help");
+  });
 });

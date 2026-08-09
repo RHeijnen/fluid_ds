@@ -1,8 +1,14 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
 import { reducedMotion } from "../../internal/motion.js";
+import {
+  fieldChromeStyles,
+  fieldHelpDescribedBy,
+  renderFieldChrome
+} from "../../internal/field-chrome.js";
 
 export type FluidTimeFormat = "12h" | "24h";
 
@@ -64,6 +70,15 @@ function formatLabel(value: string, format: FluidTimeFormat): string {
  *
  * @summary Pick a time from a generated list.
  *
+ *
+ * A visible label and help text can be attached directly with the `label` and
+ * `help-text` attributes; the label is a real `<label for>` inside the shadow
+ * root and the help text is announced via `aria-describedby`. For rich label
+ * content, error messages, or a required indicator, wrap the control in
+ * `fluid-field` instead.
+ *
+ * @csspart label - The visible label (present only when `label` is set).
+ * @csspart help-text - The help text (present only when `help-text` is set).
  * @csspart base - The field container.
  * @csspart input - The text input.
  * @csspart trigger - The clock toggle button.
@@ -106,6 +121,7 @@ export class FluidTimePicker extends FluidFormAssociated {
 
   static override styles = [
     reducedMotion,
+    fieldChromeStyles,
     css`
       :host {
         display: inline-block;
@@ -286,6 +302,12 @@ export class FluidTimePicker extends FluidFormAssociated {
   @state() private activeIndex = -1;
 
   @query("input") private inputEl!: HTMLInputElement;
+
+  /** Visible label rendered above the field (a real label/for association). */
+  @property() label = "";
+
+  /** Help text rendered below the field, announced via aria-describedby. */
+  @property({ attribute: "help-text" }) helpText = "";
   @query(".trigger") private triggerEl!: HTMLButtonElement;
   @query(".listbox") private listboxEl!: HTMLElement;
 
@@ -529,9 +551,12 @@ export class FluidTimePicker extends FluidFormAssociated {
   override render(): TemplateResult {
     const opts = this.filteredOptions;
     const active = this.activeIndex >= 0 ? opts[this.activeIndex] : undefined;
-    return html`
+    return renderFieldChrome(
+      { label: this.label, helpText: this.helpText, for: "input" },
+      html`
       <div part="base" class="base">
         <input
+          id="input"
           part="input"
           type="text"
           .value=${this.typed}
@@ -543,6 +568,7 @@ export class FluidTimePicker extends FluidFormAssociated {
           aria-haspopup="listbox"
           aria-expanded=${this.open ? "true" : "false"}
           aria-controls=${this.listboxId}
+          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
           aria-activedescendant=${this.open && active ? active.id : ""}
           @input=${this.onInput}
           @change=${this.commitTyped}
@@ -592,6 +618,7 @@ export class FluidTimePicker extends FluidFormAssociated {
               `
             )}
       </ul>
-    `;
+    `
+    );
   }
 }

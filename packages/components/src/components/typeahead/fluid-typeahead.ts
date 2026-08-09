@@ -5,6 +5,11 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
 import { autoUpdate, computePosition, flip, offset, size } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import {
+  fieldChromeStyles,
+  fieldHelpDescribedBy,
+  renderFieldChrome
+} from "../../internal/field-chrome.js";
 import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 
 let counter = 0;
@@ -88,6 +93,15 @@ export type TypeaheadOptionRenderer = (
  *
  * @slot - Optional `<fluid-option>` children with extra markup.
  *
+ *
+ * A visible label and help text can be attached directly with the `label` and
+ * `help-text` attributes; the label is a real `<label for>` inside the shadow
+ * root and the help text is announced via `aria-describedby`. For rich label
+ * content, error messages, or a required indicator, wrap the control in
+ * `fluid-field` instead.
+ *
+ * @csspart label - The visible label (present only when `label` is set).
+ * @csspart help-text - The help text (present only when `help-text` is set).
  * @csspart base - The outer wrapper.
  * @csspart input - The text input.
  * @csspart listbox - The popover listbox.
@@ -138,7 +152,9 @@ export type TypeaheadOptionRenderer = (
 export class FluidTypeahead extends FluidFormAssociated {
   static override formAssociated = true;
 
-  static override styles = css`
+  static override styles = [
+    fieldChromeStyles,
+    css`
     :host {
       display: inline-flex;
       width: 100%;
@@ -358,7 +374,8 @@ export class FluidTypeahead extends FluidFormAssociated {
     .option.selected .match {
       color: inherit;
     }
-  `;
+  `
+  ];
 
   @query("input") private inputEl!: HTMLInputElement;
   @query(".input-wrap") private wrapEl!: HTMLElement;
@@ -449,6 +466,12 @@ export class FluidTypeahead extends FluidFormAssociated {
 
   /** Accessible label. */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
+
+  /** Visible label rendered above the field (a real label/for association). */
+  @property() label = "";
+
+  /** Help text rendered below the field, announced via aria-describedby. */
+  @property({ attribute: "help-text" }) helpText = "";
 
   /**
    * When true, restricts the input value to an option's value, typing
@@ -806,7 +829,9 @@ export class FluidTypeahead extends FluidFormAssociated {
   }
 
   override render(): TemplateResult {
-    return html`
+    return renderFieldChrome(
+      { label: this.label, helpText: this.helpText, for: "input" },
+      html`
       <div part="base" class="base">
         <div
           class=${classMap({
@@ -828,6 +853,7 @@ export class FluidTypeahead extends FluidFormAssociated {
             aria-activedescendant=${ifDefined(this.open ? this.activeId : undefined)}
             aria-autocomplete="list"
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+            aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
             autocomplete="off"
             spellcheck="false"
             .value=${live(this.value)}
@@ -884,6 +910,7 @@ export class FluidTypeahead extends FluidFormAssociated {
         </div>
         <slot @slotchange=${() => this.requestUpdate()} style="display:none"></slot>
       </div>
-    `;
+    `
+    );
   }
 }
