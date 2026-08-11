@@ -29886,6 +29886,48 @@
             },
             {
               "kind": "field",
+              "name": "hasIcon",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hasBadge",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "handleOptionalSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "slot",
+                  "type": {
+                    "text": "HTMLSlotElement"
+                  }
+                },
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "\"icon\" | \"badge\""
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
               "name": "#cleanups",
               "privacy": "private",
               "default": "new Set<() => void>()",
@@ -42115,6 +42157,16 @@
               "return": {
                 "type": {
                   "text": "HTMLElement[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "deepestActiveElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Element | null"
                 }
               }
             },

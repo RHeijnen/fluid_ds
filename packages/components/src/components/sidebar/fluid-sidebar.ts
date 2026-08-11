@@ -291,19 +291,31 @@ export class FluidSidebar extends FluidElement {
     if (!this.baseEl) return [];
     const selector =
       'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-    const inShadow = Array.from(this.baseEl.querySelectorAll<HTMLElement>(selector));
-    const slotted: HTMLElement[] = [];
-    for (const slot of this.baseEl.querySelectorAll<HTMLSlotElement>("slot")) {
-      for (const node of slot.assignedElements({ flatten: true })) {
-        if (node instanceof HTMLElement) {
-          if (node.matches(selector)) slotted.push(node);
-          slotted.push(...Array.from(node.querySelectorAll<HTMLElement>(selector)));
-        }
+    const result: HTMLElement[] = [];
+    const visit = (node: Element): void => {
+      if (node instanceof HTMLElement && node.matches(selector)) result.push(node);
+      if (node instanceof HTMLSlotElement) {
+        node.assignedElements({ flatten: true }).forEach(visit);
+        return;
       }
+      const children = node.shadowRoot?.children ?? node.children;
+      Array.from(children).forEach(visit);
+    };
+    Array.from(this.baseEl.children).forEach(visit);
+    const active = this.deepestActiveElement();
+    return result.filter((el) => {
+      if (el === active) return true;
+      const style = getComputedStyle(el);
+      return el.getClientRects().length > 0 && style.display !== "none" && style.visibility !== "hidden";
+    });
+  }
+
+  private deepestActiveElement(): Element | null {
+    let active = (this.getRootNode() as Document | ShadowRoot).activeElement;
+    while (active instanceof HTMLElement && active.shadowRoot?.activeElement) {
+      active = active.shadowRoot.activeElement;
     }
-    return [...inShadow, ...slotted].filter(
-      (el) => el.offsetParent !== null || el === document.activeElement
-    );
+    return active;
   }
 
   private firstFocusable(): HTMLElement | undefined {
@@ -327,21 +339,13 @@ export class FluidSidebar extends FluidElement {
       const first = items[0];
       const last = items[items.length - 1];
       if (!first || !last) return;
-      const root = this.getRootNode() as Document;
-      const active = root.activeElement as HTMLElement | null;
-      const path = e.composedPath();
-      const inside = path.includes(this.baseEl);
-      if (e.shiftKey) {
-        if (active === first || !inside) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (active === last || !inside) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
+      const active = this.deepestActiveElement();
+      const index = items.findIndex((item) => item === active);
+      const next = e.shiftKey
+        ? index <= 0 ? last : items[index - 1]
+        : index < 0 || index === items.length - 1 ? first : items[index + 1];
+      e.preventDefault();
+      next?.focus();
     }
   };
 

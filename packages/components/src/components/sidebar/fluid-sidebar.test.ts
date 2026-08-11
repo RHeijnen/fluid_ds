@@ -1,5 +1,6 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "../nav-list/define.js";
 import type { FluidSidebar } from "./fluid-sidebar.js";
 
 const tokens =
@@ -79,6 +80,43 @@ describe("<fluid-sidebar>", () => {
     el.shadowRoot!.querySelector<HTMLElement>(".backdrop")!.click();
     await elementUpdated(el);
     expect(el.open).to.be.false;
+  });
+
+  it("moves focus through controls nested in slotted component shadow roots", async () => {
+    const el = await fixture<FluidSidebar>(html`
+      <fluid-sidebar overlay aria-label="Nav">
+        <fluid-nav-list label="Product navigation">
+          <fluid-nav-item href="#first">First</fluid-nav-item>
+          <fluid-nav-item href="#last">Last</fluid-nav-item>
+        </fluid-nav-list>
+      </fluid-sidebar>
+    `);
+    el.hide();
+    await elementUpdated(el);
+    el.show();
+    await elementUpdated(el);
+    await aTimeout(30);
+    const items = Array.from(el.querySelectorAll("fluid-nav-item"));
+    const first = items[0]!.shadowRoot!.querySelector<HTMLAnchorElement>("a")!;
+    const last = items[1]!.shadowRoot!.querySelector<HTMLAnchorElement>("a")!;
+    expect(items[0]!.shadowRoot!.activeElement).to.equal(first);
+
+    first.dispatchEvent(new KeyboardEvent("keydown", {
+      key: "Tab",
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    }));
+    expect(items[1]!.shadowRoot!.activeElement).to.equal(last);
+
+    last.focus();
+    last.dispatchEvent(new KeyboardEvent("keydown", {
+      key: "Tab",
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    }));
+    expect(items[0]!.shadowRoot!.activeElement).to.equal(first);
   });
 
   it("inline mode does not render a backdrop", async () => {

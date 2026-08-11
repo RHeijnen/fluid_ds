@@ -1,5 +1,5 @@
 import { html, css, nothing, type TemplateResult } from "lit";
-import { property } from "lit/decorators.js";
+import { property, state } from "lit/decorators.js";
 import { reducedMotion } from "../../internal/motion.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -116,6 +116,11 @@ export class FluidNavItem extends FluidElement {
         align-items: center;
       }
 
+      .icon[hidden],
+      .badge[hidden] {
+        display: none;
+      }
+
       .label {
         flex: 1 1 auto;
         min-width: 0;
@@ -156,6 +161,15 @@ export class FluidNavItem extends FluidElement {
    */
   @property({ type: Boolean, reflect: true }) current = false;
 
+  @state() private hasIcon = false;
+  @state() private hasBadge = false;
+
+  private handleOptionalSlotChange(slot: HTMLSlotElement, target: "icon" | "badge"): void {
+    const populated = slot.assignedElements({ flatten: true }).length > 0;
+    if (target === "icon") this.hasIcon = populated;
+    else this.hasBadge = populated;
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
     if (!this.hasAttribute("role")) this.setAttribute("role", "listitem");
@@ -172,9 +186,21 @@ export class FluidNavItem extends FluidElement {
           rel=${this.rel || nothing}
           aria-current=${this.current ? "page" : nothing}
         >
-          <span part="icon" class="icon"><slot name="icon"></slot></span>
+          <span part="icon" class="icon" ?hidden=${!this.hasIcon}
+            ><slot
+              name="icon"
+              @slotchange=${(event: Event) =>
+                this.handleOptionalSlotChange(event.currentTarget as HTMLSlotElement, "icon")}
+            ></slot
+          ></span>
           <span part="label" class="label"><slot></slot></span>
-          <span part="badge" class="badge"><slot name="badge"></slot></span>
+          <span part="badge" class="badge" ?hidden=${!this.hasBadge}
+            ><slot
+              name="badge"
+              @slotchange=${(event: Event) =>
+                this.handleOptionalSlotChange(event.currentTarget as HTMLSlotElement, "badge")}
+            ></slot
+          ></span>
         </a>
       </div>
     `;

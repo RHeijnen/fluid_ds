@@ -20,9 +20,7 @@ describe("<fluid-nav-list>", () => {
     const el = await fixture<FluidNavList>(
       html`<fluid-nav-list><fluid-nav-item href="/a">A</fluid-nav-item></fluid-nav-list>`
     );
-    expect(el.shadowRoot!.querySelector("nav")!.getAttribute("aria-label")).to.equal(
-      "Navigation"
-    );
+    expect(el.shadowRoot!.querySelector("nav")!.getAttribute("aria-label")).to.equal("Navigation");
   });
 });
 
@@ -37,9 +35,7 @@ describe("<fluid-nav-item>", () => {
   });
 
   it("carries role=listitem so list semantics hold", async () => {
-    const el = await fixture<FluidNavItem>(
-      html`<fluid-nav-item href="/a">A</fluid-nav-item>`
-    );
+    const el = await fixture<FluidNavItem>(html`<fluid-nav-item href="/a">A</fluid-nav-item>`);
     expect(el.getAttribute("role")).to.equal("listitem");
   });
 
@@ -53,9 +49,7 @@ describe("<fluid-nav-item>", () => {
   });
 
   it("omits aria-current when not current", async () => {
-    const el = await fixture<FluidNavItem>(
-      html`<fluid-nav-item href="/a">A</fluid-nav-item>`
-    );
+    const el = await fixture<FluidNavItem>(html`<fluid-nav-item href="/a">A</fluid-nav-item>`);
     expect(el.shadowRoot!.querySelector("a")!.hasAttribute("aria-current")).to.be.false;
   });
 
@@ -69,14 +63,10 @@ describe("<fluid-nav-item>", () => {
   });
 
   it("toggles aria-current when current changes", async () => {
-    const el = await fixture<FluidNavItem>(
-      html`<fluid-nav-item href="/a">A</fluid-nav-item>`
-    );
+    const el = await fixture<FluidNavItem>(html`<fluid-nav-item href="/a">A</fluid-nav-item>`);
     el.current = true;
     await elementUpdated(el);
-    expect(el.shadowRoot!.querySelector("a")!.getAttribute("aria-current")).to.equal(
-      "page"
-    );
+    expect(el.shadowRoot!.querySelector("a")!.getAttribute("aria-current")).to.equal("page");
   });
 
   it("exposes icon and badge slots", async () => {
@@ -89,6 +79,16 @@ describe("<fluid-nav-item>", () => {
     );
     expect(el.shadowRoot!.querySelector('slot[name="icon"]')).to.exist;
     expect(el.shadowRoot!.querySelector('slot[name="badge"]')).to.exist;
+    await aTimeout(0);
+    expect(el.shadowRoot!.querySelector<HTMLElement>(".icon")!.hidden).to.be.false;
+    expect(el.shadowRoot!.querySelector<HTMLElement>(".badge")!.hidden).to.be.false;
+  });
+
+  it("does not reserve flex gaps for empty optional slots", async () => {
+    const el = await fixture<FluidNavItem>(html`<fluid-nav-item href="/a">Label</fluid-nav-item>`);
+    await aTimeout(0);
+    expect(el.shadowRoot!.querySelector<HTMLElement>(".icon")!.hidden).to.be.true;
+    expect(el.shadowRoot!.querySelector<HTMLElement>(".badge")!.hidden).to.be.true;
   });
 });
 
