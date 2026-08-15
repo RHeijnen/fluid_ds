@@ -183,6 +183,18 @@ export class FluidInfiniteTable extends LitElement {
         var(--fluid-surface-base, #fff)
       );
     }
+    /*
+     * Optional second toolbar line. Spans both columns so it reaches the
+     * toolbar's own edges rather than stopping at the filters column, and is
+     * removed from layout entirely when nothing is slotted — the toolbar's
+     * gap would otherwise reserve a visible band for an empty row.
+     */
+    .toolbar-secondary {
+      grid-column: 1 / -1;
+    }
+    .toolbar-secondary[hidden] {
+      display: none;
+    }
     .toolbar-actions {
       display: flex;
       align-items: center;
@@ -728,6 +740,18 @@ export class FluidInfiniteTable extends LitElement {
   @state() private grabbedKey: string | null = null;
   @state() private draggingKey: string | null = null;
   @state() private announcement = "";
+  @state() private hasToolbarSecondary = false;
+
+  private handleToolbarSecondaryChange = (event: Event) => {
+    const slot = event.target as HTMLSlotElement;
+    this.hasToolbarSecondary = slot.assignedNodes().some((node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) return true;
+      return (
+        node.nodeType === Node.TEXT_NODE &&
+        (node.textContent ?? "").trim().length > 0
+      );
+    });
+  };
   /**
    * What each column currently measures, for the grip to report.
    *
@@ -1732,6 +1756,12 @@ export class FluidInfiniteTable extends LitElement {
                 </button>`
               : nothing}
             <slot name="toolbar-actions"></slot>
+          </div>
+          <div class="toolbar-secondary" ?hidden=${!this.hasToolbarSecondary}>
+            <slot
+              name="toolbar-secondary"
+              @slotchange=${this.handleToolbarSecondaryChange}
+            ></slot>
           </div>
         </div>
 
