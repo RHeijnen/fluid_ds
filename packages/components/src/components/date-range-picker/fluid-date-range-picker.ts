@@ -1,5 +1,6 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
+import { live } from "lit/directives/live.js";
 import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
 import { reducedMotion } from "../../internal/motion.js";
@@ -69,7 +70,8 @@ let counter = 0;
  * @uses-token --fluid-focus-ring-width - Focus ring width.
  * @uses-token --fluid-target-min - Min target size.
  *
- * @fires fluid-change - The range was applied. `detail: { start, end, startDate, endDate }`.
+ * @fires fluid-change - The range was applied, by calendar or by typing when
+ *   `typeable` is set. `detail: { start, end, startDate, endDate }`.
  * @fires fluid-open - The popover opened.
  * @fires fluid-close - The popover closed.
  */
@@ -212,6 +214,27 @@ export class FluidDateRangePicker extends FluidFormAssociated {
 
   /** Hide the preset column. */
   @property({ type: Boolean, attribute: "no-presets" }) noPresets = false;
+  /**
+   * Let the range be typed as well as picked. Off by default: the field is
+   * read-only and the calendar is the only way in, which is what most callers
+   * want. Turned on, the text is parsed on Enter or blur and applied like a
+   * calendar selection; anything unparseable reverts to the committed range.
+   */
+  @property({ type: Boolean, reflect: true }) typeable = false;
+  /**
+   * Fixed day/month/year pattern for the text side of the field, e.g.
+   * `DD-MM-YY`. Governs display *and* typed parsing together, so what the
+   * field shows is always something it will accept back.
+   *
+   * Unset, the field formats via `format` + `locale` and reads typed text as
+   * ISO or whatever the platform parser makes of it. Set it when the text has
+   * to match an existing control exactly — a locale-formatted `8/9/26` and a
+   * `DD-MM-YY` `09-08-26` are both valid-looking and mean different days.
+   *
+   * Tokens: `DD`/`D` day, `MM`/`M` month, `YYYY`/`YY` year. Anything else is
+   * a literal.
+   */
+  @property({ attribute: "date-pattern" }) datePattern: string | null = null;
 
   /** Preset list (property only; defaults to the built-in set). */
   @property({ attribute: false }) presets: RangePreset[] = defaultRangePresets;
@@ -249,8 +272,89 @@ export class FluidDateRangePicker extends FluidFormAssociated {
   private fmt(iso: string | null): string {
     const d = fromISODate(iso);
     if (!d) return "";
+    if (this.datePattern) return this.formatWithPattern(d, this.datePattern);
     const o = fmtOpts(this.format);
     return o ? formatDate(d, this.locale, o) : iso!;
+  }
+
+  private formatWithPattern(date: Date, pattern: string): string {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const pad2 = (n: number): string => String(n).padStart(2, "0");
+    return pattern.replace(/YYYY|YY|MM|M|DD|D/g, (token) => {
+      switch (token) {
+        case "YYYY":
+          return String(year);
+        case "YY":
+          return pad2(year % 100);
+        case "MM":
+          return pad2(month);
+        case "M":
+          return String(month);
+        case "DD":
+          return pad2(day);
+        default:
+          return String(day);
+      }
+    });
+  }
+
+  /**
+   * Read text written in {@link datePattern}. Returns null on anything that
+   * does not fit, so the caller can fall back or revert — a half-typed date
+   * must not silently become some other day.
+   */
+  private parseWithPattern(text: string, pattern: string): string | null {
+    const order: string[] = [];
+    let source = "";
+    let i = 0;
+    while (i < pattern.length) {
+      const token = ["YYYY", "YY", "MM", "DD", "M", "D"].find((t) =>
+        pattern.startsWith(t, i)
+      );
+      if (token) {
+        order.push(token[0] === "Y" ? "year" : token[0] === "M" ? "month" : "day");
+        source +=
+          token === "YYYY"
+            ? "(\\d{4})"
+            : token.length === 2
+              ? "(\\d{2})"
+              : "(\\d{1,2})";
+        i += token.length;
+      } else {
+        source += pattern[i]!.replace(/[^A-Za-z0-9]/g, (c) => "\\" + c);
+        i += 1;
+      }
+    }
+
+    const match = new RegExp("^" + source + "$").exec(text.trim());
+    if (!match) return null;
+
+    const parts: Record<string, number> = {};
+    order.forEach((name, index) => {
+      parts[name] = Number(match[index + 1]);
+    });
+    if (
+      !Number.isFinite(parts["year"]) ||
+      !Number.isFinite(parts["month"]) ||
+      !Number.isFinite(parts["day"])
+    ) {
+      return null;
+    }
+
+    // Two-digit years land in the current century, matching the pattern's intent.
+    const year =
+      parts["year"]! < 100
+        ? Math.floor(new Date().getFullYear() / 100) * 100 + parts["year"]!
+        : parts["year"]!;
+    const iso =
+      String(year).padStart(4, "0") +
+      "-" +
+      String(parts["month"]).padStart(2, "0") +
+      "-" +
+      String(parts["day"]).padStart(2, "0");
+    return fromISODate(iso) ? iso : null;
   }
 
   private get displayText(): string {
@@ -312,6 +416,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
     // the dialog container itself (tabindex=-1); from there the user Tabs/arrows
     // into the grid. We deliberately do NOT reach into the calendar's nested
     // shadow root (fragile + the focus would escape this dialog's subtree).
+    // ...except when the field is typeable. That rationale rests on the input
+    // being readonly; a typeable one is a real text field the user may be
+    // about to type or paste into, and it Tabs into the dialog on its own.
+    // Stealing focus here would send the paste somewhere it cannot be seen.
+    if (this.typeable) return;
     requestAnimationFrame(() => {
       const activePreset = this.dialogEl?.querySelector<HTMLButtonElement>(
         ".preset[aria-pressed='true']"
@@ -374,6 +483,146 @@ export class FluidDateRangePicker extends FluidFormAssociated {
     if (this.tempStart && !this.tempEnd) this.hover = (e as CustomEvent).detail?.iso as string;
   };
 
+  /**
+   * Focusing the field opens the calendar, so reaching it by keyboard or by
+   * clicking the text offers the same thing a click on the trigger does.
+   * Suppressed while returning focus after apply/cancel, which would otherwise
+   * reopen the dialog the moment it closed.
+   */
+  private onInputFocus = (): void => {
+    if (this.disabled || this.suppressFocusOpen) return;
+    this.open = true;
+    if (!this.typeable) return;
+    /* Select the whole range so one click is enough to paste over it. Deferred
+       a frame because the browser places the caret after this event, which
+       would drop a selection made here. */
+    requestAnimationFrame(() => {
+      if (this.inputEl && this.renderRoot instanceof ShadowRoot &&
+          this.renderRoot.activeElement === this.inputEl) {
+        this.inputEl.select();
+      }
+    });
+  };
+
+  private suppressFocusOpen = false;
+
+  /** Return focus to the field without the focus handler reopening it. */
+  private refocusInput(): void {
+    this.suppressFocusOpen = true;
+    this.inputEl?.focus();
+    this.suppressFocusOpen = false;
+  }
+
+  private onTyped = (e: Event): void => {
+    if (!this.typeable) return;
+    this.typed = (e.target as HTMLInputElement).value;
+  };
+
+  private onInputKeydown = (e: KeyboardEvent): void => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      this.open = true;
+      return;
+    }
+    if (!this.typeable) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      this.commitTyped();
+      this.open = false;
+    } else if (e.key === "Escape" && !this.open) {
+      e.preventDefault();
+      this.typed = this.displayText;
+    }
+  };
+
+  private onTypedBlur = (e: FocusEvent): void => {
+    if (!this.typeable) return;
+    /* Clicking a day or a preset blurs the input on the way into the dialog.
+       Committing there would fight the click, so only commit once focus has
+       actually left the component. */
+    const next = e.relatedTarget as Node | null;
+    if (next && this.renderRoot instanceof ShadowRoot && this.renderRoot.contains(next)) {
+      return;
+    }
+    this.commitTyped();
+  };
+
+  /**
+   * Apply what was typed, or put the committed range back.
+   *
+   * Two dates separated by an en dash, a hyphen, a slash or the word "to".
+   * Each side is read as ISO first, then handed to the platform parser, so
+   * `2026-08-09 - 2026-08-15` is always understood and the locale-formatted
+   * text the field itself displays round-trips. A reversed pair is swapped
+   * rather than rejected, and min/max still clamp.
+   */
+  private commitTyped(): void {
+    const text = this.typed.trim();
+    if (!text) {
+      if (this.start || this.end) {
+        this.start = null;
+        this.end = null;
+        this.emitRangeChange();
+      }
+      return;
+    }
+
+    const parsed = this.parseTypedRange(text);
+    if (!parsed) {
+      this.typed = this.displayText;
+      return;
+    }
+
+    let [start, end] = parsed;
+    if (start > end) [start, end] = [end, start];
+    if (this.min && start < this.min) start = this.min;
+    if (this.max && end > this.max) end = this.max;
+
+    if (start === this.start && end === this.end) {
+      this.typed = this.displayText;
+      return;
+    }
+    this.start = start;
+    this.end = end;
+    this.emitRangeChange();
+  }
+
+  private parseTypedRange(text: string): [string, string] | null {
+    const halves = text.split(/\s*(?:–|—|\bto\b|\/|-(?=\s)|(?<=\s)-)\s*/i);
+    const parts = halves.map((part) => part.trim()).filter(Boolean);
+    const [from, to] = parts;
+    if (parts.length !== 2 || !from || !to) return null;
+    const start = this.parseTypedDate(from);
+    const end = this.parseTypedDate(to);
+    return start && end ? [start, end] : null;
+  }
+
+  private parseTypedDate(text: string): string | null {
+    if (this.datePattern) {
+      return this.parseWithPattern(text, this.datePattern);
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      return fromISODate(text) ? text : null;
+    }
+    const parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? null : toISODate(parsed);
+  }
+
+  private emitRangeChange(): void {
+    this.dispatchEvent(
+      new CustomEvent("fluid-change", {
+        detail: {
+          start: this.start,
+          end: this.end,
+          startDate: fromISODate(this.start),
+          endDate: fromISODate(this.end)
+        },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
   private selectPreset(p: RangePreset): void {
     const r = p.getRange();
     this.tempStart = toISODate(r.start);
@@ -395,11 +644,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       })
     );
     this.open = false;
-    this.inputEl?.focus();
+    this.refocusInput();
   }
   private cancel(): void {
     this.open = false;
-    this.inputEl?.focus();
+    this.refocusInput();
   }
 
   private onDialogKeydown = (e: KeyboardEvent): void => {
@@ -433,16 +682,19 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         <input
           part="input"
           type="text"
-          .value=${this.typed}
+          .value=${live(this.typed)}
           placeholder=${this.placeholder}
           ?disabled=${this.disabled}
-          readonly
+          ?readonly=${this.readonly || !this.typeable}
           role="combobox"
           aria-haspopup="dialog"
           aria-expanded=${this.open ? "true" : "false"}
           aria-controls=${this.dialogId}
-          @click=${() => !this.disabled && (this.open = true)}
-          @keydown=${(e: KeyboardEvent) => { if (e.key === "ArrowDown") { e.preventDefault(); this.open = true; } }}
+          @click=${() => !this.disabled && !this.typeable && (this.open = true)}
+          @focus=${this.onInputFocus}
+          @input=${this.onTyped}
+          @blur=${this.onTypedBlur}
+          @keydown=${this.onInputKeydown}
         />
         <button part="trigger" class="trigger" type="button" aria-label="Choose date range"
           aria-haspopup="dialog" aria-expanded=${this.open ? "true" : "false"} ?disabled=${this.disabled}

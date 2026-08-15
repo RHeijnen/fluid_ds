@@ -12702,6 +12702,27 @@
             },
             {
               "kind": "field",
+              "name": "typeable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Let the range be typed as well as picked. Off by default: the field is\nread-only and the calendar is the only way in, which is what most callers\nwant. Turned on, the text is parsed on Enter or blur and applied like a\ncalendar selection; anything unparseable reverts to the committed range.",
+              "attribute": "typeable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "datePattern",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Fixed day/month/year pattern for the text side of the field, e.g.\n`DD-MM-YY`. Governs display *and* typed parsing together, so what the\nfield shows is always something it will accept back.\n\nUnset, the field formats via `format` + `locale` and reads typed text as\nISO or whatever the platform parser makes of it. Set it when the text has\nto match an existing control exactly — a locale-formatted `8/9/26` and a\n`DD-MM-YY` `09-08-26` are both valid-looking and mean different days.\n\nTokens: `DD`/`D` day, `MM`/`M` month, `YYYY`/`YY` year. Anything else is\na literal.",
+              "attribute": "date-pattern"
+            },
+            {
+              "kind": "field",
               "name": "presets",
               "type": {
                 "text": "RangePreset[]"
@@ -12836,6 +12857,55 @@
               ]
             },
             {
+              "kind": "method",
+              "name": "formatWithPattern",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                },
+                {
+                  "name": "pattern",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "parseWithPattern",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "pattern",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Read text written in datePattern. Returns null on anything that\ndoes not fit, so the caller can fall back or revert — a half-typed date\nmust not silently become some other day."
+            },
+            {
               "kind": "field",
               "name": "displayText",
               "type": {
@@ -12959,6 +13029,104 @@
               "kind": "field",
               "name": "onHover",
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onInputFocus",
+              "privacy": "private",
+              "description": "Focusing the field opens the calendar, so reaching it by keyboard or by\nclicking the text offers the same thing a click on the trigger does.\nSuppressed while returning focus after apply/cancel, which would otherwise\nreopen the dialog the moment it closed."
+            },
+            {
+              "kind": "field",
+              "name": "suppressFocusOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "refocusInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Return focus to the field without the focus handler reopening it."
+            },
+            {
+              "kind": "field",
+              "name": "onTyped",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onInputKeydown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onTypedBlur",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "commitTyped",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Apply what was typed, or put the committed range back.\n\nTwo dates separated by an en dash, a hyphen, a slash or the word \"to\".\nEach side is read as ISO first, then handed to the platform parser, so\n`2026-08-09 - 2026-08-15` is always understood and the locale-formatted\ntext the field itself displays round-trips. A reversed pair is swapped\nrather than rejected, and min/max still clamp."
+            },
+            {
+              "kind": "method",
+              "name": "parseTypedRange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "[string, string] | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "parseTypedDate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emitRangeChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
             },
             {
               "kind": "method",
@@ -13358,7 +13526,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "The range was applied. `detail: { start, end, startDate, endDate }`."
+              "description": "The range was applied, by calendar or by typing when `typeable` is set. `detail: { start, end, startDate, endDate }`."
             }
           ],
           "attributes": [
@@ -13476,6 +13644,24 @@
               "default": "false",
               "description": "Hide the preset column.",
               "fieldName": "noPresets"
+            },
+            {
+              "name": "typeable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Let the range be typed as well as picked. Off by default: the field is\nread-only and the calendar is the only way in, which is what most callers\nwant. Turned on, the text is parsed on Enter or blur and applied like a\ncalendar selection; anything unparseable reverts to the committed range.",
+              "fieldName": "typeable"
+            },
+            {
+              "name": "date-pattern",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Fixed day/month/year pattern for the text side of the field, e.g.\n`DD-MM-YY`. Governs display *and* typed parsing together, so what the\nfield shows is always something it will accept back.\n\nUnset, the field formats via `format` + `locale` and reads typed text as\nISO or whatever the platform parser makes of it. Set it when the text has\nto match an existing control exactly — a locale-formatted `8/9/26` and a\n`DD-MM-YY` `09-08-26` are both valid-looking and mean different days.\n\nTokens: `DD`/`D` day, `MM`/`M` month, `YYYY`/`YY` year. Anything else is\na literal.",
+              "fieldName": "datePattern"
             },
             {
               "name": "open",
