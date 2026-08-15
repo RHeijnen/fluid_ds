@@ -1740,15 +1740,20 @@ export class FluidInfiniteTable extends LitElement {
           <div>${hasFilters ? html`<slot name="filters"></slot>` : nothing}</div>
           <div class="toolbar-actions">
             <span part="progress" class="progress" role="status">
-              <strong>${this.rows.length.toLocaleString()}</strong> loaded
-              ${this.total
-                ? html`of <strong>${this.total.toLocaleString()}</strong>`
-                : nothing}
-              ${this.availableTotal && this.availableTotal !== this.total
-                ? html`matching ·
-                    <strong>${this.availableTotal.toLocaleString()}</strong>
-                    total`
-                : nothing}
+              ${this.rows.length === 0
+                ? html`<strong>0</strong> results`
+                : html`<strong>${this.rows.length.toLocaleString()}</strong>
+                    loaded
+                    ${this.total
+                      ? html`of <strong>${this.total.toLocaleString()}</strong>`
+                      : nothing}
+                    ${this.availableTotal && this.availableTotal !== this.total
+                      ? html`matching ·
+                          <strong>
+                            ${this.availableTotal.toLocaleString()}
+                          </strong>
+                          total`
+                      : nothing}`}
             </span>
             ${this.configurable
               ? html`<button type="button" @click=${this.openColumns}>
