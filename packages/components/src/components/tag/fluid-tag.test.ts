@@ -18,6 +18,34 @@ describe("<fluid-tag>", () => {
     expect(el.shadowRoot!.querySelector(".remove")).to.exist;
   });
 
+  it("names the remove button 'Remove' by default", async () => {
+    const el = await fixture<FluidTag>(html`<fluid-tag removable>Beta</fluid-tag>`);
+    expect(el.shadowRoot!.querySelector(".remove")!.getAttribute("aria-label")).to.equal(
+      "Remove"
+    );
+  });
+
+  it("takes the remove button's name from remove-label", async () => {
+    /* The × does not always mean "drop this tag": a consumer may hang an
+       action off it whose outcome is something else, and this name is the
+       only thing announcing which. */
+    const el = await fixture<FluidTag>(
+      html`<fluid-tag removable remove-label="Back to CURO">Domain: PAYTER</fluid-tag>`
+    );
+    expect(el.shadowRoot!.querySelector(".remove")!.getAttribute("aria-label")).to.equal(
+      "Back to CURO"
+    );
+  });
+
+  it("re-names the remove button when removeLabel changes", async () => {
+    const el = await fixture<FluidTag>(html`<fluid-tag removable>Beta</fluid-tag>`);
+    el.removeLabel = "Back to CURO";
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector(".remove")!.getAttribute("aria-label")).to.equal(
+      "Back to CURO"
+    );
+  });
+
   it("fires fluid-remove on remove click", async () => {
     const el = await fixture<FluidTag>(html`<fluid-tag removable>Beta</fluid-tag>`);
     const button = el.shadowRoot!.querySelector<HTMLButtonElement>(".remove")!;

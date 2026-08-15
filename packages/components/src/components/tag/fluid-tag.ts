@@ -160,6 +160,19 @@ export class FluidTag extends FluidElement {
   /** Show a removal × button. */
   @property({ type: Boolean, reflect: true }) removable = false;
 
+  /**
+   * Accessible name for the remove button.
+   *
+   * The button carries no text, so its name is the only thing announcing what
+   * activating it does. "Remove" is right when the tag stands for something
+   * the user added and can drop, but a consumer may use the same × for an
+   * action that is not a removal at all — a scope chip whose × returns to a
+   * default, say — and a screen reader would then describe the wrong outcome.
+   * Living in the shadow root, it cannot be corrected from the outside, so it
+   * is exposed here.
+   */
+  @property({ attribute: "remove-label" }) removeLabel = "Remove";
+
   /** Disabled state, removal button can't be activated. */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
@@ -181,7 +194,7 @@ export class FluidTag extends FluidElement {
                 part="remove"
                 class="remove"
                 type="button"
-                aria-label="Remove"
+                aria-label=${this.removeLabel}
                 ?disabled=${this.disabled}
                 @click=${this.handleRemove}
               >
