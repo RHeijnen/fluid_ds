@@ -184,6 +184,49 @@ export class FluidTypeahead extends FluidFormAssociated {
       color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
     }
 
+    /*
+     * Prefix / suffix render as flush sibling sections of the field, divided
+     * by a rule — the same treatment fluid-input gives them, so a typeahead
+     * and an input carrying the same affix look identical.
+     */
+    .affix {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: stretch;
+      flex-shrink: 0;
+      color: var(--fluid-typeahead-affix-fg, var(--fluid-text-secondary));
+      background: var(--fluid-typeahead-affix-bg, var(--fluid-surface-subtle));
+    }
+    .affix[hidden] {
+      display: none;
+    }
+    .prefix {
+      border-right: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
+        solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
+    }
+    .suffix {
+      border-left: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
+        solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
+    }
+    .size-sm .affix:not(.flush) {
+      padding: 0 var(--fluid-field-padding-x-sm);
+    }
+    .size-md .affix:not(.flush) {
+      padding: 0 var(--fluid-field-padding-x-md);
+    }
+    .size-lg .affix:not(.flush) {
+      padding: 0 var(--fluid-field-padding-x-lg);
+    }
+    /*
+     * data-flush: an affix that is itself a control (a select, a swatch) owns
+     * its own padding, so the wrapper gives up its own and lets it stretch.
+     */
+    .affix.flush {
+      padding: 0;
+      align-items: stretch;
+    }
+
     .input-wrap:hover:not(.disabled):not(.focused) {
       border-color: var(--fluid-typeahead-border-hover, var(--fluid-border-strong));
     }
@@ -480,6 +523,10 @@ export class FluidTypeahead extends FluidFormAssociated {
   @property({ type: Boolean, attribute: "strict" }) strict = false;
 
   @state() private focused = false;
+  @state() private hasPrefix = false;
+  @state() private hasSuffix = false;
+  @state() private prefixFlush = false;
+  @state() private suffixFlush = false;
   @state() private activeIndex = -1;
   @state() private filteredOptions: TypeaheadOption[] = [];
   @state() private loading = false;
@@ -828,6 +875,18 @@ export class FluidTypeahead extends FluidFormAssociated {
       >${label.slice(idx + q.length)}`;
   }
 
+  private handlePrefixSlotChange = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement;
+    this.hasPrefix = affixSlotHasContent(slot);
+    this.prefixFlush = affixSlotIsFlush(slot);
+  };
+
+  private handleSuffixSlotChange = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement;
+    this.hasSuffix = affixSlotHasContent(slot);
+    this.suffixFlush = affixSlotIsFlush(slot);
+  };
+
   override render(): TemplateResult {
     return renderFieldChrome(
       { label: this.label, helpText: this.helpText, for: "input" },
@@ -841,6 +900,13 @@ export class FluidTypeahead extends FluidFormAssociated {
             disabled: this.disabled
           })}
         >
+          <span
+            class=${classMap({ affix: true, prefix: true, flush: this.prefixFlush })}
+            part="prefix"
+            ?hidden=${!this.hasPrefix}
+          >
+            <slot name="prefix" @slotchange=${this.handlePrefixSlotChange}></slot>
+          </span>
           <input
             id="input"
             part="input"
@@ -866,6 +932,13 @@ export class FluidTypeahead extends FluidFormAssociated {
             @blur=${this.handleBlur}
             @keydown=${this.handleKeyDown}
           />
+          <span
+            class=${classMap({ affix: true, suffix: true, flush: this.suffixFlush })}
+            part="suffix"
+            ?hidden=${!this.hasSuffix}
+          >
+            <slot name="suffix" @slotchange=${this.handleSuffixSlotChange}></slot>
+          </span>
         </div>
         <div
           part="listbox"
@@ -913,4 +986,20 @@ export class FluidTypeahead extends FluidFormAssociated {
     `
     );
   }
+}
+
+/** True when a named affix slot actually has something in it. */
+function affixSlotHasContent(slot: HTMLSlotElement): boolean {
+  return slot.assignedNodes().some((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) return true;
+    return (
+      node.nodeType === Node.TEXT_NODE &&
+      (node.textContent ?? "").trim().length > 0
+    );
+  });
+}
+
+/** True when a slotted affix opts into edge-to-edge layout via data-flush. */
+function affixSlotIsFlush(slot: HTMLSlotElement): boolean {
+  return slot.assignedElements().some((el) => el.hasAttribute("data-flush"));
 }

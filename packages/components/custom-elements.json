@@ -58120,6 +58120,42 @@
             },
             {
               "kind": "field",
+              "name": "hasPrefix",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "hasSuffix",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "prefixFlush",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "suffixFlush",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
               "name": "activeIndex",
               "type": {
                 "text": "number"
@@ -58479,6 +58515,16 @@
                 }
               ],
               "description": "Highlight the matched portion of the label."
+            },
+            {
+              "kind": "field",
+              "name": "handlePrefixSlotChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "handleSuffixSlotChange",
+              "privacy": "private"
             },
             {
               "kind": "field",
