@@ -83,6 +83,9 @@ export interface FluidInfiniteTableSort {
  * @fires fluid-row-click - A non-interactive part of a row was activated.
  *
  * @slot filters - Application-owned filter controls rendered above the header.
+ * @slot toolbar-actions - Host controls placed at the end of the toolbar, after
+ * the row count and the built-in Columns button. Pair with `configurable=false`
+ * and {@link openColumnManager} to replace that button with your own.
  * @slot empty - Empty-result content.
  * @slot error - Error content, shown when `error` is set.
  *
@@ -1084,8 +1087,19 @@ export class FluidInfiniteTable extends LitElement {
     );
   }
 
-  private openColumns(): void {
+  /**
+   * Open the column manager.
+   *
+   * Public so a host that hides the built-in button (`configurable=false`)
+   * can still reach the dialog from its own toolbar control — the dialog is
+   * rendered regardless of `configurable`, only the button is gated.
+   */
+  openColumnManager(): void {
     this.columnDialog?.showModal();
+  }
+
+  private openColumns(): void {
+    this.openColumnManager();
   }
 
   private updateColumn(key: string, visible: boolean): void {
@@ -1717,6 +1731,7 @@ export class FluidInfiniteTable extends LitElement {
                   Columns
                 </button>`
               : nothing}
+            <slot name="toolbar-actions"></slot>
           </div>
         </div>
 
