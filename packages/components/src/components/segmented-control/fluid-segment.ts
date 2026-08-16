@@ -45,6 +45,14 @@ export class FluidSegment extends FluidElement {
       align-items: center;
       justify-content: center;
       gap: var(--fluid-segment-gap, var(--fluid-space-2));
+      /* A segment is flex: 1 1 0, so it starts from a zero basis and is free to
+         be squeezed by its siblings. Without this, the squeeze lands on the
+         label: a two-word segment beside three others breaks onto a second and
+         third line and the control grows taller than every control next to it.
+         Holding the label on one line makes the segment's min-content its own
+         width, so segments still share the space evenly and simply stop
+         shrinking once the longest label is reached. */
+      white-space: nowrap;
       /* SC 2.5.8 Target Size, floor the segment to --fluid-target-min. */
       min-height: var(--fluid-target-min, 0px);
       padding: var(--fluid-space-1) var(--fluid-space-3);
