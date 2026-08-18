@@ -75,6 +75,9 @@ let counter = 0;
  * @uses-token --fluid-field-height-md - Field height.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Trigger min target (24/44px).
+ * @uses-token --fluid-font-size-sm - Text size at size="sm".
+ * @uses-token --fluid-font-size-md - Text size at size="md".
+ * @uses-token --fluid-font-size-lg - Text size at size="lg".
  *
  * @fires fluid-change - The committed date changed. `detail: { value, date, timestamp }`.
  * @fires fluid-open - The calendar opened.
@@ -105,8 +108,12 @@ export class FluidDatePicker extends FluidFormAssociated {
         border-radius: var(--fluid-date-picker-radius, var(--fluid-field-border-radius, var(--fluid-radius-md)));
         transition: border-color 120ms ease, box-shadow 120ms ease;
       }
-      :host([size="sm"]) .base { height: var(--fluid-field-height-sm, 2rem); padding-inline: var(--fluid-field-padding-x-sm, 0.6rem); }
-      :host([size="lg"]) .base { height: var(--fluid-field-height-lg, 3rem); padding-inline: var(--fluid-field-padding-x-lg, 0.9rem); }
+      /* Font scales with the size, as it does on every other field. Sized by
+         height alone, a sm picker kept the md text and read a size larger than
+         the input beside it — see fluid-date-range-picker. */
+      .base { font-size: var(--fluid-font-size-md); }
+      :host([size="sm"]) .base { height: var(--fluid-field-height-sm, 2rem); padding-inline: var(--fluid-field-padding-x-sm, 0.6rem); font-size: var(--fluid-font-size-sm); }
+      :host([size="lg"]) .base { height: var(--fluid-field-height-lg, 3rem); padding-inline: var(--fluid-field-padding-x-lg, 0.9rem); font-size: var(--fluid-font-size-lg); }
       .base:focus-within {
         border-color: var(--fluid-date-picker-border-focus, var(--fluid-accent-base));
         outline: var(--fluid-date-picker-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid

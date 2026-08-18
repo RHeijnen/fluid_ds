@@ -111,6 +111,9 @@ function formatLabel(value: string, format: FluidTimeFormat): string {
  * @uses-token --fluid-field-height-md - Field height.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Trigger + option min target (24px AA / 44px AAA).
+ * @uses-token --fluid-font-size-sm - Text size at size="sm".
+ * @uses-token --fluid-font-size-md - Text size at size="md".
+ * @uses-token --fluid-font-size-lg - Text size at size="lg".
  *
  * @fires fluid-change - The committed time changed. `detail: { value }` where value is the 24h "HH:MM" (or null when cleared).
  * @fires fluid-open - The listbox opened.
@@ -147,13 +150,19 @@ export class FluidTimePicker extends FluidFormAssociated {
         border-radius: var(--fluid-time-picker-radius, var(--fluid-field-border-radius, var(--fluid-radius-md)));
         transition: border-color 120ms ease, box-shadow 120ms ease;
       }
+      /* Font scales with the size, as it does on every other field. The
+         size-scoped font rules further down style the dropdown rows, not the
+         field — see fluid-date-range-picker. */
+      .base { font-size: var(--fluid-font-size-md); }
       :host([size="sm"]) .base {
         height: var(--fluid-field-height-sm, 2rem);
         padding-inline: var(--fluid-field-padding-x-sm, 0.6rem);
+        font-size: var(--fluid-font-size-sm);
       }
       :host([size="lg"]) .base {
         height: var(--fluid-field-height-lg, 3rem);
         padding-inline: var(--fluid-field-padding-x-lg, 0.9rem);
+        font-size: var(--fluid-font-size-lg);
       }
       .base:focus-within {
         border-color: var(--fluid-time-picker-border-focus, var(--fluid-accent-base));

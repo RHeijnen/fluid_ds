@@ -65,6 +65,9 @@ let counter = 0;
  * @uses-token --fluid-text-primary - Field text.
  * @uses-token --fluid-border-default - Borders.
  * @uses-token --fluid-accent-base - Focus + active preset.
+ * @uses-token --fluid-font-size-sm - Text size at size="sm".
+ * @uses-token --fluid-font-size-md - Text size at size="md".
+ * @uses-token --fluid-font-size-lg - Text size at size="lg".
  * @uses-token --fluid-field-border-radius - Field radius.
  * @uses-token --fluid-field-height-md - Field height.
  * @uses-token --fluid-focus-ring-width - Focus ring width.
@@ -97,8 +100,19 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         border-radius: var(--fluid-date-range-picker-radius, var(--fluid-field-border-radius, var(--fluid-radius-md)));
         transition: border-color 120ms ease, box-shadow 120ms ease;
       }
-      :host([size="sm"]) .base { height: var(--fluid-field-height-sm, 2rem); }
-      :host([size="lg"]) .base { height: var(--fluid-field-height-lg, 3rem); }
+      /* Font scales with the size, as it does on every other field. Sized
+         by height alone, a sm picker kept the md text: beside a sm input and
+         a sm select on the same toolbar row it was the one control reading a
+         size larger, and consumers had no size-aware token to correct it. */
+      .base { font-size: var(--fluid-font-size-md); }
+      :host([size="sm"]) .base {
+        height: var(--fluid-field-height-sm, 2rem);
+        font-size: var(--fluid-font-size-sm);
+      }
+      :host([size="lg"]) .base {
+        height: var(--fluid-field-height-lg, 3rem);
+        font-size: var(--fluid-font-size-lg);
+      }
       .base:focus-within {
         border-color: var(--fluid-accent-base);
         outline: var(--fluid-focus-ring-width, 2px) solid color-mix(in srgb, var(--fluid-accent-base) 35%, transparent);
