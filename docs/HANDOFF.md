@@ -112,14 +112,20 @@ to hand off context when you switch machines.
     `DOCS_SITE`). The site is currently shipped via **local `wrangler pages
     deploy website --project-name=fluid-25z --branch=main`** (run after
     `pnpm build:website`).
-  - **CI auto-deploy NOT working yet:** `deploy.yml` builds + deploys on push to
-    `main`, but the Cloudflare token step fails (`wrangler` exit 1). Until that
-    token/permission is fixed, deploy locally with wrangler. (`CLOUDFLARE_API_TOKEN`
-    + `CLOUDFLARE_ACCOUNT_ID` secrets exist; the token likely needs
-    Account → Cloudflare Pages → Edit.)
-  - **Next:** attach `fluid-web.dev` to the `fluid-25z` Pages project in the
-    Cloudflare dashboard (+ DNS), fix the CI deploy token, and the
-    Trusted-Publishing rewire of `release.yml`.
+  - **CI auto-deploy fixed 2026-08-25 (pending first green run):** the failure
+    was never the Cloudflare token. `cloudflare/wrangler-action@v3` tried to
+    `pnpm add wrangler` (not a dependency anywhere), and pnpm refuses that at a
+    workspace root (`ERR_PNPM_ADDING_TO_ROOT`), so every deploy died before
+    wrangler even started; authentication was never reached. `deploy.yml` now
+    runs `pnpm dlx wrangler@3 pages deploy` directly with the
+    `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` secrets as env vars.
+    Caveat: because no run ever got past installation, the token has never
+    actually been exercised in CI. If the next run fails, THAT is the real
+    token/permission test (it may need Account → Cloudflare Pages → Edit).
+  - **Next:** verify the first CI deploy goes green (see caveat above), attach
+    `fluid-web.dev` to the `fluid-25z` Pages project in the Cloudflare
+    dashboard (+ DNS) if not already done, and the Trusted-Publishing rewire of
+    `release.yml`.
   - Docs search (Pagefind) only indexes at **build**, so it's empty in
     `astro dev`; it works once the site is deployed (or via `pnpm docs:build`).
 - **⚠️ Process note: `pnpm verify` does NOT build the docs site.** `verify`'s
@@ -337,6 +343,18 @@ Things true across machines (machine-specific quirks go in private memory):
 ## Log
 
 Newest first. One short entry per working session.
+
+### 2026-08-25: website CI deploy unblocked (wrangler-action → pnpm dlx)
+
+Every push-to-main run of `deploy.yml` had been failing at the final step. The
+build was always green; the culprit was `cloudflare/wrangler-action@v3`, which
+installs wrangler with `pnpm add` when it isn't a dependency, and pnpm rejects
+that at a workspace root (`ERR_PNPM_ADDING_TO_ROOT`). The step exited before
+wrangler ran, so the old "token permissions" diagnosis in this file was a
+guess at a failure that never got that far. The deploy step now runs
+`pnpm dlx wrangler@3 pages deploy website --project-name=fluid-25z
+--branch=main` with the two `CLOUDFLARE_*` secrets as env vars. The token
+itself remains unexercised in CI until the first post-fix run.
 
 ### 2026-08-08: table gestures steadied, TMS adopts charts, fluid-fold added
 
