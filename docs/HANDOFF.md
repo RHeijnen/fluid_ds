@@ -17,6 +17,28 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **Latest continuation, 2026-08-28.** Product commit `d2d0ee8` (`0.4 hardening`)
+> was pushed manually; at the start of the follow-up documentation work, `main`
+> and `origin/main` were synchronized and the worktree was clean. The full forms
+> block, rows #001–028 of the 155-element owner visual-review ledger, is Approved.
+> Resume the owner-led Storybook review at #029 `fluid-avatar`; 127 rows remain.
+> Read the [component-review handoff](handoff-component-review-2026-08-28.md) for
+> the exact loop and decisions established during the forms review. Use the
+> [0.4.0 verification and test inventory](verification-and-test-inventory-0.4.0.md)
+> for marketing-safe counts and coverage definitions. A fresh exact-commit Linux
+> coverage run passes 2,719 assertions across 146 files and records 96.48%
+> statements/lines, 93.75% functions and 86.45% branches. The authoritative
+> three-engine matrix represents 8,157 executions, not 8,157 unique tests.
+> GitHub's Node 24 `verify` lane for `d2d0ee8` failed before the matrix because
+> the runner assumed a bundled `corepack` executable. The uncommitted follow-up
+> makes the matrix and coverage runners use the workflow-installed pnpm only
+> after validating version 9.15.0 against `packageManager`; the focused native
+> runner guard passes 11/11 on Windows and Linux. This correction still requires
+> a commit, push and GitHub confirmation and must not be described as CI-green.
+> Documentation changes after `d2d0ee8` are new uncommitted follow-up work until
+> the owner directs otherwise. Do not push, publish, deploy or tag them without
+> explicit instruction.
+
 > **Current continuation, 2026-08-28.** All 59 rows in the stable critical-mode
 > ledger are now covered by executable recovery/interaction evidence or an
 > explicit API/manual-policy boundary. This closes the former 39/59 machine

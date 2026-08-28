@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runOwnedNode } from "./cem/owned-node.mjs";
+import { resolvePinnedPnpm } from "./pnpm-runtime.mjs";
 import { unitMatrixCommands } from "./run-unit-matrix.mjs";
 
 test("matrix arguments select every catalog package once and drain failures serially", () => {
@@ -36,6 +37,31 @@ test("empty, invalid or duplicated engines and invalid package filters fail clos
     assert.throws(() => unitMatrixCommands(catalog, browsers));
   for (const components of [[], [{ package: "--filter=*" }], [{ package: "@fluid-ds/x && other" }]])
     assert.throws(() => unitMatrixCommands({ components }, ["chromium"]));
+});
+
+test("the active pnpm must match the exact packageManager pin without requiring Corepack", () => {
+  assert.equal(
+    resolvePinnedPnpm("pnpm@9.15.0", {
+      env: { npm_config_user_agent: "pnpm/9.15.0 npm/? node/v24.0.0 linux x64" },
+      platform: "linux"
+    }),
+    "pnpm"
+  );
+  assert.equal(
+    resolvePinnedPnpm("pnpm@9.15.0", {
+      env: { npm_config_user_agent: "pnpm/9.15.0 npm/? node/v24.0.0 win32 x64" },
+      platform: "win32"
+    }),
+    "pnpm.cmd"
+  );
+  assert.throws(
+    () =>
+      resolvePinnedPnpm("pnpm@9.15.0", {
+        env: { npm_config_user_agent: "pnpm/10.0.0 npm/? node/v24.0.0 linux x64" }
+      }),
+    /expected 9\.15\.0, received 10\.0\.0/
+  );
+  assert.throws(() => resolvePinnedPnpm("pnpm@9", { env: {} }), /exact pnpm version/);
 });
 
 test("the current matrix contains all fourteen published component packages", async () => {
@@ -101,6 +127,10 @@ async function nativeRunnerFixture(kind, failFirst) {
     join(directory, "scripts/resolve-test-browsers.mjs"),
     await readFile(join(repository, "scripts/resolve-test-browsers.mjs"))
   );
+  await writeFile(
+    join(directory, "scripts/pnpm-runtime.mjs"),
+    await readFile(join(repository, "scripts/pnpm-runtime.mjs"))
+  );
   // A failed coverage command must not advance to inventory certification.
   await writeFile(
     join(directory, "scripts/coverage-inventory.mjs"),
@@ -126,7 +156,12 @@ async function nativeRunnerFixture(kind, failFirst) {
   assert.equal(result.directChildExitObserved, true, JSON.stringify(result));
   assert.equal(result.terminationRequested, false, JSON.stringify(result));
   assert.equal(result.signal, null, JSON.stringify(result));
-  const events = (await readFile(log, "utf8"))
+  const eventLog = await readFile(log, "utf8").catch((error) =>
+    assert.fail(
+      `Fixture package tasks did not start (${error.message}).\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`
+    )
+  );
+  const events = eventLog
     .trim()
     .split("\n")
     .map((line) => JSON.parse(line));

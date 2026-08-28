@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { checkCoverageInventories } from "./coverage-inventory.mjs";
+import { resolvePinnedPnpm } from "./pnpm-runtime.mjs";
 
-const executable = process.platform === "win32" ? "corepack.cmd" : "corepack";
+const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+const executable = resolvePinnedPnpm(manifest.packageManager);
 const packages = [
   "components",
   "charts",
@@ -24,7 +26,7 @@ const startedAt = Date.now();
 // Finish every queued package before propagating failures or checking inventory.
 const result = spawnSync(
   executable,
-  ["pnpm", "--workspace-concurrency=1", "--no-bail", ...filters, "test"],
+  ["--workspace-concurrency=1", "--no-bail", ...filters, "test"],
   {
     cwd: new URL("..", import.meta.url),
     stdio: "inherit",
