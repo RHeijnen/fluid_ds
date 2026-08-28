@@ -1,6 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { formattingLocales } from "../../internal/formatting-locale.js";
 
 type Unit = "year" | "quarter" | "month" | "week" | "day" | "hour" | "minute" | "second";
 
@@ -32,7 +33,7 @@ export class FluidRelativeTime extends FluidElement {
   /** The date to compare against now. */
   @property() date: Date | string | number = new Date();
 
-  /** Locale. */
+  /** BCP 47 locale. Omit to inherit declared lang, then fall back to English. */
   @property() locale: string | null = null;
 
   /** Numeric style, "auto" allows phrases like "yesterday". */
@@ -95,7 +96,7 @@ export class FluidRelativeTime extends FluidElement {
     const matched = UNITS.find((u) => abs >= u.ms) ?? UNITS[UNITS.length - 1]!;
     const value = Math.round(diff / matched.ms);
     try {
-      const formatter = new Intl.RelativeTimeFormat(this.locale ?? undefined, {
+      const formatter = new Intl.RelativeTimeFormat(formattingLocales(this, this.locale), {
         numeric: this.numeric,
         style: this.format
       });

@@ -1,6 +1,8 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { formattingLocales } from "../../internal/formatting-locale.js";
+import type { FluidBinaryUnit } from "../../internal/localization.js";
 
 /**
  * Format a byte count for display. Wraps `Intl.NumberFormat` with `unit`
@@ -28,16 +30,14 @@ export class FluidFormatBytes extends FluidElement {
   /** Notation style. */
   @property() display: "short" | "long" | "narrow" = "short";
 
-  /** BCP 47 locale tag, or omit to use the browser default. */
+  /** BCP 47 locale. Omit to inherit declared lang, then fall back to English. */
   @property() locale: string | null = null;
 
   /** Display style, binary (KiB, MiB) or decimal (KB, MB). */
   @property() base: "binary" | "decimal" = "decimal";
 
   override render(): TemplateResult {
-    return html`${this.base === "binary"
-      ? this.formatBinary()
-      : this.formatDecimal()}`;
+    return html`${this.base === "binary" ? this.formatBinary() : this.formatDecimal()}`;
   }
 
   /** Decimal (SI) base: 1000-based with locale-aware Intl unit names. */
@@ -55,7 +55,7 @@ export class FluidFormatBytes extends FluidElement {
     const sign = this.value < 0 ? -1 : 1;
     const unit = units[i];
     if (!unit) return "";
-    const formatter = new Intl.NumberFormat(this.locale ?? undefined, {
+    const formatter = new Intl.NumberFormat(formattingLocales(this, this.locale), {
       style: "unit",
       unit,
       unitDisplay: this.display,
@@ -72,20 +72,20 @@ export class FluidFormatBytes extends FluidElement {
   private formatBinary(): string {
     const isBit = this.unit === "bit";
     // [short, long, narrow] suffix per magnitude (index 0 = base unit).
-    const table: ReadonlyArray<readonly [string, string, string]> = isBit
+    const table: ReadonlyArray<readonly [string, FluidBinaryUnit, string]> = isBit
       ? [
-          ["bit", "bits", "bit"],
-          ["Kibit", "kibibits", "Kibit"],
-          ["Mibit", "mebibits", "Mibit"],
-          ["Gibit", "gibibits", "Gibit"],
-          ["Tibit", "tebibits", "Tibit"]
+          ["bit", "bit", "bit"],
+          ["Kibit", "kibibit", "Kibit"],
+          ["Mibit", "mebibit", "Mibit"],
+          ["Gibit", "gibibit", "Gibit"],
+          ["Tibit", "tebibit", "Tibit"]
         ]
       : [
-          ["B", "bytes", "B"],
-          ["KiB", "kibibytes", "KiB"],
-          ["MiB", "mebibytes", "MiB"],
-          ["GiB", "gibibytes", "GiB"],
-          ["TiB", "tebibytes", "TiB"]
+          ["B", "byte", "B"],
+          ["KiB", "kibibyte", "KiB"],
+          ["MiB", "mebibyte", "MiB"],
+          ["GiB", "gibibyte", "GiB"],
+          ["TiB", "tebibyte", "TiB"]
         ];
     let value = Math.abs(this.value);
     let i = 0;
@@ -96,11 +96,24 @@ export class FluidFormatBytes extends FluidElement {
     const sign = this.value < 0 ? -1 : 1;
     const row = table[i];
     if (!row) return "";
-    const suffix = this.display === "long" ? row[1] : this.display === "narrow" ? row[2] : row[0];
-    const formatter = new Intl.NumberFormat(this.locale ?? undefined, {
-      maximumFractionDigits: i === 0 ? 0 : 1
-    });
-    const num = formatter.format(sign * value);
+    const locales = formattingLocales(this, this.locale);
+    const maximumFractionDigits = i === 0 ? 0 : 1;
+    const formatter = new Intl.NumberFormat(locales, { maximumFractionDigits });
+    const signedValue = sign * value;
+    const num = formatter.format(signedValue);
+    if (this.display === "long") {
+      const pluralCategory = new Intl.PluralRules(locales, { maximumFractionDigits }).select(
+        signedValue
+      );
+      return this.localize.termForLocale(
+        locales[0] ?? "en",
+        "binaryUnit",
+        pluralCategory,
+        num,
+        row[1]
+      );
+    }
+    const suffix = this.display === "narrow" ? row[2] : row[0];
     // Narrow display omits the space, matching Intl's "narrow" unit style.
     return this.display === "narrow" ? `${num}${suffix}` : `${num} ${suffix}`;
   }

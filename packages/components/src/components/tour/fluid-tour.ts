@@ -1,6 +1,13 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
-import { autoUpdate, computePosition, flip, offset, shift, type Placement } from "@floating-ui/dom";
+import {
+  autoUpdate,
+  computePosition,
+  flip,
+  offset,
+  shift,
+  type Placement
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 // The tour's action controls are real Fluid buttons, so they match the rest of
@@ -33,16 +40,17 @@ let counter = 0;
  * that target with the step title, body, a "Step n of m" counter, and the
  * Back / Next / Done plus Skip controls.
  *
- * Accessibility: the popover is the WAI-ARIA APG Dialog (Modal) pattern. It is
- * `role="dialog"` with `aria-modal="true"`, labelled by its heading and
- * described by its body. Focus moves into the popover on open and is trapped
- * (Tab wraps); each step's text is mirrored into an `aria-live` region so a
+ * Accessibility: the popover is a nonmodal `role="dialog"`, labelled by its
+ * heading and described by its body. This is a coachmark, not a blocking modal:
+ * the surrounding page stays usable. Focus moves into the popover on open;
+ * leaving it with Tab dismisses the tour without taking focus back. Each
+ * step's text is mirrored into an `aria-live` region so a
  * screen reader announces the change. The scrim and popover render in the top
  * layer (`popover="manual"`) so they are never clipped by an ancestor's
  * overflow, transform, or containment.
  *
  * Keyboard: ArrowRight / ArrowLeft step forward / back, Escape skips the tour,
- * Tab is trapped inside the popover.
+ * Tab follows the document order and dismisses when focus leaves the popover.
  *
  * Pointer: a press outside the popover skips the tour, the pointer equivalent
  * of Escape. The press is not swallowed, so the spotlit control stays usable.
@@ -92,7 +100,7 @@ let counter = 0;
  *
  * @fires fluid-step-change - The active step changed. `detail: { index }`.
  * @fires fluid-finish - The tour completed (Done on the last step).
- * @fires fluid-skip - The tour was dismissed (Skip, Escape, or a press outside the popover).
+ * @fires fluid-skip - The tour was dismissed (Skip, Escape, or pointer/focus moving outside the popover).
  */
 export class FluidTour extends FluidElement {
   static override styles = [
@@ -159,7 +167,10 @@ export class FluidTour extends FluidElement {
         border: var(--fluid-tour-border-width, 1px) solid
           var(--fluid-tour-border, var(--fluid-border-default));
         border-radius: var(--fluid-tour-radius, var(--fluid-radius-lg, 0.75rem));
-        box-shadow: var(--fluid-tour-shadow, var(--fluid-shadow-lg, 0 12px 32px -8px rgb(0 0 0 / 0.25)));
+        box-shadow: var(
+          --fluid-tour-shadow,
+          var(--fluid-shadow-lg, 0 12px 32px -8px rgb(0 0 0 / 0.25))
+        );
         font-family: var(--fluid-tour-font-family, var(--fluid-font-family-sans));
         opacity: 0;
         transform: scale(0.97);
@@ -227,13 +238,12 @@ export class FluidTour extends FluidElement {
       }
       .action-next {
         border-radius: var(--fluid-radius-md, 8px);
-        box-shadow:
-          0 0 0 var(--fluid-tour-highlight-ring-width, 3px)
-            color-mix(
-              in srgb,
-              var(--fluid-tour-highlight-ring, var(--fluid-accent-base)) 35%,
-              transparent
-            );
+        box-shadow: 0 0 0 var(--fluid-tour-highlight-ring-width, 3px)
+          color-mix(
+            in srgb,
+            var(--fluid-tour-highlight-ring, var(--fluid-accent-base)) 35%,
+            transparent
+          );
       }
 
       .sr-only {
@@ -259,16 +269,31 @@ export class FluidTour extends FluidElement {
   /** Index of the active step. */
   @property({ type: Number, reflect: true }) index = 0;
 
-  @state() private liveMessage = "";
+  /** Snapshot application content; translate it without replaying step effects. */
+  @state() private announcedStep: {
+    current: number;
+    total: number;
+    title: string;
+    body: string;
+  } | null = null;
 
   @query(".panel") private panelEl!: HTMLElement;
   @query(".scrim") private scrimEl!: HTMLElement;
   @query(".highlight") private highlightEl!: HTMLElement;
 
   private cleanup?: () => void;
+  private interactionDisposers: Array<() => void> = [];
   private currentTarget: HTMLElement | null = null;
   private previouslyFocused: HTMLElement | null = null;
   private panelId = `fluid-tour-${++counter}`;
+  private focusFrame?: number;
+  private stepRevision = 0;
+  private restoreFocusOnClose = true;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated && this.open) void this.start();
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -339,11 +364,16 @@ export class FluidTour extends FluidElement {
   }
 
   private async start(): Promise<void> {
+    this.restoreFocusOnClose = true;
     const root = this.getRootNode() as Document | ShadowRoot;
     this.previouslyFocused = root.activeElement as HTMLElement | null;
-    document.addEventListener("keydown", this.handleKeyDown, true);
-    document.addEventListener("pointerdown", this.handlePointerDown, true);
+    this.interactionDisposers = [
+      this.listen(document, "keydown", this.handleKeyDown, { capture: true }),
+      this.listen(document, "pointerdown", this.handlePointerDown, { capture: true }),
+      this.listen(document, "focusin", this.handleFocusIn, { capture: true })
+    ];
     await this.updateComplete;
+    if (!this.open || !this.isConnected) return;
     const scrim = this.scrimEl as HTMLElement & { showPopover?: () => void };
     const panel = this.panelEl as HTMLElement & { showPopover?: () => void };
     try {
@@ -356,10 +386,13 @@ export class FluidTour extends FluidElement {
   }
 
   private teardown(): void {
+    this.stepRevision++;
+    if (this.focusFrame !== undefined) cancelAnimationFrame(this.focusFrame);
+    this.focusFrame = undefined;
     this.cleanup?.();
     this.cleanup = undefined;
-    document.removeEventListener("keydown", this.handleKeyDown, true);
-    document.removeEventListener("pointerdown", this.handlePointerDown, true);
+    for (const dispose of this.interactionDisposers) dispose();
+    this.interactionDisposers = [];
     const scrim: (HTMLElement & { hidePopover?: () => void }) | null = this.scrimEl ?? null;
     const panel: (HTMLElement & { hidePopover?: () => void }) | null = this.panelEl ?? null;
     try {
@@ -369,7 +402,7 @@ export class FluidTour extends FluidElement {
       /* not shown, ignore */
     }
     this.currentTarget = null;
-    const restore = this.previouslyFocused;
+    const restore = this.restoreFocusOnClose ? this.previouslyFocused : null;
     this.previouslyFocused = null;
     restore?.focus?.();
   }
@@ -392,9 +425,11 @@ export class FluidTour extends FluidElement {
 
   /** Resolve the current target, place the spotlight + popover, move focus. */
   private async applyStep(): Promise<void> {
+    const revision = ++this.stepRevision;
     const step = this.currentStep;
     if (!step) return;
     await this.updateComplete;
+    if (!this.open || !this.isConnected || revision !== this.stepRevision) return;
 
     const target = this.resolveTarget(step.target);
     this.currentTarget = target;
@@ -409,12 +444,20 @@ export class FluidTour extends FluidElement {
     this.reposition();
 
     // Announce the step for assistive tech.
-    this.liveMessage = `Step ${this.index + 1} of ${this.steps.length}. ${step.title}. ${step.body}`;
+    this.announcedStep = {
+      current: this.index + 1,
+      total: this.steps.length,
+      title: step.title,
+      body: step.body
+    };
 
     // Move focus into the popover after it paints. Prefer the emphasised
     // primary action (the Next / Done button) so focus lands on the control we
     // want the user to act on; otherwise the first focusable control.
-    requestAnimationFrame(() => {
+    if (this.focusFrame !== undefined) cancelAnimationFrame(this.focusFrame);
+    this.focusFrame = requestAnimationFrame(() => {
+      this.focusFrame = undefined;
+      if (!this.open || !this.isConnected || revision !== this.stepRevision) return;
       const controls = this.focusables();
       const preferred = controls.find((c) => c.classList.contains("action-next"));
       (preferred ?? controls[0])?.focus();
@@ -444,7 +487,7 @@ export class FluidTour extends FluidElement {
       void computePosition(target, this.panelEl, {
         placement: this.currentStep?.placement ?? "bottom",
         strategy: "fixed",
-        middleware: [offset(12), flip({ rootBoundary: "viewport" }), shift({ padding: 12 })]
+        middleware: [offset(12), flip(), shift({ padding: 12 })]
       }).then(({ x, y }) => {
         Object.assign(this.panelEl.style, { left: `${x}px`, top: `${y}px` });
       });
@@ -474,6 +517,12 @@ export class FluidTour extends FluidElement {
     this.skip();
   };
 
+  private handleFocusIn = (e: FocusEvent): void => {
+    if (!this.open || e.composedPath().includes(this.panelEl)) return;
+    this.restoreFocusOnClose = false;
+    this.skip();
+  };
+
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (!this.open) return;
     switch (e.key) {
@@ -489,9 +538,6 @@ export class FluidTour extends FluidElement {
       case "ArrowLeft":
         e.preventDefault();
         this.back();
-        return;
-      case "Tab":
-        this.trapFocus(e);
         return;
       default:
         return;
@@ -512,29 +558,6 @@ export class FluidTour extends FluidElement {
     );
   }
 
-  /** Keep Tab focus inside the popover (APG Dialog focus trap). */
-  private trapFocus(e: KeyboardEvent): void {
-    if (!this.panelEl) return;
-    const focusables = this.focusables();
-    if (focusables.length === 0) return;
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-    if (!first || !last) return;
-    // Resolve the focused control inside this component's own shadow root. The
-    // action buttons are `fluid-button` hosts, so `shadowRoot.activeElement`
-    // gives us the host element we can compare against `focusables`.
-    const shadow = this.shadowRoot;
-    const focused = shadow?.activeElement as HTMLElement | null;
-    const active = focused && this.panelEl.contains(focused) ? focused : null;
-    if (e.shiftKey && active === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && active === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  }
-
   override render(): TemplateResult {
     const step = this.currentStep;
     const total = this.steps.length;
@@ -542,6 +565,25 @@ export class FluidTour extends FluidElement {
     const isFirst = this.index <= 0;
     const titleId = `${this.panelId}-title`;
     const bodyId = `${this.panelId}-body`;
+    // Keep count formatting aligned with the message dictionary's effective
+    // language, including its browser fallback and regional numbering system.
+    let locales = ["en"];
+    try {
+      locales = [...Intl.getCanonicalLocales(this.localize.locale), "en"];
+    } catch {
+      /* Use English count formatting for an invalid locale. */
+    }
+    const number = new Intl.NumberFormat(locales);
+    const announcement = this.announcedStep;
+    const liveMessage = announcement
+      ? this.term(
+          "tourStepAnnouncement",
+          number.format(announcement.current),
+          number.format(announcement.total),
+          announcement.title,
+          announcement.body
+        )
+      : "";
 
     return html`
       <div part="scrim" class="scrim" popover="manual" aria-hidden="true">
@@ -554,11 +596,12 @@ export class FluidTour extends FluidElement {
         class="panel"
         popover="manual"
         role="dialog"
-        aria-modal="true"
         aria-labelledby=${titleId}
         aria-describedby=${bodyId}
       >
-        <p part="counter" class="counter">Step ${total ? this.index + 1 : 0} of ${total}</p>
+        <p part="counter" class="counter">
+          ${this.term("tourStep", number.format(total ? this.index + 1 : 0), number.format(total))}
+        </p>
         <h2 part="title" class="title" id=${titleId}>${step?.title ?? ""}</h2>
         <p part="body" class="body" id=${bodyId}>${step?.body ?? ""}</p>
 
@@ -570,7 +613,7 @@ export class FluidTour extends FluidElement {
             size="sm"
             @fluid-click=${() => this.skip()}
           >
-            Skip
+            ${this.term("skip")}
           </fluid-button>
           <span class="spacer"></span>
           ${isFirst
@@ -583,7 +626,7 @@ export class FluidTour extends FluidElement {
                   size="sm"
                   @fluid-click=${() => this.back()}
                 >
-                  Back
+                  ${this.term("back")}
                 </fluid-button>
               `}
           <fluid-button
@@ -593,12 +636,12 @@ export class FluidTour extends FluidElement {
             size="sm"
             @fluid-click=${() => this.next()}
           >
-            ${isLast ? "Done" : "Next"}
+            ${this.term(isLast ? "done" : "next")}
           </fluid-button>
         </div>
       </div>
 
-      <div class="sr-only" role="status" aria-live="polite">${this.liveMessage}</div>
+      <div class="sr-only" role="status" aria-live="polite">${liveMessage}</div>
     `;
   }
 }

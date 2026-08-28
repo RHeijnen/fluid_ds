@@ -1,0 +1,390 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/rich-text-editor/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-rich-text-editor",
+          "declaration": {
+            "name": "FluidRichTextEditor",
+            "module": "src/components/rich-text-editor/fluid-rich-text-editor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/rich-text-editor/fluid-rich-text-editor.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A lightweight, accessible WYSIWYG rich-text editor. A roving-tabindex toolbar\n(role=\"toolbar\") of toggle buttons sits above a `contenteditable` region\nexposed as a multi-line textbox. Formatting uses `document.execCommand`, which\nis deprecated yet still universally supported and adequate for a small editor;\nno external editor library is pulled in.\n\nThe editable region takes its accessible name from the `label` prop and shows\nthe `placeholder` while empty. Get or set the HTML via the `value` property;\nsetting it replaces the editable content. Each input dispatches `fluid-change`\nwith the current HTML, and the toggle buttons reflect `aria-pressed` from\n`document.queryCommandState` whenever the selection changes.\nHorizontal toolbar arrows follow its rendered direction: Right advances in\nLTR and Left advances in RTL. Vertical arrows retain command-order semantics.",
+          "name": "FluidRichTextEditor",
+          "cssProperties": [
+            {
+              "description": "Editable region background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-editor-bg"
+            },
+            {
+              "description": "Text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-editor-fg"
+            },
+            {
+              "description": "Border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-editor-border"
+            },
+            {
+              "description": "Toolbar background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-editor-toolbar-bg"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-editor-radius"
+            },
+            {
+              "description": "Focus ring color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-editor-focus"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The editor root (toolbar + editable region).",
+              "name": "base"
+            },
+            {
+              "description": "The formatting toolbar.",
+              "name": "toolbar"
+            },
+            {
+              "description": "A toolbar button.",
+              "name": "button"
+            },
+            {
+              "description": "The contenteditable textbox.",
+              "name": "editable"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "description": "The editor content as an HTML string. Setting it replaces the editable content."
+            },
+            {
+              "kind": "field",
+              "name": "_value",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the editable region.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Placeholder shown while the editor is empty.",
+              "attribute": "placeholder"
+            },
+            {
+              "kind": "field",
+              "name": "readOnly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Keep the content selectable but prevent editing and toolbar commands.",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "active",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "pressed",
+              "type": {
+                "text": "Record<string, boolean>"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "editable",
+              "type": {
+                "text": "HTMLDivElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "savedRange",
+              "type": {
+                "text": "Range | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "savedBackward",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "onSelectionChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "syncPressed",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "exec",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "c",
+                  "type": {
+                    "text": "ToolbarCommand"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emitChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onPaste",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "ClipboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onToolbarKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "The content changed. `detail: { value }` (current HTML).",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the editable region.",
+              "fieldName": "label"
+            },
+            {
+              "name": "placeholder",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Placeholder shown while the editor is empty.",
+              "fieldName": "placeholder"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Keep the content selectable but prevent editing and toolbar commands.",
+              "fieldName": "readOnly"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Accessible contenteditable WYSIWYG with a formatting toolbar.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base",
+              "description": "Editable background."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Toolbar background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Editable text color."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Placeholder + toolbar icon color."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Border color."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Focus ring + active toggle color."
+            },
+            {
+              "name": "--fluid-accent-text",
+              "description": "Active toggle foreground."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Corner radius."
+            },
+            {
+              "name": "--fluid-radius-sm",
+              "description": "Toolbar button radius."
+            },
+            {
+              "name": "--fluid-font-family-sans",
+              "description": "Editor font family."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-focus-ring-offset",
+              "description": "Focus ring offset (AA / AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum control target (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-rich-text-editor",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRichTextEditor",
+          "declaration": {
+            "name": "FluidRichTextEditor",
+            "module": "src/components/rich-text-editor/fluid-rich-text-editor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRichTextEditor",
+          "declaration": {
+            "name": "FluidRichTextEditor",
+            "module": "src/components/rich-text-editor/fluid-rich-text-editor.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

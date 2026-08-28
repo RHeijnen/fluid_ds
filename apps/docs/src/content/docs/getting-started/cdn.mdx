@@ -12,7 +12,7 @@ free, has a global edge network, supports version pinning + ranges, and
 lists package contents at a discoverable URL.
 
 This page is the URL reference. For the paste-and-go quick start, see
-[Installation → CDN](/getting-started/installation/#the-fastest-path-cdn-html).
+[Installation → CDN](/getting-started/installation/#the-fastest-path-cdn--html).
 
 ## URL pattern
 
@@ -132,8 +132,7 @@ bundler import.
       "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/",
 
       "lit":                   "https://esm.run/lit",
-      "lit/":                  "https://esm.run/lit/",
-      "@floating-ui/dom":      "https://esm.run/@floating-ui/dom"
+      "lit/":                  "https://esm.run/lit/"
     }
   }
 </script>
@@ -146,12 +145,12 @@ bundler import.
 </script>
 ```
 
-Note the last three entries. Fluid's component files ship their own bare
-imports: every component imports `lit` (and `lit/...` decorators), and the
-overlay components (tooltip, popover, select, dropdown, dialog, drawer)
-import `@floating-ui/dom`. The browser has no idea what those bare
-specifiers mean, so they **must** be in the map too, otherwise the first
-`define.js` throws "Failed to resolve module specifier". We point them at
+Note the `lit` entries. Fluid's component files ship their own bare imports:
+every component imports `lit` (and `lit/...` decorators). The browser has no
+idea what those bare specifiers mean, so they **must** be in the map too,
+otherwise the first `define.js` throws "Failed to resolve module specifier".
+(Positioning is fully in-house since 0.4.0, so `lit` is the only bare import
+the core components ship.) We point them at
 [esm.run](https://esm.run) because it resolves *their* transitive
 dependencies (e.g. `lit-html`, `@lit/reactive-element`) for you, so you only
 list the top-level packages, not the whole graph. (Pin a major, e.g.

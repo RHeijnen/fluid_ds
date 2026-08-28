@@ -169,6 +169,10 @@ function bookingOverlaps(slotStart: Date, slotEnd: Date, booking: Booking, slotM
 export function generateSlots(iso: string, availability: Availability, bookings: Booking[] = [], now: Date = new Date()): Slot[] {
   const { slotMinutes } = availability;
   const step = availability.stepMinutes && availability.stepMinutes > 0 ? availability.stepMinutes : slotMinutes;
+  // Reject malformed increments before entering the loop. Zero/negative or
+  // sub-minute steps can otherwise loop forever or create unbounded output.
+  if (!Number.isInteger(slotMinutes) || slotMinutes < 1 || slotMinutes > 1440 ||
+      !Number.isInteger(step) || step < 1 || step > 1440) return [];
   const buffer = availability.bufferMinutes ?? 0;
   const capacity = availability.capacity && availability.capacity > 0 ? availability.capacity : 1;
   const noticeCutoff = now.getTime() + (availability.minNoticeMinutes ?? 0) * 60_000;

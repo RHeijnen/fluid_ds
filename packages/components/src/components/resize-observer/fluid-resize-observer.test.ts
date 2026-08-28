@@ -13,6 +13,13 @@ const peek = (el: FluidResizeObserver): Internals =>
   el as unknown as Internals;
 
 describe("<fluid-resize-observer>", () => {
+  it("passes an a11y audit without changing slotted semantics", async () => {
+    const el = await fixture<FluidResizeObserver>(html`
+      <fluid-resize-observer><button>Observed action</button></fluid-resize-observer>
+    `);
+    await expect(el).to.be.accessible();
+  });
+
   it("renders its slotted children", async () => {
     const el = await fixture<FluidResizeObserver>(html`
       <fluid-resize-observer><div id="t">hi</div></fluid-resize-observer>
@@ -145,7 +152,9 @@ describe("<fluid-resize-observer>", () => {
       await el.updateComplete;
       expect(el.box).to.equal("border-box");
       expect(observeCalls.length).to.be.greaterThan(0);
-      expect(observeCalls[0].box).to.equal("border-box");
+      const firstCall = observeCalls[0];
+      if (!firstCall) throw new Error("ResizeObserver did not observe a target");
+      expect(firstCall.box).to.equal("border-box");
     } finally {
       window.ResizeObserver = RealRO;
     }

@@ -5,6 +5,13 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
 
 export type FluidOtpType = "number" | "text";
 
+export interface FluidOtpValueDetail {
+  value: string;
+}
+
+export type FluidOtpInputEvent = CustomEvent<FluidOtpValueDetail>;
+export type FluidOtpCompleteEvent = CustomEvent<FluidOtpValueDetail>;
+
 /**
  * A one-time-code / PIN input: a row of single-character boxes that together
  * capture a short code (an OTP, 2FA token, or PIN).
@@ -52,7 +59,7 @@ export type FluidOtpType = "number" | "text";
  * @cssproperty --fluid-otp-invalid-border - Border color when invalid. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-otp-disabled-bg - Background when disabled. Falls back to --fluid-surface-subtle.
  * @cssproperty --fluid-otp-disabled-fg - Character color when disabled. Falls back to --fluid-text-secondary.
- * @cssproperty --fluid-otp-font-family - Font family for characters. Falls back to --fluid-font-family-mono.
+ * @cssproperty --fluid-otp-font-family - Font family for characters. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-otp-font-size - Character size. Falls back to --fluid-font-size-lg.
  *
  * @uses-token --fluid-surface-base - Default box background.
@@ -69,20 +76,25 @@ export type FluidOtpType = "number" | "text";
  * @uses-token --fluid-field-border-width - Default border width.
  * @uses-token --fluid-field-border-radius - Default corner radius.
  * @uses-token --fluid-field-height-lg - Default box size.
- * @uses-token --fluid-font-family-mono - Default font family.
+ * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-font-size-lg - Default character size.
  * @uses-token --fluid-space-2 - Default gap between boxes.
  * @uses-token --fluid-duration-fast - Border/shadow transition duration.
  * @uses-token --fluid-easing-standard - Border/shadow transition easing.
  *
- * @fires fluid-input - Fired whenever the concatenated value changes. `event.detail.value` is the current value.
- * @fires fluid-complete - Fired once every box is filled. `event.detail.value` is the complete code.
+ * @fires {FluidOtpInputEvent} fluid-input - Fired whenever the concatenated value changes. `event.detail.value` is the current value.
+ * @fires {FluidOtpCompleteEvent} fluid-complete - Fired once every box is filled. `event.detail.value` is the complete code.
  */
 export class FluidOtp extends FluidFormAssociated {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-block;
-      font-family: var(--fluid-otp-font-family, var(--fluid-font-family-mono));
+      font-family: var(--fluid-otp-font-family, var(--fluid-font-family-sans));
     }
 
     :host([hidden]) {
@@ -109,11 +121,18 @@ export class FluidOtp extends FluidFormAssociated {
        * opting into AAA (data-fluid-conformance="aaa") lifts every box to a
        * 44px target (SC 2.5.5) while AA (24px) leaves the design size untouched.
        */
-      width: max(var(--fluid-otp-size, var(--fluid-field-height-lg, 2.75rem)), var(--fluid-target-min, 0px));
-      height: max(var(--fluid-otp-size, var(--fluid-field-height-lg, 2.75rem)), var(--fluid-target-min, 0px));
+      width: max(
+        var(--fluid-otp-size, var(--fluid-field-height-lg, 2.75rem)),
+        var(--fluid-target-min, 0px)
+      );
+      height: max(
+        var(--fluid-otp-size, var(--fluid-field-height-lg, 2.75rem)),
+        var(--fluid-target-min, 0px)
+      );
       text-align: center;
       font-family: inherit;
       font-size: var(--fluid-otp-font-size, var(--fluid-font-size-lg));
+      font-variant-numeric: tabular-nums;
       color: var(--fluid-otp-fg, var(--fluid-text-primary));
       background: var(--fluid-otp-bg, var(--fluid-surface-base));
       border: var(--fluid-otp-border-width, var(--fluid-field-border-width)) solid
@@ -142,11 +161,7 @@ export class FluidOtp extends FluidFormAssociated {
       border-color: var(--fluid-otp-border-focus, var(--fluid-accent-base));
       box-shadow:
         0 0 0 var(--fluid-otp-focus-ring-width, var(--fluid-focus-ring-width))
-          color-mix(
-            in srgb,
-            var(--fluid-otp-focus-ring-color, var(--fluid-focus-ring-color)) 35%,
-            transparent
-          ),
+          color-mix(in srgb, var(--fluid-focus-ring-color) 35%, transparent),
         inset 0 1px 0 0 rgb(0 0 0 / 0.02);
     }
 
@@ -208,6 +223,13 @@ export class FluidOtp extends FluidFormAssociated {
 
   @state() private invalid = false;
 
+  constructor() {
+    super();
+    // Keep the constraint active from first render, but only paint the error
+    // after the user leaves the group or a form validation attempt occurs.
+    this.addEventListener("invalid", this.handleInvalid);
+  }
+
   /** The per-box characters, length-normalized from `value`. */
   private get chars(): string[] {
     const out: string[] = [];
@@ -256,38 +278,40 @@ export class FluidOtp extends FluidFormAssociated {
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value")) {
+    if (changed.has("value") || changed.has("length")) {
+      const clamped = this.value.slice(0, this.length);
+      if (clamped !== this.value) this.value = clamped;
       this.syncFormValue();
     }
+    if (changed.has("required") && !this.required) this.invalid = false;
   }
 
-  protected override updated(changed: PropertyValues<this>): void {
-    // When `length` shrinks at runtime, the boxes render only the first
-    // `length` chars (via the `chars` getter), but `this.value` still holds the
-    // longer string, so the form would submit (and fluid-complete checks would
-    // see) stale extra characters. Re-clamp the stored value to the new length.
-    if (changed.has("length") && this.value.length > this.length) {
-      this.setValue(this.value.slice(0, this.length));
-    }
-    if (changed.has("value") || changed.has("required")) {
-      this.refreshValidity();
-    }
+  protected override updated(_changed: PropertyValues<this>): void {
+    // Keep an already-invalid message current after an inherited locale change.
+    this.refreshValidity();
   }
 
-  private refreshValidity(): void {
+  private refreshValidity(showInvalid = this.invalid): void {
     const list = Array.from(this.boxes ?? []);
     if (this.required && this.value.length < this.length) {
-      this.setValidity(
-        { valueMissing: true },
-        "Please complete the code.",
-        list[0]
-      );
-      this.invalid = true;
+      const firstMissing = list.find((box) => box.value === "") ?? list[0];
+      this.setValidity({ valueMissing: true }, this.term("completeCode"), firstMissing);
+      this.invalid = showInvalid;
     } else {
       this.setValidity({});
       this.invalid = false;
     }
   }
+
+  private handleInvalid = (): void => {
+    this.refreshValidity(true);
+  };
+
+  private handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.shadowRoot?.contains(next)) return;
+    this.refreshValidity(true);
+  };
 
   /** Sanitize a candidate character for the current `type`. */
   private sanitize(input: string): string {
@@ -300,8 +324,10 @@ export class FluidOtp extends FluidFormAssociated {
     const clamped = next.slice(0, this.length);
     if (clamped === this.value) return;
     this.value = clamped;
+    // Public value events must observe the same form value synchronously.
+    this.syncFormValue();
     this.dispatchEvent(
-      new CustomEvent("fluid-input", {
+      new CustomEvent<FluidOtpValueDetail>("fluid-input", {
         detail: { value: this.value },
         bubbles: true,
         composed: true
@@ -309,7 +335,7 @@ export class FluidOtp extends FluidFormAssociated {
     );
     if (this.value.length === this.length) {
       this.dispatchEvent(
-        new CustomEvent("fluid-complete", {
+        new CustomEvent<FluidOtpValueDetail>("fluid-complete", {
           detail: { value: this.value },
           bubbles: true,
           composed: true
@@ -382,12 +408,12 @@ export class FluidOtp extends FluidFormAssociated {
       }
       case "ArrowLeft": {
         event.preventDefault();
-        this.focusBox(index - 1);
+        this.focusBox(index + (this.isRtl ? 1 : -1));
         break;
       }
       case "ArrowRight": {
         event.preventDefault();
-        this.focusBox(index + 1);
+        this.focusBox(index + (this.isRtl ? -1 : 1));
         break;
       }
       case "Home": {
@@ -425,13 +451,14 @@ export class FluidOtp extends FluidFormAssociated {
 
   override render(): TemplateResult {
     const chars = this.chars;
-    const label = this.ariaLabel ?? "One-time code";
+    const label = this.ariaLabel ?? this.term("oneTimeCode");
     return html`
       <div
         part="base"
         class=${classMap({ base: true, invalid: this.invalid })}
         role="group"
         aria-label=${label}
+        @focusout=${this.handleFocusOut}
       >
         ${chars.map(
           (ch, i) => html`
@@ -444,7 +471,7 @@ export class FluidOtp extends FluidFormAssociated {
               autocomplete=${i === 0 ? "one-time-code" : "off"}
               maxlength="1"
               ?disabled=${this.disabled}
-              aria-label=${`Digit ${i + 1} of ${this.length}`}
+              aria-label=${this.term("digitOf", i + 1, this.length)}
               aria-invalid=${this.invalid ? "true" : "false"}
               @input=${this.handleInput(i)}
               @keydown=${this.handleKeydown(i)}

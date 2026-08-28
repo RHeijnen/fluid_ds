@@ -1,4 +1,4 @@
-import { expect, fixture, html } from "@open-wc/testing";
+import { expect, fixture, html, waitUntil } from "@open-wc/testing";
 import "./define.js";
 import type { FluidScroller } from "./fluid-scroller.js";
 
@@ -65,7 +65,7 @@ describe("<fluid-scroller>", () => {
       constructor() {
         instances.push(this);
       }
-      observe() {}
+      observe() { this.disconnected = false; }
       unobserve() {}
       disconnect() {
         this.disconnected = true;
@@ -78,14 +78,61 @@ describe("<fluid-scroller>", () => {
       await el.updateComplete;
 
       expect(instances).to.have.lengthOf(1);
-      expect(instances[0].disconnected).to.equal(false);
+      const observer = instances[0];
+      if (!observer) throw new Error("Scroller did not create its observer");
+      expect(observer.disconnected).to.equal(false);
 
       el.remove();
 
-      expect(instances[0].disconnected).to.equal(true);
+      expect(observer.disconnected).to.equal(true);
     } finally {
       window.ResizeObserver = RealResizeObserver;
     }
+  });
+
+  it("reacts to scrollbar changes after the first render", async () => {
+    const el = await fixture<FluidScroller>(html`<fluid-scroller></fluid-scroller>`);
+    el.noScrollbar = true;
+    await el.updateComplete;
+    expect(container(el).style.scrollbarWidth).to.equal("none");
+    el.noScrollbar = false;
+    await el.updateComplete;
+    expect(container(el).style.scrollbarWidth).to.equal("");
+  });
+
+  it("updates fades when slotted content resizes, including after reconnect", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div><fluid-scroller style="width:100px"><div style="width:50px">Content</div></fluid-scroller></div>
+    `);
+    const el = wrapper.querySelector<FluidScroller>("fluid-scroller")!;
+    const content = el.querySelector<HTMLElement>("div")!;
+    await el.updateComplete;
+    expect(fade(el, "end").hasAttribute("data-visible")).to.equal(false);
+    content.style.width = "500px";
+    await waitUntil(() => fade(el, "end").hasAttribute("data-visible"), "content resize updates overflow");
+    el.remove();
+    wrapper.append(el);
+    await el.updateComplete;
+    content.style.width = "50px";
+    await waitUntil(() => !fade(el, "end").hasAttribute("data-visible"), "reconnected observer updates overflow");
+  });
+
+  it("tracks logical start and end fades in RTL", async () => {
+    const el = await fixture<FluidScroller>(html`
+      <fluid-scroller dir="rtl" style="width:100px"><div style="width:500px">Content</div></fluid-scroller>
+    `);
+    await el.updateComplete;
+    const c = container(el);
+    expect(c.scrollWidth - c.clientWidth).to.equal(400);
+    expect(fade(el, "start").hasAttribute("data-visible")).to.equal(false);
+    expect(fade(el, "end").hasAttribute("data-visible")).to.equal(true);
+    c.scrollLeft = -400;
+    c.dispatchEvent(new Event("scroll"));
+    await el.updateComplete;
+    expect(c.scrollLeft).to.equal(-400);
+    expect(fade(el, "start").hasAttribute("data-visible")).to.equal(true);
+    expect(fade(el, "end").hasAttribute("data-visible")).to.equal(false);
+    expect(fade(el, "start").getBoundingClientRect().right).to.equal(el.getBoundingClientRect().right);
   });
 
   it("passes an accessibility audit", async () => {

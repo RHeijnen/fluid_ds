@@ -22,6 +22,27 @@ describe("<fluid-stat>", () => {
     expect(el.shadowRoot!.querySelector('[part="change"]')).to.be.null;
   });
 
+  it("renders a downward trend in the accessible group label", async () => {
+    const el = await fixture<FluidStat>(html`
+      <fluid-stat label="Churn" value="1.8%" change="-0.3%" trend="down"></fluid-stat>
+    `);
+    const group = el.shadowRoot!.querySelector('[role="group"]')!;
+    expect(group.getAttribute("aria-label")).to.contain("-0.3%");
+    expect(el.shadowRoot!.querySelector('[part="change"]')!.getAttribute("data-trend")).to.equal("down");
+  });
+
+  it("reacts when label, value, and change are updated", async () => {
+    const el = await fixture<FluidStat>(html`<fluid-stat label="Users" value="10"></fluid-stat>`);
+    el.label = "Teams";
+    el.value = "12";
+    el.change = "+2";
+    await el.updateComplete;
+    const group = el.shadowRoot!.querySelector('[role="group"]')!;
+    expect(group.getAttribute("aria-label")).to.contain("Teams");
+    expect(group.getAttribute("aria-label")).to.contain("12");
+    expect(group.getAttribute("aria-label")).to.contain("+2");
+  });
+
   it("passes the a11y audit", async () => {
     const host = await fixture<HTMLElement>(html`
       <div style="--fluid-text-primary:#18181b; --fluid-text-secondary:#3f3f46; --fluid-success-text:#15803d;">

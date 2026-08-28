@@ -1,6 +1,6 @@
 import { FluidTextarea } from "./fluid-textarea.js";
 
-if (!customElements.get("fluid-textarea")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-textarea")) {
   customElements.define("fluid-textarea", FluidTextarea);
 }
 

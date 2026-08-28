@@ -1,0 +1,28 @@
+{
+  "name": "@fluid-ds/benchmarks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Repeatable bundle and SSR performance budgets for Fluid.",
+  "scripts": {
+    "test:measurement": "node --test scripts/measurement-validity.test.mjs scripts/hydration-validity.test.mjs",
+    "test:expansion": "node --test scripts/expansion-validity.test.mjs",
+    "benchmark": "node ./scripts/run.mjs",
+    "benchmark:expansion": "node ./scripts/run-expansion.mjs",
+    "analyze:map-retention": "node ./scripts/analyze-map-retention.mjs",
+    "check": "node ./scripts/run.mjs --check",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/react": "workspace:*",
+    "esbuild": "^0.25.12",
+    "lit": "^3.2.1",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "playwright": "^1.49.1",
+    "typescript": "^5.7.2"
+  }
+}

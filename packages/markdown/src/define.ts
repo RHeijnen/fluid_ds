@@ -1,6 +1,6 @@
 import { FluidMarkdown } from "./fluid-markdown.js";
 
-if (!customElements.get("fluid-markdown")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-markdown")) {
   customElements.define("fluid-markdown", FluidMarkdown);
 }
 

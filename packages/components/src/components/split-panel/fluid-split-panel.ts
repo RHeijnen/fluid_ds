@@ -27,7 +27,11 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-focus-ring-color - Focus ring on the divider.
  *
  * @fires fluid-reposition - Fired whenever the split changes (pointer drag or keyboard); detail = { position }.
- */
+ * @cssproperty --fluid-split-panel-accent-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-split-panel-border-default - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-split-panel-border-strong - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-split-panel-focus-ring-color - Component override for the corresponding semantic token.
+*/
 export class FluidSplitPanel extends FluidElement {
   static override styles = css`
     :host {
@@ -48,10 +52,11 @@ export class FluidSplitPanel extends FluidElement {
 
     .divider {
       flex: 0 0 var(--fluid-split-divider-size, 4px);
-      background: var(--fluid-split-divider-color, var(--fluid-border-default));
+      background: var(--fluid-split-divider-color, var(--fluid-split-panel-border-default, var(--fluid-border-default)));
       cursor: col-resize;
       touch-action: none;
-      transition: background 120ms ease;
+      transition: background
+        calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
       position: relative;
     }
     :host([orientation="vertical"]) .divider {
@@ -59,10 +64,10 @@ export class FluidSplitPanel extends FluidElement {
     }
     .divider:hover,
     .divider[data-dragging] {
-      background: var(--fluid-split-divider-active-color, var(--fluid-accent-base, var(--fluid-border-strong)));
+      background: var(--fluid-split-divider-active-color, var(--fluid-split-panel-accent-base, var(--fluid-accent-base, var(--fluid-border-strong)))der-strong, var(--fluid-split-panel-border-strong, var(--fluid-border-strong)))));
     }
     .divider:focus-visible {
-      outline: 2px solid var(--fluid-split-divider-focus-ring, var(--fluid-focus-ring-color));
+      outline: 2px solid var(--fluid-split-divider-focus-ring, var(--fluid-split-panel-focus-ring-color, var(--fluid-focus-ring-color)));
       outline-offset: 1px;
     }
 
@@ -89,7 +94,14 @@ export class FluidSplitPanel extends FluidElement {
   @property({ type: Number, attribute: "max-position" }) maxPosition = 100;
 
   /** Accessible name for the divider, announced by screen readers. */
-  @property() label = "Resize panels";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("resizePanels");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   @query(".divider") private divider!: HTMLDivElement;
 

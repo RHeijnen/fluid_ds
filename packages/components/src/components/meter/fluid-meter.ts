@@ -88,6 +88,10 @@ export class FluidMeter extends FluidElement {
       color: var(--fluid-meter-label-fg, var(--fluid-text-primary));
     }
 
+    .label[hidden] {
+      display: none;
+    }
+
     ::slotted(*) {
       margin: 0 !important;
     }
@@ -166,7 +170,7 @@ export class FluidMeter extends FluidElement {
    */
   @property({ type: Number }) optimum?: number;
 
-  /** Accessible label for the gauge. Falls back to "Meter". */
+  /** Accessible label for the gauge, before slotted text and the localized default. */
   @property() label?: string;
 
   /** Show the value text at the end of the label row. */
@@ -174,7 +178,8 @@ export class FluidMeter extends FluidElement {
 
   /**
    * Format function for the value text and the numeric part of
-   * `aria-valuetext`. Receives the clamped value. Defaults to the raw number.
+   * `aria-valuetext`. Receives the clamped value. Defaults to a locale-aware,
+   * ungrouped number that preserves JavaScript numeric precision.
    */
   @property({ attribute: false }) valueFormatter?: (value: number) => string;
 
@@ -239,25 +244,24 @@ export class FluidMeter extends FluidElement {
     return distance === 1 ? "suboptimum" : "even-less-good";
   }
 
-  /** Human-readable band name used in the accessible value text. */
-  private bandLabel(band: FluidMeterBand): string {
-    switch (band) {
-      case "optimum":
-        return "good";
-      case "suboptimum":
-        return "fair";
-      case "even-less-good":
-        return "poor";
-    }
-  }
-
   private get hasBanding(): boolean {
     return this.low !== undefined || this.high !== undefined || this.optimum !== undefined;
   }
 
   /** Numeric portion of the value text (formatter or raw number). */
   private numericText(value: number): string {
-    return this.valueFormatter ? this.valueFormatter(value) : String(value);
+    if (this.valueFormatter) return this.valueFormatter(value);
+    try {
+      return new Intl.NumberFormat([this.localize.locale, "en"], {
+        useGrouping: false,
+        maximumSignificantDigits: 21
+      }).format(value);
+    } catch {
+      return new Intl.NumberFormat("en", {
+        useGrouping: false,
+        maximumSignificantDigits: 21
+      }).format(value);
+    }
   }
 
   /**
@@ -266,8 +270,11 @@ export class FluidMeter extends FluidElement {
    * conveyed by color alone.
    */
   private valueText(value: number): string {
-    const base = `${this.numericText(value)} of ${this.numericText(this.hi)}`;
-    return this.hasBanding ? `${base}, ${this.bandLabel(this.band)}` : base;
+    const current = this.numericText(value);
+    const maximum = this.numericText(this.hi);
+    return this.hasBanding
+      ? this.term("meterValueWithBand", current, maximum, this.band)
+      : this.term("meterValue", current, maximum);
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
@@ -286,6 +293,21 @@ export class FluidMeter extends FluidElement {
   override connectedCallback(): void {
     super.connectedCallback();
     if (!this.hasAttribute("role")) this.setAttribute("role", "meter");
+    // Slot assignment changes do not cover edits inside an assigned text node.
+    // Observe only light DOM and release the observer on every disconnect.
+    if (typeof MutationObserver !== "undefined") {
+      const observer = new MutationObserver(() => {
+        if (this.isConnected) this.requestUpdate();
+      });
+      observer.observe(this, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ["slot"]
+      });
+      this.registerCleanup(() => observer.disconnect());
+    }
   }
 
   protected override updated(): void {
@@ -294,23 +316,35 @@ export class FluidMeter extends FluidElement {
     this.setAttribute("aria-valuemax", String(this.hi));
     this.setAttribute("aria-valuenow", String(value));
     this.setAttribute("aria-valuetext", this.valueText(value));
-    if (!this.hasAttribute("aria-labelledby")) {
-      // Don't clobber a visible slotted label with the generic fallback: when
-      // slot text is present (and no explicit `label`), derive the accessible
-      // name from it so the visible label and the accessible name match.
-      const slotted = this.label ? "" : this.textContent?.trim();
-      const name = this.label ?? (slotted || "Meter");
-      this.setAttribute("aria-label", name);
-    }
+    const slotted = this.defaultSlotNodes
+      .map((node) => node.textContent ?? "")
+      .join("")
+      .trim();
+    this.updateDefaultAriaLabel(this.label ?? (slotted || this.term("meter")));
+  }
+
+  private get defaultSlotNodes(): Node[] {
+    // Named-slot children are not rendered by this component's default slot.
+    // Read light DOM as well as rendering the slot continuously so text-only
+    // labels and nodes inserted after the first render behave consistently.
+    return Array.from(this.childNodes ?? []).filter((node) => {
+      if (node.nodeType !== 1) return node.nodeType === 3;
+      return !(node as Element).getAttribute("slot");
+    });
+  }
+
+  private handleSlotChange(): void {
+    if (this.isConnected) this.requestUpdate();
   }
 
   private renderLabel(): TemplateResult | "" {
-    const hasSlot = this.children.length > 0;
-    if (!hasSlot && !this.showValue) return "";
+    const hasSlot = this.defaultSlotNodes.some(
+      (node) => node.nodeType === 1 || Boolean(node.textContent?.trim())
+    );
     const value = this.clamped;
     return html`
-      <div part="label" class="label">
-        <slot></slot>
+      <div part="label" class="label" ?hidden=${!hasSlot && !this.showValue}>
+        <slot @slotchange=${this.handleSlotChange}></slot>
         ${this.showValue
           ? html`<span part="value" class="value-text">${this.valueText(value)}</span>`
           : ""}
@@ -328,11 +362,7 @@ export class FluidMeter extends FluidElement {
       <div part="base" class="base">
         ${this.renderLabel()}
         <div part="track" class="track">
-          <div
-            part="fill"
-            class="fill ${bandClass}"
-            style="width: ${pct.toFixed(2)}%;"
-          ></div>
+          <div part="fill" class="fill ${bandClass}" style="width: ${pct.toFixed(2)}%;"></div>
         </div>
       </div>
     `;

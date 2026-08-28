@@ -18,6 +18,12 @@ function message(spec: Partial<FieldSpec> & { type: FieldSpec["type"] }, raw: un
   return r.message;
 }
 
+function failure(spec: Partial<FieldSpec> & { type: FieldSpec["type"] }, raw: unknown) {
+  const result = coerceCell(raw, field(spec));
+  if (result.ok) throw new Error("expected failure");
+  return result;
+}
+
 describe("isEmpty", () => {
   it("treats null, undefined, and blank strings as empty", () => {
     expect(isEmpty(null)).to.be.true;
@@ -125,5 +131,59 @@ describe("string constraints", () => {
   it("enforces a pattern", () => {
     expect(message({ type: "string", pattern: /^\d+$/ }, "x")).to.match(/required format/);
     expect(value({ type: "string", pattern: "^\\d+$" }, "42")).to.equal("42");
+  });
+});
+
+describe("structured diagnostics", () => {
+  it("returns stable codes and typed parameters for every built-in error family", () => {
+    const cases = [
+      [failure({ type: "string", required: true }, ""), "required", { label: "f" }],
+      [failure({ type: "string", min: 3 }, "ab"), "stringTooShort", { label: "f", minimum: 3 }],
+      [failure({ type: "string", max: 2 }, "abc"), "stringTooLong", { label: "f", maximum: 2 }],
+      [failure({ type: "string", pattern: /^ok$/ }, "no"), "patternMismatch", { label: "f" }],
+      [failure({ type: "number" }, "<bad>"), "invalidNumber", { label: "f", value: "<bad>" }],
+      [failure({ type: "integer" }, "1.5"), "invalidInteger", { label: "f", value: "1.5" }],
+      [failure({ type: "number", min: 2 }, 1), "numberBelowMinimum", { label: "f", minimum: 2 }],
+      [failure({ type: "number", max: 2 }, 3), "numberAboveMaximum", { label: "f", maximum: 2 }],
+      [
+        failure({ type: "boolean", truthy: ["oui"] }, "non"),
+        "invalidBoolean",
+        { label: "f", value: "non" }
+      ],
+      [failure({ type: "date" }, "not-a-date"), "invalidDate", { label: "f", value: "not-a-date" }],
+      [
+        failure({ type: "date", min: Date.UTC(2026, 0, 2) }, "2026-01-01"),
+        "dateBeforeMinimum",
+        { label: "f" }
+      ],
+      [
+        failure({ type: "date", max: Date.UTC(2025, 11, 31) }, "2026-01-01"),
+        "dateAfterMaximum",
+        { label: "f" }
+      ],
+      [failure({ type: "email" }, "not email"), "invalidEmail", { label: "f", value: "not email" }],
+      [failure({ type: "url" }, "not url"), "invalidUrl", { label: "f", value: "not url" }],
+      [
+        failure({ type: "enum", options: ["a", 2] }, "b"),
+        "invalidEnum",
+        { label: "f", options: ["a", 2] }
+      ],
+      [failure({ type: "json" }, "{bad"), "invalidJson", { label: "f" }]
+    ] as const;
+
+    for (const [result, code, parameters] of cases) {
+      expect(result.code).to.equal(code);
+      expect(result.parameters).to.deep.equal(parameters);
+      expect(result.message).to.be.a("string").and.not.equal("");
+    }
+  });
+
+  it("keeps unusual labels and raw values as data rather than parsing them from messages", () => {
+    const result = failure({ type: "number", label: "Amount: {gross}" }, '"quoted"');
+    expect(result).to.include({ code: "invalidNumber" });
+    expect(result.parameters).to.deep.equal({
+      label: "Amount: {gross}",
+      value: '"quoted"'
+    });
   });
 });

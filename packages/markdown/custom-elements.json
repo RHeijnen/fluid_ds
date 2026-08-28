@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-markdown",
+          "declaration": {
+            "name": "FluidMarkdown",
+            "module": "src/fluid-markdown.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/fluid-markdown.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders Markdown to HTML inside the shadow DOM. Provide source in one\nof three ways:\n\n  - inline text content (the default slot)\n  - the `value` property\n  - a remote URL via the `src` attribute\n\nPowered by [marked](https://marked.js.org/). Pass `marked` options via\nthe `options` property if you need GFM, breaks, etc.\n\nRendered HTML is sanitized with DOMPurify by default since `marked` does not\nsanitize and `src` can fetch untrusted remote content. Set `trusted` to\nbypass sanitization for known-safe input.",
+          "name": "FluidMarkdown",
+          "cssProperties": [
+            {
+              "description": "Text color.",
+              "name": "--fluid-markdown-color"
+            },
+            {
+              "description": "Background for inline and block code.",
+              "name": "--fluid-markdown-code-bg"
+            },
+            {
+              "description": "Blockquote left border color.",
+              "name": "--fluid-markdown-blockquote-border"
+            },
+            {
+              "description": "Blockquote text color.",
+              "name": "--fluid-markdown-blockquote-fg"
+            },
+            {
+              "description": "Link color.",
+              "name": "--fluid-markdown-link-fg"
+            },
+            {
+              "description": "Table cell border color.",
+              "name": "--fluid-markdown-table-border"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The rendered output container.",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Markdown source as a text node.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Markdown source.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Fetch source from this URL.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "options",
+              "type": {
+                "text": "MarkedOptions"
+              },
+              "default": "{ gfm: true, breaks: false }",
+              "description": "Pass-through options for marked."
+            },
+            {
+              "kind": "field",
+              "name": "trusted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Skip HTML sanitization. Only set this when the markdown source is fully\ntrusted: it allows raw script/iframe/event-handler markup to execute.",
+              "attribute": "trusted"
+            },
+            {
+              "kind": "field",
+              "name": "rendered",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "loadError",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-render",
+              "description": "Fired when render completes.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Markdown source.",
+              "fieldName": "value"
+            },
+            {
+              "name": "src",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Fetch source from this URL.",
+              "fieldName": "src"
+            },
+            {
+              "name": "trusted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Skip HTML sanitization. Only set this when the markdown source is fully\ntrusted: it allows raw script/iframe/event-handler markup to execute.",
+              "fieldName": "trusted"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Markdown renderer.",
+          "tagName": "fluid-markdown",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidMarkdown",
+          "declaration": {
+            "name": "FluidMarkdown",
+            "module": "src/fluid-markdown.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidMarkdown",
+          "declaration": {
+            "name": "FluidMarkdown",
+            "module": "src/fluid-markdown.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

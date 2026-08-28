@@ -1,0 +1,609 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/event-calendar/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-event-calendar",
+          "declaration": {
+            "name": "FluidEventCalendar",
+            "module": "src/components/event-calendar/fluid-event-calendar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/event-calendar/fluid-event-calendar.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A month view that DISPLAYS events. This is the read-oriented calendar (a\ndistinct concern from the booking scheduler): it lays out a six-week month\ngrid, drops event chips onto the days they fall on, and collapses any\noverflow into a \"+N more\" indicator. Navigation steps the visible month and\nday / event clicks surface as events for the host to act on.\n\nThe grid is a `role=\"grid\"` with one `role=\"row\"` per week and a\n`role=\"gridcell\"` per day. Days use roving tabindex: exactly one day is in\nthe tab order at a time and arrow keys move between days (Home / End to the\nends of a week, PageUp / PageDown by month). Event tone is carried by the\ntheme-independent `--fluid-<tone>-*` tracks and is never color-only: the chip\nalways renders its title text.\nF2 enters a day's event buttons; arrow keys move between those buttons and\nEscape or F2 returns to the day cell.",
+          "name": "FluidEventCalendar",
+          "cssProperties": [
+            {
+              "description": "Calendar background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-event-calendar-bg"
+            },
+            {
+              "description": "Calendar text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-event-calendar-fg"
+            },
+            {
+              "description": "Muted text (trailing days, weekday heads). Falls back to --fluid-text-secondary.",
+              "name": "--fluid-event-calendar-muted-fg"
+            },
+            {
+              "description": "Grid line / border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-event-calendar-border"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-event-calendar-radius"
+            },
+            {
+              "description": "Today cell background tint. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-event-calendar-today-bg"
+            },
+            {
+              "description": "Today day-number ring color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-event-calendar-today-ring"
+            },
+            {
+              "description": "Navigation button color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-event-calendar-nav-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The calendar root.",
+              "name": "base"
+            },
+            {
+              "description": "The header row (month label + navigation).",
+              "name": "header"
+            },
+            {
+              "description": "The month / year label.",
+              "name": "title"
+            },
+            {
+              "description": "The navigation button group.",
+              "name": "nav"
+            },
+            {
+              "description": "The previous-month button.",
+              "name": "prev"
+            },
+            {
+              "description": "The next-month button.",
+              "name": "next"
+            },
+            {
+              "description": "The month grid.",
+              "name": "grid"
+            },
+            {
+              "description": "A weekday column heading.",
+              "name": "weekday"
+            },
+            {
+              "description": "A day cell.",
+              "name": "day"
+            },
+            {
+              "description": "The day-of-month number inside a cell.",
+              "name": "day-number"
+            },
+            {
+              "description": "An event chip.",
+              "name": "event"
+            },
+            {
+              "description": "The \"+N more\" overflow indicator.",
+              "name": "more"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "The visible month as YYYY-MM. Defaults to the current month.",
+              "attribute": "month"
+            },
+            {
+              "kind": "field",
+              "name": "events",
+              "type": {
+                "text": "CalendarEvent[]"
+              },
+              "default": "[]",
+              "description": "Events to display. Accepts an array property or a JSON string attribute.",
+              "attribute": "events"
+            },
+            {
+              "kind": "field",
+              "name": "weekStart",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First day of the week: 0 (Sunday) through 6 (Saturday). Default 1 (Monday).",
+              "attribute": "week-start"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for month, weekday, date and number display. Defaults to inherited language.",
+              "resolveInitializer": {
+                "module": "src/components/event-calendar/fluid-event-calendar.ts"
+              },
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "maxPerDay",
+              "type": {
+                "text": "number"
+              },
+              "default": "3",
+              "description": "Maximum event chips shown per day before collapsing into \"+N more\".",
+              "attribute": "max-per-day"
+            },
+            {
+              "kind": "field",
+              "name": "focusedISO",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\"",
+              "description": "ISO of the day currently in the roving tab order."
+            },
+            {
+              "kind": "field",
+              "name": "restoreGridFocus",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "monthParts",
+              "type": {
+                "text": "[number, number]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "weekStartDay",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "displayLocale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "buildCells",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "DayCell[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "weekdayNames",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "monthLabel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "emit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "detail",
+                  "type": {
+                    "text": "unknown"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "changeMonth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onDayClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "cell",
+                  "type": {
+                    "text": "DayCell"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onEventClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "ev",
+                  "type": {
+                    "text": "CalendarEvent"
+                  }
+                },
+                {
+                  "name": "originalEvent",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "focusISO",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "iso",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onGridKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "cells",
+                  "type": {
+                    "text": "DayCell[]"
+                  }
+                },
+                {
+                  "name": "current",
+                  "type": {
+                    "text": "DayCell"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderDay",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "cell",
+                  "type": {
+                    "text": "DayCell"
+                  }
+                },
+                {
+                  "name": "cells",
+                  "type": {
+                    "text": "DayCell[]"
+                  }
+                },
+                {
+                  "name": "activeISO",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "max",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-day-click",
+              "description": "A day cell was activated. detail: { date: \"YYYY-MM-DD\" }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-event-click",
+              "description": "An event chip was activated. detail: { id, event }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-month-change",
+              "description": "The visible month changed. detail: { month: \"YYYY-MM\" }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "month",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "The visible month as YYYY-MM. Defaults to the current month.",
+              "fieldName": "month"
+            },
+            {
+              "name": "events",
+              "type": {
+                "text": "CalendarEvent[]"
+              },
+              "default": "[]",
+              "description": "Events to display. Accepts an array property or a JSON string attribute.",
+              "fieldName": "events"
+            },
+            {
+              "name": "week-start",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First day of the week: 0 (Sunday) through 6 (Saturday). Default 1 (Monday).",
+              "fieldName": "weekStart"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for month, weekday, date and number display. Defaults to inherited language.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "max-per-day",
+              "type": {
+                "text": "number"
+              },
+              "default": "3",
+              "description": "Maximum event chips shown per day before collapsing into \"+N more\".",
+              "fieldName": "maxPerDay"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Accessible month grid that displays events.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base",
+              "description": "Calendar background."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Today cell tint."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Primary text."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Muted text."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Grid lines."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Corner radius."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Accent track (default tone, today ring)."
+            },
+            {
+              "name": "--fluid-accent-text",
+              "description": "Accent foreground."
+            },
+            {
+              "name": "--fluid-success-base",
+              "description": "Success tone track."
+            },
+            {
+              "name": "--fluid-success-text",
+              "description": "Success tone foreground."
+            },
+            {
+              "name": "--fluid-warning-base",
+              "description": "Warning tone track."
+            },
+            {
+              "name": "--fluid-warning-text",
+              "description": "Warning tone foreground."
+            },
+            {
+              "name": "--fluid-danger-base",
+              "description": "Danger tone track."
+            },
+            {
+              "name": "--fluid-danger-text",
+              "description": "Danger tone foreground."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum control target (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-event-calendar",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidEventCalendar",
+          "declaration": {
+            "name": "FluidEventCalendar",
+            "module": "src/components/event-calendar/fluid-event-calendar.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CalendarEvent",
+          "declaration": {
+            "name": "CalendarEvent",
+            "module": "src/components/event-calendar/fluid-event-calendar.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidEventCalendar",
+          "declaration": {
+            "name": "FluidEventCalendar",
+            "module": "src/components/event-calendar/fluid-event-calendar.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

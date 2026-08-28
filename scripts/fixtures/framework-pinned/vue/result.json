@@ -1,0 +1,129 @@
+{
+  "status": "passed",
+  "framework": "Vue",
+  "lane": "latest-compatible-packed-production-runtime",
+  "node": "v22.22.2",
+  "platform": "linux",
+  "packageManager": "pnpm@9.15.0",
+  "commandOutcomes": [
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71741,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 393
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71753,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3414
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71765,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1313
+    },
+    {
+      "stage": "install",
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71777,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2071
+    },
+    {
+      "stage": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71792,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2135
+    },
+    {
+      "stage": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 71817,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3446
+    }
+  ],
+  "runtimeStatus": "passed",
+  "commands": [
+    "pnpm --filter @fluid-ds/framework-vue typecheck",
+    "pnpm --filter @fluid-ds/framework-vue build",
+    "node scripts/check-framework-vue-runtime.mjs"
+  ],
+  "limitations": [
+    "This Vite fixture is client-side rendered; it provides no SSR HTML or framework hydration contract.",
+    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
+    "Four representative core elements do not certify the full component catalog or other frameworks.",
+    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
+  ]
+}

@@ -1,0 +1,62 @@
+diff --git a/dist/index.js b/dist/index.js
+index e7bb89d9904bce12b980f32f04865b001f5d1582..9251faf750dae37e5dd0fdd685eb016aca40beed 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -10652,7 +10652,7 @@ var setupPage = /* @__PURE__ */ __name(async (page, browserContext) => {
+   const targetURL = process.env.TARGET_URL;
+   const failOnConsole = process.env.TEST_CHECK_CONSOLE;
+   const viewMode = process.env.VIEW_MODE ?? "story";
+-  const renderedEvent = viewMode === "docs" ? "docsRendered" : "storyRendered";
++  const renderedEvent = viewMode === "docs" ? "docsRendered" : "storyFinished";
+   const { packageJson } = await (0, import_read_pkg_up.default)();
+   const { version: testRunnerVersion } = packageJson;
+   const referenceURL = process.env.REFERENCE_URL;
+@@ -10688,7 +10688,7 @@ var setupPage = /* @__PURE__ */ __name(async (page, browserContext) => {
+   if (!testRunnerPackageLocation)
+     throw new Error("Could not find test-runner package location");
+   const scriptLocation = import_node_path3.default.join(import_node_path3.default.dirname(testRunnerPackageLocation), "dist", "setup-page-script.mjs");
+-  const content = (await (0, import_promises.readFile)(scriptLocation, "utf-8")).replaceAll("{{storybookUrl}}", finalStorybookUrl).replaceAll("{{failOnConsole}}", failOnConsole ?? "false").replaceAll("{{renderedEvent}}", renderedEvent).replaceAll("{{testRunnerVersion}}", testRunnerVersion).replaceAll("{{logLevel}}", testRunnerConfig2.logLevel ?? "info").replaceAll("{{debugPrintLimit}}", debugPrintLimit.toString());
++  const content = (await (0, import_promises.readFile)(scriptLocation, "utf-8")).replaceAll("{{storybookUrl}}", finalStorybookUrl).replaceAll("{{failOnConsole}}", failOnConsole ?? "false").replaceAll("{{renderedEvent}}", renderedEvent).replaceAll("{{viewMode}}", viewMode).replaceAll("{{testRunnerVersion}}", testRunnerVersion).replaceAll("{{logLevel}}", testRunnerConfig2.logLevel ?? "info").replaceAll("{{debugPrintLimit}}", debugPrintLimit.toString());
+   await page.addScriptTag({
+     content
+   });
+diff --git a/dist/index.mjs b/dist/index.mjs
+index f27555f75f2e8e7c2f53ffb580f8ace72572e577..3a4fb207ff92e366e212bdd6acbccb1e124b3f2d 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -10635,7 +10635,7 @@ var setupPage = /* @__PURE__ */ __name(async (page, browserContext) => {
+   const targetURL = process.env.TARGET_URL;
+   const failOnConsole = process.env.TEST_CHECK_CONSOLE;
+   const viewMode = process.env.VIEW_MODE ?? "story";
+-  const renderedEvent = viewMode === "docs" ? "docsRendered" : "storyRendered";
++  const renderedEvent = viewMode === "docs" ? "docsRendered" : "storyFinished";
+   const { packageJson } = await (0, import_read_pkg_up.default)();
+   const { version: testRunnerVersion } = packageJson;
+   const referenceURL = process.env.REFERENCE_URL;
+@@ -10671,7 +10671,7 @@ var setupPage = /* @__PURE__ */ __name(async (page, browserContext) => {
+   if (!testRunnerPackageLocation)
+     throw new Error("Could not find test-runner package location");
+   const scriptLocation = path4.join(path4.dirname(testRunnerPackageLocation), "dist", "setup-page-script.mjs");
+-  const content = (await readFile(scriptLocation, "utf-8")).replaceAll("{{storybookUrl}}", finalStorybookUrl).replaceAll("{{failOnConsole}}", failOnConsole ?? "false").replaceAll("{{renderedEvent}}", renderedEvent).replaceAll("{{testRunnerVersion}}", testRunnerVersion).replaceAll("{{logLevel}}", testRunnerConfig2.logLevel ?? "info").replaceAll("{{debugPrintLimit}}", debugPrintLimit.toString());
++  const content = (await readFile(scriptLocation, "utf-8")).replaceAll("{{storybookUrl}}", finalStorybookUrl).replaceAll("{{failOnConsole}}", failOnConsole ?? "false").replaceAll("{{renderedEvent}}", renderedEvent).replaceAll("{{viewMode}}", viewMode).replaceAll("{{testRunnerVersion}}", testRunnerVersion).replaceAll("{{logLevel}}", testRunnerConfig2.logLevel ?? "info").replaceAll("{{debugPrintLimit}}", debugPrintLimit.toString());
+   await page.addScriptTag({
+     content
+   });
+diff --git a/dist/setup-page-script.mjs b/dist/setup-page-script.mjs
+index 88dbf74668c945421f2bd4a398134cebfaa83657..d2ca6e4976796433a5354472a536c8bdba07d5ee 100644
+--- a/dist/setup-page-script.mjs
++++ b/dist/setup-page-script.mjs
+@@ -331,9 +331,11 @@ ${stackTrace}
+       });
+     }, "rejectWithFormattedError");
+     const listeners = {
+-      [TEST_RUNNER_RENDERED_EVENT]: () => {
++      [TEST_RUNNER_RENDERED_EVENT]: (result) => {
+         cleanup(listeners);
+-        if (hasErrors) {
++        if (result?.status === "error") {
++          rejectWithFormattedError(storyId, "Storybook reported a failed story after its completion hooks");
++        } else if (hasErrors) {
+           rejectWithFormattedError(storyId, "Browser console errors");
+         } else {
+           resolve(document.getElementById("root"));

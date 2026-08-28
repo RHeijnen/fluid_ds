@@ -179,10 +179,19 @@ range. A meter is **not interactive**, so it has no keyboard contract. See the
 
 ### Names
 
-Set `label` (or `aria-labelledby` to point at visible text) for the accessible
-name; it defaults to "Meter" if you provide neither. Slotted text in the label
-row is visual: give the host its own name so screen readers announce the gauge
-even when the value sits off-screen.
+Use `aria-labelledby` to reference visible text, or supply `aria-label` for an
+explicit host name. Without author ARIA naming, the component uses `label`, then
+its rendered default-slot text, then the localized "Meter" fallback. Plain-text
+slot labels are rendered, and edits to the label text update the derived name.
+
+Owned fallback names follow the nearest `lang`, including changes after mounting
+and reconnecting. Explicit labels remain application-owned, even when empty or
+equal to an English default. Removing `aria-label` restores the current derived
+name. An empty name is preserved, not an accessibility recommendation.
+
+Hydration limitation: an `aria-label` already present in server-rendered markup
+is preserved as authored. Automatic locale updates for a server-generated default
+need explicit ownership provenance and are not yet verified.
 
 ### State semantics
 
@@ -192,6 +201,10 @@ even when the value sits off-screen.
 conveyed by color alone (SC 1.4.1 Use of Color): a screen-reader user hears the
 band, and the fill-vs-track boundary carries an inset hairline so the level
 stays visible at 3:1 (SC 1.4.11).
+
+The range sentence and qualitative bands are still English in this release;
+localizing the fallback name does not localize `aria-valuetext`. A supplied
+`valueFormatter` remains application-owned.
 
 ### Motion & target size
 

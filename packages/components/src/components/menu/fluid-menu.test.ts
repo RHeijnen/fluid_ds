@@ -1,11 +1,4 @@
-import {
-  expect,
-  fixture,
-  html,
-  oneEvent,
-  elementUpdated,
-  aTimeout
-} from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
 import type { FluidMenu } from "./fluid-menu.js";
@@ -24,6 +17,33 @@ const items = (el: FluidMenu): FluidMenuItem[] =>
   Array.from(el.querySelectorAll<FluidMenuItem>("fluid-menu-item"));
 
 describe("<fluid-menu>", () => {
+  it("navigates from direct keyboard focus instead of an unrelated hover highlight", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    const [first, open, , last] = items(el);
+    first!.focus();
+    await sendKeys({ press: "ArrowDown" });
+    expect(document.activeElement).to.equal(open);
+    last!.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, composed: true }));
+    expect(last!.active).to.be.true;
+    await sendKeys({ press: "ArrowDown" });
+    expect(document.activeElement).to.equal(last);
+    expect(last!.tabIndex).to.equal(0);
+    expect(open!.tabIndex).to.equal(-1);
+  });
+
+  it("does not add an item activation Space to subsequent typeahead", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    const [first, open] = items(el);
+    open!.focus();
+    open!.dispatchEvent(
+      new KeyboardEvent("keydown", { key: " ", bubbles: true, composed: true, cancelable: true })
+    );
+    first!.focus();
+    first!.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "o", bubbles: true, composed: true, cancelable: true })
+    );
+    expect(document.activeElement).to.equal(open);
+  });
   it("renders role=menu and items as role=menuitem", async () => {
     const el = await fixture<FluidMenu>(basicMenu());
     expect(el.shadowRoot!.querySelector('[role="menu"]')).to.exist;
@@ -67,7 +87,9 @@ describe("<fluid-menu>", () => {
     const el = await fixture<FluidMenu>(basicMenu());
     let count = 0;
     el.addEventListener("fluid-select", () => count++);
-    items(el).find((i) => i.value === "open")!.click();
+    items(el)
+      .find((i) => i.value === "open")!
+      .click();
     await aTimeout(0);
     expect(count).to.equal(1);
   });
@@ -76,7 +98,9 @@ describe("<fluid-menu>", () => {
     const el = await fixture<FluidMenu>(basicMenu());
     let fired = false;
     el.addEventListener("fluid-select", () => (fired = true));
-    items(el).find((i) => i.value === "save")!.click();
+    items(el)
+      .find((i) => i.value === "save")!
+      .click();
     await aTimeout(0);
     expect(fired).to.be.false;
   });
@@ -89,6 +113,72 @@ describe("<fluid-menu>", () => {
     expect(items(el).find((i) => i.active)!.value).to.equal("open");
     await sendKeys({ press: "ArrowDown" }); // open -> (skip save) -> delete
     expect(items(el).find((i) => i.active)!.value).to.equal("delete");
+  });
+
+  it("moves active focus and the roving tab stop when the current item is disabled", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    await elementUpdated(el);
+    el.focus();
+    const [first, open] = items(el);
+    expect(document.activeElement).to.equal(first);
+    first!.disabled = true;
+    await aTimeout(0);
+
+    expect(first!.active).to.be.false;
+    expect(first!.tabIndex).to.equal(-1);
+    expect(first!.getAttribute("aria-disabled")).to.equal("true");
+    expect(open!.active).to.be.true;
+    expect(open!.tabIndex).to.equal(0);
+    expect(document.activeElement).to.equal(open);
+  });
+
+  it("preserves the current roving item when unrelated items are inserted", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    await elementUpdated(el);
+    el.focus();
+    await sendKeys({ press: "ArrowDown" });
+    const open = items(el).find((item) => item.value === "open")!;
+
+    const added = document.createElement("fluid-menu-item") as FluidMenuItem;
+    added.value = "archive";
+    added.textContent = "Archive";
+    el.prepend(added);
+    await aTimeout(0);
+
+    expect(open.active).to.be.true;
+    expect(open.tabIndex).to.equal(0);
+    expect(document.activeElement).to.equal(open);
+    expect(added.active).to.be.false;
+    expect(added.tabIndex).to.equal(-1);
+    expect(items(el).filter((item) => item.tabIndex === 0)).to.deep.equal([open]);
+  });
+
+  it("adopts child state changed while disconnected on reconnect", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`<div>${basicMenu()}</div>`);
+    const el = wrapper.querySelector<FluidMenu>("fluid-menu")!;
+    await elementUpdated(el);
+    el.focus();
+    const [first, open] = items(el);
+    el.remove();
+    first!.disabled = true;
+    const added = document.createElement("fluid-menu-item") as FluidMenuItem;
+    added.value = "archive";
+    added.textContent = "Archive";
+    el.append(added);
+    wrapper.append(el);
+    await aTimeout(0);
+
+    expect(first!.active).to.be.false;
+    expect(first!.tabIndex).to.equal(-1);
+    expect(open!.tabIndex).to.equal(0);
+    expect(items(el).filter((item) => item.tabIndex === 0)).to.deep.equal([open]);
+
+    let selected = "";
+    el.addEventListener("fluid-select", (event) => {
+      selected = (event as CustomEvent<{ value: string }>).detail.value;
+    });
+    open!.click();
+    expect(selected).to.equal("open");
   });
 
   it("ArrowUp wraps to the last enabled item", async () => {
@@ -113,8 +203,7 @@ describe("<fluid-menu>", () => {
     const el = await fixture<FluidMenu>(basicMenu());
     await elementUpdated(el);
     el.focus(); // active = new
-    setTimeout(() => sendKeys({ press: "Enter" }));
-    const event = await oneEvent(el, "fluid-select");
+    const [event] = await Promise.all([oneEvent(el, "fluid-select"), sendKeys({ press: "Enter" })]);
     expect(event.detail.value).to.equal("new");
   });
 
@@ -191,5 +280,118 @@ describe("<fluid-menu>", () => {
     await elementUpdated(menu);
     await aTimeout(20);
     await expect(menu).to.be.accessible();
+  });
+
+  it("cycles repeated-character typeahead forward, wraps, and skips disabled matches", async () => {
+    const el = await fixture<FluidMenu>(html`
+      <fluid-menu aria-label="Destinations">
+        <fluid-menu-item value="alpha">Alpha</fluid-menu-item>
+        <fluid-menu-item value="open">Open</fluid-menu-item>
+        <fluid-menu-item value="offline" disabled>Offline</fluid-menu-item>
+        <fluid-menu-item value="options">Options</fluid-menu-item>
+      </fluid-menu>
+    `);
+    await elementUpdated(el);
+    el.focus();
+    const press = (key: string) => {
+      (document.activeElement as HTMLElement).dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key,
+          bubbles: true,
+          composed: true,
+          cancelable: true
+        })
+      );
+    };
+
+    press("o");
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("open");
+    press("o");
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("options");
+    press("o");
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("open");
+  });
+
+  it("isolates outer roving state from pointer activity in a nested menu", async () => {
+    const el = await fixture<FluidMenu>(html`
+      <fluid-menu aria-label="Outer actions">
+        <fluid-menu-item value="outer-a">Outer A</fluid-menu-item>
+        <fluid-menu-item value="outer-b">Outer B</fluid-menu-item>
+        <div>
+          <fluid-menu aria-label="Nested actions">
+            <fluid-menu-item value="nested-a">Nested A</fluid-menu-item>
+            <fluid-menu-item value="nested-b">Nested B</fluid-menu-item>
+          </fluid-menu>
+        </div>
+      </fluid-menu>
+    `);
+    await elementUpdated(el);
+    el.focus();
+    const outerItems = items(el).filter((item) => item.closest("fluid-menu") === el);
+    const nested = el.querySelector<FluidMenu>("fluid-menu")!;
+    const nestedItem = nested.querySelector<FluidMenuItem>('[value="nested-b"]')!;
+
+    nestedItem.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, composed: true }));
+
+    expect(outerItems[0]!.active).to.be.true;
+    expect(outerItems[0]!.tabIndex).to.equal(0);
+    expect(outerItems[1]!.active).to.be.false;
+    expect(nestedItem.active).to.be.true;
+  });
+
+  it("moves active state, the tab stop, and focus after the focused item is removed", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    await elementUpdated(el);
+    el.focus();
+    const [first, open] = items(el);
+    expect(document.activeElement).to.equal(first);
+
+    first!.remove();
+    await aTimeout(0);
+
+    expect(open!.active).to.be.true;
+    expect(open!.tabIndex).to.equal(0);
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("open");
+    expect(
+      items(el)
+        .filter((item) => item.tabIndex === 0)
+        .map((item) => item.value)
+    ).to.deep.equal(["open"]);
+  });
+
+  it("preserves roving focus while a presentational menu label is inserted, hidden, and removed", async () => {
+    const el = await fixture<FluidMenu>(basicMenu());
+    await elementUpdated(el);
+    el.focus();
+    (document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      })
+    );
+    const open = items(el).find((item) => item.value === "open")!;
+    const label = document.createElement("fluid-menu-label");
+    label.textContent = "Dynamic group";
+
+    el.insertBefore(label, open);
+    await aTimeout(0);
+    expect(label.getAttribute("role")).to.equal("presentation");
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("open");
+    expect(open.active).to.be.true;
+    expect(open.tabIndex).to.equal(0);
+
+    label.hidden = true;
+    await aTimeout(0);
+    label.remove();
+    await aTimeout(0);
+    expect((document.activeElement as FluidMenuItem | null)?.value).to.equal("open");
+    expect(open.active).to.be.true;
+    expect(
+      items(el)
+        .filter((item) => item.tabIndex === 0)
+        .map((item) => item.value)
+    ).to.deep.equal(["open"]);
   });
 });

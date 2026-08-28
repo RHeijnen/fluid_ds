@@ -1,6 +1,6 @@
 import { FluidPopup } from "./fluid-popup.js";
 
-if (!customElements.get("fluid-popup")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-popup")) {
   customElements.define("fluid-popup", FluidPopup);
 }
 

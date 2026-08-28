@@ -104,11 +104,26 @@ export class FluidTruncate extends FluidElement {
   /** Whether the content is currently expanded. Reflected. */
   @property({ type: Boolean, reflect: true }) expanded = false;
 
-  /** Label for the expand action. */
-  @property({ attribute: "more-label" }) moreLabel = "Show more";
+  private moreLabelOverride: string | null = null;
+  private lessLabelOverride: string | null = null;
 
-  /** Label for the collapse action. */
-  @property({ attribute: "less-label" }) lessLabel = "Show less";
+  /** Expand label. Defaults to the current locale; an explicit value overrides it. */
+  @property({ attribute: "more-label" })
+  get moreLabel(): string {
+    return this.moreLabelOverride ?? this.term("showMore");
+  }
+  set moreLabel(value: string | null) {
+    this.moreLabelOverride = value;
+  }
+
+  /** Collapse label. Defaults to the current locale; an explicit value overrides it. */
+  @property({ attribute: "less-label" })
+  get lessLabel(): string {
+    return this.lessLabelOverride ?? this.term("showLess");
+  }
+  set lessLabel(value: string | null) {
+    this.lessLabelOverride = value;
+  }
 
   /** Whether the clamped content overflows its box (drives the toggle). */
   @state() private overflowing = false;

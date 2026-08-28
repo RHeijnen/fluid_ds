@@ -3,13 +3,7 @@
  * coerce + validate every cell, dedupe, and cap. Returns cleaned rows plus a
  * full error report. Pure and DOM-free.
  */
-import type {
-  ApplyOptions,
-  Blueprint,
-  CellError,
-  ParseResult,
-  RawTable
-} from "./types.js";
+import type { ApplyOptions, Blueprint, CellError, ParseResult, RawTable } from "./types.js";
 import { autoMap } from "./mapping.js";
 import { coerceCell, isEmpty } from "./coerce.js";
 
@@ -37,12 +31,8 @@ export function applyBlueprint(
   const maxRows = blueprint.maxRows ?? Infinity;
 
   raw.rows.forEach((sourceRow, rowIndex) => {
-    if (cleaned.length >= maxRows) {
-      truncated += 1;
-      return;
-    }
-
     const out: Record<string, unknown> = {};
+    const rowErrors: CellError[] = [];
 
     for (const field of blueprint.fields) {
       const column = mapping[field.key] ?? null;
@@ -51,11 +41,15 @@ export function applyBlueprint(
       // Unmapped + required = the source never provided this field.
       if (column === null && field.required && field.default === undefined) {
         out[field.key] = null;
-        errors.push({
+        rowErrors.push({
           row: cleaned.length,
           field: field.key,
           value: rawValue,
-          message: `${field.label ?? field.key} is required but no column is mapped to it`
+          message: `${field.label ?? field.key} is required but no column is mapped to it`,
+          diagnostic: {
+            code: "unmappedRequired",
+            parameters: { label: field.label ?? field.key }
+          }
         });
         continue;
       }
@@ -63,11 +57,15 @@ export function applyBlueprint(
       const coerced = coerceCell(rawValue, field);
       if (!coerced.ok) {
         out[field.key] = isEmpty(rawValue) ? null : rawValue;
-        errors.push({
+        rowErrors.push({
           row: cleaned.length,
           field: field.key,
           value: rawValue,
-          message: coerced.message
+          message: coerced.message,
+          diagnostic: {
+            code: coerced.code,
+            parameters: coerced.parameters
+          } as NonNullable<CellError["diagnostic"]>
         });
         continue;
       }
@@ -77,11 +75,19 @@ export function applyBlueprint(
         try {
           value = field.transform(value);
         } catch (err) {
-          errors.push({
+          const reason = err instanceof Error ? err.message : String(err);
+          rowErrors.push({
             row: cleaned.length,
             field: field.key,
             value: rawValue,
-            message: `${field.label ?? field.key} transform failed: ${(err as Error).message}`
+            message: `${field.label ?? field.key} transform failed: ${reason}`,
+            diagnostic: {
+              code: "transformFailed",
+              parameters: {
+                label: field.label ?? field.key,
+                reason
+              }
+            }
           });
         }
       }
@@ -89,11 +95,15 @@ export function applyBlueprint(
       if (field.validate) {
         const result = field.validate(value);
         if (result !== true) {
-          errors.push({
+          rowErrors.push({
             row: cleaned.length,
             field: field.key,
             value: rawValue,
-            message: typeof result === "string" ? result : `${field.label ?? field.key} is invalid`
+            message: typeof result === "string" ? result : `${field.label ?? field.key} is invalid`,
+            diagnostic: {
+              code: "customValidation",
+              parameters: { label: field.label ?? field.key }
+            }
           });
         }
       }
@@ -112,6 +122,12 @@ export function applyBlueprint(
       seenDedupe.add(dedupeKey);
     }
 
+    if (cleaned.length >= maxRows) {
+      truncated += 1;
+      return;
+    }
+
+    errors.push(...rowErrors);
     cleaned.push(out);
     void rowIndex;
   });

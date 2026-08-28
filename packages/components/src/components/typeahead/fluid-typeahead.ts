@@ -3,7 +3,7 @@ import { property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
-import { autoUpdate, computePosition, flip, offset, size } from "@floating-ui/dom";
+import { autoUpdate, computePosition, flip, offset, size } from "../../internal/position.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
 import {
   fieldChromeStyles,
@@ -23,6 +23,17 @@ export interface TypeaheadOption {
   /** Free-form payload, preserved through events so consumers can read it. */
   data?: unknown;
 }
+
+export interface FluidTypeaheadInputDetail {
+  value: string;
+}
+export interface FluidTypeaheadChangeDetail {
+  value: string;
+  label: string;
+  option: TypeaheadOption;
+}
+export type FluidTypeaheadInputEvent = CustomEvent<FluidTypeaheadInputDetail>;
+export type FluidTypeaheadChangeEvent = CustomEvent<FluidTypeaheadChangeDetail>;
 
 type RawOption = string | TypeaheadOption;
 
@@ -127,6 +138,28 @@ export type TypeaheadOptionRenderer = (
  * @cssproperty --fluid-typeahead-placeholder-fg - Placeholder text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-typeahead-accent - Accent used for active rail, match highlight, selected text. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-typeahead-empty-fg - Empty/loading text color. Falls back to --fluid-text-secondary.
+ * @cssproperty --fluid-typeahead-listbox-shadow - Listbox elevation. Falls back to --fluid-shadow-lg.
+ * @cssproperty --fluid-typeahead-invalid-border - Invalid border color. Falls back to --fluid-danger-base.
+ * @cssproperty --fluid-typeahead-duration - Transition duration. Falls back to --fluid-duration-fast.
+ * @cssproperty --fluid-typeahead-easing - Transition easing. Falls back to --fluid-easing-standard.
+ * @cssproperty --fluid-typeahead-height-sm - Small field height. Falls back to --fluid-field-height-sm.
+ * @cssproperty --fluid-typeahead-height-md - Medium field height. Falls back to --fluid-field-height-md.
+ * @cssproperty --fluid-typeahead-height-lg - Large field height. Falls back to --fluid-field-height-lg.
+ * @cssproperty --fluid-typeahead-font-size-sm - Small text size. Falls back to --fluid-font-size-sm.
+ * @cssproperty --fluid-typeahead-font-size-md - Medium text size. Falls back to --fluid-font-size-md.
+ * @cssproperty --fluid-typeahead-font-size-lg - Large text size. Falls back to --fluid-font-size-lg.
+ * @cssproperty --fluid-typeahead-padding-x-sm - Small inline padding. Falls back to --fluid-field-padding-x-sm.
+ * @cssproperty --fluid-typeahead-padding-x-md - Medium inline padding. Falls back to --fluid-field-padding-x-md.
+ * @cssproperty --fluid-typeahead-padding-x-lg - Large inline padding. Falls back to --fluid-field-padding-x-lg.
+ * @cssproperty --fluid-typeahead-listbox-padding - Listbox padding. Falls back to --fluid-space-1.
+ * @cssproperty --fluid-typeahead-listbox-max-height - Listbox maximum height. Defaults to 18rem.
+ * @cssproperty --fluid-typeahead-option-padding-block - Option block padding. Falls back to --fluid-space-2.
+ * @cssproperty --fluid-typeahead-option-padding-inline - Option inline padding. Falls back to --fluid-space-3.
+ * @cssproperty --fluid-typeahead-option-radius - Option radius. Falls back to --fluid-radius-sm.
+ * @cssproperty --fluid-typeahead-option-active-bg - Active option background.
+ * @cssproperty --fluid-typeahead-option-active-rail-width - Active rail width. Defaults to 2px.
+ * @cssproperty --fluid-typeahead-option-active-rail-inset - Active rail block inset. Defaults to 4px.
+ * @cssproperty --fluid-typeahead-option-selected-font-weight - Selected option weight. Falls back to --fluid-font-weight-semibold.
  *
  * @uses-token --fluid-surface-base - Input + listbox background.
  * @uses-token --fluid-surface-subtle - Disabled background.
@@ -146,278 +179,322 @@ export type TypeaheadOptionRenderer = (
  * @uses-token --fluid-font-family-sans - Input font family.
  * @uses-token --fluid-shadow-lg - Listbox elevation.
  *
- * @fires fluid-input - Fired on every keystroke. detail.value is the current query.
- * @fires fluid-change - Fired when an option is selected. detail.option is the chosen TypeaheadOption.
+ * @fires {FluidTypeaheadInputEvent} fluid-input - Fired on every keystroke. detail.value is the current query.
+ * @fires {FluidTypeaheadChangeEvent} fluid-change - Fired when an option is selected. detail.option is the chosen TypeaheadOption.
  */
 export class FluidTypeahead extends FluidFormAssociated {
+  // Native constraint validation must be able to focus the shadow control.
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override formAssociated = true;
 
   static override styles = [
     fieldChromeStyles,
     css`
-    :host {
-      display: inline-flex;
-      width: 100%;
-      max-width: 100%;
-    }
+      :host {
+        display: inline-flex;
+        width: 100%;
+        max-width: 100%;
+      }
 
-    .base {
-      position: relative;
-      width: 100%;
-    }
+      .base {
+        position: relative;
+        width: 100%;
+      }
 
-    .input-wrap {
-      display: inline-flex;
-      align-items: stretch;
-      width: 100%;
-      background: var(--fluid-typeahead-bg, var(--fluid-surface-base));
-      border: var(--fluid-typeahead-border-width, var(--fluid-field-border-width)) solid
-        var(--fluid-typeahead-border, var(--fluid-border-default));
-      border-radius: var(--fluid-typeahead-radius, var(--fluid-field-border-radius));
-      box-shadow:
-        inset 0 1px 0 0 rgb(0 0 0 / 0.02),
-        0 1px 2px 0 rgb(0 0 0 / 0.04);
-      transition:
-        border-color var(--fluid-duration-fast) var(--fluid-easing-standard),
-        box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard);
-      font-family: var(--fluid-typeahead-font-family, var(--fluid-font-family-sans));
-      color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
-    }
+      .input-wrap {
+        display: inline-flex;
+        align-items: stretch;
+        width: 100%;
+        background: var(--fluid-typeahead-bg, var(--fluid-surface-base));
+        border: var(--fluid-typeahead-border-width, var(--fluid-field-border-width)) solid
+          var(--fluid-typeahead-border, var(--fluid-border-default));
+        border-radius: var(--fluid-typeahead-radius, var(--fluid-field-border-radius));
+        box-shadow:
+          inset 0 1px 0 0 rgb(0 0 0 / 0.02),
+          0 1px 2px 0 rgb(0 0 0 / 0.04);
+        transition:
+          border-color var(--fluid-typeahead-duration, var(--fluid-duration-fast))
+            var(--fluid-typeahead-easing, var(--fluid-easing-standard)),
+          box-shadow var(--fluid-typeahead-duration, var(--fluid-duration-fast))
+            var(--fluid-typeahead-easing, var(--fluid-easing-standard));
+        font-family: var(--fluid-typeahead-font-family, var(--fluid-font-family-sans));
+        color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
+        overflow: hidden;
+      }
 
-    /*
+      /*
      * Prefix / suffix render as flush sibling sections of the field, divided
      * by a rule — the same treatment fluid-input gives them, so a typeahead
      * and an input carrying the same affix look identical.
      */
-    .affix {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      align-self: stretch;
-      flex-shrink: 0;
-      color: var(--fluid-typeahead-affix-fg, var(--fluid-text-secondary));
-      background: var(--fluid-typeahead-affix-bg, var(--fluid-surface-subtle));
-    }
-    .affix[hidden] {
-      display: none;
-    }
-    .prefix {
-      border-right: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
-        solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
-    }
-    .suffix {
-      border-left: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
-        solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
-    }
-    .size-sm .affix:not(.flush) {
-      padding: 0 var(--fluid-field-padding-x-sm);
-    }
-    .size-md .affix:not(.flush) {
-      padding: 0 var(--fluid-field-padding-x-md);
-    }
-    .size-lg .affix:not(.flush) {
-      padding: 0 var(--fluid-field-padding-x-lg);
-    }
-    /*
+      .affix {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        align-self: stretch;
+        flex-shrink: 0;
+        color: var(--fluid-typeahead-affix-fg, var(--fluid-text-secondary));
+        background: var(--fluid-typeahead-affix-bg, var(--fluid-surface-subtle));
+      }
+      .affix[hidden] {
+        display: none;
+      }
+      .prefix {
+        border-inline-end: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
+          solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
+      }
+      .suffix {
+        border-inline-start: var(--fluid-typeahead-border-width, var(--fluid-field-border-width))
+          solid var(--fluid-typeahead-affix-border, var(--fluid-border-default));
+      }
+      .size-sm .affix:not(.flush) {
+        padding: 0 var(--fluid-typeahead-padding-x-sm, var(--fluid-field-padding-x-sm));
+      }
+      .size-md .affix:not(.flush) {
+        padding: 0 var(--fluid-typeahead-padding-x-md, var(--fluid-field-padding-x-md));
+      }
+      .size-lg .affix:not(.flush) {
+        padding: 0 var(--fluid-typeahead-padding-x-lg, var(--fluid-field-padding-x-lg));
+      }
+      /*
      * data-flush: an affix that is itself a control (a select, a swatch) owns
      * its own padding, so the wrapper gives up its own and lets it stretch.
      */
-    .affix.flush {
-      padding: 0;
-      align-items: stretch;
-    }
+      .affix.flush {
+        padding: 0;
+        align-items: stretch;
+      }
 
-    .input-wrap:hover:not(.disabled):not(.focused) {
-      border-color: var(--fluid-typeahead-border-hover, var(--fluid-border-strong));
-    }
+      .input-wrap:hover:not(.disabled):not(.focused) {
+        border-color: var(--fluid-typeahead-border-hover, var(--fluid-border-strong));
+      }
 
-    .input-wrap.focused {
-      border-color: var(--fluid-typeahead-border-focus, var(--fluid-accent-base));
-      box-shadow:
-        0 0 0 var(--fluid-typeahead-focus-ring-width, var(--fluid-focus-ring-width))
-          color-mix(in srgb, var(--fluid-typeahead-focus-ring, var(--fluid-focus-ring-color)) 25%, transparent),
-        inset 0 1px 0 0 rgb(0 0 0 / 0.02);
-    }
+      .input-wrap.focused {
+        border-color: var(--fluid-typeahead-border-focus, var(--fluid-accent-base));
+        box-shadow:
+          0 0 0 var(--fluid-typeahead-focus-ring-width, var(--fluid-focus-ring-width))
+            color-mix(
+              in srgb,
+              var(--fluid-typeahead-focus-ring, var(--fluid-focus-ring-color)) 25%,
+              transparent
+            ),
+          inset 0 1px 0 0 rgb(0 0 0 / 0.02);
+      }
 
-    .input-wrap.disabled {
-      background: var(--fluid-typeahead-disabled-bg, var(--fluid-surface-subtle));
-      color: var(--fluid-typeahead-disabled-fg, var(--fluid-text-secondary));
-      cursor: not-allowed;
-    }
+      .input-wrap.disabled {
+        background: var(--fluid-typeahead-disabled-bg, var(--fluid-surface-subtle));
+        color: var(--fluid-typeahead-disabled-fg, var(--fluid-text-secondary));
+        cursor: not-allowed;
+      }
 
-    /* Fused-dropdown styling, see fluid-select for the same pattern.
+      .input-wrap.invalid {
+        border-color: var(--fluid-typeahead-invalid-border, var(--fluid-danger-base));
+      }
+      .input-wrap.invalid.focused {
+        box-shadow: 0 0 0 var(--fluid-typeahead-focus-ring-width, var(--fluid-focus-ring-width))
+          color-mix(
+            in srgb,
+            var(--fluid-typeahead-invalid-border, var(--fluid-danger-base)) 35%,
+            transparent
+          );
+      }
+
+      /* Fused-dropdown styling, see fluid-select for the same pattern.
        When open, the listbox visually grows out of the input as one shape:
        seam edge is flat, halo wraps three sides, listbox borrows the same
        accent border to read as one element. */
-    :host([open][data-placement="bottom"]) .input-wrap {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-    /*
+      :host([open][data-placement="bottom"]) .input-wrap {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+      /*
      * Drop the focus halo entirely when fused. The accent border on the
      * combined shape already signals focus clearly; the extra halo around the
      * input alone reads as a visual gap between input and listbox.
      */
-    :host([open]) .input-wrap.focused {
-      box-shadow: inset 0 1px 0 0 rgb(0 0 0 / 0.02);
-    }
-    :host([open][data-placement="top"]) .input-wrap {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
+      :host([open]) .input-wrap.focused {
+        box-shadow: inset 0 1px 0 0 rgb(0 0 0 / 0.02);
+      }
+      :host([open][data-placement="top"]) .input-wrap {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
 
-    /*
+      /*
      * SC 2.5.8 Target Size. min-height reads --fluid-target-min as a floor so
      * AAA (44px) lifts the field without touching the visual padding; AA stays
      * at the field height. Literal fallbacks keep the max() valid when the
      * field-height tokens aren't loaded (e.g. unit tests).
      */
-    .size-sm {
-      min-height: max(var(--fluid-field-height-sm, 1.75rem), var(--fluid-target-min, 0px));
-      font-size: var(--fluid-font-size-sm);
-    }
-    .size-md {
-      min-height: max(var(--fluid-field-height-md, 2.25rem), var(--fluid-target-min, 0px));
-      font-size: var(--fluid-font-size-md);
-    }
-    .size-lg {
-      min-height: max(var(--fluid-field-height-lg, 2.75rem), var(--fluid-target-min, 0px));
-      font-size: var(--fluid-font-size-lg);
-    }
+      .size-sm {
+        min-height: max(
+          var(--fluid-typeahead-height-sm, var(--fluid-field-height-sm, 1.75rem)),
+          var(--fluid-target-min, 0px)
+        );
+        font-size: var(--fluid-typeahead-font-size-sm, var(--fluid-font-size-sm));
+      }
+      .size-md {
+        min-height: max(
+          var(--fluid-typeahead-height-md, var(--fluid-field-height-md, 2.25rem)),
+          var(--fluid-target-min, 0px)
+        );
+        font-size: var(--fluid-typeahead-font-size-md, var(--fluid-font-size-md));
+      }
+      .size-lg {
+        min-height: max(
+          var(--fluid-typeahead-height-lg, var(--fluid-field-height-lg, 2.75rem)),
+          var(--fluid-target-min, 0px)
+        );
+        font-size: var(--fluid-typeahead-font-size-lg, var(--fluid-font-size-lg));
+      }
 
-    input {
-      all: unset;
-      flex: 1 1 auto;
-      min-width: 0;
-      font: inherit;
-      color: inherit;
-      line-height: var(--fluid-font-line-height-normal);
-    }
-    .size-sm input {
-      padding: 0 var(--fluid-field-padding-x-sm);
-    }
-    .size-md input {
-      padding: 0 var(--fluid-field-padding-x-md);
-    }
-    .size-lg input {
-      padding: 0 var(--fluid-field-padding-x-lg);
-    }
-    input::placeholder {
-      color: var(--fluid-typeahead-placeholder-fg, var(--fluid-text-secondary));
-    }
+      input {
+        all: unset;
+        flex: 1 1 auto;
+        min-width: 0;
+        font: inherit;
+        color: inherit;
+        line-height: var(--fluid-typeahead-line-height, var(--fluid-font-line-height-normal));
+      }
+      .size-sm input {
+        padding: 0 var(--fluid-typeahead-padding-x-sm, var(--fluid-field-padding-x-sm));
+      }
+      .size-md input {
+        padding: 0 var(--fluid-typeahead-padding-x-md, var(--fluid-field-padding-x-md));
+      }
+      .size-lg input {
+        padding: 0 var(--fluid-typeahead-padding-x-lg, var(--fluid-field-padding-x-lg));
+      }
+      input::placeholder {
+        color: var(--fluid-typeahead-placeholder-fg, var(--fluid-text-secondary));
+      }
 
-    /*
+      /*
      * The Popover API promotes the listbox to the browser top layer so cards,
      * modals and transformed containers cannot clip it. position:fixed and
-     * floating-ui still own viewport placement and provide the fallback.
+     * the positioning engine still owns viewport placement and provide the fallback.
      */
-    .listbox {
-      position: fixed;
-      inset: auto;
-      margin: 0;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      box-sizing: border-box;
-      max-height: 18rem;
-      overflow-y: auto;
-      background: var(--fluid-typeahead-bg, var(--fluid-surface-base));
-      border: var(--fluid-typeahead-border-width, var(--fluid-field-border-width)) solid
-        var(--fluid-typeahead-border, var(--fluid-border-default));
-      border-radius: var(--fluid-typeahead-radius, var(--fluid-field-border-radius));
-      box-shadow: var(--fluid-shadow-lg);
-      padding: var(--fluid-space-1);
-      opacity: 0;
-      visibility: hidden;
-      transition:
-        opacity var(--fluid-duration-fast) var(--fluid-easing-standard),
-        visibility 0s var(--fluid-duration-fast);
-    }
+      .listbox {
+        position: fixed;
+        inset: auto;
+        margin: 0;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+        max-height: var(--fluid-typeahead-listbox-max-height, 18rem);
+        overflow: hidden auto;
+        background: var(--fluid-typeahead-bg, var(--fluid-surface-base));
+        border: var(--fluid-typeahead-border-width, var(--fluid-field-border-width)) solid
+          var(--fluid-typeahead-border, var(--fluid-border-default));
+        border-radius: var(--fluid-typeahead-radius, var(--fluid-field-border-radius));
+        box-shadow: var(--fluid-typeahead-listbox-shadow, var(--fluid-shadow-lg));
+        padding: var(--fluid-typeahead-listbox-padding, var(--fluid-space-1));
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity var(--fluid-typeahead-duration, var(--fluid-duration-fast))
+            var(--fluid-typeahead-easing, var(--fluid-easing-standard)),
+          visibility 0s var(--fluid-typeahead-duration, var(--fluid-duration-fast));
+      }
 
-    :host([open]) .listbox {
-      opacity: 1;
-      visibility: visible;
-      transition-delay: 0s;
-      border-color: var(--fluid-typeahead-border-focus, var(--fluid-accent-base));
-    }
+      :host([open]) .listbox {
+        opacity: 1;
+        visibility: visible;
+        transition-delay: 0s;
+        border-color: var(--fluid-typeahead-border-focus, var(--fluid-accent-base));
+      }
 
-    :host([open][data-placement="bottom"]) .listbox {
-      border-top: 0;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-    :host([open][data-placement="top"]) .listbox {
-      border-bottom: 0;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-    }
+      :host([open][data-placement="bottom"]) .listbox {
+        border-top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+      :host([open][data-placement="top"]) .listbox {
+        border-bottom: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
 
-    .option {
-      display: flex;
-      align-items: center;
-      padding: var(--fluid-space-2) var(--fluid-space-3);
-      cursor: pointer;
-      user-select: none;
-      border-radius: var(--fluid-radius-sm);
-      font-size: inherit;
-      color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
-      position: relative;
-      transition:
-        background-color var(--fluid-duration-fast) var(--fluid-easing-standard),
-        color var(--fluid-duration-fast) var(--fluid-easing-standard);
-    }
+      .option {
+        display: flex;
+        align-items: center;
+        padding: var(--fluid-typeahead-option-padding-block, var(--fluid-space-2))
+          var(--fluid-typeahead-option-padding-inline, var(--fluid-space-3));
+        cursor: pointer;
+        user-select: none;
+        border-radius: var(--fluid-typeahead-option-radius, var(--fluid-radius-sm));
+        font-size: inherit;
+        color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
+        position: relative;
+        transition:
+          background-color var(--fluid-typeahead-duration, var(--fluid-duration-fast))
+            var(--fluid-typeahead-easing, var(--fluid-easing-standard)),
+          color var(--fluid-typeahead-duration, var(--fluid-duration-fast))
+            var(--fluid-typeahead-easing, var(--fluid-easing-standard));
+      }
 
-    /*
+      /*
      * Active = keyboard-focused option. Brand-tinted background with a 2px
      * accent rail on the left edge, more identifiable than a flat grey row,
      * and the rail visually anchors the highlight to the brand.
      */
-    .option.active {
-      background: color-mix(
-        in srgb,
-        var(--fluid-typeahead-accent, var(--fluid-accent-base)) 8%,
-        transparent
-      );
-      color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
-    }
-    .option.active::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 4px;
-      bottom: 4px;
-      width: 2px;
-      background: var(--fluid-typeahead-accent, var(--fluid-accent-base));
-      border-radius: var(--fluid-radius-full);
-    }
+      .option.active {
+        background: var(
+          --fluid-typeahead-option-active-bg,
+          color-mix(
+            in srgb,
+            var(--fluid-typeahead-accent, var(--fluid-accent-base)) 8%,
+            transparent
+          )
+        );
+        color: var(--fluid-typeahead-fg, var(--fluid-text-primary));
+      }
+      .option.active::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 0;
+        top: var(--fluid-typeahead-option-active-rail-inset, 4px);
+        bottom: var(--fluid-typeahead-option-active-rail-inset, 4px);
+        width: var(--fluid-typeahead-option-active-rail-width, 2px);
+        background: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        border-radius: var(--fluid-typeahead-option-active-rail-radius, var(--fluid-radius-full));
+      }
 
-    .option.selected {
-      color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
-      font-weight: var(--fluid-font-weight-semibold);
-    }
+      .option.selected {
+        color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        font-weight: var(
+          --fluid-typeahead-option-selected-font-weight,
+          var(--fluid-font-weight-semibold)
+        );
+      }
 
-    .option-empty,
-    .option-loading {
-      padding: var(--fluid-space-3);
-      color: var(--fluid-typeahead-empty-fg, var(--fluid-text-secondary));
-      font-size: var(--fluid-font-size-sm);
-      text-align: center;
-    }
+      .option-empty,
+      .option-loading {
+        padding: var(--fluid-typeahead-empty-padding, var(--fluid-space-3));
+        color: var(--fluid-typeahead-empty-fg, var(--fluid-text-secondary));
+        font-size: var(--fluid-typeahead-empty-font-size, var(--fluid-font-size-sm));
+        text-align: center;
+      }
 
-    /*
+      /*
      * Match highlight, the matched substring inside an option's label.
      * Weight bump + accent color, no extra background, so it composes cleanly
      * with the active-row tint instead of fighting it.
      */
-    .match {
-      color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
-      font-weight: var(--fluid-font-weight-semibold);
-    }
-    .option.active .match,
-    .option.selected .match {
-      color: inherit;
-    }
-  `
+      .match {
+        color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        font-weight: var(--fluid-typeahead-match-font-weight, var(--fluid-font-weight-semibold));
+      }
+      .option.active .match,
+      .option.selected .match {
+        color: inherit;
+      }
+    `
   ];
 
   @query("input") private inputEl!: HTMLInputElement;
@@ -437,7 +514,9 @@ export class FluidTypeahead extends FluidFormAssociated {
    * Must return an array of options (or a Promise of one). Overrides the
    * static `options` prop when set.
    */
-  @property({ attribute: false }) loadOptions?: (query: string) => Promise<RawOption[]> | RawOption[];
+  @property({ attribute: false }) loadOptions?: (
+    query: string
+  ) => Promise<RawOption[]> | RawOption[];
 
   /** Debounce delay (ms) for loadOptions calls. */
   @property({ type: Number, attribute: "debounce" }) debounceMs = 200;
@@ -523,6 +602,7 @@ export class FluidTypeahead extends FluidFormAssociated {
   @property({ type: Boolean, attribute: "strict" }) strict = false;
 
   @state() private focused = false;
+  @state() private invalid = false;
   @state() private hasPrefix = false;
   @state() private hasSuffix = false;
   @state() private prefixFlush = false;
@@ -537,14 +617,18 @@ export class FluidTypeahead extends FluidFormAssociated {
   private debounceTimer?: ReturnType<typeof setTimeout>;
   private lastQuery = "";
 
+  constructor() {
+    super();
+    this.addEventListener("invalid", this.handleInvalid);
+  }
+
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsideClick, true);
+    this.listen(document, "pointerdown", this.handleOutsideClick, { capture: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsideClick, true);
     this.cleanupAutoUpdate?.();
     hideFromTopLayer(this.listboxEl);
     clearTimeout(this.debounceTimer);
@@ -553,6 +637,7 @@ export class FluidTypeahead extends FluidFormAssociated {
   override formResetCallback(): void {
     this.value = this.getAttribute("value") ?? "";
     this.selectedValue = null;
+    this.invalid = false;
   }
 
   override formDisabledCallback(disabled: boolean): void {
@@ -572,7 +657,9 @@ export class FluidTypeahead extends FluidFormAssociated {
    */
   private normalizeOptions(opts: RawOption[]): TypeaheadOption[] {
     return opts.map((o) =>
-      typeof o === "string" ? { value: o, label: o } : { value: o.value, label: o.label, data: o.data }
+      typeof o === "string"
+        ? { value: o, label: o }
+        : { value: o.value, label: o.label, data: o.data }
     );
   }
 
@@ -603,6 +690,10 @@ export class FluidTypeahead extends FluidFormAssociated {
     if ((changed.has("value") || changed.has("options")) && !this.loadOptions) {
       this.recomputeFiltered(this.value);
     }
+    // Derive validity before rendering. Updating `invalid` from `updated()`
+    // schedules a second reactive pass; when a blurred required control becomes
+    // valid, that pass can leave Lit's updateComplete chain unsettled.
+    if (this.inputEl) this.refreshValidity();
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -611,6 +702,24 @@ export class FluidTypeahead extends FluidFormAssociated {
       else this.closeListbox();
     }
   }
+
+  protected override firstUpdated(): void {
+    this.refreshValidity();
+  }
+
+  private refreshValidity(showInvalid = this.invalid): void {
+    if (this.required && !this.value) {
+      this.setValidity({ valueMissing: true }, this.term("fillOutField"), this.inputEl);
+      this.invalid = showInvalid;
+    } else {
+      this.setValidity({});
+      this.invalid = false;
+    }
+  }
+
+  private handleInvalid = () => {
+    this.invalid = true;
+  };
 
   private async openListbox(): Promise<void> {
     if (!this.wrapEl || !this.listboxEl) return;
@@ -646,9 +755,8 @@ export class FluidTypeahead extends FluidFormAssociated {
         // ones, so a scrolled page kept the placement it would have had at
         // scroll zero: a control near the bottom of a long page opened
         // upwards even after being scrolled to the top of the screen.
-        flip({ rootBoundary: "viewport" }),
+        flip(),
         size({
-          rootBoundary: "viewport",
           apply: ({ rects, elements }) => {
             // Pin width exactly to the input so the fused shape stays aligned.
             elements.floating.style.width = `${rects.reference.width}px`;
@@ -656,7 +764,7 @@ export class FluidTypeahead extends FluidFormAssociated {
         })
       ]
     });
-    // Keep floating-ui's subpixel coords, input + listbox share the same
+    // Keep the engine's subpixel coords, input + listbox share the same
     // subpixel offset, so they line up. Rounding picks a different pixel
     // grid than the input and shifts the listbox half a pixel sideways.
     Object.assign(this.listboxEl.style, {
@@ -676,9 +784,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     if (this.loadOptions) return; // async path handles its own pipeline
     const all = this.options.length ? this.normalizeOptions(this.options) : this.slottedOptions();
     const q = query.trim().toLowerCase();
-    const filtered = q
-      ? all.filter((o) => o.label.toLowerCase().includes(q))
-      : all;
+    const filtered = q ? all.filter((o) => o.label.toLowerCase().includes(q)) : all;
     this.filteredOptions = filtered.slice(0, this.maxOptions);
     this.activeIndex = this.filteredOptions.length ? 0 : -1;
   }
@@ -716,7 +822,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     }
     this.selectedValue = opt.value;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidTypeaheadChangeDetail>("fluid-change", {
         detail: { value: opt.value, label: opt.label, option: opt },
         bubbles: true,
         composed: true
@@ -730,7 +836,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     this.lastQuery = next;
     this.selectedValue = null;
     this.dispatchEvent(
-      new CustomEvent("fluid-input", {
+      new CustomEvent<FluidTypeaheadInputDetail>("fluid-input", {
         detail: { value: next },
         bubbles: true,
         composed: true
@@ -791,6 +897,7 @@ export class FluidTypeahead extends FluidFormAssociated {
       // Strict mode: invalid free text clears.
       this.value = "";
     }
+    this.refreshValidity(true);
   };
 
   private handleKeyDown = (e: KeyboardEvent) => {
@@ -870,8 +977,7 @@ export class FluidTypeahead extends FluidFormAssociated {
     if (!q) return html`${label}`;
     const idx = label.toLowerCase().indexOf(q.toLowerCase());
     if (idx < 0) return html`${label}`;
-    return html`${label.slice(0, idx)}<span class="match"
-        >${label.slice(idx, idx + q.length)}</span
+    return html`${label.slice(0, idx)}<span class="match">${label.slice(idx, idx + q.length)}</span
       >${label.slice(idx + q.length)}`;
   }
 
@@ -891,99 +997,101 @@ export class FluidTypeahead extends FluidFormAssociated {
     return renderFieldChrome(
       { label: this.label, helpText: this.helpText, for: "input" },
       html`
-      <div part="base" class="base">
-        <div
-          class=${classMap({
-            "input-wrap": true,
-            [`size-${this.size}`]: true,
-            focused: this.focused,
-            disabled: this.disabled
-          })}
-        >
-          <span
-            class=${classMap({ affix: true, prefix: true, flush: this.prefixFlush })}
-            part="prefix"
-            ?hidden=${!this.hasPrefix}
+        <div part="base" class="base">
+          <div
+            class=${classMap({
+              "input-wrap": true,
+              [`size-${this.size}`]: true,
+              focused: this.focused,
+              disabled: this.disabled,
+              invalid: this.invalid
+            })}
           >
-            <slot name="prefix" @slotchange=${this.handlePrefixSlotChange}></slot>
-          </span>
-          <input
-            id="input"
-            part="input"
-            type="text"
-            name=${ifDefined(this.name || undefined)}
-            role="combobox"
-            aria-haspopup="listbox"
-            aria-expanded=${this.open ? "true" : "false"}
-            aria-controls=${this.listboxId}
-            aria-activedescendant=${ifDefined(this.open ? this.activeId : undefined)}
-            aria-autocomplete="list"
+            <span
+              class=${classMap({ affix: true, prefix: true, flush: this.prefixFlush })}
+              part="prefix"
+              ?hidden=${!this.hasPrefix}
+            >
+              <slot name="prefix" @slotchange=${this.handlePrefixSlotChange}></slot>
+            </span>
+            <input
+              id="input"
+              part="input"
+              type="text"
+              name=${ifDefined(this.name || undefined)}
+              role="combobox"
+              aria-haspopup="listbox"
+              aria-expanded=${this.open ? "true" : "false"}
+              aria-controls=${this.listboxId}
+              aria-activedescendant=${ifDefined(this.open ? this.activeId : undefined)}
+              aria-autocomplete="list"
+              aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+              aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
+              aria-invalid=${this.invalid ? "true" : "false"}
+              autocomplete="off"
+              spellcheck="false"
+              .value=${live(this.value)}
+              placeholder=${this.placeholder}
+              ?disabled=${this.disabled}
+              ?required=${this.required}
+              @input=${this.handleInput}
+              @focus=${this.handleFocus}
+              @click=${this.handleClick}
+              @blur=${this.handleBlur}
+              @keydown=${this.handleKeyDown}
+            />
+            <span
+              class=${classMap({ affix: true, suffix: true, flush: this.suffixFlush })}
+              part="suffix"
+              ?hidden=${!this.hasSuffix}
+            >
+              <slot name="suffix" @slotchange=${this.handleSuffixSlotChange}></slot>
+            </span>
+          </div>
+          <div
+            part="listbox"
+            class="listbox"
+            id=${this.listboxId}
+            role="listbox"
+            popover="manual"
             aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-            aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
-            autocomplete="off"
-            spellcheck="false"
-            .value=${live(this.value)}
-            placeholder=${this.placeholder}
-            ?disabled=${this.disabled}
-            ?required=${this.required}
-            @input=${this.handleInput}
-            @focus=${this.handleFocus}
-            @click=${this.handleClick}
-            @blur=${this.handleBlur}
-            @keydown=${this.handleKeyDown}
-          />
-          <span
-            class=${classMap({ affix: true, suffix: true, flush: this.suffixFlush })}
-            part="suffix"
-            ?hidden=${!this.hasSuffix}
+            @click=${this.handleOptionClick}
+            @pointermove=${this.handleOptionHover}
           >
-            <slot name="suffix" @slotchange=${this.handleSuffixSlotChange}></slot>
-          </span>
+            ${this.loading
+              ? html`<div class="option-loading">${this.term("loading")}…</div>`
+              : this.filteredOptions.length === 0
+                ? html`<div class="option-empty">${this.term("noMatches")}</div>`
+                : this.filteredOptions.map(
+                    (opt, i) => html`
+                      <div
+                        part="option"
+                        class=${classMap({
+                          option: true,
+                          active: i === this.activeIndex,
+                          selected: opt.value === this.selectedValue
+                        })}
+                        role="option"
+                        id=${`${this.listboxId}-opt-${i}`}
+                        aria-selected=${i === this.activeIndex ? "true" : "false"}
+                        data-index=${i}
+                      >
+                        ${this.renderOption
+                          ? this.renderOption(opt, {
+                              index: i,
+                              active: i === this.activeIndex,
+                              selected: opt.value === this.selectedValue,
+                              query: this.value.trim(),
+                              highlight: (text: string) => this.renderLabel(text)
+                            })
+                          : this.renderLabel(opt.label)}
+                      </div>
+                    `
+                  )}
+          </div>
+          <slot @slotchange=${() => this.requestUpdate()} style="display:none"></slot>
         </div>
-        <div
-          part="listbox"
-          class="listbox"
-          id=${this.listboxId}
-          role="listbox"
-          popover="manual"
-          aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-          @click=${this.handleOptionClick}
-          @pointermove=${this.handleOptionHover}
-        >
-          ${this.loading
-            ? html`<div class="option-loading">Loading…</div>`
-            : this.filteredOptions.length === 0
-              ? html`<div class="option-empty">No matches</div>`
-              : this.filteredOptions.map(
-                  (opt, i) => html`
-                    <div
-                      part="option"
-                      class=${classMap({
-                        option: true,
-                        active: i === this.activeIndex,
-                        selected: opt.value === this.selectedValue
-                      })}
-                      role="option"
-                      id=${`${this.listboxId}-opt-${i}`}
-                      aria-selected=${i === this.activeIndex ? "true" : "false"}
-                      data-index=${i}
-                    >
-                      ${this.renderOption
-                        ? this.renderOption(opt, {
-                            index: i,
-                            active: i === this.activeIndex,
-                            selected: opt.value === this.selectedValue,
-                            query: this.value.trim(),
-                            highlight: (text: string) => this.renderLabel(text)
-                          })
-                        : this.renderLabel(opt.label)}
-                    </div>
-                  `
-                )}
-        </div>
-        <slot @slotchange=${() => this.requestUpdate()} style="display:none"></slot>
-      </div>
-    `
+      `
     );
   }
 }
@@ -992,10 +1100,7 @@ export class FluidTypeahead extends FluidFormAssociated {
 function affixSlotHasContent(slot: HTMLSlotElement): boolean {
   return slot.assignedNodes().some((node) => {
     if (node.nodeType === Node.ELEMENT_NODE) return true;
-    return (
-      node.nodeType === Node.TEXT_NODE &&
-      (node.textContent ?? "").trim().length > 0
-    );
+    return node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim().length > 0;
   });
 }
 

@@ -1,5 +1,6 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "@fluid-ds/components/locales/nl";
 import type { FluidTimeSlots } from "./fluid-time-slots.js";
 import type { Slot } from "../../internal/availability.js";
 
@@ -17,6 +18,18 @@ async function slotsFixture(value: string | null = null): Promise<FluidTimeSlots
 }
 
 describe("<fluid-time-slots>", () => {
+  it("localizes unavailable and live availability text", async () => {
+    const el = await fixture<FluidTimeSlots>(html`
+      <fluid-time-slots lang="nl" .slots=${SLOTS}></fluid-time-slots>
+    `);
+    await elementUpdated(el);
+    const unavailable = el.shadowRoot!.querySelector<HTMLButtonElement>("button:disabled")!;
+    expect(unavailable.getAttribute("aria-label")).to.contain("niet beschikbaar");
+    expect(el.shadowRoot!.querySelector('[aria-live="polite"]')?.textContent).to.contain(
+      "beschikbare"
+    );
+  });
+
   it("renders a radiogroup of slot radios", async () => {
     const el = await slotsFixture();
     const group = el.shadowRoot!.querySelector('[role="radiogroup"]');
@@ -35,14 +48,17 @@ describe("<fluid-time-slots>", () => {
     const el = await slotsFixture();
     const radios = Array.from(el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
     // index 2 is full
+    if (!radios[2]) throw new Error("Expected the full slot");
     expect(radios[2].disabled).to.be.true;
   });
 
   it("fires fluid-change with the slot start when an available slot is clicked", async () => {
     const el = await slotsFixture();
     const radios = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[role="radio"]');
-    setTimeout(() => radios[1].click());
-    const ev = await oneEvent(el, "fluid-change");
+    if (!radios[1]) throw new Error("Expected the second available slot");
+    const changed = oneEvent(el, "fluid-change");
+    radios[1].click();
+    const ev = await changed;
     expect(ev.detail.value).to.equal("2026-06-15T09:30");
     expect(el.value).to.equal("2026-06-15T09:30");
   });
@@ -50,6 +66,7 @@ describe("<fluid-time-slots>", () => {
   it("does not select a full slot on click", async () => {
     const el = await slotsFixture();
     const radios = el.shadowRoot!.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    if (!radios[2]) throw new Error("Expected the full slot");
     radios[2].click();
     await elementUpdated(el);
     expect(el.value).to.be.null;
@@ -58,6 +75,7 @@ describe("<fluid-time-slots>", () => {
   it("marks the selected slot aria-checked", async () => {
     const el = await slotsFixture("2026-06-15T09:30");
     const radios = Array.from(el.shadowRoot!.querySelectorAll('[role="radio"]'));
+    if (!radios[0] || !radios[1]) throw new Error("Expected both selectable slots");
     expect(radios[1].getAttribute("aria-checked")).to.equal("true");
     expect(radios[0].getAttribute("aria-checked")).to.equal("false");
   });

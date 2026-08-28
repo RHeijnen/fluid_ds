@@ -1,6 +1,6 @@
 import { FluidPage } from "./fluid-page.js";
 
-if (!customElements.get("fluid-page")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-page")) {
   customElements.define("fluid-page", FluidPage);
 }
 

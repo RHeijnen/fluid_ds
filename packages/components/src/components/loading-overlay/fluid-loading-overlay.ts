@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../spinner/define.js";
 import { FluidElement } from "../../internal/base-element.js";
@@ -59,6 +59,10 @@ export class FluidLoadingOverlay extends FluidElement {
         position: relative;
       }
 
+      .content[inert] {
+        user-select: none;
+      }
+
       .overlay {
         position: absolute;
         inset: 0;
@@ -82,14 +86,8 @@ export class FluidLoadingOverlay extends FluidElement {
       }
 
       fluid-spinner {
-        font-size: var(
-          --fluid-loading-overlay-spinner-size,
-          var(--fluid-font-size-2xl)
-        );
-        --fluid-spinner-color: var(
-          --fluid-loading-overlay-fg,
-          var(--fluid-text-primary)
-        );
+        font-size: var(--fluid-loading-overlay-spinner-size, var(--fluid-font-size-2xl));
+        --fluid-spinner-color: var(--fluid-loading-overlay-fg, var(--fluid-text-primary));
       }
 
       .label {
@@ -115,14 +113,47 @@ export class FluidLoadingOverlay extends FluidElement {
   @property({ type: Boolean, reflect: true }) active = false;
 
   /** Optional text shown under the spinner and announced by assistive tech. */
-  @property() label = "";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? "";
+  }
+  set label(value: string | null) {
+    const previousOverride = this.labelOverride;
+    this.labelOverride = value;
+    // Both an absent caption and an explicitly empty one read as "" above,
+    // but only the absent override receives the localized accessible fallback.
+    if (previousOverride !== value) this.requestUpdate();
+  }
+  private labelOverride: string | null = null;
+  private focusToRestore?: HTMLElement;
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("active") && this.active) {
+      const focused = (this.getRootNode() as Document | ShadowRoot).activeElement;
+      if (focused instanceof HTMLElement && focused !== this && this.contains(focused)) {
+        this.focusToRestore = focused;
+      }
+    }
+  }
 
   override updated(changed: Map<string, unknown>): void {
     if (changed.has("active")) {
       if (this.active) {
         this.setAttribute("aria-busy", "true");
+        this.focusToRestore?.blur();
       } else {
         this.removeAttribute("aria-busy");
+        const target = this.focusToRestore;
+        const root = this.getRootNode() as Document | ShadowRoot;
+        const focused = root.activeElement;
+        const focusVacant =
+          root instanceof Document
+            ? focused === root.body || focused === null
+            : focused === null && root.ownerDocument.activeElement === root.host;
+        if (target?.isConnected && this.contains(target) && focusVacant) {
+          target.focus();
+        }
+        this.focusToRestore = undefined;
       }
     }
   }
@@ -130,7 +161,7 @@ export class FluidLoadingOverlay extends FluidElement {
   override render(): TemplateResult {
     return html`
       <div part="base" class="base">
-        <slot></slot>
+        <slot class="content" ?inert=${this.active}></slot>
         ${this.active
           ? html`
               <div
@@ -138,15 +169,10 @@ export class FluidLoadingOverlay extends FluidElement {
                 class="overlay"
                 role="status"
                 aria-live="polite"
-                aria-label=${this.label || "Loading"}
+                aria-label=${this.labelOverride ?? this.term("loading")}
               >
-                <fluid-spinner
-                  part="spinner"
-                  aria-hidden="true"
-                ></fluid-spinner>
-                ${this.label
-                  ? html`<span part="label" class="label">${this.label}</span>`
-                  : ""}
+                <fluid-spinner part="spinner" aria-hidden="true"></fluid-spinner>
+                ${this.label ? html`<span part="label" class="label">${this.label}</span>` : ""}
               </div>
             `
           : ""}

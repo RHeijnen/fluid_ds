@@ -1,6 +1,6 @@
 import { FluidKbd } from "./fluid-kbd.js";
 
-if (!customElements.get("fluid-kbd")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-kbd")) {
   customElements.define("fluid-kbd", FluidKbd);
 }
 

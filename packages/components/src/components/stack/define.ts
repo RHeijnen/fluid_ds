@@ -1,6 +1,6 @@
 import { FluidStack } from "./fluid-stack.js";
 
-if (!customElements.get("fluid-stack")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-stack")) {
   customElements.define("fluid-stack", FluidStack);
 }
 

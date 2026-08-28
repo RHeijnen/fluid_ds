@@ -1,6 +1,6 @@
 import { FluidCallout } from "./fluid-callout.js";
 
-if (!customElements.get("fluid-callout")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-callout")) {
   customElements.define("fluid-callout", FluidCallout);
 }
 

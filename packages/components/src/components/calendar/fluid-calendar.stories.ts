@@ -5,6 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Forms/Calendar",
   component: "fluid-calendar",
+  parameters: { status: { type: "experimental" } },
   argTypes: {
     value: { control: "text" },
     min: { control: "text" },
@@ -21,7 +22,10 @@ export const Single: Story = {
   render: (a) =>
     html`<fluid-calendar
       .value=${a.value}
+      min=${a.min ?? ""}
+      max=${a.max ?? ""}
       week-start=${a.weekStart}
+      ?range=${Boolean(a.range)}
       style="border:1px solid var(--fluid-border-default); border-radius:0.75rem; padding:0.75rem;"
     ></fluid-calendar>`
 };

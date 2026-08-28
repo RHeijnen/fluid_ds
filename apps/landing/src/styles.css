@@ -4,7 +4,9 @@
  * nav bar, hero spacing, footer, and the styling-comparison strip.
  */
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 :root {
   font-family: var(--fluid-font-family-sans);
@@ -65,11 +67,73 @@ nav.primary a {
   color: var(--fluid-text-secondary);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
-  transition: background 100ms ease, color 100ms ease;
+  transition:
+    background 100ms ease,
+    color 100ms ease;
 }
 nav.primary a:hover {
   background: var(--fluid-surface-muted);
   color: var(--fluid-text-primary);
+}
+
+.landing-button {
+  display: inline-flex;
+  min-block-size: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fluid-space-2, 0.5rem);
+  padding: 0.55rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--fluid-radius-md, 0.375rem);
+  background: var(--fluid-accent-base);
+  color: var(--fluid-accent-text);
+  font: inherit;
+  font-weight: var(--fluid-font-weight-medium, 500);
+  line-height: var(--fluid-font-line-height-tight, 1.2);
+  text-decoration: none;
+  transition:
+    background 100ms ease,
+    color 100ms ease,
+    border-color 100ms ease;
+}
+.landing-button:hover {
+  background: var(--fluid-accent-hover);
+  color: var(--fluid-accent-text);
+}
+.landing-button.secondary {
+  border-color: var(--fluid-border-default);
+  background: var(--fluid-surface-base);
+  color: var(--fluid-accent-base);
+}
+.landing-button.secondary:hover {
+  border-color: var(--fluid-border-strong);
+  background: var(--fluid-surface-muted);
+}
+.landing-button.ghost {
+  background: transparent;
+  color: var(--fluid-accent-base);
+}
+.landing-button.ghost:hover {
+  background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
+}
+.landing-button.compact {
+  min-block-size: 2.125rem;
+  padding: 0.4rem 0.75rem;
+}
+nav.primary a.landing-button.secondary {
+  padding: 0.4rem 0.75rem;
+  background: var(--fluid-surface-base);
+  color: var(--fluid-accent-base);
+}
+nav.primary a.landing-button.secondary:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-accent-base);
+}
+.landing-button:focus-visible,
+nav.primary a:focus-visible,
+.surface-card:focus-visible {
+  outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-focus-ring-color);
+  outline-offset: var(--fluid-focus-ring-offset, 2px);
 }
 
 /* ------------------------------------------------------------------ */
@@ -234,8 +298,17 @@ footer.site-footer a {
 /* Mobile tweaks */
 
 @media (max-width: 640px) {
-  nav.primary a:not(.cta) {
-    display: none;
+  header.site-nav {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  nav.primary {
+    width: 100%;
+    overflow-x: auto;
+    padding-block-end: 0.25rem;
+  }
+  nav.primary a {
+    flex: none;
   }
 }
 
@@ -317,7 +390,9 @@ footer.site-footer a {
   margin-bottom: 0.5rem;
   color: var(--fluid-accent-base);
 }
-.feature-head strong { color: var(--fluid-text-primary); }
+.feature-head strong {
+  color: var(--fluid-text-primary);
+}
 
 /* ------------------------------------------------------------------ */
 /* Component wall */
@@ -334,7 +409,9 @@ footer.site-footer a {
   align-items: center;
   gap: 0.5rem;
 }
-.wall-cell.wall-wide { grid-column: 1 / -1; }
+.wall-cell.wall-wide {
+  grid-column: 1 / -1;
+}
 
 /* ------------------------------------------------------------------ */
 /* Charts */
@@ -344,13 +421,18 @@ footer.site-footer a {
   grid-template-columns: 1.4fr 1fr;
   gap: 1.25rem;
 }
-.card-h { margin: 0; font-size: 1rem; }
+.card-h {
+  margin: 0;
+  font-size: 1rem;
+}
 @media (max-width: 760px) {
-  .chart-grid { grid-template-columns: 1fr; }
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ------------------------------------------------------------------ */
-/* "New in v0.3" showcase */
+/* "New in v0.4" showcase */
 
 .whatsnew-grid {
   display: grid;
@@ -358,14 +440,16 @@ footer.site-footer a {
   gap: 1rem;
   align-items: stretch;
 }
-.wn-card { height: 100%; }
+.wn-card {
+  height: 100%;
+}
 .wn-blurb {
   margin: 0.5rem 0 0;
   color: var(--fluid-text-secondary);
   font-size: 0.95rem;
 }
-/* A consistent stage at the bottom of each card so the QR, buttons, and
-   parser mock all align to the same baseline regardless of content height. */
+/* A consistent stage at the bottom of each card so the live demos and the
+   table mock all align to the same baseline regardless of content height. */
 .wn-stage {
   margin-top: 1.1rem;
   min-height: 12rem;
@@ -404,6 +488,56 @@ footer.site-footer a {
   color: var(--fluid-text-secondary);
   text-align: center;
 }
+/* Vertical stack used by the typeahead and fold demo stages. */
+.wn-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 16rem;
+}
+/* Tags collected by the keep-open typeahead demo. */
+.wn-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 1.7rem;
+}
+.wn-fold-copy {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+}
+/* Mock column headers for the infinite-table column-management card. */
+.wn-columns {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+}
+.wn-col {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem;
+  padding: 0.55rem 0.5rem;
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-sm, 0.25rem);
+  background: var(--fluid-surface-base);
+  font-size: 0.72rem;
+  font-family: var(--fluid-font-family-mono);
+  color: var(--fluid-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.wn-col i {
+  flex: none;
+  width: 3px;
+  height: 1rem;
+  border-radius: 2px;
+  background: var(--fluid-accent-base);
+  opacity: 0.55;
+}
 
 /* ------------------------------------------------------------------ */
 /* Expansion packs + surface/framework cards */
@@ -414,15 +548,31 @@ footer.site-footer a {
   color: var(--fluid-accent-base);
   font-weight: 600;
 }
-.surface-card { text-decoration: none; color: inherit; display: block; }
-.surface-card fluid-card { transition: transform 120ms ease; height: 100%; }
-.surface-card:hover fluid-card { transform: translateY(-3px); }
-.surface-card strong { display: inline-flex; align-items: center; gap: 0.35rem; }
+.surface-card {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.surface-card fluid-card {
+  transition: transform 120ms ease;
+  height: 100%;
+}
+.surface-card:hover fluid-card {
+  transform: translateY(-3px);
+}
+.surface-card strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
 
 /* ------------------------------------------------------------------ */
 /* CTA + footer */
 
-.cta-row .cta-inner { text-align: center; padding: 1.5rem 1rem; }
+.cta-row .cta-inner {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
 .footer-links {
   display: flex;
   flex-wrap: wrap;

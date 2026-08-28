@@ -1,5 +1,6 @@
-import { LitElement, html, css, type TemplateResult, type PropertyValues } from "lit";
+import { html, css, type TemplateResult, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 /** A single calendar event. */
 export interface CalendarEvent {
@@ -29,7 +30,8 @@ interface DayCell {
 }
 
 const pad = (n: number): string => String(n).padStart(2, "0");
-const toISO = (d: Date): string => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const toISO = (d: Date): string =>
+  `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
 /** Parse a YYYY-MM value into [year, monthIndex]; falls back to the current month. */
 function parseMonth(value: string | undefined): [number, number] {
@@ -58,6 +60,8 @@ function parseMonth(value: string | undefined): [number, number] {
  * ends of a week, PageUp / PageDown by month). Event tone is carried by the
  * theme-independent `--fluid-<tone>-*` tracks and is never color-only: the chip
  * always renders its title text.
+ * F2 enters a day's event buttons; arrow keys move between those buttons and
+ * Escape or F2 returns to the day cell.
  *
  * @summary Accessible month grid that displays events.
  *
@@ -104,7 +108,7 @@ function parseMonth(value: string | undefined): [number, number] {
  * @fires fluid-day-click - A day cell was activated. detail: { date: "YYYY-MM-DD" }.
  * @fires fluid-event-click - An event chip was activated. detail: { id, event }.
  */
-export class FluidEventCalendar extends LitElement {
+export class FluidEventCalendar extends FluidElement {
   static override styles = css`
     :host {
       display: block;
@@ -150,12 +154,16 @@ export class FluidEventCalendar extends LitElement {
       background: var(--fluid-event-calendar-today-bg, var(--fluid-surface-muted, #f4f4f5));
     }
     .nav-btn:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
       outline-offset: 2px;
     }
     .nav-btn svg {
       width: 1.25rem;
       height: 1.25rem;
+    }
+    .base[dir="rtl"] .nav-btn svg {
+      transform: scaleX(-1);
     }
     .grid {
       display: grid;
@@ -179,7 +187,8 @@ export class FluidEventCalendar extends LitElement {
       min-height: 5.5rem;
       padding: 0.3rem;
       border-top: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
-      border-left: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border-left: 1px solid
+        var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
       text-align: left;
       background: transparent;
       color: inherit;
@@ -190,7 +199,8 @@ export class FluidEventCalendar extends LitElement {
       border-left: 0;
     }
     .day:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
       outline-offset: -2px;
     }
     .day.is-out {
@@ -210,7 +220,8 @@ export class FluidEventCalendar extends LitElement {
       border-radius: var(--fluid-radius-full, 999px);
     }
     .day.is-today .day-number {
-      box-shadow: inset 0 0 0 2px var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
+      box-shadow: inset 0 0 0 2px
+        var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
       font-weight: 700;
     }
     .events {
@@ -268,7 +279,8 @@ export class FluidEventCalendar extends LitElement {
       text-decoration: underline;
     }
     .more:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-event-calendar-today-ring, var(--fluid-accent-base, #4f46e5));
       outline-offset: 1px;
     }
     @media (prefers-reduced-motion: reduce) {
@@ -288,14 +300,15 @@ export class FluidEventCalendar extends LitElement {
   /** First day of the week: 0 (Sunday) through 6 (Saturday). Default 1 (Monday). */
   @property({ type: Number, attribute: "week-start" }) weekStart = 1;
 
-  /** BCP-47 locale for month and weekday names. Defaults to the document locale. */
-  @property({ type: String }) locale = "";
+  /** BCP-47 locale for month, weekday, date and number display. Defaults to inherited language. */
+  @property({ type: String }) locale: string | undefined = undefined;
 
   /** Maximum event chips shown per day before collapsing into "+N more". */
   @property({ type: Number, attribute: "max-per-day" }) maxPerDay = 3;
 
   /** ISO of the day currently in the roving tab order. */
   @state() private focusedISO = "";
+  private restoreGridFocus = false;
 
   private get monthParts(): [number, number] {
     return parseMonth(this.month);
@@ -306,12 +319,44 @@ export class FluidEventCalendar extends LitElement {
     return w >= 0 && w <= 6 ? w : 1;
   }
 
+  private get displayLocale(): string | undefined {
+    const locale = this.locale === undefined ? this.localize.locale : this.locale;
+    if (locale === "") return undefined;
+    try {
+      Intl.getCanonicalLocales(locale);
+      return locale;
+    } catch {
+      return this.locale === undefined ? "en" : undefined;
+    }
+  }
+
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.displayLocale, { useGrouping: false }).format(value);
+  }
+
   override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("month") || changed.has("weekStart")) {
+      this.restoreGridFocus = !!this.shadowRoot?.activeElement?.closest('[role="gridcell"]');
+    }
     if ((changed.has("month") || changed.has("weekStart")) && this.focusedISO) {
       // If the focused day is no longer in the visible grid, drop it so the
       // roving target re-seeds to the first day of the new month.
       const cells = this.buildCells();
       if (!cells.some((c) => c.iso === this.focusedISO)) this.focusedISO = "";
+    }
+    if (!this.focusedISO) {
+      const cells = this.buildCells();
+      this.focusedISO =
+        cells.find((cell) => cell.isToday && cell.inMonth)?.iso ??
+        cells.find((cell) => cell.inMonth)?.iso ??
+        "";
+    }
+  }
+
+  protected override updated(): void {
+    if (this.restoreGridFocus) {
+      this.restoreGridFocus = false;
+      this.renderRoot.querySelector<HTMLElement>('[role="gridcell"][tabindex="0"]')?.focus();
     }
   }
 
@@ -345,7 +390,7 @@ export class FluidEventCalendar extends LitElement {
   }
 
   private weekdayNames(): string[] {
-    const fmt = new Intl.DateTimeFormat(this.locale || undefined, { weekday: "short" });
+    const fmt = new Intl.DateTimeFormat(this.displayLocale, { weekday: "short" });
     // 2024-01-07 is a Sunday; rotate to the configured first day.
     return Array.from({ length: 7 }, (_, i) =>
       fmt.format(new Date(2024, 0, 7 + ((this.weekStartDay + i) % 7)))
@@ -354,7 +399,7 @@ export class FluidEventCalendar extends LitElement {
 
   private monthLabel(): string {
     const [year, month] = this.monthParts;
-    return new Intl.DateTimeFormat(this.locale || undefined, { month: "long", year: "numeric" }).format(
+    return new Intl.DateTimeFormat(this.displayLocale, { month: "long", year: "numeric" }).format(
       new Date(year, month, 1)
     );
   }
@@ -373,11 +418,13 @@ export class FluidEventCalendar extends LitElement {
   }
 
   private onDayClick(cell: DayCell): void {
+    this.focusedISO = cell.iso;
     this.emit("fluid-day-click", { date: cell.iso });
   }
 
   private onEventClick(ev: CalendarEvent, originalEvent: Event): void {
     originalEvent.stopPropagation();
+    this.focusedISO = ev.date;
     this.emit("fluid-event-click", { id: ev.id, event: ev });
   }
 
@@ -390,15 +437,36 @@ export class FluidEventCalendar extends LitElement {
   }
 
   private onGridKeydown(e: KeyboardEvent, cells: DayCell[], current: DayCell): void {
+    const cell = e.currentTarget as HTMLElement;
+    if (e.target !== cell) {
+      if (e.key === "Escape" || e.key === "F2") {
+        e.preventDefault();
+        this.focusISO(current.iso);
+      } else if (["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) {
+        e.preventDefault();
+        const buttons = Array.from(cell.querySelectorAll<HTMLButtonElement>("button"));
+        const index = buttons.indexOf(e.target as HTMLButtonElement);
+        const direction =
+          e.key === "ArrowDown"
+            ? 1
+            : e.key === "ArrowUp"
+              ? -1
+              : (e.key === "ArrowRight") !== this.isRtl
+                ? 1
+                : -1;
+        buttons[(index + direction + buttons.length) % buttons.length]?.focus();
+      }
+      return;
+    }
     const idx = cells.findIndex((c) => c.iso === current.iso);
     if (idx < 0) return;
     let target = idx;
     switch (e.key) {
       case "ArrowRight":
-        target = idx + 1;
+        target = idx + (this.isRtl ? -1 : 1);
         break;
       case "ArrowLeft":
-        target = idx - 1;
+        target = idx + (this.isRtl ? 1 : -1);
         break;
       case "ArrowDown":
         target = idx + 7;
@@ -413,12 +481,19 @@ export class FluidEventCalendar extends LitElement {
         target = idx - (idx % 7) + 6;
         break;
       case "PageUp":
+      case "PageDown": {
         e.preventDefault();
-        this.changeMonth(-1);
+        const delta = e.key === "PageUp" ? -1 : 1;
+        const [year, month] = this.monthParts;
+        const last = new Date(year, month + delta + 1, 0).getDate();
+        const next = new Date(year, month + delta, Math.min(current.day, last));
+        this.changeMonth(delta);
+        this.focusISO(toISO(next));
         return;
-      case "PageDown":
+      }
+      case "F2":
         e.preventDefault();
-        this.changeMonth(1);
+        cell.querySelector<HTMLButtonElement>("button")?.focus();
         return;
       case "Enter":
       case " ":
@@ -440,7 +515,8 @@ export class FluidEventCalendar extends LitElement {
 
     // Seed the roving target: the focused day if still present, else today if
     // visible and in-month, else the first in-month day.
-    let activeISO = this.focusedISO && cells.some((c) => c.iso === this.focusedISO) ? this.focusedISO : "";
+    let activeISO =
+      this.focusedISO && cells.some((c) => c.iso === this.focusedISO) ? this.focusedISO : "";
     if (!activeISO) {
       const today = cells.find((c) => c.isToday && c.inMonth);
       const firstIn = cells.find((c) => c.inMonth);
@@ -453,7 +529,7 @@ export class FluidEventCalendar extends LitElement {
     const label = this.monthLabel();
 
     return html`
-      <div part="base" class="base">
+      <div part="base" class="base" dir=${this.localize.dir}>
         <div part="header" class="header">
           <h2 part="title" class="title" id="ec-title">${label}</h2>
           <div part="nav" class="nav">
@@ -461,19 +537,39 @@ export class FluidEventCalendar extends LitElement {
               part="prev"
               class="nav-btn"
               type="button"
-              aria-label="Previous month"
+              aria-label=${this.term("previousMonth")}
               @click=${() => this.changeMonth(-1)}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m15 18-6-6 6-6"></path>
+              </svg>
             </button>
             <button
               part="next"
               class="nav-btn"
               type="button"
-              aria-label="Next month"
+              aria-label=${this.term("nextMonth")}
               @click=${() => this.changeMonth(1)}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m9 18 6-6-6-6"></path>
+              </svg>
             </button>
           </div>
         </div>
@@ -481,7 +577,8 @@ export class FluidEventCalendar extends LitElement {
         <div part="grid" class="grid" role="grid" aria-labelledby="ec-title">
           <div class="week" role="row">
             ${weekdays.map(
-              (name) => html`<span part="weekday" class="weekday" role="columnheader">${name}</span>`
+              (name) =>
+                html`<span part="weekday" class="weekday" role="columnheader">${name}</span>`
             )}
           </div>
           ${rows.map(
@@ -506,14 +603,15 @@ export class FluidEventCalendar extends LitElement {
     const overflow = cell.events.length - visible.length;
     const isActive = cell.iso === activeISO;
 
-    const dateLabel = new Intl.DateTimeFormat(this.locale || undefined, {
+    const dateLabel = new Intl.DateTimeFormat(this.displayLocale, {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric"
     }).format(new Date(`${cell.iso}T00:00:00`));
     const count = cell.events.length;
-    const ariaLabel = count > 0 ? `${dateLabel}, ${count} event${count === 1 ? "" : "s"}` : dateLabel;
+    const ariaLabel =
+      count > 0 ? this.term("eventsOnDate", count, this.formatNumber(count), dateLabel) : dateLabel;
 
     return html`
       <div
@@ -524,10 +622,13 @@ export class FluidEventCalendar extends LitElement {
         tabindex=${isActive ? 0 : -1}
         aria-label=${ariaLabel}
         aria-current=${cell.isToday ? "date" : "false"}
+        @focus=${() => {
+          this.focusedISO = cell.iso;
+        }}
         @click=${() => this.onDayClick(cell)}
         @keydown=${(e: KeyboardEvent) => this.onGridKeydown(e, cells, cell)}
       >
-        <span part="day-number" class="day-number">${cell.day}</span>
+        <span part="day-number" class="day-number">${this.formatNumber(cell.day)}</span>
         ${visible.length
           ? html`<div class="events">
               ${visible.map((ev) => {
@@ -551,13 +652,13 @@ export class FluidEventCalendar extends LitElement {
               class="more"
               type="button"
               tabindex="-1"
-              aria-label=${`Show all ${count} events on ${dateLabel}`}
+              aria-label=${this.term("showAllEvents", count, this.formatNumber(count), dateLabel)}
               @click=${(e: Event) => {
                 e.stopPropagation();
                 this.onDayClick(cell);
               }}
             >
-              +${overflow} more
+              ${this.term("moreEvents", overflow, this.formatNumber(overflow))}
             </button>`
           : ""}
       </div>

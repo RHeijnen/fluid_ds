@@ -1,6 +1,6 @@
 import { FluidInclude } from "./fluid-include.js";
 
-if (!customElements.get("fluid-include")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-include")) {
   customElements.define("fluid-include", FluidInclude);
 }
 

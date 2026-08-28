@@ -8,7 +8,7 @@ import {
   shift,
   size,
   type Placement
-} from "@floating-ui/dom";
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 
 /**
@@ -21,7 +21,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * Use it directly when you need precise positioning without the overlay
  * behavior of popover/dropdown.
  *
- * @summary Floating-ui-driven anchored element.
+ * @summary Anchored floating element.
  *
  * @slot anchor - The reference element. Required.
  * @slot - The popup content.
@@ -64,7 +64,7 @@ export class FluidPopup extends FluidElement {
    */
   @property({ type: Boolean, reflect: true }) open = false;
 
-  /** Floating-ui placement. */
+  /** Placement relative to the anchor. */
   @property() placement: Placement = "bottom-start";
 
   /** Distance in px between the anchor and the popup. */
@@ -97,15 +97,21 @@ export class FluidPopup extends FluidElement {
 
   private cleanup?: () => void;
   private resolvedAnchor: HTMLElement | null = null;
+  private direction: "ltr" | "rtl" | undefined;
+  private positionRequest = 0;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.active = true;
+    this.resolveAnchor();
+    if (this.hasUpdated) {
+      this.restartTracking();
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.cleanup?.();
+    this.positionRequest += 1;
     this.active = false;
   }
 
@@ -119,26 +125,48 @@ export class FluidPopup extends FluidElement {
       this.resolveAnchor();
       this.restartTracking();
     }
-    if (changed.has("open") || changed.has("placement") || changed.has("distance")) {
+    if (
+      changed.has("open") ||
+      changed.has("placement") ||
+      changed.has("distance") ||
+      changed.has("skidding") ||
+      changed.has("strategy") ||
+      changed.has("matchWidth") ||
+      changed.has("flip") ||
+      changed.has("shift")
+    ) {
+      if (changed.has("matchWidth") && !this.matchWidth) {
+        this.popupEl?.style.removeProperty("width");
+      }
       this.restartTracking();
+    }
+    const direction = this.localize.dir;
+    if (direction !== this.direction) {
+      this.direction = direction;
+      if (this.open) void this.reposition();
     }
   }
 
   private resolveAnchor(): void {
     if (this.anchorElement) {
       this.resolvedAnchor = this.anchorElement;
-      return;
+    } else if (this.anchorSelector) {
+      this.resolvedAnchor = (
+        this.getRootNode() as Document | ShadowRoot
+      ).querySelector<HTMLElement>(this.anchorSelector);
+    } else {
+      const slotted = this.shadowRoot
+        ?.querySelector<HTMLSlotElement>("slot[name='anchor']")
+        ?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
+      this.resolvedAnchor =
+        slotted ?? this.querySelector<HTMLElement>(":scope > [slot='anchor']") ?? null;
     }
-    if (this.anchorSelector) {
-      this.resolvedAnchor = (this.getRootNode() as Document | ShadowRoot).querySelector<HTMLElement>(
-        this.anchorSelector
-      );
-      return;
-    }
-    const slotted = this.shadowRoot
-      ?.querySelector<HTMLSlotElement>("slot[name='anchor']")
-      ?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
-    this.resolvedAnchor = slotted ?? null;
+    this.active = this.resolvedAnchor !== null;
+  }
+
+  private handleAnchorChange(): void {
+    this.resolveAnchor();
+    this.restartTracking();
   }
 
   private restartTracking(): void {
@@ -155,11 +183,12 @@ export class FluidPopup extends FluidElement {
 
   private async reposition(): Promise<void> {
     if (!this.resolvedAnchor || !this.popupEl) return;
-    const middleware = [
-      offset({ mainAxis: this.distance, crossAxis: this.skidding })
-    ];
+    const request = ++this.positionRequest;
+    const anchor = this.resolvedAnchor;
+    const popup = this.popupEl;
+    const middleware = [offset({ mainAxis: this.distance, crossAxis: this.skidding })];
     if (this.flip) {
-      middleware.push(flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }));
+      middleware.push(flip());
     }
     if (this.shift) {
       middleware.push(shift({ padding: 4 }));
@@ -173,12 +202,14 @@ export class FluidPopup extends FluidElement {
         })
       );
     }
-    const { x, y, placement } = await computePosition(this.resolvedAnchor, this.popupEl, {
+    const { x, y, placement } = await computePosition(anchor, popup, {
       placement: this.placement,
       strategy: this.strategy,
       middleware
     });
-    Object.assign(this.popupEl.style, { left: `${x}px`, top: `${y}px` });
+    if (request !== this.positionRequest || anchor !== this.resolvedAnchor || !this.isConnected)
+      return;
+    Object.assign(popup.style, { left: `${x}px`, top: `${y}px` });
     this.dispatchEvent(
       new CustomEvent("fluid-reposition", {
         detail: { placement },
@@ -195,7 +226,7 @@ export class FluidPopup extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <slot name="anchor" @slotchange=${() => this.resolveAnchor()}></slot>
+      <slot name="anchor" @slotchange=${this.handleAnchorChange}></slot>
       <div part="popup" class="popup">
         <slot></slot>
       </div>

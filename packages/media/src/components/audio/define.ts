@@ -1,6 +1,6 @@
 import { FluidAudio } from "./fluid-audio.js";
 
-if (!customElements.get("fluid-audio")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-audio")) {
   customElements.define("fluid-audio", FluidAudio);
 }
 

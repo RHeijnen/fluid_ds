@@ -1,5 +1,10 @@
-import { playwrightLauncher } from "@web/test-runner-playwright";
+import {
+  fluidMochaFramework,
+  fluidPlaywrightLauncher
+} from "../../scripts/web-test-runner-lifecycle.mjs";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
+import { fluidCoverage } from "../../scripts/web-test-runner-coverage.mjs";
+import { resolveTestBrowsers } from "../../scripts/resolve-test-browsers.mjs";
 import { fromRollup } from "@web/dev-server-rollup";
 import rollupCommonjs from "@rollup/plugin-commonjs";
 
@@ -11,24 +16,15 @@ const commonjs = fromRollup(rollupCommonjs);
  * Browser matrix mirrors @fluid-ds/components: Chromium locally for a fast inner
  * loop, all three engines in CI via FLUID_BROWSERS=all.
  */
-const ALL = ["chromium", "firefox", "webkit"];
-
-function resolveBrowsers() {
-  const raw = process.env.FLUID_BROWSERS?.trim().toLowerCase();
-  if (!raw || raw === "chromium") return ["chromium"];
-  if (raw === "all") return ALL;
-  const ok = raw.split(",").map((s) => s.trim()).filter((b) => ALL.includes(b));
-  return ok.length ? ok : ["chromium"];
-}
 
 /** @type {import("@web/test-runner").TestRunnerConfig} */
 export default {
   // Distinct port so the root `test` script can run this in parallel with the
   // other suites without colliding on web-test-runner's default :8000.
-  port: 8031,
+  port: 8034,
   files: ["src/**/*.test.ts"],
   nodeResolve: true,
-  browsers: resolveBrowsers().map((product) => playwrightLauncher({ product })),
+  browsers: resolveTestBrowsers().map((product) => fluidPlaywrightLauncher({ product })),
   plugins: [
     commonjs({
       // Only transform the one CommonJS dependency; leave axe-core and other
@@ -41,13 +37,8 @@ export default {
       tsconfig: "./tsconfig.json"
     })
   ],
-  testFramework: {
-    config: {
-      ui: "bdd",
-      timeout: "5000"
-    }
-  },
-  coverage: false,
+  testFramework: fluidMochaFramework(),
+  ...fluidCoverage("qr"),
   testRunnerHtml: (testFramework) => `
     <!doctype html>
     <html>

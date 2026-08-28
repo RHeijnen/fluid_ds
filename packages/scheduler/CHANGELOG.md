@@ -1,5 +1,18 @@
 # @fluid-ds/scheduler
 
+## 0.4.0
+
+### Minor Changes
+
+- Localize scheduler, time-slot, and availability-editor interface copy and live status text,
+  including locale-aware dates, numbers, and right-to-left direction.
+- Strengthen form behavior across reset, state restoration, reconnect, disabled, readonly, and
+  loading states. Focus now delegates to an available day or slot, and unavailable selections
+  are revalidated before submission.
+- Preserve special-date hours and advanced availability settings when editing, retain fractional
+  notice periods, and keep invalid time ranges as marked drafts instead of emitting invalid
+  availability.
+
 ## 0.0.9
 
 ### Patch Changes

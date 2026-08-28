@@ -32,7 +32,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-focus-ring-color - Focus ring.
  *
  * @fires fluid-position-change - Fired during drag; detail = { position }.
- */
+ * @cssproperty --fluid-comparison-shadow-md - Component override for the corresponding semantic token.
+*/
 export class FluidComparison extends FluidElement {
   static override styles = css`
     :host {
@@ -90,7 +91,7 @@ export class FluidComparison extends FluidElement {
       align-items: center;
       justify-content: center;
       color: var(--fluid-comparison-handle-fg, var(--fluid-accent-base));
-      box-shadow: var(--fluid-shadow-md);
+      box-shadow: var(--fluid-comparison-shadow-md, var(--fluid-shadow-md));
       touch-action: none;
     }
     .handle:focus-visible {
@@ -193,7 +194,7 @@ export class FluidComparison extends FluidElement {
           class="handle"
           role="slider"
           tabindex="0"
-          aria-label="Comparison slider"
+          aria-label=${this.term("comparisonSlider")}
           aria-valuemin="0"
           aria-valuemax="100"
           aria-valuenow=${Math.round(this.position)}

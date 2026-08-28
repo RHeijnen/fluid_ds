@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "dispositions": [
+    {
+      "id": "extract-zip-2.0.1-symlink-traversal",
+      "advisoryId": "GHSA-jmr9-qjv8-65gv",
+      "module": "extract-zip",
+      "version": "2.0.1",
+      "patchedDependency": "extract-zip@2.0.1",
+      "lockPatchHash": "5guokmk2c4keaki7w3gnbg3qha",
+      "patchPath": "patches/extract-zip@2.0.1.patch",
+      "patchSha256": "eb7256cf5bb05c6b698eed8c07015d911dc016a155b815f6e7cfccbf467dc7b0",
+      "proofPath": "quality/evidence/dependency-risk/local-patches/extract-zip-2.0.1-linux.json",
+      "requiredChecks": [
+        "escaping-symlink-target-rejected",
+        "duplicate-symlink-write-rejected",
+        "safe-file-and-in-root-symlink-preserved"
+      ],
+      "rationale": "Fluid applies and tests an exact local patch because upstream has no patched release.",
+      "owner": "Fluid maintainers"
+    }
+  ]
+}

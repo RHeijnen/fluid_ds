@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/contract",
+    "types": [],
+    "allowJs": true,
+    "paths": {
+      "@fluid-ds/components": ["./node_modules/@fluid-ds/components/dist/index.d.ts"],
+      "@fluid-ds/components/define/*": [
+        "./node_modules/@fluid-ds/components/dist/components/*/define.js"
+      ]
+    }
+  },
+  "files": ["src/contract-main.ts"],
+  "include": ["src/**/*.d.ts"]
+}

@@ -1,6 +1,6 @@
 import { FluidVideo } from "./fluid-video.js";
 
-if (!customElements.get("fluid-video")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-video")) {
   customElements.define("fluid-video", FluidVideo);
 }
 

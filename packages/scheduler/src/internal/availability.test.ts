@@ -27,6 +27,14 @@ function avail(overrides: Partial<Availability> = {}): Availability {
 }
 
 describe("availability engine", () => {
+  it("rejects non-positive, fractional, and non-finite slot increments without looping", () => {
+    for (const slotMinutes of [0, -1, 0.5, NaN, Infinity]) {
+      expect(generateSlots(DAY, avail({ slotMinutes }))).to.deep.equal([]);
+    }
+    for (const stepMinutes of [0.5, Infinity]) {
+      expect(generateSlots(DAY, avail({ stepMinutes }))).to.deep.equal([]);
+    }
+  });
   describe("time helpers", () => {
     it("parses HH:MM to minutes", () => {
       expect(parseTime("09:00")).to.equal(540);
@@ -88,6 +96,7 @@ describe("availability engine", () => {
       const slots = generateSlots(DAY, avail(), [], past);
       // 09:00–12:00 in 30-min slots = 6
       expect(slots).to.have.length(6);
+      if (!slots[0] || !slots[5]) throw new Error("Expected six generated slots");
       expect(slots[0].start).to.equal("2026-06-15T09:00");
       expect(slots[0].end).to.equal("2026-06-15T09:30");
       expect(slots[5].start).to.equal("2026-06-15T11:30");
@@ -149,8 +158,11 @@ describe("availability engine", () => {
     it("sorts slots from out-of-order windows chronologically", () => {
       const a = avail({ weekly: { [WD]: [{ start: "13:00", end: "14:00" }, { start: "09:00", end: "10:00" }] } });
       const slots = generateSlots(DAY, a, [], past);
-      expect(slots[0].start).to.equal("2026-06-15T09:00");
-      expect(slots[slots.length - 1].start).to.equal("2026-06-15T13:30");
+      const first = slots[0];
+      const last = slots.at(-1);
+      if (!first || !last) throw new Error("Expected chronologically sorted slots");
+      expect(first.start).to.equal("2026-06-15T09:00");
+      expect(last.start).to.equal("2026-06-15T13:30");
     });
   });
 

@@ -53,6 +53,11 @@ export class FluidGrid extends FluidElement {
       display: none;
     }
 
+    ::slotted(*) {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     /*
      * Fixed-column mode. JS stamps data-grid-mode="fixed" whenever a
      * cols / cols-sm / cols-md / cols-lg attribute is present; the
@@ -108,25 +113,40 @@ export class FluidGrid extends FluidElement {
   /** Inline-axis item alignment: start | center | end | stretch. */
   @property() justify?: string;
 
+  private validCount(value: number | undefined): number | undefined {
+    return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : undefined;
+  }
+
+  private validCssValue(property: string, value: string | undefined): string | undefined {
+    return value && CSS.supports(property, value) ? value : undefined;
+  }
+
+  private validLength(value: string | undefined): string | undefined {
+    return value && CSS.supports("width", `calc(${value} + 0px)`) ? value : undefined;
+  }
+
   private setVar(name: string, value: string | number | undefined | null): void {
     if (value === undefined || value === null || value === "") this.style.removeProperty(name);
     else this.style.setProperty(name, String(value));
   }
 
   protected override updated(): void {
-    const fixed =
-      this.cols != null || this.colsSm != null || this.colsMd != null || this.colsLg != null;
+    const cols = this.validCount(this.cols);
+    const colsSm = this.validCount(this.colsSm);
+    const colsMd = this.validCount(this.colsMd);
+    const colsLg = this.validCount(this.colsLg);
+    const fixed = cols != null || colsSm != null || colsMd != null || colsLg != null;
     if (fixed) this.setAttribute("data-grid-mode", "fixed");
     else this.removeAttribute("data-grid-mode");
 
-    this.setVar("--_cols", this.cols);
-    this.setVar("--_cols-sm", this.colsSm);
-    this.setVar("--_cols-md", this.colsMd);
-    this.setVar("--_cols-lg", this.colsLg);
-    this.setVar("--fluid-grid-gap", this.gap);
-    this.setVar("--fluid-grid-min-col", this.minColWidth);
-    this.setVar("--fluid-grid-align", this.align);
-    this.setVar("--fluid-grid-justify", this.justify);
+    this.setVar("--_cols", cols);
+    this.setVar("--_cols-sm", colsSm);
+    this.setVar("--_cols-md", colsMd);
+    this.setVar("--_cols-lg", colsLg);
+    this.setVar("--fluid-grid-gap", this.validLength(this.gap));
+    this.setVar("--fluid-grid-min-col", this.validLength(this.minColWidth));
+    this.setVar("--fluid-grid-align", this.validCssValue("align-items", this.align));
+    this.setVar("--fluid-grid-justify", this.validCssValue("justify-items", this.justify));
   }
 
   override render(): TemplateResult {

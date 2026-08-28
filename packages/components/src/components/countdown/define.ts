@@ -1,6 +1,6 @@
 import { FluidCountdown } from "./fluid-countdown.js";
 
-if (!customElements.get("fluid-countdown")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-countdown")) {
   customElements.define("fluid-countdown", FluidCountdown);
 }
 

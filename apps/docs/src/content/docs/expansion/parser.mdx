@@ -11,7 +11,8 @@ error report. A mapping UI and an error-preview table come with it.
 
 It splits into a **headless core** (`@fluid-ds/parser/core`, zero UI, runs
 server-side) and two web components built on the core. Standard web components,
-so they drop into React, Vue, Angular, Svelte, or plain HTML. WCAG 2.2 AA.
+so they drop into React, Vue, Angular, Svelte, or plain HTML. They target WCAG
+2.2 AA; production accessibility certification is still pending.
 
 ## Install
 
@@ -105,6 +106,27 @@ bad cells highlighted, and emits `fluid-parse` on confirm.
 Call `importer.export("csv")` or `importer.export("json")` to download the
 cleaned rows (it also returns the serialized string).
 
+Resetting, removing the chosen file, or disconnecting the component invalidates
+an in-progress read. A later completion cannot resurrect an old preview or emit
+a stale loaded/error event. Starting another read clears the old result; the
+outer container exposes `aria-busy="true"` while processing. Reset returns focus
+to the intake when focus was inside the parser.
+
+### Mapping and duplicate handling
+
+The mapper auto-matches each source column at most once. Manual selection may
+reuse a source column for multiple output fields; this is intentional when one
+input supplies multiple derived values. Every change emits a copied, complete
+`mapping` payload. Required selects expose native required state and
+`aria-invalid` when unmapped. If available columns change, removed source names
+are cleared rather than remaining silently selected in the mapping data.
+
+Repeated input headers receive collision-free suffixes, even if the file already
+contains headers such as `name_2`. `dedupeBy` removes later duplicate rows before
+the row cap is applied. Cell errors from discarded rows are not attached to a
+different kept row; inspect the duplicate and truncation counters for discarded
+input.
+
 ## Headless: `applyBlueprint` with no UI
 
 The whole engine is usable on its own, including server-side, with no custom
@@ -180,6 +202,11 @@ The intake reuses `fluid-dropzone` and the validation summary reuses
 - Interactive targets respect `--fluid-target-min` and focus rings respect
   `--fluid-focus-ring-width`, so everything scales to AAA sizing when an
   ancestor opts in. Transitions honor `prefers-reduced-motion: reduce`.
+
+Automated contracts cover real local CSV/JSON ingestion, parser errors and
+recovery, mapping, duplicate rows, reset, download contents, and native keyboard
+activation. Excel-specific browser flows, fluent locale review, and manual
+assistive-technology sign-off remain separate readiness requirements.
 
 ## License
 

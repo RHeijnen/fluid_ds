@@ -1,16 +1,12 @@
-import { html, css, type PropertyValues, type TemplateResult } from "lit";
-import { property, query } from "lit/decorators.js";
-import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { html, css, nothing, type PropertyValues, type TemplateResult } from "lit";
+import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { motionStyles, reducedMotion } from "../../internal/motion.js";
 
-registerIcon(
-  "close",
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`
-);
-
 export type FluidDialogSize = "sm" | "md" | "lg" | "xl" | "fullscreen";
+
+export type FluidDialogShowEvent = CustomEvent<null>;
+export type FluidDialogHideEvent = CustomEvent<null>;
 
 /**
  * Modal dialog built on the native `<dialog>` element. The platform handles
@@ -40,6 +36,7 @@ export type FluidDialogSize = "sm" | "md" | "lg" | "xl" | "fullscreen";
  * @cssproperty --fluid-dialog-radius - Panel corner radius. Falls back to --fluid-radius-lg.
  * @cssproperty --fluid-dialog-font-family - Panel font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-dialog-max-width - Max width of the panel.
+ * @cssproperty --fluid-dialog-shadow - Panel elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-dialog-border-width - Header/footer separator width. Falls back to 1px.
  * @cssproperty --fluid-dialog-header-border - Header separator color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-dialog-footer-border - Footer separator color. Falls back to --fluid-border-default.
@@ -67,139 +64,141 @@ export type FluidDialogSize = "sm" | "md" | "lg" | "xl" | "fullscreen";
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
  *
- * @fires fluid-show - Fired when the dialog opens.
- * @fires fluid-hide - Fired when the dialog closes (any reason).
+ * @fires {FluidDialogShowEvent} fluid-show - Fired when the dialog opens.
+ * @fires {FluidDialogHideEvent} fluid-hide - Fired when the dialog closes (any reason).
  */
 export class FluidDialog extends FluidElement {
   static override styles = [
     motionStyles,
     reducedMotion,
     css`
-    :host {
-      display: contents;
-    }
+      :host {
+        display: contents;
+      }
 
-    dialog {
-      padding: 0;
-      border: none;
-      background: transparent;
-      max-width: 100vw;
-      max-height: 100vh;
-      color: var(--fluid-dialog-fg, var(--fluid-text-primary));
-    }
+      dialog {
+        padding: 0;
+        border: none;
+        background: transparent;
+        max-width: 100vw;
+        max-height: 100vh;
+        color: var(--fluid-dialog-fg, var(--fluid-text-primary));
+      }
 
-    /* Modal backdrop, slightly tinted with the surface color. */
-    dialog::backdrop {
-      background: var(--fluid-dialog-backdrop, rgb(0 0 0 / 0.4));
-      backdrop-filter: blur(2px);
-      animation: fluid-backdrop-in
-        calc(var(--fluid-dialog-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1))
-        var(--fluid-easing-standard);
-    }
+      /* Modal backdrop, slightly tinted with the surface color. */
+      dialog::backdrop {
+        background: var(--fluid-dialog-backdrop, rgb(0 0 0 / 0.4));
+        backdrop-filter: blur(2px);
+        animation: fluid-backdrop-in
+          calc(
+            var(--fluid-dialog-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1)
+          )
+          var(--fluid-easing-standard);
+      }
 
-    .panel {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: var(--fluid-dialog-max-width, 32rem);
-      max-height: calc(100vh - 4rem);
-      background: var(--fluid-dialog-bg, var(--fluid-surface-base));
-      border-radius: var(--fluid-dialog-radius, var(--fluid-radius-lg));
-      box-shadow: var(--fluid-shadow-lg);
-      font-family: var(--fluid-dialog-font-family, var(--fluid-font-family-sans));
-      overflow: hidden;
-      animation: var(--fluid-dialog-enter-animation, fluid-scale-in)
-        calc(var(--fluid-dialog-enter-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-        var(--fluid-dialog-enter-easing, var(--fluid-easing-emphasized)) both;
-    }
+      .panel {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: var(--fluid-dialog-max-width, 32rem);
+        max-height: calc(100vh - 4rem);
+        background: var(--fluid-dialog-bg, var(--fluid-surface-base));
+        border-radius: var(--fluid-dialog-radius, var(--fluid-radius-lg));
+        box-shadow: var(--fluid-dialog-shadow, var(--fluid-shadow-lg));
+        font-family: var(--fluid-dialog-font-family, var(--fluid-font-family-sans));
+        overflow: hidden;
+        animation: var(--fluid-dialog-enter-animation, fluid-scale-in)
+          calc(
+            var(--fluid-dialog-enter-duration, var(--fluid-duration-normal)) *
+              var(--fluid-motion, 1)
+          )
+          var(--fluid-dialog-enter-easing, var(--fluid-easing-emphasized)) both;
+      }
 
-    /* Size variants. */
-    :host([size="sm"]) .panel {
-      max-width: 22rem;
-    }
-    :host([size="md"]) .panel {
-      max-width: 32rem;
-    }
-    :host([size="lg"]) .panel {
-      max-width: 48rem;
-    }
-    :host([size="xl"]) .panel {
-      max-width: 64rem;
-    }
-    :host([size="fullscreen"]) .panel {
-      max-width: 100vw;
-      max-height: 100vh;
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-    }
+      /* Size variants. */
+      :host([size="sm"]) .panel {
+        max-width: 22rem;
+      }
+      :host([size="lg"]) .panel {
+        max-width: 48rem;
+      }
+      :host([size="xl"]) .panel {
+        max-width: 64rem;
+      }
+      :host([size="fullscreen"]) .panel {
+        max-width: 100vw;
+        max-height: 100vh;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+      }
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--fluid-space-3);
-      padding: var(--fluid-space-4) var(--fluid-space-5);
-      border-bottom: var(--fluid-dialog-border-width, 1px) solid
-        var(--fluid-dialog-header-border, var(--fluid-border-default));
-    }
-    .header.empty {
-      display: none;
-    }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--fluid-space-3);
+        padding: var(--fluid-space-4) var(--fluid-space-5);
+        border-bottom: var(--fluid-dialog-border-width, 1px) solid
+          var(--fluid-dialog-header-border, var(--fluid-border-default));
+      }
 
-    .label {
-      font-size: var(--fluid-font-size-lg);
-      font-weight: var(--fluid-font-weight-semibold);
-      flex: 1 1 auto;
-    }
+      .label {
+        font-size: var(--fluid-font-size-lg);
+        font-weight: var(--fluid-font-weight-semibold);
+        flex: 1 1 auto;
+      }
 
-    /* SC 2.5.8 Target Size, floor the close button to --fluid-target-min. */
-    .close {
-      all: unset;
-      cursor: pointer;
-      box-sizing: border-box;
-      width: max(2rem, var(--fluid-target-min, 0px));
-      height: max(2rem, var(--fluid-target-min, 0px));
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--fluid-radius-sm);
-      color: var(--fluid-dialog-close-fg, var(--fluid-text-secondary));
-      flex-shrink: 0;
-    }
-    .close:hover {
-      background: var(--fluid-dialog-close-hover-bg, var(--fluid-surface-muted));
-      color: var(--fluid-dialog-close-hover-fg, var(--fluid-text-primary));
-    }
-    .close:focus-visible {
-      outline: var(--fluid-dialog-focus-ring-width, var(--fluid-focus-ring-width)) solid
-        var(--fluid-dialog-focus-ring, var(--fluid-focus-ring-color));
-      outline-offset: 1px;
-    }
+      /* SC 2.5.8 Target Size, floor the close button to --fluid-target-min. */
+      .close {
+        all: unset;
+        cursor: pointer;
+        box-sizing: border-box;
+        width: max(2rem, var(--fluid-target-min, 0px));
+        height: max(2rem, var(--fluid-target-min, 0px));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--fluid-radius-sm);
+        color: var(--fluid-dialog-close-fg, var(--fluid-text-secondary));
+        flex-shrink: 0;
+      }
+      .close:hover {
+        background: var(--fluid-dialog-close-hover-bg, var(--fluid-surface-muted));
+        color: var(--fluid-dialog-close-hover-fg, var(--fluid-text-primary));
+      }
+      .close:focus-visible {
+        outline: var(--fluid-dialog-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-dialog-focus-ring, var(--fluid-focus-ring-color));
+        outline-offset: 1px;
+      }
 
-    .body {
-      padding: var(--fluid-space-5);
-      overflow-y: auto;
-      flex: 1 1 auto;
-    }
+      .body {
+        padding: var(--fluid-space-5);
+        overflow-y: auto;
+        flex: 1 1 auto;
+      }
 
-    .footer {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: var(--fluid-space-2);
-      padding: var(--fluid-space-4) var(--fluid-space-5);
-      border-top: var(--fluid-dialog-border-width, 1px) solid
-        var(--fluid-dialog-footer-border, var(--fluid-border-default));
-      background: var(--fluid-dialog-footer-bg, var(--fluid-surface-subtle));
-    }
-    .footer.empty {
-      display: none;
-    }
-  `
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: var(--fluid-space-2);
+        padding: var(--fluid-space-4) var(--fluid-space-5);
+        border-top: var(--fluid-dialog-border-width, 1px) solid
+          var(--fluid-dialog-footer-border, var(--fluid-border-default));
+        background: var(--fluid-dialog-footer-bg, var(--fluid-surface-subtle));
+      }
+      .header.empty,
+      .footer.empty {
+        display: none;
+      }
+    `
   ];
 
-  @query("dialog") private dialogEl!: HTMLDialogElement;
+  private get dialogEl(): HTMLDialogElement | null {
+    return this.renderRoot.querySelector("dialog");
+  }
 
   /** Open state. */
   @property({ type: Boolean, reflect: true }) open = false;
@@ -210,11 +209,33 @@ export class FluidDialog extends FluidElement {
   /** Whether clicking the backdrop closes the dialog. Default true. */
   @property({ type: Boolean, attribute: "light-dismiss" }) lightDismiss = true;
 
+  /** Prevent backdrop clicks from closing the dialog. */
+  @property({ type: Boolean, attribute: "no-light-dismiss" }) noLightDismiss = false;
+
   /** Hide the built-in close (×) button. */
   @property({ type: Boolean, attribute: "no-close-button" }) noCloseButton = false;
 
   /** Accessible label (used when no label slot content). */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
+
+  /** Accessible label for the internal native dialog. */
+  @property() label = "";
+
+  override attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    value: string | null
+  ): void {
+    if (name === "aria-label" && value !== null) {
+      // `aria-label` is not permitted on a role-less custom-element host. Keep
+      // the established consumer API, but move the value synchronously to the
+      // internal native dialog and remove the invalid host attribute.
+      this.label = value;
+      this.removeAttribute(name);
+      return;
+    }
+    super.attributeChangedCallback(name, oldValue, value);
+  }
 
   /** Show the dialog. */
   show(): void {
@@ -226,49 +247,77 @@ export class FluidDialog extends FluidElement {
     this.open = false;
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated && this.open) {
+      void this.updateComplete.then(() => {
+        if (this.open) this.presentNativeModal();
+      });
+    }
+  }
+
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
-      if (this.open) this.openNative();
-      else this.closeNative();
+      if (this.open) this.presentNativeModal();
+      else this.dialogEl?.close();
     }
   }
 
-  private openNative(): void {
-    if (!this.dialogEl) return;
-    if (!this.dialogEl.open) {
-      this.dialogEl.showModal();
-      this.dispatchEvent(new CustomEvent("fluid-show", { bubbles: true, composed: true }));
+  private presentNativeModal(): void {
+    const dialog = this.dialogEl;
+    if (!this.isConnected || !dialog || dialog.matches(":modal")) return;
+    const emitShow = !dialog.open;
+
+    // Removing an open native dialog from the document removes it from the
+    // top layer without clearing its `open` state. Clear only that stale
+    // presentation state before restoring modality on reconnect.
+    if (dialog.open) dialog.removeAttribute("open");
+
+    dialog.showModal();
+    this.ensureFocusWithin();
+    if (emitShow) {
+      this.dispatchEvent(
+        new CustomEvent<null>("fluid-show", { detail: null, bubbles: true, composed: true })
+      );
     }
   }
 
-  private closeNative(): void {
-    if (!this.dialogEl) return;
-    if (this.dialogEl.open) this.dialogEl.close();
+  private ensureFocusWithin(): void {
+    const target =
+      this.querySelector<HTMLElement>("[autofocus]:not([disabled])") ??
+      (this.matches(":focus-within") ? null : this.renderRoot.querySelector<HTMLElement>(".close"));
+    target?.focus();
   }
 
-  private handleDialogClose = () => {
+  private handleDialogClose(): void {
     // The native dialog can close via Escape, form submission, etc. Sync state.
     this.open = false;
-    this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
-  };
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
+    );
+  }
 
-  private handleBackdropClick = (e: MouseEvent) => {
-    if (!this.lightDismiss) return;
+  private handleBackdropClick(e: MouseEvent): void {
+    if (this.noLightDismiss || !this.lightDismiss) return;
     // The backdrop is the dialog element itself when clicked outside the panel.
     if (e.target === this.dialogEl) this.hide();
-  };
+  }
 
   override render(): TemplateResult {
+    const accessibleLabel = this.label || this.ariaLabel;
     return html`
       <dialog
         part="base"
-        aria-label=${this.ariaLabel ?? ""}
+        aria-label=${accessibleLabel || nothing}
+        aria-labelledby=${accessibleLabel ? nothing : "fluid-dialog-label"}
         @close=${this.handleDialogClose}
         @click=${this.handleBackdropClick}
       >
         <div part="panel" class="panel">
           <div part="header" class="header">
-            <div class="label"><slot name="label"><slot name="heading"></slot></slot></div>
+            <div id="fluid-dialog-label" class="label">
+              <slot name="label"><slot name="heading"></slot></slot>
+            </div>
             ${this.noCloseButton
               ? ""
               : html`
@@ -276,10 +325,21 @@ export class FluidDialog extends FluidElement {
                     part="close"
                     class="close"
                     type="button"
-                    aria-label="Close dialog"
-                    @click=${() => this.hide()}
+                    aria-label=${this.term("closeDialog")}
+                    @click=${this.hide}
                   >
-                    <fluid-icon name="close"></fluid-icon>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      height="1em"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m6 6 12 12M18 6 6 18"></path>
+                    </svg>
                   </button>
                 `}
           </div>
@@ -295,20 +355,18 @@ export class FluidDialog extends FluidElement {
     const root = this.shadowRoot!;
     for (const slotName of ["label", "footer"]) {
       const slot = root.querySelector<HTMLSlotElement>(`slot[name="${slotName}"]`);
-      const parent = slot?.parentElement?.parentElement;
-      if (!parent) continue;
+      const section = slot?.closest<HTMLElement>(".header,.footer");
+      if (!section) continue;
       const update = () => {
-        const hasContent = (slot!.assignedNodes({ flatten: true }) ?? []).length > 0;
-        if (slotName === "label") {
-          parent.querySelector(".header")?.classList.toggle("empty", !hasContent && this.noCloseButton);
-        }
-        if (slotName === "footer") {
-          parent.querySelector(".footer")?.classList.toggle("empty", !hasContent);
-        }
+        const hasContent = slot!.assignedNodes({ flatten: true }).length > 0;
+        section.classList.toggle(
+          "empty",
+          !hasContent && (slotName === "footer" || this.noCloseButton)
+        );
       };
-      slot?.addEventListener("slotchange", update);
+      this.listen(slot!, "slotchange", update);
       update();
     }
-    if (this.open) this.openNative();
+    if (this.open) this.presentNativeModal();
   }
 }

@@ -1,6 +1,6 @@
 import { FluidSwitch } from "./fluid-switch.js";
 
-if (!customElements.get("fluid-switch")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-switch")) {
   customElements.define("fluid-switch", FluidSwitch);
 }
 

@@ -1,5 +1,16 @@
 # @fluid-ds/table
 
+## 0.4.0
+
+### Minor Changes
+
+- Localize simple and infinite table controls, selection labels, result counts, and live column
+  announcements, with locale-aware numbers and right-to-left direction.
+- Harden infinite-table virtualization and reconnect behavior, expose accurate virtual row
+  metadata, and add controlled sorting without mutating the supplied rows or sort state.
+- Improve column interaction with keyboard reordering and resizing, stable drag cancellation,
+  truncated narrow cells, and an opt-in synchronized horizontal column scrollbar.
+
 ## 0.1.2
 
 ### Patch Changes

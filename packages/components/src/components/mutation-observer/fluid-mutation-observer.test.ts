@@ -11,6 +11,13 @@ const peek = (el: FluidMutationObserver): Internals =>
   el as unknown as Internals;
 
 describe("<fluid-mutation-observer>", () => {
+  it("passes an a11y audit without changing slotted semantics", async () => {
+    const el = await fixture<FluidMutationObserver>(html`
+      <fluid-mutation-observer child-list><button>Observed action</button></fluid-mutation-observer>
+    `);
+    await expect(el).to.be.accessible();
+  });
+
   it("renders its slotted children", async () => {
     const el = await fixture<FluidMutationObserver>(html`
       <fluid-mutation-observer child-list>

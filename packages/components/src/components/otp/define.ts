@@ -1,6 +1,6 @@
 import { FluidOtp } from "./fluid-otp.js";
 
-if (!customElements.get("fluid-otp")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-otp")) {
   customElements.define("fluid-otp", FluidOtp);
 }
 

@@ -54,9 +54,24 @@ export class FluidButtonGroup extends FluidElement {
   /** Accessible label for the group (role=group). */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
+  private memberObserver?: MutationObserver;
+  private readonly stampedMembers = new Set<HTMLElement>();
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute("role", "group");
+    if (typeof MutationObserver !== "undefined") {
+      this.memberObserver = new MutationObserver(() => this.stampMembers());
+      this.memberObserver.observe(this, { childList: true, subtree: true });
+    }
+    if (this.hasUpdated) this.stampMembers();
+  }
+
+  override disconnectedCallback(): void {
+    this.memberObserver?.disconnect();
+    this.memberObserver = undefined;
+    this.clearStamps();
+    super.disconnectedCallback();
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -93,10 +108,18 @@ export class FluidButtonGroup extends FluidElement {
       .map((el) => this.memberButton(el))
       .filter((b): b is HTMLElement => b !== null);
 
+    for (const previous of this.stampedMembers) {
+      if (!members.includes(previous)) {
+        previous.removeAttribute("data-fluid-group");
+        previous.removeAttribute("data-fluid-group-orientation");
+        this.stampedMembers.delete(previous);
+      }
+    }
+
     const last = members.length - 1;
     members.forEach((btn, i) => {
-      const pos =
-        members.length === 1 ? "only" : i === 0 ? "first" : i === last ? "last" : "inner";
+      this.stampedMembers.add(btn);
+      const pos = members.length === 1 ? "only" : i === 0 ? "first" : i === last ? "last" : "inner";
       btn.setAttribute("data-fluid-group", pos);
       if (this.orientation === "vertical") {
         btn.setAttribute("data-fluid-group-orientation", "vertical");
@@ -104,6 +127,14 @@ export class FluidButtonGroup extends FluidElement {
         btn.removeAttribute("data-fluid-group-orientation");
       }
     });
+  }
+
+  private clearStamps(): void {
+    for (const member of this.stampedMembers) {
+      member.removeAttribute("data-fluid-group");
+      member.removeAttribute("data-fluid-group-orientation");
+    }
+    this.stampedMembers.clear();
   }
 
   override render(): TemplateResult {

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "stable": false,
+  "experiment": "focus-prepaint-plus-two-frame-compositor-settle",
+  "branchExecutionContract": {
+    "intendedFixture": "components-forms-button--keyboard-focus",
+    "expectedExecutionsPerMode": 1,
+    "expectedExecutionsForOtherFixtures": 0,
+    "assertionsPassed": true
+  },
+  "completedIterationsBeforeStop": 23,
+  "modesPerIteration": 5,
+  "failure": {
+    "run": 1,
+    "mode": "rtl",
+    "image": "components-forms-button--keyboard-focus-rtl.png",
+    "changedPixels": 1,
+    "changedChannels": 1,
+    "maximumChannelDelta": 1,
+    "coordinate": [825, 23],
+    "location": "right-to-left rounded focus-ring edge",
+    "variantSha256": "18294cde554708406e5ff4dedc2c8784a6cb4f0e86ac162f16ba527e6b0815bb",
+    "canonicalSha256": "d8045bf516fb19d0852208d37b1f23db207cf8c8a559a9ca2cb5ef9ffdae9a90"
+  },
+  "disposition": "The causal experiment failed exact-hash comparison and was stopped. The prepaint change was reverted and no new 50-run window was started."
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "policy": {
+    "rasterThreads": 1,
+    "chromiumLaunchArgs": ["--num-raster-threads=1"]
+  },
+  "comparison": {
+    "referenceRun": "2026-08-27-isolated-focus-50-run-stable/run-1",
+    "policyRun": "2026-08-27-raster1-full-validation/run-1",
+    "candidateFiles": 60,
+    "acceptedSmokeFiles": 5,
+    "byteIdenticalFiles": 64,
+    "differingFiles": [
+      {
+        "name": "components-forms-button--keyboard-focus-dark.png",
+        "referenceSha256": "9733204344e24e5a8d5b669e14bd0111f4e87b8ad3ffbc53935946cae0ebfb05",
+        "policySha256": "a7054edba79e3fb4e7e4d5251ac4e8096d21e4942e66e74d6dc8b53092efd0bb",
+        "decodedPixelDifferences": [
+          {
+            "x": 14,
+            "y": 23,
+            "referenceArgb": "FF0E141C",
+            "policyArgb": "FF0E141D"
+          }
+        ]
+      }
+    ],
+    "acceptedBaseline": {
+      "fileCount": 1009,
+      "aggregateSha256": "369356a6da2903f0040998a59c00c370886e6c0e028362fe8b390bec61b01c0f",
+      "worktreeClean": true,
+      "changed": false
+    }
+  },
+  "scope": "Bounded canonical-platform raster correction for unaccepted candidate evidence; no baseline approval, threshold, mask, or product CSS change."
+}

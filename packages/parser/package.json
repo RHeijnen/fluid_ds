@@ -1,8 +1,9 @@
 {
   "name": "@fluid-ds/parser",
-  "version": "0.1.6",
-  "description": "Drop a JSON / CSV / Excel file onto a Fluid file-drop and get validated, typed rows. A declarative blueprint maps + coerces + validates each column, with a mapping UI and an error-preview table. Framework-agnostic, WCAG 2.2 AA.",
+  "version": "0.4.0",
+  "description": "JSON, CSV and Excel import web components for Fluid, with typed column mapping, validation and an error-preview table.",
   "type": "module",
+  "customElements": "custom-elements.json",
   "license": "MIT",
   "author": "Fluid contributors",
   "homepage": "https://github.com/RHeijnen/fluid_ds",
@@ -30,6 +31,7 @@
     "access": "public",
     "tag": "latest",
     "exports": {
+      "./custom-elements.json": "./custom-elements.json",
       ".": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
@@ -48,8 +50,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./custom-elements.json": "./custom-elements.json",
     ".": {
       "types": "./src/index.ts",
+      "node": "./dist/index.js",
       "import": "./src/index.ts"
     },
     "./core": {
@@ -62,10 +66,12 @@
     }
   },
   "files": [
+    "custom-elements.json",
     "dist",
     "src",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "**/define.js",
@@ -74,14 +80,16 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test": "web-test-runner --config web-test-runner.config.js",
+    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "dependencies": {
     "@fluid-ds/components": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
-    "lit": "^3.2.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "peerDependencies": {
+    "lit": "^3.2.1"
   },
   "devDependencies": {
     "@open-wc/testing": "^4.0.0",
@@ -90,6 +98,7 @@
     "@web/test-runner": "^0.20.0",
     "@web/test-runner-playwright": "^0.11.0",
     "playwright": "^1.49.1",
+    "lit": "^3.2.1",
     "typescript": "^5.7.2"
   }
 }

@@ -88,15 +88,56 @@ throttled.
 use the `start()`, `pause()`, and `reset()` methods.
 
 ```html
-<fluid-countdown id="c" seconds="120" autostart="false"></fluid-countdown>
-
 <script type="module">
-  const c = document.getElementById("c");
+  import "@fluid-ds/components/define/countdown";
+  const c = document.createElement("fluid-countdown");
+  c.autostart = false;
+  c.seconds = 120;
+  document.body.append(c);
   c.start();
   // c.pause();
   // c.reset();
 </script>
 ```
+
+`autostart` is a Boolean property. The string attribute `autostart="false"`
+does not disable it; assign the property before connecting the element.
+
+### Localization
+
+Import the desired [locale pack](/guides/localization/) and declare `lang` on
+the countdown or an ancestor, including a containing shadow host. The timer
+name, short unit labels, complete remaining-time sentence and completion
+message use the translation registry. Spoken durations use `Intl.NumberFormat`
+unit grammar and `Intl.ListFormat`; visible clock/segment digits remain ASCII
+for compatibility. Message formatting follows the registry's effective language:
+declared context, then document/browser language, then English. Malformed Intl
+language tags use English unit formatting; an empty nearest language follows
+the registry's document/browser fallback. This differs from the standalone
+formatters' explicit-locale/inherited-language/English policy.
+
+Changing language updates the last announced duration or completion message,
+including while paused, without advancing the countdown or emitting another
+completion event. The ten-second announcement throttle and `reset()` behavior
+are unchanged. An explicit `aria-label`, including an empty string, remains
+application-owned; provide a meaningful name for accessible use.
+
+Custom dictionaries can override `countdownRemaining(duration)` and
+`countdownComplete`. The duration argument is an already-localized display
+string, not raw seconds; the callback owns the complete sentence. The official
+Dutch, German, French, Spanish and Arabic message drafts still require fluent
+review. Browser context tests do not establish native-ancestor SSR inheritance
+or screen-reader announcement quality.
+
+### Disconnect and reconnect
+
+`start()` retains its immediate first tick. An immediate completion does not
+install another interval, and the first render reflects that tick's value.
+Disconnect removes the interval without emitting detached ticks. Reconnecting
+an active fixed-duration countdown resumes the remaining duration with one
+immediate tick; time spent detached does not consume that duration. A valid
+`target` instead uses elapsed wall-clock time on reconnect. A manually paused
+countdown remains paused, including when `autostart` was initially enabled.
 
 ## Events
 
@@ -216,6 +257,6 @@ covered by a token.
   one at zero, so a screen reader is not flooded with one update per tick. The
   visible digits still update every second.
 - The clock separators (`:`) are `aria-hidden`, so the live text reads as a
-  sentence ("1 hour, 1 minute, 1 second remaining") rather than punctuation.
+  localized sentence rather than punctuation.
 - Honor `prefers-reduced-motion`: the component has no animation, so there's
   nothing to suppress.

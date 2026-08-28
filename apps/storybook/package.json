@@ -8,8 +8,11 @@
     "dev": "storybook dev -p 6006 --no-open --disable-telemetry",
     "predev:open": "pnpm --filter @fluid-ds/tokens build",
     "dev:open": "storybook dev -p 6006 --disable-telemetry",
-    "prebuild": "pnpm --filter @fluid-ds/tokens build",
+    "prebuild": "pnpm test:fonts && pnpm --filter @fluid-ds/tokens build",
     "build": "storybook build --disable-telemetry",
+    "test:interactions": "test-storybook",
+    "test:runner": "node --test scripts/test-runner-config.test.mjs && node scripts/check-runner.mjs",
+    "test:fonts": "node scripts/check-fonts.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -29,11 +32,15 @@
     "@storybook/blocks": "^8.4.7",
     "@storybook/web-components": "^8.4.7",
     "@storybook/web-components-vite": "^8.4.7",
+    "@storybook/test": "^8.4.7",
+    "@storybook/test-runner": "^0.20.1",
     "@whitespace/storybook-addon-html": "^6.1.1",
+    "http-server": "^14.1.1",
     "prettier": "^3.4.2",
     "storybook": "^8.4.7",
     "storybook-addon-pseudo-states": "^4.0.2",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^6.4.3",
+    "wait-on": "^8.0.1"
   }
 }

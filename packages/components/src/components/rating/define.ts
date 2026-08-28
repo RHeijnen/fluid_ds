@@ -1,6 +1,6 @@
 import { FluidRating } from "./fluid-rating.js";
 
-if (!customElements.get("fluid-rating")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-rating")) {
   customElements.define("fluid-rating", FluidRating);
 }
 

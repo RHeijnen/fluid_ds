@@ -1,6 +1,6 @@
 import { FluidAvailabilityEditor } from "./fluid-availability-editor.js";
 
-if (!customElements.get("fluid-availability-editor")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-availability-editor")) {
   customElements.define("fluid-availability-editor", FluidAvailabilityEditor);
 }
 

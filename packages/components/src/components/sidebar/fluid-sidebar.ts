@@ -44,6 +44,7 @@ import { reducedMotion } from "../../internal/motion.js";
  * @cssproperty --fluid-sidebar-border - Edge separator color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-sidebar-border-width - Edge separator width. Falls back to 1px.
  * @cssproperty --fluid-sidebar-backdrop - Overlay backdrop fill. Falls back to rgb(0 0 0 / 0.4).
+ * @cssproperty --fluid-sidebar-shadow - Overlay elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-sidebar-font-family - Font family. Falls back to --fluid-font-family-sans.
  * @cssproperty [--fluid-sidebar-duration=var(--fluid-duration-normal)] - Collapse duration (scaled by --fluid-motion).
  * @cssproperty [--fluid-sidebar-easing=var(--fluid-easing-emphasized)] - Collapse easing.
@@ -155,7 +156,7 @@ export class FluidSidebar extends FluidElement {
       inset-block: 0;
       inset-inline-start: 0;
       block-size: 100%;
-      box-shadow: var(--fluid-shadow-lg);
+      box-shadow: var(--fluid-sidebar-shadow, var(--fluid-shadow-lg));
       pointer-events: auto;
       transform: translateX(-100%);
       transition:
@@ -204,12 +205,11 @@ export class FluidSidebar extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("keydown", this.handleKeyDown);
+    this.listen(document, "keydown", this.handleKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("keydown", this.handleKeyDown);
   }
 
   /** Expand the sidebar. */
@@ -251,7 +251,7 @@ export class FluidSidebar extends FluidElement {
         const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
         parent.classList.toggle("empty", !hasContent);
       };
-      slot.addEventListener("slotchange", update);
+      this.listen(slot, "slotchange", update);
       update();
     }
   }
@@ -366,7 +366,7 @@ export class FluidSidebar extends FluidElement {
         part="base"
         class="base"
         tabindex="-1"
-        aria-label=${this.ariaLabel ?? "Sidebar"}
+        aria-label=${this.ariaLabel ?? this.term("sidebar")}
       >
         <div part="header" class="header"><slot name="header"></slot></div>
         <div part="content" class="content"><slot></slot></div>

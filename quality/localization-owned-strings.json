@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 1,
+  "scope": "Published Fluid custom elements plus shared runtime surfaces reviewed for user-visible string ownership and localization/RTL disposition",
+  "measurement": "source disposition inventory; not an English-literal count, localization percentage, translation-quality score, or runtime certification",
+  "ownershipCategories": [
+    "internal",
+    "configurable-default",
+    "application-content",
+    "native-browser",
+    "dependency-ui",
+    "non-user-text"
+  ],
+  "catalogDispositions": [
+    {
+      "disposition": "completed-bounded-contract",
+      "meaning": "Known messages have a registry-backed focused contract; this is not fluent-language or whole-component certification.",
+      "evidence": [
+        "docs/reviews/localization-remaining-2026-08-26.md",
+        "docs/reviews/scheduler-form-contract-2026-08-27.md"
+      ],
+      "tags": ["fluid-countdown", "fluid-scheduler", "fluid-time-slots", "fluid-tour"]
+    },
+    {
+      "disposition": "completed-audited-migration",
+      "meaning": "The dated source audit confirmed owned defaults or messages and the corresponding bounded runtime migrations and focused evidence are now present; this is not fluent or visual certification.",
+      "evidence": [
+        "docs/reviews/core-date-time-localization-2026-08-27.md",
+        "docs/reviews/core-units-file-size-meter-localization-2026-08-27.md",
+        "docs/reviews/event-calendar-availability-localization-rtl-2026-08-27.md",
+        "docs/reviews/editor-kanban-node-graph-localization-rtl-2026-08-27.md",
+        "docs/reviews/table-localization-rtl-2026-08-27.md",
+        "docs/reviews/charts-map-localization-rtl-2026-08-27.md",
+        "docs/reviews/markdown-qr-localization-rtl-2026-08-27.md",
+        "docs/reviews/media-localization-2026-08-27.md",
+        "docs/reviews/parser-presentation-localization-rtl-2026-08-27.md"
+      ],
+      "tags": [
+        "fluid-anchor-nav",
+        "fluid-animated-image",
+        "fluid-app-bar",
+        "fluid-audio",
+        "fluid-availability-editor",
+        "fluid-banner",
+        "fluid-bar-chart",
+        "fluid-bubble-chart",
+        "fluid-chart",
+        "fluid-code-block",
+        "fluid-color-picker",
+        "fluid-column-mapper",
+        "fluid-date-picker",
+        "fluid-date-range-picker",
+        "fluid-doughnut-chart",
+        "fluid-dropzone",
+        "fluid-event-calendar",
+        "fluid-file-input",
+        "fluid-file-parser",
+        "fluid-fold",
+        "fluid-format-bytes",
+        "fluid-infinite-table",
+        "fluid-kanban",
+        "fluid-lightbox",
+        "fluid-line-chart",
+        "fluid-loading-overlay",
+        "fluid-map",
+        "fluid-markdown",
+        "fluid-masked-input",
+        "fluid-meter",
+        "fluid-node-graph",
+        "fluid-pie-chart",
+        "fluid-polar-area-chart",
+        "fluid-popconfirm",
+        "fluid-pricing-table",
+        "fluid-pricing-tier",
+        "fluid-progress-ring",
+        "fluid-qr-code",
+        "fluid-radar-chart",
+        "fluid-range-slider",
+        "fluid-rich-text-editor",
+        "fluid-scatter-chart",
+        "fluid-select",
+        "fluid-signature-pad",
+        "fluid-skeleton",
+        "fluid-speed-dial",
+        "fluid-split-panel",
+        "fluid-table",
+        "fluid-tag",
+        "fluid-tag-input",
+        "fluid-time-picker",
+        "fluid-toast",
+        "fluid-transfer",
+        "fluid-video",
+        "fluid-video-playlist",
+        "fluid-zoomable-frame"
+      ]
+    },
+    {
+      "disposition": "completed-existing-contract",
+      "meaning": "Current-source review confirms known Fluid-owned strings already use the shared registry with focused component coverage; this remains bounded and does not imply fluent, visual, or manual assistive-technology approval.",
+      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"],
+      "tags": [
+        "fluid-avatar",
+        "fluid-breadcrumb",
+        "fluid-breadcrumb-item",
+        "fluid-calendar",
+        "fluid-callout",
+        "fluid-carousel",
+        "fluid-carousel-item",
+        "fluid-checkbox",
+        "fluid-command-palette",
+        "fluid-comparison",
+        "fluid-context-menu",
+        "fluid-copy-button",
+        "fluid-description-item",
+        "fluid-description-list",
+        "fluid-dialog",
+        "fluid-drawer",
+        "fluid-field",
+        "fluid-menu",
+        "fluid-menu-item",
+        "fluid-menu-label",
+        "fluid-nav-item",
+        "fluid-nav-list",
+        "fluid-number-input",
+        "fluid-option",
+        "fluid-otp",
+        "fluid-pagination",
+        "fluid-popover",
+        "fluid-progress-bar",
+        "fluid-radio",
+        "fluid-radio-group",
+        "fluid-rating",
+        "fluid-sidebar",
+        "fluid-spinner",
+        "fluid-switch",
+        "fluid-theme-toggle",
+        "fluid-toast-item",
+        "fluid-truncate",
+        "fluid-typeahead"
+      ]
+    },
+    {
+      "disposition": "reviewed-no-owned-candidate",
+      "meaning": "The current-source review found no additional Fluid-owned runtime message candidate; application, browser, dependency and canonical boundaries remain explicit and this is not localization or accessibility certification.",
+      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"],
+      "tags": [
+        "fluid-accordion",
+        "fluid-animation",
+        "fluid-aspect-ratio",
+        "fluid-avatar-group",
+        "fluid-badge",
+        "fluid-button",
+        "fluid-button-group",
+        "fluid-card",
+        "fluid-celebrate",
+        "fluid-col",
+        "fluid-details",
+        "fluid-divider",
+        "fluid-dropdown",
+        "fluid-dropdown-item",
+        "fluid-empty-state",
+        "fluid-fieldset",
+        "fluid-form",
+        "fluid-format-date",
+        "fluid-format-number",
+        "fluid-grid",
+        "fluid-hero",
+        "fluid-hotkey",
+        "fluid-icon",
+        "fluid-image",
+        "fluid-include",
+        "fluid-input",
+        "fluid-intersection-observer",
+        "fluid-kbd",
+        "fluid-list",
+        "fluid-list-item",
+        "fluid-mosaic",
+        "fluid-mosaic-item",
+        "fluid-mutation-observer",
+        "fluid-page",
+        "fluid-popup",
+        "fluid-relative-time",
+        "fluid-resize-observer",
+        "fluid-result",
+        "fluid-scroller",
+        "fluid-segment",
+        "fluid-segmented-control",
+        "fluid-slider",
+        "fluid-sparkline",
+        "fluid-stack",
+        "fluid-stat",
+        "fluid-step",
+        "fluid-steps",
+        "fluid-tab",
+        "fluid-tab-panel",
+        "fluid-tabs",
+        "fluid-textarea",
+        "fluid-timeline",
+        "fluid-timeline-item",
+        "fluid-toolbar",
+        "fluid-tooltip",
+        "fluid-tree",
+        "fluid-tree-item"
+      ]
+    }
+  ],
+  "surfaceRecords": [
+    {
+      "id": "completed-context-and-messages",
+      "ownership": "internal",
+      "disposition": "localized-runtime-covered",
+      "summary": "Formatter context, countdown/tour messages, scheduler/time-slot messages, and parser-correct request-local SSR ancestor context are completed bounded contracts.",
+      "sources": [
+        "packages/components/src/components/format-number/fluid-format-number.ts",
+        "packages/components/src/components/format-date/fluid-format-date.ts",
+        "packages/components/src/components/relative-time/fluid-relative-time.ts",
+        "packages/components/src/components/format-bytes/fluid-format-bytes.ts",
+        "packages/components/src/components/countdown/fluid-countdown.ts",
+        "packages/components/src/components/tour/fluid-tour.ts",
+        "packages/components/src/ssr.ts",
+        "packages/scheduler/src/components/scheduler/fluid-scheduler.ts",
+        "packages/scheduler/src/components/time-slots/fluid-time-slots.ts"
+      ],
+      "evidence": [
+        "docs/reviews/localization-remaining-2026-08-26.md",
+        "docs/reviews/scheduler-form-contract-2026-08-27.md",
+        "docs/reviews/ssr-state-adoption-inventory-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "core-units-file-size-meter",
+      "ownership": "internal",
+      "disposition": "localized-runtime-covered",
+      "summary": "Binary long-unit grammar, live file-size punctuation, and meter descriptions have bounded locale-aware contracts while existing unit semantics remain an explicit compatibility boundary.",
+      "sources": [
+        "packages/components/src/components/format-bytes/fluid-format-bytes.ts",
+        "packages/components/src/components/file-input/fluid-file-input.ts",
+        "packages/components/src/components/dropzone/fluid-dropzone.ts",
+        "packages/components/src/components/meter/fluid-meter.ts"
+      ],
+      "evidence": ["docs/reviews/core-units-file-size-meter-localization-2026-08-27.md"]
+    },
+    {
+      "id": "core-calendar-date-time",
+      "ownership": "configurable-default",
+      "disposition": "localized-runtime-covered",
+      "summary": "Core calendar direction, picker display context, built-in presets, range prompts and time display have bounded locale/RTL contracts while preserving overrides and canonical ISO/time values.",
+      "sources": [
+        "packages/components/src/internal/date-utils.ts",
+        "packages/components/src/components/calendar/fluid-calendar.ts",
+        "packages/components/src/components/date-picker/fluid-date-picker.ts",
+        "packages/components/src/components/date-range-picker/fluid-date-range-picker.ts",
+        "packages/components/src/components/time-picker/fluid-time-picker.ts",
+        "docs/reviews/calendar-rtl-contract-2026-08-27.md"
+      ],
+      "evidence": [
+        "docs/reviews/calendar-rtl-contract-2026-08-27.md",
+        "docs/reviews/core-date-time-localization-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "media-controls",
+      "ownership": "configurable-default",
+      "disposition": "localized-runtime-covered",
+      "summary": "Fluid-authored player, playlist, lightbox, animation, and physical zoom/pan defaults have live locale contracts while caller alt/title and track content stay untouched.",
+      "sources": [
+        "packages/media/src/components/animated-image/fluid-animated-image.ts",
+        "packages/media/src/components/audio/fluid-audio.ts",
+        "packages/media/src/components/video/fluid-video.ts",
+        "packages/media/src/components/video-playlist/fluid-video-playlist.ts",
+        "packages/media/src/components/lightbox/fluid-lightbox.ts",
+        "packages/media/src/components/zoomable-frame/fluid-zoomable-frame.ts"
+      ],
+      "evidence": ["docs/reviews/media-localization-2026-08-27.md"]
+    },
+    {
+      "id": "calendar-availability-editor",
+      "ownership": "internal",
+      "disposition": "localized-runtime-covered",
+      "summary": "Event-calendar controls and counts plus availability-editor labels and actions now have localized date, plural, live-context and RTL workflow contracts while canonical events remain stable.",
+      "sources": [
+        "packages/calendar/src/components/event-calendar/fluid-event-calendar.ts",
+        "packages/scheduler/src/components/availability-editor/fluid-availability-editor.ts"
+      ],
+      "evidence": [
+        "docs/reviews/event-calendar-availability-localization-rtl-2026-08-27.md",
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "editor-kanban-node-graph",
+      "ownership": "configurable-default",
+      "disposition": "localized-runtime-covered",
+      "summary": "Editor commands, kanban announcements and node-graph templates now have typed localized defaults integrated with the existing RTL contracts while overrides and caller data remain authoritative.",
+      "sources": [
+        "packages/editor/src/components/rich-text-editor/fluid-rich-text-editor.ts",
+        "packages/kanban/src/components/kanban/fluid-kanban.ts",
+        "packages/node-graph/src/components/node-graph/fluid-node-graph.ts",
+        "docs/reviews/editor-rtl-contract-2026-08-27.md",
+        "docs/reviews/kanban-node-graph-rtl-contract-2026-08-27.md"
+      ],
+      "evidence": [
+        "docs/reviews/editor-kanban-node-graph-localization-rtl-2026-08-27.md",
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "table-chart-map-markdown-qr",
+      "ownership": "internal",
+      "disposition": "localized-runtime-covered",
+      "summary": "Table actions and counts, chart and map naming, Markdown failure wrappers, and QR-derived names now have bounded localized contracts with caller data preserved.",
+      "sources": [
+        "packages/table/src/components/table/fluid-table.ts",
+        "packages/table/src/components/infinite-table/fluid-infinite-table.ts",
+        "packages/charts/src/components/chart/fluid-chart.ts",
+        "packages/map/src/components/map/fluid-map.ts",
+        "packages/markdown/src/fluid-markdown.ts",
+        "packages/qr/src/fluid-qr-code.ts"
+      ],
+      "evidence": [
+        "docs/reviews/table-localization-rtl-2026-08-27.md",
+        "docs/reviews/charts-map-localization-rtl-2026-08-27.md",
+        "docs/reviews/markdown-qr-localization-rtl-2026-08-27.md",
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "parser-structured-errors",
+      "ownership": "internal",
+      "disposition": "localized-runtime-covered",
+      "summary": "Stable diagnostic codes and typed parameters now drive localized mapper and file-parser presentation while preserving parser events, caller messages and canonical exported data.",
+      "sources": [
+        "packages/parser/src/components/column-mapper/fluid-column-mapper.ts",
+        "packages/parser/src/components/file-parser/fluid-file-parser.ts",
+        "packages/parser/src/core/coerce.ts",
+        "packages/parser/src/core/apply-blueprint.ts",
+        "packages/parser/src/core/parse-file.ts",
+        "docs/reviews/parser-structured-errors-2026-08-27.md"
+      ],
+      "evidence": [
+        "docs/reviews/parser-structured-errors-2026-08-27.md",
+        "docs/reviews/parser-presentation-localization-rtl-2026-08-27.md",
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "application-content",
+      "ownership": "application-content",
+      "disposition": "preserve-verbatim",
+      "summary": "Filenames, titles, datasets, documents, custom validator text, imported values, captions, and formatter callbacks are never translated by English matching.",
+      "sources": [
+        "packages/components/src/components/file-input/fluid-file-input.ts",
+        "packages/editor/src/components/rich-text-editor/fluid-rich-text-editor.ts",
+        "packages/charts/src/components/chart/fluid-chart.ts",
+        "packages/parser/src/core/apply-blueprint.ts"
+      ],
+      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"]
+    },
+    {
+      "id": "native-browser",
+      "ownership": "native-browser",
+      "disposition": "document-and-test-boundary",
+      "summary": "Native validation, picker/media controls, and prompt chrome are browser-owned; Fluid-authored input to those surfaces remains Fluid-owned.",
+      "sources": [
+        "packages/components/src/components/input/fluid-input.ts",
+        "packages/components/src/components/number-input/fluid-number-input.ts",
+        "packages/components/src/components/textarea/fluid-textarea.ts",
+        "packages/media/src/components/video/fluid-video.ts",
+        "packages/editor/src/components/rich-text-editor/fluid-rich-text-editor.ts"
+      ],
+      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"]
+    },
+    {
+      "id": "dependency-ui",
+      "ownership": "dependency-ui",
+      "disposition": "document-and-test-boundary",
+      "summary": "Leaflet controls, attribution and dependency diagnostics remain explicit dependency-owned boundaries without source patches, attribution removal or translation claims.",
+      "sources": [
+        "packages/map/src/components/map/fluid-map.ts",
+        "packages/markdown/src/fluid-markdown.ts"
+      ],
+      "evidence": [
+        "docs/reviews/charts-map-localization-rtl-2026-08-27.md",
+        "docs/reviews/markdown-qr-localization-rtl-2026-08-27.md",
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"
+      ]
+    },
+    {
+      "id": "canonical-and-developer-text",
+      "ownership": "non-user-text",
+      "disposition": "preserve-verbatim",
+      "summary": "ISO/form/export values, event names, enum tokens, CSS, and developer diagnostics stay stable unless separately rendered to users.",
+      "sources": [
+        "packages/components/src/components/date-picker/fluid-date-picker.ts",
+        "packages/components/src/components/time-picker/fluid-time-picker.ts",
+        "packages/parser/src/core/parse-file.ts"
+      ],
+      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"]
+    }
+  ],
+  "humanGates": [
+    "Fluent nl/de/fr/es/ar grammar and terminology review",
+    "Manual assistive-technology review",
+    "Visual Arabic RTL and pseudo-locale overflow approval"
+  ]
+}

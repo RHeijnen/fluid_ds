@@ -1,0 +1,62 @@
+name: Framework contracts
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: framework-contracts-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - "@fluid-ds/admin-react"
+          - "@fluid-ds/admin-next"
+          - "@fluid-ds/admin-angular"
+          - "@fluid-ds/framework-vue"
+          - "@fluid-ds/framework-astro"
+          - "@fluid-ds/framework-sveltekit"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test:framework:isolation
+      - run: pnpm test:framework:guards
+      - name: Install React runtime browsers
+        if: matrix.package == '@fluid-ds/admin-react'
+        run: pnpm --filter @fluid-ds/a11y exec playwright install --with-deps chromium firefox webkit
+      - name: Packed React production browser contracts and exact frozen replay
+        if: matrix.package == '@fluid-ds/admin-react'
+        env:
+          FRAMEWORK_PACKAGE: ${{ matrix.package }}
+        run: node scripts/check-framework-fixture.mjs "$FRAMEWORK_PACKAGE" --browser --replay
+      - name: Packed build and type contracts for remaining frameworks
+        if: matrix.package != '@fluid-ds/admin-react'
+        env:
+          FRAMEWORK_PACKAGE: ${{ matrix.package }}
+        run: node scripts/check-framework-fixture.mjs "$FRAMEWORK_PACKAGE"
+      - name: Retain resolved consumer and tarballs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: framework-${{ strategy.job-index }}
+          path: |
+            quality/evidence/framework-fixtures/
+            quality/evidence/framework-replays/

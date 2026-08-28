@@ -3,8 +3,7 @@ import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
 import type { FluidTagInput } from "./fluid-tag-input.js";
 
-const input = (el: FluidTagInput): HTMLInputElement =>
-  el.shadowRoot!.querySelector("input")!;
+const input = (el: FluidTagInput): HTMLInputElement => el.shadowRoot!.querySelector("input")!;
 
 const chips = (el: FluidTagInput): NodeListOf<HTMLElement> =>
   el.shadowRoot!.querySelectorAll<HTMLElement>("fluid-tag");
@@ -19,9 +18,7 @@ describe("<fluid-tag-input>", () => {
   });
 
   it("renders each token as a removable fluid-tag chip", async () => {
-    const el = await fixture<FluidTagInput>(
-      html`<fluid-tag-input value="a,b"></fluid-tag-input>`
-    );
+    const el = await fixture<FluidTagInput>(html`<fluid-tag-input value="a,b"></fluid-tag-input>`);
     const first = chips(el)[0]!;
     expect(first.hasAttribute("removable")).to.be.true;
     expect(first.textContent?.trim()).to.equal("a");
@@ -32,9 +29,9 @@ describe("<fluid-tag-input>", () => {
     const field = input(el);
     field.focus();
     await sendKeys({ type: "hello" });
-    setTimeout(() => sendKeys({ press: "Enter" }));
-    const event = await oneEvent(el, "fluid-change");
-    expect(event.detail.value).to.eql(["hello"]);
+    const [event] = await Promise.all([oneEvent(el, "fluid-change"), sendKeys({ press: "Enter" })]);
+    expect(event.detail).to.deep.equal({ value: ["hello"] });
+    expect([event.bubbles, event.composed, event.cancelable]).to.deep.equal([true, true, false]);
     await elementUpdated(el);
     expect(field.value).to.equal("");
   });
@@ -44,8 +41,7 @@ describe("<fluid-tag-input>", () => {
     const field = input(el);
     field.focus();
     await sendKeys({ type: "world" });
-    setTimeout(() => sendKeys({ press: "," }));
-    const event = await oneEvent(el, "fluid-change");
+    const [event] = await Promise.all([oneEvent(el, "fluid-change"), sendKeys({ press: "," })]);
     expect(event.detail.value).to.eql(["world"]);
     await elementUpdated(el);
     expect(field.value).to.equal("");
@@ -56,15 +52,15 @@ describe("<fluid-tag-input>", () => {
       html`<fluid-tag-input value="a,b,c"></fluid-tag-input>`
     );
     input(el).focus();
-    setTimeout(() => sendKeys({ press: "Backspace" }));
-    const event = await oneEvent(el, "fluid-change");
+    const [event] = await Promise.all([
+      oneEvent(el, "fluid-change"),
+      sendKeys({ press: "Backspace" })
+    ]);
     expect(event.detail.value).to.eql(["a", "b"]);
   });
 
   it("does not remove a token on Backspace when the field has text", async () => {
-    const el = await fixture<FluidTagInput>(
-      html`<fluid-tag-input value="a,b"></fluid-tag-input>`
-    );
+    const el = await fixture<FluidTagInput>(html`<fluid-tag-input value="a,b"></fluid-tag-input>`);
     const field = input(el);
     field.focus();
     await sendKeys({ type: "x" });
@@ -85,9 +81,7 @@ describe("<fluid-tag-input>", () => {
   });
 
   it("rejects duplicates by default", async () => {
-    const el = await fixture<FluidTagInput>(
-      html`<fluid-tag-input value="a"></fluid-tag-input>`
-    );
+    const el = await fixture<FluidTagInput>(html`<fluid-tag-input value="a"></fluid-tag-input>`);
     input(el).focus();
     await sendKeys({ type: "a" });
     await sendKeys({ press: "Enter" });
@@ -101,8 +95,7 @@ describe("<fluid-tag-input>", () => {
     );
     input(el).focus();
     await sendKeys({ type: "a" });
-    setTimeout(() => sendKeys({ press: "Enter" }));
-    const event = await oneEvent(el, "fluid-change");
+    const [event] = await Promise.all([oneEvent(el, "fluid-change"), sendKeys({ press: "Enter" })]);
     expect(event.detail.value).to.eql(["a", "a"]);
   });
 

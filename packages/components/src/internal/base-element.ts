@@ -1,4 +1,9 @@
 import { LitElement } from "lit";
+import {
+  LocalizationController,
+  type FluidTranslationArguments,
+  type FluidTranslationTerm
+} from "./localization.js";
 
 /**
  * Base class for every Fluid component.
@@ -16,10 +21,18 @@ import { LitElement } from "lit";
  * (which Lit already requires).
  */
 export class FluidElement extends LitElement {
+  static override get observedAttributes(): string[] {
+    return [...new Set([...super.observedAttributes, "aria-label", "aria-labelledby"])];
+  }
+
+  protected readonly localize = new LocalizationController(this);
   /** Teardown callbacks, each run once on disconnect. */
   #cleanups = new Set<() => void>();
   /** Aborted on disconnect; a fresh one is minted on the next access. */
   #abort?: AbortController;
+  #usesDefaultAriaLabel: boolean | undefined;
+  #settingDefaultAriaLabel = false;
+  #hasDefaultAriaLabel = false;
 
   /**
    * An `AbortSignal` that aborts when the element disconnects. Pass it to
@@ -50,15 +63,28 @@ export class FluidElement extends LitElement {
    * Add an event listener that is automatically removed on disconnect (it is
    * wired to {@link disconnectSignal}). Returns a disposer to remove it early.
    */
+  protected listen<K extends keyof GlobalEventHandlersEventMap>(
+    target: EventTarget,
+    type: K,
+    handler: (event: GlobalEventHandlersEventMap[K]) => unknown,
+    options?: AddEventListenerOptions
+  ): () => void;
   protected listen(
     target: EventTarget,
     type: string,
     handler: EventListenerOrEventListenerObject,
     options?: AddEventListenerOptions
+  ): () => void;
+  protected listen(
+    target: EventTarget,
+    type: string,
+    handler: unknown,
+    options?: AddEventListenerOptions
   ): () => void {
+    const listener = handler as EventListenerOrEventListenerObject;
     const opts: AddEventListenerOptions = { ...options, signal: this.disconnectSignal };
-    target.addEventListener(type, handler, opts);
-    return this.registerCleanup(() => target.removeEventListener(type, handler, opts));
+    target.addEventListener(type, listener, opts);
+    return this.registerCleanup(() => target.removeEventListener(type, listener, opts));
   }
 
   /**
@@ -71,11 +97,59 @@ export class FluidElement extends LitElement {
    *
    *   if (this.changedAfterFirstRender(changed, "value")) this.emitChange();
    */
-  protected changedAfterFirstRender(
-    changed: Map<PropertyKey, unknown>,
-    key: PropertyKey
-  ): boolean {
+  protected changedAfterFirstRender(changed: Map<PropertyKey, unknown>, key: PropertyKey): boolean {
     return changed.has(key) && changed.get(key) !== undefined;
+  }
+
+  /** Resolve a built-in UI term from the nearest `lang` context. */
+  protected term<K extends FluidTranslationTerm>(
+    key: K,
+    ...args: FluidTranslationArguments<K>
+  ): string {
+    return this.localize.term(key, ...args);
+  }
+
+  /** Effective writing direction from the nearest `dir` or locale context. */
+  protected get isRtl(): boolean {
+    return this.localize.dir === "rtl";
+  }
+
+  /**
+   * Keep a translated host name until the consumer authors one. Existing
+   * attributes, including server-rendered ones, are author-owned: ownership
+   * is never inferred by comparing text with an English default.
+   */
+  protected updateDefaultAriaLabel(label: string): void {
+    this.#hasDefaultAriaLabel = true;
+    this.#usesDefaultAriaLabel ??= !this.hasAttribute("aria-label");
+    if (!this.#usesDefaultAriaLabel) return;
+    const desired = this.hasAttribute("aria-labelledby") ? null : label;
+    if (this.getAttribute("aria-label") === desired) return;
+    this.#settingDefaultAriaLabel = true;
+    try {
+      if (desired === null) this.removeAttribute("aria-label");
+      else this.setAttribute("aria-label", desired);
+    } finally {
+      this.#settingDefaultAriaLabel = false;
+    }
+  }
+
+  override attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    value: string | null
+  ): void {
+    super.attributeChangedCallback(name, oldValue, value);
+    if (name === "aria-label" && !this.#settingDefaultAriaLabel) {
+      this.#usesDefaultAriaLabel = value === null;
+    }
+    if (
+      this.#hasDefaultAriaLabel &&
+      !this.#settingDefaultAriaLabel &&
+      (name === "aria-label" || name === "aria-labelledby")
+    ) {
+      this.requestUpdate();
+    }
   }
 
   override disconnectedCallback(): void {

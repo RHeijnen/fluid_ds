@@ -54,6 +54,7 @@ type FluidMenuItemElement = HTMLElement & {
  *
  * @fires fluid-select - Fired when an item is activated. `event.detail.value`
  *   carries the item's `value`. Bubbles and is composed.
+ * @cssproperty --fluid-menu-border-strong - Component override for the corresponding semantic token.
  */
 export class FluidMenu extends FluidElement {
   static override styles = [
@@ -76,8 +77,8 @@ export class FluidMenu extends FluidElement {
         overflow: hidden auto;
         scrollbar-width: thin;
         scrollbar-color: var(
-            --fluid-border-strong,
-            color-mix(in srgb, currentColor 25%, transparent)
+            --fluid-menu-border-strong,
+            var(--fluid-border-strong, color-mix(in srgb, currentColor 25%, transparent))
           )
           transparent;
         background: var(--fluid-menu-bg, var(--fluid-surface-base));
@@ -113,25 +114,44 @@ export class FluidMenu extends FluidElement {
 
   private typeaheadBuffer = "";
   private typeaheadTimer?: ReturnType<typeof setTimeout>;
+  private itemObserver?: MutationObserver;
+  private knownItems: FluidMenuItemElement[] = [];
+  private currentItem?: FluidMenuItemElement;
+  private lastFocusedItem?: FluidMenuItemElement;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("pointermove", this.handlePointerMove);
+    this.listen(this, "pointermove", this.handlePointerMove);
+    this.listen(this, "focusin", this.handleFocusIn);
+    if (typeof MutationObserver !== "undefined") {
+      this.itemObserver = new MutationObserver(() => this.reconcileItems());
+      this.itemObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled"]
+      });
+    }
+    if (this.hasUpdated) this.reconcileItems();
   }
 
   override disconnectedCallback(): void {
+    this.itemObserver?.disconnect();
+    this.itemObserver = undefined;
     super.disconnectedCallback();
-    this.removeEventListener("pointermove", this.handlePointerMove);
     clearTimeout(this.typeaheadTimer);
     // Reset the type-ahead buffer too: the pending timer that would have
     // cleared it is now cancelled, so without this the stale buffer leaks into
     // the next session if the element is re-attached.
     this.typeaheadBuffer = "";
+    this.lastFocusedItem = undefined;
   }
 
   /** All non-disabled-aware menu item children, in DOM order. */
   private getItems(): FluidMenuItemElement[] {
-    return Array.from(this.querySelectorAll<FluidMenuItemElement>("fluid-menu-item"));
+    return Array.from(this.querySelectorAll<FluidMenuItemElement>("fluid-menu-item")).filter(
+      (item) => item.closest("fluid-menu") === this
+    );
   }
 
   private getEnabledItems(): FluidMenuItemElement[] {
@@ -174,6 +194,37 @@ export class FluidMenu extends FluidElement {
       item.tabIndex = item === firstEnabled ? 0 : -1;
       item.active = false;
     }
+    this.knownItems = items;
+  }
+
+  private reconcileItems(): void {
+    const items = this.getItems();
+    const enabled = items.filter((item) => !item.disabled);
+    const active = enabled.find((item) => item.active);
+    const tabbable = enabled.find((item) => item.tabIndex === 0);
+    const previousIndex = this.currentItem ? this.knownItems.indexOf(this.currentItem) : -1;
+    const currentWasRemoved = Boolean(this.currentItem && !items.includes(this.currentItem));
+    const replacement = currentWasRemoved
+      ? enabled[Math.min(Math.max(previousIndex, 0), enabled.length - 1)]
+      : undefined;
+    const hadActive = items.some((item) => item.active) || currentWasRemoved;
+    const focused = (this.getRootNode() as Document | ShadowRoot).activeElement;
+    const focusedItem = items.find((item) => item === focused);
+    const target = active ?? replacement ?? tabbable ?? enabled[0];
+
+    for (const item of items) {
+      item.tabIndex = item === target ? 0 : -1;
+      item.active = item === active || (hadActive && item === target);
+    }
+    if (
+      (focusedItem?.disabled || (currentWasRemoved && this.lastFocusedItem === this.currentItem)) &&
+      target
+    ) {
+      target.active = true;
+      target.focus();
+    }
+    this.currentItem = target;
+    this.knownItems = items;
   }
 
   private setActive(item: FluidMenuItemElement): void {
@@ -182,13 +233,18 @@ export class FluidMenu extends FluidElement {
       i.active = isActive;
       i.tabIndex = isActive ? 0 : -1;
     }
+    this.currentItem = item;
+    this.knownItems = this.getItems();
     item.scrollIntoView({ block: "nearest" });
   }
 
   private moveBy(delta: number): void {
     const items = this.getItems();
     if (!items.length) return;
-    const current = this.activeItem;
+    // Native Tab entry and direct item.focus() do not set the hover highlight.
+    // Keyboard navigation must start at actual focus, even after pointer hover.
+    const focused = (this.getRootNode() as Document | ShadowRoot).activeElement;
+    const current = items.find((item) => item === focused) ?? this.activeItem;
     let index = current ? items.indexOf(current) : delta > 0 ? -1 : 0;
     const seen = new Set<number>();
     do {
@@ -217,8 +273,15 @@ export class FluidMenu extends FluidElement {
     clearTimeout(this.typeaheadTimer);
     this.typeaheadTimer = setTimeout(() => (this.typeaheadBuffer = ""), 500);
     const items = this.getItems();
-    const match = items.find(
-      (i) => !i.disabled && i.textContent?.trim().toLowerCase().startsWith(this.typeaheadBuffer)
+    const repeatedCharacter = [...this.typeaheadBuffer].every(
+      (candidate) => candidate === this.typeaheadBuffer[0]
+    );
+    const query = repeatedCharacter ? char.toLowerCase() : this.typeaheadBuffer;
+    const current = this.activeItem;
+    const start = repeatedCharacter && current ? items.indexOf(current) + 1 : 0;
+    const ordered = [...items.slice(start), ...items.slice(0, start)];
+    const match = ordered.find(
+      (i) => !i.disabled && i.textContent?.trim().toLowerCase().startsWith(query)
     );
     if (match) {
       this.setActive(match);
@@ -227,6 +290,9 @@ export class FluidMenu extends FluidElement {
   }
 
   private handleKeyDown = (e: KeyboardEvent) => {
+    // An item owns Enter/Space activation. Do not also add its consumed Space
+    // to the menu's typeahead buffer.
+    if (e.defaultPrevented) return;
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
@@ -257,12 +323,19 @@ export class FluidMenu extends FluidElement {
     const item = (e.target as HTMLElement).closest(
       "fluid-menu-item"
     ) as FluidMenuItemElement | null;
-    if (!item || item.disabled) return;
+    if (!item || item.disabled || item.closest("fluid-menu") !== this) return;
     if (item !== this.activeItem) this.setActive(item);
   };
 
+  private handleFocusIn = (e: FocusEvent) => {
+    const item = (e.target as HTMLElement).closest(
+      "fluid-menu-item"
+    ) as FluidMenuItemElement | null;
+    if (item?.closest("fluid-menu") === this) this.lastFocusedItem = item;
+  };
+
   private handleSlotChange = () => {
-    this.resetRovingTabindex();
+    this.reconcileItems();
   };
 
   override render(): TemplateResult {
@@ -271,7 +344,7 @@ export class FluidMenu extends FluidElement {
         part="base"
         class="base"
         role="menu"
-        aria-label=${this.ariaLabel ?? "Menu"}
+        aria-label=${this.ariaLabel ?? this.term("menu")}
         @keydown=${this.handleKeyDown}
       >
         <slot @slotchange=${this.handleSlotChange}></slot>

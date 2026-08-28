@@ -38,4 +38,3 @@ export const Locale: Story = {
     </ul>
   `
 };
-

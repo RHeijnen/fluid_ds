@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 
@@ -240,7 +240,7 @@ export class FluidThemeToggle extends FluidElement {
           part="theme-button"
           class="button"
           type="button"
-          aria-label="Toggle dark mode"
+          aria-label=${this.term("toggleDarkMode")}
           aria-pressed=${isDark ? "true" : "false"}
           @click=${this.toggleTheme}
         >
@@ -256,8 +256,8 @@ export class FluidThemeToggle extends FluidElement {
                 class="button"
                 type="button"
                 aria-label=${currentBrand
-                  ? `Cycle brand, current ${currentBrand}`
-                  : "Cycle brand"}
+                  ? this.term("cycleBrandCurrent", currentBrand)
+                  : this.term("cycleBrand")}
                 @click=${this.cycleBrand}
               >
                 <fluid-icon part="icon" name="palette"></fluid-icon>

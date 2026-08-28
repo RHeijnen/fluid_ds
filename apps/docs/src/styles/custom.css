@@ -198,11 +198,7 @@ header.header {
 /* ------------------------------------------------------------------ */
 
 .hero h1 {
-  background: linear-gradient(
-    100deg,
-    var(--fluid-text-primary),
-    var(--fluid-accent-base)
-  );
+  background: linear-gradient(100deg, var(--fluid-text-primary), var(--fluid-accent-base));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -304,6 +300,33 @@ fluid-code-block:not(:defined) pre.astro-code {
  */
 .fluid-demo > * {
   margin: 0 !important;
+}
+
+/* Navigation must remain a real anchor. This mirrors the secondary button
+   treatment without nesting the native button inside another interactive
+   element. */
+.fluid-doc-link-button {
+  display: inline-flex;
+  min-block-size: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fluid-space-2);
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+  background: var(--fluid-surface-base);
+  color: var(--fluid-accent-base);
+  font-weight: var(--fluid-font-weight-medium);
+  line-height: var(--fluid-font-line-height-tight);
+  text-decoration: none;
+}
+.fluid-doc-link-button:hover {
+  border-color: var(--fluid-border-strong);
+  background: var(--fluid-surface-muted);
+}
+.fluid-doc-link-button:focus-visible {
+  outline: var(--fluid-focus-ring-width) solid var(--fluid-focus-ring-color);
+  outline-offset: var(--fluid-focus-ring-offset);
 }
 
 /* ------------------------------------------------------------------ */

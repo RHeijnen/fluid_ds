@@ -1,0 +1,49 @@
+name: Code coverage
+
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13"
+      - run: pnpm install --frozen-lockfile
+      - name: Build workspace prerequisites
+        run: pnpm build
+      - run: pnpm --filter @fluid-ds/components exec playwright install --with-deps chromium
+      - run: pnpm test:coverage-inventory
+      - run: pnpm test:browser-policy
+      - run: pnpm test:browser-lifecycle
+      - run: pnpm test:ssr-node
+      - run: pnpm test:coverage
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: browser-code-coverage
+          path: |
+            packages/*/coverage
+            quality/evidence/coverage/
+            quality/evidence/wtr-lifecycle/
+            quality/evidence/wtr-lifecycle-tests/
+            quality/evidence/wtr-watchdog-tests/
+            quality/evidence/unit-matrix-tests/
+            quality/evidence/wtr-mocha-policy/
+          if-no-files-found: error

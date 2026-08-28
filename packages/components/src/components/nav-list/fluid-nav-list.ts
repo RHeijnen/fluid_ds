@@ -69,7 +69,7 @@ export class FluidNavList extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <nav part="base" class="base" aria-label=${this.label || "Navigation"}>
+      <nav part="base" class="base" aria-label=${this.label || this.term("navigation")}>
         <div part="list" class="list" role="list">
           <slot></slot>
         </div>

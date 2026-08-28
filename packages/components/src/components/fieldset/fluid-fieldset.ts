@@ -166,9 +166,42 @@ export class FluidFieldset extends FluidElement {
   private readonly uid = ++fieldsetIdCounter;
   private readonly descriptionId = `fluid-fieldset-desc-${this.uid}`;
   private readonly errorId = `fluid-fieldset-error-${this.uid}`;
+  private childObserver?: MutationObserver;
+  private readonly disabledOwnership = new Map<HTMLElement, boolean>();
+  private readonly internalDisabledMutations = new Map<
+    HTMLElement,
+    Array<{ from: boolean; to: boolean }>
+  >();
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (typeof MutationObserver !== "undefined") {
+      this.childObserver = new MutationObserver((records) => this.handleChildMutations(records));
+      this.childObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled"],
+        attributeOldValue: true
+      });
+    }
+    if (this.hasUpdated) this.propagateDisabled();
+  }
+
+  override disconnectedCallback(): void {
+    this.childObserver?.disconnect();
+    this.childObserver = undefined;
+    this.releaseDisabledOwnership();
+    this.internalDisabledMutations.clear();
+    super.disconnectedCallback();
+  }
 
   private handleSlotChange = (): void => {
     this.propagateDisabled();
+  };
+
+  private handleContentSlotChange = (): void => {
+    this.requestUpdate();
   };
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -184,18 +217,84 @@ export class FluidFieldset extends FluidElement {
    * the group is re-enabled.
    */
   private propagateDisabled(): void {
-    const elements = this.fieldElements ?? [];
+    const roots = this.fieldElements ?? [];
+    const elements = roots
+      .flatMap((root) => [root, ...root.querySelectorAll<HTMLElement>("*")])
+      .filter(
+        (element) =>
+          element.closest("fluid-fieldset") === this &&
+          (/^(BUTTON|FIELDSET|INPUT|SELECT|TEXTAREA)$/.test(element.tagName) ||
+            element.tagName.startsWith("FLUID-"))
+      );
+    const current = new Set(elements);
+    for (const [element] of this.disabledOwnership) {
+      if (!current.has(element)) this.releaseDisabledElement(element);
+    }
     for (const el of elements) {
       if (this.disabled) {
-        if (!el.hasAttribute("disabled")) {
-          el.setAttribute("disabled", "");
-          el.setAttribute("data-fluid-fieldset-disabled", "");
+        if (!this.disabledOwnership.has(el)) {
+          this.disabledOwnership.set(el, el.hasAttribute("disabled"));
         }
-      } else if (el.hasAttribute("data-fluid-fieldset-disabled")) {
-        el.removeAttribute("disabled");
-        el.removeAttribute("data-fluid-fieldset-disabled");
+        if (!el.hasAttribute("disabled")) {
+          el.setAttribute("data-fluid-fieldset-disabled", "");
+          this.writeDisabled(el, true);
+        }
+      } else if (this.disabledOwnership.has(el)) {
+        this.releaseDisabledElement(el);
       }
     }
+  }
+
+  private handleChildMutations(records: MutationRecord[]): void {
+    const disabledRecords = new Map<HTMLElement, MutationRecord[]>();
+    for (const record of records) {
+      if (record.type !== "attributes" || record.attributeName !== "disabled") continue;
+      const element = record.target as HTMLElement;
+      const targetRecords = disabledRecords.get(element) ?? [];
+      targetRecords.push(record);
+      disabledRecords.set(element, targetRecords);
+    }
+
+    for (const [element, targetRecords] of disabledRecords) {
+      const internal = this.internalDisabledMutations.get(element) ?? [];
+      targetRecords.forEach((record, index) => {
+        const from = record.oldValue !== null;
+        const next = targetRecords[index + 1];
+        const to = next ? next.oldValue !== null : element.hasAttribute("disabled");
+        const expected = internal[0];
+        if (expected?.from === from && expected.to === to) {
+          internal.shift();
+        } else if (this.disabledOwnership.has(element)) {
+          this.disabledOwnership.set(element, to);
+        }
+      });
+      if (internal.length) this.internalDisabledMutations.set(element, internal);
+      else this.internalDisabledMutations.delete(element);
+    }
+    this.propagateDisabled();
+  }
+
+  private writeDisabled(element: HTMLElement, disabled: boolean): void {
+    const from = element.hasAttribute("disabled");
+    if (from === disabled) return;
+    if (this.childObserver && this.contains(element)) {
+      const pending = this.internalDisabledMutations.get(element) ?? [];
+      pending.push({ from, to: disabled });
+      this.internalDisabledMutations.set(element, pending);
+    }
+    element.toggleAttribute("disabled", disabled);
+  }
+
+  private releaseDisabledElement(element: HTMLElement): void {
+    const authored = this.disabledOwnership.get(element);
+    if (authored === undefined) return;
+    this.disabledOwnership.delete(element);
+    element.removeAttribute("data-fluid-fieldset-disabled");
+    this.writeDisabled(element, authored);
+  }
+
+  private releaseDisabledOwnership(): void {
+    for (const [element] of this.disabledOwnership) this.releaseDisabledElement(element);
   }
 
   private get hasLegend(): boolean {
@@ -211,16 +310,15 @@ export class FluidFieldset extends FluidElement {
   }
 
   private hasSlotted(name: string): boolean {
-    return this.querySelector(`[slot="${name}"]`) !== null;
+    return (
+      typeof this.querySelector === "function" && this.querySelector(`[slot="${name}"]`) !== null
+    );
   }
 
   override render(): TemplateResult {
     const showDescription = this.hasDescription;
     const showError = this.hasError;
-    const describedBy = [
-      showDescription ? this.descriptionId : "",
-      showError ? this.errorId : ""
-    ]
+    const describedBy = [showDescription ? this.descriptionId : "", showError ? this.errorId : ""]
       .filter(Boolean)
       .join(" ");
 
@@ -232,12 +330,16 @@ export class FluidFieldset extends FluidElement {
         aria-describedby=${ifDefined(describedBy || undefined)}
       >
         <legend part="legend" class="legend" ?hidden=${!this.hasLegend}>
-          <slot name="legend">${this.hasSlotted("legend") ? "" : this.legend}</slot>
+          <slot name="legend" @slotchange=${this.handleContentSlotChange}
+            >${this.hasSlotted("legend") ? "" : this.legend}</slot
+          >
         </legend>
 
         ${showDescription
           ? html`<div part="description" class="description" id=${this.descriptionId}>
-              <slot name="description">${this.description}</slot>
+              <slot name="description" @slotchange=${this.handleContentSlotChange}
+                >${this.description}</slot
+              >
             </div>`
           : ""}
 
@@ -247,7 +349,7 @@ export class FluidFieldset extends FluidElement {
 
         ${showError
           ? html`<div part="error" class="error" id=${this.errorId} role="alert">
-              <slot name="error">${this.error}</slot>
+              <slot name="error" @slotchange=${this.handleContentSlotChange}>${this.error}</slot>
             </div>`
           : ""}
       </fieldset>

@@ -159,14 +159,12 @@ export class FluidMenuItem extends FluidElement {
     this.setAttribute("role", "menuitem");
     if (!this.id) this.id = `fluid-menu-item-${++counter}`;
     if (!this.hasAttribute("tabindex")) this.tabIndex = -1;
-    this.addEventListener("click", this.handleClick);
-    this.addEventListener("keydown", this.handleKeyDown);
+    this.listen(this, "click", this.handleClick);
+    this.listen(this, "keydown", this.handleKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("click", this.handleClick);
-    this.removeEventListener("keydown", this.handleKeyDown);
   }
 
   protected override updated(changed: PropertyValues<this>): void {

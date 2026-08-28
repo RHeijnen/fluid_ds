@@ -1,6 +1,6 @@
 import { FluidInfiniteTable } from "./fluid-infinite-table.js";
 
-if (!customElements.get("fluid-infinite-table")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-infinite-table")) {
   customElements.define("fluid-infinite-table", FluidInfiniteTable);
 }
 

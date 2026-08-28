@@ -251,12 +251,15 @@ Implements the WAI-ARIA Tabs pattern. The cross-component contract is in the
 | <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last tab. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused tab (only in `manual` mode; `auto` activates on focus). |
 
-Only the selected tab is a tab stop (roving tabindex), so <kbd>Tab</kbd> doesn't
-walk every tab.
+One tab is a tab stop (roving tabindex), so <kbd>Tab</kbd> doesn't walk every tab.
+In manual mode, arrows move that tab stop with focus while the selected panel
+stays unchanged until <kbd>Enter</kbd> or <kbd>Space</kbd>. Disabled tabs are
+skipped. Arrow keys within panel inputs retain their normal editing behavior.
 
 ### Names & roles
 
-- `<fluid-tabs>` is `role="tablist"`; `<fluid-tab>` is `role="tab"` with
+- The navigation container inside `<fluid-tabs>` has `role="tablist"`;
+  `<fluid-tab>` is `role="tab"` with
   `aria-selected` + `aria-controls`; `<fluid-tab-panel>` is `role="tabpanel"`
   with `aria-labelledby` back to its tab
   ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).

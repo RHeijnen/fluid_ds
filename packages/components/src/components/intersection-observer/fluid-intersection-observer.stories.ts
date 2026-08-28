@@ -15,6 +15,7 @@ export const Default: Story = {
   render: () => html`
     <p>Scroll the box below, the target turns green when it enters the viewport.</p>
     <div
+      tabindex="0"
       style="height: 12rem; overflow: auto; border: 1px solid var(--fluid-border-default); padding: var(--fluid-space-3);"
     >
       <div style="height: 14rem;">(scroll down)</div>
@@ -30,7 +31,7 @@ export const Default: Story = {
         }}
       >
         <div
-          style="height: 4rem; display: flex; align-items: center; justify-content: center; background: var(--fluid-surface-muted); border-radius: var(--fluid-radius-md); color: white; font-weight: 600;"
+          style="height: 4rem; display: flex; align-items: center; justify-content: center; background: var(--fluid-surface-muted); border-radius: var(--fluid-radius-md); color: var(--fluid-text-primary); font-weight: 600;"
         >
           Hidden
         </div>

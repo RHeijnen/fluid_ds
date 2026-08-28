@@ -66,8 +66,14 @@ import {
  * @fires fluid-date-activate - A day was chosen. `detail: { iso, date }`.
  * @fires fluid-date-hover - The pointer entered a day (range preview). `detail: { iso, date }`.
  * @fires fluid-view-change - The displayed month changed via the nav. `detail: { view }`.
+ * @cssproperty --fluid-calendar-accent-base - Component override for the corresponding semantic token.
  */
 export class FluidCalendar extends FluidElement {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidElement.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-block;
@@ -153,10 +159,19 @@ export class FluidCalendar extends FluidElement {
     /* In-range fill sits on the cell so the band reads continuous; selected
        endpoints paint on top. Square inner edges so the band looks connected. */
     td.in-range {
-      background: var(--fluid-calendar-range-bg, color-mix(in srgb, var(--fluid-accent-base) 16%, transparent));
+      background: var(
+        --fluid-calendar-range-bg,
+        color-mix(in srgb, var(--fluid-accent-base) 16%, transparent)
+      );
     }
-    td.range-start { border-top-left-radius: var(--fluid-radius-md); border-bottom-left-radius: var(--fluid-radius-md); }
-    td.range-end { border-top-right-radius: var(--fluid-radius-md); border-bottom-right-radius: var(--fluid-radius-md); }
+    td.range-start {
+      border-start-start-radius: var(--fluid-radius-md);
+      border-end-start-radius: var(--fluid-radius-md);
+    }
+    td.range-end {
+      border-start-end-radius: var(--fluid-radius-md);
+      border-end-end-radius: var(--fluid-radius-md);
+    }
     .day.selected {
       background: var(--fluid-calendar-selected-bg, var(--fluid-accent-base));
       color: var(--fluid-calendar-selected-fg, var(--fluid-accent-text));
@@ -182,12 +197,20 @@ export class FluidCalendar extends FluidElement {
       width: 0.3rem;
       height: 0.3rem;
       border-radius: 50%;
-      background: var(--fluid-accent-base);
+      background: var(--fluid-calendar-accent-base, var(--fluid-accent-base));
     }
-    .dot[data-state="open"] { background: var(--fluid-calendar-dot-open, var(--fluid-success-base)); }
-    .dot[data-state="some"] { background: var(--fluid-calendar-dot-some, var(--fluid-warning-base)); }
-    .dot[data-state="full"] { background: var(--fluid-calendar-dot-full, var(--fluid-danger-base)); }
-    .day.selected .dot { background: var(--fluid-calendar-selected-fg, var(--fluid-accent-text)); }
+    .dot[data-state="open"] {
+      background: var(--fluid-calendar-dot-open, var(--fluid-success-base));
+    }
+    .dot[data-state="some"] {
+      background: var(--fluid-calendar-dot-some, var(--fluid-warning-base));
+    }
+    .dot[data-state="full"] {
+      background: var(--fluid-calendar-dot-full, var(--fluid-danger-base));
+    }
+    .day.selected .dot {
+      background: var(--fluid-calendar-selected-fg, var(--fluid-accent-text));
+    }
     .sr-only {
       position: absolute;
       width: 1px;
@@ -228,7 +251,7 @@ export class FluidCalendar extends FluidElement {
   /** First day of the week: 0 = Sunday … 6 = Saturday. Default Monday (1). */
   @property({ type: Number, attribute: "week-start" }) weekStart: Weekday = 1;
 
-  /** BCP-47 locale for month + weekday names. Defaults to the document locale. */
+  /** BCP-47 locale for month, weekday and day labels. Defaults to inherited language. */
   @property() locale: string | undefined = undefined;
 
   /** Hide the month label + prev/next nav (the host drives the view instead). */
@@ -240,18 +263,39 @@ export class FluidCalendar extends FluidElement {
    * coloured availability dot; `closed` / `unavailable` days are disabled.
    * Used by fluid-scheduler; harmless (no-op) when unset.
    */
-  @property({ attribute: "day-state", type: Object }) dayState: Record<string, string> | null = null;
+  @property({ attribute: "day-state", type: Object }) dayState: Record<string, string> | null =
+    null;
 
   /** The roving-focus date (one day is tabbable at a time). */
   @state() private focusISO: string | null = null;
 
   @query(".day[tabindex='0']") private focusBtn?: HTMLButtonElement;
 
+  override focus(options?: FocusOptions): void {
+    if (this.focusBtn) this.focusBtn.focus(options);
+    else super.focus(options);
+  }
+
   private get minDate(): Date | null {
     return fromISODate(this.min);
   }
   private get maxDate(): Date | null {
     return fromISODate(this.max);
+  }
+
+  /** Explicit display locale wins; otherwise follow the reactive Fluid language context. */
+  private get displayLocale(): string | undefined {
+    // Historically an explicit empty calendar locale selected Intl's browser
+    // default. Keep that caller-owned boundary distinct from an omitted locale,
+    // which follows Fluid's inherited language context.
+    const locale = this.locale === undefined ? this.localize.locale : this.locale;
+    if (locale === "") return undefined;
+    try {
+      Intl.getCanonicalLocales(locale);
+      return locale;
+    } catch {
+      return undefined;
+    }
   }
 
   /** The first-of-month Date currently shown. */
@@ -298,7 +342,11 @@ export class FluidCalendar extends FluidElement {
     this.view = toISODate(new Date(d.getFullYear(), d.getMonth(), 1));
     this.focusISO = toISODate(focus);
     this.dispatchEvent(
-      new CustomEvent("fluid-view-change", { detail: { view: this.view }, bubbles: true, composed: true })
+      new CustomEvent("fluid-view-change", {
+        detail: { view: this.view },
+        bubbles: true,
+        composed: true
+      })
     );
   }
 
@@ -323,14 +371,32 @@ export class FluidCalendar extends FluidElement {
     const focus = fromISODate(this.focusISO) ?? startOfDay(new Date());
     let next: Date | null = null;
     switch (e.key) {
-      case "ArrowLeft": next = addDays(focus, -1); break;
-      case "ArrowRight": next = addDays(focus, 1); break;
-      case "ArrowUp": next = addDays(focus, -7); break;
-      case "ArrowDown": next = addDays(focus, 7); break;
-      case "Home": next = addDays(focus, -((focus.getDay() - this.weekStart + 7) % 7)); break;
-      case "End": next = addDays(focus, 6 - ((focus.getDay() - this.weekStart + 7) % 7)); break;
-      case "PageUp": next = addMonths(focus, e.shiftKey ? -12 : -1); next.setDate(Math.min(focus.getDate(), 28)); break;
-      case "PageDown": next = addMonths(focus, e.shiftKey ? 12 : 1); next.setDate(Math.min(focus.getDate(), 28)); break;
+      case "ArrowLeft":
+        next = addDays(focus, this.isRtl ? 1 : -1);
+        break;
+      case "ArrowRight":
+        next = addDays(focus, this.isRtl ? -1 : 1);
+        break;
+      case "ArrowUp":
+        next = addDays(focus, -7);
+        break;
+      case "ArrowDown":
+        next = addDays(focus, 7);
+        break;
+      case "Home":
+        next = addDays(focus, -((focus.getDay() - this.weekStart + 7) % 7));
+        break;
+      case "End":
+        next = addDays(focus, 6 - ((focus.getDay() - this.weekStart + 7) % 7));
+        break;
+      case "PageUp":
+        next = addMonths(focus, e.shiftKey ? -12 : -1);
+        next.setDate(Math.min(focus.getDate(), 28));
+        break;
+      case "PageDown":
+        next = addMonths(focus, e.shiftKey ? 12 : 1);
+        next.setDate(Math.min(focus.getDate(), 28));
+        break;
       case "Enter":
       case " ":
         e.preventDefault();
@@ -369,7 +435,8 @@ export class FluidCalendar extends FluidElement {
     const between = this.range && lo && hi && compareDay(d, lo) > 0 && compareDay(d, hi) < 0;
 
     const td: string[] = [];
-    if (this.range && (between || isStart || isEnd) && lo && hi && !isSameDay(lo, hi)) td.push("in-range");
+    if (this.range && (between || isStart || isEnd) && lo && hi && !isSameDay(lo, hi))
+      td.push("in-range");
     if (isStart) td.push("range-start");
     if (isEnd) td.push("range-end");
 
@@ -383,70 +450,113 @@ export class FluidCalendar extends FluidElement {
   override render(): TemplateResult {
     const v = this.viewDate();
     const grid = getMonthGrid(v.getFullYear(), v.getMonth(), this.weekStart);
-    const names = weekdayNames(this.locale, this.weekStart);
-    const monthLabel = formatDate(v, this.locale, { month: "long", year: "numeric" });
+    const displayLocale = this.displayLocale;
+    const names = weekdayNames(displayLocale, this.weekStart);
+    const monthLabel = formatDate(v, displayLocale, { month: "long", year: "numeric" });
+    const dayNumber = new Intl.NumberFormat(displayLocale, { useGrouping: false });
+    const previousGlyph = this.isRtl ? "›" : "‹";
+    const nextGlyph = this.isRtl ? "‹" : "›";
     const rows: CalendarDay[][] = [];
     for (let i = 0; i < grid.length; i += 7) rows.push(grid.slice(i, i + 7));
 
-    const prevDisabled = !!this.minDate && compareDay(addMonths(v, -1), startOfDay(this.minDate)) < 0 &&
+    const prevDisabled =
+      !!this.minDate &&
+      compareDay(addMonths(v, -1), startOfDay(this.minDate)) < 0 &&
       addMonths(v, -1).getMonth() !== startOfDay(this.minDate).getMonth();
-    const nextDisabled = !!this.maxDate && compareDay(new Date(v.getFullYear(), v.getMonth() + 1, 1), startOfDay(this.maxDate)) > 0;
+    const nextDisabled =
+      !!this.maxDate &&
+      compareDay(new Date(v.getFullYear(), v.getMonth() + 1, 1), startOfDay(this.maxDate)) > 0;
 
     return html`
-      <div part="base" class="base">
+      <div part="base" class="base" dir=${this.isRtl ? "rtl" : "ltr"}>
         ${this.noNav
-          ? html`<div class="header" part="header"><span class="month-label">${monthLabel}</span></div>`
-          : html`
-              <div class="header" part="header">
-                <button part="nav-button" class="nav-button" type="button" aria-label="Previous month"
-                  ?disabled=${prevDisabled} @click=${() => this.goMonth(-1)}>‹</button>
-                <span class="month-label" aria-live="polite">${monthLabel}</span>
-                <button part="nav-button" class="nav-button" type="button" aria-label="Next month"
-                  ?disabled=${nextDisabled} @click=${() => this.goMonth(1)}>›</button>
-              </div>`}
+          ? html`<div class="header" part="header">
+              <span class="month-label">${monthLabel}</span>
+            </div>`
+          : html` <div class="header" part="header">
+              <button
+                part="nav-button"
+                class="nav-button"
+                type="button"
+                aria-label=${this.term("previousMonth")}
+                ?disabled=${prevDisabled}
+                @click=${() => this.goMonth(-1)}
+              >
+                ${previousGlyph}
+              </button>
+              <span class="month-label" aria-live="polite">${monthLabel}</span>
+              <button
+                part="nav-button"
+                class="nav-button"
+                type="button"
+                aria-label=${this.term("nextMonth")}
+                ?disabled=${nextDisabled}
+                @click=${() => this.goMonth(1)}
+              >
+                ${nextGlyph}
+              </button>
+            </div>`}
 
         <table part="grid" role="grid" aria-label=${monthLabel} @keydown=${this.onDayKeydown}>
           <thead>
             <tr role="row">
-              ${names.map(
-                (n, i) => html`<th role="columnheader" abbr=${weekdayNames(this.locale, this.weekStart)[i] ?? n}>${n}</th>`
-              )}
+              ${names.map((n) => html`<th role="columnheader" abbr=${n}>${n}</th>`)}
             </tr>
           </thead>
           <tbody>
             ${rows.map(
-              (week) => html`
-                <tr role="row">
+              (week) =>
+                html` <tr role="row">
                   ${week.map((day) => {
                     const cls = this.dayClass(day);
                     const disabled = this.isDisabled(day.date);
                     const isFocus = day.iso === this.focusISO;
-                    const label = formatDate(day.date, this.locale, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-                    return html`
-                      <td role="gridcell" class=${cls.td} aria-selected=${cls.btn.includes("selected") ? "true" : "false"}>
-                        <button
-                          part=${cls.btn.includes("selected") ? "day day-selected" : day.isToday ? "day day-today" : "day"}
-                          class=${cls.btn}
-                          type="button"
-                          tabindex=${isFocus ? 0 : -1}
-                          ?disabled=${disabled}
-                          aria-label=${label}
-                          aria-current=${day.isToday ? "date" : "false"}
-                          @click=${() => this.activate(day.date)}
-                          @pointerenter=${() =>
-                            this.range &&
-                            !disabled &&
-                            this.dispatchEvent(
-                              new CustomEvent("fluid-date-hover", {
-                                detail: { iso: day.iso, date: day.date },
-                                bubbles: true,
-                                composed: true
-                              })
-                            )}
-                        >${day.date.getDate()}${day.inMonth && this.dayState && ["open", "some", "full"].includes(this.dayState[day.iso] ?? "")
-                          ? html`<span class="dot" data-state=${this.dayState[day.iso]} aria-hidden="true"></span>`
-                          : ""}</button>
-                      </td>`;
+                    const label = formatDate(day.date, displayLocale, {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric"
+                    });
+                    return html` <td
+                      role="gridcell"
+                      class=${cls.td}
+                      aria-selected=${cls.btn.includes("selected") ? "true" : "false"}
+                    >
+                      <button
+                        part=${cls.btn.includes("selected")
+                          ? "day day-selected"
+                          : day.isToday
+                            ? "day day-today"
+                            : "day"}
+                        class=${cls.btn}
+                        type="button"
+                        tabindex=${isFocus ? 0 : -1}
+                        ?disabled=${disabled}
+                        aria-label=${label}
+                        aria-current=${day.isToday ? "date" : "false"}
+                        @click=${() => this.activate(day.date)}
+                        @pointerenter=${() =>
+                          this.range &&
+                          !disabled &&
+                          this.dispatchEvent(
+                            new CustomEvent("fluid-date-hover", {
+                              detail: { iso: day.iso, date: day.date },
+                              bubbles: true,
+                              composed: true
+                            })
+                          )}
+                      >
+                        ${dayNumber.format(day.date.getDate())}${day.inMonth &&
+                        this.dayState &&
+                        ["open", "some", "full"].includes(this.dayState[day.iso] ?? "")
+                          ? html`<span
+                              class="dot"
+                              data-state=${this.dayState[day.iso]}
+                              aria-hidden="true"
+                            ></span>`
+                          : ""}
+                      </button>
+                    </td>`;
                   })}
                 </tr>`
             )}

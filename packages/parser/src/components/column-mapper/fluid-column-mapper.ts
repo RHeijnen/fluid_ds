@@ -133,6 +133,15 @@ export class FluidColumnMapper extends FluidElement {
         this.mapping = autoMap(this.columns, this.blueprint);
       }
     }
+    if ((changed.has("columns") || changed.has("blueprint") || changed.has("mapping")) &&
+      (this.columns.length > 0 || Object.keys(this.mapping).length > 0)) {
+      // A removed source column must not remain silently selected in the data
+      // while the native select displays its empty option.
+      this.mapping = Object.fromEntries(this.blueprint.fields.map((field) => {
+        const source = this.mapping[field.key];
+        return [field.key, typeof source === "string" && this.columns.includes(source) ? source : null];
+      }));
+    }
   }
 
   private onSelect(fieldKey: string, event: Event): void {
@@ -151,7 +160,7 @@ export class FluidColumnMapper extends FluidElement {
   override render(): TemplateResult {
     const fields = this.blueprint.fields ?? [];
     return html`
-      <div part="base" class="base">
+      <div part="base" class="base" dir=${this.localize.dir}>
         ${fields.map((field) => {
           const selected = this.mapping[field.key] ?? "";
           const unmapped = field.required && selected === "";
@@ -161,17 +170,26 @@ export class FluidColumnMapper extends FluidElement {
               <label part="label" class="label" for=${selectId}>
                 ${field.label ?? field.key}
                 ${field.required
-                  ? html`<span part="required" class="required" title="Required">*</span>`
+                  ? html`<span
+                      part="required"
+                      class="required"
+                      aria-hidden="true"
+                      title=${this.term("parserRequiredTitle")}
+                      >*</span
+                    >`
                   : ""}
               </label>
               <select
                 part="select"
                 id=${selectId}
                 .value=${selected}
+                ?required=${field.required}
                 aria-invalid=${unmapped ? "true" : "false"}
                 @change=${(e: Event) => this.onSelect(field.key, e)}
               >
-                <option value="">${field.required ? "Select a column…" : "(not mapped)"}</option>
+                <option value="">
+                  ${field.required ? this.term("parserSelectColumn") : this.term("parserNotMapped")}
+                </option>
                 ${this.columns.map(
                   (col) => html`<option value=${col} ?selected=${col === selected}>${col}</option>`
                 )}

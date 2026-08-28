@@ -118,6 +118,49 @@ input.loadOptions = async (q) => {
 Add `debounce="200"` to throttle requests, `min-query="2"` to wait for a couple
 of characters, and `strict` to clear free text that doesn't match an option.
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-typeahead label="Country" help-text="Start typing to filter the list." placeholder="Pick a country…" options='["United States","Canada","Mexico","United Kingdom"]' style="max-width: 20rem;"></fluid-typeahead>
+</Demo>
+
+<ConformanceCode code={`<fluid-typeahead
+  label="Country"
+  help-text="Start typing to filter the list."
+  placeholder="Pick a country…"
+  options='["United States","Canada","Mexico","United Kingdom"]'
+></fluid-typeahead>`} />
+
+### Multi-pick with `keep-open`
+
+Set `keep-open` to gather several values in a row: the listbox stays open
+after a choice and the query is left alone, with each pick reported through
+its own `fluid-change` event. Collect the picks in your own state (tags, a
+chip list, a form array); the field itself keeps reporting single choices.
+
+<Demo>
+  <fluid-typeahead keep-open aria-label="Add toppings" placeholder="Add toppings…" options='["Basil","Mozzarella","Mushroom","Olive","Pepperoni"]' style="max-width: 20rem;"></fluid-typeahead>
+</Demo>
+
+<ConformanceCode code={`<fluid-typeahead
+  keep-open
+  aria-label="Add toppings"
+  options='["Basil","Mozzarella","Mushroom","Olive","Pepperoni"]'
+></fluid-typeahead>
+
+<script>
+  const el = document.querySelector("fluid-typeahead");
+  el.addEventListener("fluid-change", (e) => {
+    addTag(e.detail.option); // one event per pick, list stays open
+  });
+</script>`} />
+
 ### Sizes
 
 `size` accepts `sm`, `md` (default), and `lg`.

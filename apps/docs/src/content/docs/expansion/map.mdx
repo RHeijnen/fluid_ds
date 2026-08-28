@@ -67,6 +67,31 @@ import "@fluid-ds/map/define/map";
 update the property and the map re-syncs in place. The container is a labelled
 `role="region"`, so give every map a meaningful `label`.
 
+Marker `label` values are plain text. They supply the marker's accessible name,
+popup and tooltip; markup in a label is displayed literally. Give each marker
+a distinctive name. The explicit `icon.html` and `attribution` APIs still accept
+HTML, so supply trusted or sanitized markup there.
+
+### Offline and self-hosted operation
+
+Set `tile-url=""` to disable the tile layer without generating failed tile
+requests. For a fully offline map, also serve Leaflet's actual stylesheet
+locally before the component upgrades, and use tone pins or local/data-URL
+marker images. The default pin images and automatic stylesheet loader use
+unpkg; the default tile layer uses OpenStreetMap.
+
+```html
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" data-fluid-map-leaflet-css />
+<fluid-map tile-url="" label="Delivery locations"></fluid-map>
+```
+
+Assign markers with `tone: "info"` (or another tone) through the `markers`
+property to use inline SVG pins. Removing and reconnecting the element tears
+down and recreates its Leaflet instance from the current properties, without
+duplicating marker event listeners. If user pan/zoom should survive that
+reconnection, mirror `fluid-move` into your application's saved view and supply
+the saved `center` / `zoom` properties.
+
 ## Custom markers
 
 Each marker can be a plain pin, a semantic **tone** pin, or a fully **custom
@@ -143,7 +168,7 @@ div.
 | `center` | - | `[number, number]` | `[51.505, -0.09]` | Map center as `[lat, lng]`. |
 | `zoom` | `zoom` | `number` | `13` | Zoom level. |
 | `markers` | - | `{ lat, lng, label?, tone?, icon? }[]` | `[]` | Markers to place. `label` becomes a popup + tooltip; `tone` renders a coloured Fluid pin; `icon` is a fully custom image or HTML / emoji marker (wins over `tone`). |
-| `tileUrl` | `tile-url` | `string` | OpenStreetMap tiles | Tile layer URL template. |
+| `tileUrl` | `tile-url` | `string` | OpenStreetMap tiles | Tile layer URL template; an empty string disables tiles. |
 | `attribution` | `attribution` | `string` | OpenStreetMap credit | Tile attribution (HTML allowed). |
 | `label` | `label` | `string` | `"Map"` | Accessible name for the map region. |
 
@@ -151,7 +176,7 @@ div.
 
 | Event | Detail | When |
 | --- | --- | --- |
-| `fluid-marker-click` | `{ marker }` | A marker is clicked. |
+| `fluid-marker-click` | `{ marker }` | A marker is clicked or activated with Enter. |
 | `fluid-move` | `{ center, zoom }` | The view finishes moving or zooming. |
 
 ## Theming
@@ -169,6 +194,20 @@ without extra work. Component tokens layer on top for fine-grained control:
 The tiles themselves come from your tile provider, so map imagery is not
 themed by Fluid. Swap `tile-url` for a dark or styled tile set if you want the
 map body to match a dark theme.
+
+## Accessibility and verification scope
+
+The Leaflet viewport supports keyboard panning with arrow keys, zoom controls,
+and Enter activation of focusable markers. Keep an equivalent textual list of
+locations and actions in the application when the geographical view conveys
+essential information. A labelled map alone is not an accessible alternative
+for all spatial relationships.
+
+The offline interaction contract checks marker names and event payloads,
+pan/zoom, replacement data and reconnect behavior. These automated checks are
+not screen-reader certification. Leaflet's internal control strings still need
+a complete localization strategy, and representative assistive-technology
+review remains a release gate.
 
 ## License
 

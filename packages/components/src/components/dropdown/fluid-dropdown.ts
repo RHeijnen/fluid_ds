@@ -7,10 +7,13 @@ import {
   offset,
   shift,
   type Placement
-} from "@floating-ui/dom";
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { hideFromTopLayer, showInTopLayer } from "../../internal/top-layer.js";
 import type { FluidDropdownItem } from "./fluid-dropdown-item.js";
+
+export type FluidDropdownShowEvent = CustomEvent<null>;
+export type FluidDropdownHideEvent = CustomEvent<null>;
 
 let counter = 0;
 
@@ -32,6 +35,7 @@ let counter = 0;
  * @cssproperty --fluid-dropdown-border - Menu border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-dropdown-border-width - Menu border width. Falls back to 1px.
  * @cssproperty --fluid-dropdown-radius - Menu corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-dropdown-shadow - Menu elevation. Falls back to --fluid-shadow-lg.
  *
  * @uses-token --fluid-surface-base - Default menu background.
  * @uses-token --fluid-border-default - Default menu border.
@@ -40,8 +44,9 @@ let counter = 0;
  * @uses-token --fluid-shadow-lg - Menu elevation.
  *
  * @fires fluid-select - Fired when an item is selected. detail.value, detail.item.
- * @fires fluid-show - Fired when the menu opens.
- * @fires fluid-hide - Fired when the menu closes.
+ * @fires {FluidDropdownShowEvent} fluid-show - Fired when the menu opens.
+ * @fires {FluidDropdownHideEvent} fluid-hide - Fired when the menu closes.
+ * @cssproperty --fluid-dropdown-border-strong - Component override for the corresponding semantic token.
  */
 export class FluidDropdown extends FluidElement {
   static override styles = css`
@@ -63,13 +68,13 @@ export class FluidDropdown extends FluidElement {
      * context, a plain position:fixed + z-index can still be clipped by a
      * fixed-containing-block ancestor or sit under a sticky sidebar (this bit
      * the split-button menu in the docs: it disappeared behind the nav pane).
-     * The top layer has no such failure mode. position:fixed + the floating-ui
+     * The top layer has no such failure mode. position:fixed + the positioning engine
      * coords still drive placement; z-index is a harmless fallback.
      */
     .menu {
       position: fixed;
       /* Override the UA popover defaults (inset: 0; margin: auto) so our
-         floating-ui left/top win. */
+         the engine's left/top win. */
       inset: auto;
       margin: 0;
       top: 0;
@@ -82,14 +87,17 @@ export class FluidDropdown extends FluidElement {
          content overflows max-height (matches the select listbox). */
       overflow: hidden auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--fluid-border-strong, color-mix(in srgb, currentColor 25%, transparent))
+      scrollbar-color: var(
+          --fluid-dropdown-border-strong,
+          var(--fluid-border-strong, color-mix(in srgb, currentColor 25%, transparent))
+        )
         transparent;
       padding: var(--fluid-space-1);
       background: var(--fluid-dropdown-bg, var(--fluid-surface-base));
       border: var(--fluid-dropdown-border-width, 1px) solid
         var(--fluid-dropdown-border, var(--fluid-border-default));
       border-radius: var(--fluid-dropdown-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-shadow-lg);
+      box-shadow: var(--fluid-dropdown-shadow, var(--fluid-shadow-lg));
       opacity: 0;
       transform: scale(0.97);
       transform-origin: top left;
@@ -143,7 +151,7 @@ export class FluidDropdown extends FluidElement {
     }
   `;
 
-  @query(".menu") private menuEl!: HTMLElement;
+  @query(".menu") private menuEl!: HTMLElement & { ariaActiveDescendantElement: Element | null };
 
   /** Open state. */
   @property({ type: Boolean, reflect: true }) open = false;
@@ -158,22 +166,48 @@ export class FluidDropdown extends FluidElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
 
   private trigger: HTMLElement | null = null;
+  private triggerDisposers: Array<() => void> = [];
   private cleanup?: () => void;
   private menuId = `fluid-dropdown-menu-${++counter}`;
   private typeaheadBuffer = "";
   private typeaheadTimer?: ReturnType<typeof setTimeout>;
+  private focusFrame?: number;
+  private openSequence = 0;
+  private restoreFocus = true;
+  private itemObserver?: MutationObserver;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsideClick, true);
+    this.listen(document, "pointerdown", this.handleOutsideClick, { capture: true });
+    if (typeof MutationObserver !== "undefined") {
+      this.itemObserver = new MutationObserver(() => this.reconcileItems());
+      this.itemObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled", "type"]
+      });
+    }
+    if (this.hasUpdated) {
+      this.attachTrigger();
+      // `open` is intentionally retained across a temporary disconnect. Lit
+      // does not run `updated()` again when that value did not change, so the
+      // top-layer and active-descendant state must be restored explicitly.
+      if (this.open) void this.handleOpen(false);
+    }
   }
 
   override disconnectedCallback(): void {
+    this.itemObserver?.disconnect();
+    this.itemObserver = undefined;
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsideClick, true);
     this.cleanup?.();
     hideFromTopLayer(this.menuEl);
     clearTimeout(this.typeaheadTimer);
+    if (this.focusFrame !== undefined) cancelAnimationFrame(this.focusFrame);
+    this.openSequence++;
+    this.trigger = null;
+    this.triggerDisposers = [];
   }
 
   protected override firstUpdated(): void {
@@ -183,12 +217,13 @@ export class FluidDropdown extends FluidElement {
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
       if (this.open) this.handleOpen();
-      else this.handleClose();
+      else if (changed.get("open") === true) this.handleClose();
     }
   }
 
   show(): void {
     if (this.disabled || this.open) return;
+    this.restoreFocus = true;
     this.open = true;
   }
   hide(): void {
@@ -201,9 +236,9 @@ export class FluidDropdown extends FluidElement {
   }
 
   private getItems(): FluidDropdownItem[] {
-    return Array.from(
-      this.querySelectorAll<HTMLElement>("fluid-dropdown-item")
-    ).filter((el) => el.getAttribute("type") !== "separator") as FluidDropdownItem[];
+    return Array.from(this.querySelectorAll<FluidDropdownItem>("fluid-dropdown-item")).filter(
+      (el) => el.type !== "separator" && el.closest("fluid-dropdown") === this
+    );
   }
 
   private getEnabledItems(): FluidDropdownItem[] {
@@ -215,46 +250,67 @@ export class FluidDropdown extends FluidElement {
     const slotted = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
     if (!slotted) return;
     if (this.trigger !== slotted) {
-      this.trigger?.removeEventListener("click", this.handleTriggerClick);
-      this.trigger?.removeEventListener("keydown", this.handleTriggerKey);
+      for (const dispose of this.triggerDisposers) dispose();
       this.trigger = slotted;
-      this.trigger.addEventListener("click", this.handleTriggerClick);
-      this.trigger.addEventListener("keydown", this.handleTriggerKey);
+      this.triggerDisposers = [
+        this.listen(this.trigger, "click", this.handleTriggerClick),
+        this.listen(this.trigger, "keydown", this.handleTriggerKey)
+      ];
       this.trigger.setAttribute("aria-haspopup", "menu");
-      this.trigger.setAttribute("aria-controls", this.menuId);
+      // aria-controls is optional for a menu button. A light-DOM IDREF cannot
+      // resolve the menu inside our shadow root, so do not publish a broken one.
     }
     this.trigger.setAttribute("aria-expanded", this.open ? "true" : "false");
   }
 
-  private async handleOpen(): Promise<void> {
+  private async handleOpen(emitEvent = true): Promise<void> {
     if (!this.trigger || !this.menuEl) return;
+    const sequence = ++this.openSequence;
     this.trigger.setAttribute("aria-expanded", "true");
     // Promote the menu into the browser top layer so it paints above all app
     // chrome and escapes every clipping / stacking context. Guarded: throws if
     // already open or if the API is unavailable (very old browsers degrade to
     // the position:fixed + z-index fallback).
     showInTopLayer(this.menuEl);
+    // Establish the roving active item before any asynchronous positioning or
+    // the public `fluid-show` event. Otherwise a fast ArrowDown can race the
+    // focus frame and be reset to the first item, particularly under WebKit.
+    const items = this.getEnabledItems();
+    if (items[0]) this.setActiveIndex(0);
     this.cleanup = autoUpdate(this.trigger, this.menuEl, () => this.reposition());
     await this.reposition();
+    if (!this.isConnected || !this.open || sequence !== this.openSequence) return;
     // Focus the first enabled item so arrow keys work immediately.
-    requestAnimationFrame(() => {
-      const items = this.getEnabledItems();
-      if (items[0]) this.setActiveIndex(0);
+    this.focusFrame = requestAnimationFrame(() => {
+      this.focusFrame = undefined;
+      if (!this.isConnected || !this.open || sequence !== this.openSequence) return;
       this.menuEl.focus();
     });
-    this.dispatchEvent(new CustomEvent("fluid-show", { bubbles: true, composed: true }));
+    if (emitEvent) {
+      this.dispatchEvent(
+        new CustomEvent<null>("fluid-show", { detail: null, bubbles: true, composed: true })
+      );
+    }
   }
 
   private handleClose(): void {
+    this.openSequence++;
+    if (this.focusFrame !== undefined) cancelAnimationFrame(this.focusFrame);
+    this.focusFrame = undefined;
     this.cleanup?.();
     this.cleanup = undefined;
     hideFromTopLayer(this.menuEl);
     if (this.trigger) {
       this.trigger.setAttribute("aria-expanded", "false");
-      (this.trigger as HTMLElement).focus();
+      if (this.restoreFocus) this.trigger.focus();
     }
     this.clearActive();
-    this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
+    this.restoreFocus = true;
+    this.typeaheadBuffer = "";
+    clearTimeout(this.typeaheadTimer);
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
+    );
   }
 
   private async reposition(): Promise<void> {
@@ -262,11 +318,7 @@ export class FluidDropdown extends FluidElement {
     const { x, y } = await computePosition(this.trigger, this.menuEl, {
       placement: this.placement,
       strategy: "fixed",
-      middleware: [
-        offset(this.distance),
-        flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }),
-        shift({ padding: 8 })
-      ]
+      middleware: [offset(this.distance), flip(), shift({ padding: 8 })]
     });
     Object.assign(this.menuEl.style, { left: `${x}px`, top: `${y}px` });
   }
@@ -277,14 +329,33 @@ export class FluidDropdown extends FluidElement {
 
   private setActiveIndex(idx: number): void {
     const items = this.getEnabledItems();
-    items.forEach((it, i) => (it.active = i === idx));
-    items[idx]?.scrollIntoView({ block: "nearest" });
-    if (items[idx]) this.menuEl.setAttribute("aria-activedescendant", items[idx].id);
+    const target = items[idx];
+    for (const item of this.querySelectorAll<FluidDropdownItem>("fluid-dropdown-item")) {
+      if (item.closest("fluid-dropdown") === this) item.active = item === target;
+    }
+    target?.scrollIntoView({ block: "nearest" });
+    // The item is slotted from the containing tree. Use element reflection,
+    // not a string IDREF which cannot resolve through this shadow boundary.
+    this.menuEl.ariaActiveDescendantElement = target ?? null;
   }
 
   private clearActive(): void {
-    for (const it of this.getItems()) it.active = false;
-    this.menuEl?.removeAttribute("aria-activedescendant");
+    for (const it of this.querySelectorAll<FluidDropdownItem>("fluid-dropdown-item")) {
+      if (it.closest("fluid-dropdown") === this) it.active = false;
+    }
+    if (this.menuEl) this.menuEl.ariaActiveDescendantElement = null;
+  }
+
+  private reconcileItems(): void {
+    if (!this.open || !this.menuEl) return;
+    const enabled = this.getEnabledItems();
+    const active = enabled.find((item) => item.active);
+    if (active) {
+      this.menuEl.ariaActiveDescendantElement = active;
+      return;
+    }
+    if (enabled.length) this.setActiveIndex(0);
+    else this.clearActive();
   }
 
   private moveActive(delta: number): void {
@@ -295,7 +366,13 @@ export class FluidDropdown extends FluidElement {
   }
 
   private commitItem(item: FluidDropdownItem): void {
-    if (item.disabled) return;
+    if (
+      !this.open ||
+      item.disabled ||
+      item.type === "separator" ||
+      item.closest("fluid-dropdown") !== this
+    )
+      return;
     if (item.type === "checkbox") {
       item.checked = !item.checked;
     }
@@ -366,6 +443,10 @@ export class FluidDropdown extends FluidElement {
         this.hide();
         return;
       case "Tab":
+        // Let the browser move relative to the trigger in either direction.
+        // Do not restore focus again after the native Tab default action.
+        this.trigger?.focus();
+        this.restoreFocus = false;
         this.hide();
         return;
     }
@@ -375,13 +456,17 @@ export class FluidDropdown extends FluidElement {
   };
 
   private handleMenuClick = (e: Event) => {
-    const item = (e.target as HTMLElement).closest("fluid-dropdown-item") as FluidDropdownItem | null;
+    const item = (e.target as HTMLElement).closest(
+      "fluid-dropdown-item"
+    ) as FluidDropdownItem | null;
     if (!item) return;
     this.commitItem(item);
   };
 
   private handleMenuHover = (e: Event) => {
-    const item = (e.target as HTMLElement).closest("fluid-dropdown-item") as FluidDropdownItem | null;
+    const item = (e.target as HTMLElement).closest(
+      "fluid-dropdown-item"
+    ) as FluidDropdownItem | null;
     if (!item) return;
     const items = this.getEnabledItems();
     const idx = items.indexOf(item);
@@ -392,6 +477,7 @@ export class FluidDropdown extends FluidElement {
     if (!this.open) return;
     const path = e.composedPath();
     if (path.includes(this) || (this.trigger && path.includes(this.trigger))) return;
+    this.restoreFocus = false;
     this.hide();
   };
 

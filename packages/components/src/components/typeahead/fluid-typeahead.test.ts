@@ -5,6 +5,14 @@ import type { FluidTypeahead } from "./fluid-typeahead.js";
 const FRUITS = ["Apple", "Apricot", "Banana", "Blackberry", "Cherry", "Cranberry", "Date"];
 
 describe("<fluid-typeahead>", () => {
+  it("platform focus reaches the combobox without the JavaScript focus override", async () => {
+    const el = await fixture<FluidTypeahead>(
+      html`<fluid-typeahead label="Search"></fluid-typeahead>`
+    );
+    HTMLElement.prototype.focus.call(el);
+    expect(el.shadowRoot!.activeElement).to.equal(el.shadowRoot!.querySelector("input"));
+  });
+
   it("forwards its form name to the internal combobox for autofill metadata", async () => {
     const el = await fixture<FluidTypeahead>(html`
       <fluid-typeahead name="domain" aria-label="Domain" .options=${FRUITS}></fluid-typeahead>
@@ -131,9 +139,7 @@ describe("<fluid-typeahead>", () => {
       ></fluid-typeahead>
     `);
     el.value = "United";
-    el.shadowRoot!
-      .querySelector("input")!
-      .dispatchEvent(new Event("input", { bubbles: true }));
+    el.shadowRoot!.querySelector("input")!.dispatchEvent(new Event("input", { bubbles: true }));
     await el.updateComplete;
     expect(el.shadowRoot!.querySelectorAll(".option").length).to.equal(2);
   });
@@ -149,8 +155,8 @@ describe("<fluid-typeahead>", () => {
     input.dispatchEvent(new Event("input", { bubbles: true }));
     await aTimeout(30);
     await el.updateComplete;
-    const opts = Array.from(el.shadowRoot!.querySelectorAll(".option")).map(
-      (o) => o.textContent?.trim()
+    const opts = Array.from(el.shadowRoot!.querySelectorAll(".option")).map((o) =>
+      o.textContent?.trim()
     );
     expect(opts).to.deep.equal(["foo-result-1", "foo-result-2"]);
   });
@@ -161,9 +167,9 @@ describe("<fluid-typeahead>", () => {
     `);
     el.open = true;
     await el.updateComplete;
-    el.shadowRoot!
-      .querySelector("input")!
-      .dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    el.shadowRoot!.querySelector("input")!.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    );
     await el.updateComplete;
     expect(el.open).to.be.false;
   });
@@ -195,6 +201,49 @@ describe("<fluid-typeahead>", () => {
     expect(data.get("fruit")).to.equal("Apple");
   });
 
+  it("reports valueMissing when required and empty", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead
+        required
+        name="fruit"
+        aria-label="Fruit"
+        .options=${FRUITS}
+      ></fluid-typeahead>
+    `);
+    await el.updateComplete;
+    expect(el.validity.valueMissing).to.equal(true);
+    expect(el.checkValidity()).to.equal(false);
+
+    el.value = "Apple";
+    await el.updateComplete;
+    expect(el.validity.valid).to.equal(true);
+  });
+
+  it("keeps an untouched required field visually neutral, then shows and clears invalid state", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead
+        required
+        name="fruit"
+        aria-label="Fruit"
+        .options=${FRUITS}
+      ></fluid-typeahead>
+    `);
+    await el.updateComplete;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
+
+    expect(wrap).not.to.have.class("invalid");
+    expect(input.getAttribute("aria-invalid")).to.equal("false");
+    input.dispatchEvent(new Event("blur"));
+    await el.updateComplete;
+    expect(wrap).to.have.class("invalid");
+    expect(input.getAttribute("aria-invalid")).to.equal("true");
+    el.value = "Apple";
+    await el.updateComplete;
+    expect(wrap).not.to.have.class("invalid");
+    expect(input.getAttribute("aria-invalid")).to.equal("false");
+  });
+
   it("passes a11y audit (closed)", async () => {
     const el = await fixture<FluidTypeahead>(html`
       <fluid-typeahead aria-label="Fruit" .options=${FRUITS}></fluid-typeahead>
@@ -213,6 +262,41 @@ describe("<fluid-typeahead>", () => {
     await el.updateComplete;
     const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
     expect(getComputedStyle(wrap).backgroundColor).to.equal("rgb(1, 2, 3)");
+  });
+
+  it("component-scoped sizing and typography hooks stay isolated to typeahead", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead size="sm" aria-label="x" .options=${FRUITS}></fluid-typeahead>
+    `);
+    el.style.setProperty("--fluid-typeahead-height-sm", "44px");
+    el.style.setProperty("--fluid-typeahead-font-size-sm", "13px");
+    el.style.setProperty("--fluid-typeahead-padding-x-sm", "17px");
+    await el.updateComplete;
+
+    const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    expect(wrap.getBoundingClientRect().height).to.equal(44);
+    expect(getComputedStyle(wrap).fontSize).to.equal("13px");
+    expect(getComputedStyle(input).paddingInlineStart).to.equal("17px");
+  });
+
+  it("renders slotted prefix and suffix as full-height affixes", async () => {
+    const el = await fixture<FluidTypeahead>(html`
+      <fluid-typeahead aria-label="x" .options=${FRUITS}>
+        <span slot="prefix">Find</span>
+        <span slot="suffix">Global</span>
+      </fluid-typeahead>
+    `);
+    await el.updateComplete;
+
+    const wrap = el.shadowRoot!.querySelector<HTMLElement>(".input-wrap")!;
+    const prefix = el.shadowRoot!.querySelector<HTMLElement>(".prefix")!;
+    const suffix = el.shadowRoot!.querySelector<HTMLElement>(".suffix")!;
+    expect(prefix.hidden).to.equal(false);
+    expect(suffix.hidden).to.equal(false);
+    expect(prefix.getBoundingClientRect().height).to.equal(wrap.getBoundingClientRect().height);
+    expect(suffix.getBoundingClientRect().height).to.equal(wrap.getBoundingClientRect().height);
+    expect(getComputedStyle(wrap).overflow).to.equal("hidden");
   });
 
   it("field min-height respects --fluid-target-min (AAA scaling)", async () => {
@@ -249,7 +333,12 @@ describe("<fluid-typeahead>", () => {
 
     it("stays open and leaves the query alone when gathering several", async () => {
       const el = await fixture<FluidTypeahead>(html`
-        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+        <fluid-typeahead
+          aria-label="Fruit"
+          keep-open
+          debounce="0"
+          .options=${FRUITS}
+        ></fluid-typeahead>
       `);
       await openWith(el, "Ap");
       await pickFirst(el);
@@ -263,7 +352,12 @@ describe("<fluid-typeahead>", () => {
 
     it("still reports every pick", async () => {
       const el = await fixture<FluidTypeahead>(html`
-        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+        <fluid-typeahead
+          aria-label="Fruit"
+          keep-open
+          debounce="0"
+          .options=${FRUITS}
+        ></fluid-typeahead>
       `);
       await openWith(el, "Ap");
       const picked: string[] = [];
@@ -271,16 +365,24 @@ describe("<fluid-typeahead>", () => {
         picked.push((event as CustomEvent<{ value: string }>).detail.value);
       });
       const rows = el.shadowRoot!.querySelectorAll<HTMLElement>(".option");
-      rows[0].click();
+      const first = rows[0];
+      const second = rows[1];
+      if (!first || !second) throw new Error("Expected both matching fruit options");
+      first.click();
       await el.updateComplete;
-      rows[1].click();
+      second.click();
       await el.updateComplete;
       expect(picked).to.deep.equal(["Apple", "Apricot"]);
     });
 
     it("still closes on Escape", async () => {
       const el = await fixture<FluidTypeahead>(html`
-        <fluid-typeahead aria-label="Fruit" keep-open debounce="0" .options=${FRUITS}></fluid-typeahead>
+        <fluid-typeahead
+          aria-label="Fruit"
+          keep-open
+          debounce="0"
+          .options=${FRUITS}
+        ></fluid-typeahead>
       `);
       await openWith(el, "Ap");
       const input = el.shadowRoot!.querySelector("input")!;
@@ -294,7 +396,11 @@ describe("<fluid-typeahead>", () => {
   describe("renderOption", () => {
     const TERMINALS = [
       { value: "t1", label: "APO0Q25L017092", data: { product: "Apollo CLO Dev", domain: "CURO" } },
-      { value: "t2", label: "APO20204800024", data: { product: "Apollo CLO Dev", domain: "PAYTER_RD" } }
+      {
+        value: "t2",
+        label: "APO20204800024",
+        data: { product: "Apollo CLO Dev", domain: "PAYTER_RD" }
+      }
     ];
 
     const open = async (el: FluidTypeahead, query: string) => {
@@ -320,10 +426,12 @@ describe("<fluid-typeahead>", () => {
       await open(el, "APO");
       const rows = el.shadowRoot!.querySelectorAll(".option");
       expect(rows).to.have.lengthOf(2);
-      expect(rows[0].querySelector(".serial")!.textContent).to.equal("APO0Q25L017092");
+      const first = rows[0];
+      if (!first) throw new Error("Expected a rendered terminal option");
+      expect(first.querySelector(".serial")!.textContent).to.equal("APO0Q25L017092");
       // Data an option carries alongside its label is what a row is usually
       // built from; pasting it into the label was the only way before.
-      expect(rows[0].querySelector(".domain")!.textContent).to.equal("CURO");
+      expect(first.querySelector(".domain")!.textContent).to.equal("CURO");
     });
 
     it("hands the row its position, state and the query", async () => {
@@ -334,7 +442,12 @@ describe("<fluid-typeahead>", () => {
           debounce="0"
           .options=${TERMINALS}
           .renderOption=${(option: { label: string }, context: Record<string, unknown>) => {
-            seen.push({ label: option.label, index: context.index, active: context.active, query: context.query });
+            seen.push({
+              label: option.label,
+              index: context.index,
+              active: context.active,
+              query: context.query
+            });
             return html`${option.label}`;
           }}
         ></fluid-typeahead>
@@ -354,8 +467,10 @@ describe("<fluid-typeahead>", () => {
           aria-label="Terminal"
           debounce="0"
           .options=${TERMINALS}
-          .renderOption=${(option: { label: string }, context: { highlight: (t: string) => unknown }) =>
-            html`<span class="wrapped">${context.highlight(option.label)}</span>`}
+          .renderOption=${(
+            option: { label: string },
+            context: { highlight: (t: string) => unknown }
+          ) => html`<span class="wrapped">${context.highlight(option.label)}</span>`}
         ></fluid-typeahead>
       `);
       await open(el, "APO");
@@ -403,7 +518,10 @@ describe("<fluid-typeahead> opening onto the whole list", () => {
     // keystroke had narrowed the list to, however the value had changed since.
     const asked: string[] = [];
     const el = await fixture<FluidTypeahead>(html`
-      <fluid-typeahead aria-label="Fruit" min-query="0" debounce="0"
+      <fluid-typeahead
+        aria-label="Fruit"
+        min-query="0"
+        debounce="0"
         .loadOptions=${(query: string) => {
           asked.push(query);
           return FRUITS.filter((fruit) => fruit.toLowerCase().includes(query.trim().toLowerCase()));

@@ -1,6 +1,6 @@
 import { FluidHotkey } from "./fluid-hotkey.js";
 
-if (!customElements.get("fluid-hotkey")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-hotkey")) {
   customElements.define("fluid-hotkey", FluidHotkey);
 }
 

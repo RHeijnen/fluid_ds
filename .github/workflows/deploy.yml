@@ -7,7 +7,7 @@ name: deploy website
 # Why build in GitHub Actions rather than Cloudflare's own build system:
 # `pnpm build:website` is a heavy, multi-toolchain build (Astro + Storybook +
 # several Vite apps + a Next.js static export + an Angular CLI build). Running
-# it on the same Node 20 + pnpm runner that `verify` already uses is far more
+# it on the same Node 22 + pnpm runner that `verify` already uses is far more
 # reliable than Cloudflare's generic builder, and keeps one source of truth for
 # the build environment. Cloudflare only receives the finished static folder.
 #
@@ -20,6 +20,9 @@ on:
     branches: [main]
   # Manual redeploy button in the Actions tab.
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 # A newer commit supersedes an in-flight deploy.
 concurrency:
@@ -36,15 +39,15 @@ jobs:
       deployments: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: pnpm
 
       - name: Install dependencies
@@ -55,11 +58,9 @@ jobs:
       - name: Build unified website
         run: pnpm build:website
 
-      # wrangler runs via `pnpm dlx` rather than cloudflare/wrangler-action:
-      # the action tries to `pnpm add wrangler` when it isn't a dependency,
-      # which pnpm refuses at a workspace root (ERR_PNPM_ADDING_TO_ROOT), so
-      # every deploy died before wrangler ever ran. `pnpm dlx` sidesteps the
-      # workspace entirely; wrangler reads the two CLOUDFLARE_* env vars
+      # Wrangler is an exact root devDependency and therefore comes from the
+      # frozen lockfile installed above. `pnpm exec` cannot fetch or select a
+      # different CLI version. Wrangler reads the two CLOUDFLARE_* env vars
       # natively.
       #
       # The project name must match the existing Direct Upload Pages project
@@ -67,7 +68,7 @@ jobs:
       # served from the custom domain fluid-web.dev attached to it in
       # Cloudflare.
       - name: Deploy to Cloudflare Pages
-        run: pnpm dlx wrangler@3 pages deploy website --project-name=fluid-25z --branch=main
+        run: pnpm exec wrangler pages deploy website --project-name=fluid-25z --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

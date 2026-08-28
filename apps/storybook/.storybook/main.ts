@@ -1,6 +1,7 @@
 import type { StorybookConfig } from "@storybook/web-components-vite";
 
 const config: StorybookConfig = {
+  staticDirs: ["../public"],
   stories: [
     "../stories/**/*.mdx",
     "../stories/**/*.stories.@(js|ts)",
@@ -11,11 +12,13 @@ const config: StorybookConfig = {
     "../../../packages/parser/src/**/*.stories.@(js|ts)",
     "../../../packages/scheduler/src/**/*.stories.@(js|ts)",
     "../../../packages/media/src/**/*.stories.@(js|ts)",
+    "../../../packages/markdown/src/**/*.stories.@(js|ts)",
     "../../../packages/table/src/**/*.stories.@(js|ts)",
     "../../../packages/calendar/src/**/*.stories.@(js|ts)",
     "../../../packages/editor/src/**/*.stories.@(js|ts)",
     "../../../packages/kanban/src/**/*.stories.@(js|ts)",
-    "../../../packages/map/src/**/*.stories.@(js|ts)"
+    "../../../packages/map/src/**/*.stories.@(js|ts)",
+    "../../../packages/node-graph/src/**/*.stories.@(js|ts)"
   ],
   addons: [
     "@storybook/addon-essentials",

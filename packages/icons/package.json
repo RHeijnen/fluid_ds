@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/icons",
-  "version": "0.0.3",
+  "version": "0.4.0",
   "description": "Icon registry for Fluid. Curated lucide subset registered by default, ~1500 more available as side-effect modules or via the lazy loadIcon() API.",
   "type": "module",
   "license": "MIT",
@@ -31,6 +31,18 @@
       "types": "./src/index.ts",
       "import": "./src/index.ts"
     },
+    "./registry": {
+      "types": "./src/registry.ts",
+      "import": "./src/registry.ts"
+    },
+    "./load-icon": {
+      "types": "./src/load-icon.ts",
+      "import": "./src/load-icon.ts"
+    },
+    "./manifest": {
+      "types": "./src/lucide/_manifest.ts",
+      "import": "./src/lucide/_manifest.ts"
+    },
     "./register-defaults": {
       "types": "./src/register-defaults.ts",
       "import": "./src/register-defaults.ts"
@@ -48,6 +60,18 @@
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
       },
+      "./registry": {
+        "types": "./dist/registry.d.ts",
+        "import": "./dist/registry.js"
+      },
+      "./load-icon": {
+        "types": "./dist/load-icon.d.ts",
+        "import": "./dist/load-icon.js"
+      },
+      "./manifest": {
+        "types": "./dist/lucide/_manifest.d.ts",
+        "import": "./dist/lucide/_manifest.js"
+      },
       "./register-defaults": {
         "types": "./dist/register-defaults.d.ts",
         "import": "./dist/register-defaults.js"
@@ -62,7 +86,8 @@
     "dist",
     "src",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "**/register-defaults.js",

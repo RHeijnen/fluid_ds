@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
+import "./define.js";
 import "../bar-chart/define.js";
 import "../line-chart/define.js";
 import "../pie-chart/define.js";
@@ -24,6 +25,22 @@ export default meta;
 type Story = StoryObj;
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+
+/** The generic chart is a public element, separate from the typed wrappers. */
+export const Generic: Story = {
+  render: () => html`
+    <div style="height: 16rem; max-width: 32rem;">
+      <fluid-chart
+        type="bar"
+        label="Monthly signups"
+        .data=${{
+          labels: months,
+          datasets: [{ label: "Signups", data: [120, 190, 150, 220, 280, 240] }]
+        }}
+      ></fluid-chart>
+    </div>
+  `
+};
 
 export const Bar: Story = {
   render: () => html`
@@ -154,7 +171,9 @@ export const Sparkline: Story = {
   render: () => html`
     <div style="display: flex; align-items: center; gap: 0.75rem;">
       <strong style="font-size: 1.5rem;">$48.2k</strong>
-      <fluid-sparkline .values=${[12, 15, 10, 18, 22, 19, 25, 28, 26, 32, 30, 35]}></fluid-sparkline>
+      <fluid-sparkline
+        .values=${[12, 15, 10, 18, 22, 19, 25, 28, 26, 32, 30, 35]}
+      ></fluid-sparkline>
     </div>
   `
 };

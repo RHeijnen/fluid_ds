@@ -1,91 +1,277 @@
 ---
 title: "Server-side rendering"
-description: "How Fluid components behave under SSR, Next.js, Nuxt, Astro, Remix, SvelteKit, and how to keep the first paint clean."
+description: "Fluid's import-safety, declarative shadow DOM, registration, and hydration contracts."
 ---
 
-import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
+import { Aside } from "@astrojs/starlight/components";
 
-Web components and SSR have a reputation for being awkward together.
-The reality in 2026: it works fine in every major framework, **once you
-know the two rules**. This page covers those rules and the per-framework
-specifics.
+Fluid supports two server-rendering modes. Choose the one that matches your renderer:
 
-## The two rules
+1. **HTML hosts with client upgrade**: the server emits tags such as
+   `<fluid-button>Save</fluid-button>`. The browser registers and upgrades them.
+2. **Declarative shadow DOM (DSD)**: Fluid's server entry renders the component's
+   shadow tree into the response. The browser adopts that tree, then Lit hydrates it.
 
-### Rule 1: Define components on the client, not the server
+These modes share server-safe component modules, but they are not the same contract.
 
-Fluid components register themselves with `customElements.define()`,
-which only exists in the browser. Importing
-`@fluid-ds/components/define/button` on the server throws.
+## The four SSR contracts
 
-Solution: gate the import to client-only modules. Every framework has a
-way to do this, `"use client"`, `<ClientOnly>`, `client:load`,
-`onMounted`, etc.
+| Contract         | What it guarantees                                                                      | Entry point                          |
+| ---------------- | --------------------------------------------------------------------------------------- | ------------------------------------ |
+| Import safety    | Importing built package and registration modules in Node does not require a browser DOM | Package and `define/*` entries       |
+| Registration     | A `define/*` entry associates a tag with its implementation                             | `@fluid-ds/components/define/button` |
+| Server rendering | Lit templates produce HTML containing declarative shadow roots                          | `@fluid-ds/components/ssr`           |
+| Client hydration | Lit adopts server-rendered shadow roots instead of replacing them                       | `@fluid-ds/components/ssr-client`    |
 
-### Rule 2: The SSR-rendered markup is just HTML
+Import safety alone does not render a shadow tree. Registration alone does not enable
+hydration. Use all three relevant entries for DSD rendering.
 
-The server emits `<fluid-button>Save</fluid-button>` as plain HTML. The
-browser sees an *unknown* tag at first paint (which is fine, it renders
-as inline by default). When the JS bundle loads on the client and
-`customElements.define()` runs, the tag **upgrades** to a real
-component. From the user's perspective: a tiny flash where the styled
-button replaces a plain one.
+## Render declarative shadow DOM
 
-This is the only "hydration mismatch" SSR + web components has, and
-it's not really a mismatch, it's an upgrade. Two ways to soften it:
+The server entry provides an incremental result for streaming and a convenience function
+for renderers that need a complete string.
 
-- **Style fallback**: in your global CSS, give unstyled `<fluid-button>`
-  enough styling that it looks roughly like the upgraded version.
-- **`:not(:defined)` hiding**: hide unstyled custom elements until they
-  upgrade.
+```ts title="server/render-fluid.ts"
+import { html } from "lit";
+import { renderFluidToString } from "@fluid-ds/components/ssr";
 
-```css
-fluid-button:not(:defined),
-fluid-input:not(:defined),
-fluid-card:not(:defined) {
-  visibility: hidden;
+// Load the SSR entry first, then register only the elements used by this route.
+await Promise.all([
+  import("@fluid-ds/components/define/button"),
+  import("@fluid-ds/components/define/input")
+]);
+
+export function renderForm() {
+  return renderFluidToString(html`
+    <form>
+      <fluid-input label="Email" name="email"></fluid-input>
+      <fluid-button type="submit">Save</fluid-button>
+    </form>
+  `);
 }
 ```
 
-The `:defined` pseudo-class is widely supported and toggles
-automatically when the element registers.
+The result contains `<template shadowrootmode="open">` for each rendered Fluid element.
+Treat the returned string as trusted application output. Do not interpolate untrusted raw
+HTML into a Lit template.
 
-<Aside type="tip" title="Auto-suppress before upgrade">
-  Wrap the rule in `@layer fallback { ... }` so your own page CSS can
-  unconditionally override it without specificity tricks.
+For a streaming response, use `renderFluid()` and consume its iterable in order. Await a
+promise chunk before requesting later output:
+
+```ts
+import { renderFluid, type RenderResult } from "@fluid-ds/components/ssr";
+
+async function write(result: RenderResult, response: NodeJS.WritableStream) {
+  for (const chunk of result) {
+    if (typeof chunk === "string") response.write(chunk);
+    else await write(await chunk, response);
+  }
+}
+```
+
+## Hydrate on the client
+
+The hydration support entry must execute before component definitions:
+
+```ts title="client/register-fluid.ts"
+import "@fluid-ds/components/ssr-client";
+import "@fluid-ds/icons/register-defaults";
+import "@fluid-ds/components/define/button";
+import "@fluid-ds/components/define/input";
+```
+
+Import that module once from the application's client bootstrap. Do not load it once per
+component instance.
+
+If a page can become interactive before definitions load, capture its native state
+immediately before registration. Await the returned restoration function before reading
+form values or enabling application submission logic:
+
+```ts
+import { captureFluidFormState } from "@fluid-ds/components/ssr-client";
+
+const form = document.querySelector("form")!;
+const restoreFormState = captureFluidFormState(form);
+await import("@fluid-ds/components/define/input");
+await import("@fluid-ds/components/define/checkbox");
+await restoreFormState();
+```
+
+The returned function waits for the supported components' first updates, applies their
+captured state through public properties, waits for form values and validity to update,
+then restores native focus and supported text selection. It does not replay synthetic
+`input`, `change`, `fluid-input`, or `fluid-change` events. Calling it again does not
+overwrite edits made after restoration.
+
+The verified host-state contract currently covers `fluid-input` and `fluid-checkbox`.
+For these controls, displayed values, host properties, validation and `FormData` agree.
+Checkbox restoration preserves the configured submission value instead of replacing it
+with the inner native checkbox's default `"on"` value. Checkbox reset defaults follow
+explicit `checked` and `indeterminate` attribute writes; reflected live-property changes
+and user toggles do not redefine those defaults, including after reconnect.
+
+Native `input`, `select` and `textarea` state is traversed through open shadow roots,
+including a control or shadow host passed as the root. Non-text inputs do not receive
+unsupported selection calls, and file values are never assigned. This does **not** yet
+certify host-state reconciliation for composite controls such as `fluid-select`, date
+pickers, radio groups or file inputs. A removed control is skipped, not replaced: callers
+must retain the server-rendered nodes. The helper is a point-in-time snapshot, not an
+autosave mechanism for later edits, navigation, reload or browser autofill.
+
+<Aside type="caution" title="Keep server and client registration aligned">
+  A tag rendered with DSD on the server must have the same definition registered in the browser.
+  Missing registration leaves static markup; a different version can produce a hydration mismatch.
 </Aside>
 
-## Per-framework specifics
+## Host-only rendering
 
-### Next.js (app router)
+Frameworks can emit custom-element hosts without invoking Fluid's Lit renderer:
 
-Fluid imports go into a client component. Either tag the file
-itself:
+```html
+<fluid-button>Save</fluid-button>
+```
 
-```tsx title="app/RegisterFluid.tsx"
+Registration modules are server-importable, but loading them on the server is unnecessary
+in this mode. Register on the client from the framework's browser entry. Until upgrade,
+the host has no Fluid shadow tree. If that transition is visible, reserve layout in global
+CSS or hide selected elements with `:not(:defined)`:
+
+```css
+@layer fluid-fallback {
+  fluid-dialog:not(:defined),
+  fluid-drawer:not(:defined) {
+    visibility: hidden;
+  }
+}
+```
+
+Do not hide an entire page of controls. That replaces a brief upgrade with unavailable
+content on slow or failed JavaScript loads.
+
+## Framework integration matrix
+
+| Framework          | Verified rendering mode                | Repository contract                                                                      |
+| ------------------ | -------------------------------------- | ---------------------------------------------------------------------------------------- |
+| React 19 + Vite    | CSR                                    | Packed build plus three-engine wrapper/native runtime contract                           |
+| Vue 3 + Vite       | CSR                                    | Packed build plus three-engine properties/events/slots/refs/forms runtime contract       |
+| Angular standalone | CSR                                    | Packed build plus three-engine properties/events/slots/refs/forms runtime contract       |
+| Plain TS/HTML      | CSR                                    | Packed build plus three-engine native custom-element runtime contract                    |
+| Astro              | Build-time static DSD                  | Packed static build, delayed registration/hydration, and retained-node contract          |
+| Next.js App Router | Static DSD + local request-time server | Packed static export plus a production-server isolation/cache/hydration contract         |
+| SvelteKit          | Build-time static DSD                  | Packed adapter-static output, delayed registration/hydration, and retained-node contract |
+
+The final retained replay passes all seven representative consumers from tarballs
+and portable locks using offline frozen installs. CSR fixtures explicitly reject
+unexpected DSD; the three static fixtures require it before registration. A separate
+packed Next production-server gate makes the contract route dynamic, verifies two
+concurrent request identities and private/no-store cache semantics, then passes the
+same hydration contract in Chromium, Firefox, and WebKit. It does not certify a
+deployed ingress, CDN, edge runtime, or hosting adapter. Adapter-backed Astro and
+SvelteKit servers, Angular SSR, Vue/Nuxt SSR, and Remix remain unverified future depth.
+
+The Node gate expands published JavaScript export targets, including wildcard
+subpaths, and imports each distinct built file in a separate fresh Node process.
+Package roots, registration, locale, animation, icon and React entries are included.
+No browser globals or
+other Fluid entries are preloaded, so one entry cannot make another accidentally
+import-safe. Rendering then uses Lit's separate SSR registry to render all published
+elements and rejects a render-tag inventory that disagrees with the catalog.
+CSS, JSON, declarations and the tokens package's explicit TypeScript-source export
+are classified outside plain-Node JavaScript certification. This checks built
+targets, not installed-package export-condition resolution or every bundler.
+Eight Node renderer contracts cover escaping, lazy ordered chunks, nested asynchronous
+chunks, error propagation, parser-correct native ancestry and interleaved caller
+contexts. Their line,
+function and branch coverage gate applies only to Fluid's small built `ssr.js`
+wrapper, not Lit itself or the component catalog.
+
+<Aside type="note" title="Server language inheritance is request-local">
+  `renderFluid()` and `renderFluidToString()` follow `lang` and `dir` on ordinary native ancestors
+  as well as on Fluid hosts. The renderer uses the HTML parser's resulting tree, so optional
+  `li`/`p` end tags and table foster parenting do not receive lexical-stack guesses. Context is
+  bound to each rendered element and remains isolated across interleaved asynchronous requests; no
+  process-global current locale is used. Explicit host attributes still take precedence. The
+  [localization and RTL guide](/guides/localization/#server-rendering-and-request-isolation)
+  distinguishes this request-local element context from the process-global dictionary registry.
+</Aside>
+
+The 213-case browser gate registers the 155-element catalog, checks shadow-root presence and catches
+page errors, console errors and hydration warnings. Its separate named-form contract checks
+actual retained server control nodes, native typing and checkbox changes before hydration,
+host values, `FormData`, focus, text selection, validation, reset and subsequent submission.
+Input shadow roots delegate native focus in both client rendering and server DSD, so
+platform form-validation focus does not depend on the host's JavaScript `focus()` method.
+The machine-derived pre-registration matrix covers all 14 applicable
+form-associated elements; eight custom-interaction/file surfaces are explicitly
+non-applicable to editing before definition.
+A negative-control test verifies that replacing a server input fails the identity check.
+The empty, hidden catalog fixtures are not per-component post-hydration interaction proof.
+
+Run the browser matrix with `FLUID_BROWSERS=all pnpm test:ssr-browser` after installing the
+declared Playwright engines. Local default is Chromium; selecting unsupported engine names
+fails configuration. This fixture uses Vite development modules, not packed production
+bundles. Every console warning is attached to the test result. Apart from Lit's exact
+development-mode notice, warnings, console errors and hydration warnings fail.
+Negative controls prove that render-cycle, unknown, altered and hydration warnings
+cannot pass this gate. The former 14-component render-cycle exception list has been
+deleted after causal component repairs. The audio catalog fixture uses a valid local
+WAV instead of exempting invalid-media warnings.
+
+The separate native-form focus matrix uses isolated client-rendered and DSD fixtures for
+`fluid-input`, `fluid-checkbox`, `fluid-switch`, `fluid-textarea`, `fluid-number-input`,
+`fluid-typeahead`, `fluid-masked-input`, `fluid-select`, `fluid-time-picker` and
+`fluid-date-picker`.
+Each case exercises native and Fluid submit buttons through both
+pointer and keyboard activation, checks that required fields block submission and receive
+native focus without browser errors, then submits an actual edited value. DSD cases also
+check the server's focus-delegation attribute and retain the original field and submit
+button nodes. The four newer composite-control fixtures also check native pointer and
+keyboard submission with application-supplied validation errors, preserve those errors
+through a language change, clear them, and verify canonical form values and reset.
+Select retains its original server-rendered popup and option shadow roots too.
+Date-picker retains the original input, dialog, nested calendar host and calendar
+shadow root, and verifies ISO form values and date-event payloads.
+
+This covers ten of the sixteen required form controls, not certification of every
+required or composite control. The three-control extension passed all 18 client/DSD
+cases across Chromium, Firefox and WebKit with normal process exit on 26 August 2026.
+The added date-picker slice passes six more client/DSD cases on Linux after
+reproducing invalid-focus failures in every engine. The expanded 96-case combined
+matrix passes in a pinned Linux container across Chromium, Firefox and WebKit,
+with unchanged source and normal shutdown inside the existing five-minute gate.
+Historical Windows WebKit teardown
+failures remain open; this is not Safari or cross-platform certification. Native
+validation focus is separate from pre-hydration state adoption: the latter remains
+limited to `fluid-input` and `fluid-checkbox`.
+
+Next.js, Astro and SvelteKit currently run host-only build contracts in CI, not browser DSD
+hydration contracts. Their production-runtime certification remains separate work.
+
+## Next.js host-only example
+
+```tsx title="app/fluid-registry.tsx"
 "use client";
 
+import "@fluid-ds/components/ssr-client";
 import "@fluid-ds/icons/register-defaults";
 import "@fluid-ds/components/define/button";
 import "@fluid-ds/components/define/input";
 
-export default function RegisterFluid() {
+export function FluidRegistry() {
   return null;
 }
 ```
 
-…and mount it in your root layout:
-
 ```tsx title="app/layout.tsx"
-import RegisterFluid from "./RegisterFluid";
 import "@fluid-ds/tokens/base.css";
 import "@fluid-ds/tokens/light.css";
+import { FluidRegistry } from "./fluid-registry";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <RegisterFluid />
+        <FluidRegistry />
         {children}
       </body>
     </html>
@@ -93,109 +279,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Pages and components themselves can stay server-rendered, they emit
-`<fluid-button>` as HTML and Next happily streams it.
+This example uses host-only rendering. Importing `ssr-client` is harmless here and lets the
+same browser registry hydrate DSD if a server boundary starts producing it later.
 
-### Next.js (pages router)
+## Astro host-only example
 
-Use a `_app.tsx` that conditionally registers:
-
-```tsx title="pages/_app.tsx"
-import type { AppProps } from "next/app";
-import { useEffect } from "react";
-import "@fluid-ds/tokens/base.css";
-import "@fluid-ds/tokens/light.css";
-
-export default function App({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    void Promise.all([
-      import("@fluid-ds/icons/register-defaults"),
-      import("@fluid-ds/components/define/button"),
-      import("@fluid-ds/components/define/input")
-    ]);
-  }, []);
-  return <Component {...pageProps} />;
-}
-```
-
-### Nuxt 3
-
-Nuxt has built-in client-only support via `.client.ts` suffix or the
-`<ClientOnly>` component, but the cleanest place is a plugin:
-
-```ts title="plugins/fluid-ds.client.ts"
-import "@fluid-ds/tokens/base.css";
-import "@fluid-ds/tokens/light.css";
-import "@fluid-ds/icons/register-defaults";
-import "@fluid-ds/components/define/button";
-
-export default defineNuxtPlugin(() => {});
-```
-
-The `.client.ts` suffix makes Nuxt skip this file on the server.
-
-Add the Vue compiler hint so it stops warning about unknown tags:
-
-```ts title="nuxt.config.ts"
-export default defineNuxtConfig({
-  vue: {
-    compilerOptions: {
-      isCustomElement: (tag) => tag.startsWith("fluid-")
-    }
-  }
-});
-```
-
-### Astro
-
-Astro's content-first model is the friendliest of the bunch, Fluid
-DS pages essentially **are** Astro pages. Put the registration in a
-single `<script>` block (Astro bundles + code-splits it):
-
-```astro title="src/layouts/Default.astro"
+```astro title="src/layouts/default.astro"
 ---
 import "@fluid-ds/tokens/base.css";
 import "@fluid-ds/tokens/light.css";
 ---
-<html>
+
+<html lang="en">
   <head>
     <script>
+      import "@fluid-ds/components/ssr-client";
       import "@fluid-ds/icons/register-defaults";
       import "@fluid-ds/components/define/button";
-      import "@fluid-ds/components/define/input";
     </script>
   </head>
   <body><slot /></body>
 </html>
 ```
 
-Components render statically in HTML and upgrade on the client. This is
-exactly how the [Fluid docs site itself](/) works.
-
-### Remix
-
-Same pattern as Next pages router, register on the client in a
-`useEffect`:
-
-```tsx title="app/root.tsx"
-import { useEffect } from "react";
-import { Outlet } from "@remix-run/react";
-import "@fluid-ds/tokens/base.css";
-
-export default function App() {
-  useEffect(() => {
-    void Promise.all([
-      import("@fluid-ds/icons/register-defaults"),
-      import("@fluid-ds/components/define/button")
-    ]);
-  }, []);
-  return <Outlet />;
-}
-```
-
-### SvelteKit
-
-Use a `+layout.svelte` with a client-only block:
+## SvelteKit host-only example
 
 ```svelte title="src/routes/+layout.svelte"
 <script lang="ts">
@@ -203,6 +310,7 @@ Use a `+layout.svelte` with a client-only block:
   import "@fluid-ds/tokens/base.css";
 
   onMount(async () => {
+    await import("@fluid-ds/components/ssr-client");
     await Promise.all([
       import("@fluid-ds/icons/register-defaults"),
       import("@fluid-ds/components/define/button")
@@ -213,70 +321,38 @@ Use a `+layout.svelte` with a client-only block:
 <slot />
 ```
 
-### Plain Node + Express + Astro
+## Operational requirements
 
-If you're rendering HTML manually (Express + a templating engine,
-custom SSR), just emit the tags. They render fine; the client picks
-them up after the JS loads.
+- Load token CSS in the server-rendered document head so first paint has the correct values.
+- Keep server and browser package versions identical.
+- Register only the definitions a route or bundle needs when bundle size matters.
+- Preserve server-rendered input values before hydration. Browser gates should exercise
+  typed values, reloads, and browser autofill behavior.
+- Capture `console.error`, unhandled errors, and hydration warnings in end-to-end tests.
+- Test both a cold navigation and a client-side navigation.
 
-## Streaming SSR + React 19
+## Troubleshooting
 
-React 19 (and Next.js 15+) support **declarative shadow DOM** SSR for
-web components, meaning the shadow tree itself is rendered as
-`<template shadowrootmode="open">` in the SSR HTML. Fluid doesn't
-opt into this yet (it'd require shipping a separate SSR-flavoured
-build), but **standard SSR works fine without it**. The upgrade pattern
-above gets you 99% of the user-visible benefit.
+### `HTMLElement is not defined`
 
-If you have an explicit need for streaming HTML with the shadow tree
-included (no flash of unstyled custom element at all), open an issue:
-we'd take a contribution that adds opt-in DSD output.
+A dependency may be evaluating a browser-only base class, or an old Fluid build may be
+installed. For DSD rendering, load the SSR entry before component definitions. The current
+Node gate checks cold built imports without preloading the SSR shim, then uses
+the shim for a separate rendering phase. Inspect which phase failed before
+changing import order or introducing browser globals on the server.
 
-## Common gotchas
+### A declarative shadow root is missing
 
-### "ReferenceError: HTMLElement is not defined"
+Confirm that `@fluid-ds/components/ssr` was loaded before the matching `define/*` module and
+that the value was rendered through `renderFluid` or `renderFluidToString`.
 
-You imported a Fluid component on the server. Move the import to a
-client-only path (see the per-framework sections above).
+### The browser replaces server markup
 
-### Inputs lose value on hydration
+Confirm that `@fluid-ds/components/ssr-client` runs before every Fluid definition and that
+server and client resolve the same component version.
 
-You're controlling a `fluid-input` via React's `value` prop without
-setting the corresponding ref. React 19 handles this; React 18 needs
-a `useRef` + manual assignment. See the
-[React section in Framework integrations](/guides/frameworks/#react).
+### An input loses its value
 
-### Flash of unstyled custom element
-
-The `:not(:defined)` rule above eliminates the unstyled-then-styled
-flash. It's invisible to the user but visible in profiling tools.
-
-### CSS missing on first paint
-
-Make sure the token CSS files are imported at the top of your root
-layout. They have to be in the HTML head, not in a client-only
-component, because the server emits the markup before the client
-loads.
-
-## Hydration timing diagram
-
-```
-   Server                     Network               Browser
-─────────────────────────────────────────────────────────────────
-   render HTML       →        HTML payload    →    parse HTML
-   (unknown tags)                                  (unknown tags
-                                                    rendered as
-                                                    inline boxes)
-                                                          ↓
-                                                    JS bundle loads
-                                                          ↓
-                                                    customElements
-                                                    .define() runs
-                                                          ↓
-                                                    tags upgrade
-                                                    (instant restyling)
-```
-
-The window between "parse HTML" and "tags upgrade" is the FOUC window.
-On a fast connection it's invisible; on a slow connection, the
-`:not(:defined)` rule keeps it invisible too.
+Distinguish the initial attribute from the live property. Capture user-entered state before
+framework rerenders, avoid replacing the host node, and test the exact framework adapter in
+a real browser.

@@ -39,6 +39,7 @@ export class FluidSkeleton extends FluidElement {
     }
 
     .base {
+      box-sizing: border-box;
       width: 100%;
       height: 100%;
       background: var(--fluid-skeleton-color, var(--fluid-color-neutral-200));
@@ -89,6 +90,13 @@ export class FluidSkeleton extends FluidElement {
         animation: none;
       }
     }
+
+    @media (forced-colors: active) {
+      .base {
+        background: CanvasText;
+        border: 1px solid Canvas;
+      }
+    }
   `;
 
   /** Animation effect. */
@@ -103,7 +111,11 @@ export class FluidSkeleton extends FluidElement {
     if (!this.hasAttribute("role")) this.setAttribute("role", "status");
     if (!this.hasAttribute("aria-busy")) this.setAttribute("aria-busy", "true");
     if (!this.hasAttribute("aria-live")) this.setAttribute("aria-live", "polite");
-    if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Loading");
+    this.updateDefaultAriaLabel(this.term("loading"));
+  }
+
+  protected override updated(): void {
+    this.updateDefaultAriaLabel(this.term("loading"));
   }
 
   override render(): TemplateResult {

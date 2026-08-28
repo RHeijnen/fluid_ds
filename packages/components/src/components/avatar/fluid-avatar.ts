@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -129,12 +129,8 @@ export class FluidAvatar extends FluidElement {
 
   @state() private imageFailed = false;
 
-  protected override willUpdate(): void {
-    // Reset the failed-load flag if the image URL changed.
-    if (this.image && this.imageFailed) {
-      // Lit's @property setter doesn't memo changes, but we just want a chance
-      // to re-attempt the load when consumers swap the src.
-    }
+  protected override willUpdate(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has("image")) this.imageFailed = false;
   }
 
   /** Derive initials from `label` if `initials` wasn't provided. */
@@ -157,16 +153,12 @@ export class FluidAvatar extends FluidElement {
   override render(): TemplateResult {
     const initials = this.resolvedInitials();
     const showImage = this.image && !this.imageFailed;
-    const ariaLabel = this.label || (initials ? `Avatar: ${initials}` : "Avatar");
+    const ariaLabel =
+      this.label || (initials ? this.term("avatarWithInitials", initials) : this.term("avatar"));
     return html`
       <span part="base" class="base" role="img" aria-label=${ariaLabel}>
         ${showImage
-          ? html`<img
-              part="image"
-              src=${this.image}
-              alt=""
-              @error=${this.handleImageError}
-            />`
+          ? html`<img part="image" src=${this.image} alt="" @error=${this.handleImageError} />`
           : initials
             ? html`<span part="initials">${initials}</span>`
             : html`<slot name="icon"></slot>`}

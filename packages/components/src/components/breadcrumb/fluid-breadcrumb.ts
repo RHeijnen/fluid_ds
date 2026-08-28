@@ -35,32 +35,73 @@ export class FluidBreadcrumb extends FluidElement {
 
   /**
    * Accessible label for the nav landmark. Defaults to "Breadcrumb".
+   * The legacy `arialabel` attribute remains an alias for native `aria-label`.
    */
-  @property() override ariaLabel: string | null = "Breadcrumb";
+  @property({ attribute: "arialabel", noAccessor: true })
+  override get ariaLabel(): string | null {
+    return this.getAttribute("aria-label");
+  }
+  override set ariaLabel(value: string | null) {
+    if (value === null) this.removeAttribute("aria-label");
+    else this.setAttribute("aria-label", value);
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
-    if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Breadcrumb");
+    this.updateDefaultAriaLabel(this.term("breadcrumb"));
+    this.itemObserver?.disconnect();
+    if (typeof MutationObserver !== "undefined") {
+      this.itemObserver = new MutationObserver(() => this.reconcileItems());
+      this.itemObserver.observe(this, {
+        attributeFilter: ["current", "hidden"],
+        attributes: true,
+        subtree: true
+      });
+    }
+    this.reconcileItems();
   }
 
-  private handleSlotChange = () => {
-    // Mark the last item as current if no item is explicitly current.
-    const items = Array.from(
-      this.querySelectorAll<HTMLElement>("fluid-breadcrumb-item")
-    ) as FluidBreadcrumbItem[];
-    if (!items.length) return;
-    const anyExplicit = items.some((i) => i.hasAttribute("current"));
-    if (!anyExplicit) {
-      items[items.length - 1]!.current = true;
+  override disconnectedCallback(): void {
+    this.itemObserver?.disconnect();
+    super.disconnectedCallback();
+  }
+
+  protected override updated(): void {
+    this.updateDefaultAriaLabel(this.term("breadcrumb"));
+  }
+
+  private automaticCurrent?: FluidBreadcrumbItem;
+  private itemObserver?: MutationObserver;
+
+  private reconcileItems(): void {
+    const items = Array.from(this.children).filter(
+      (child): child is FluidBreadcrumbItem => child.localName === "fluid-breadcrumb-item"
+    );
+    const visibleItems = items.filter((item) => !item.hidden);
+    const last = visibleItems.at(-1);
+    const explicitCurrent = visibleItems.some(
+      (item) => item !== this.automaticCurrent && item.current
+    );
+
+    if (explicitCurrent) {
+      if (this.automaticCurrent) this.automaticCurrent.current = false;
+      this.automaticCurrent = undefined;
+    } else if (last !== this.automaticCurrent || !last?.current) {
+      if (this.automaticCurrent) this.automaticCurrent.current = false;
+      this.automaticCurrent = last;
+      if (last) last.current = true;
     }
+
     // Mark the visually-last item so it can hide its trailing separator.
     // (`::slotted()::part()` cannot reach a part in the nested shadow tree,
     // so the item itself owns the hide rule keyed off this attribute.)
-    items.forEach((item, index) => {
-      if (index === items.length - 1) item.setAttribute("data-fluid-last", "");
+    items.forEach((item) => {
+      if (item === last) item.setAttribute("data-fluid-last", "");
       else item.removeAttribute("data-fluid-last");
     });
-  };
+  }
+
+  private handleSlotChange = () => this.reconcileItems();
 
   override render(): TemplateResult {
     return html`

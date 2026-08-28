@@ -1,0 +1,1485 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/node-graph/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-node-graph",
+          "declaration": {
+            "name": "FluidNodeGraph",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/node-graph/fluid-node-graph.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An editable node graph: draggable nodes with typed connection ports, joined\nby Bezier edges. The graph knows nothing about what a node MEANS; a\n`nodeTypes` registry supplies each type's label, accent, height and port\ntopology, and a `renderNode` callback can take over the node body entirely.\nEverything domain-shaped stays in the consumer.\n\nPointer: drag a node by its body to move it (grid-snapped), drag empty\ncanvas to pan, wheel to zoom at the pointer, drag from an output port to a\nnode to connect, grab a connected input port to pick the connection up again\n(drop on empty canvas to remove it). Click a node or an edge to select it;\nDelete removes the selection.\n\nKeyboard, at full parity: Tab reaches every node and port. On a node, arrow\nkeys nudge by one grid step (Shift for four), Enter or Space selects, Delete\nremoves. On an output port, Enter starts a connection, ArrowUp / ArrowDown\ncycle through valid targets (previewed on the canvas), Enter connects and\nEscape cancels. On an input port, Enter selects the newest incoming\nconnection so Delete can remove it. On the canvas itself, arrows pan, plus\nand minus zoom, and Home fits the graph. Arrow movement, panning, ports and\ngraph coordinates are physical and remain unchanged in RTL. Every mutation\nis announced through a polite live region.\n\nThe component applies mutations to its own `nodes` / `edges` state and\nemits an event for each one, so a consumer can either treat it as the owner\nof the drawing or mirror every event into an external store.\n\nTraversal display is data, not behavior: paint per-node badges via\n`runStates` and dashed marching-ants edges via `traversedEdges`; the\ncomponent never runs a traversal itself.",
+          "name": "FluidNodeGraph",
+          "cssProperties": [
+            {
+              "description": "Canvas background. Falls back to --fluid-surface-subtle.",
+              "name": "--fluid-node-graph-bg"
+            },
+            {
+              "description": "Dot grid color. Falls back to --fluid-border-default.",
+              "name": "--fluid-node-graph-grid-color"
+            },
+            {
+              "description": "Node background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-node-graph-node-bg"
+            },
+            {
+              "description": "Node border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-node-graph-node-border"
+            },
+            {
+              "description": "Node corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-node-graph-node-radius"
+            },
+            {
+              "description": "Default edge stroke. Falls back to --fluid-text-secondary.",
+              "name": "--fluid-node-graph-edge-color"
+            },
+            {
+              "description": "Edge stroke width. Defaults to 2px.",
+              "name": "--fluid-node-graph-edge-width"
+            },
+            {
+              "description": "Node text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-node-graph-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The canvas viewport (the focusable, pannable surface).",
+              "name": "base"
+            },
+            {
+              "description": "A single node.",
+              "name": "node"
+            },
+            {
+              "description": "The content area of a node.",
+              "name": "node-body"
+            },
+            {
+              "description": "Every connection point button.",
+              "name": "port"
+            },
+            {
+              "description": "Every visible edge path.",
+              "name": "edge"
+            },
+            {
+              "description": "The node / edge / zoom readout overlay.",
+              "name": "hud"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "nodes",
+              "type": {
+                "text": "NodeGraphNode[]"
+              },
+              "default": "[]",
+              "description": "The nodes on the canvas. Set as a property."
+            },
+            {
+              "kind": "field",
+              "name": "edges",
+              "type": {
+                "text": "NodeGraphEdge[]"
+              },
+              "default": "[]",
+              "description": "The connections between nodes. Set as a property."
+            },
+            {
+              "kind": "field",
+              "name": "nodeTypes",
+              "type": {
+                "text": "Record<string, NodeGraphNodeType>"
+              },
+              "default": "{}",
+              "description": "Registry mapping a node's `type` to its label, accent, height and ports."
+            },
+            {
+              "kind": "field",
+              "name": "renderNode",
+              "type": {
+                "text": "(node: NodeGraphNode) => unknown | undefined"
+              },
+              "description": "Optional renderer for a node's body. Receives the node, returns Lit-renderable content."
+            },
+            {
+              "kind": "field",
+              "name": "runStates",
+              "type": {
+                "text": "Record<string, NodeGraphRunState>"
+              },
+              "default": "{}",
+              "description": "Per-node traversal paint state. Display only; the host runs the traversal."
+            },
+            {
+              "kind": "field",
+              "name": "traversedEdges",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "description": "Ids of edges to paint with the traversed (marching ants) style."
+            },
+            {
+              "kind": "field",
+              "name": "messages",
+              "type": {
+                "text": "Partial<NodeGraphMessages>"
+              },
+              "default": "{}",
+              "description": "Overrides for the announcement strings (localization)."
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name of the editor.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "grid",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Grid snap step in world pixels. 0 disables snapping.",
+              "attribute": "grid"
+            },
+            {
+              "kind": "field",
+              "name": "nodeWidth",
+              "type": {
+                "text": "number"
+              },
+              "default": "230",
+              "description": "Node width in world pixels. All nodes share one width.",
+              "attribute": "node-width"
+            },
+            {
+              "kind": "field",
+              "name": "minZoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.4",
+              "attribute": "min-zoom"
+            },
+            {
+              "kind": "field",
+              "name": "maxZoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "attribute": "max-zoom"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Blocks every mutation (move, connect, remove, drop). Pan, zoom and selection stay live.",
+              "attribute": "readonly",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "dropFormat",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"text/fluid-node-graph\"",
+              "description": "The dataTransfer type accepted on drop; matching drops emit fluid-node-drop.",
+              "attribute": "drop-format"
+            },
+            {
+              "kind": "field",
+              "name": "viewX",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "40"
+            },
+            {
+              "kind": "field",
+              "name": "viewY",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "20"
+            },
+            {
+              "kind": "field",
+              "name": "zoom",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "selectedNodeId",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "selectedEdgeId",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "linkPointer",
+              "type": {
+                "text": "{ x: number; y: number } | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "keyboardLink",
+              "type": {
+                "text": "KeyboardLink | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "liveAnnouncement",
+              "type": {
+                "text": "NodeGraphAnnouncement | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "drag",
+              "type": {
+                "text": "DragState | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "isCustomControl",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "typeOf",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "NodeGraphNodeType & typeof DEFAULT_TYPE"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "nodeById",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "NodeGraphNode | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "nodeTitle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "nodeHeight",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "outPorts",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "readonly NodeGraphPort[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "hasInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "portY",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                },
+                {
+                  "name": "portId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "portTone",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "NodeGraphTone"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                },
+                {
+                  "name": "portId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "portLabel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                },
+                {
+                  "name": "portId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "snap",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "msg",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "keyof NodeGraphMessages"
+                  }
+                },
+                {
+                  "name": "vars",
+                  "default": "{}",
+                  "type": {
+                    "text": "Record<string, string | number>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "announce",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "keyof NodeGraphMessages"
+                  }
+                },
+                {
+                  "name": "vars",
+                  "default": "{}",
+                  "type": {
+                    "text": "Record<string, string | number>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "name",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "detail",
+                  "type": {
+                    "text": "unknown"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "moveNode",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "announce",
+                  "default": "false"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeNode",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeEdge",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "connectNodes",
+              "return": {
+                "type": {
+                  "text": "NodeGraphEdge | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "port",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "to",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Create an edge if it is valid: the target must exist, accept input, not be\nthe source itself, and not already have this exact connection. Returns the\ncreated edge or null. Public so a consumer can connect programmatically\nthrough the same guards the gestures use."
+            },
+            {
+              "kind": "method",
+              "name": "setSelection",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nodeId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "edgeId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "canvasRect",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "DOMRect | undefined"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toWorld",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "{ x: number; y: number }"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "clientX",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "clientY",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emitViewport",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resetViewport",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reset pan and zoom to the initial viewport."
+            },
+            {
+              "kind": "method",
+              "name": "zoomBy",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "factor",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "centerX",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "centerY",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Multiply the zoom by a factor, keeping the given canvas point (or the center) fixed."
+            },
+            {
+              "kind": "method",
+              "name": "fitView",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Fit every node into view, clamped to the zoom range (and never past 1.25x)."
+            },
+            {
+              "kind": "method",
+              "name": "centerOn",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "nodeId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Center the viewport on a node at the current zoom."
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasPointerDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasPointerMove",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasPointerUp",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasWheel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "WheelEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasDragOver",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasDrop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCanvasKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onNodeKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "candidateTargets",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "port",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "startKeyboardLink",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "from",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "port",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "announceCandidate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "cancelKeyboardLink",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "announce",
+                  "default": "true"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onOutPortKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                },
+                {
+                  "name": "portId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onInPortKeyDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "edgePathFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "edge",
+                  "type": {
+                    "text": "NodeGraphEdge"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "previewPath",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderEdges",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderNodeElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "node",
+                  "type": {
+                    "text": "NodeGraphNode"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-connect",
+              "description": "An edge was created. detail: { id, from, port, to }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-edge-remove",
+              "description": "An edge was removed. detail: { id, from, port, to }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-node-drop",
+              "description": "Something was dropped on the canvas (see drop-format). detail: { data, x, y } in world coordinates.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-node-move",
+              "description": "A node moved. detail: { id, x, y }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-node-remove",
+              "description": "A node (and its edges) was removed. detail: { id }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-selection-change",
+              "description": "Selection changed. detail: { nodeId, edgeId } (either or both null).\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-viewport-change",
+              "description": "Pan or zoom settled. detail: { x, y, zoom }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name of the editor.",
+              "fieldName": "label"
+            },
+            {
+              "name": "grid",
+              "type": {
+                "text": "number"
+              },
+              "default": "8",
+              "description": "Grid snap step in world pixels. 0 disables snapping.",
+              "fieldName": "grid"
+            },
+            {
+              "name": "node-width",
+              "type": {
+                "text": "number"
+              },
+              "default": "230",
+              "description": "Node width in world pixels. All nodes share one width.",
+              "fieldName": "nodeWidth"
+            },
+            {
+              "name": "min-zoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.4",
+              "fieldName": "minZoom"
+            },
+            {
+              "name": "max-zoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "fieldName": "maxZoom"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Blocks every mutation (move, connect, remove, drop). Pan, zoom and selection stay live.",
+              "fieldName": "readonly"
+            },
+            {
+              "name": "drop-format",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"text/fluid-node-graph\"",
+              "description": "The dataTransfer type accepted on drop; matching drops emit fluid-node-drop.",
+              "fieldName": "dropFormat"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Accessible node graph editor with typed ports and Bezier edges.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-subtle",
+              "description": "Default canvas background."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Default node background."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Default node border and grid dots."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Default node text."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Default edge stroke, summaries, HUD."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Selection, focus rings, accent-toned ports."
+            },
+            {
+              "name": "--fluid-success-base",
+              "description": "Success-toned ports and edges."
+            },
+            {
+              "name": "--fluid-danger-base",
+              "description": "Danger-toned ports and edges."
+            },
+            {
+              "name": "--fluid-warning-base",
+              "description": "Warning-toned ports and edges."
+            },
+            {
+              "name": "--fluid-info-base",
+              "description": "Info-toned ports, edges and running badges."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Default node radius."
+            },
+            {
+              "name": "--fluid-radius-full",
+              "description": "HUD pill radius."
+            },
+            {
+              "name": "--fluid-space-1",
+              "description": "Small gaps."
+            },
+            {
+              "name": "--fluid-space-2",
+              "description": "Node padding."
+            },
+            {
+              "name": "--fluid-space-3",
+              "description": "HUD placement."
+            },
+            {
+              "name": "--fluid-shadow-sm",
+              "description": "Node elevation."
+            },
+            {
+              "name": "--fluid-font-family-sans",
+              "description": "Typography."
+            },
+            {
+              "name": "--fluid-font-size-sm",
+              "description": "Node titles."
+            },
+            {
+              "name": "--fluid-font-size-xs",
+              "description": "Summaries, port labels, HUD."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-focus-ring-offset",
+              "description": "Focus ring offset (scales with conformance)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum port target size (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-node-graph",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidNodeGraph",
+          "declaration": {
+            "name": "FluidNodeGraph",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidNodeGraph",
+          "declaration": {
+            "name": "FluidNodeGraph",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphEdge",
+          "declaration": {
+            "name": "NodeGraphEdge",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphMessages",
+          "declaration": {
+            "name": "NodeGraphMessages",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphNode",
+          "declaration": {
+            "name": "NodeGraphNode",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphNodeType",
+          "declaration": {
+            "name": "NodeGraphNodeType",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphPort",
+          "declaration": {
+            "name": "NodeGraphPort",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphRunState",
+          "declaration": {
+            "name": "NodeGraphRunState",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "NodeGraphTone",
+          "declaration": {
+            "name": "NodeGraphTone",
+            "module": "src/components/node-graph/fluid-node-graph.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

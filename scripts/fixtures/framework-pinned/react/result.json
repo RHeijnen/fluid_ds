@@ -1,0 +1,184 @@
+{
+  "fixture": "@fluid-ds/admin-react",
+  "status": "passed",
+  "lane": "latest-compatible",
+  "node": "v22.22.2",
+  "platform": "linux",
+  "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "passed"
+  },
+  "commandOutcomes": [
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69175,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 526
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69187,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1388
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69199,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3388
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69211,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 798
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69223,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 391
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69235,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 391
+    },
+    {
+      "stage": "install",
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69247,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3732
+    },
+    {
+      "stage": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69262,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2327
+    },
+    {
+      "stage": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 69287,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2935
+    }
+  ],
+  "browserRuntimeTested": true,
+  "browserRuntimeRequested": true,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": "From the toolchain checkout: node scripts/framework-runtime.mjs <retained-fixture-directory> <new-runtime-evidence-directory>. Requires the apps/a11y Playwright dependency and all three installed browser engines."
+}

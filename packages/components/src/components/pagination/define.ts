@@ -1,6 +1,6 @@
 import { FluidPagination } from "./fluid-pagination.js";
 
-if (!customElements.get("fluid-pagination")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-pagination")) {
   customElements.define("fluid-pagination", FluidPagination);
 }
 

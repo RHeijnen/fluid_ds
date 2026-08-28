@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -62,7 +62,7 @@ export class FluidAvatarGroup extends FluidElement {
 
     .base ::slotted(fluid-avatar:not(:first-child)),
     .overflow {
-      margin-left: calc(-1 * var(--fluid-avatar-group-overlap, 0.6rem));
+      margin-inline-start: calc(-1 * var(--fluid-avatar-group-overlap, 0.6rem));
     }
 
     /* Avatars beyond the max are removed from the layout AND the a11y tree. */
@@ -77,10 +77,7 @@ export class FluidAvatarGroup extends FluidElement {
       box-sizing: border-box;
       width: var(--avatar-size, 2.5rem);
       height: var(--avatar-size, 2.5rem);
-      background-color: var(
-        --fluid-avatar-group-overflow-bg,
-        var(--fluid-surface-muted)
-      );
+      background-color: var(--fluid-avatar-group-overflow-bg, var(--fluid-surface-muted));
       color: var(--fluid-avatar-group-overflow-fg, var(--fluid-text-primary));
       font-family: var(--fluid-font-family-sans);
       font-weight: var(--fluid-font-weight-semibold);
@@ -132,9 +129,7 @@ export class FluidAvatarGroup extends FluidElement {
     const slot = e.target as HTMLSlotElement;
     const avatars = slot
       .assignedElements({ flatten: true })
-      .filter(
-        (el): el is HTMLElement => el.tagName.toLowerCase() === "fluid-avatar"
-      );
+      .filter((el): el is HTMLElement => el.tagName.toLowerCase() === "fluid-avatar");
 
     this.applyToAvatars(avatars);
   };
@@ -194,15 +189,13 @@ export class FluidAvatarGroup extends FluidElement {
     if (!slot) return [];
     return slot
       .assignedElements({ flatten: true })
-      .filter(
-        (el): el is HTMLElement => el.tagName.toLowerCase() === "fluid-avatar"
-      );
+      .filter((el): el is HTMLElement => el.tagName.toLowerCase() === "fluid-avatar");
   }
 
-  override firstUpdated(): void {
-    // Compute the count and forward sizes on first render too, so the
-    // accessible name is correct even before the first slotchange is observed.
-    this.applyToAvatars(this.slottedAvatars());
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("max") || changed.has("size")) {
+      this.applyToAvatars(this.slottedAvatars());
+    }
   }
 
   private accessibleName(): string {
@@ -213,18 +206,10 @@ export class FluidAvatarGroup extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <span
-        part="base"
-        class="base"
-        role="group"
-        aria-label=${this.accessibleName()}
-      >
+      <span part="base" class="base" role="group" aria-label=${this.accessibleName()}>
         <slot @slotchange=${this.handleSlotChange}></slot>
         ${this.overflowCount > 0
-          ? html`<span
-              part="overflow"
-              class="overflow"
-              aria-hidden="true"
+          ? html`<span part="overflow" class="overflow" aria-hidden="true"
               >+${this.overflowCount}</span
             >`
           : ""}

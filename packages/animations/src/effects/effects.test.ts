@@ -192,6 +192,11 @@ describe("effects: colors override", () => {
 });
 
 describe("<fluid-celebrate>", () => {
+  it("passes an a11y audit as a non-visual behavior element", async () => {
+    const el = await fixture<FluidCelebrate>(html`<fluid-celebrate effect="confetti"></fluid-celebrate>`);
+    await expect(el).to.be.accessible();
+  });
+
   afterEach(restoreMatchMedia);
 
   it("upgrades and renders nothing visible", async () => {

@@ -3,6 +3,18 @@ import "./define.js";
 import type { FluidCopyButton } from "./fluid-copy-button.js";
 
 describe("<fluid-copy-button>", () => {
+  let clipboardDescriptor: PropertyDescriptor | undefined;
+  beforeEach(() => {
+    clipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+  });
+  afterEach(() => {
+    if (clipboardDescriptor) Object.defineProperty(navigator, "clipboard", clipboardDescriptor);
+    else Reflect.deleteProperty(navigator, "clipboard");
+    expect(Object.getOwnPropertyDescriptor(navigator, "clipboard")).to.deep.equal(
+      clipboardDescriptor
+    );
+  });
+
   it("renders a button", async () => {
     const el = await fixture<FluidCopyButton>(
       html`<fluid-copy-button value="hello"></fluid-copy-button>`

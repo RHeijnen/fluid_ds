@@ -1,6 +1,23 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
-import type { FluidDropzone } from "./fluid-dropzone.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
+import type {
+  FluidDropzone,
+  FluidDropzoneChangeDetail,
+  FluidDropzoneChangeEvent,
+  FluidDropzoneRejectDetail,
+  FluidDropzoneRejectEvent
+} from "../../index.js";
+
+const emptyDropzoneChange: FluidDropzoneChangeDetail = { files: [] };
+const emptyDropzoneReject: FluidDropzoneRejectDetail = { files: [], reason: "type" };
+// @ts-expect-error Reject reasons are the closed public type/size union.
+const invalidDropzoneReject: FluidDropzoneRejectDetail = { files: [], reason: "application" };
+void invalidDropzoneReject;
 
 const TOKENS =
   "--fluid-surface-base:#ffffff;--fluid-surface-muted:#f4f4f5;" +
@@ -25,6 +42,126 @@ function dropFiles(el: FluidDropzone, files: File[]): void {
 }
 
 describe("<fluid-dropzone>", () => {
+  describe("<fluid-dropzone> localized defaults", () => {
+    it("preserves application slot content while translating its default accessible label", async () => {
+      const control = await fixture<FluidDropzone>(
+        html`<fluid-dropzone lang="nl"><span>Application upload policy</span></fluid-dropzone>`
+      );
+      control.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      const slot = control.shadowRoot!.querySelector("slot")!;
+      expect(slot.assignedElements()[0]!.textContent).to.equal("Application upload policy");
+      expect(control.shadowRoot!.querySelector(".dropzone")!.getAttribute("aria-label")).to.equal(
+        "اسحب الملفات إلى هنا أو انقر لتصفحها"
+      );
+      control.querySelector("span")!.remove();
+      expect(slot.assignedElements()).to.have.length(0);
+      expect(slot.textContent!.trim()).to.equal("اسحب الملفات إلى هنا أو انقر لتصفحها");
+    });
+
+    const readLabels = (control: FluidDropzone) => [
+      control.shadowRoot!.querySelector(".dropzone")!.getAttribute("aria-label")
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Sleep bestanden hierheen of klik om te bladeren"]],
+      ["de", ["Dateien hierher ziehen oder zum Auswählen klicken"]],
+      ["fr", ["Déposez des fichiers ici ou cliquez pour parcourir"]],
+      ["es", ["Arrastra archivos aquí o haz clic para buscarlos"]],
+      ["ar", ["اسحب الملفات إلى هنا أو انقر لتصفحها"]],
+      ["fr-CA", ["Déposez des fichiers ici ou cliquez pour parcourir"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-dropzone></fluid-dropzone></div>
+        `);
+        const control = wrapper.querySelector<FluidDropzone>("fluid-dropzone")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.label).to.equal(expected[0]);
+        expect(control.hasAttribute("label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidDropzone>(html`<fluid-dropzone></fluid-dropzone>`);
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([
+        "Sleep bestanden hierheen of klik om te bladeren"
+      ]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([
+        "Dateien hierher ziehen oder zum Auswählen klicken"
+      ]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["اسحب الملفات إلى هنا أو انقر لتصفحها"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-dropzone></fluid-dropzone></div>
+      `);
+      const control = wrapper.querySelector<FluidDropzone>("fluid-dropzone")!;
+      control.label = "Drag files here or click to browse";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Drag files here or click to browse"]);
+      control.setAttribute("label", "Drag files here or click to browse");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Drag files here or click to browse"]);
+      control.removeAttribute("label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([
+        "Déposez des fichiers ici ou cliquez pour parcourir"
+      ]);
+      control.label = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([""]);
+      Reflect.set(control, "label", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["اسحب الملفات إلى هنا أو انقر لتصفحها"]);
+    });
+
+    it("localizes file-size punctuation live without changing filename or legacy unit semantics", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-dropzone></fluid-dropzone></div>
+      `);
+      const control = wrapper.querySelector<FluidDropzone>("fluid-dropzone")!;
+      dropFiles(control, [makeFile("Application 1.5.txt", "text/plain", 1536)]);
+      await elementUpdated(control);
+      expect(control.shadowRoot!.querySelector(".name")!.textContent).to.equal(
+        "Application 1.5.txt"
+      );
+      expect(control.shadowRoot!.querySelector(".size")!.textContent).to.equal("1.5 KB");
+      wrapper.lang = "fr";
+      await aTimeout(0);
+      await elementUpdated(control);
+      expect(control.shadowRoot!.querySelector(".size")!.textContent).to.equal("1,5 KB");
+      expect(control.shadowRoot!.querySelector(".name")!.textContent).to.equal(
+        "Application 1.5.txt"
+      );
+    });
+  });
+
   it("renders a focusable drop region with the button role", async () => {
     const el = await fixture<FluidDropzone>(html`<fluid-dropzone></fluid-dropzone>`);
     const zone = el.shadowRoot!.querySelector(".dropzone")!;
@@ -56,8 +193,9 @@ describe("<fluid-dropzone>", () => {
     setTimeout(() =>
       dropFiles(el, [makeFile("a.txt", "text/plain", 10), makeFile("b.txt", "text/plain", 20)])
     );
-    const event = await oneEvent(el, "fluid-change");
+    const event = (await oneEvent(el, "fluid-change")) as FluidDropzoneChangeEvent;
     expect(event.detail.files).to.have.lengthOf(2);
+    expect(emptyDropzoneChange).to.deep.equal({ files: [] });
     await elementUpdated(el);
     expect(el.shadowRoot!.querySelectorAll(".file")).to.have.lengthOf(2);
   });
@@ -77,15 +215,16 @@ describe("<fluid-dropzone>", () => {
       html`<fluid-dropzone accept="image/*"></fluid-dropzone>`
     );
     setTimeout(() => dropFiles(el, [makeFile("doc.txt", "text/plain", 10)]));
-    const event = await oneEvent(el, "fluid-reject");
-    expect(event.detail.reason).to.equal("type");
-    expect(event.detail.files).to.have.lengthOf(1);
+    const event = (await oneEvent(el, "fluid-reject")) as FluidDropzoneRejectEvent;
+    expect(event.detail).to.deep.equal({
+      files: [event.detail.files[0]],
+      reason: "type"
+    });
+    expect(emptyDropzoneReject).to.deep.equal({ files: [], reason: "type" });
   });
 
   it("rejects files larger than maxSize with reason 'size'", async () => {
-    const el = await fixture<FluidDropzone>(
-      html`<fluid-dropzone max-size="50"></fluid-dropzone>`
-    );
+    const el = await fixture<FluidDropzone>(html`<fluid-dropzone max-size="50"></fluid-dropzone>`);
     setTimeout(() => dropFiles(el, [makeFile("big.txt", "text/plain", 100)]));
     const event = await oneEvent(el, "fluid-reject");
     expect(event.detail.reason).to.equal("size");

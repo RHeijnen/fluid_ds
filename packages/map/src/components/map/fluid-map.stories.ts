@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import {
+  ensureOfflineMapStyles,
+  offlineMapAttribution,
+  offlineMapMarkers,
+  offlineMapTileUrl,
+  withOfflineMapAssets
+} from "./offline-story-fixture.js";
 
 const markers = [
   { lat: 51.505, lng: -0.09, label: "Centre" },
@@ -12,15 +19,20 @@ const meta: Meta = {
   title: "Map/Map",
   tags: ["autodocs"],
   parameters: { status: { type: "experimental" } },
-  render: () => html`
-    <fluid-map
-      label="Map of central London"
-      .center=${[51.505, -0.09]}
-      .zoom=${13}
-      .markers=${markers}
-      style="max-width: 40rem;"
-    ></fluid-map>
-  `
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        label="Map of central London"
+        .center=${[51.505, -0.09]}
+        .zoom=${13}
+        .markers=${withOfflineMapAssets(markers)}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
+        style="max-width: 40rem;"
+      ></fluid-map>
+    `;
+  }
 };
 
 export default meta;
@@ -28,51 +40,96 @@ type Story = StoryObj;
 
 export const Default: Story = {};
 
+/** No network tile provider, CDN styles or remote marker images are needed. */
+export const Offline: Story = {
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        tile-url=""
+        label="Offline delivery locations"
+        .center=${[51.505, -0.09]}
+        .zoom=${13}
+        .markers=${offlineMapMarkers}
+        style="width: 640px; max-width: 100%;"
+      ></fluid-map>
+    `;
+  }
+};
+
 export const NoMarkers: Story = {
-  render: () => html`
-    <fluid-map label="Empty map" .center=${[40.7128, -74.006]} .zoom=${11} style="max-width: 40rem;"></fluid-map>
-  `
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        label="Empty map"
+        .center=${[40.7128, -74.006]}
+        .zoom=${11}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
+        style="max-width: 40rem;"
+      ></fluid-map>
+    `;
+  }
 };
 
 export const ZoomedOut: Story = {
-  render: () => html`
-    <fluid-map
-      label="Map of Europe"
-      .center=${[50.0, 10.0]}
-      .zoom=${4}
-      .markers=${[{ lat: 48.8566, lng: 2.3522, label: "Paris" }, { lat: 52.52, lng: 13.405, label: "Berlin" }]}
-      style="max-width: 40rem;"
-    ></fluid-map>
-  `
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        label="Map of Europe"
+        .center=${[50.0, 10.0]}
+        .zoom=${4}
+        .markers=${withOfflineMapAssets([
+          { lat: 48.8566, lng: 2.3522, label: "Paris" },
+          { lat: 52.52, lng: 13.405, label: "Berlin" }
+        ])}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
+        style="max-width: 40rem;"
+      ></fluid-map>
+    `;
+  }
 };
 
 export const Tall: Story = {
-  render: () => html`
-    <fluid-map
-      label="Tall map"
-      .center=${[51.505, -0.09]}
-      .markers=${markers}
-      style="max-width: 40rem; --fluid-map-height: 32rem;"
-    ></fluid-map>
-  `
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        label="Tall map"
+        .center=${[51.505, -0.09]}
+        .markers=${withOfflineMapAssets(markers)}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
+        style="max-width: 40rem; --fluid-map-height: 32rem;"
+      ></fluid-map>
+    `;
+  }
 };
 
 /** Semantic tone pins: coloured Fluid pins that follow the active theme/brand. */
 export const TonedMarkers: Story = {
-  render: () => html`
-    <fluid-map
-      label="Map with toned markers"
-      .center=${[51.505, -0.09]}
-      .zoom=${13}
-      .markers=${[
-        { lat: 51.505, lng: -0.09, label: "Info", tone: "info" },
-        { lat: 51.515, lng: -0.1, label: "All good", tone: "success" },
-        { lat: 51.5, lng: -0.075, label: "Heads up", tone: "warning" },
-        { lat: 51.49, lng: -0.11, label: "Problem", tone: "danger" }
-      ]}
-      style="max-width: 40rem;"
-    ></fluid-map>
-  `
+  render: () => {
+    ensureOfflineMapStyles();
+    return html`
+      <fluid-map
+        label="Map with toned markers"
+        .center=${[51.505, -0.09]}
+        .zoom=${13}
+        .markers=${[
+          { lat: 51.505, lng: -0.09, label: "Info", tone: "info" },
+          { lat: 51.515, lng: -0.1, label: "All good", tone: "success" },
+          { lat: 51.5, lng: -0.075, label: "Heads up", tone: "warning" },
+          { lat: 51.49, lng: -0.11, label: "Problem", tone: "danger" }
+        ]}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
+        style="max-width: 40rem;"
+      ></fluid-map>
+    `;
+  }
 };
 
 /**
@@ -81,6 +138,7 @@ export const TonedMarkers: Story = {
  */
 export const CustomMarkers: Story = {
   render: () => {
+    ensureOfflineMapStyles();
     const pinSvg =
       "data:image/svg+xml," +
       encodeURIComponent(
@@ -101,6 +159,8 @@ export const CustomMarkers: Story = {
             icon: { iconUrl: pinSvg, iconSize: [32, 32], iconAnchor: [16, 16] }
           }
         ]}
+        .tileUrl=${offlineMapTileUrl}
+        .attribution=${offlineMapAttribution}
         style="max-width: 40rem;"
       ></fluid-map>
     `;

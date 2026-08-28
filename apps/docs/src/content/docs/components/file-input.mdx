@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-file-input>` is the file picker, a drag-and-drop zone that also accepts
 clicks, listing each selected file inline with a remove button. It's
 form-associated, so the selected files submit with the parent `<form>`.
@@ -29,6 +28,7 @@ form-associated, so the selected files submit with the parent `<form>`.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/file-input/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -40,6 +40,7 @@ form-associated, so the selected files submit with the parent `<form>`.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/file-input";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -79,16 +80,24 @@ Slot your own copy into `label` and `hint` to match your tone.
   </fluid-file-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-file-input accept="image/*">
+<ConformanceCode
+  code={`<fluid-file-input accept="image/*">
   <span slot="label">Drop your avatar here</span>
   <span slot="hint">PNG or JPG, up to 2 MB</span>
-</fluid-file-input>`} />
+</fluid-file-input>`}
+/>
 
 ## Listening for changes
 
 File-input fires **`fluid-change`** when the selected list changes.
 `detail.files` is a `File[]`; `detail.value` is a comma-separated filename
 string.
+
+The form's `FormData` is already synchronized when `fluid-change` fires, so a
+listener can read the selected files immediately. Single-file selection replaces
+the previous file. With `multiple`, later selections append to the current list.
+Removing a file emits the same event; `reset()` and native form reset clear the
+selection without emitting a change event.
 
 <Tabs syncKey="framework">
   <TabItem label="HTML">
@@ -102,6 +111,7 @@ string.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Uploader.tsx"
@@ -120,6 +130,7 @@ string.
       return <fluid-file-input ref={ref} aria-label="Upload" multiple />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Uploader.vue"
@@ -132,6 +143,7 @@ string.
       <fluid-file-input aria-label="Upload" multiple @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="uploader.component.ts"
@@ -150,6 +162,7 @@ string.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Uploader.svelte"
@@ -162,6 +175,7 @@ string.
 
     <fluid-file-input aria-label="Upload" multiple on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -175,6 +189,14 @@ document.querySelector("fluid-file-input").reset();
 
 The picker is form-associated: each file is appended to the submitted `FormData`
 under `name`, and `required` blocks submission until a file is chosen.
+Invalid submission focuses the visible drop zone, including application errors
+set with `setCustomValidity(message)`. Clear an application error with
+`setCustomValidity("")`; changing the locale does not clear it.
+
+When disabled, the picker and remove buttons cannot change the selection, and
+the control contributes no submitted files. Re-enabling preserves its selection.
+After keyboard removal, focus stays on a remaining remove button or returns to
+the drop zone when the list is empty.
 
 ```html
 <form enctype="multipart/form-data">
@@ -183,12 +205,19 @@ under `name`, and `required` blocks submission until a file is chosen.
 </form>
 ```
 
+Files are chosen in the browser, not preselected by server rendering. The
+client and declarative-shadow-DOM hydration contracts are tested separately;
+this does not imply support for restoring file selections across page reloads
+or adopting selections made before the component is registered. The `accept`
+attribute is a chooser hint, not content validation; validate uploads in your
+application too.
+
 ## When to use
 
 - Anywhere you'd reach for a native `<input type="file">` and want the drop-zone
   affordance, file listing, and theming on top.
 
-### When *not* to use
+### When _not_ to use
 
 - **Just a button** that opens the picker without a drop zone: wrap a hidden
   native input with [`<fluid-button>`](/components/button/).
@@ -209,8 +238,8 @@ override ladder). The **complete list** is in the [API table below](#api).
 ```
 
 <Aside type="tip">
-  Select a `fluid-file-input` in the [Theme builder](/playground/) to tweak the
-  drop zone, file rows, and focus tokens visually.
+  Select a `fluid-file-input` in the [Theme builder](/playground/) to tweak the drop zone, file
+  rows, and focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -231,14 +260,15 @@ the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Focus the drop zone, then each remove button. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Open the system file picker. |
+| Key                                 | Action                                        |
+| ----------------------------------- | --------------------------------------------- |
+| <kbd>Tab</kbd>                      | Focus the drop zone, then each remove button. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Open the system file picker.                  |
 
 Focus is always on the visible drop zone, so the focus indicator
 (`--fluid-file-input-focus-ring`) is the ring you see, never a hidden element.
 A `disabled` picker is removed from the tab order and ignores
+
 <kbd>Enter</kbd> / <kbd>Space</kbd>.
 
 Drag-and-drop sets a `dragging` state for visual feedback; the underlying input
@@ -267,10 +297,10 @@ picker blocks form submission.
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

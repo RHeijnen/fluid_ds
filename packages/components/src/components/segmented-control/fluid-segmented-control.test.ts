@@ -1,6 +1,7 @@
-import { expect, fixture, html, oneEvent } from "@open-wc/testing";
+import { aTimeout, expect, fixture, html, oneEvent } from "@open-wc/testing";
 import "./define.js";
 import type { FluidSegmentedControl } from "./fluid-segmented-control.js";
+import type { FluidSegment } from "./fluid-segment.js";
 
 const sample = html`
   <fluid-segmented-control aria-label="View" value="grid">
@@ -68,6 +69,152 @@ describe("<fluid-segmented-control>", () => {
     await el.updateComplete;
     expect(el.value).to.equal("grid");
   });
+
+  it("falls back without emitting when the selected segment is disabled or removed", async () => {
+    let changes = 0;
+    const el = await fixture<FluidSegmentedControl>(html`
+      <fluid-segmented-control aria-label="View" value="grid" @fluid-change=${() => changes++}>
+        <fluid-segment value="list">List</fluid-segment>
+        <fluid-segment value="grid">Grid</fluid-segment>
+        <fluid-segment value="board">Board</fluid-segment>
+      </fluid-segmented-control>
+    `);
+    const segments = Array.from(el.querySelectorAll("fluid-segment"));
+
+    segments[1]!.setAttribute("disabled", "");
+    await aTimeout(0);
+    await el.updateComplete;
+
+    expect(el.value).to.equal("list");
+    expect(segments[0]!.getAttribute("aria-checked")).to.equal("true");
+    expect(segments[1]!.getAttribute("aria-checked")).to.equal("false");
+    expect(changes).to.equal(0);
+
+    segments[0]!.remove();
+    await aTimeout(0);
+    await el.updateComplete;
+
+    expect(el.value).to.equal("board");
+    expect(segments[2]!.getAttribute("aria-checked")).to.equal("true");
+    expect(segments[2]!.tabIndex).to.equal(0);
+    expect(changes).to.equal(0);
+  });
+
+  it("recovers selection after every option is disabled and after reconnect", async () => {
+    const el = await fixture<FluidSegmentedControl>(sample);
+    const segments = Array.from(el.querySelectorAll("fluid-segment"));
+    segments[0]!.setAttribute("disabled", "");
+    segments[1]!.setAttribute("disabled", "");
+    await aTimeout(0);
+    await el.updateComplete;
+
+    expect(el.value).to.equal("");
+    expect(segments.every((segment) => segment.getAttribute("aria-checked") === "false")).to.equal(
+      true
+    );
+
+    el.remove();
+    segments[2]!.removeAttribute("disabled");
+    document.body.append(el);
+    await el.updateComplete;
+
+    expect(el.value).to.equal("kanban");
+    expect(segments[2]!.getAttribute("aria-checked")).to.equal("true");
+    expect(segments[2]!.tabIndex).to.equal(0);
+  });
+
+  it("keeps a standalone segment inert through removal and reconnect", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div><fluid-segment value="orphan" selected>Orphan</fluid-segment></div>
+    `);
+    const segment = wrapper.querySelector<FluidSegment>("fluid-segment")!;
+    await segment.updateComplete;
+    expect(segment.selected).to.be.false;
+    expect(segment.getAttribute("aria-checked")).to.equal("false");
+    expect(segment.tabIndex).to.equal(-1);
+
+    segment.remove();
+    segment.selected = true;
+    wrapper.append(segment);
+    await segment.updateComplete;
+    expect(segment.selected).to.be.false;
+    expect(segment.getAttribute("aria-checked")).to.equal("false");
+    expect(segment.tabIndex).to.equal(-1);
+  });
+
+  it("releases a selected segment removed from its controlling group", async () => {
+    const el = await fixture<FluidSegmentedControl>(sample);
+    const selected = el.querySelector<FluidSegment>('[value="grid"]')!;
+    selected.remove();
+    await aTimeout(0);
+    await selected.updateComplete;
+
+    expect(selected.selected).to.be.false;
+    expect(selected.getAttribute("aria-checked")).to.equal("false");
+    expect(selected.tabIndex).to.equal(-1);
+    expect(el.value).to.equal("list");
+  });
+
+  for (const [key, expected] of [
+    ["ArrowRight", "board"],
+    ["ArrowLeft", "list"],
+    ["ArrowDown", "board"],
+    ["ArrowUp", "list"],
+    ["Home", "list"],
+    ["End", "board"]
+  ] as const) {
+    it(`${key} selects and focuses the expected enabled segment`, async () => {
+      const el = await fixture<FluidSegmentedControl>(html`
+        <fluid-segmented-control aria-label="View" value="grid">
+          <fluid-segment value="list">List</fluid-segment>
+          <fluid-segment value="grid">Grid</fluid-segment>
+          <fluid-segment value="disabled" disabled>Disabled</fluid-segment>
+          <fluid-segment value="board">Board</fluid-segment>
+        </fluid-segmented-control>
+      `);
+      const current = el.querySelector<FluidSegment>('[value="grid"]')!;
+      const changes: CustomEvent[] = [];
+      el.addEventListener("fluid-change", (event) => changes.push(event as CustomEvent));
+      current.focus();
+      current.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+      await el.updateComplete;
+
+      const selected = el.querySelector<FluidSegment>(`[value="${expected}"]`)!;
+      expect(el.value).to.equal(expected);
+      expect(document.activeElement).to.equal(selected);
+      expect(selected.selected).to.be.true;
+      expect(selected.tabIndex).to.equal(0);
+      expect(changes.map((event) => event.detail)).to.deep.equal([{ value: expected }]);
+    });
+  }
+
+  for (const [key, expected] of [
+    ["ArrowRight", "list"],
+    ["ArrowLeft", "board"]
+  ] as const) {
+    it(`${key} follows the rendered segment order in inherited RTL`, async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div dir="rtl">
+          <fluid-segmented-control aria-label="View" value="grid">
+            <fluid-segment value="list">List</fluid-segment>
+            <fluid-segment value="grid">Grid</fluid-segment>
+            <fluid-segment value="board">Board</fluid-segment>
+          </fluid-segmented-control>
+        </div>
+      `);
+      const el = wrapper.querySelector<FluidSegmentedControl>("fluid-segmented-control")!;
+      const current = el.querySelector<FluidSegment>('[value="grid"]')!;
+      await aTimeout(0);
+      current.focus();
+      current.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+      await el.updateComplete;
+
+      const selected = el.querySelector<FluidSegment>(`[value="${expected}"]`)!;
+      expect(el.value).to.equal(expected);
+      expect(document.activeElement).to.equal(selected);
+      expect(selected.selected).to.be.true;
+    });
+  }
 
   it("passes a11y audit", async () => {
     const el = await fixture<FluidSegmentedControl>(sample);

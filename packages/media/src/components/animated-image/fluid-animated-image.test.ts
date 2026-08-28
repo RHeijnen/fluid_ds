@@ -7,6 +7,13 @@ const SRC =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 describe("<fluid-animated-image>", () => {
+  it("passes an a11y audit with alternative text and playback control", async () => {
+    const el = await fixture<FluidAnimatedImage>(html`
+      <fluid-animated-image src=${SRC} alt="Decorative loading sequence"></fluid-animated-image>
+    `);
+    await expect(el).to.be.accessible();
+  });
+
   it("fires fluid-load when the image finishes loading", async () => {
     const el = await fixture<FluidAnimatedImage>(
       html`<fluid-animated-image alt="anim"></fluid-animated-image>`

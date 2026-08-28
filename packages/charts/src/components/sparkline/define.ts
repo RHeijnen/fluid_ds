@@ -1,6 +1,6 @@
 import { FluidSparkline } from "./fluid-sparkline.js";
 
-if (!customElements.get("fluid-sparkline")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-sparkline")) {
   customElements.define("fluid-sparkline", FluidSparkline);
 }
 

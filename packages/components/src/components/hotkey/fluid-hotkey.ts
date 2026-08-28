@@ -55,6 +55,7 @@ export class FluidHotkey extends FluidElement {
   whenInput = false;
 
   private attachedTarget: EventTarget | null = null;
+  private disposeTarget?: () => void;
   private boundHandler = (event: KeyboardEvent): void => this.handleKeydown(event);
 
   /** Parsed sequence of chords; each chord is a Set of normalized tokens. */
@@ -135,12 +136,13 @@ export class FluidHotkey extends FluidElement {
     const target = this.resolveTarget();
     if (!target) return;
     this.attachedTarget = target;
-    target.addEventListener("keydown", this.boundHandler as EventListener);
+    this.disposeTarget = this.listen(target, "keydown", this.boundHandler);
   }
 
   private detach(): void {
     if (!this.attachedTarget) return;
-    this.attachedTarget.removeEventListener("keydown", this.boundHandler as EventListener);
+    this.disposeTarget?.();
+    this.disposeTarget = undefined;
     this.attachedTarget = null;
   }
 

@@ -17,6 +17,7 @@
     "@fluid-ds/components": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
     "@fluid-ds/markdown": "workspace:*",
+    "@fluid-ds/table": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",
     "lit": "^3.2.1"
@@ -24,6 +25,6 @@
   "devDependencies": {
     "@types/node": "^22.10.5",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^6.4.3"
   }
 }

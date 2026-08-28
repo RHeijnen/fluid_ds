@@ -1,0 +1,4 @@
+{
+  "rasterThreads": 1,
+  "chromiumLaunchArgs": ["--num-raster-threads=1"]
+}

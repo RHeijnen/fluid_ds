@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fluid-web.dev/schemas/quality-exceptions.schema.json",
+  "title": "Fluid quality exceptions",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["accessibility"],
+  "properties": {
+    "accessibility": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/exception" }
+    }
+  },
+  "$defs": {
+    "exception": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "reason", "issue", "owner", "reviewAfter"],
+      "properties": {
+        "tag": { "type": "string", "pattern": "^fluid-[a-z0-9-]+$" },
+        "reason": { "type": "string", "minLength": 20 },
+        "issue": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "reviewAfter": { "type": "string", "format": "date" }
+      }
+    }
+  }
+}

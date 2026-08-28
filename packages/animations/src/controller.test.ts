@@ -195,6 +195,7 @@ describe("controller: triggers", () => {
       el.dispatchEvent(new PointerEvent("pointerenter"));
       const anims = el.getAnimations();
       expect(anims.length).to.equal(1);
+      if (!anims[0]) throw new Error("Expected the pointer-triggered animation");
       // FADE is finite (200ms); the stale SPIN would be Infinity. Asserting the
       // resolved-at-fire-time def means we get FADE's timing, not SPIN's.
       expect(anims[0].effect!.getTiming().duration).to.equal(200);

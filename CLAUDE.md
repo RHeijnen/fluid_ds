@@ -53,8 +53,25 @@ regenerate it from this list.
 
 - `pnpm dev`: Storybook + playground together.
 - `pnpm build` / `pnpm typecheck` / `pnpm test`.
-- `pnpm verify`: full gate of typecheck → lint → check:coverage → check:tokens →
-  test → build.
+- `pnpm verify`: workspace and browser-test typechecks, lint, presence/quality,
+  canonical manifests, framework/test-harness guards, tokens, serialized unit
+  matrix, build, cold Node SSR/rendering, and built documentation links. See the
+  root `package.json` for exact ordering. Browser SSR, accessibility, visual,
+  packed-framework runtime and measured coverage have additional dedicated gates;
+  a passing `verify` alone is not production certification.
+- Supervised unit-test cleanup currently has Windows native-handle and Linux
+  pidfd implementations. Linux requires Python with `os.pidfd_open` and
+  `signal.pidfd_send_signal`; CI configures Python 3.13. The baseline native Linux
+  controls and expanded watchdog guards pass on Python 3.12.3 (39 applicable
+  checks, with one Windows-only skip).
+  Other operating systems fail closed
+  before supervised execution rather than falling back to PID-tree cleanup.
+  Stock watch-mode execution is not an equivalent lifecycle-certification gate.
+  Batch mode has a separate 30-second startup watchdog, unchanged 30-second
+  shutdown deadline and 10-second inventory/cleanup operation bounds. A timeout
+  remains a failure; unavailable process inventory is unknown, not empty.
+  See `docs/reviews/windows-webkit-teardown-2026-08-26.md` for the retained
+  Windows failures and the separate ownership-safety incident.
 - `pnpm check:coverage`: every component must have a `.stories.ts`, a docs
   `.mdx` page (`apps/docs/src/content/docs/components/<name>.mdx`), AND appear in
   the playground preview (`apps/playground/src/preview.ts`). Missing any of the

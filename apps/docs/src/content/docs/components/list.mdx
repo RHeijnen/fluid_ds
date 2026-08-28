@@ -109,6 +109,10 @@ A bare list with no frame or dividers. Set `bordered` and `divided` to add them.
 
 Each row composes four regions. The leading and trailing slots stay out of the
 text column; the trailing slot is for meta text or action controls.
+For interactive and link rows, trailing content is a sibling of the row's
+button or anchor, not nested inside it. Activating a trailing action does not
+emit the row's `fluid-select`; its own disabled state is controlled by the
+consumer independently of the row.
 
 <Demo>
   <fluid-list label="Files" bordered divided style="max-width: 28rem;">

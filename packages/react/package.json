@@ -1,0 +1,167 @@
+{
+  "name": "@fluid-ds/react",
+  "version": "0.4.0",
+  "description": "Generated React 19 wrappers and JSX types for Fluid web components.",
+  "fluidIntegration": "react",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "react",
+    "react-components",
+    "web-components",
+    "design-system",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "node": "./dist/index.js",
+      "import": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./src/generated/*.ts",
+      "import": "./src/generated/*.ts"
+    },
+    "./jsx": {
+      "types": "./src/jsx.ts",
+      "import": "./src/jsx.ts"
+    },
+    "./jsx/*": {
+      "types": "./src/jsx/*.ts",
+      "import": "./src/jsx/*.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./*": {
+        "types": "./dist/generated/*.d.ts",
+        "import": "./dist/generated/*.js"
+      },
+      "./jsx": {
+        "types": "./dist/jsx.d.ts",
+        "import": "./dist/jsx.js"
+      },
+      "./jsx/*": {
+        "types": "./dist/jsx/*.d.ts",
+        "import": "./dist/jsx/*.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "generate": "node ./scripts/generate.mjs",
+    "build": "pnpm generate && tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "node ./scripts/check-generated.mjs && node --test scripts/event-props.test.mjs scripts/generated-output.test.mjs && tsc --noEmit"
+  },
+  "dependencies": {
+    "@lit/react": "^1.0.8"
+  },
+  "peerDependencies": {
+    "@fluid-ds/animations": "^0.4.0",
+    "@fluid-ds/calendar": "^0.4.0",
+    "@fluid-ds/charts": "^0.4.0",
+    "@fluid-ds/components": "^0.4.0",
+    "@fluid-ds/editor": "^0.4.0",
+    "@fluid-ds/kanban": "^0.4.0",
+    "@fluid-ds/map": "^0.4.0",
+    "@fluid-ds/markdown": "^0.4.0",
+    "@fluid-ds/media": "^0.4.0",
+    "@fluid-ds/node-graph": "^0.4.0",
+    "@fluid-ds/parser": "^0.4.0",
+    "@fluid-ds/qr": "^0.4.0",
+    "@fluid-ds/scheduler": "^0.4.0",
+    "@fluid-ds/table": "^0.4.0",
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@fluid-ds/animations": {
+      "optional": true
+    },
+    "@fluid-ds/calendar": {
+      "optional": true
+    },
+    "@fluid-ds/charts": {
+      "optional": true
+    },
+    "@fluid-ds/components": {
+      "optional": true
+    },
+    "@fluid-ds/editor": {
+      "optional": true
+    },
+    "@fluid-ds/kanban": {
+      "optional": true
+    },
+    "@fluid-ds/map": {
+      "optional": true
+    },
+    "@fluid-ds/markdown": {
+      "optional": true
+    },
+    "@fluid-ds/media": {
+      "optional": true
+    },
+    "@fluid-ds/node-graph": {
+      "optional": true
+    },
+    "@fluid-ds/parser": {
+      "optional": true
+    },
+    "@fluid-ds/qr": {
+      "optional": true
+    },
+    "@fluid-ds/scheduler": {
+      "optional": true
+    },
+    "@fluid-ds/table": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@fluid-ds/animations": "0.4.0",
+    "@fluid-ds/calendar": "0.4.0",
+    "@fluid-ds/charts": "0.4.0",
+    "@fluid-ds/components": "0.4.0",
+    "@fluid-ds/editor": "0.4.0",
+    "@fluid-ds/kanban": "0.4.0",
+    "@fluid-ds/map": "0.4.0",
+    "@fluid-ds/markdown": "0.4.0",
+    "@fluid-ds/media": "0.4.0",
+    "@fluid-ds/node-graph": "0.4.0",
+    "@fluid-ds/parser": "0.4.0",
+    "@fluid-ds/qr": "0.4.0",
+    "@fluid-ds/scheduler": "0.4.0",
+    "@fluid-ds/table": "0.4.0",
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.7.2"
+  }
+}

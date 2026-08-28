@@ -105,6 +105,27 @@ export class FluidSegment extends FluidElement {
     super.connectedCallback();
     this.setAttribute("role", "radio");
     if (!this.id) this.id = `fluid-segment-${++counter}`;
+    if (typeof this.closest === "function" && !this.closest("fluid-segmented-control")) {
+      this.selected = false;
+    }
+  }
+
+  override disconnectedCallback(): void {
+    // Selection and roving tabindex are owned by the segmented-control. A
+    // removed segment must not remain an orphaned checked radio/tab stop.
+    this.selected = false;
+    super.disconnectedCallback();
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed);
+    if (
+      changed.has("selected") &&
+      typeof this.closest === "function" &&
+      !this.closest("fluid-segmented-control")
+    ) {
+      this.selected = false;
+    }
   }
 
   protected override updated(changed: PropertyValues<this>): void {

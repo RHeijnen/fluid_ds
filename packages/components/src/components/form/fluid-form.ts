@@ -2,6 +2,17 @@ import { html, css, type TemplateResult } from "lit";
 import { property, query } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
+export interface FluidFormSubmitDetail {
+  values: { [name: string]: string | string[] };
+}
+
+export interface FluidFormInvalidDetail {
+  invalid: HTMLElement;
+}
+
+export type FluidFormSubmitEvent = CustomEvent<FluidFormSubmitDetail>;
+export type FluidFormInvalidEvent = CustomEvent<FluidFormInvalidDetail>;
+
 /**
  * A thin wrapper around a native `<form>` that coordinates Fluid
  * form-associated controls. It is standards-based: it renders a real
@@ -45,10 +56,10 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-space-4 - Default vertical gap between fields.
  * @uses-token --fluid-space-2 - Default actions gap and top margin.
  *
- * @fires fluid-submit - Dispatched on a valid submit. `detail.values` is a
+ * @fires {FluidFormSubmitEvent} fluid-submit - Dispatched on a valid submit. `detail.values` is a
  *   plain object collected from the named light-DOM controls. Repeated field
  *   names collapse to a string array.
- * @fires fluid-invalid - Dispatched when submit is blocked by an invalid
+ * @fires {FluidFormInvalidEvent} fluid-invalid - Dispatched when submit is blocked by an invalid
  *   control. `detail.invalid` is the first invalid element (already focused).
  */
 export class FluidForm extends FluidElement {
@@ -85,6 +96,7 @@ export class FluidForm extends FluidElement {
   `;
 
   @query("form") private formEl!: HTMLFormElement;
+  private connectionVersion = 0;
 
   /**
    * Skip the validity gate. When set, submit always emits `fluid-submit`
@@ -134,7 +146,9 @@ export class FluidForm extends FluidElement {
    * expose a `name` attribute plus a `.value` property).
    */
   private lightControls(): Element[] {
-    return Array.from(this.querySelectorAll("[name]"));
+    return Array.from(this.querySelectorAll("[name]")).filter(
+      (element) => element.closest("fluid-form") === this
+    );
   }
 
   /**
@@ -187,19 +201,21 @@ export class FluidForm extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.connectionVersion++;
     // The submit button and the editable controls live in the light DOM, not
     // inside our shadow `<form>`, so the platform never wires them to that form.
     // We listen on the host instead: a click on a `type="submit"` control, or
     // Enter pressed in a single-line text field, drives the same gate as
     // `submit()`.
-    this.addEventListener("click", this.handleClick);
-    this.addEventListener("keydown", this.handleKeydown);
+    this.listen(this, "click", this.handleClick);
+    this.listen(this, "keydown", this.handleKeydown);
   }
 
   override disconnectedCallback(): void {
+    // Invalidate microtasks captured by this connection. Lifecycle teardown
+    // must cancel pending async work, even if this instance reconnects later.
+    this.connectionVersion++;
     super.disconnectedCallback();
-    this.removeEventListener("click", this.handleClick);
-    this.removeEventListener("keydown", this.handleKeydown);
   }
 
   private handleClick = (event: MouseEvent): void => {
@@ -251,17 +267,22 @@ export class FluidForm extends FluidElement {
    * what a host expects when it reacts to a submit via fetch or routing.
    */
   private triggerSubmit(): void {
+    const connectionVersion = this.connectionVersion;
     if (!this.novalidate) {
       const invalid = this.firstInvalid();
       if (invalid) {
         // reportValidity surfaces the native validity UI where supported.
-        if (typeof (invalid as HTMLElement & { reportValidity?: () => boolean }).reportValidity === "function") {
+        if (
+          typeof (invalid as HTMLElement & { reportValidity?: () => boolean }).reportValidity ===
+          "function"
+        ) {
           (invalid as HTMLElement & { reportValidity: () => boolean }).reportValidity();
         }
         invalid.focus();
         queueMicrotask(() => {
+          if (!this.isConnected || this.connectionVersion !== connectionVersion) return;
           this.dispatchEvent(
-            new CustomEvent("fluid-invalid", {
+            new CustomEvent<FluidFormInvalidDetail>("fluid-invalid", {
               detail: { invalid },
               bubbles: true,
               composed: true
@@ -274,8 +295,9 @@ export class FluidForm extends FluidElement {
 
     const values = this.collectValues();
     queueMicrotask(() => {
+      if (!this.isConnected || this.connectionVersion !== connectionVersion) return;
       this.dispatchEvent(
-        new CustomEvent("fluid-submit", {
+        new CustomEvent<FluidFormSubmitDetail>("fluid-submit", {
           detail: { values },
           bubbles: true,
           composed: true
@@ -286,12 +308,7 @@ export class FluidForm extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <form
-        part="base"
-        class="base"
-        novalidate
-        @submit=${this.handleSubmit}
-      >
+      <form part="base" class="base" novalidate @submit=${this.handleSubmit}>
         <slot></slot>
         <div part="actions" class="actions">
           <slot name="actions"></slot>
@@ -306,7 +323,7 @@ export class FluidForm extends FluidElement {
 /** A control is skipped when it (or a participating fieldset) is disabled. */
 function isDisabled(el: Element): boolean {
   const candidate = el as Element & { disabled?: boolean };
-  return candidate.disabled === true;
+  return candidate.disabled === true || el.matches(":disabled");
 }
 
 /**

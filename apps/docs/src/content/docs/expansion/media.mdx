@@ -35,10 +35,10 @@ import "@fluid-ds/media/define/lightbox";
 
 | Tag | Use |
 | --- | --- |
-| `<fluid-video>` | Themed wrapper around native `<video>` with consistent focus rings + control styling. |
+| `<fluid-video>` | Themed video surface with browser-native playback controls. |
 | `<fluid-video-playlist>` | Playlist-driven video player with auto-advance. |
 | `<fluid-animated-image>` | GIF / APNG / animated WebP with play/pause control (canvas-snapshot trick). |
-| `<fluid-zoomable-frame>` | Pan + zoom container for images, iframes, SVG. Scroll wheel + drag. |
+| `<fluid-zoomable-frame>` | Pan + zoom container with wheel, drag, and native zoom/pan buttons. |
 | `<fluid-audio>` | Themed audio player: custom play/pause, seek slider with time, mute. |
 | `<fluid-lightbox>` | Thumbnail gallery that opens images in a modal lightbox (top-layer `<dialog>`, prev/next, Escape). |
 
@@ -79,8 +79,55 @@ array, not an HTML attribute), so set it from script after the element upgrades:
 </script>
 ```
 
-When `auto-advance` is set, the playlist plays the next entry once the current
-one ends.
+`autoAdvance` defaults to `true`: the playlist selects the next entry when the
+current clip ends. Set the JavaScript property to `false` to disable it. `loop`
+wraps from the last entry to the first. Each track is a native button with
+`aria-pressed`, and the current title names the video. `goTo(index)` ignores
+out-of-range, fractional, or non-finite indexes. Selection remains usable after
+removing and reconnecting the playlist.
+
+### Video sources, captions, and lifecycle
+
+Use `label` to name a player and provide captions for speech. Direct child
+`source` and `track` elements are mirrored into the native video, because native
+media selection does not traverse shadow slots. The original consumer nodes
+remain in the light DOM; changes to their attributes are synchronized.
+
+```html
+<fluid-video label="Product introduction" controls>
+  <source src="/intro.webm" type="video/webm" />
+  <source src="/intro.mp4" type="video/mp4" />
+  <track kind="captions" src="/intro.en.vtt" srclang="en" label="English" default />
+</fluid-video>
+```
+
+`play()` returns the native playback promise, including autoplay or decoder
+rejections. Handle that promise in application code. `pause()` and `load()`
+delegate to the native player; `nativeElement` exposes its time, error, and text
+track APIs. Removing a player pauses playback. Native controls and codec support
+remain browser-specific, not a cross-browser custom controls implementation.
+
+The `default` track attribute does not force captions on against native browser
+selection preferences. A disabled track may not fetch its cues until selected.
+Use the native caption controls, or explicitly select a track through
+`nativeElement.textTracks[index].mode = "showing"` when implementing application
+controls. Automated checks verify selected, fetched cues during playback; they
+do not certify automatic caption selection or caption quality.
+
+### Pan without dragging
+
+The default controls include zoom out, reset, zoom in, and four pan directions.
+Tab visits each native button; Enter or Space activates it. Pan buttons move by
+`pan-step` CSS pixels (40 by default). `panBy(x, y)` provides the same movement
+for application controls. Panning is intentionally unbounded; reset clears both
+offsets and restores scale 1, constrained to the configured zoom bounds.
+
+The seven accessible names can be overridden with `zoom-in-label`,
+`zoom-out-label`, `reset-label`, `pan-left-label`, `pan-right-label`,
+`pan-up-label`, and `pan-down-label`. These are consumer-supplied translations:
+the standalone media package does not yet subscribe to core locale bundles.
+When using `no-controls`, provide equivalent keyboard and single-pointer
+controls in the application; wheel and drag alone are not sufficient.
 
 `<fluid-audio>` wraps a native `<audio>` element for playback but draws its own
 accessible controls (the play button is labelled by state, the scrubber is a
@@ -107,6 +154,14 @@ generated tables in each component's reference.
 - Anywhere you'd reach for native media elements but want consistent
   styling, focus behavior, and pause / play semantics across browsers
   and animation formats.
+
+## Accessibility verification
+
+Automated contracts exercise local video decoding, caption cues, selection,
+native keyboard activation, drag cancellation, reconnect, and pan buttons.
+They do not replace caption-quality review or screen-reader and cross-browser
+testing. Zoom controls use `--fluid-target-min` for the conformance-aware target
+floor. A production accessibility sign-off is still pending.
 
 ## License
 

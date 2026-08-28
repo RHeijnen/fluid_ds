@@ -1,23 +1,16 @@
-import { playwrightLauncher } from "@web/test-runner-playwright";
+import {
+  fluidMochaFramework,
+  fluidPlaywrightLauncher
+} from "../../scripts/web-test-runner-lifecycle.mjs";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
+import { fluidCoverage } from "../../scripts/web-test-runner-coverage.mjs";
+import { resolveTestBrowsers } from "../../scripts/resolve-test-browsers.mjs";
 
 /**
  * Browser matrix mirrors @fluid-ds/components: Chromium locally for a fast inner
  * loop, all three engines in CI via FLUID_BROWSERS=all. marked is pure ESM, so
  * unlike the qr pack we need no CommonJS interop plugin here.
  */
-const ALL = ["chromium", "firefox", "webkit"];
-
-function resolveBrowsers() {
-  const raw = process.env.FLUID_BROWSERS?.trim().toLowerCase();
-  if (!raw || raw === "chromium") return ["chromium"];
-  if (raw === "all") return ALL;
-  const ok = raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter((b) => ALL.includes(b));
-  return ok.length ? ok : ["chromium"];
-}
 
 /** @type {import("@web/test-runner").TestRunnerConfig} */
 export default {
@@ -26,7 +19,7 @@ export default {
   port: 8033,
   files: ["src/**/*.test.ts"],
   nodeResolve: true,
-  browsers: resolveBrowsers().map((product) => playwrightLauncher({ product })),
+  browsers: resolveTestBrowsers().map((product) => fluidPlaywrightLauncher({ product })),
   plugins: [
     esbuildPlugin({
       ts: true,
@@ -34,13 +27,8 @@ export default {
       tsconfig: "./tsconfig.json"
     })
   ],
-  testFramework: {
-    config: {
-      ui: "bdd",
-      timeout: "5000"
-    }
-  },
-  coverage: false,
+  testFramework: fluidMochaFramework(),
+  ...fluidCoverage("markdown"),
   testRunnerHtml: (testFramework) => `
     <!doctype html>
     <html>

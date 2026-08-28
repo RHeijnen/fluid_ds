@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
 import type { FluidAspectRatio } from "./fluid-aspect-ratio.js";
+import { offlineLandscapeImage } from "./offline-story-fixture.js";
 
 type Args = Pick<FluidAspectRatio, "ratio">;
 
@@ -34,9 +35,7 @@ const meta: Meta<Args> = {
   args: { ratio: "16/9" },
   render: (args) => html`
     <div style="max-width: 320px;">
-      <fluid-aspect-ratio ratio=${args.ratio}>
-        ${placeholder(args.ratio)}
-      </fluid-aspect-ratio>
+      <fluid-aspect-ratio ratio=${args.ratio}> ${placeholder(args.ratio)} </fluid-aspect-ratio>
     </div>
   `
 };
@@ -65,10 +64,7 @@ export const CoveredImage: Story = {
   render: () => html`
     <div style="max-width: 320px;">
       <fluid-aspect-ratio ratio="16/9">
-        <img
-          src="https://picsum.photos/seed/fluid/800/300"
-          alt="Landscape sample, covered to fill a 16:9 box"
-        />
+        <img src=${offlineLandscapeImage} alt="Landscape sample, covered to fill a 16:9 box" />
       </fluid-aspect-ratio>
     </div>
   `

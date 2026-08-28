@@ -2,6 +2,12 @@ import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { FormDisabledController } from "../../internal/form-disabled.js";
+
+export interface FluidSwitchValueDetail {
+  checked: boolean;
+}
+export type FluidSwitchChangeEvent = CustomEvent<FluidSwitchValueDetail>;
 
 /**
  * A toggle switch (on/off).
@@ -53,9 +59,16 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
  * @uses-token --fluid-motion - Global motion scalar; multiplies the toggle duration (0 = off).
  * @uses-token --fluid-easing-standard - Track/thumb transition easing.
  *
- * @fires fluid-change - Fired when the checked state changes. `event.detail.checked`.
+ * @fires {FluidSwitchChangeEvent} fluid-change - Fired when the checked state changes. `event.detail.checked`.
  */
 export class FluidSwitch extends FluidFormAssociated {
+  private readonly formDisabled = new FormDisabledController(this);
+  // Native constraint validation must be able to focus the shadow control.
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-flex;
@@ -185,13 +198,35 @@ export class FluidSwitch extends FluidFormAssociated {
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private focused = false;
+  private defaultChecked = false;
+  private reflectingState = false;
+
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value);
+    // Explicit attribute writes define the reset default. Reflection of live
+    // state after user interaction must not redefine that authored default.
+    if (!this.reflectingState && name === "checked") this.defaultChecked = value !== null;
+  }
+
+  protected override update(changed: PropertyValues<this>): void {
+    this.reflectingState = true;
+    try {
+      super.update(changed);
+    } finally {
+      this.reflectingState = false;
+    }
+  }
 
   override formResetCallback(): void {
-    this.checked = this.hasAttribute("checked");
+    this.checked = this.defaultChecked;
   }
 
   override formDisabledCallback(disabled: boolean): void {
-    this.disabled = disabled;
+    this.formDisabled.preserve(
+      disabled,
+      () => this.disabled,
+      (value) => (this.disabled = value)
+    );
   }
 
   override formStateRestoreCallback(state: string | File | FormData | null): void {
@@ -213,7 +248,7 @@ export class FluidSwitch extends FluidFormAssociated {
     if (changed.has("required") || changed.has("checked")) {
       if (this.required && !this.checked) {
         // Anchor not yet available during the first willUpdate; updated() reapplies with it.
-        this.setValidity({ valueMissing: true }, "Please toggle this switch.");
+        this.setValidity({ valueMissing: true }, this.term("toggleThisSwitch"));
       } else {
         this.setValidity({});
       }
@@ -222,14 +257,14 @@ export class FluidSwitch extends FluidFormAssociated {
 
   protected override updated(): void {
     if (this.required && !this.checked && this.inputEl) {
-      this.setValidity({ valueMissing: true }, "Please toggle this switch.", this.inputEl);
+      this.setValidity({ valueMissing: true }, this.term("toggleThisSwitch"), this.inputEl);
     }
   }
 
   private handleChange = () => {
     this.checked = this.inputEl.checked;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidSwitchValueDetail>("fluid-change", {
         detail: { checked: this.checked },
         bubbles: true,
         composed: true

@@ -85,6 +85,7 @@ export class FluidPagination extends FluidElement {
 
     .list {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: var(--fluid-pagination-gap, var(--fluid-space-1));
       margin: 0;
@@ -113,8 +114,7 @@ export class FluidPagination extends FluidElement {
       user-select: none;
       background-color: var(--fluid-pagination-bg, transparent);
       color: var(--fluid-pagination-fg, var(--fluid-text-primary));
-      box-shadow: inset 0 0 0 1px
-        var(--fluid-pagination-border, var(--fluid-border-default));
+      box-shadow: inset 0 0 0 1px var(--fluid-pagination-border, var(--fluid-border-default));
       transition:
         background-color var(--fluid-duration-fast) var(--fluid-easing-standard),
         color var(--fluid-duration-fast) var(--fluid-easing-standard);
@@ -125,8 +125,8 @@ export class FluidPagination extends FluidElement {
     }
 
     .button:focus-visible {
-      outline: var(--fluid-pagination-focus-ring-width, var(--fluid-focus-ring-width, 2px))
-        solid var(--fluid-pagination-focus-ring-color, var(--fluid-focus-ring-color));
+      outline: var(--fluid-pagination-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
+        var(--fluid-focus-ring-color);
       outline-offset: var(--fluid-pagination-focus-ring-offset, var(--fluid-focus-ring-offset));
     }
 
@@ -190,17 +190,23 @@ export class FluidPagination extends FluidElement {
    * Accessible name for the navigation landmark. Override when a page has more
    * than one pager so each is distinguishable (SC 2.4.1, SC 1.3.1).
    */
-  @property({ attribute: "label" }) label = "Pagination";
+  @property({ attribute: "label" }) label = "";
 
   /**
    * Resolve the effective page count from whichever inputs are provided.
    * Always at least 1 so the control still renders a single page.
    */
   private get pageCount(): number {
-    if (this.totalPages != null && this.totalPages > 0) {
+    if (this.totalPages != null && Number.isFinite(this.totalPages) && this.totalPages > 0) {
       return Math.floor(this.totalPages);
     }
-    if (this.total != null && this.total > 0 && this.pageSize > 0) {
+    if (
+      this.total != null &&
+      Number.isFinite(this.total) &&
+      this.total > 0 &&
+      Number.isFinite(this.pageSize) &&
+      this.pageSize > 0
+    ) {
       return Math.max(1, Math.ceil(this.total / this.pageSize));
     }
     return 1;
@@ -223,7 +229,7 @@ export class FluidPagination extends FluidElement {
   private buildItems(): PageItem[] {
     const count = this.pageCount;
     const current = this.current;
-    const siblings = Math.max(0, Math.floor(this.siblings));
+    const siblings = Number.isFinite(this.siblings) ? Math.max(0, Math.floor(this.siblings)) : 1;
 
     // Small lists: just show every page, no truncation needed.
     const windowSize = siblings * 2 + 5; // first + last + current + 2*siblings + 2 gaps
@@ -295,8 +301,9 @@ export class FluidPagination extends FluidElement {
     disabled: boolean
   ): TemplateResult {
     const isPrev = direction === "prev";
-    const path = isPrev ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6";
-    const aria = isPrev ? "Previous page" : "Next page";
+    const pointsBack = isPrev !== this.isRtl;
+    const path = pointsBack ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6";
+    const aria = isPrev ? this.term("previousPage") : this.term("nextPage");
     return html`
       <li part="item">
         <button
@@ -330,7 +337,7 @@ export class FluidPagination extends FluidElement {
     const items = this.buildItems();
 
     return html`
-      <nav part="base" aria-label=${this.label}>
+      <nav part="base" aria-label=${this.label || this.term("pagination")}>
         <ul part="list" class="list">
           ${this.renderEdge("prev", current - 1, current <= 1)}
           ${items.map((item) => {
@@ -346,7 +353,7 @@ export class FluidPagination extends FluidElement {
                 class="button page"
                 type="button"
                 aria-current=${isCurrent ? "page" : nothing}
-                aria-label="Page ${item}"
+                aria-label=${this.term("page", item)}
                 @click=${() => this.goTo(item)}
               >
                 ${item}

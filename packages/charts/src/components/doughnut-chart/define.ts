@@ -1,6 +1,6 @@
 import { FluidDoughnutChart } from "./fluid-doughnut-chart.js";
 
-if (!customElements.get("fluid-doughnut-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-doughnut-chart")) {
   customElements.define("fluid-doughnut-chart", FluidDoughnutChart);
 }
 

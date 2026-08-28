@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-27",
+  "environment": {
+    "platform": "linux",
+    "container": "fluid-readiness-linux-20260826",
+    "engines": ["chromium", "firefox", "webkit"],
+    "retries": 0
+  },
+  "initialFullRun": {
+    "total": 642,
+    "passed": 639,
+    "failed": 3,
+    "skipped": 0,
+    "flaky": 0,
+    "durationMilliseconds": 700642.789,
+    "failure": "The parser interaction expected legacy English accessible text containing '(s)' in each engine; the fixture exposed the current grammatical singular/plural text.",
+    "rawResults": "full-accessibility-regression-2026-08-27-red.json"
+  },
+  "focusedRepairRuns": [
+    {
+      "phase": "after-status-assertion-update",
+      "total": 9,
+      "passed": 6,
+      "failed": 3,
+      "failure": "The same parser flow still searched for the legacy 'Import 2 row(s)' button instead of the current 'Import 2 rows' accessible name."
+    },
+    {
+      "phase": "after-complete-accessible-name-update",
+      "total": 9,
+      "passed": 9,
+      "failed": 0
+    }
+  ],
+  "finalFullRun": {
+    "total": 642,
+    "passed": 642,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "durationMilliseconds": 736953.45,
+    "perEngine": {
+      "chromium": 214,
+      "firefox": 214,
+      "webkit": 214
+    },
+    "catalogAxeAudits": 465,
+    "environmentContracts": 18,
+    "dialogStoryLifecycleContracts": 3,
+    "rawResults": "full-accessibility-regression-2026-08-27-final.json"
+  },
+  "additionalMatrices": {
+    "visualFixtureAndFocusGuards": {
+      "passed": 51,
+      "failed": 0
+    },
+    "stableCandidateRecoveryCohorts": {
+      "passed": 18,
+      "failed": 0
+    },
+    "fixtureSelectionAndDialogStructure": {
+      "passed": 11,
+      "failed": 0
+    }
+  },
+  "boundaries": {
+    "playwrightWebkitIsNativeSafariCertification": false,
+    "manualAssistiveTechnologyCoverage": false,
+    "exhaustiveDeviceCoverage": false
+  }
+}

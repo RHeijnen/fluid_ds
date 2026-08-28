@@ -1,5 +1,6 @@
-import { LitElement, html, css, type TemplateResult } from "lit";
+import { html, css, type TemplateResult } from "lit";
 import { property, query } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 // Leaflet ships a UMD bundle as its package "main" with no real ES exports, so
 // a bare `import * as L from "leaflet"` resolves to an empty namespace under a
@@ -7,19 +8,16 @@ import { property, query } from "lit/decorators.js";
 // exposes the named exports the `L.` usage below relies on (works in Vite and
 // Storybook too). Types come from @types/leaflet via the "paths" shim in
 // tsconfig.base.json (the ESM build ships no declarations).
-import * as L from "leaflet/dist/leaflet-src.esm.js";
+import type * as Leaflet from "leaflet";
+
+type LeafletRuntime = typeof import("leaflet/dist/leaflet-src.esm.js");
 
 /**
  * Semantic colour for a marker. Drives the pin fill via a tokenised
  * `<fluid-map-pin>` SVG built with `L.divIcon` — falls back to the default
  * Leaflet PNG pin when omitted, so existing call sites stay pixel-identical.
  */
-export type FluidMapMarkerTone =
-  | "neutral"
-  | "info"
-  | "success"
-  | "warning"
-  | "danger";
+export type FluidMapMarkerTone = "neutral" | "info" | "success" | "warning" | "danger";
 
 /**
  * A fully custom marker icon. Two shapes:
@@ -119,7 +117,7 @@ export interface FluidMapMarker {
  * @fires fluid-marker-click - A marker was clicked. `detail: { marker }`.
  * @fires fluid-move - The view moved or zoomed. `detail: { center, zoom }`.
  */
-export class FluidMap extends LitElement {
+export class FluidMap extends FluidElement {
   static override styles = css`
     fluid-map {
       display: block;
@@ -165,7 +163,7 @@ export class FluidMap extends LitElement {
    */
   @property({ type: Array }) markers: FluidMapMarker[] = [];
 
-  /** Tile layer URL template. Defaults to OpenStreetMap. */
+  /** Tile layer URL template. Defaults to OpenStreetMap. Empty disables tiles. */
   @property({ type: String, attribute: "tile-url" }) tileUrl =
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
@@ -174,13 +172,30 @@ export class FluidMap extends LitElement {
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   /** Accessible name for the map region. */
-  @property({ type: String }) label = "Map";
+  @property({ type: String })
+  get label(): string {
+    return this.labelOverride ?? this.term("map");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   @query(".viewport") private viewport!: HTMLDivElement;
 
-  private map?: L.Map;
-  private tileLayer?: L.TileLayer;
-  private markerLayer?: L.LayerGroup;
+  private map?: Leaflet.Map;
+  private tileLayer?: Leaflet.TileLayer;
+  private markerLayer?: Leaflet.LayerGroup;
+  private renderedMarkers: Array<{ marker: Leaflet.Marker; source: FluidMapMarker }> = [];
+  private initializing = false;
+  private resizeFrame = 0;
+
+  private static leaflet?: LeafletRuntime;
+
+  private static async loadLeaflet(): Promise<LeafletRuntime> {
+    FluidMap.leaflet ??= await import("leaflet/dist/leaflet-src.esm.js");
+    return FluidMap.leaflet;
+  }
 
   // Light DOM: Leaflet cannot size or style itself inside a shadow root.
   // Lit only adopts `static styles` into a shadow root, so in light DOM we
@@ -227,8 +242,8 @@ export class FluidMap extends LitElement {
   // URL, so markers render as broken images. We sidestep `Icon.Default` entirely
   // and build one explicit `L.icon` (a plain icon uses its URLs verbatim, with no
   // imagePath prepend) pointing at the CDN PNGs, shared by every marker.
-  private static iconInstance?: L.Icon;
-  private static markerIcon(): L.Icon {
+  private static iconInstance?: Leaflet.Icon;
+  private static markerIcon(L: LeafletRuntime): Leaflet.Icon {
     if (!FluidMap.iconInstance) {
       const base = "https://unpkg.com/leaflet@1.9.4/dist/images/";
       FluidMap.iconInstance = L.icon({
@@ -256,8 +271,8 @@ export class FluidMap extends LitElement {
     neutral: "var(--fluid-text-secondary, #52525b)"
   };
 
-  private static toneIconCache = new Map<string, L.DivIcon>();
-  private static tonedIcon(tone: FluidMapMarkerTone): L.DivIcon {
+  private static toneIconCache = new Map<string, Leaflet.DivIcon>();
+  private static tonedIcon(L: LeafletRuntime, tone: FluidMapMarkerTone): Leaflet.DivIcon {
     const cached = FluidMap.toneIconCache.get(tone);
     if (cached) return cached;
     const fill = FluidMap.TONE_TOKENS[tone];
@@ -291,7 +306,10 @@ export class FluidMap extends LitElement {
   // (`L.icon`, used verbatim so there's no imagePath prepend bug) or an HTML /
   // emoji icon (`L.divIcon`). Anchors default to sensible placements: image
   // icons sit by their bottom centre (pin tip), HTML icons by their centre.
-  private static buildCustomIcon(spec: FluidMapMarkerIcon): L.Icon | L.DivIcon {
+  private static buildCustomIcon(
+    L: LeafletRuntime,
+    spec: FluidMapMarkerIcon
+  ): Leaflet.Icon | Leaflet.DivIcon {
     if ("html" in spec && spec.html !== undefined) {
       const [w, h] = spec.iconSize ?? [30, 30];
       return L.divIcon({
@@ -316,22 +334,43 @@ export class FluidMap extends LitElement {
 
   // Choose the icon for a marker: an explicit custom `icon` wins, then a
   // semantic `tone` pin, then the default Leaflet pin.
-  private static iconFor(m: FluidMapMarker): L.Icon | L.DivIcon {
-    if (m.icon) return FluidMap.buildCustomIcon(m.icon);
-    if (m.tone) return FluidMap.tonedIcon(m.tone);
-    return FluidMap.markerIcon();
+  private static iconFor(L: LeafletRuntime, m: FluidMapMarker): Leaflet.Icon | Leaflet.DivIcon {
+    if (m.icon) return FluidMap.buildCustomIcon(L, m.icon);
+    if (m.tone) return FluidMap.tonedIcon(L, m.tone);
+    return FluidMap.markerIcon(L);
   }
 
   override firstUpdated(): void {
+    void this.initializeMap();
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (this.hasUpdated && !this.map) void this.initializeMap();
+  }
+
+  private async initializeMap(): Promise<void> {
+    if (this.initializing || this.map || typeof window === "undefined") return;
+    this.initializing = true;
+    const L = await FluidMap.loadLeaflet();
+    this.initializing = false;
+    if (!this.isConnected || this.map) return;
+
     FluidMap.loadLeafletCss();
     this.map = L.map(this.viewport, {
       center: this.center,
-      zoom: this.zoom
+      zoom: this.zoom,
+      // Leaflet 1.9's zoom fallback uses an untracked timeout which can fire
+      // after `remove()` and dereference its deleted map pane. The component
+      // must remain safe to disconnect at any point in its public lifecycle.
+      zoomAnimation: false
     });
 
-    this.tileLayer = L.tileLayer(this.tileUrl, {
-      attribution: this.attribution
-    }).addTo(this.map);
+    if (this.tileUrl) {
+      this.tileLayer = L.tileLayer(this.tileUrl, {
+        attribution: this.attribution
+      }).addTo(this.map);
+    }
 
     this.markerLayer = L.layerGroup().addTo(this.map);
     this.syncMarkers();
@@ -349,41 +388,75 @@ export class FluidMap extends LitElement {
 
     // Leaflet measures the container on creation; ensure it picks up the
     // settled layout once the element is in the DOM and sized.
-    requestAnimationFrame(() => this.map?.invalidateSize());
+    this.resizeFrame = requestAnimationFrame(() => this.map?.invalidateSize());
   }
 
   override updated(changed: Map<string, unknown>): void {
     if (!this.map) return;
+    const L = FluidMap.leaflet!;
 
     if (changed.has("center") || changed.has("zoom")) {
       this.map.setView(this.center, this.zoom);
     }
     if (changed.has("tileUrl") || changed.has("attribution")) {
       this.tileLayer?.remove();
-      this.tileLayer = L.tileLayer(this.tileUrl, { attribution: this.attribution }).addTo(this.map);
+      this.tileLayer = this.tileUrl
+        ? L.tileLayer(this.tileUrl, { attribution: this.attribution }).addTo(this.map)
+        : undefined;
     }
     if (changed.has("markers")) {
       this.syncMarkers();
     }
+    // Inherited locale changes do not recreate Leaflet markers. Only names
+    // that were omitted by the caller follow the translated map fallback.
+    this.syncMarkerNames();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    cancelAnimationFrame(this.resizeFrame);
+    // Leaflet can retain a zoom-transition callback after `remove()`. Stop the
+    // public animation lifecycle first so a rapid disconnect/reconnect cannot
+    // let that callback read the removed map pane.
+    this.map?.stop();
+    // Explicitly sever wrapper-owned Evented callbacks before Leaflet tears
+    // down its layers and DOM handlers. This keeps the custom-element closure
+    // out of any third-party state that can remain queued during teardown.
+    this.map?.off();
     this.map?.remove();
+    // Leaflet 1.9.4 registers the container's scroll guard in `_initContainer`,
+    // outside `_initEvents`; `Map.remove()` therefore leaves that listener in
+    // the reusable viewport's `_leaflet_events` store. Clear all Leaflet-owned
+    // listeners from this private, component-owned node after normal teardown.
+    if (this.map) FluidMap.leaflet?.DomEvent.off(this.viewport);
     this.map = undefined;
+    this.tileLayer = undefined;
+    this.markerLayer = undefined;
+    this.renderedMarkers = [];
   }
 
   private syncMarkers(): void {
     if (!this.markerLayer) return;
+    const L = FluidMap.leaflet!;
     this.markerLayer.clearLayers();
+    this.renderedMarkers = [];
     for (const m of this.markers) {
-      const marker = L.marker([m.lat, m.lng], { icon: FluidMap.iconFor(m) });
+      const marker = L.marker([m.lat, m.lng], {
+        icon: FluidMap.iconFor(L, m),
+        title: m.label ?? "",
+        alt: m.label ?? this.label
+      });
       if (m.label) {
-        marker.bindPopup(m.label);
-        // Reuse the label as the accessible / hover title for the marker.
-        marker.bindTooltip(m.label);
+        // Labels are plain text, not an HTML injection surface. Consumers that
+        // deliberately need markup can still supply the explicit icon.html API.
+        const popup = document.createElement("span");
+        popup.textContent = m.label;
+        const tooltip = document.createElement("span");
+        tooltip.textContent = m.label;
+        marker.bindPopup(popup);
+        marker.bindTooltip(tooltip);
       }
-      marker.on("click", () => {
+      const emitActivation = () => {
         this.dispatchEvent(
           new CustomEvent("fluid-marker-click", {
             detail: { marker: m },
@@ -391,12 +464,38 @@ export class FluidMap extends LitElement {
             composed: true
           })
         );
+      };
+      marker.on("click", emitActivation);
+      // Leaflet opens marker popups on keypress without synthesizing click.
+      // Keyboard activation must still reach the wrapper's public event API.
+      marker.on("keypress", (event: Leaflet.LeafletKeyboardEvent) => {
+        if (event.originalEvent.key === "Enter" || event.originalEvent.keyCode === 13) {
+          emitActivation();
+        }
       });
       this.markerLayer.addLayer(marker);
+      this.renderedMarkers.push({ marker, source: m });
+    }
+    this.syncMarkerNames();
+  }
+
+  private syncMarkerNames(): void {
+    for (const { marker, source } of this.renderedMarkers) {
+      const name = source.label ?? this.label;
+      marker.options.alt = name;
+      const element = marker.getElement();
+      element?.setAttribute("aria-label", name);
+      if (element instanceof HTMLImageElement) element.alt = name;
     }
   }
 
   override render(): TemplateResult {
-    return html`<div part="base" class="viewport" role="region" aria-label=${this.label}></div>`;
+    return html`<div
+      part="base"
+      class="viewport"
+      role="region"
+      aria-label=${this.label}
+      dir=${this.localize.dir}
+    ></div>`;
   }
 }

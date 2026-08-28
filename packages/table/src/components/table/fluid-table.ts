@@ -1,5 +1,6 @@
-import { LitElement, html, css, nothing, type TemplateResult } from "lit";
+import { html, css, nothing, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 /** A single column definition. */
 export interface FluidTableColumn {
@@ -74,7 +75,7 @@ export interface FluidTableSort {
  * @fires fluid-sort - The sort changed. `detail: { key, dir }`.
  * @fires fluid-selection-change - The row selection changed. `detail: { selected: rowKeys[] }`.
  */
-export class FluidTable extends LitElement {
+export class FluidTable extends FluidElement {
   static override styles = css`
     :host {
       display: block;
@@ -165,7 +166,9 @@ export class FluidTable extends LitElement {
       height: 1em;
       flex: none;
       opacity: 0.4;
-      transition: opacity 120ms ease, transform 120ms ease;
+      transition:
+        opacity 120ms ease,
+        transform 120ms ease;
     }
     th[aria-sort="ascending"] .sort-icon {
       opacity: 1;
@@ -221,16 +224,17 @@ export class FluidTable extends LitElement {
   }
 
   /** Rows in the order they should render, applying the current sort. */
-  private get sortedRows(): FluidTableRow[] {
+  private get sortedRows(): Array<{ row: FluidTableRow; index: number }> {
+    const indexed = this.rows.map((row, index) => ({ row, index }));
     const sort = this.sort;
-    if (!sort) return this.rows;
+    if (!sort) return indexed;
     const { key, dir } = sort;
     const factor = dir === "desc" ? -1 : 1;
-    return [...this.rows].sort((a, b) => factor * this.compare(a[key], b[key]));
+    return indexed.sort((a, b) => this.compare(a.row[key], b.row[key], factor));
   }
 
   /** String + numeric aware comparison. Nullish values sort last. */
-  private compare(a: unknown, b: unknown): number {
+  private compare(a: unknown, b: unknown, factor: number): number {
     const aNull = a == null || a === "";
     const bNull = b == null || b === "";
     if (aNull && bNull) return 0;
@@ -238,8 +242,10 @@ export class FluidTable extends LitElement {
     if (bNull) return -1;
     const an = typeof a === "number" ? a : Number(a);
     const bn = typeof b === "number" ? b : Number(b);
-    if (!Number.isNaN(an) && !Number.isNaN(bn)) return an - bn;
-    return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: "base" });
+    if (!Number.isNaN(an) && !Number.isNaN(bn)) return factor * (an - bn);
+    return (
+      factor * String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: "base" })
+    );
   }
 
   private ariaSortFor(col: FluidTableColumn): "ascending" | "descending" | "none" {
@@ -256,7 +262,11 @@ export class FluidTable extends LitElement {
     }
     this.sort = { key: col.key, dir };
     this.dispatchEvent(
-      new CustomEvent("fluid-sort", { detail: { key: col.key, dir }, bubbles: true, composed: true })
+      new CustomEvent("fluid-sort", {
+        detail: { key: col.key, dir },
+        bubbles: true,
+        composed: true
+      })
     );
   }
 
@@ -292,6 +302,16 @@ export class FluidTable extends LitElement {
     return [...this.selected];
   }
 
+  private formatNumber(value: number): string {
+    try {
+      return new Intl.NumberFormat(this.localize.locale || undefined, {
+        useGrouping: false
+      }).format(value);
+    } catch {
+      return new Intl.NumberFormat("en", { useGrouping: false }).format(value);
+    }
+  }
+
   private renderSortIcon(): TemplateResult {
     return html`<svg
       class="sort-icon"
@@ -315,7 +335,7 @@ export class FluidTable extends LitElement {
     const someSelected = keys.some((k) => this.selected.has(k));
 
     return html`
-      <table part="base">
+      <table part="base" dir=${this.localize.dir}>
         ${this.caption
           ? html`<caption part="caption" class=${this.hideCaption ? "sr-only" : ""}>
               ${this.caption}
@@ -328,7 +348,7 @@ export class FluidTable extends LitElement {
                   <input
                     part="select-all"
                     type="checkbox"
-                    aria-label="Select all rows"
+                    aria-label=${this.term("selectAllRows")}
                     .checked=${allSelected}
                     .indeterminate=${someSelected && !allSelected}
                     @change=${(e: Event) => this.toggleAll((e.target as HTMLInputElement).checked)}
@@ -359,8 +379,7 @@ export class FluidTable extends LitElement {
           </tr>
         </thead>
         <tbody>
-          ${rows.map((row) => {
-            const naturalIndex = this.rows.indexOf(row);
+          ${rows.map(({ row, index: naturalIndex }) => {
             const key = this.rowKey(row, naturalIndex);
             const isSelected = this.selected.has(key);
             return html`<tr part="row" ?data-selected=${isSelected}>
@@ -369,9 +388,10 @@ export class FluidTable extends LitElement {
                     <input
                       part="select-row"
                       type="checkbox"
-                      aria-label=${`Select row ${naturalIndex + 1}`}
+                      aria-label=${this.term("selectTableRow", this.formatNumber(naturalIndex + 1))}
                       .checked=${isSelected}
-                      @change=${(e: Event) => this.toggleRow(key, (e.target as HTMLInputElement).checked)}
+                      @change=${(e: Event) =>
+                        this.toggleRow(key, (e.target as HTMLInputElement).checked)}
                     />
                   </td>`
                 : nothing}

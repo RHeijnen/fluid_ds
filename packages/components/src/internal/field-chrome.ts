@@ -1,5 +1,4 @@
 import { css, html, nothing, type TemplateResult } from "lit";
-import { ifDefined } from "lit/directives/if-defined.js";
 
 /**
  * Shared "field chrome" for form controls: an optional visible label above the
@@ -36,6 +35,7 @@ export const fieldChromeStyles = css`
     gap: var(--fluid-field-gap, var(--fluid-space-1));
     width: 100%;
     min-width: 0;
+    font-family: var(--fluid-field-font-family, var(--fluid-font-family-sans));
   }
 
   .field-chrome-label {
@@ -47,10 +47,20 @@ export const fieldChromeStyles = css`
   }
 
   .field-chrome-help {
+    flex: 1 1 auto;
+    min-width: 0;
     margin: 0;
     color: var(--fluid-field-description-fg, var(--fluid-text-secondary));
     font-size: var(--fluid-field-description-font-size, var(--fluid-font-size-sm));
     line-height: var(--fluid-font-line-height-normal);
+  }
+
+  .field-chrome-supporting {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--fluid-field-supporting-gap, var(--fluid-space-2));
+    min-width: 0;
   }
 `;
 
@@ -61,6 +71,8 @@ export interface FieldChromeOptions {
   helpText: string;
   /** Id of the labelable element inside the same shadow root the label points at. */
   for?: string;
+  /** Optional content aligned to the trailing edge of the help/supporting row. */
+  supportingTrailing?: TemplateResult;
 }
 
 /**
@@ -74,17 +86,27 @@ export function renderFieldChrome(
 ): TemplateResult {
   const label = options.label.trim();
   const help = options.helpText.trim();
-  if (!label && !help) return control;
+  const trailing = options.supportingTrailing;
+  if (!label && !help && !trailing) return control;
   return html`
     <div class="field-chrome">
       ${label
-        ? html`<label class="field-chrome-label" part="label" for=${ifDefined(options.for)}
+        ? html`<label class="field-chrome-label" part="label" for=${options.for ?? nothing}
             >${label}</label
           >`
         : nothing}
       ${control}
-      ${help
-        ? html`<div class="field-chrome-help" part="help-text" id=${FIELD_HELP_ID}>${help}</div>`
+      ${help || trailing
+        ? html`
+            <div class="field-chrome-supporting">
+              ${help
+                ? html`<div class="field-chrome-help" part="help-text" id=${FIELD_HELP_ID}>
+                    ${help}
+                  </div>`
+                : nothing}
+              ${trailing ?? nothing}
+            </div>
+          `
         : nothing}
     </div>
   `;

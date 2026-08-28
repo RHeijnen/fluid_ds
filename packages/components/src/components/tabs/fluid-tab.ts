@@ -93,6 +93,25 @@ export class FluidTab extends FluidElement {
     super.connectedCallback();
     this.setAttribute("role", "tab");
     if (!this.id) this.id = `fluid-tab-${++counter}`;
+    if (typeof this.closest === "function" && !this.closest("fluid-tabs")) this.selected = false;
+  }
+
+  override disconnectedCallback(): void {
+    this.selected = false;
+    this.setAttribute("aria-selected", "false");
+    this.tabIndex = -1;
+    super.disconnectedCallback();
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed);
+    if (
+      changed.has("selected") &&
+      typeof this.closest === "function" &&
+      !this.closest("fluid-tabs")
+    ) {
+      this.selected = false;
+    }
   }
 
   protected override updated(changed: PropertyValues<this>): void {

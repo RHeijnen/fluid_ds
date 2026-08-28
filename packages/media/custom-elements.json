@@ -1,0 +1,2154 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/animated-image/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-animated-image",
+          "declaration": {
+            "name": "FluidAnimatedImage",
+            "module": "src/components/animated-image/fluid-animated-image.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/animated-image/fluid-animated-image.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Plays/pauses animated images (GIF, APNG, WebP). When paused, draws the\ncurrent frame to a canvas so the image looks frozen even though the\nsource keeps animating in the background.",
+          "name": "FluidAnimatedImage",
+          "cssParts": [
+            {
+              "description": "The wrapper.",
+              "name": "base"
+            },
+            {
+              "description": "The underlying <img>.",
+              "name": "image"
+            },
+            {
+              "description": "The pause-frame canvas.",
+              "name": "canvas"
+            },
+            {
+              "description": "The play/pause overlay button.",
+              "name": "control"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Image source URL.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "alt",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Accessible alt text.",
+              "attribute": "alt"
+            },
+            {
+              "kind": "field",
+              "name": "paused",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Paused state.",
+              "attribute": "paused",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "noControl",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the play/pause control overlay.",
+              "attribute": "no-control"
+            },
+            {
+              "kind": "field",
+              "name": "imgEl",
+              "type": {
+                "text": "HTMLImageElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "canvasEl",
+              "type": {
+                "text": "HTMLCanvasElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "loaded",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "onLoad",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onError",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "snapshot",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Toggle paused state."
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-error",
+              "description": "Fired when the image fails to load.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-load",
+              "description": "Fired when the image finishes loading.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Image source URL.",
+              "fieldName": "src"
+            },
+            {
+              "name": "alt",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Accessible alt text.",
+              "fieldName": "alt"
+            },
+            {
+              "name": "paused",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Paused state.",
+              "fieldName": "paused"
+            },
+            {
+              "name": "no-control",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the play/pause control overlay.",
+              "fieldName": "noControl"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Animated image with play/pause.",
+          "tagName": "fluid-animated-image",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidAnimatedImage",
+          "declaration": {
+            "name": "FluidAnimatedImage",
+            "module": "src/components/animated-image/fluid-animated-image.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/audio/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-audio",
+          "declaration": {
+            "name": "FluidAudio",
+            "module": "src/components/audio/fluid-audio.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/audio/fluid-audio.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A themed audio player with custom, accessible controls (play/pause, a seek\nslider with elapsed / total time, and mute). It wraps a native `<audio>`\nelement for playback, so format support and buffering are the platform's.",
+          "name": "FluidAudio",
+          "cssProperties": [
+            {
+              "description": "Player background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-audio-bg"
+            },
+            {
+              "description": "Control + text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-audio-fg"
+            },
+            {
+              "description": "Played-progress + focus color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-audio-accent"
+            },
+            {
+              "description": "Unplayed track color. Falls back to --fluid-border-default.",
+              "name": "--fluid-audio-track"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-audio-radius"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The player container.",
+              "name": "base"
+            },
+            {
+              "description": "The play / pause toggle.",
+              "name": "play-button"
+            },
+            {
+              "description": "The seek slider.",
+              "name": "scrubber"
+            },
+            {
+              "description": "The elapsed / total time label.",
+              "name": "time"
+            },
+            {
+              "description": "The mute toggle.",
+              "name": "mute-button"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Audio source URL.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop playback.",
+              "attribute": "loop"
+            },
+            {
+              "kind": "field",
+              "name": "preload",
+              "type": {
+                "text": "\"none\" | \"metadata\" | \"auto\""
+              },
+              "default": "\"metadata\"",
+              "description": "Preload strategy passed to the native audio element.",
+              "attribute": "preload"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the player group.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "playing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "current",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "duration",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "audio",
+              "type": {
+                "text": "HTMLAudioElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "play",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Start playback."
+            },
+            {
+              "kind": "method",
+              "name": "pause",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pause playback."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onSeek",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "toggleMute",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-ended",
+              "description": "Playback reached the end.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-pause",
+              "description": "Playback paused.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-play",
+              "description": "Playback started.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Audio source URL.",
+              "fieldName": "src"
+            },
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop playback.",
+              "fieldName": "loop"
+            },
+            {
+              "name": "preload",
+              "type": {
+                "text": "\"none\" | \"metadata\" | \"auto\""
+              },
+              "default": "\"metadata\"",
+              "description": "Preload strategy passed to the native audio element.",
+              "fieldName": "preload"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the player group.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Themed audio player.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Player background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Controls + time."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Progress + focus ring."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Unplayed track."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Corner radius."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum control target (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-audio",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidAudio",
+          "declaration": {
+            "name": "FluidAudio",
+            "module": "src/components/audio/fluid-audio.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/lightbox/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-lightbox",
+          "declaration": {
+            "name": "FluidLightbox",
+            "module": "src/components/lightbox/fluid-lightbox.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/lightbox/fluid-lightbox.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An image gallery with a full-screen lightbox. Slot in `<img>` thumbnails;\nclicking (or pressing Enter / Space on) one opens it large in a modal\n`<dialog>` (native top layer, focus trap, Escape to close, backdrop) with\nprevious / next navigation and a position counter.\n\nEach thumbnail becomes a focusable button; its `alt` is reused as the\naccessible name and the enlarged image's alt text. Set `data-full` on a\nthumbnail to load a higher-resolution source in the lightbox.",
+          "name": "FluidLightbox",
+          "cssProperties": [
+            {
+              "description": "Gap between thumbnails. Falls back to 0.5rem.",
+              "name": "--fluid-lightbox-gap"
+            },
+            {
+              "description": "Thumbnail track size. Falls back to 7rem.",
+              "name": "--fluid-lightbox-thumb-size"
+            },
+            {
+              "description": "Thumbnail corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-lightbox-thumb-radius"
+            },
+            {
+              "description": "Backdrop color. Falls back to a 80% black scrim.",
+              "name": "--fluid-lightbox-backdrop"
+            },
+            {
+              "description": "Control button background. Falls back to a translucent surface.",
+              "name": "--fluid-lightbox-control-bg"
+            },
+            {
+              "description": "Control button color. Falls back to white.",
+              "name": "--fluid-lightbox-control-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The thumbnail grid.",
+              "name": "base"
+            },
+            {
+              "description": "The modal dialog.",
+              "name": "dialog"
+            },
+            {
+              "description": "The enlarged image.",
+              "name": "image"
+            },
+            {
+              "description": "The previous button.",
+              "name": "prev"
+            },
+            {
+              "description": "The next button.",
+              "name": "next"
+            },
+            {
+              "description": "The close button.",
+              "name": "close"
+            },
+            {
+              "description": "The \"n of m\" position label.",
+              "name": "counter"
+            }
+          ],
+          "slots": [
+            {
+              "description": "One or more `<img>` thumbnails.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Wrap navigation past the first / last image.",
+              "attribute": "loop"
+            },
+            {
+              "kind": "field",
+              "name": "index",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "open",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "imgs",
+              "type": {
+                "text": "HTMLImageElement[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dialog",
+              "type": {
+                "text": "HTMLDialogElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "onSlotChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "openAt",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "i",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Open the lightbox at a given index."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Close the lightbox."
+            },
+            {
+              "kind": "method",
+              "name": "nav",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "The shown image changed. `detail: { index }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-close",
+              "description": "The lightbox closed.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-open",
+              "description": "The lightbox opened. `detail: { index }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Wrap navigation past the first / last image.",
+              "fieldName": "loop"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Thumbnail gallery with a modal lightbox.",
+          "usesTokens": [
+            {
+              "name": "--fluid-radius-md",
+              "description": "Thumbnail radius."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum control target (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-lightbox",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidLightbox",
+          "declaration": {
+            "name": "FluidLightbox",
+            "module": "src/components/lightbox/fluid-lightbox.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/lightbox/offline-story-fixture.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "offlineLightboxImage",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "index",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "Deterministic story-only thumbnails; each has real image dimensions but performs no request."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "offlineLightboxImage",
+          "declaration": {
+            "name": "offlineLightboxImage",
+            "module": "src/components/lightbox/offline-story-fixture.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/video-playlist/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-video-playlist",
+          "declaration": {
+            "name": "FluidVideoPlaylist",
+            "module": "src/components/video-playlist/fluid-video-playlist.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/video-playlist/fluid-video-playlist.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Playlist-driven video player. Pass a list of entries via the `entries`\nproperty and the component renders a `<fluid-video>` plus a clickable\ntrack list. Advances to the next entry automatically when each clip ends.",
+          "name": "FluidVideoPlaylist",
+          "cssProperties": [
+            {
+              "description": "Default text color.",
+              "name": "--fluid-video-playlist-fg"
+            },
+            {
+              "description": "Playlist border + row separator color.",
+              "name": "--fluid-video-playlist-list-border"
+            },
+            {
+              "description": "Hover background for inactive rows.",
+              "name": "--fluid-video-playlist-item-hover-bg"
+            },
+            {
+              "description": "Active row accent color.",
+              "name": "--fluid-video-playlist-active-accent"
+            },
+            {
+              "description": "Keyboard focus ring color.",
+              "name": "--fluid-video-playlist-focus-ring"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "Outer container.",
+              "name": "base"
+            },
+            {
+              "description": "The video element.",
+              "name": "video"
+            },
+            {
+              "description": "The playlist sidebar.",
+              "name": "list"
+            },
+            {
+              "description": "A playlist row.",
+              "name": "item"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "entries",
+              "type": {
+                "text": "PlaylistEntry[]"
+              },
+              "default": "[]",
+              "description": "Playlist entries."
+            },
+            {
+              "kind": "field",
+              "name": "autoAdvance",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Auto-advance when the current clip ends.",
+              "attribute": "auto-advance"
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop the playlist.",
+              "attribute": "loop"
+            },
+            {
+              "kind": "field",
+              "name": "activeIndex",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "onEnded",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "goTo",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Jump to a specific entry."
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "Fired when the active index changes; detail = { index, entry }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "auto-advance",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Auto-advance when the current clip ends.",
+              "fieldName": "autoAdvance"
+            },
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop the playlist.",
+              "fieldName": "loop"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Playlist video player.",
+          "usesTokens": [
+            {
+              "name": "--fluid-accent-base",
+              "description": "Active row tint."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Default background."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Row separator."
+            },
+            {
+              "name": "--fluid-focus-ring-color",
+              "description": "Keyboard focus ring."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Conformance-aware focus ring width."
+            }
+          ],
+          "tagName": "fluid-video-playlist",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidVideoPlaylist",
+          "declaration": {
+            "name": "FluidVideoPlaylist",
+            "module": "src/components/video-playlist/fluid-video-playlist.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/video/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-video",
+          "declaration": {
+            "name": "FluidVideo",
+            "module": "src/components/video/fluid-video.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/video/fluid-video.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Themed wrapper around the native `<video>` element. Forwards the most\ncommonly used attributes and exposes a few helpers (`play`, `pause`,\n`load`) so it behaves like a Fluid component while still leaning on\nthe platform for actual playback.",
+          "name": "FluidVideo",
+          "cssProperties": [
+            {
+              "description": "Border radius applied to the player.",
+              "name": "--fluid-video-radius"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The inner native video element.",
+              "name": "base"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Additional `<source>` and `<track>` elements (passed straight to the inner video).",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Video source URL.",
+              "attribute": "src"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name forwarded to the native video control.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "poster",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Poster image URL.",
+              "attribute": "poster"
+            },
+            {
+              "kind": "field",
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Native controls.",
+              "attribute": "controls"
+            },
+            {
+              "kind": "field",
+              "name": "autoplay",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Autoplay (most browsers require muted).",
+              "attribute": "autoplay"
+            },
+            {
+              "kind": "field",
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop.",
+              "attribute": "loop"
+            },
+            {
+              "kind": "field",
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Muted.",
+              "attribute": "muted"
+            },
+            {
+              "kind": "field",
+              "name": "preload",
+              "type": {
+                "text": "\"auto\" | \"metadata\" | \"none\""
+              },
+              "default": "\"metadata\"",
+              "description": "Preload behavior.",
+              "attribute": "preload"
+            },
+            {
+              "kind": "field",
+              "name": "playsInline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Inline playback on mobile.",
+              "attribute": "plays-inline"
+            },
+            {
+              "kind": "field",
+              "name": "videoEl",
+              "type": {
+                "text": "HTMLVideoElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "mediaChildrenObserver",
+              "type": {
+                "text": "MutationObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "sourceMarkup",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "trackMarkup",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "method",
+              "name": "syncMediaChildren",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "play",
+              "return": {
+                "type": {
+                  "text": "Promise<void> | void"
+                }
+              },
+              "description": "Play the video."
+            },
+            {
+              "kind": "method",
+              "name": "pause",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pause the video."
+            },
+            {
+              "kind": "method",
+              "name": "load",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reload the source."
+            },
+            {
+              "kind": "field",
+              "name": "nativeElement",
+              "type": {
+                "text": "HTMLVideoElement | null"
+              },
+              "description": "Underlying native element (for advanced consumers).",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onPlay",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onPause",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onEnded",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-ended",
+              "description": "Fired when playback ends.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-pause",
+              "description": "Fired when playback pauses.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-play",
+              "description": "Fired when playback starts.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "src",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Video source URL.",
+              "fieldName": "src"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name forwarded to the native video control.",
+              "fieldName": "label"
+            },
+            {
+              "name": "poster",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Poster image URL.",
+              "fieldName": "poster"
+            },
+            {
+              "name": "controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Native controls.",
+              "fieldName": "controls"
+            },
+            {
+              "name": "autoplay",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Autoplay (most browsers require muted).",
+              "fieldName": "autoplay"
+            },
+            {
+              "name": "loop",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Loop.",
+              "fieldName": "loop"
+            },
+            {
+              "name": "muted",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Muted.",
+              "fieldName": "muted"
+            },
+            {
+              "name": "preload",
+              "type": {
+                "text": "\"auto\" | \"metadata\" | \"none\""
+              },
+              "default": "\"metadata\"",
+              "description": "Preload behavior.",
+              "fieldName": "preload"
+            },
+            {
+              "name": "plays-inline",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Inline playback on mobile.",
+              "fieldName": "playsInline"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Themed HTML5 video player.",
+          "usesTokens": [
+            {
+              "name": "--fluid-radius-md",
+              "description": "Default border radius."
+            }
+          ],
+          "tagName": "fluid-video",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidVideo",
+          "declaration": {
+            "name": "FluidVideo",
+            "module": "src/components/video/fluid-video.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/zoomable-frame/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-zoomable-frame",
+          "declaration": {
+            "name": "FluidZoomableFrame",
+            "module": "src/components/zoomable-frame/fluid-zoomable-frame.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/zoomable-frame/fluid-zoomable-frame.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A pan + zoom container. Wraps any element (image, iframe, SVG) and\nlets the user zoom with the scroll wheel and pan by dragging.\nNative buttons provide zoom and pan without dragging, including keyboard\nactivation. No composite APG pattern applies; each action is a native button.",
+          "name": "FluidZoomableFrame",
+          "cssProperties": [
+            {
+              "description": "Viewport background.",
+              "name": "--fluid-zoom-bg"
+            },
+            {
+              "description": "Zoom button background.",
+              "name": "--fluid-zoom-button-bg"
+            },
+            {
+              "description": "Zoom button foreground color.",
+              "name": "--fluid-zoom-button-fg"
+            },
+            {
+              "description": "Zoom button hover background.",
+              "name": "--fluid-zoom-button-hover-bg"
+            },
+            {
+              "description": "Focus ring color.",
+              "name": "--fluid-zoom-focus-ring"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The viewport.",
+              "name": "base"
+            },
+            {
+              "description": "The transformed wrapper.",
+              "name": "content"
+            },
+            {
+              "description": "The zoom button strip.",
+              "name": "controls"
+            },
+            {
+              "description": "A single zoom button.",
+              "name": "button"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The content to make zoomable (first slotted element).",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Current zoom factor.",
+              "attribute": "scale",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "minScale",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "Minimum zoom.",
+              "attribute": "min-scale"
+            },
+            {
+              "kind": "field",
+              "name": "maxScale",
+              "type": {
+                "text": "number"
+              },
+              "default": "5",
+              "description": "Maximum zoom.",
+              "attribute": "max-scale"
+            },
+            {
+              "kind": "field",
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.25",
+              "description": "Zoom step for buttons.",
+              "attribute": "step"
+            },
+            {
+              "kind": "field",
+              "name": "noControls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the floating zoom buttons.",
+              "attribute": "no-controls"
+            },
+            {
+              "kind": "field",
+              "name": "panStep",
+              "type": {
+                "text": "number"
+              },
+              "default": "40",
+              "description": "Distance in CSS pixels moved by each pan control. Panning is unbounded.",
+              "attribute": "pan-step"
+            },
+            {
+              "kind": "field",
+              "name": "zoomInLabel",
+              "type": {
+                "text": "string"
+              },
+              "description": "Translatable names for the native controls.",
+              "attribute": "zoom-in-label"
+            },
+            {
+              "kind": "field",
+              "name": "zoomInLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "zoomOutLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "zoom-out-label"
+            },
+            {
+              "kind": "field",
+              "name": "zoomOutLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "resetLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "reset-label"
+            },
+            {
+              "kind": "field",
+              "name": "resetLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "panLeftLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "pan-left-label"
+            },
+            {
+              "kind": "field",
+              "name": "panLeftLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "panRightLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "pan-right-label"
+            },
+            {
+              "kind": "field",
+              "name": "panRightLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "panUpLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "pan-up-label"
+            },
+            {
+              "kind": "field",
+              "name": "panUpLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "panDownLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "pan-down-label"
+            },
+            {
+              "kind": "field",
+              "name": "panDownLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "contentEl",
+              "type": {
+                "text": "HTMLDivElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "x",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "y",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "dragging",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "lastX",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "lastY",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "activePointer",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "applyTransform",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "clampScale",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "s",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "onWheel",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onPointerDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onPointerMove",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onPointerUp",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "releaseDrag",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "pointerId",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "zoomIn",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Zoom in by the configured step."
+            },
+            {
+              "kind": "method",
+              "name": "zoomOut",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Zoom out by the configured step."
+            },
+            {
+              "kind": "field",
+              "name": "zoomStep",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "panDistance",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "panBy",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Pan by CSS pixels without requiring a drag gesture."
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Reset zoom + pan."
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-zoom",
+              "description": "Fired when the zoom level changes; detail = { scale }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Current zoom factor.",
+              "fieldName": "scale"
+            },
+            {
+              "name": "min-scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "Minimum zoom.",
+              "fieldName": "minScale"
+            },
+            {
+              "name": "max-scale",
+              "type": {
+                "text": "number"
+              },
+              "default": "5",
+              "description": "Maximum zoom.",
+              "fieldName": "maxScale"
+            },
+            {
+              "name": "step",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.25",
+              "description": "Zoom step for buttons.",
+              "fieldName": "step"
+            },
+            {
+              "name": "no-controls",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the floating zoom buttons.",
+              "fieldName": "noControls"
+            },
+            {
+              "name": "pan-step",
+              "type": {
+                "text": "number"
+              },
+              "default": "40",
+              "description": "Distance in CSS pixels moved by each pan control. Panning is unbounded.",
+              "fieldName": "panStep"
+            },
+            {
+              "name": "zoom-in-label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Translatable names for the native controls.",
+              "fieldName": "zoomInLabel"
+            },
+            {
+              "name": "zoom-out-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "zoomOutLabel"
+            },
+            {
+              "name": "reset-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "resetLabel"
+            },
+            {
+              "name": "pan-left-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "panLeftLabel"
+            },
+            {
+              "name": "pan-right-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "panRightLabel"
+            },
+            {
+              "name": "pan-up-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "panUpLabel"
+            },
+            {
+              "name": "pan-down-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "panDownLabel"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Pan + zoom container.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Default viewport background."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Button background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Button color."
+            },
+            {
+              "name": "--fluid-focus-ring-color",
+              "description": "Focus ring."
+            },
+            {
+              "name": "--fluid-shadow-sm",
+              "description": "Zoom button elevation."
+            },
+            {
+              "name": "--fluid-space-3",
+              "description": "Controls strip inset from the edges."
+            },
+            {
+              "name": "--fluid-space-2",
+              "description": "Gap between zoom buttons."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Conformance-aware control target size."
+            }
+          ],
+          "tagName": "fluid-zoomable-frame",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidZoomableFrame",
+          "declaration": {
+            "name": "FluidZoomableFrame",
+            "module": "src/components/zoomable-frame/fluid-zoomable-frame.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidAnimatedImage",
+          "declaration": {
+            "name": "FluidAnimatedImage",
+            "module": "src/components/animated-image/fluid-animated-image.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidAudio",
+          "declaration": {
+            "name": "FluidAudio",
+            "module": "src/components/audio/fluid-audio.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidLightbox",
+          "declaration": {
+            "name": "FluidLightbox",
+            "module": "src/components/lightbox/fluid-lightbox.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidVideo",
+          "declaration": {
+            "name": "FluidVideo",
+            "module": "src/components/video/fluid-video.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidVideoPlaylist",
+          "declaration": {
+            "name": "FluidVideoPlaylist",
+            "module": "src/components/video-playlist/fluid-video-playlist.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidZoomableFrame",
+          "declaration": {
+            "name": "FluidZoomableFrame",
+            "module": "src/components/zoomable-frame/fluid-zoomable-frame.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "PlaylistEntry",
+          "declaration": {
+            "name": "PlaylistEntry",
+            "module": "src/components/video-playlist/fluid-video-playlist.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/internal/format.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "formatMediaNumber",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              }
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "minimumIntegerDigits",
+              "default": "1"
+            }
+          ],
+          "description": "Format a media display number without allowing an invalid browser locale to break controls."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "formatMediaNumber",
+          "declaration": {
+            "name": "formatMediaNumber",
+            "module": "src/internal/format.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "seededFrom": "2026-08-27-canonical-three-run-stable",
+  "copiedRuns": [
+    1,
+    2,
+    3
+  ],
+  "policy": "Copied retained executions remain subject to the same full-set hash, platform, and accepted-baseline lifecycle comparison as newly captured executions."
+}

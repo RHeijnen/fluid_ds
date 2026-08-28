@@ -1,6 +1,6 @@
 import { FluidCopyButton } from "./fluid-copy-button.js";
 
-if (!customElements.get("fluid-copy-button")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-copy-button")) {
   customElements.define("fluid-copy-button", FluidCopyButton);
 }
 

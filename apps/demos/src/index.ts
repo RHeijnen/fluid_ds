@@ -15,7 +15,8 @@ interface Tile {
 
 const samples: Tile[] = [
   { href: "./settings/", icon: "⚙️", title: "Settings dashboard", desc: "A SaaS settings page: profile, notifications, a billing chart, form fields, and a save / cancel footer." },
-  { href: "./admin/", icon: "📊", title: "Admin / data", desc: "A data-table admin: filter bar, rows, a bulk-action dropdown, a confirm-delete dialog, and status badges." }
+  { href: "./admin/", icon: "📊", title: "Admin / data", desc: "A data-table admin: filter bar, rows, a bulk-action dropdown, a confirm-delete dialog, and status badges." },
+  { href: "./data-table/", icon: "🗂️", title: "Data table", desc: "The infinite table on a real dataset: windowed rows, infinite loading, sorting, filters, and a persistent column layout." }
 ];
 
 const portals: Tile[] = [

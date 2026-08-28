@@ -292,8 +292,10 @@ children and a roving tabindex. See the
 | `Enter` / `Space` | Activate the focused item, then close |
 | printable character | Type-ahead to the next matching item |
 | `Escape` | Close the menu and return focus to the trigger |
+| `Tab` / `Shift` + `Tab` | Leave the menu in document order and close it without pulling focus back |
 
-Focus moves into the menu on open and returns to the trigger on close. The
+Focus moves into the menu on open. Selection and Escape restore the trigger;
+moving focus outside preserves the new destination and closes the menu. The
 focus indicator on each item is `:focus-visible` and reads the focus-ring
 tokens.
 

@@ -69,6 +69,23 @@ With no value, the placeholder shows until a time is chosen.
 
 <ConformanceCode code={`<fluid-time-picker placeholder="Pick a time…"></fluid-time-picker>`} />
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-time-picker label="Pickup time" help-text="We deliver between 09:00 and 17:00."></fluid-time-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-time-picker
+  label="Pickup time"
+  help-text="We deliver between 09:00 and 17:00."
+></fluid-time-picker>`} />
+
 ### Display format
 
 `format` accepts `24h` (default) and `12h`. It changes only the text the field

@@ -4,7 +4,7 @@ description: "An accessible drag-and-drop kanban board web component."
 ---
 
 A kanban board for Fluid: columns of draggable cards you can rearrange with a
-pointer or, just as fully, with the keyboard. Expansion pack.
+pointer, native move buttons, or the keyboard. Expansion pack.
 
 ## Install
 
@@ -61,12 +61,13 @@ not an attribute):
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `columns` | `KanbanColumn[]` | `[]` | The board data. Each column is `{ id, title, cards }`, each card is `{ id, title, description? }`. |
+| `moveUpLabel`, `moveDownLabel`, `movePreviousLabel`, `moveNextLabel` | `string` | English move labels | Localizable accessible names for the move buttons. The card title is appended. Corresponding attributes are `move-up-label`, `move-down-label`, `move-previous-label`, and `move-next-label`. |
 
 ### Methods
 
 | Method | Description |
 | --- | --- |
-| `moveCard(cardId, toColumn, toIndex)` | Move a card to the target column index, update state, announce, and emit `fluid-move`. Returns the new position or `null`. |
+| `moveCard(cardId, toColumn, toIndex)` | Move a card to the target column index, update state, announce, and emit `fluid-move`. Returns the new position or `null` for invalid inputs. Unchanged positions do not emit an event. |
 
 ### Events
 
@@ -84,11 +85,30 @@ The keyboard path is a first-class peer of drag and drop, not a fallback.
 | `Space` / `Enter` | Pick up the focused card, or drop a card that is held. |
 | `ArrowLeft` / `ArrowRight` | Move a held card to the previous / next column. |
 | `ArrowUp` / `ArrowDown` | Reorder a held card within its column. |
-| `Escape` | Cancel the current pickup, leaving the card where it was. |
+| `Escape` | Cancel the current pickup and restore the card to its original column and position. |
 
 Each column is a labelled `group`; cards live in a `list` with `listitem`
 children, and the held state is reflected with `aria-grabbed`. Every pickup,
 move, drop, and cancel is announced through a polite `aria-live` region.
+
+Arrow moves are applied immediately. If Escape restores a moved card, a
+compensating `fluid-move` event reports the restored position so persisted state
+can follow the board. Disconnecting clears pickup state but preserves the board
+data. After reconnecting, cards can be moved again without resetting `columns`.
+
+## Moving without dragging
+
+Each card also has native Up, Down, Previous column, and Next column buttons.
+They perform the same moves with a single click or tap, without requiring a
+drag gesture. Out-of-bounds moves are disabled. The moved card receives focus
+after the update. These controls intentionally change the card layout; visual
+baselines need review. Style them through `part="move-controls"` and
+`part="move-button"`.
+
+Pointer dragging onto another card inserts before it. Dropping on a column's
+empty area appends to that column. The board requires unique card IDs and
+unique column IDs. Live announcements and other existing internal labels still
+need the full localization review.
 
 ## Theming
 

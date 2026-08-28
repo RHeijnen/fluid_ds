@@ -1,5 +1,30 @@
 # @fluid-ds/components
 
+## 0.4.0
+
+### Minor Changes
+
+- Add public server-rendering and hydration entry points, including declarative
+  shadow DOM rendering, client hydration support, request-local rendering state,
+  and state adoption for form controls that users can change before hydration.
+
+- Add a typed localization system with inherited language and direction,
+  regional and English fallback, live locale updates, tree-shakable locale
+  registration entry points, and pseudo-locales for UI integration testing.
+
+- Expand and document the component catalog to 124 custom elements across 103
+  families, including the signature pad and its form value, validation,
+  keyboard, pointer, undo, clear, and read-only interaction contracts.
+
+### Patch Changes
+
+- Harden form value, validity, focus, selection, keyboard, overlay, and
+  disconnect/reconnect behavior across controls while preserving public event
+  payloads and application-provided content.
+
+- Publish canonical custom-elements metadata and Node-importable package and
+  definition entry points for framework and tooling consumers.
+
 ## 0.1.6
 
 ### Patch Changes

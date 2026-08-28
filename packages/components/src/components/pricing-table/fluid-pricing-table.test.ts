@@ -1,9 +1,93 @@
 import { expect, fixture, html, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidPricingTable } from "./fluid-pricing-table.js";
 import type { FluidPricingTier } from "./fluid-pricing-tier.js";
 
 describe("<fluid-pricing-table>", () => {
+  describe("<fluid-pricing-table> localized defaults", () => {
+    const readLabels = (control: FluidPricingTable) => [
+      control.shadowRoot!.querySelector(".base")!.getAttribute("aria-label")
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Abonnementen"]],
+      ["de", ["Tarife"]],
+      ["fr", ["Offres tarifaires"]],
+      ["es", ["Planes de precios"]],
+      ["ar", ["خطط الأسعار"]],
+      ["fr-CA", ["Offres tarifaires"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-pricing-table></fluid-pricing-table></div>
+        `);
+        const control = wrapper.querySelector<FluidPricingTable>("fluid-pricing-table")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.label).to.equal(expected[0]);
+        expect(control.hasAttribute("label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidPricingTable>(
+        html`<fluid-pricing-table></fluid-pricing-table>`
+      );
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Abonnementen"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Tarife"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["خطط الأسعار"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-pricing-table></fluid-pricing-table></div>
+      `);
+      const control = wrapper.querySelector<FluidPricingTable>("fluid-pricing-table")!;
+      control.label = "Pricing plans";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Pricing plans"]);
+      control.setAttribute("label", "Pricing plans");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Pricing plans"]);
+      control.removeAttribute("label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Offres tarifaires"]);
+      control.label = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([""]);
+      Reflect.set(control, "label", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["خطط الأسعار"]);
+    });
+  });
+
   it("renders a group with an accessible label", async () => {
     const el = await fixture<FluidPricingTable>(
       html`<fluid-pricing-table label="Plans"></fluid-pricing-table>`
@@ -34,6 +118,89 @@ describe("<fluid-pricing-table>", () => {
 });
 
 describe("<fluid-pricing-tier>", () => {
+  describe("<fluid-pricing-tier> localized defaults", () => {
+    const readLabels = (control: FluidPricingTier) => [
+      control.shadowRoot!.querySelector(".badge")!.textContent!.trim()
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Populairst"]],
+      ["de", ["Am beliebtesten"]],
+      ["fr", ["Le plus populaire"]],
+      ["es", ["Más popular"]],
+      ["ar", ["الأكثر شيوعًا"]],
+      ["fr-CA", ["Le plus populaire"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en">
+            <fluid-pricing-tier featured name="Application plan" price="$19"></fluid-pricing-tier>
+          </div>
+        `);
+        const control = wrapper.querySelector<FluidPricingTier>("fluid-pricing-tier")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("featured-label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.featuredLabel).to.equal(expected[0]);
+        expect(control.hasAttribute("featured-label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidPricingTier>(
+        html`<fluid-pricing-tier featured name="Application plan" price="$19"></fluid-pricing-tier>`
+      );
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Populairst"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Am beliebtesten"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["الأكثر شيوعًا"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en">
+          <fluid-pricing-tier featured name="Application plan" price="$19"></fluid-pricing-tier>
+        </div>
+      `);
+      const control = wrapper.querySelector<FluidPricingTier>("fluid-pricing-tier")!;
+      control.featuredLabel = "Most popular";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Most popular"]);
+      control.setAttribute("featured-label", "Most popular");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Most popular"]);
+      control.removeAttribute("featured-label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Le plus populaire"]);
+      control.featuredLabel = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([""]);
+      Reflect.set(control, "featuredLabel", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["الأكثر شيوعًا"]);
+    });
+  });
+
   it("renders the name as a heading with the default level", async () => {
     const el = await fixture<FluidPricingTier>(
       html`<fluid-pricing-tier name="Pro"></fluid-pricing-tier>`
@@ -103,7 +270,11 @@ describe("<fluid-pricing-tier>", () => {
 
   it("uses a custom featured label", async () => {
     const el = await fixture<FluidPricingTier>(
-      html`<fluid-pricing-tier name="Pro" featured featured-label="Best value"></fluid-pricing-tier>`
+      html`<fluid-pricing-tier
+        name="Pro"
+        featured
+        featured-label="Best value"
+      ></fluid-pricing-tier>`
     );
     expect(el.shadowRoot!.querySelector(".badge")!.textContent?.trim()).to.equal("Best value");
   });

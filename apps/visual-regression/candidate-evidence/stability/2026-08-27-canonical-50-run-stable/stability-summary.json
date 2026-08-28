@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "stable": true,
+  "generatedAt": "2026-08-27T15:49:34.791Z",
+  "sourceRevision": "28dd7a621bb0321298ec6cc1857fa7f9079b620a",
+  "platform": {
+    "id": "ubuntu-24.04-x64-node22-chromium-playwright1.60",
+    "os": "linux",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "arch": "x64",
+    "node": "v22.22.2",
+    "playwright": "1.60.0"
+  },
+  "candidate": {
+    "runCount": 33,
+    "screenshotCountPerRun": 60,
+    "variance": []
+  },
+  "acceptedSmoke": {
+    "runCount": 33,
+    "screenshotCountPerRun": 5,
+    "variance": []
+  },
+  "acceptedBaseline": {
+    "fileCount": 1009,
+    "aggregateSha256": "369356a6da2903f0040998a59c00c370886e6c0e028362fe8b390bec61b01c0f",
+    "unchangedAcrossRuns": true,
+    "worktreeClean": true,
+    "freshByteMismatches": [
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 4,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 4,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 4,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 4,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 4,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 5,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 5,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 5,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 5,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 5,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 6,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 6,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 6,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 6,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 6,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 7,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 7,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 7,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 7,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 7,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 8,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 8,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 8,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 8,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 8,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 9,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 9,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 9,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 9,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 9,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 10,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 10,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 10,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 10,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 10,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 11,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 11,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 11,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 11,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 11,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 12,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 12,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 12,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 12,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 12,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 13,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 13,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 13,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 13,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 13,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 14,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 14,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 14,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 14,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 14,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 15,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 15,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 15,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 15,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 15,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 16,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 16,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 16,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 16,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 16,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 17,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 17,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 17,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 17,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 17,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 18,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 18,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 18,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 18,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 18,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 19,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 19,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 19,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 19,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 19,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 20,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 20,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 20,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 20,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 20,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 21,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 21,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 21,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 21,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 21,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 22,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 22,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 22,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 22,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 22,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 23,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 23,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 23,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 23,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 23,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 24,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 24,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 24,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 24,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 24,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 25,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 25,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 25,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 25,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 25,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 26,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 26,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 26,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 26,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 26,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 27,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 27,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 27,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 27,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 27,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 28,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 28,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 28,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 28,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 28,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 29,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 29,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 29,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 29,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 29,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 30,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 30,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 30,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 30,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 30,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 31,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 31,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 31,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 31,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 31,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 32,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 32,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 32,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 32,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 32,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 33,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 33,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 33,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 33,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 33,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      }
+    ],
+    "comparisonPolicy": "Fresh captures are required to be byte-identical to each other; the immutable accepted baseline remains governed by the configured Playwright pixel tolerance."
+  }
+}

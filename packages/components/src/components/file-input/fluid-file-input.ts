@@ -2,8 +2,17 @@ import { html, css, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+
+/** Files and serialized filename value carried by file-input changes. */
+export interface FluidFileInputChangeDetail {
+  files: File[];
+  value: string;
+}
+
+export type FluidFileInputChangeEvent = CustomEvent<FluidFileInputChangeDetail>;
+export type FluidFileInputVariant = "dropzone" | "compact";
 
 registerIcon(
   "upload",
@@ -52,6 +61,20 @@ registerIcon(
  * @cssproperty --fluid-file-input-remove-fg - Remove button color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-file-input-remove-hover-bg - Remove button hover background. Falls back to --fluid-surface-muted.
  * @cssproperty --fluid-file-input-remove-hover-fg - Remove button hover color. Falls back to --fluid-text-primary.
+ * @cssproperty --fluid-file-input-compact-bg - Compact field background. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-file-input-compact-fg - Compact field text color. Falls back to --fluid-text-primary.
+ * @cssproperty --fluid-file-input-compact-border - Compact field border color. Falls back to --fluid-border-default.
+ * @cssproperty --fluid-file-input-compact-border-hover - Compact field border on hover. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-file-input-compact-border-focus - Compact field border when focused or receiving a drag. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-file-input-compact-border-width - Compact field border width. Falls back to --fluid-field-border-width.
+ * @cssproperty --fluid-file-input-compact-radius - Compact field corner radius. Falls back to --fluid-field-border-radius.
+ * @cssproperty --fluid-file-input-compact-height - Compact field height. Falls back to --fluid-field-height-md.
+ * @cssproperty --fluid-file-input-compact-padding-inline - Compact field horizontal padding. Falls back to --fluid-space-3.
+ * @cssproperty --fluid-file-input-compact-focus-ring-color - Compact focus ring color. Falls back to --fluid-focus-ring-color.
+ * @cssproperty --fluid-file-input-compact-focus-ring-width - Compact focus ring width. Falls back to --fluid-focus-ring-width.
+ * @cssproperty --fluid-file-input-compact-invalid-border - Compact invalid border color. Falls back to --fluid-danger-base.
+ * @cssproperty --fluid-file-input-compact-disabled-bg - Compact disabled background. Falls back to --fluid-surface-subtle.
+ * @cssproperty --fluid-file-input-compact-disabled-fg - Compact disabled text color. Falls back to --fluid-text-secondary.
  *
  * @uses-token --fluid-surface-subtle - Default drop zone background.
  * @uses-token --fluid-surface-base - Default file row background.
@@ -64,14 +87,20 @@ registerIcon(
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum remove-button hit-target size (24px AA / 44px AAA).
  * @uses-token --fluid-field-border-width - Default file-row border width.
+ * @uses-token --fluid-field-height-md - Compact field height.
  * @uses-token --fluid-radius-md - Drop zone corner radius.
  * @uses-token --fluid-radius-sm - File row + remove-button corner radius.
  * @uses-token --fluid-font-family-sans - Label + file-row font family.
  *
- * @fires fluid-change - Fired when the selected file list changes.
- *   detail.files holds a FileList; detail.value is a comma-separated filename string.
+ * @fires {FluidFileInputChangeEvent} fluid-change - Fired when the selected file list changes.
+ *   detail.files holds a File[]; detail.value is a comma-separated filename string.
  */
 export class FluidFileInput extends FluidFormAssociated {
+  static override shadowRootOptions = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: block;
@@ -84,6 +113,9 @@ export class FluidFileInput extends FluidFormAssociated {
     }
 
     .dropzone {
+      all: unset;
+      box-sizing: border-box;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -124,6 +156,75 @@ export class FluidFileInput extends FluidFormAssociated {
       cursor: not-allowed;
     }
 
+    .dropzone.compact {
+      min-height: calc(
+        max(
+            var(--fluid-file-input-compact-height, var(--fluid-field-height-md, 2.25rem)),
+            var(--fluid-target-min, 0px)
+          ) +
+          var(--fluid-file-input-compact-border-width, var(--fluid-field-border-width, 1px)) +
+          var(--fluid-file-input-compact-border-width, var(--fluid-field-border-width, 1px))
+      );
+      padding: 0 var(--fluid-file-input-compact-padding-inline, var(--fluid-space-3));
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: var(--fluid-space-2);
+      background: var(--fluid-file-input-compact-bg, var(--fluid-surface-base));
+      color: var(--fluid-file-input-compact-fg, var(--fluid-text-primary));
+      border: var(--fluid-file-input-compact-border-width, var(--fluid-field-border-width, 1px))
+        solid var(--fluid-file-input-compact-border, var(--fluid-border-default));
+      border-radius: var(--fluid-file-input-compact-radius, var(--fluid-field-border-radius));
+      box-shadow:
+        inset 0 1px 0 0 rgb(0 0 0 / 0.02),
+        0 1px 2px 0 rgb(0 0 0 / 0.04);
+      text-align: left;
+    }
+
+    .dropzone.compact:hover:not(.disabled):not(:focus-visible):not(.dragging) {
+      background: var(--fluid-file-input-compact-bg, var(--fluid-surface-base));
+      border-color: var(--fluid-file-input-compact-border-hover, var(--fluid-border-strong));
+      box-shadow:
+        inset 0 1px 0 0 rgb(0 0 0 / 0.02),
+        0 1px 3px 0 rgb(0 0 0 / 0.06);
+    }
+
+    .dropzone.compact:focus-visible,
+    .dropzone.compact.dragging {
+      outline: none;
+      border-color: var(--fluid-file-input-compact-border-focus, var(--fluid-accent-base));
+      background: var(--fluid-file-input-compact-bg, var(--fluid-surface-base));
+      box-shadow:
+        0 0 0 var(--fluid-file-input-compact-focus-ring-width, var(--fluid-focus-ring-width))
+          color-mix(
+            in srgb,
+            var(--fluid-file-input-compact-focus-ring-color, var(--fluid-focus-ring-color)) 35%,
+            transparent
+          ),
+        inset 0 1px 0 0 rgb(0 0 0 / 0.02);
+    }
+
+    .dropzone.compact.invalid {
+      border-color: var(--fluid-file-input-compact-invalid-border, var(--fluid-danger-base));
+    }
+
+    .dropzone.compact.invalid:focus-visible {
+      box-shadow:
+        0 0 0 var(--fluid-file-input-compact-focus-ring-width, var(--fluid-focus-ring-width))
+          color-mix(
+            in srgb,
+            var(--fluid-file-input-compact-invalid-border, var(--fluid-danger-base)) 35%,
+            transparent
+          ),
+        inset 0 1px 0 0 rgb(0 0 0 / 0.02);
+    }
+
+    .dropzone.compact.disabled {
+      opacity: 1;
+      background: var(--fluid-file-input-compact-disabled-bg, var(--fluid-surface-subtle));
+      color: var(--fluid-file-input-compact-disabled-fg, var(--fluid-text-secondary));
+      box-shadow: none;
+    }
+
     .icon {
       width: 2rem;
       height: 2rem;
@@ -133,6 +234,11 @@ export class FluidFileInput extends FluidFormAssociated {
     .dropzone.dragging .icon {
       color: var(--fluid-file-input-accent, var(--fluid-accent-base));
     }
+    .compact .icon {
+      width: 1rem;
+      height: 1rem;
+      flex: 0 0 auto;
+    }
 
     .label {
       font-size: var(--fluid-font-size-md);
@@ -141,6 +247,17 @@ export class FluidFileInput extends FluidFormAssociated {
     .hint {
       font-size: var(--fluid-font-size-sm);
       color: var(--fluid-file-input-hint-fg, var(--fluid-text-secondary));
+    }
+    .compact .label {
+      flex: 0 0 auto;
+      font-size: var(--fluid-font-size-sm);
+    }
+    .compact .hint {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     input[type="file"] {
@@ -215,6 +332,7 @@ export class FluidFileInput extends FluidFormAssociated {
   `;
 
   @query("input[type='file']") private inputEl!: HTMLInputElement;
+  @query(".dropzone") private dropzoneEl!: HTMLElement;
 
   /** Form control name. */
   @property({ reflect: true }) override name = "";
@@ -231,15 +349,25 @@ export class FluidFileInput extends FluidFormAssociated {
   /** Required for form validation. */
   @property({ type: Boolean, reflect: true }) required = false;
 
+  /** Visual presentation: rich drop zone or single-row form control. */
+  @property({ reflect: true }) variant: FluidFileInputVariant = "dropzone";
+
   /** Accessible label. */
-  @property({ attribute: "aria-label" }) override ariaLabel: string | null = "File input";
+  @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private files: File[] = [];
   @state() private dragging = false;
+  @state() private invalid = false;
+
+  constructor() {
+    super();
+    this.addEventListener("invalid", this.handleInvalid);
+  }
 
   /** Resets the file list. */
   reset(): void {
     this.files = [];
+    this.invalid = false;
     if (this.inputEl) this.inputEl.value = "";
     this.updateFormValue();
   }
@@ -266,12 +394,17 @@ export class FluidFileInput extends FluidFormAssociated {
   }
 
   private updateFormValue(): void {
+    // Let the platform anchor its message to the host. Its delegated focus
+    // target is the visible picker button, always before the hidden file input.
+    // WebKit's fallback validation UI adds a UA shadow root to an explicit
+    // descendant anchor, which hides that button's label and hint children.
     if (!this.files.length) {
       this.internals.setFormValue(null);
       if (this.required) {
-        this.setValidity({ valueMissing: true }, "Please select a file.");
+        this.setValidity({ valueMissing: true }, this.term("selectFileRequired"));
       } else {
         this.setValidity({});
+        this.invalid = false;
       }
       return;
     }
@@ -280,14 +413,20 @@ export class FluidFileInput extends FluidFormAssociated {
     for (const file of this.files) fd.append(this.name || "file", file, file.name);
     this.internals.setFormValue(fd);
     this.setValidity({});
+    this.invalid = false;
   }
+
+  private handleInvalid = (): void => {
+    this.invalid = true;
+  };
 
   private commitFiles(fileList: FileList | null): void {
-    if (!fileList || !fileList.length) return;
+    if (this.disabled || !fileList || !fileList.length) return;
     const incoming = Array.from(fileList);
     this.files = this.multiple ? [...this.files, ...incoming] : incoming.slice(0, 1);
+    this.updateFormValue();
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidFileInputChangeDetail>("fluid-change", {
         detail: { files: this.files, value: this.files.map((f) => f.name).join(", ") },
         bubbles: true,
         composed: true
@@ -295,29 +434,34 @@ export class FluidFileInput extends FluidFormAssociated {
     );
   }
 
-  private removeFile(index: number): void {
+  private async removeFile(index: number): Promise<void> {
+    if (this.disabled) return;
+    const button = this.shadowRoot!.querySelectorAll<HTMLButtonElement>(".file-remove")[index];
+    const restoreFocus = this.shadowRoot!.activeElement === button;
     this.files = this.files.filter((_, i) => i !== index);
     if (!this.files.length && this.inputEl) this.inputEl.value = "";
+    this.updateFormValue();
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidFileInputChangeDetail>("fluid-change", {
         detail: { files: this.files, value: this.files.map((f) => f.name).join(", ") },
         bubbles: true,
         composed: true
       })
     );
+    await this.updateComplete;
+    if (!restoreFocus || !this.isConnected || this.disabled) return;
+    // Do not override a consumer that deliberately moved focus in its handler.
+    const active = (this.getRootNode() as Document | ShadowRoot).activeElement;
+    const innerActive = this.shadowRoot!.activeElement;
+    if (active && active !== this && active !== this.ownerDocument.body) return;
+    if (innerActive && innerActive !== button) return;
+    const buttons = this.shadowRoot!.querySelectorAll<HTMLButtonElement>(".file-remove");
+    (buttons[Math.min(index, buttons.length - 1)] ?? this.dropzoneEl).focus();
   }
 
   private handleClick = () => {
     if (this.disabled) return;
     this.inputEl?.click();
-  };
-
-  private handleKey = (e: KeyboardEvent) => {
-    if (this.disabled) return;
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      this.inputEl?.click();
-    }
   };
 
   private handleChange = (e: Event) => {
@@ -343,38 +487,71 @@ export class FluidFileInput extends FluidFormAssociated {
   };
 
   private formatSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} kB`;
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+    let value = bytes;
+    let unit = "B";
+    if (bytes >= 1024 * 1024 * 1024) {
+      value = bytes / (1024 * 1024 * 1024);
+      unit = "GB";
+    } else if (bytes >= 1024 * 1024) {
+      value = bytes / (1024 * 1024);
+      unit = "MB";
+    } else if (bytes >= 1024) {
+      value = bytes / 1024;
+      unit = "kB";
+    }
+    const fractionDigits = unit === "B" ? 0 : 1;
+    let formatted: string;
+    try {
+      formatted = new Intl.NumberFormat([this.localize.locale, "en"], {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+      }).format(value);
+    } catch {
+      formatted = new Intl.NumberFormat("en", {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+      }).format(value);
+    }
+    return `${formatted} ${unit}`;
   }
 
   override render(): TemplateResult {
+    const compactSummary = this.files.length
+      ? this.files.map((file) => file.name).join(", ")
+      : null;
     return html`
       <div part="base" class="base">
-        <div
+        <button
           part="label"
-          class=${classMap({ dropzone: true, dragging: this.dragging, disabled: this.disabled })}
-          role="button"
+          class=${classMap({
+            dropzone: true,
+            compact: this.variant === "compact",
+            dragging: this.dragging,
+            disabled: this.disabled,
+            invalid: this.invalid
+          })}
+          type="button"
+          ?disabled=${this.disabled}
           tabindex=${this.disabled ? -1 : 0}
-          aria-label=${this.ariaLabel ?? "File input"}
+          aria-label=${this.ariaLabel ?? this.term("fileInput")}
           aria-disabled=${this.disabled ? "true" : "false"}
+          aria-invalid=${this.invalid ? "true" : "false"}
           @click=${this.handleClick}
-          @keydown=${this.handleKey}
           @dragover=${this.handleDragOver}
           @dragleave=${this.handleDragLeave}
           @drop=${this.handleDrop}
         >
           <fluid-icon class="icon" name="upload"></fluid-icon>
-          <div class="label">
-            <slot name="label">Click or drag files here</slot>
-          </div>
-          <div class="hint">
-            <slot name="hint">
-              ${this.multiple ? "Multiple files supported" : "One file at a time"}
-            </slot>
-          </div>
-        </div>
+          <span class="label">
+            <slot name="label">${this.term("chooseOrDropFiles")}</slot>
+          </span>
+          <span class="hint">
+            ${compactSummary ??
+            html`<slot name="hint">
+              ${this.term(this.multiple ? "multipleFilesHint" : "singleFileHint")}
+            </slot>`}
+          </span>
+        </button>
         <!-- The real file input is visually hidden and removed from the a11y
              tree + tab order; the drop zone above is the accessible control. -->
         <input
@@ -388,7 +565,7 @@ export class FluidFileInput extends FluidFormAssociated {
           ?required=${this.required}
           @change=${this.handleChange}
         />
-        ${this.files.length
+        ${this.files.length && this.variant === "dropzone"
           ? html`
               <div part="file-list" class="file-list">
                 ${this.files.map(
@@ -401,7 +578,8 @@ export class FluidFileInput extends FluidFormAssociated {
                       <button
                         class="file-remove"
                         type="button"
-                        aria-label=${`Remove ${file.name}`}
+                        ?disabled=${this.disabled}
+                        aria-label=${this.term("removeFile", file.name)}
                         @click=${() => this.removeFile(i)}
                       >
                         <fluid-icon name="close"></fluid-icon>

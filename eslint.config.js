@@ -9,7 +9,12 @@ export default [
   {
     ignores: [
       "**/node_modules/**",
+      // Local pnpm patch extraction, not authored source (also gitignored).
+      ".codex-tmp/test-runner-viewmode/**",
+      // Retained certification logs, traces and diagnostic copies are not shipped source.
+      "quality/evidence/**",
       "**/dist/**",
+      "**/build/**",
       "**/storybook-static/**",
       // Unified deploy artifact assembled by `pnpm build:website`.
       "website/**",
@@ -17,6 +22,7 @@ export default [
       // Per-framework demo build caches / outputs (Angular, Next.js).
       "**/.angular/**",
       "**/.next/**",
+      "**/.svelte-kit/**",
       "**/out/**",
       // Playwright HTML reports and test results are generated artifacts
       // (trace JS files, vendor bundles, screenshots). They shouldn't be
@@ -43,6 +49,11 @@ export default [
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    files: ["apps/storybook/.storybook/test-runner-jest.config.cjs"],
+    languageOptions: { sourceType: "commonjs", globals: { ...globals.node } },
+    rules: { "@typescript-eslint/no-require-imports": "off" }
+  },
   {
     files: ["packages/components/src/**/*.ts"],
     plugins: {
@@ -87,9 +98,26 @@ export default [
     }
   },
   {
-    files: ["scripts/**/*.mjs", "**/cem-plugins/**/*.mjs", "apps/*/scripts/**/*.mjs"],
+    files: [
+      "scripts/**/*.mjs",
+      "**/cem-plugins/**/*.mjs",
+      "apps/*/scripts/**/*.mjs",
+      "packages/*/scripts/**/*.mjs"
+    ],
     languageOptions: {
       globals: { ...globals.node }
+    }
+  },
+  {
+    files: ["apps/benchmarks/scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node }
+    }
+  },
+  {
+    files: ["packages/react/src/jsx.ts", "packages/react/src/jsx/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-namespace": "off"
     }
   },
   {

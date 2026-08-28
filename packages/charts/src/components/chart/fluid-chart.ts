@@ -1,5 +1,6 @@
-import { LitElement, html, css, type PropertyValues, type TemplateResult } from "lit";
-import { property, query } from "lit/decorators.js";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
+import { property, query, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 import {
   Chart,
   registerables,
@@ -8,6 +9,7 @@ import {
   type ChartDataset,
   type ChartOptions,
   type ChartType,
+  type LegendItem,
   type Plugin
 } from "chart.js";
 
@@ -19,7 +21,13 @@ const CARTESIAN = new Set<ChartType>(["line", "bar", "scatter", "bubble"]);
 /** #rgb / #rrggbb → rgba() string (passes through anything non-hex). */
 function rgba(hex: string, alpha: number): string {
   const m = hex.trim().replace("#", "");
-  const full = m.length === 3 ? m.split("").map((c) => c + c).join("") : m;
+  const full =
+    m.length === 3
+      ? m
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : m;
   const n = Number.parseInt(full, 16);
   if (full.length !== 6 || Number.isNaN(n)) return hex;
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
@@ -33,7 +41,12 @@ function mergeDeep<T>(base: T, over: unknown): T {
     const bv = (base as Record<string, unknown>)?.[key];
     const ov = (over as Record<string, unknown>)[key];
     out[key] =
-      ov && typeof ov === "object" && !Array.isArray(ov) && bv && typeof bv === "object" && !Array.isArray(bv)
+      ov &&
+      typeof ov === "object" &&
+      !Array.isArray(ov) &&
+      bv &&
+      typeof bv === "object" &&
+      !Array.isArray(bv)
         ? mergeDeep(bv, ov)
         : ov;
   }
@@ -64,9 +77,26 @@ interface FluidTheme {
  *
  * @summary Generic Chart.js wrapper, themed by Fluid tokens.
  *
+ * @slot fallback - Accessible data alternative, such as a table or concise summary.
+ *
  * @csspart base - The canvas element.
+ * @csspart plot - The responsive canvas container.
+ * @csspart legend - The HTML legend group.
+ * @csspart legend-button - A native visibility toggle for a series or arc.
+ * @fires fluid-legend-change - A legend control was activated. Detail includes label, visible, datasetIndex or index.
  *
  * @cssproperty --fluid-chart-height - Default height of the chart. Falls back to 16rem.
+ * @cssproperty --fluid-chart-legend-gap - Space between legend controls.
+ * @cssproperty --fluid-chart-legend-bg - Legend control background.
+ * @cssproperty --fluid-chart-legend-fg - Legend text color.
+ * @cssproperty --fluid-chart-legend-border - Legend control border.
+ * @cssproperty --fluid-chart-legend-radius - Legend control corner radius.
+ * @cssproperty --fluid-chart-legend-padding - Legend control padding.
+ * @cssproperty --fluid-chart-legend-target - Minimum legend control size.
+ * @cssproperty --fluid-chart-legend-font - Legend control font.
+ * @cssproperty --fluid-chart-legend-focus-color - Legend focus ring color.
+ * @cssproperty --fluid-chart-legend-focus-width - Legend focus ring width.
+ * @cssproperty --fluid-chart-legend-focus-offset - Legend focus ring offset.
  *
  * @uses-token --fluid-accent-base - Primary series + area-fill gradient.
  * @uses-token --fluid-color-brand-200 - Categorical series palette (brand ramp).
@@ -82,19 +112,61 @@ interface FluidTheme {
  * @uses-token --fluid-border-default - Grid lines + axis borders.
  * @uses-token --fluid-surface-base - Arc/segment borders + tooltip text on the inverse bg.
  * @uses-token --fluid-font-family-sans - All chart text.
+ * @uses-token --fluid-space-2 - Legend gap and padding.
+ * @uses-token --fluid-space-1 - Legend vertical padding.
+ * @uses-token --fluid-target-min - Legend minimum target size.
+ * @uses-token --fluid-radius-sm - Legend corner radius.
+ * @uses-token --fluid-focus-ring-color - Legend focus ring.
+ * @uses-token --fluid-focus-ring-width - Legend focus ring thickness.
+ * @uses-token --fluid-focus-ring-offset - Legend focus ring offset.
  */
-export class FluidChart extends LitElement {
+export class FluidChart extends FluidElement {
   static override styles = css`
     :host {
-      display: block;
+      display: flex;
+      flex-direction: column;
       position: relative;
       width: 100%;
       height: var(--fluid-chart-height, 16rem);
+    }
+    .plot {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
     }
     canvas {
       display: block;
       width: 100%;
       height: 100%;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      gap: var(--fluid-chart-legend-gap, var(--fluid-space-2, 0.5rem));
+    }
+    .legend button {
+      cursor: pointer;
+      min-height: var(--fluid-chart-legend-target, var(--fluid-target-min, 24px));
+      min-width: var(--fluid-chart-legend-target, var(--fluid-target-min, 24px));
+      padding: var(
+        --fluid-chart-legend-padding,
+        var(--fluid-space-1, 0.25rem) var(--fluid-space-2, 0.5rem)
+      );
+      color: var(--fluid-chart-legend-fg, var(--fluid-text-primary, #111827));
+      background: var(--fluid-chart-legend-bg, var(--fluid-surface-base, #fff));
+      border: 1px solid var(--fluid-chart-legend-border, var(--fluid-border-default, #e5e7eb));
+      border-radius: var(--fluid-chart-legend-radius, var(--fluid-radius-sm, 0.25rem));
+      font: var(--fluid-chart-legend-font, inherit);
+    }
+    .legend button[aria-pressed="false"] {
+      text-decoration: line-through;
+    }
+    .legend button:focus-visible {
+      outline: var(--fluid-chart-legend-focus-width, var(--fluid-focus-ring-width, 2px)) solid
+        var(--fluid-chart-legend-focus-color, var(--fluid-focus-ring-color, #2563eb));
+      outline-offset: var(--fluid-chart-legend-focus-offset, var(--fluid-focus-ring-offset, 2px));
     }
   `;
 
@@ -104,6 +176,16 @@ export class FluidChart extends LitElement {
   /** Chart.js data object. */
   @property({ attribute: false }) data: ChartData = { labels: [], datasets: [] };
 
+  /** Accessible canvas name. Describe the chart's subject, not only its visual type. */
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("chart");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
+
   /** Chart.js options object. Merged over the Fluid theme (these win). */
   @property({ attribute: false }) options: ChartOptions = {};
 
@@ -111,38 +193,64 @@ export class FluidChart extends LitElement {
 
   private chart: Chart | null = null;
   private themeObserver?: MutationObserver;
+  @state() private legendItems: LegendItem[] = [];
+  private pendingLegendItems?: LegendItem[];
+  private legendUpdateQueued = false;
+  private renderingChartUpdate = false;
+  private savedDatasetVisibility?: boolean[];
+  private savedDataVisibility?: boolean[];
+  private savedType?: ChartType;
+  private motionQuery?: MediaQueryList;
+  private handleMotionChange = () => this.retheme();
 
   override connectedCallback(): void {
     super.connectedCallback();
+    this.motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.motionQuery.addEventListener("change", this.handleMotionChange);
     // Re-theme when the page scheme or brand flips (attributes on <html>).
     this.themeObserver = new MutationObserver(() => this.retheme());
     this.themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-fluid-theme", "data-fluid-brand", "data-fluid-conformance"]
     });
-  }
-
-  protected override firstUpdated(): void {
-    this.render2d();
+    if (this.hasUpdated) this.requestUpdate();
   }
 
   protected override updated(changed: PropertyValues<this>): void {
-    if (changed.has("type")) {
-      this.destroy();
-      this.render2d();
-    } else if ((changed.has("data") || changed.has("options")) && this.chart) {
-      const { data, options } = this.buildConfig();
-      this.chart.data = data;
-      this.chart.options = options;
-      this.chart.update();
-    } else if (changed.has("data") || changed.has("options")) {
-      this.render2d();
+    if (!this.isConnected) return;
+    this.renderingChartUpdate = true;
+    try {
+      if (changed.has("type") && this.chart) {
+        this.destroy();
+        this.savedDatasetVisibility = undefined;
+        this.savedDataVisibility = undefined;
+        this.render2d();
+      } else if ((changed.has("data") || changed.has("options")) && this.chart) {
+        const { data, options } = this.buildConfig();
+        this.chart.data = data;
+        this.chart.options = options;
+        this.chart.update();
+      } else if (!this.chart) {
+        this.render2d();
+      }
+      if (this.chart && (changed.size === 0 || changed.has("label"))) {
+        this.syncLegend(this.chart);
+        // The doughnut total is painted into the third-party canvas. A locale
+        // change therefore needs one in-place draw, but never a new Chart,
+        // update, dataset mutation, or visibility reset.
+        if (changed.size === 0 && this.type === "doughnut") this.chart.draw();
+      }
+    } finally {
+      this.renderingChartUpdate = false;
     }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.themeObserver?.disconnect();
+    this.motionQuery?.removeEventListener("change", this.handleMotionChange);
+    this.motionQuery = undefined;
+    this.saveVisibility();
     this.destroy();
   }
 
@@ -154,6 +262,7 @@ export class FluidChart extends LitElement {
   /** Full re-theme (re-reads tokens, rebuilds gradients). */
   private retheme(): void {
     if (!this.chart) return;
+    this.saveVisibility();
     this.destroy();
     this.render2d();
   }
@@ -187,6 +296,9 @@ export class FluidChart extends LitElement {
       font: { family: t.font },
       plugins: {
         legend: {
+          // A native HTML legend replaces the pointer-only canvas legend.
+          // Callers can opt the canvas legend back in with display:true.
+          display: false,
           labels: {
             color: t.text,
             usePointStyle: true,
@@ -245,10 +357,10 @@ export class FluidChart extends LitElement {
       | undefined;
     const center = cfg?.fluidCenterText;
     if (center === false) return [];
-    const label =
+    const labelOverride =
       center && typeof center === "object" && "label" in center
         ? String((center as { label: unknown }).label)
-        : "Total";
+        : null;
     return [
       {
         id: "fluidArcDecor",
@@ -259,7 +371,7 @@ export class FluidChart extends LitElement {
           c.shadowBlur = 16;
           c.shadowOffsetY = 6;
         },
-        afterDatasetsDraw(chart) {
+        afterDatasetsDraw: (chart) => {
           const c = chart.ctx;
           c.restore(); // drop the shadow before drawing text
           const ds = chart.data.datasets?.[0];
@@ -273,10 +385,10 @@ export class FluidChart extends LitElement {
           c.textBaseline = "middle";
           c.fillStyle = t.text;
           c.font = `700 26px ${t.font}`;
-          c.fillText(total.toLocaleString(), cx, cy - 8);
+          c.fillText(this.formatNumber(total), cx, cy - 8);
           c.fillStyle = t.muted;
           c.font = `500 13px ${t.font}`;
-          c.fillText(label, cx, cy + 15);
+          c.fillText(labelOverride ?? this.term("chartTotal"), cx, cy + 15);
           c.restore();
         }
       } as Plugin
@@ -345,20 +457,110 @@ export class FluidChart extends LitElement {
 
   private buildConfig(): { data: ChartData; options: ChartOptions; plugins: Plugin[] } {
     const t = this.readTheme();
+    const options = mergeDeep(this.themedOptions(t), this.options);
+    if (this.motionQuery?.matches) options.animation = false;
     return {
       data: this.themedData(t),
-      options: mergeDeep(this.themedOptions(t), this.options),
-      plugins: this.type === "doughnut" ? this.arcDecor(t) : []
+      options,
+      plugins: [
+        ...(this.type === "doughnut" ? this.arcDecor(t) : []),
+        { id: "fluidHtmlLegend", afterUpdate: (chart) => this.syncLegend(chart) }
+      ]
     };
   }
 
   private render2d(): void {
-    if (!this.canvas) return;
+    if (!this.canvas || !this.isConnected || this.chart) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
     const { data, options, plugins } = this.buildConfig();
     const config: ChartConfiguration = { type: this.type, data, options, plugins };
     this.chart = new Chart(ctx, config);
+    if (this.savedType === this.type && (this.savedDatasetVisibility || this.savedDataVisibility)) {
+      this.savedDatasetVisibility?.forEach((visible, index) => {
+        if (index < this.chart!.data.datasets.length)
+          this.chart!.setDatasetVisibility(index, visible);
+      });
+      this.savedDataVisibility?.forEach((visible, index) => {
+        if (
+          index < (this.chart!.data.labels?.length ?? 0) &&
+          visible !== this.chart!.getDataVisibility(index)
+        ) {
+          this.chart!.toggleDataVisibility(index);
+        }
+      });
+      this.chart.update("none");
+    }
+    this.savedDatasetVisibility = undefined;
+    this.savedDataVisibility = undefined;
+    this.savedType = undefined;
+  }
+
+  private saveVisibility(): void {
+    if (!this.chart) return;
+    this.savedType = this.type;
+    this.savedDatasetVisibility = this.chart.data.datasets.map((_, index) =>
+      this.chart!.isDatasetVisible(index)
+    );
+    this.savedDataVisibility = (this.chart.data.labels ?? []).map((_, index) =>
+      this.chart!.getDataVisibility(index)
+    );
+  }
+
+  private syncLegend(chart: Chart): void {
+    const legend = this.options.plugins?.legend;
+    const next =
+      legend?.display === false
+        ? []
+        : (chart.legend?.legendItems ?? []).map((item, index) => ({
+            ...item,
+            text:
+              item.text || this.term("chartLegendItem", this.label, this.formatNumber(index + 1))
+          }));
+    if (!this.renderingChartUpdate) {
+      this.legendItems = next;
+      return;
+    }
+    this.pendingLegendItems = next;
+    if (this.legendUpdateQueued) return;
+    this.legendUpdateQueued = true;
+    queueMicrotask(() => {
+      this.legendUpdateQueued = false;
+      const next = this.pendingLegendItems;
+      this.pendingLegendItems = undefined;
+      if (next && this.isConnected) this.legendItems = next;
+    });
+  }
+
+  private activateLegend(event: MouseEvent, item: LegendItem): void {
+    const chart = this.chart;
+    const legend = chart?.legend;
+    if (!chart || !legend || typeof legend.options.onClick !== "function") return;
+    // Reuse the resolved callback, including pie/polar overrides and consumer
+    // onClick. This is the same action as a real canvas legend click, not a
+    // synthetic canvas event. Native buttons supply Enter and Space behavior.
+    legend.options.onClick.call(
+      legend,
+      { type: "click", native: event, x: null, y: null },
+      item,
+      legend
+    );
+    this.syncLegend(chart);
+    this.dispatchEvent(
+      new CustomEvent("fluid-legend-change", {
+        detail: {
+          label: item.text,
+          datasetIndex: item.datasetIndex,
+          index: item.index,
+          visible:
+            item.index === undefined
+              ? chart.isDatasetVisible(item.datasetIndex ?? 0)
+              : chart.getDataVisibility(item.index)
+        },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private destroy(): void {
@@ -366,7 +568,40 @@ export class FluidChart extends LitElement {
     this.chart = null;
   }
 
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.localize.locale).format(value);
+  }
+
   override render(): TemplateResult {
-    return html`<canvas part="base"></canvas>`;
+    return html`
+      <div class="plot" part="plot" dir=${this.localize.dir}>
+        <canvas part="base" role="img" aria-label=${this.label}>${this.label}</canvas>
+      </div>
+      ${this.legendItems.length
+        ? html`
+            <div
+              class="legend"
+              part="legend"
+              role="group"
+              aria-label=${this.label}
+              dir=${this.localize.dir}
+            >
+              ${this.legendItems.map(
+                (item) => html`
+                  <button
+                    part="legend-button"
+                    type="button"
+                    aria-pressed=${String(!item.hidden)}
+                    @click=${(event: MouseEvent) => this.activateLegend(event, item)}
+                  >
+                    ${item.text}
+                  </button>
+                `
+              )}
+            </div>
+          `
+        : null}
+      <slot name="fallback"></slot>
+    `;
   }
 }

@@ -1,5 +1,10 @@
 import { expect, fixture, html, elementUpdated, oneEvent, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "@fluid-ds/components/locales/nl";
+import "@fluid-ds/components/locales/de";
+import "@fluid-ds/components/locales/fr";
+import "@fluid-ds/components/locales/es";
+import "@fluid-ds/components/locales/ar";
 import type { FluidKanban, KanbanColumn } from "./fluid-kanban.js";
 
 const data: KanbanColumn[] = [
@@ -60,6 +65,69 @@ function dragEvent(type: string, dt: DataTransfer): DragEvent {
 }
 
 describe("<fluid-kanban>", () => {
+  it("does not emit moves for unchanged positions or invalid indices", async () => {
+    const el = await board();
+    const events: Event[] = [];
+    el.addEventListener("fluid-move", (event) => events.push(event));
+    el.moveCard("c1", 0, 0);
+    el.moveCard("c1", 0, -1);
+    expect(el.moveCard("c1", Number.NaN, 0)).to.equal(null);
+    expect(el.moveCard("c1", 0, Number.NaN)).to.equal(null);
+    expect(events).to.deep.equal([]);
+    expect(el.columns).to.deep.equal(clone());
+  });
+
+  it("Escape restores the picked-up position after a keyboard move", async () => {
+    const el = await board();
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await el.updateComplete;
+    card(el, "c1").dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+    );
+    await el.updateComplete;
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await el.updateComplete;
+    expect(el.columns).to.deep.equal(clone());
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
+  });
+
+  it("offers a single-pointer move without dragging", async () => {
+    const el = await board();
+    const control = card(el, "c1").querySelector<HTMLButtonElement>('[data-move="next"]');
+    expect(control).to.exist;
+    expect(control!.getBoundingClientRect().height).to.be.at.least(24);
+    expect(control!.getBoundingClientRect().width).to.be.at.least(24);
+    control!.click();
+    await el.updateComplete;
+    expect(el.columns[1]!.cards.map((item) => item.id)).to.deep.equal(["c1", "c3"]);
+  });
+
+  it("refocuses arbitrary card IDs safely and clears pickup state on reconnect", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`<div><fluid-kanban></fluid-kanban></div>`);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    const id = 'card"with]punctuation';
+    el.columns = [
+      { id: "one", title: "One", cards: [{ id, title: "Quoted ID" }] },
+      { id: "two", title: "Two", cards: [] }
+    ];
+    await el.updateComplete;
+    const current = () =>
+      [...el.shadowRoot!.querySelectorAll<HTMLElement>("[data-card-id]")].find(
+        (element) => element.dataset.cardId === id
+      )!;
+    current().focus();
+    current().dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    current().dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    await el.updateComplete;
+    await Promise.resolve();
+    expect(el.shadowRoot!.activeElement).to.equal(current());
+    expect(el.columns[1]!.cards[0]!.id).to.equal(id);
+    el.remove();
+    wrapper.append(el);
+    await el.updateComplete;
+    expect(current().getAttribute("aria-grabbed")).to.equal("false");
+  });
+
   it("renders each column as a labelled group with a card list", async () => {
     const el = await board();
     const columns = el.shadowRoot!.querySelectorAll('[part="column"]');
@@ -114,15 +182,65 @@ describe("<fluid-kanban>", () => {
     expect(el.columns[1]!.cards.some((c) => c.id === "c1")).to.equal(true);
   });
 
+  it("follows the rendered logical column track in RTL without reversing board data", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div dir="rtl"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+
+    const renderedColumns = el.shadowRoot!.querySelectorAll<HTMLElement>('[part="column"]');
+    expect(renderedColumns[0]!.getBoundingClientRect().left).to.be.greaterThan(
+      renderedColumns[1]!.getBoundingClientRect().left
+    );
+
+    const original = clone();
+    const c1 = card(el, "c1");
+    c1.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await elementUpdated(el);
+    const moved = oneEvent(el, "fluid-move") as Promise<CustomEvent>;
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    const event = await moved;
+    await elementUpdated(el);
+
+    expect(event.detail).to.include({ cardId: "c1", fromColumn: "todo", toColumn: "doing" });
+    expect(el.columns.map((entry) => entry.id)).to.deep.equal(original.map((entry) => entry.id));
+    expect(el.columns[1]!.cards.map((entry) => entry.id)).to.deep.equal(["c1", "c3"]);
+
+    const previous = card(el, "c1").querySelector<HTMLElement>('[data-move="previous"]')!;
+    const next = card(el, "c1").querySelector<HTMLButtonElement>('[data-move="next"]')!;
+    expect(previous.getAttribute("aria-label")).to.equal("Move to previous column: Alpha");
+    expect(getComputedStyle(previous.querySelector(".horizontal-symbol")!).transform).to.not.equal(
+      "none"
+    );
+    expect(next.disabled).to.equal(true);
+  });
+
+  it("uses a live inherited direction while a card is picked up", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div dir="ltr"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    wrapper.dir = "rtl";
+    await aTimeout(0);
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    await elementUpdated(el);
+
+    expect(el.columns[1]!.cards.map((entry) => entry.id)).to.deep.equal(["c1", "c3"]);
+  });
+
   it("ArrowDown reorders within a column", async () => {
     const el = await board();
     const c1 = card(el, "c1");
     c1.focus();
     c1.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
     await elementUpdated(el);
-    card(el, "c1").dispatchEvent(
-      new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
-    );
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
     await elementUpdated(el);
     expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2", "c1"]);
   });
@@ -133,9 +251,7 @@ describe("<fluid-kanban>", () => {
     c1.focus();
     c1.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
     await elementUpdated(el);
-    card(el, "c1").dispatchEvent(
-      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
-    );
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await elementUpdated(el);
     expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
     expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c1", "c2"]);
@@ -201,5 +317,118 @@ describe("<fluid-kanban>", () => {
     await elementUpdated(el);
     await aTimeout(20);
     await expect(el).to.be.accessible();
+  });
+
+  it("updates inherited Arabic and regional French board controls without mutating board data", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+    const original = el.columns;
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    expect(el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-label")).to.equal(
+      "لوحة كانبان"
+    );
+    expect(el.shadowRoot!.querySelector<HTMLElement>('[part="base"]')!.dir).to.equal("rtl");
+    expect(card(el, "c1").querySelector('[data-move="next"]')!.getAttribute("aria-label")).to.equal(
+      "تحريك إلى العمود التالي: Alpha"
+    );
+
+    wrapper.lang = "fr-CA";
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-label")).to.equal(
+      "Tableau Kanban"
+    );
+    expect(card(el, "c1").querySelector('[data-move="next"]')!.getAttribute("aria-label")).to.equal(
+      "Déplacer vers la colonne suivante : Alpha"
+    );
+    expect(el.columns).to.equal(original);
+    expect(moves).to.deep.equal([]);
+  });
+
+  it("preserves explicit move-label overrides including empty values", async () => {
+    const el = await fixture<FluidKanban>(html`
+      <fluid-kanban
+        move-up-label="Custom up"
+        move-down-label="Custom down"
+        move-previous-label="Custom previous"
+        move-next-label=""
+      ></fluid-kanban>
+    `);
+    el.columns = clone();
+    await elementUpdated(el);
+    expect(card(el, "c1").querySelector('[data-move="up"]')!.getAttribute("aria-label")).to.equal(
+      "Custom up: Alpha"
+    );
+    expect(card(el, "c1").querySelector('[data-move="down"]')!.getAttribute("aria-label")).to.equal(
+      "Custom down: Alpha"
+    );
+    expect(
+      card(el, "c1").querySelector('[data-move="previous"]')!.getAttribute("aria-label")
+    ).to.equal("Custom previous: Alpha");
+    expect(card(el, "c1").querySelector('[data-move="next"]')!.getAttribute("aria-label")).to.equal(
+      ": Alpha"
+    );
+    el.lang = "ar";
+    await elementUpdated(el);
+    expect(card(el, "c1").querySelector('[data-move="up"]')!.getAttribute("aria-label")).to.equal(
+      "Custom up: Alpha"
+    );
+    expect(card(el, "c1").querySelector('[data-move="down"]')!.getAttribute("aria-label")).to.equal(
+      "Custom down: Alpha"
+    );
+    expect(
+      card(el, "c1").querySelector('[data-move="previous"]')!.getAttribute("aria-label")
+    ).to.equal("Custom previous: Alpha");
+    expect(card(el, "c1").querySelector('[data-move="next"]')!.getAttribute("aria-label")).to.equal(
+      ": Alpha"
+    );
+  });
+
+  it("relocalizes an active pickup announcement without replaying a business event", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await elementUpdated(el);
+    const status = el.shadowRoot!.querySelector<HTMLElement>('[role="status"]')!;
+    expect(status.dir).to.equal("rtl");
+    expect(status.textContent).to.contain("تم الالتقاط").and.contain("To do");
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    wrapper.lang = "de";
+    await elementUpdated(el);
+    expect(status.textContent).to.contain("Aufgenommen").and.contain("To do");
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("true");
+    expect(moves).to.deep.equal([]);
+  });
+
+  it("uses inherited Arabic direction for logical keyboard movement and preserves canonical data", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await elementUpdated(el);
+    const moved = oneEvent(el, "fluid-move") as Promise<CustomEvent>;
+    card(el, "c1").dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    const event = await moved;
+    expect(event.detail).to.deep.equal({
+      cardId: "c1",
+      fromColumn: "todo",
+      toColumn: "doing",
+      index: 0
+    });
+    expect(el.columns.map((entry) => entry.id)).to.deep.equal(["todo", "doing"]);
+    expect(el.columns[1]!.cards.map((entry) => entry.id)).to.deep.equal(["c1", "c3"]);
+    expect(el.shadowRoot!.querySelector('[role="status"]')!.textContent).to.contain("Alpha");
   });
 });

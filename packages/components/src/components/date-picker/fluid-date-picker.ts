@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
+import { autoUpdate, computePosition, flip, offset, shift } from "../../internal/position.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
 import { reducedMotion } from "../../internal/motion.js";
 import {
@@ -11,18 +11,30 @@ import {
 } from "../../internal/field-chrome.js";
 import "../calendar/define.js";
 import type { FluidCalendar } from "../calendar/fluid-calendar.js";
-import { type Weekday, fromISODate, toISODate, formatDate, clampDate, inRange } from "../../internal/date-utils.js";
+import {
+  type Weekday,
+  fromISODate,
+  toISODate,
+  formatDate,
+  clampDate,
+  inRange
+} from "../../internal/date-utils.js";
 
 type DisplayFormat = "short" | "medium" | "long" | "numeric" | "iso";
 
 /** Map the friendly `format` to Intl options (or null = emit the raw ISO). */
 function formatOptions(format: DisplayFormat): Intl.DateTimeFormatOptions | null {
   switch (format) {
-    case "iso": return null;
-    case "numeric": return { year: "numeric", month: "2-digit", day: "2-digit" };
-    case "short": return { dateStyle: "short" };
-    case "long": return { dateStyle: "long" };
-    default: return { dateStyle: "medium" };
+    case "iso":
+      return null;
+    case "numeric":
+      return { year: "numeric", month: "2-digit", day: "2-digit" };
+    case "short":
+      return { dateStyle: "short" };
+    case "long":
+      return { dateStyle: "long" };
+    default:
+      return { dateStyle: "medium" };
   }
 }
 
@@ -65,6 +77,7 @@ let counter = 0;
  * @cssproperty --fluid-date-picker-border-focus - Focused border. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-date-picker-radius - Field corner radius. Falls back to --fluid-field-border-radius → --fluid-radius-md.
  * @cssproperty --fluid-date-picker-dialog-bg - Popover background. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-date-picker-dialog-shadow - Popover elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-date-picker-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
  * @uses-token --fluid-surface-base - Field + dialog background.
@@ -82,9 +95,17 @@ let counter = 0;
  * @fires fluid-change - The committed date changed. `detail: { value, date, timestamp }`.
  * @fires fluid-open - The calendar opened.
  * @fires fluid-close - The calendar closed.
+ * @cssproperty --fluid-date-picker-accent-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-date-picker-border-default - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-date-picker-text-primary - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-date-picker-text-secondary - Component override for the corresponding semantic token.
  */
 export class FluidDatePicker extends FluidFormAssociated {
   static override formAssociated = true;
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
 
   static override styles = [
     reducedMotion,
@@ -94,7 +115,10 @@ export class FluidDatePicker extends FluidFormAssociated {
         display: inline-block;
         font-family: var(--fluid-date-picker-font-family, var(--fluid-font-family-sans));
       }
-      :host([disabled]) { opacity: 0.6; pointer-events: none; }
+      :host([disabled]) {
+        opacity: 0.6;
+        pointer-events: none;
+      }
       .base {
         display: inline-flex;
         align-items: center;
@@ -105,15 +129,30 @@ export class FluidDatePicker extends FluidFormAssociated {
         color: var(--fluid-date-picker-fg, var(--fluid-input-fg, var(--fluid-text-primary)));
         border: var(--fluid-field-border-width, 1px) solid
           var(--fluid-date-picker-border, var(--fluid-input-border, var(--fluid-border-default)));
-        border-radius: var(--fluid-date-picker-radius, var(--fluid-field-border-radius, var(--fluid-radius-md)));
-        transition: border-color 120ms ease, box-shadow 120ms ease;
+        border-radius: var(
+          --fluid-date-picker-radius,
+          var(--fluid-field-border-radius, var(--fluid-radius-md))
+        );
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease;
       }
       /* Font scales with the size, as it does on every other field. Sized by
          height alone, a sm picker kept the md text and read a size larger than
          the input beside it — see fluid-date-range-picker. */
-      .base { font-size: var(--fluid-font-size-md); }
-      :host([size="sm"]) .base { height: var(--fluid-field-height-sm, 2rem); padding-inline: var(--fluid-field-padding-x-sm, 0.6rem); font-size: var(--fluid-font-size-sm); }
-      :host([size="lg"]) .base { height: var(--fluid-field-height-lg, 3rem); padding-inline: var(--fluid-field-padding-x-lg, 0.9rem); font-size: var(--fluid-font-size-lg); }
+      .base {
+        font-size: var(--fluid-font-size-md);
+      }
+      :host([size="sm"]) .base {
+        height: var(--fluid-field-height-sm, 2rem);
+        padding-inline: var(--fluid-field-padding-x-sm, 0.6rem);
+        font-size: var(--fluid-font-size-sm);
+      }
+      :host([size="lg"]) .base {
+        height: var(--fluid-field-height-lg, 3rem);
+        padding-inline: var(--fluid-field-padding-x-lg, 0.9rem);
+        font-size: var(--fluid-font-size-lg);
+      }
       .base:focus-within {
         border-color: var(--fluid-date-picker-border-focus, var(--fluid-accent-base));
         outline: var(--fluid-date-picker-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
@@ -130,7 +169,12 @@ export class FluidDatePicker extends FluidFormAssociated {
         font: inherit;
         padding: 0;
       }
-      input::placeholder { color: var(--fluid-input-placeholder-fg, var(--fluid-text-secondary)); }
+      input::placeholder {
+        color: var(
+          --fluid-input-placeholder-fg,
+          var(--fluid-date-picker-text-secondary, var(--fluid-text-secondary))
+        );
+      }
       .trigger {
         display: inline-grid;
         place-items: center;
@@ -140,16 +184,19 @@ export class FluidDatePicker extends FluidFormAssociated {
         border: 0;
         border-radius: var(--fluid-radius-sm, 4px);
         background: transparent;
-        color: var(--fluid-text-secondary);
+        color: var(--fluid-date-picker-text-secondary, var(--fluid-text-secondary));
         cursor: pointer;
       }
-      .trigger:hover { color: var(--fluid-text-primary); }
+      .trigger:hover {
+        color: var(--fluid-date-picker-text-primary, var(--fluid-text-primary));
+      }
       .trigger:focus-visible {
-        outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base);
+        outline: var(--fluid-focus-ring-width, 2px) solid
+          var(--fluid-date-picker-accent-base, var(--fluid-accent-base));
         outline-offset: 1px;
       }
       /* Rendered in the top layer via popover="manual" so it is never clipped
-         by an ancestor's overflow / transform / contain. floating-ui still
+         by an ancestor's overflow / transform / contain. the positioning engine still
          drives placement. */
       .dialog {
         position: fixed;
@@ -160,9 +207,12 @@ export class FluidDatePicker extends FluidFormAssociated {
         margin: 0;
         padding: 0.65rem;
         background: var(--fluid-date-picker-dialog-bg, var(--fluid-surface-base));
-        border: 1px solid var(--fluid-border-default);
+        border: 1px solid var(--fluid-date-picker-border-default, var(--fluid-border-default));
         border-radius: var(--fluid-radius-lg, 0.75rem);
-        box-shadow: var(--fluid-shadow-lg, 0 12px 32px -8px rgba(0, 0, 0, 0.25));
+        box-shadow: var(
+          --fluid-date-picker-dialog-shadow,
+          var(--fluid-shadow-lg, 0 12px 32px -8px rgba(0, 0, 0, 0.25))
+        );
         opacity: 0;
         transform: scale(0.97);
         transform-origin: top left;
@@ -172,11 +222,20 @@ export class FluidDatePicker extends FluidFormAssociated {
           overlay calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) allow-discrete,
           display calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) allow-discrete;
       }
-      .dialog:popover-open { opacity: 1; transform: scale(1); }
-      @starting-style {
-        .dialog:popover-open { opacity: 0; transform: scale(0.97); }
+      .dialog:popover-open {
+        opacity: 1;
+        transform: scale(1);
       }
-      svg { width: 1.1em; height: 1.1em; }
+      @starting-style {
+        .dialog:popover-open {
+          opacity: 0;
+          transform: scale(0.97);
+        }
+      }
+      svg {
+        width: 1.1em;
+        height: 1.1em;
+      }
     `
   ];
 
@@ -189,7 +248,14 @@ export class FluidDatePicker extends FluidFormAssociated {
   @property({ type: Boolean, reflect: true }) disabled = false;
   @property({ type: Boolean }) required = false;
   @property({ type: Boolean }) readonly = false;
-  @property() placeholder = "Select a date";
+  @property()
+  get placeholder(): string {
+    return this.placeholderOverride ?? this.term("selectDate");
+  }
+  set placeholder(value: string | null) {
+    this.placeholderOverride = value;
+  }
+  private placeholderOverride: string | null = null;
 
   /** Earliest selectable date, `YYYY-MM-DD`. */
   @property() min: string | null = null;
@@ -211,6 +277,9 @@ export class FluidDatePicker extends FluidFormAssociated {
   /** Whether the calendar popover is open. */
   @property({ type: Boolean, reflect: true }) open = false;
 
+  /** Open the calendar when the text input is clicked. */
+  @property({ type: Boolean, attribute: "open-on-input-click" }) openOnInputClick = false;
+
   @state() private typed = "";
 
   @query("input") private inputEl!: HTMLInputElement;
@@ -227,18 +296,18 @@ export class FluidDatePicker extends FluidFormAssociated {
   private cleanup?: () => void;
   private dialogId = `fluid-datepicker-${++counter}`;
   private defaultValue: string | null = null;
+  private lastDisplayText = "";
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.defaultValue = this.value;
     if (this.value) this.syncFormValue();
-    document.addEventListener("pointerdown", this.onDocPointerDown, true);
+    this.listen(document, "pointerdown", this.onDocPointerDown, { capture: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.cleanup?.();
-    document.removeEventListener("pointerdown", this.onDocPointerDown, true);
   }
 
   /** Visible text for the current value. */
@@ -246,16 +315,45 @@ export class FluidDatePicker extends FluidFormAssociated {
     const d = fromISODate(this.value);
     if (!d) return "";
     const opts = formatOptions(this.format);
-    return opts ? formatDate(d, this.locale, opts) : this.value!;
+    return opts ? formatDate(d, this.displayLocale, opts) : this.value!;
+  }
+
+  /** Explicit locale wins; otherwise date display follows the reactive language context. */
+  private get displayLocale(): string | undefined {
+    const locale = this.locale === undefined ? this.localize.locale : this.locale;
+    if (locale === "") return undefined;
+    try {
+      Intl.getCanonicalLocales(locale);
+      return locale;
+    } catch {
+      return this.locale === undefined ? "en" : undefined;
+    }
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value")) {
-      this.typed = this.displayText;
-      this.syncFormValue();
-      if (this.required && !this.value) this.setValidity({ valueMissing: true }, "Please choose a date.");
-      else this.setValidity({});
+    const displayText = this.displayText;
+    if (changed.has("value") || this.typed === this.lastDisplayText) {
+      this.typed = displayText;
     }
+    this.lastDisplayText = displayText;
+    if (changed.has("value")) {
+      this.syncFormValue();
+    }
+    this.refreshValidity();
+  }
+
+  protected override firstUpdated(): void {
+    // The first client render supplies the native validation focus anchor.
+    this.refreshValidity();
+  }
+
+  private refreshValidity(): void {
+    const missing = this.required && !this.value;
+    this.setValidity(
+      missing ? { valueMissing: true } : {},
+      missing ? this.term("chooseDateRequired") : undefined,
+      this.inputEl ?? undefined
+    );
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -298,7 +396,8 @@ export class FluidDatePicker extends FluidFormAssociated {
     await this.reposition();
     requestAnimationFrame(() => {
       // Move keyboard focus into the grid.
-      const focusBtn = this.calendarEl?.shadowRoot?.querySelector<HTMLButtonElement>(".day[tabindex='0']");
+      const focusBtn =
+        this.calendarEl?.shadowRoot?.querySelector<HTMLButtonElement>(".day[tabindex='0']");
       focusBtn?.focus();
     });
   }
@@ -324,7 +423,7 @@ export class FluidDatePicker extends FluidFormAssociated {
     const { x, y } = await computePosition(this.base, this.dialogEl, {
       placement: "bottom-start",
       strategy: "fixed",
-      middleware: [offset(6), flip({ rootBoundary: "viewport" }), shift({ padding: 8 })]
+      middleware: [offset(6), flip(), shift({ padding: 8 })]
     });
     Object.assign(this.dialogEl.style, { left: `${x}px`, top: `${y}px` });
   }
@@ -339,6 +438,11 @@ export class FluidDatePicker extends FluidFormAssociated {
     if (this.disabled || this.readonly) return;
     this.open = !this.open;
   }
+
+  private onInputClick = (): void => {
+    if (!this.openOnInputClick || this.disabled || this.readonly) return;
+    this.open = true;
+  };
 
   private onInputKeydown = (e: KeyboardEvent): void => {
     if (e.key === "ArrowDown" && !this.open) {
@@ -363,7 +467,8 @@ export class FluidDatePicker extends FluidFormAssociated {
     let d = fromISODate(text);
     if (!d) {
       const parsed = new Date(text);
-      if (!isNaN(parsed.getTime())) d = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+      if (!isNaN(parsed.getTime()))
+        d = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
     }
     const min = fromISODate(this.min);
     const max = fromISODate(this.max);
@@ -391,61 +496,69 @@ export class FluidDatePicker extends FluidFormAssociated {
     return renderFieldChrome(
       { label: this.label, helpText: this.helpText, for: "input" },
       html`
-      <div part="base" class="base">
-        <input
-          id="input"
-          part="input"
-          type="text"
-          .value=${this.typed}
-          placeholder=${this.placeholder}
-          ?disabled=${this.disabled}
-          ?readonly=${this.readonly}
-          role="combobox"
-          aria-haspopup="dialog"
-          aria-expanded=${this.open ? "true" : "false"}
-          aria-controls=${this.dialogId}
-          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
-          @input=${(e: Event) => (this.typed = (e.target as HTMLInputElement).value)}
-          @change=${this.commitTyped}
-          @keydown=${this.onInputKeydown}
-        />
-        <button
-          part="trigger"
-          class="trigger"
-          type="button"
-          aria-label="Choose date"
-          aria-haspopup="dialog"
-          aria-expanded=${this.open ? "true" : "false"}
-          ?disabled=${this.disabled}
-          @click=${() => this.toggle()}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-            <path d="M16 2v4M8 2v4M3 10h18"></path>
-          </svg>
-        </button>
-      </div>
+        <div part="base" class="base">
+          <input
+            id="input"
+            part="input"
+            type="text"
+            .value=${this.typed}
+            placeholder=${this.placeholder}
+            ?disabled=${this.disabled}
+            ?readonly=${this.readonly}
+            role="combobox"
+            aria-haspopup="dialog"
+            aria-expanded=${this.open ? "true" : "false"}
+            aria-controls=${this.dialogId}
+            aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
+            @click=${this.onInputClick}
+            @input=${(e: Event) => (this.typed = (e.target as HTMLInputElement).value)}
+            @change=${this.commitTyped}
+            @keydown=${this.onInputKeydown}
+          />
+          <button
+            part="trigger"
+            class="trigger"
+            type="button"
+            aria-label=${this.term("chooseDate")}
+            aria-haspopup="dialog"
+            aria-expanded=${this.open ? "true" : "false"}
+            ?disabled=${this.disabled}
+            @click=${() => this.toggle()}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+              <path d="M16 2v4M8 2v4M3 10h18"></path>
+            </svg>
+          </button>
+        </div>
 
-      <div
-        part="dialog"
-        id=${this.dialogId}
-        class="dialog"
-        role="dialog"
-        aria-label="Choose date"
-        popover="manual"
-        @keydown=${this.onDialogKeydown}
-      >
-        <fluid-calendar
-          part="calendar"
-          .value=${this.value}
-          min=${this.min ?? ""}
-          max=${this.max ?? ""}
-          week-start=${this.weekStart}
-          locale=${this.locale ?? ""}
-          @fluid-date-activate=${this.onCalendarActivate}
-        ></fluid-calendar>
-      </div>
-    `
+        <div
+          part="dialog"
+          id=${this.dialogId}
+          class="dialog"
+          role="dialog"
+          aria-label=${this.term("chooseDate")}
+          popover="manual"
+          @keydown=${this.onDialogKeydown}
+        >
+          <fluid-calendar
+            part="calendar"
+            .value=${this.value}
+            min=${this.min ?? ""}
+            max=${this.max ?? ""}
+            week-start=${this.weekStart}
+            .locale=${this.locale}
+            @fluid-date-activate=${this.onCalendarActivate}
+          ></fluid-calendar>
+        </div>
+      `
     );
   }
 }

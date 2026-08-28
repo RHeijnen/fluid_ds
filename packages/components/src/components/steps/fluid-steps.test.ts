@@ -13,6 +13,16 @@ const sample = html`
 `;
 
 describe("<fluid-steps>", () => {
+  it("delegates a clickable step's public focus method to its native button", async () => {
+    const el = await fixture<FluidSteps>(html`
+      <fluid-steps clickable><fluid-step>Account</fluid-step></fluid-steps>
+    `);
+    const step = el.querySelector<FluidStep>("fluid-step")!;
+    await step.updateComplete;
+    step.focus();
+    expect(step.shadowRoot!.activeElement).to.equal(step.shadowRoot!.querySelector("button"));
+  });
+
   it("derives complete / current / upcoming state from `current`", async () => {
     const el = await fixture<FluidSteps>(sample);
     await el.updateComplete;

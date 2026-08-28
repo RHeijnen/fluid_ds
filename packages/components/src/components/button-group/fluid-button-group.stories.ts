@@ -20,7 +20,7 @@ const meta: Meta<Args> = {
     }
   },
   argTypes: {
-    orientation: { control: "inline-radio", options: ["horizontal", "vertical"] }
+    orientation: { control: false, table: { disable: true } }
   },
   args: { orientation: "horizontal" },
   render: (args) => html`
@@ -36,10 +36,6 @@ export default meta;
 type Story = StoryObj<Args>;
 
 export const Default: Story = {};
-
-export const Vertical: Story = {
-  args: { orientation: "vertical" }
-};
 
 export const PrimaryEnd: Story = {
   parameters: {

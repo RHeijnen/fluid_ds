@@ -13,6 +13,13 @@ const peek = (el: FluidIntersectionObserver): Internals =>
   el as unknown as Internals;
 
 describe("<fluid-intersection-observer>", () => {
+  it("passes an a11y audit without changing slotted semantics", async () => {
+    const el = await fixture<FluidIntersectionObserver>(html`
+      <fluid-intersection-observer><button>Observed action</button></fluid-intersection-observer>
+    `);
+    await expect(el).to.be.accessible();
+  });
+
   it("renders its slotted children", async () => {
     const el = await fixture<FluidIntersectionObserver>(html`
       <fluid-intersection-observer><div id="t">hi</div></fluid-intersection-observer>

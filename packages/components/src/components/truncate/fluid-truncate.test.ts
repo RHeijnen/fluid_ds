@@ -1,5 +1,10 @@
 import { expect, fixture, html, elementUpdated, aTimeout, oneEvent } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidTruncate } from "./fluid-truncate.js";
 
 const long = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
@@ -16,6 +21,81 @@ async function settle(el: FluidTruncate): Promise<void> {
 }
 
 describe("<fluid-truncate>", () => {
+  for (const [locale, more, less] of [
+    ["nl", "Meer tonen", "Minder tonen"],
+    ["de", "Mehr anzeigen", "Weniger anzeigen"],
+    ["fr-CA", "Afficher plus", "Afficher moins"],
+    ["es", "Mostrar más", "Mostrar menos"],
+    ["ar", "عرض المزيد", "عرض أقل"]
+  ] as const) {
+    it(`reactively translates both disclosure labels for ${locale}`, async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-truncate expanded lines="1" style="width:120px">${long}</fluid-truncate></div>
+      `);
+      const control = wrapper.querySelector<FluidTruncate>("fluid-truncate")!;
+      await settle(control);
+      expect(control.moreLabel).to.equal("Show more");
+      expect(control.lessLabel).to.equal("Show less");
+      wrapper.lang = locale;
+      await settle(control);
+      const toggle = control.shadowRoot!.querySelector<HTMLButtonElement>(".toggle")!;
+      expect(toggle).to.exist;
+      expect(toggle.textContent?.trim()).to.equal(less);
+      expect(control.lessLabel).to.equal(less);
+      toggle.click();
+      await settle(control);
+      expect(control.expanded).to.equal(false);
+      const collapsedToggle = control.shadowRoot!.querySelector<HTMLButtonElement>(".toggle")!;
+      expect(collapsedToggle).to.exist;
+      expect(collapsedToggle.textContent?.trim()).to.equal(more);
+      expect(control.moreLabel).to.equal(more);
+    });
+  }
+
+  it("preserves explicit label overrides and resumes translation after attributes are removed", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="nl">
+        <fluid-truncate expanded lines="1" style="width:120px" more-label="Expand story" less-label="Collapse story">${long}</fluid-truncate>
+      </div>
+    `);
+    const control = wrapper.querySelector<FluidTruncate>("fluid-truncate")!;
+    await settle(control);
+    wrapper.lang = "de";
+    await settle(control);
+    expect(control.moreLabel).to.equal("Expand story");
+    expect(control.lessLabel).to.equal("Collapse story");
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Collapse story");
+    control.removeAttribute("more-label");
+    control.removeAttribute("less-label");
+    await settle(control);
+    expect(control.moreLabel).to.equal("Mehr anzeigen");
+    expect(control.lessLabel).to.equal("Weniger anzeigen");
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Weniger anzeigen");
+    control.moreLabel = "Show more";
+    wrapper.lang = "ar";
+    await settle(control);
+    expect(control.moreLabel).to.equal("Show more");
+    expect(control.lessLabel).to.equal("عرض أقل");
+  });
+
+  it("updates default labels inside a reactive shadow context without changing expansion", async () => {
+    const host = await fixture<HTMLDivElement>(html`<div lang="en"></div>`);
+    const root = host.attachShadow({ mode: "closed" });
+    const wrapper = document.createElement("section");
+    wrapper.lang = "nl";
+    const control = document.createElement("fluid-truncate") as FluidTruncate;
+    control.expanded = true;
+    control.textContent = long;
+    wrapper.append(control);
+    root.append(wrapper);
+    await settle(control);
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Minder tonen");
+    wrapper.lang = "ar";
+    await settle(control);
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("عرض أقل");
+    expect(control.expanded).to.equal(true);
+  });
+
   it("defaults to 3 lines, collapsed", async () => {
     const el = await fixture<FluidTruncate>(html`<fluid-truncate>Hi</fluid-truncate>`);
     expect(el.lines).to.equal(3);
@@ -52,12 +132,11 @@ describe("<fluid-truncate>", () => {
     el.expanded = true;
     await settle(el);
     const toggle = el.shadowRoot!.querySelector<HTMLButtonElement>(".toggle");
-    if (toggle) {
-      const controlled = toggle.getAttribute("aria-controls");
-      const content = el.shadowRoot!.querySelector(".content")!;
-      expect(controlled).to.equal(content.id);
-      expect(toggle.getAttribute("aria-expanded")).to.equal("true");
-    }
+    expect(toggle).to.exist;
+    const controlled = toggle!.getAttribute("aria-controls");
+    const content = el.shadowRoot!.querySelector(".content")!;
+    expect(controlled).to.equal(content.id);
+    expect(toggle!.getAttribute("aria-expanded")).to.equal("true");
   });
 
   it("toggles expanded and fires fluid-toggle on click", async () => {

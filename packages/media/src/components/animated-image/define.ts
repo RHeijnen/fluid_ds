@@ -1,6 +1,6 @@
 import { FluidAnimatedImage } from "./fluid-animated-image.js";
 
-if (!customElements.get("fluid-animated-image")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-animated-image")) {
   customElements.define("fluid-animated-image", FluidAnimatedImage);
 }
 

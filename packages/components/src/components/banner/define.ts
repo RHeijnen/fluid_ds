@@ -1,6 +1,6 @@
 import { FluidBanner } from "./fluid-banner.js";
 
-if (!customElements.get("fluid-banner")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-banner")) {
   customElements.define("fluid-banner", FluidBanner);
 }
 

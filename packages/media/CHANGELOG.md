@@ -1,5 +1,22 @@
 # @fluid-ds/media
 
+## 0.4.0
+
+### Minor Changes
+
+- Add accessible pan controls and a public `panBy()` method to
+  `fluid-zoomable-frame`, including configurable pan distance and control labels.
+- Allow `fluid-video` to consume declarative light-DOM `<source>` and `<track>`
+  children and expose an accessible player label.
+
+### Patch Changes
+
+- Localize Fluid-owned media controls, counters and time displays across audio,
+  video, playlists, animated images, lightbox and zoomable frame while preserving
+  caller content and physical pan behavior in RTL.
+- Stop disconnected video playback and improve playlist focus treatment and
+  lightbox override handling.
+
 ## 0.1.0
 
 ### Minor Changes

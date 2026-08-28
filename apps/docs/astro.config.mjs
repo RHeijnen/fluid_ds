@@ -3,6 +3,7 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import sitemap from "@astrojs/sitemap";
 import { fluidCodeBlockTransformer } from "./src/lib/fluid-code-shiki.mjs";
+import { prefixDocLinks } from "./src/lib/prefix-doc-links.mjs";
 
 /**
  * Docs site for Fluid, built on Astro Starlight.
@@ -26,9 +27,8 @@ import { fluidCodeBlockTransformer } from "./src/lib/fluid-code-shiki.mjs";
 /**
  * `DOCS_BASE` lets the unified website build mount the docs site at a
  * sub-path (`/docs/`). For local dev it stays at the root. Starlight
- * automatically prefixes every internal link with this base, so
- * `/getting-started/installation/` becomes `/docs/getting-started/...`
- * in the production bundle.
+ * prefixes generated navigation with this base. Authored Markdown links need
+ * the explicit `prefixDocLinks` rehype transform below.
  */
 const base = process.env.DOCS_BASE ?? "/";
 
@@ -47,6 +47,8 @@ export default defineConfig({
   // Dual theme + defaultColor:"light" emits a --shiki-dark var per token;
   // custom.css flips it under [data-theme="dark"].
   markdown: {
+    remarkPlugins: [[prefixDocLinks, { base }]],
+    rehypePlugins: [[prefixDocLinks, { base }]],
     shikiConfig: {
       themes: { light: "github-light", dark: "github-dark" },
       defaultColor: "light",
@@ -67,9 +69,13 @@ export default defineConfig({
         // site title renders a second "Fluid" next to it.
         replacesTitle: true
       },
-      social: {
-        github: "https://github.com/RHeijnen/fluid_ds"
-      },
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/RHeijnen/fluid_ds"
+        }
+      ],
       customCss: ["./src/styles/custom.css"],
       components: {
         // Custom <Head> wraps Starlight's default and adds a single
@@ -140,7 +146,8 @@ export default defineConfig({
             { label: "Time picker", link: "/components/time-picker/" },
             { label: "Masked input", link: "/components/masked-input/" },
             { label: "Transfer", link: "/components/transfer/" },
-            { label: "Dropzone", link: "/components/dropzone/" }
+            { label: "Dropzone", link: "/components/dropzone/" },
+            { label: "Signature pad", link: "/components/signature-pad/" }
           ]
         },
         {
@@ -155,6 +162,7 @@ export default defineConfig({
             { label: "Split panel", link: "/components/split-panel/" },
             { label: "Scroller", link: "/components/scroller/" },
             { label: "Divider", link: "/components/divider/" },
+            { label: "Fold", link: "/components/fold/" },
             { label: "Carousel", link: "/components/carousel/" },
             { label: "Aspect ratio", link: "/components/aspect-ratio/" }
           ]
@@ -252,6 +260,7 @@ export default defineConfig({
             { label: "@fluid-ds/editor", link: "/expansion/editor/" },
             { label: "@fluid-ds/kanban", link: "/expansion/kanban/" },
             { label: "@fluid-ds/map", link: "/expansion/map/" },
+            { label: "@fluid-ds/node-graph", link: "/expansion/node-graph/" },
             { label: "@fluid-ds/markdown", link: "/expansion/markdown/" },
             { label: "@fluid-ds/qr", link: "/expansion/qr/" },
             { label: "@fluid-ds/media", link: "/expansion/media/" },
@@ -264,6 +273,7 @@ export default defineConfig({
           items: [
             { label: "Forms", link: "/guides/forms/" },
             { label: "Accessibility model", link: "/guides/accessibility/" },
+            { label: "Localization & RTL", link: "/guides/localization/" },
             { label: "Animations", link: "/guides/animations/" },
             { label: "Framework wrappers", link: "/guides/frameworks/" },
             { label: "CMS & server-rendered", link: "/guides/cms/" },

@@ -160,11 +160,23 @@ toast-specific.
 
 ### Names & roles
 
-- The container is `role="region"` with `aria-label="Notifications"`.
-- Each toast item is `role="status"` (info / neutral / success) or
-  `role="alert"` (warning / danger) so screen readers announce it at the right
+- The container is `role="region"` with a localized "Notifications" default name.
+- Each toast item is `role="status"` (info / neutral / success / warning) or
+  `role="alert"` (danger) so screen readers announce it at the right
   urgency ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
 - The dismiss button is labeled "Dismiss".
+
+The owned region name follows the nearest `lang` after mounting and reconnecting.
+Explicit `aria-label` values, including empty strings and English defaults, remain
+application-owned. Removing that attribute restores the current localized default.
+An authored `aria-labelledby` takes precedence; its references are not rewritten.
+Supply a meaningful name for each notification region, not an empty override.
+Changing the region name does not translate message content, replace existing
+toast items or move focus.
+
+Hydration limitation: an `aria-label` already present in server-rendered markup
+is preserved as authored. Automatic locale updates for a server-generated default
+need explicit ownership provenance and are not yet verified.
 
 ### Timing & motion
 

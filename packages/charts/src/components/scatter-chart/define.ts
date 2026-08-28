@@ -1,6 +1,6 @@
 import { FluidScatterChart } from "./fluid-scatter-chart.js";
 
-if (!customElements.get("fluid-scatter-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-scatter-chart")) {
   customElements.define("fluid-scatter-chart", FluidScatterChart);
 }
 

@@ -69,6 +69,23 @@ With no value, the placeholder shows until a date is chosen.
 
 <ConformanceCode code={`<fluid-date-picker placeholder="Pick a date…"></fluid-date-picker>`} />
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-date-picker label="Start date" help-text="Your subscription begins on this day."></fluid-date-picker>
+</Demo>
+
+<ConformanceCode code={`<fluid-date-picker
+  label="Start date"
+  help-text="Your subscription begins on this day."
+></fluid-date-picker>`} />
+
 ### Display format
 
 `format` accepts `short`, `medium` (default), `long`, `numeric`, and `iso`. It

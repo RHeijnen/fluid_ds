@@ -1,6 +1,6 @@
 import { FluidPopover } from "./fluid-popover.js";
 
-if (!customElements.get("fluid-popover")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-popover")) {
   customElements.define("fluid-popover", FluidPopover);
 }
 

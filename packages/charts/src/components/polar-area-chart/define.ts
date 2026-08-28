@@ -1,6 +1,6 @@
 import { FluidPolarAreaChart } from "./fluid-polar-area-chart.js";
 
-if (!customElements.get("fluid-polar-area-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-polar-area-chart")) {
   customElements.define("fluid-polar-area-chart", FluidPolarAreaChart);
 }
 

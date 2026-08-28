@@ -1,6 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { formattingLocales } from "../../internal/formatting-locale.js";
 
 /**
  * Format numbers with Intl.NumberFormat. Supports decimal, percent,
@@ -21,7 +22,7 @@ export class FluidFormatNumber extends FluidElement {
   /** Number style. */
   @property() type: "decimal" | "currency" | "percent" | "unit" = "decimal";
 
-  /** BCP 47 locale, or omit for the browser default. */
+  /** BCP 47 locale. Omit to inherit declared lang, then fall back to English. */
   @property() locale: string | null = null;
 
   /** ISO 4217 currency code (e.g. "USD"). Required when type = currency. */
@@ -73,7 +74,7 @@ export class FluidFormatNumber extends FluidElement {
       options.unitDisplay = this.unitDisplay;
     }
     try {
-      const formatter = new Intl.NumberFormat(this.locale ?? undefined, options);
+      const formatter = new Intl.NumberFormat(formattingLocales(this, this.locale), options);
       return html`${formatter.format(this.value)}`;
     } catch {
       // Fall back to a plain number if options were inconsistent.

@@ -92,6 +92,44 @@ export interface Blueprint {
   headerRow?: number | "auto";
 }
 
+/** Typed interpolation values for every parser-owned validation message. */
+export interface ParserErrorParameters {
+  required: { label: string };
+  stringTooShort: { label: string; minimum: number };
+  stringTooLong: { label: string; maximum: number };
+  patternMismatch: { label: string };
+  invalidNumber: { label: string; value: string };
+  invalidInteger: { label: string; value: string };
+  numberBelowMinimum: { label: string; minimum: number };
+  numberAboveMaximum: { label: string; maximum: number };
+  invalidBoolean: { label: string; value: string };
+  invalidDate: { label: string; value: string };
+  dateBeforeMinimum: { label: string };
+  dateAfterMaximum: { label: string };
+  invalidEmail: { label: string; value: string };
+  invalidUrl: { label: string; value: string };
+  invalidEnum: { label: string; options: readonly (string | number)[] };
+  invalidJson: { label: string };
+  unmappedRequired: { label: string };
+  transformFailed: { label: string; reason: string };
+  customValidation: { label: string };
+}
+
+/** Stable machine-readable code for a parser-owned validation result. */
+export type ParserErrorCode = keyof ParserErrorParameters;
+
+/**
+ * Machine-readable validation detail. The `code` discriminates the exact
+ * parameter tuple so UIs can translate parser-owned messages without parsing
+ * the backwards-compatible English `message` string.
+ */
+export type ParserDiagnostic = {
+  [Code in ParserErrorCode]: {
+    code: Code;
+    parameters: ParserErrorParameters[Code];
+  };
+}[ParserErrorCode];
+
 /** One validation failure, tied to a row + field + the offending source value. */
 export interface CellError {
   /** Zero-based index into the output rows. */
@@ -102,6 +140,12 @@ export interface CellError {
   value: unknown;
   /** A human-readable explanation. */
   message: string;
+  /**
+   * Stable structured detail for localization and programmatic handling.
+   * Parser-produced errors always include it; optionality preserves source
+   * compatibility for callers that previously constructed `CellError` values.
+   */
+  diagnostic?: ParserDiagnostic;
 }
 
 /** Summary counters for a parse run. */

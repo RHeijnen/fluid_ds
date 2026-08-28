@@ -1,7 +1,7 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 
@@ -38,6 +38,7 @@ export type FluidToastVariant = "neutral" | "info" | "success" | "warning" | "da
  * @cssproperty --fluid-toast-item-accent - Accent (left border) color. Falls back to the border color.
  * @cssproperty --fluid-toast-item-accent-width - Accent (left border) width. Falls back to 3px.
  * @cssproperty --fluid-toast-item-radius - Corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-toast-item-shadow - Toast elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-toast-item-font-family - Font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-toast-item-icon-fg - Default icon color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-toast-item-close-fg - Close button color. Falls back to --fluid-text-secondary.
@@ -88,10 +89,10 @@ export class FluidToastItem extends FluidElement {
       color: var(--fluid-toast-item-fg, var(--fluid-text-primary));
       border: var(--fluid-toast-item-border-width, 1px) solid
         var(--fluid-toast-item-border, var(--fluid-border-default));
-      border-left: var(--fluid-toast-item-accent-width, 3px) solid
+      border-inline-start: var(--fluid-toast-item-accent-width, 3px) solid
         var(--fluid-toast-item-accent, var(--fluid-toast-item-border, var(--fluid-border-default)));
       border-radius: var(--fluid-toast-item-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-shadow-lg);
+      box-shadow: var(--fluid-toast-item-shadow, var(--fluid-shadow-lg));
       font-family: var(--fluid-toast-item-font-family, var(--fluid-font-family-sans));
       font-size: var(--fluid-font-size-md);
       pointer-events: auto;
@@ -173,25 +174,25 @@ export class FluidToastItem extends FluidElement {
 
     /* Variant accents on the left border + icon, theme-independent tones. */
     :host([variant="info"]) .base {
-      border-left-color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
+      border-inline-start-color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
     }
     :host([variant="info"]) .icon-slot {
       color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
     }
     :host([variant="success"]) .base {
-      border-left-color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
+      border-inline-start-color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
     }
     :host([variant="success"]) .icon-slot {
       color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
     }
     :host([variant="warning"]) .base {
-      border-left-color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
+      border-inline-start-color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
     }
     :host([variant="warning"]) .icon-slot {
       color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
     }
     :host([variant="danger"]) .base {
-      border-left-color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
+      border-inline-start-color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
     }
     :host([variant="danger"]) .icon-slot {
       color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
@@ -208,39 +209,131 @@ export class FluidToastItem extends FluidElement {
   /** Reflected attribute marking the dismissing animation phase. */
   @state() private dismissing = false;
 
-  private timer?: ReturnType<typeof setTimeout>;
+  private autoDismissTimer?: ReturnType<typeof setTimeout>;
+  private exitTimer?: ReturnType<typeof setTimeout>;
+  private autoDismissStartedAt = 0;
+  private remainingDuration = 0;
+  private pausedForHover = false;
+  private pausedForFocus = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute("role", this.variant === "danger" ? "alert" : "status");
-    if (this.duration > 0) {
-      this.timer = setTimeout(() => this.dismiss(), this.duration);
-    }
+    this.syncRole();
+    this.remainingDuration = this.normalizedDuration();
+    this.scheduleAutoDismiss();
+    this.listen(this, "mouseenter", this.handleMouseEnter);
+    this.listen(this, "mouseleave", this.handleMouseLeave);
+    this.listen(this, "focusin", this.handleFocusIn);
+    this.listen(this, "focusout", this.handleFocusOut);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    clearTimeout(this.timer);
+    this.clearAutoDismissTimer();
+    this.pausedForHover = false;
+    this.pausedForFocus = false;
+    if (this.exitTimer !== undefined) {
+      clearTimeout(this.exitTimer);
+      this.exitTimer = undefined;
+      this.dismissing = false;
+      this.removeAttribute("dismissing");
+    }
   }
 
-  protected override updated(): void {
+  protected override updated(changed: PropertyValues<this>): void {
     // dismissing is a private @state, which doesn't appear in PropertyValues<this>.
     // Unconditional attribute sync is cheap.
     if (this.dismissing) this.setAttribute("dismissing", "");
     else this.removeAttribute("dismissing");
+    if (changed.has("variant")) this.syncRole();
+    if (this.changedAfterFirstRender(changed, "duration")) {
+      this.clearAutoDismissTimer();
+      this.remainingDuration = this.normalizedDuration();
+      this.scheduleAutoDismiss();
+    }
   }
 
   /** Dismiss with an exit animation. */
   dismiss(): void {
     if (this.dismissing) return;
-    clearTimeout(this.timer);
+    this.clearAutoDismissTimer();
+    this.remainingDuration = 0;
     this.dismissing = true;
-    const cleanup = () => {
+    this.exitTimer = setTimeout(() => {
+      this.exitTimer = undefined;
       this.dispatchEvent(new CustomEvent("fluid-dismiss", { bubbles: true, composed: true }));
-    };
-    // Wait for the exit animation, then notify.
-    setTimeout(cleanup, 200);
+    }, 200);
   }
+
+  private normalizedDuration(): number {
+    return Number.isFinite(this.duration) && this.duration > 0 ? this.duration : 0;
+  }
+
+  private syncRole(): void {
+    this.setAttribute("role", this.variant === "danger" ? "alert" : "status");
+  }
+
+  private clearAutoDismissTimer(): void {
+    clearTimeout(this.autoDismissTimer);
+    this.autoDismissTimer = undefined;
+  }
+
+  private scheduleAutoDismiss(): void {
+    if (
+      !this.isConnected ||
+      this.dismissing ||
+      this.pausedForHover ||
+      this.pausedForFocus ||
+      this.remainingDuration <= 0
+    ) {
+      return;
+    }
+    this.autoDismissStartedAt = performance.now();
+    this.autoDismissTimer = setTimeout(() => {
+      this.autoDismissTimer = undefined;
+      this.remainingDuration = 0;
+      this.dismiss();
+    }, this.remainingDuration);
+  }
+
+  private pauseAutoDismiss(): void {
+    if (this.autoDismissTimer === undefined) return;
+    const elapsed = performance.now() - this.autoDismissStartedAt;
+    this.remainingDuration = Math.max(0, this.remainingDuration - elapsed);
+    this.clearAutoDismissTimer();
+  }
+
+  private resumeAutoDismiss(): void {
+    if (this.pausedForHover || this.pausedForFocus) return;
+    if (this.remainingDuration <= 0) {
+      this.dismiss();
+      return;
+    }
+    this.scheduleAutoDismiss();
+  }
+
+  private handleMouseEnter = () => {
+    this.pausedForHover = true;
+    this.pauseAutoDismiss();
+  };
+
+  private handleMouseLeave = () => {
+    this.pausedForHover = false;
+    this.resumeAutoDismiss();
+  };
+
+  private handleFocusIn = () => {
+    this.pausedForFocus = true;
+    this.pauseAutoDismiss();
+  };
+
+  private handleFocusOut = () => {
+    queueMicrotask(() => {
+      if (this.matches(":focus-within")) return;
+      this.pausedForFocus = false;
+      this.resumeAutoDismiss();
+    });
+  };
 
   private defaultIconName(): string | null {
     switch (this.variant) {
@@ -268,7 +361,7 @@ export class FluidToastItem extends FluidElement {
           part="close"
           class="close"
           type="button"
-          aria-label="Dismiss"
+          aria-label=${this.term("dismiss")}
           @click=${() => this.dismiss()}
         >
           <fluid-icon name="close"></fluid-icon>

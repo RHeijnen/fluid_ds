@@ -1,6 +1,6 @@
 import { FluidRelativeTime } from "./fluid-relative-time.js";
 
-if (!customElements.get("fluid-relative-time")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-relative-time")) {
   customElements.define("fluid-relative-time", FluidRelativeTime);
 }
 

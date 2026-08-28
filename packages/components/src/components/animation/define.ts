@@ -1,6 +1,6 @@
 import { FluidAnimation } from "./fluid-animation.js";
 
-if (!customElements.get("fluid-animation")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-animation")) {
   customElements.define("fluid-animation", FluidAnimation);
 }
 

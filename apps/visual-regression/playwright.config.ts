@@ -1,6 +1,7 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { visualPlatform, visualProjects } from "./visual-platform.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const STORYBOOK_STATIC = resolve(HERE, "../storybook/storybook-static");
@@ -24,20 +25,21 @@ const BASE_URL = process.env.VR_BASE_URL ?? `http://127.0.0.1:${PORT}`;
  * - `animations: "disabled"` on every screenshot to eliminate motion noise.
  * - A small `maxDiffPixelRatio` allows sub-pixel renderer noise across
  *   machines while still catching real visual regressions.
- * - Only Chromium is used by default: adding WebKit/Firefox roughly
- *   triples the baseline count for little extra signal on a component
- *   library that targets Chromium-class engines anyway.
+ * - These image baselines are Chromium-only. Separate three-engine runtime
+ *   checks do not establish cross-browser visual or Safari certification.
  */
 export default defineConfig({
   testDir: "./tests",
   snapshotDir: "./__screenshots__",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  reporter: [
-    ["list"],
-    ["html", { outputFolder: "playwright-report", open: "never" }]
-  ],
+  retries: 0,
+  // Normal verification must not create or accept unreviewed baseline images.
+  // The explicit update command can still be used for owner-approved reviews.
+  updateSnapshots: "none",
+  timeout: 60_000,
+  reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
+  metadata: { visualPlatform },
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",
@@ -52,22 +54,14 @@ export default defineConfig({
       threshold: 0.2
     }
   },
-  projects: [
-    {
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        viewport: { width: 1024, height: 768 },
-        deviceScaleFactor: 1
-      }
-    }
-  ],
+  snapshotPathTemplate: "{snapshotDir}/{testFilePath}/{arg}-{projectName}{ext}",
+  projects: visualProjects,
   webServer: process.env.VR_BASE_URL
     ? undefined
     : {
         // Serve the prebuilt Storybook on a dedicated port. `--silent` keeps
         // the runner output focused on test results.
-        command: `pnpm exec http-server "${STORYBOOK_STATIC}" -p ${PORT} -s -c-1`,
+        command: `corepack pnpm exec http-server "${STORYBOOK_STATIC}" -p ${PORT} -s -c-1`,
         url: `${BASE_URL}/iframe.html`,
         reuseExistingServer: !process.env.CI,
         timeout: 60_000

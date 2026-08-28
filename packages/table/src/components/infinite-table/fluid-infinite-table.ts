@@ -1,5 +1,6 @@
-import { LitElement, css, html, nothing, type TemplateResult } from "lit";
+import { css, html, nothing, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 export type FluidInfiniteTableRow = Record<string, unknown>;
 
@@ -129,32 +130,19 @@ export interface FluidInfiniteTableSort {
  * @uses-token --fluid-focus-ring-offset
  * @uses-token --fluid-target-min
  */
-export class FluidInfiniteTable extends LitElement {
+export class FluidInfiniteTable extends FluidElement {
   static override styles = css`
     :host {
       display: block;
       min-width: 0;
-      color: var(
-        --fluid-infinite-table-fg,
-        var(--fluid-text-primary, #18181b)
-      );
+      color: var(--fluid-infinite-table-fg, var(--fluid-text-primary, #18181b));
       font-family: var(--fluid-font-family-sans, system-ui, sans-serif);
     }
     .viewport {
       position: relative;
-      border: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e4e4e7)
-        );
-      border-radius: var(
-        --fluid-infinite-table-radius,
-        var(--fluid-radius-md, 0.5rem)
-      );
-      background: var(
-        --fluid-infinite-table-bg,
-        var(--fluid-surface-base, #fff)
-      );
+      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border-radius: var(--fluid-infinite-table-radius, var(--fluid-radius-md, 0.5rem));
+      background: var(--fluid-infinite-table-bg, var(--fluid-surface-base, #fff));
     }
     :host([scroll-mode="container"]) .viewport {
       max-height: var(--fluid-infinite-table-height, 42rem);
@@ -174,14 +162,8 @@ export class FluidInfiniteTable extends LitElement {
       min-height: max(3rem, var(--fluid-target-min, 0px));
       padding: 0.5rem 0.75rem;
       border-bottom: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e4e4e7)
-        );
-      background: var(
-        --fluid-infinite-table-toolbar-bg,
-        var(--fluid-surface-base, #fff)
-      );
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      background: var(--fluid-infinite-table-toolbar-bg, var(--fluid-surface-base, #fff));
     }
     /*
      * Optional second toolbar line. Spans both columns so it reaches the
@@ -204,19 +186,12 @@ export class FluidInfiniteTable extends LitElement {
       white-space: nowrap;
     }
     .progress strong {
-      color: var(
-        --fluid-infinite-table-fg,
-        var(--fluid-text-primary, #18181b)
-      );
+      color: var(--fluid-infinite-table-fg, var(--fluid-text-primary, #18181b));
     }
     button {
       min-width: max(1.75rem, var(--fluid-target-min, 0px));
       min-height: max(1.75rem, var(--fluid-target-min, 0px));
-      border: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e4e4e7)
-        );
+      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-radius-sm, 0.25rem);
       background: var(--fluid-surface-base, #fff);
       color: inherit;
@@ -228,8 +203,7 @@ export class FluidInfiniteTable extends LitElement {
     }
     button:focus-visible,
     input:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
       outline-offset: var(--fluid-focus-ring-offset, 2px);
     }
     .table-scroll {
@@ -262,21 +236,14 @@ export class FluidInfiniteTable extends LitElement {
     .column-scroll-cell {
       position: sticky;
       top: calc(
-        var(--fluid-infinite-table-sticky-offset, 0px) +
-          var(--_fluid-toolbar-height, 0px) +
+        var(--fluid-infinite-table-sticky-offset, 0px) + var(--_fluid-toolbar-height, 0px) +
           var(--_fluid-header-height, 0px)
       );
       z-index: 3;
       padding: 0;
       border-bottom: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e2e8f0)
-        );
-      background: var(
-        --fluid-infinite-table-header-bg,
-        var(--fluid-surface-muted, #f8fafc)
-      );
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e2e8f0));
+      background: var(--fluid-infinite-table-header-bg, var(--fluid-surface-muted, #f8fafc));
     }
     /*
      * The strip is a child of the transformed table, so it is carried left as
@@ -306,14 +273,14 @@ export class FluidInfiniteTable extends LitElement {
     }
     table {
       width: 100%;
-      min-width: max-content;
+      /* Fixed layout already expands to declared column widths. max-content
+         creates a cyclic intrinsic-size calculation for percentage-width sort
+         buttons in Firefox, producing a multi-million-pixel flexible table. */
+      min-width: 100%;
       border-collapse: separate;
       border-spacing: 0;
       table-layout: fixed;
-      background: var(
-        --fluid-infinite-table-bg,
-        var(--fluid-surface-base, #fff)
-      );
+      background: var(--fluid-infinite-table-bg, var(--fluid-surface-base, #fff));
       font-size: var(--fluid-font-size-sm, 0.875rem);
     }
     caption {
@@ -337,16 +304,10 @@ export class FluidInfiniteTable extends LitElement {
     td {
       box-sizing: border-box;
       height: var(--_fluid-row-height);
-      padding: var(
-        --fluid-infinite-table-cell-padding,
-        0.625rem 0.75rem
-      );
+      padding: var(--fluid-infinite-table-cell-padding, 0.625rem 0.75rem);
       overflow: hidden;
       border-bottom: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e4e4e7)
-        );
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       text-align: var(--_cell-align, start);
       text-overflow: ellipsis;
       vertical-align: middle;
@@ -374,21 +335,12 @@ export class FluidInfiniteTable extends LitElement {
     thead th,
     thead td {
       position: sticky;
-      top: calc(
-        var(--fluid-infinite-table-sticky-offset, 0px) +
-          var(--_fluid-toolbar-height, 0px)
-      );
+      top: calc(var(--fluid-infinite-table-sticky-offset, 0px) + var(--_fluid-toolbar-height, 0px));
       z-index: 3;
       height: auto;
       min-height: max(2.5rem, var(--fluid-target-min, 0px));
-      background: var(
-        --fluid-infinite-table-header-bg,
-        var(--fluid-surface-muted, #f4f4f5)
-      );
-      color: var(
-        --fluid-infinite-table-fg,
-        var(--fluid-text-primary, #18181b)
-      );
+      background: var(--fluid-infinite-table-header-bg, var(--fluid-surface-muted, #f4f4f5));
+      color: var(--fluid-infinite-table-fg, var(--fluid-text-primary, #18181b));
       font-weight: 700;
       white-space: nowrap;
     }
@@ -410,17 +362,13 @@ export class FluidInfiniteTable extends LitElement {
       grid-auto-columns: minmax(0, 1fr);
     }
     tbody tr[data-row]:hover td {
-      background: var(
-        --fluid-infinite-table-row-hover-bg,
-        var(--fluid-surface-muted, #f4f4f5)
-      );
+      background: var(--fluid-infinite-table-row-hover-bg, var(--fluid-surface-muted, #f4f4f5));
     }
     :host([clickable]) tbody tr[data-row] {
       cursor: pointer;
     }
     tbody tr[data-row]:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
       outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
     }
     .sort {
@@ -491,14 +439,8 @@ export class FluidInfiniteTable extends LitElement {
       padding: 0;
       border: 0;
       border-radius: var(--fluid-radius-sm, 0.25rem);
-      background: var(
-        --fluid-infinite-table-header-bg,
-        var(--fluid-surface-muted, #f4f4f5)
-      );
-      color: var(
-        --fluid-infinite-table-grip-color,
-        var(--fluid-text-secondary, #52525b)
-      );
+      background: var(--fluid-infinite-table-header-bg, var(--fluid-surface-muted, #f4f4f5));
+      color: var(--fluid-infinite-table-grip-color, var(--fluid-text-secondary, #52525b));
       opacity: 0;
       pointer-events: none;
       place-items: center;
@@ -509,10 +451,7 @@ export class FluidInfiniteTable extends LitElement {
       opacity: 1;
     }
     .grab[aria-pressed="true"] {
-      color: var(
-        --fluid-infinite-table-grip-active-color,
-        var(--fluid-accent-base, #4f46e5)
-      );
+      color: var(--fluid-infinite-table-grip-active-color, var(--fluid-accent-base, #4f46e5));
     }
     .grip {
       position: absolute;
@@ -532,36 +471,27 @@ export class FluidInfiniteTable extends LitElement {
       inset-inline-end: 0.45rem;
       width: 2px;
       border-radius: var(--fluid-radius-sm, 0.25rem);
-      background: var(
-        --fluid-infinite-table-grip-color,
-        var(--fluid-border-default, #e4e4e7)
-      );
-      transition: background-color 120ms ease, inset-block 120ms ease;
+      background: var(--fluid-infinite-table-grip-color, var(--fluid-border-default, #e4e4e7));
+      transition:
+        background-color 120ms ease,
+        inset-block 120ms ease;
     }
     th:hover .grip::before {
-      background: var(
-        --fluid-infinite-table-grip-color,
-        var(--fluid-text-secondary, #52525b)
-      );
+      background: var(--fluid-infinite-table-grip-color, var(--fluid-text-secondary, #52525b));
     }
     .grip:hover::before,
     .grip:focus-visible::before,
     .grip[data-dragging]::before {
       inset-block: 8%;
-      background: var(
-        --fluid-infinite-table-grip-active-color,
-        var(--fluid-accent-base, #4f46e5)
-      );
+      background: var(--fluid-infinite-table-grip-active-color, var(--fluid-accent-base, #4f46e5));
     }
     .grip:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
       /* The header clips its overflow, so the ring is drawn inside it. */
       outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
     }
     th[data-grabbed] {
-      outline: var(--fluid-focus-ring-width, 2px) dashed
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) dashed var(--fluid-accent-base, #4f46e5);
       outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
     }
     /*
@@ -570,8 +500,7 @@ export class FluidInfiniteTable extends LitElement {
      */
     th[data-dragging] {
       opacity: 0.45;
-      outline: var(--fluid-focus-ring-width, 2px) dashed
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) dashed var(--fluid-accent-base, #4f46e5);
       outline-offset: calc(-1 * var(--fluid-focus-ring-offset, 2px));
     }
     /*
@@ -600,15 +529,8 @@ export class FluidInfiniteTable extends LitElement {
       max-height: min(38rem, calc(100vh - 2rem));
       padding: 0;
       overflow: hidden;
-      border: 1px solid
-        var(
-          --fluid-infinite-table-border,
-          var(--fluid-border-default, #e4e4e7)
-        );
-      border-radius: var(
-        --fluid-infinite-table-radius,
-        var(--fluid-radius-md, 0.5rem)
-      );
+      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border-radius: var(--fluid-infinite-table-radius, var(--fluid-radius-md, 0.5rem));
       background: var(--fluid-surface-base, #fff);
       color: var(--fluid-text-primary, #18181b);
       box-shadow: var(--fluid-shadow-lg, 0 20px 40px rgb(0 0 0 / 0.2));
@@ -709,11 +631,34 @@ export class FluidInfiniteTable extends LitElement {
    * what language its reader speaks.
    */
   @property({ type: String, attribute: "resize-column-label" })
-  resizeColumnLabel = "Resize {column}";
+  get resizeColumnLabel(): string {
+    return this.resizeColumnLabelOverride ?? this.term("tableResizeColumn", "{column}");
+  }
+  set resizeColumnLabel(value: string | null) {
+    this.resizeColumnLabelOverride = value;
+  }
+  private resizeColumnLabelOverride: string | null = null;
+
   @property({ type: String, attribute: "reorder-column-label" })
-  reorderColumnLabel = "Reorder {column}";
+  get reorderColumnLabel(): string {
+    return this.reorderColumnLabelOverride ?? this.term("tableReorderColumn", "{column}");
+  }
+  set reorderColumnLabel(value: string | null) {
+    this.reorderColumnLabelOverride = value;
+  }
+  private reorderColumnLabelOverride: string | null = null;
+
   @property({ type: String, attribute: "column-position-label" })
-  columnPositionLabel = "{column}, column {position} of {count}";
+  get columnPositionLabel(): string {
+    return (
+      this.columnPositionLabelOverride ??
+      this.term("tableColumnPosition", "{column}", "{position}", "{count}")
+    );
+  }
+  set columnPositionLabel(value: string | null) {
+    this.columnPositionLabelOverride = value;
+  }
+  private columnPositionLabelOverride: string | null = null;
   /**
    * Columns wider than the container scroll instead of bursting out of it.
    *
@@ -739,17 +684,14 @@ export class FluidInfiniteTable extends LitElement {
   /** The column a keyboard user has picked up, if any. */
   @state() private grabbedKey: string | null = null;
   @state() private draggingKey: string | null = null;
-  @state() private announcement = "";
+  @state() private announcementKey: string | null = null;
   @state() private hasToolbarSecondary = false;
 
   private handleToolbarSecondaryChange = (event: Event) => {
     const slot = event.target as HTMLSlotElement;
     this.hasToolbarSecondary = slot.assignedNodes().some((node) => {
       if (node.nodeType === Node.ELEMENT_NODE) return true;
-      return (
-        node.nodeType === Node.TEXT_NODE &&
-        (node.textContent ?? "").trim().length > 0
-      );
+      return node.nodeType === Node.TEXT_NODE && (node.textContent ?? "").trim().length > 0;
     });
   };
   /**
@@ -809,6 +751,12 @@ export class FluidInfiniteTable extends LitElement {
     super.connectedCallback();
     window.addEventListener("scroll", this.onDocumentScroll, { passive: true });
     window.addEventListener("resize", this.onDocumentScroll, { passive: true });
+    if (this.hasUpdated) {
+      this.observeGeometry();
+      this.observeSentinel();
+      this.measureScroll();
+      this.scheduleMeasure();
+    }
   }
 
   override disconnectedCallback(): void {
@@ -867,19 +815,14 @@ export class FluidInfiniteTable extends LitElement {
     if (!this.resizableColumns) return;
     const measured: Record<string, number> = {};
     let changed = false;
-    for (const cell of this.renderRoot.querySelectorAll<HTMLElement>(
-      "th[data-column]"
-    )) {
+    for (const cell of this.renderRoot.querySelectorAll<HTMLElement>("th[data-column]")) {
       const key = cell.dataset["column"];
       if (!key) continue;
       const width = Math.round(cell.getBoundingClientRect().width);
       measured[key] = width;
       if (this.columnWidths[key] !== width) changed = true;
     }
-    if (
-      changed ||
-      Object.keys(measured).length !== Object.keys(this.columnWidths).length
-    ) {
+    if (changed || Object.keys(measured).length !== Object.keys(this.columnWidths).length) {
       this.columnWidths = measured;
     }
   }
@@ -934,9 +877,7 @@ export class FluidInfiniteTable extends LitElement {
     const clipWidth = this.tableScroll.clientWidth;
     const tableWidth = Math.ceil(this.table.getBoundingClientRect().width);
     const headerHeight = Math.round(
-      this.renderRoot
-        .querySelector('[part~="header-row"]')
-        ?.getBoundingClientRect().height ?? 0
+      this.renderRoot.querySelector('[part~="header-row"]')?.getBoundingClientRect().height ?? 0
     );
     /*
      * Writing the strip's geometry resizes the strip, and the strip lives in
@@ -1012,14 +953,10 @@ export class FluidInfiniteTable extends LitElement {
 
   private observeSentinel(): void {
     this.intersectionObserver?.disconnect();
-    if (!this.sentinel || !this.hasMore) return;
+    if (!this.isConnected || !this.sentinel || !this.hasMore) return;
     this.intersectionObserver = new IntersectionObserver(
       (entries) => {
-        if (
-          entries.some((entry) => entry.isIntersecting) &&
-          this.hasMore &&
-          !this.loading
-        ) {
+        if (entries.some((entry) => entry.isIntersecting) && this.hasMore && !this.loading) {
           this.dispatchEvent(
             new CustomEvent("fluid-load-more", {
               detail: { offset: this.rows.length },
@@ -1061,6 +998,17 @@ export class FluidInfiniteTable extends LitElement {
     return value == null ? String(index) : String(value);
   }
 
+  private get effectiveRowHeight(): number {
+    return Number.isFinite(this.rowHeight) && this.rowHeight > 0 ? this.rowHeight : 64;
+  }
+
+  private get accessibleRowCount(): number {
+    if ((!Number.isFinite(this.total) || this.total <= 0) && this.hasMore) return -1;
+    const total = Number.isFinite(this.total) ? Math.max(0, Math.floor(this.total)) : 0;
+    // ARIA includes the header row in the count, unlike the public data total.
+    return Math.max(this.rows.length, total) + 1;
+  }
+
   private get windowedRows(): {
     rows: Array<{ row: FluidInfiniteTableRow; index: number }>;
     top: number;
@@ -1073,34 +1021,33 @@ export class FluidInfiniteTable extends LitElement {
         bottom: 0
       };
     }
-    const start = Math.max(
-      0,
-      Math.floor(this.viewScrollTop / this.rowHeight) - this.overscan
+    const rowHeight = this.effectiveRowHeight;
+    const overscan = Number.isFinite(this.overscan) ? Math.max(0, Math.floor(this.overscan)) : 6;
+    const amount = Math.max(1, Math.ceil(this.viewportHeight / rowHeight) + overscan * 2);
+    // Filtering can replace a deeply scrolled dataset with a short result set.
+    // Clamp before slicing so a stale scroll offset cannot render an empty body.
+    const start = Math.min(
+      Math.max(0, this.rows.length - amount),
+      Math.max(0, Math.floor(this.viewScrollTop / rowHeight) - overscan)
     );
-    const amount =
-      Math.ceil(this.viewportHeight / this.rowHeight) + this.overscan * 2;
     const end = Math.min(this.rows.length, start + amount);
     return {
       rows: this.rows.slice(start, end).map((row, offset) => ({
         row,
         index: start + offset
       })),
-      top: start * this.rowHeight,
-      bottom: (this.rows.length - end) * this.rowHeight
+      top: start * rowHeight,
+      bottom: (this.rows.length - end) * rowHeight
     };
   }
 
-  private columnAriaSort(column: FluidInfiniteTableColumn):
-    | "ascending"
-    | "descending"
-    | "none" {
+  private columnAriaSort(column: FluidInfiniteTableColumn): "ascending" | "descending" | "none" {
     if (this.sort?.key !== column.key) return "none";
     return this.sort.dir === "asc" ? "ascending" : "descending";
   }
 
   private requestSort(column: FluidInfiniteTableColumn): void {
-    const dir =
-      this.sort?.key === column.key && this.sort.dir === "asc" ? "desc" : "asc";
+    const dir = this.sort?.key === column.key && this.sort.dir === "asc" ? "desc" : "asc";
     this.sort = { key: column.key, dir };
     this.dispatchEvent(
       new CustomEvent("fluid-sort", {
@@ -1172,9 +1119,7 @@ export class FluidInfiniteTable extends LitElement {
 
   /** A column that cannot be configured cannot be dragged out of its place. */
   private canReorder(key: string): boolean {
-    return (
-      this.reorderableColumns && this.columnFor(key)?.configurable !== false
-    );
+    return this.reorderableColumns && this.columnFor(key)?.configurable !== false;
   }
 
   private canResize(key: string): boolean {
@@ -1188,16 +1133,52 @@ export class FluidInfiniteTable extends LitElement {
     );
   }
 
+  private formatNumber(value: number): string {
+    try {
+      return new Intl.NumberFormat(this.localize.locale || undefined).format(value);
+    } catch {
+      return new Intl.NumberFormat("en").format(value);
+    }
+  }
+
+  private progressText(): string {
+    const loaded = this.rows.length;
+    const formattedLoaded = this.formatNumber(loaded);
+    if (loaded === 0) return this.term("tableResults", loaded, formattedLoaded);
+    const formattedTotal = this.formatNumber(this.total);
+    const formattedAvailable = this.formatNumber(this.availableTotal);
+    if (this.total && this.availableTotal && this.availableTotal !== this.total) {
+      return this.term(
+        "tableLoadedOfMatchingTotal",
+        loaded,
+        formattedLoaded,
+        formattedTotal,
+        formattedAvailable
+      );
+    }
+    if (this.total) return this.term("tableLoadedOf", loaded, formattedLoaded, formattedTotal);
+    if (this.availableTotal) {
+      return this.term("tableLoadedMatchingTotal", loaded, formattedLoaded, formattedAvailable);
+    }
+    return this.term("tableLoadedResults", loaded, formattedLoaded);
+  }
+
+  private sentinelText(): string {
+    if (this.loading) return this.term("loadingMoreResults");
+    if (this.hasMore) return this.term("scrollToLoadMore");
+    return this.rows.length ? this.term("allResultsLoaded") : "";
+  }
+
   private headerCell(key: string): HTMLElement | undefined {
-    return [
-      ...this.renderRoot.querySelectorAll<HTMLElement>("th[data-column]")
-    ].find((cell) => cell.dataset["column"] === key);
+    return [...this.renderRoot.querySelectorAll<HTMLElement>("th[data-column]")].find(
+      (cell) => cell.dataset["column"] === key
+    );
   }
 
   private columnElement(key: string): HTMLElement | undefined {
-    return [
-      ...this.renderRoot.querySelectorAll<HTMLElement>("col[data-column]")
-    ].find((element) => element.dataset["column"] === key);
+    return [...this.renderRoot.querySelectorAll<HTMLElement>("col[data-column]")].find(
+      (element) => element.dataset["column"] === key
+    );
   }
 
   /**
@@ -1205,11 +1186,7 @@ export class FluidInfiniteTable extends LitElement {
    * resize persists through whatever already persists a hidden column.
    * `undefined` puts the column back on the width it was declared with.
    */
-  private setColumnWidth(
-    key: string,
-    width: string | undefined,
-    debounce = false
-  ): void {
+  private setColumnWidth(key: string, width: string | undefined, debounce = false): void {
     this.internalLayout = this.internalLayout.map((item) =>
       item.key === key ? { ...item, width } : item
     );
@@ -1221,10 +1198,7 @@ export class FluidInfiniteTable extends LitElement {
   }
 
   private measuredWidth(key: string): number {
-    return (
-      this.headerCell(key)?.getBoundingClientRect().width ??
-      FluidInfiniteTable.minColumnWidth
-    );
+    return this.headerCell(key)?.getBoundingClientRect().width ?? FluidInfiniteTable.minColumnWidth;
   }
 
   /**
@@ -1251,7 +1225,7 @@ export class FluidInfiniteTable extends LitElement {
 
   /** Which way "wider" points, so a right-to-left reader drags the same way. */
   private get direction(): 1 | -1 {
-    return getComputedStyle(this).direction === "rtl" ? -1 : 1;
+    return this.isRtl ? -1 : 1;
   }
 
   private readonly onGripPointerDown = (event: PointerEvent, key: string): void => {
@@ -1282,10 +1256,7 @@ export class FluidInfiniteTable extends LitElement {
     const state = this.resizing;
     if (!state || event.pointerId !== state.pointerId) return;
     const moved = (event.clientX - state.startX) * this.direction;
-    state.width = Math.max(
-      FluidInfiniteTable.minColumnWidth,
-      state.startWidth + moved
-    );
+    state.width = Math.max(FluidInfiniteTable.minColumnWidth, state.startWidth + moved);
     // Written straight to the column rather than through a render, so the
     // column follows the pointer instead of the frame after it.
     const column = this.columnElement(state.key);
@@ -1348,10 +1319,7 @@ export class FluidInfiniteTable extends LitElement {
       event.preventDefault();
       this.freezeFlexibleColumns();
       const delta = event.key === wider ? step : -step;
-      const next = Math.max(
-        FluidInfiniteTable.minColumnWidth,
-        this.measuredWidth(key) + delta
-      );
+      const next = Math.max(FluidInfiniteTable.minColumnWidth, this.measuredWidth(key) + delta);
       this.setColumnWidth(key, `${Math.round(next)}px`, true);
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -1368,11 +1336,7 @@ export class FluidInfiniteTable extends LitElement {
    * `dragover` as a live preview, and a consumer persists every layout it is
    * handed — the report belongs to the drop, not to the preview.
    */
-  private placeColumn(
-    key: string,
-    targetKey: string,
-    edge: "start" | "end"
-  ): boolean {
+  private placeColumn(key: string, targetKey: string, edge: "start" | "end"): boolean {
     if (key === targetKey || !this.canReorder(key) || !this.canReorder(targetKey)) {
       return false;
     }
@@ -1383,8 +1347,8 @@ export class FluidInfiniteTable extends LitElement {
     if (at < 0) return false;
     next.splice(edge === "end" ? at + 1 : at, 0, moved);
     if (
-      next.map((item) => item.key).join(" ") ===
-      this.internalLayout.map((item) => item.key).join(" ")
+      next.map((item) => item.key).join("\0") ===
+      this.internalLayout.map((item) => item.key).join("\0")
     ) {
       return false;
     }
@@ -1393,11 +1357,7 @@ export class FluidInfiniteTable extends LitElement {
   }
 
   /** Places `key` beside `targetKey`, and reports it. */
-  private reorderColumn(
-    key: string,
-    targetKey: string,
-    edge: "start" | "end"
-  ): void {
+  private reorderColumn(key: string, targetKey: string, edge: "start" | "end"): void {
     if (!this.placeColumn(key, targetKey, edge)) return;
     clearTimeout(this.emitTimer);
     this.emitLayout();
@@ -1421,10 +1381,18 @@ export class FluidInfiniteTable extends LitElement {
     const visible = this.visibleColumns;
     const index = visible.findIndex((column) => column.key === key);
     if (index < 0) return;
-    this.announcement = this.label(this.columnPositionLabel, {
+    this.announcementKey = key;
+  }
+
+  private announcementText(): string {
+    if (!this.announcementKey) return "";
+    const visible = this.visibleColumns;
+    const index = visible.findIndex((column) => column.key === this.announcementKey);
+    if (index < 0) return "";
+    return this.label(this.columnPositionLabel, {
       column: visible[index]!.label,
-      position: index + 1,
-      count: visible.length
+      position: this.formatNumber(index + 1),
+      count: this.formatNumber(visible.length)
     });
   }
 
@@ -1479,10 +1447,7 @@ export class FluidInfiniteTable extends LitElement {
     if (
       event
         .composedPath()
-        .some(
-          (target) =>
-            target instanceof HTMLElement && target.classList.contains("grip")
-        )
+        .some((target) => target instanceof HTMLElement && target.classList.contains("grip"))
     ) {
       event.preventDefault();
       return;
@@ -1567,16 +1532,17 @@ export class FluidInfiniteTable extends LitElement {
     );
   }
 
-  private handleRowKeydown(
-    event: KeyboardEvent,
-    row: FluidInfiniteTableRow,
-    index: number
-  ): void {
+  private handleRowKeydown(event: KeyboardEvent, row: FluidInfiniteTableRow, index: number): void {
     if (!this.clickable || (event.key !== "Enter" && event.key !== " ")) return;
-    if (event.composedPath().some((target) =>
-      target instanceof Element &&
-      target.matches("a,button,input,select,textarea,[role='button']")
-    )) {
+    if (
+      event
+        .composedPath()
+        .some(
+          (target) =>
+            target instanceof Element &&
+            target.matches("a,button,input,select,textarea,[role='button']")
+        )
+    ) {
       return;
     }
     event.preventDefault();
@@ -1592,18 +1558,10 @@ export class FluidInfiniteTable extends LitElement {
   private renderHeader(column: FluidInfiniteTableColumn): unknown {
     const content = column.renderHeader?.(column) ?? column.label;
     return column.sortable
-      ? html`<button
-          class="sort"
-          type="button"
-          @click=${() => this.requestSort(column)}
-        >
+      ? html`<button class="sort" type="button" @click=${() => this.requestSort(column)}>
           <span class="header-label">${content}</span>
           <span class="sort-mark" aria-hidden="true">
-            ${this.sort?.key === column.key
-              ? this.sort.dir === "asc"
-                ? "↑"
-                : "↓"
-              : "↕"}
+            ${this.sort?.key === column.key ? (this.sort.dir === "asc" ? "↑" : "↓") : "↕"}
           </span>
         </button>`
       : html`<span class="header-label">${content}</span>`;
@@ -1632,8 +1590,7 @@ export class FluidInfiniteTable extends LitElement {
               aria-label=${this.label(this.reorderColumnLabel, {
                 column: column.label
               })}
-              @keydown=${(event: KeyboardEvent) =>
-                this.onGrabKeydown(event, column.key)}
+              @keydown=${(event: KeyboardEvent) => this.onGrabKeydown(event, column.key)}
             >
               <span aria-hidden="true">⠿</span>
             </button>`
@@ -1651,16 +1608,13 @@ export class FluidInfiniteTable extends LitElement {
               column: column.label
             })}
             aria-valuemin=${FluidInfiniteTable.minColumnWidth}
-            aria-valuenow=${this.columnWidths[column.key] ??
-            FluidInfiniteTable.minColumnWidth}
-            @pointerdown=${(event: PointerEvent) =>
-              this.onGripPointerDown(event, column.key)}
+            aria-valuenow=${this.columnWidths[column.key] ?? FluidInfiniteTable.minColumnWidth}
+            @pointerdown=${(event: PointerEvent) => this.onGripPointerDown(event, column.key)}
             @pointermove=${this.onGripPointerMove}
             @pointerup=${this.onGripPointerUp}
             @pointercancel=${this.onGripPointerUp}
             @dblclick=${() => this.autoFitColumn(column.key)}
-            @keydown=${(event: KeyboardEvent) =>
-              this.onGripKeydown(event, column.key)}
+            @keydown=${(event: KeyboardEvent) => this.onGripKeydown(event, column.key)}
           ></span>`
         : nothing}
     `;
@@ -1668,12 +1622,12 @@ export class FluidInfiniteTable extends LitElement {
 
   private renderColumnsDialog(): TemplateResult {
     return html`
-      <dialog part="column-dialog" aria-labelledby="column-dialog-title">
+      <dialog part="column-dialog" aria-labelledby="column-dialog-title" dir=${this.localize.dir}>
         <div class="dialog-head">
-          <h2 id="column-dialog-title">Table columns</h2>
+          <h2 id="column-dialog-title">${this.term("tableColumns")}</h2>
           <button
             type="button"
-            aria-label="Close column settings"
+            aria-label=${this.term("closeColumnSettings")}
             @click=${() => this.columnDialog?.close()}
           >
             ×
@@ -1690,16 +1644,13 @@ export class FluidInfiniteTable extends LitElement {
                     type="checkbox"
                     .checked=${item.visible}
                     @change=${(event: Event) =>
-                      this.updateColumn(
-                        item.key,
-                        (event.target as HTMLInputElement).checked
-                      )}
+                      this.updateColumn(item.key, (event.target as HTMLInputElement).checked)}
                   />
                   <span>${column.label}</span>
                 </label>
                 <button
                   type="button"
-                  aria-label=${`Move ${column.label} earlier`}
+                  aria-label=${this.term("moveColumnEarlier", column.label)}
                   ?disabled=${index === 0}
                   @click=${() => this.moveColumn(item.key, -1)}
                 >
@@ -1707,7 +1658,7 @@ export class FluidInfiniteTable extends LitElement {
                 </button>
                 <button
                   type="button"
-                  aria-label=${`Move ${column.label} later`}
+                  aria-label=${this.term("moveColumnLater", column.label)}
                   ?disabled=${index === this.internalLayout.length - 1}
                   @click=${() => this.moveColumn(item.key, 1)}
                 >
@@ -1719,7 +1670,7 @@ export class FluidInfiniteTable extends LitElement {
         </div>
         <div class="dialog-foot">
           <button type="button" @click=${() => this.columnDialog?.close()}>
-            Done
+            ${this.term("done")}
           </button>
         </div>
       </dialog>
@@ -1734,46 +1685,29 @@ export class FluidInfiniteTable extends LitElement {
       <div
         part="viewport"
         class="viewport"
-        style=${`--_fluid-row-height:${this.rowHeight}px;`}
+        dir=${this.localize.dir}
+        style=${`--_fluid-row-height:${this.effectiveRowHeight}px;`}
       >
         <div part="toolbar" class="toolbar">
           <div>${hasFilters ? html`<slot name="filters"></slot>` : nothing}</div>
           <div class="toolbar-actions">
-            <span part="progress" class="progress" role="status">
-              ${this.rows.length === 0
-                ? html`<strong>0</strong> results`
-                : html`<strong>${this.rows.length.toLocaleString()}</strong>
-                    loaded
-                    ${this.total
-                      ? html`of <strong>${this.total.toLocaleString()}</strong>`
-                      : nothing}
-                    ${this.availableTotal && this.availableTotal !== this.total
-                      ? html`matching ·
-                          <strong>
-                            ${this.availableTotal.toLocaleString()}
-                          </strong>
-                          total`
-                      : nothing}`}
-            </span>
+            <span part="progress" class="progress" role="status"> ${this.progressText()} </span>
             ${this.configurable
               ? html`<button type="button" @click=${this.openColumns}>
-                  Columns
+                  ${this.term("columns")}
                 </button>`
               : nothing}
             <slot name="toolbar-actions"></slot>
           </div>
           <div class="toolbar-secondary" ?hidden=${!this.hasToolbarSecondary}>
-            <slot
-              name="toolbar-secondary"
-              @slotchange=${this.handleToolbarSecondaryChange}
-            ></slot>
+            <slot name="toolbar-secondary" @slotchange=${this.handleToolbarSecondaryChange}></slot>
           </div>
         </div>
 
         <div class="table-scroll">
           <table
             part="base"
-            aria-rowcount=${this.total || this.rows.length}
+            aria-rowcount=${this.accessibleRowCount}
             aria-colcount=${columns.length}
           >
             ${this.caption
@@ -1796,39 +1730,26 @@ export class FluidInfiniteTable extends LitElement {
               })}
               <col
                 class="filler"
-                style=${columns.every((column) => column.width)
-                  ? nothing
-                  : "width:0"}
+                style=${columns.every((column) => column.width) ? nothing : "width:0"}
               />
             </colgroup>
             <thead>
-              <tr part="header-row">
+              <tr part="header-row" aria-rowindex="1" aria-colindex="1">
                 ${columns.map(
                   (column) => html`
                     <th
                       part="header-cell"
                       scope="col"
                       data-column=${column.key}
-                      data-grabbed=${this.grabbedKey === column.key
-                        ? ""
-                        : nothing}
-                      data-dragging=${this.draggingKey === column.key
-                        ? ""
-                        : nothing}
-                      aria-sort=${column.sortable
-                        ? this.columnAriaSort(column)
-                        : nothing}
+                      data-grabbed=${this.grabbedKey === column.key ? "" : nothing}
+                      data-dragging=${this.draggingKey === column.key ? "" : nothing}
+                      aria-sort=${column.sortable ? this.columnAriaSort(column) : nothing}
                       style=${`--_cell-align:${column.align ?? "start"};`}
-                      draggable=${this.canReorder(column.key)
-                        ? "true"
-                        : nothing}
-                      @dragstart=${(event: DragEvent) =>
-                        this.onHeaderDragStart(event, column.key)}
+                      draggable=${this.canReorder(column.key) ? "true" : nothing}
+                      @dragstart=${(event: DragEvent) => this.onHeaderDragStart(event, column.key)}
                       @dragend=${this.onDragEnd}
-                      @dragover=${(event: DragEvent) =>
-                        this.onHeaderDragOver(event, column.key)}
-                      @drop=${(event: DragEvent) =>
-                        this.onHeaderDrop(event, column.key)}
+                      @dragover=${(event: DragEvent) => this.onHeaderDragOver(event, column.key)}
+                      @drop=${(event: DragEvent) => this.onHeaderDrop(event, column.key)}
                     >
                       ${this.renderHeaderContent(column)}
                     </th>
@@ -1865,11 +1786,11 @@ export class FluidInfiniteTable extends LitElement {
                     part="row"
                     data-row
                     data-row-key=${this.rowIdentity(row, index)}
+                    aria-rowindex=${index + 2}
+                    aria-colindex="1"
                     tabindex=${this.clickable ? "0" : nothing}
-                    @click=${(event: MouseEvent) =>
-                      this.handleRowClick(event, row, index)}
-                    @keydown=${(event: KeyboardEvent) =>
-                      this.handleRowKeydown(event, row, index)}
+                    @click=${(event: MouseEvent) => this.handleRowClick(event, row, index)}
+                    @keydown=${(event: KeyboardEvent) => this.handleRowKeydown(event, row, index)}
                   >
                     ${columns.map((column) => {
                       const value = this.valueAt(row, column);
@@ -1882,10 +1803,7 @@ export class FluidInfiniteTable extends LitElement {
                           })
                         : value;
                       return html`
-                        <td
-                          part="cell"
-                          style=${`--_cell-align:${column.align ?? "start"};`}
-                        >
+                        <td part="cell" style=${`--_cell-align:${column.align ?? "start"};`}>
                           ${rendered ?? ""}
                         </td>
                       `;
@@ -1909,23 +1827,19 @@ export class FluidInfiniteTable extends LitElement {
         ${this.error
           ? html`<div class="state" role="alert"><slot name="error">${this.error}</slot></div>`
           : !this.loading && !this.rows.length
-            ? html`<div class="state"><slot name="empty">No results</slot></div>`
+            ? html`<div class="state">
+                <slot name="empty">${this.term("tableNoResults")}</slot>
+              </div>`
             : nothing}
         <!--
           Where a moved column landed. A drag is self-evident on screen and
           silent to a screen reader, so the keyboard path says it out loud.
         -->
-        <div class="sr-only" role="status" aria-live="polite">
-          ${this.announcement}
+        <div class="sr-only" role="status" aria-live="polite" dir=${this.localize.dir}>
+          ${this.announcementText()}
         </div>
-        <div part="sentinel" class="sentinel" role="status">
-          ${this.loading
-            ? "Loading more results"
-            : this.hasMore
-              ? "Scroll to load more"
-              : this.rows.length
-                ? "All results loaded"
-                : ""}
+        <div part="sentinel" class="sentinel" role="status" dir=${this.localize.dir}>
+          ${this.sentinelText()}
         </div>
       </div>
       ${this.renderColumnsDialog()}

@@ -1,6 +1,6 @@
 import { FluidTagInput } from "./fluid-tag-input.js";
 
-if (!customElements.get("fluid-tag-input")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tag-input")) {
   customElements.define("fluid-tag-input", FluidTagInput);
 }
 

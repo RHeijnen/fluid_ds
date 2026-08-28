@@ -1,6 +1,13 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { FormDisabledController } from "../../internal/form-disabled.js";
+
+export interface FluidRatingChangeDetail {
+  value: number;
+}
+
+export type FluidRatingChangeEvent = CustomEvent<FluidRatingChangeDetail>;
 import { reducedMotion } from "../../internal/motion.js";
 
 /**
@@ -38,11 +45,12 @@ import { reducedMotion } from "../../internal/motion.js";
  * @uses-token --fluid-duration-fast - Hover-scale transition duration.
  * @uses-token --fluid-easing-standard - Hover-scale transition easing.
  *
- * @fires fluid-change - Fired when the user commits a new rating. detail.value is the new number.
+ * @fires {FluidRatingChangeEvent} fluid-change - Fired when the user commits a new rating. detail.value is the new number.
  */
 export class FluidRating extends FluidElement {
   static formAssociated = true;
   protected readonly internals: ElementInternals;
+  private readonly formDisabled = new FormDisabledController(this);
 
   constructor() {
     super();
@@ -67,90 +75,94 @@ export class FluidRating extends FluidElement {
   }
 
   formDisabledCallback(disabled: boolean): void {
-    this.disabled = disabled;
+    this.formDisabled.preserve(
+      disabled,
+      () => this.disabled,
+      (value) => (this.disabled = value)
+    );
   }
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: inline-flex;
-    }
+      :host {
+        display: inline-flex;
+      }
 
-    .base {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--fluid-rating-gap, var(--fluid-space-1));
-      font-size: var(--fluid-rating-symbol-size, 1.5rem);
-      line-height: 1;
-      color: var(--fluid-rating-inactive-color, var(--fluid-color-neutral-300));
-      border-radius: var(--fluid-radius-sm);
-    }
+      .base {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--fluid-rating-gap, var(--fluid-space-1));
+        font-size: var(--fluid-rating-symbol-size, 1.5rem);
+        line-height: 1;
+        color: var(--fluid-rating-inactive-color, var(--fluid-color-neutral-300));
+        border-radius: var(--fluid-radius-sm);
+      }
 
-    /*
+      /*
      * The host carries role="slider" + the keyboard handler, so it's the focus
      * target. Render a visible ring on it that reads --fluid-focus-ring-width
      * (3px at AAA).
      */
-    :host(:focus-visible) {
-      outline: none;
-    }
-    :host(:focus-visible) .base {
-      outline: var(--fluid-rating-focus-ring-width, var(--fluid-focus-ring-width)) solid
-        var(--fluid-rating-focus-ring, var(--fluid-focus-ring-color));
-      outline-offset: 2px;
-    }
+      :host(:focus-visible) {
+        outline: none;
+      }
+      :host(:focus-visible) .base {
+        outline: var(--fluid-rating-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-rating-focus-ring, var(--fluid-focus-ring-color));
+        outline-offset: 2px;
+      }
 
-    :host([disabled]) .base {
-      opacity: 0.5;
-    }
+      :host([disabled]) .base {
+        opacity: 0.5;
+      }
 
-    /*
+      /*
      * SC 2.5.8 Target Size. Each symbol floors its box to --fluid-target-min,
      * so AA keeps the 24px star and AAA grows the per-star hit area (and the
      * symbol with it) to 44px, no per-size override needed.
      */
-    .star {
-      position: relative;
-      display: inline-block;
-      width: max(1em, var(--fluid-target-min, 0px));
-      height: max(1em, var(--fluid-target-min, 0px));
-      cursor: pointer;
-      color: inherit;
-      transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);
-    }
+      .star {
+        position: relative;
+        display: inline-block;
+        width: max(1em, var(--fluid-target-min, 0px));
+        height: max(1em, var(--fluid-target-min, 0px));
+        cursor: pointer;
+        color: inherit;
+        transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);
+      }
 
-    .star:hover:not(.disabled) {
-      transform: scale(1.1);
-    }
+      .star:hover:not(.disabled) {
+        transform: scale(1.1);
+      }
 
-    .star.disabled {
-      cursor: default;
-    }
+      .star.disabled {
+        cursor: default;
+      }
 
-    /* Two stacked symbols, the inactive layer fills the slot fully, and the
+      /* Two stacked symbols, the inactive layer fills the slot fully, and the
        active layer overlays on top, masked from the left to the current value.
        This lets us paint a half-filled star without needing different SVGs. */
-    .layer {
-      position: absolute;
-      inset: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
+      .layer {
+        position: absolute;
+        inset: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
 
-    .layer-active {
-      color: var(--fluid-rating-active-color, var(--fluid-color-amber-500));
-      overflow: hidden;
-    }
+      .layer-active {
+        color: var(--fluid-rating-active-color, var(--fluid-color-amber-500));
+        overflow: hidden;
+      }
 
-    /* Default symbol, a star. SVG so it scales cleanly. */
-    .symbol {
-      width: 100%;
-      height: 100%;
-      display: inline-block;
-    }
-  `
+      /* Default symbol, a star. SVG so it scales cleanly. */
+      .symbol {
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+      }
+    `
   ];
 
   /** Current value (0 to `max`). Supports decimal values when `precision` < 1. */
@@ -172,12 +184,22 @@ export class FluidRating extends FluidElement {
   @property({ reflect: true }) name = "";
 
   /** Accessible label. */
-  @property({ attribute: "aria-label" }) override ariaLabel: string | null = "Rating";
+  @property({ attribute: "aria-label", noAccessor: true })
+  override get ariaLabel(): string | null {
+    return this.getAttribute("aria-label");
+  }
+  override set ariaLabel(value: string | null) {
+    if (value === null) this.removeAttribute("aria-label");
+    else this.setAttribute("aria-label", value);
+  }
 
   @state() private hoverValue: number | null = null;
-
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value")) {
+    if (changed.has("max") || changed.has("precision")) {
+      const clamped = this.clamp(this.value);
+      if (Number.isFinite(clamped) && clamped !== this.value) this.value = clamped;
+    }
+    if (changed.has("value") || changed.has("max") || changed.has("precision")) {
       this.internals.setFormValue(String(this.value));
     }
   }
@@ -187,18 +209,28 @@ export class FluidRating extends FluidElement {
     this.setAttribute("role", "slider");
     this.setAttribute("aria-valuemin", "0");
     this.tabIndex = this.readonly || this.disabled ? -1 : 0;
-    this.addEventListener("keydown", this.handleKeyDown);
+    this.listen(this, "keydown", this.handleKeyDown);
   }
 
   override disconnectedCallback(): void {
+    // Hover is transient interaction state. Keeping it while detached makes a
+    // reconnected rating display the preview instead of its committed value.
+    this.hoverValue = null;
     super.disconnectedCallback();
-    this.removeEventListener("keydown", this.handleKeyDown);
   }
 
-  protected override updated(): void {
+  protected override updated(changed: PropertyValues<this>): void {
+    this.updateDefaultAriaLabel(this.term("rating"));
     this.setAttribute("aria-valuemax", String(this.max));
     this.setAttribute("aria-valuenow", String(this.value));
     this.tabIndex = this.readonly || this.disabled ? -1 : 0;
+    if (
+      (changed.has("readonly") || changed.has("disabled")) &&
+      (this.readonly || this.disabled) &&
+      this.ownerDocument.activeElement === this
+    ) {
+      this.blur();
+    }
   }
 
   private clamp(v: number): number {
@@ -211,7 +243,7 @@ export class FluidRating extends FluidElement {
     if (clamped === this.value) return;
     this.value = clamped;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidRatingChangeDetail>("fluid-change", {
         detail: { value: this.value },
         bubbles: true,
         composed: true

@@ -2,8 +2,15 @@ import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { FormDisabledController } from "../../internal/form-disabled.js";
 
 export type FluidSliderSize = "sm" | "md" | "lg";
+
+export interface FluidSliderValueDetail {
+  value: string;
+}
+export type FluidSliderInputEvent = CustomEvent<FluidSliderValueDetail>;
+export type FluidSliderChangeEvent = CustomEvent<FluidSliderValueDetail>;
 
 /**
  * A range slider for numeric input.
@@ -42,10 +49,11 @@ export type FluidSliderSize = "sm" | "md" | "lg";
  * @uses-token --fluid-target-min - Minimum pointer-target row height (24px AA / 44px AAA).
  * @uses-token --fluid-gradient-glossy - Thumb sheen.
  *
- * @fires fluid-input - Fires on every value change (drag, keypress).
- * @fires fluid-change - Fires when the user commits a change (release / blur).
+ * @fires {FluidSliderInputEvent} fluid-input - Fires on every value change (drag, keypress).
+ * @fires {FluidSliderChangeEvent} fluid-change - Fires when the user commits a change (release / blur).
  */
 export class FluidSlider extends FluidFormAssociated {
+  private readonly formDisabled = new FormDisabledController(this);
   static override styles = css`
     :host {
       display: inline-flex;
@@ -163,14 +171,24 @@ export class FluidSlider extends FluidFormAssociated {
       height: 26px;
       margin-top: -9px;
       box-shadow:
-        0 0 0 6px color-mix(in srgb, var(--fluid-slider-thumb-color, var(--fluid-accent-base)) 18%, transparent),
+        0 0 0 6px
+          color-mix(
+            in srgb,
+            var(--fluid-slider-thumb-color, var(--fluid-accent-base)) 18%,
+            transparent
+          ),
         0 2px 4px rgb(0 0 0 / 0.15);
     }
     input[type="range"]:active::-moz-range-thumb {
       width: 10px;
       height: 26px;
       box-shadow:
-        0 0 0 6px color-mix(in srgb, var(--fluid-slider-thumb-color, var(--fluid-accent-base)) 18%, transparent),
+        0 0 0 6px
+          color-mix(
+            in srgb,
+            var(--fluid-slider-thumb-color, var(--fluid-accent-base)) 18%,
+            transparent
+          ),
         0 2px 4px rgb(0 0 0 / 0.15);
     }
 
@@ -233,7 +251,11 @@ export class FluidSlider extends FluidFormAssociated {
   }
 
   override formDisabledCallback(disabled: boolean): void {
-    this.disabled = disabled;
+    this.formDisabled.preserve(
+      disabled,
+      () => this.disabled,
+      (value) => (this.disabled = value)
+    );
   }
 
   override formStateRestoreCallback(state: string | File | FormData | null): void {
@@ -245,10 +267,24 @@ export class FluidSlider extends FluidFormAssociated {
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value")) {
-      this.numericValue = Number(this.value);
+    if (changed.has("value") || changed.has("min") || changed.has("max") || changed.has("step")) {
+      const normalized = this.normalizedValue();
+      if (normalized !== this.value) this.value = normalized;
+      this.numericValue = Number(normalized);
       this.syncFormValue();
     }
+  }
+
+  private normalizedValue(): string {
+    const ownerDocument = this.ownerDocument;
+    if (!ownerDocument?.createElement) return this.value;
+    const control = ownerDocument.createElement("input");
+    control.type = "range";
+    control.min = String(this.min);
+    control.max = String(this.max);
+    control.step = String(this.step);
+    control.value = this.value;
+    return control.value;
   }
 
   protected override updated(): void {
@@ -270,7 +306,7 @@ export class FluidSlider extends FluidFormAssociated {
   private handleInput = (e: Event) => {
     this.value = (e.target as HTMLInputElement).value;
     this.dispatchEvent(
-      new CustomEvent("fluid-input", {
+      new CustomEvent<FluidSliderValueDetail>("fluid-input", {
         detail: { value: this.value },
         bubbles: true,
         composed: true
@@ -280,7 +316,31 @@ export class FluidSlider extends FluidFormAssociated {
 
   private handleChange = () => {
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidSliderValueDetail>("fluid-change", {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true
+      })
+    );
+  };
+
+  private handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    e.preventDefault();
+    const previous = this.inputEl.value;
+    if (e.key === "ArrowRight") this.inputEl.stepUp();
+    else this.inputEl.stepDown();
+    if (this.inputEl.value === previous) return;
+    this.value = this.inputEl.value;
+    this.dispatchEvent(
+      new CustomEvent<FluidSliderValueDetail>("fluid-input", {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true
+      })
+    );
+    this.dispatchEvent(
+      new CustomEvent<FluidSliderValueDetail>("fluid-change", {
         detail: { value: this.value },
         bubbles: true,
         composed: true
@@ -308,14 +368,13 @@ export class FluidSlider extends FluidFormAssociated {
     const THUMB_W = 6;
     const offsetPx = (0.5 - pct / 100) * THUMB_W;
     const stop = `calc(${pct}% + ${offsetPx.toFixed(2)}px)`;
-    const trackBg = `linear-gradient(to right,
+    const trackDirection = this.isRtl ? "to left" : "to right";
+    const trackBg = `linear-gradient(${trackDirection},
       var(--fluid-slider-fill-color, var(--fluid-accent-base)) 0%,
       var(--fluid-slider-fill-color, var(--fluid-accent-base)) ${stop},
       var(--fluid-slider-track-color, var(--fluid-color-neutral-200)) ${stop},
       var(--fluid-slider-track-color, var(--fluid-color-neutral-200)) 100%)`;
-    const labelText = this.valueFormatter
-      ? this.valueFormatter(this.numericValue)
-      : this.value;
+    const labelText = this.valueFormatter ? this.valueFormatter(this.numericValue) : this.value;
     return html`
       <div
         part="base"
@@ -332,6 +391,7 @@ export class FluidSlider extends FluidFormAssociated {
           ?disabled=${this.disabled}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
           aria-valuetext=${ifDefined(this.valueFormatter ? labelText : undefined)}
+          @keydown=${this.handleKeyDown}
           @input=${this.handleInput}
           @change=${this.handleChange}
         />

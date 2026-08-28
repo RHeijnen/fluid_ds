@@ -55,6 +55,24 @@ validates like a native `<textarea>`).
 
 <ConformanceCode code={`<fluid-textarea name="notes" rows="4" placeholder="Tell us more…"></fluid-textarea>`} />
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-textarea label="Delivery notes" help-text="Anything the courier should know." rows="3" style="width:100%;"></fluid-textarea>
+</Demo>
+
+<ConformanceCode code={`<fluid-textarea
+  label="Delivery notes"
+  help-text="Anything the courier should know."
+  rows="3"
+></fluid-textarea>`} />
+
 ### Auto-resize
 
 `resize="auto"` grows the textarea to fit its content as the user types, good

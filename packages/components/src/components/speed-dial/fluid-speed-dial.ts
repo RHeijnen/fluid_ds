@@ -69,7 +69,8 @@ let counter = 0;
  *   `event.detail.action` is the activated element.
  * @fires fluid-open - Fired when the dial opens.
  * @fires fluid-close - Fired when the dial closes.
- */
+ * @cssproperty --fluid-speed-dial-shadow-lg - Component override for the corresponding semantic token.
+*/
 export class FluidSpeedDial extends FluidElement {
   static override styles = [
     reducedMotion,
@@ -105,7 +106,7 @@ export class FluidSpeedDial extends FluidElement {
         border-radius: var(--fluid-speed-dial-radius, var(--fluid-radius-full));
         background: var(--fluid-speed-dial-bg, var(--fluid-accent-base));
         color: var(--fluid-speed-dial-fg, var(--fluid-accent-text));
-        box-shadow: var(--fluid-shadow-lg);
+        box-shadow: var(--fluid-speed-dial-shadow-lg, var(--fluid-shadow-lg));
         cursor: pointer;
         transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);
       }
@@ -230,7 +231,14 @@ export class FluidSpeedDial extends FluidElement {
   @property({ reflect: true }) placement: FluidSpeedDialPlacement = "up";
 
   /** Accessible label for the trigger button. */
-  @property() label = "Actions";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("actions");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   @state() private activeIndex = -1;
 
@@ -238,12 +246,11 @@ export class FluidSpeedDial extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsideClick, true);
+    this.listen(document, "pointerdown", this.handleOutsideClick, { capture: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsideClick, true);
   }
 
   override focus(options?: FocusOptions): void {

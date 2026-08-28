@@ -2,7 +2,7 @@ import { html, css, type TemplateResult, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../button/define.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -38,13 +38,18 @@ registerIcon(
  * @csspart body - The scrollable code area.
  * @csspart copy - The copy button.
  *
- * @cssproperty [--fluid-code-bg=var(--fluid-surface-subtle)] - Code area background.
- * @cssproperty [--fluid-code-fg=var(--fluid-text-primary)] - Code foreground (used when not syntax-highlighted).
- * @cssproperty [--fluid-code-border=var(--fluid-border-default)] - Border + header divider color.
- * @cssproperty [--fluid-code-header-bg=var(--fluid-surface-muted)] - Header bar background.
+ * @cssproperty [--fluid-code-bg=var(--fluid-code-block-surface-subtle, var(--fluid-surface-subtle))] - Code area background.
+ * @cssproperty [--fluid-code-fg=var(--fluid-code-block-text-primary, var(--fluid-text-primary))] - Code foreground (used when not syntax-highlighted).
+ * @cssproperty [--fluid-code-border=var(--fluid-code-block-border-default, var(--fluid-border-default))] - Border + header divider color.
+ * @cssproperty [--fluid-code-header-bg=var(--fluid-code-block-surface-muted, var(--fluid-surface-muted))] - Header bar background.
  *
  * @fires fluid-copy - Fired when the user copies the code. `event.detail.text`.
- */
+ * @cssproperty --fluid-code-block-border-default - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-code-block-surface-muted - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-code-block-surface-subtle - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-code-block-text-primary - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-code-block-text-secondary - Component override for the corresponding semantic token.
+*/
 export class FluidCodeBlock extends FluidElement {
   static override styles = css`
     :host {
@@ -56,10 +61,10 @@ export class FluidCodeBlock extends FluidElement {
     }
 
     .base {
-      border: 1px solid var(--fluid-code-border, var(--fluid-border-default));
+      border: 1px solid var(--fluid-code-border, var(--fluid-code-block-border-default, var(--fluid-border-default)));
       border-radius: var(--fluid-radius-md);
-      background: var(--fluid-code-bg, var(--fluid-surface-subtle));
-      color: var(--fluid-code-fg, var(--fluid-text-primary));
+      background: var(--fluid-code-bg, var(--fluid-code-block-surface-subtle, var(--fluid-surface-subtle)));
+      color: var(--fluid-code-fg, var(--fluid-code-block-text-primary, var(--fluid-text-primary)));
       overflow: hidden;
       font-family: var(--fluid-font-family-mono);
       font-size: var(--fluid-font-size-sm, 0.875rem);
@@ -72,11 +77,11 @@ export class FluidCodeBlock extends FluidElement {
       gap: var(--fluid-space-2);
       min-height: 2.25rem;
       padding-inline: var(--fluid-space-3) var(--fluid-space-1);
-      background: var(--fluid-code-header-bg, var(--fluid-surface-muted));
-      border-bottom: 1px solid var(--fluid-code-border, var(--fluid-border-default));
+      background: var(--fluid-code-header-bg, var(--fluid-code-block-surface-muted, var(--fluid-surface-muted)));
+      border-bottom: 1px solid var(--fluid-code-border, var(--fluid-code-block-border-default, var(--fluid-border-default)));
       font-family: var(--fluid-font-family-sans);
       font-size: var(--fluid-font-size-xs, 0.75rem);
-      color: var(--fluid-text-secondary);
+      color: var(--fluid-code-block-text-secondary, var(--fluid-text-secondary));
     }
 
     .label {
@@ -208,10 +213,10 @@ export class FluidCodeBlock extends FluidElement {
                         <fluid-icon
                           name=${this.copied ? "check" : "copy"}
                           label=${this.copied
-                            ? "Copied"
+                            ? this.term("copied")
                             : this.language
-                              ? `Copy ${this.language} code`
-                              : "Copy code"}
+                              ? this.term("copyLanguageCode", this.language)
+                              : this.term("copyCode")}
                         ></fluid-icon>
                       </fluid-button>
                     `

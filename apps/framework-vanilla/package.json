@@ -1,0 +1,19 @@
+{
+  "name": "@fluid-ds/framework-vanilla",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Executable plain TypeScript and HTML consumer contract for Fluid.",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^7.1.3"
+  }
+}

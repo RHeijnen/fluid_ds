@@ -142,6 +142,9 @@ export class FluidCountdown extends FluidElement {
   @state() private running = false;
 
   private timerId: ReturnType<typeof setInterval> | null = null;
+  private resumeOnConnect = false;
+  private initializedTarget: string | undefined;
+  private initializedSeconds: number | undefined;
 
   /** Wall-clock target in ms (derived from `target`), or null for duration mode. */
   private targetMs: number | null = null;
@@ -152,28 +155,42 @@ export class FluidCountdown extends FluidElement {
   /** Whether fluid-complete has already fired for the current run. */
   private completed = false;
 
-  /** The polite live announcement string. */
-  @state() private announcement = "";
+  /** Keep the announced value so locale updates do not require a new tick. */
+  @state() private announcement: number | "complete" | null = null;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.computeInitialRemaining();
-    if (this.autostart) this.start();
+    // Fixed durations pause while detached; wall-clock targets continue to elapse.
+    if (!this.hasUpdated || this.targetMs !== null || this.sourceChanged())
+      this.computeInitialRemaining();
+    const shouldStart = this.resumeOnConnect || (!this.hasUpdated && this.autostart);
+    this.resumeOnConnect = false;
+    if (shouldStart) this.start();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
+    this.resumeOnConnect = this.running;
+    this.running = false;
     this.clearTimer();
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("target") || changed.has("seconds")) {
+    if ((changed.has("target") || changed.has("seconds")) && this.sourceChanged()) {
       this.computeInitialRemaining();
     }
   }
 
+  private sourceChanged(): boolean {
+    return (
+      this.target !== this.initializedTarget || !Object.is(this.seconds, this.initializedSeconds)
+    );
+  }
+
   /** Resolve the starting remaining time from `target` or `seconds`. */
   private computeInitialRemaining(): void {
+    this.initializedTarget = this.target;
+    this.initializedSeconds = this.seconds;
     if (this.target) {
       const parsed = Date.parse(this.target);
       if (!Number.isNaN(parsed)) {
@@ -197,12 +214,14 @@ export class FluidCountdown extends FluidElement {
     this.running = true;
     this.completed = false;
     this.tick();
-    this.timerId = setInterval(() => this.tick(), 1000);
+    // The immediate tick can complete the countdown or be paused by an event listener.
+    if (this.running) this.timerId = setInterval(() => this.tick(), 1000);
   }
 
   /** Pause the countdown, keeping the remaining time intact. */
   pause(): void {
     this.running = false;
+    this.resumeOnConnect = false;
     this.clearTimer();
   }
 
@@ -211,7 +230,7 @@ export class FluidCountdown extends FluidElement {
     this.pause();
     this.completed = false;
     this.lastAnnounced = -1;
-    this.announcement = "";
+    this.announcement = null;
     this.computeInitialRemaining();
   }
 
@@ -255,30 +274,43 @@ export class FluidCountdown extends FluidElement {
     const atBoundary = value % 10 === 0 || value === 0;
     if (atBoundary && value !== this.lastAnnounced) {
       this.lastAnnounced = value;
-      this.announcement = this.spokenLabel(value);
+      this.announcement = value;
     }
   }
 
   private maybeComplete(): void {
     if (this.completed) return;
     this.completed = true;
-    this.announcement = "Countdown complete.";
-    this.dispatchEvent(
-      new CustomEvent("fluid-complete", { bubbles: true, composed: true })
-    );
+    this.announcement = "complete";
+    this.dispatchEvent(new CustomEvent("fluid-complete", { bubbles: true, composed: true }));
   }
 
   /** A human-readable sentence for the live region. */
   private spokenLabel(value: number): string {
     const { days, hours, minutes, seconds } = splitParts(value);
-    const bits: string[] = [];
-    if (days) bits.push(`${days} day${days === 1 ? "" : "s"}`);
-    if (hours) bits.push(`${hours} hour${hours === 1 ? "" : "s"}`);
-    if (minutes) bits.push(`${minutes} minute${minutes === 1 ? "" : "s"}`);
-    if (seconds || bits.length === 0) {
-      bits.push(`${seconds} second${seconds === 1 ? "" : "s"}`);
+    // Follow the same effective context as the complete-message dictionary,
+    // including its browser-language fallback. Invalid Intl tags stay safe.
+    let locales = ["en"];
+    try {
+      locales = [...Intl.getCanonicalLocales(this.localize.locale), "en"];
+    } catch {
+      /* Use English unit formatting for an invalid locale. */
     }
-    return `${bits.join(", ")} remaining.`;
+    const bits: string[] = [];
+    const unit = (count: number, name: string): string =>
+      new Intl.NumberFormat(locales, { style: "unit", unit: name, unitDisplay: "long" }).format(
+        count
+      );
+    if (days) bits.push(unit(days, "day"));
+    if (hours) bits.push(unit(hours, "hour"));
+    if (minutes) bits.push(unit(minutes, "minute"));
+    if (seconds || bits.length === 0) {
+      bits.push(unit(seconds, "second"));
+    }
+    const duration = new Intl.ListFormat(locales, { style: "long", type: "conjunction" }).format(
+      bits
+    );
+    return this.term("countdownRemaining", duration);
   }
 
   private renderSegments(parts: CountdownParts): TemplateResult {
@@ -289,24 +321,24 @@ export class FluidCountdown extends FluidElement {
       ${showDays
         ? html`<span part="segment" class="segment">
             <span part="digit" class="digit">${parts.days}</span>
-            <span part="label" class="label">days</span>
+            <span part="label" class="label">${this.term("days")}</span>
           </span>`
         : ""}
       ${showHours
         ? html`<span part="segment" class="segment">
             <span part="digit" class="digit">${pad2(parts.hours)}</span>
-            <span part="label" class="label">hrs</span>
+            <span part="label" class="label">${this.term("hoursShort")}</span>
           </span>`
         : ""}
       ${showMinutes
         ? html`<span part="segment" class="segment">
             <span part="digit" class="digit">${pad2(parts.minutes)}</span>
-            <span part="label" class="label">min</span>
+            <span part="label" class="label">${this.term("minutesShort")}</span>
           </span>`
         : ""}
       <span part="segment" class="segment">
         <span part="digit" class="digit">${pad2(parts.seconds)}</span>
-        <span part="label" class="label">sec</span>
+        <span part="label" class="label">${this.term("secondsShort")}</span>
       </span>
     `;
   }
@@ -332,14 +364,18 @@ export class FluidCountdown extends FluidElement {
         part="base"
         class="base ${isClock ? "clock" : ""}"
         role="timer"
-        aria-label=${this.ariaLabel ?? "Time remaining"}
+        aria-label=${this.ariaLabel ?? this.term("timeRemaining")}
       >
         ${isClock ? this.renderClock(parts) : this.renderSegments(parts)}
       </div>
       <span
         aria-live="polite"
         style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0;white-space:nowrap;"
-        >${this.announcement}</span
+        >${this.announcement === "complete"
+          ? this.term("countdownComplete")
+          : this.announcement === null
+            ? ""
+            : this.spokenLabel(this.announcement)}</span
       >
     `;
   }

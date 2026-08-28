@@ -1,6 +1,6 @@
 import { FluidIntersectionObserver } from "./fluid-intersection-observer.js";
 
-if (!customElements.get("fluid-intersection-observer")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-intersection-observer")) {
   customElements.define("fluid-intersection-observer", FluidIntersectionObserver);
 }
 

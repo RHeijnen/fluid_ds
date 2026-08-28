@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "bundleGzipBytes": {
+    "button": 19000,
+    "dialog": 14000,
+    "input": 16000,
+    "react-button": 23000
+  },
+  "ssr": {
+    "averageMilliseconds": 0.5,
+    "p95Milliseconds": 1.5
+  },
+  "browser": {
+    "definitionMilliseconds": 250,
+    "create100Milliseconds": 150,
+    "update100Milliseconds": 100,
+    "localeSwitch100Milliseconds": 120,
+    "hydrate100Milliseconds": 500,
+    "lifecycleHeapGrowthBytes": 3000000
+  }
+}

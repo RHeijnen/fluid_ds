@@ -86,9 +86,7 @@ describe("<fluid-avatar-group>", () => {
       </fluid-avatar-group>
     `);
     await elementUpdated(el);
-    const hidden = el.querySelectorAll(
-      'fluid-avatar[data-fluid-overflow][aria-hidden="true"]'
-    );
+    const hidden = el.querySelectorAll('fluid-avatar[data-fluid-overflow][aria-hidden="true"]');
     expect(hidden.length).to.equal(1);
     const overflow = el.shadowRoot!.querySelector('[part="overflow"]')!;
     expect(overflow.getAttribute("aria-hidden")).to.equal("true");
@@ -116,6 +114,71 @@ describe("<fluid-avatar-group>", () => {
     `);
     expect(el.getAttribute("size")).to.equal("sm");
     expect(el.getAttribute("max")).to.equal("2");
+  });
+
+  it("recomputes count, overflow labels and hidden state as avatars are added and removed", async () => {
+    const el = await fixture<FluidAvatarGroup>(html`
+      <fluid-avatar-group max="2">
+        <fluid-avatar label="Ada Lovelace"></fluid-avatar>
+        <fluid-avatar label="Grace Hopper"></fluid-avatar>
+      </fluid-avatar-group>
+    `);
+    const base = el.shadowRoot!.querySelector('[part="base"]')!;
+    const alan = document.createElement("fluid-avatar");
+    alan.setAttribute("label", "Alan Turing");
+    el.append(alan);
+    await aTimeout(0);
+
+    expect(base.getAttribute("aria-label")).to.equal("3 members");
+    expect(el.shadowRoot!.querySelector(".overflow")!.textContent?.trim()).to.equal("+1");
+    expect(alan.matches('[data-fluid-overflow][aria-hidden="true"]')).to.equal(true);
+
+    el.querySelector("fluid-avatar")!.remove();
+    await aTimeout(0);
+    expect(base.getAttribute("aria-label")).to.equal("2 members");
+    expect(el.shadowRoot!.querySelector(".overflow")).to.equal(null);
+    expect(alan.hasAttribute("data-fluid-overflow")).to.equal(false);
+    expect(alan.hasAttribute("aria-hidden")).to.equal(false);
+  });
+
+  it("reconciles hidden avatars and overflow when max changes live", async () => {
+    const el = await fixture<FluidAvatarGroup>(html`
+      <fluid-avatar-group max="1">
+        <fluid-avatar label="Ada Lovelace"></fluid-avatar>
+        <fluid-avatar label="Grace Hopper"></fluid-avatar>
+        <fluid-avatar label="Alan Turing"></fluid-avatar>
+      </fluid-avatar-group>
+    `);
+    expect(el.querySelectorAll('[data-fluid-overflow][aria-hidden="true"]')).to.have.length(2);
+
+    el.max = 2;
+    await elementUpdated(el);
+    expect(el.querySelectorAll('[data-fluid-overflow][aria-hidden="true"]')).to.have.length(1);
+    expect(el.shadowRoot!.querySelector(".overflow")!.textContent?.trim()).to.equal("+1");
+
+    el.max = 0;
+    await elementUpdated(el);
+    expect(el.querySelectorAll("[data-fluid-overflow]")).to.have.length(0);
+    expect(el.shadowRoot!.querySelector(".overflow")).to.equal(null);
+  });
+
+  it("keeps a capped avatar cluster within a narrow containing block", async () => {
+    const wrapper = await fixture<HTMLElement>(html`
+      <div style="width: 120px; overflow: auto;">
+        <fluid-avatar-group max="2" size="sm">
+          <fluid-avatar label="Ada Lovelace"></fluid-avatar>
+          <fluid-avatar label="Grace Hopper"></fluid-avatar>
+          <fluid-avatar label="Alan Turing"></fluid-avatar>
+          <fluid-avatar label="Katherine Johnson"></fluid-avatar>
+        </fluid-avatar-group>
+      </div>
+    `);
+    const group = wrapper.querySelector<FluidAvatarGroup>("fluid-avatar-group")!;
+    await elementUpdated(group);
+    expect(wrapper.scrollWidth).to.be.at.most(wrapper.clientWidth);
+    expect(group.getBoundingClientRect().width).to.be.at.most(
+      wrapper.getBoundingClientRect().width
+    );
   });
 
   it("passes an a11y audit", async () => {

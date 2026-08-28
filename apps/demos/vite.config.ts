@@ -29,7 +29,8 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, "index.html"),
         settings: resolve(__dirname, "settings/index.html"),
-        admin: resolve(__dirname, "admin/index.html")
+        admin: resolve(__dirname, "admin/index.html"),
+        "data-table": resolve(__dirname, "data-table/index.html")
       }
     }
   },

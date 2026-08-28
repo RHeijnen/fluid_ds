@@ -87,6 +87,31 @@ With no value, the placeholder text shows until a choice is made.
   <fluid-option value="ca">Canada</fluid-option>
 </fluid-select>`} />
 
+### Label and help text
+
+The `label` and `help-text` attributes attach a visible label and a help row
+directly to the control. The label is a real `<label for>` association inside
+the shadow root; the help text is announced through `aria-describedby`. For
+rich label content, error messages, or a required indicator, wrap the control
+in [Field](/components/field/) instead.
+
+<Demo>
+  <fluid-select label="Country" help-text="Where the invoice is sent." placeholder="Select a country…" style="max-width: 18rem;">
+    <fluid-option value="us">United States</fluid-option>
+    <fluid-option value="ca">Canada</fluid-option>
+    <fluid-option value="mx">Mexico</fluid-option>
+  </fluid-select>
+</Demo>
+
+<ConformanceCode code={`<fluid-select
+  label="Country"
+  help-text="Where the invoice is sent."
+  placeholder="Select a country…"
+>
+  <fluid-option value="us">United States</fluid-option>
+  <fluid-option value="ca">Canada</fluid-option>
+</fluid-select>`} />
+
 ### Sizes
 
 `size` accepts `sm`, `md` (default), and `lg`.
@@ -326,9 +351,13 @@ current value. The select needs an accessible name, a visible label wired with
 
 ### State semantics
 
-`required` participates in form validation; the active option is tracked with
-`aria-activedescendant` so screen readers announce navigation without moving DOM
-focus.
+`required` participates in form validation. DOM focus stays on the trigger while
+`ariaActiveDescendantElement` references the active option. This element-reference
+API bridges the trigger's shadow root and the slotted options; a string
+`aria-activedescendant` alone cannot resolve an option across that boundary.
+It is cleared when the popup closes. Older browsers without ARIA element
+reflection are outside this component's supported accessibility baseline.
+Cross-browser and assistive-technology certification remains pending.
 
 ### Motion & target size
 

@@ -1,9 +1,9 @@
 import { FluidTimeline } from "./fluid-timeline.js";
 import { FluidTimelineItem } from "./fluid-timeline-item.js";
 
-if (!customElements.get("fluid-timeline"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-timeline"))
   customElements.define("fluid-timeline", FluidTimeline);
-if (!customElements.get("fluid-timeline-item"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-timeline-item"))
   customElements.define("fluid-timeline-item", FluidTimelineItem);
 
 declare global {

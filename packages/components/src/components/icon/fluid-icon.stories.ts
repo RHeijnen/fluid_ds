@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "@fluid-ds/icons/register-defaults";
-import { listIcons } from "@fluid-ds/icons";
+import { listIcons } from "@fluid-ds/icons/registry";
 import "./define.js";
 import type { FluidIcon } from "./fluid-icon.js";
 

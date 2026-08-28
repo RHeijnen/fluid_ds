@@ -1,6 +1,6 @@
 import { FluidFormatNumber } from "./fluid-format-number.js";
 
-if (!customElements.get("fluid-format-number")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-format-number")) {
   customElements.define("fluid-format-number", FluidFormatNumber);
 }
 

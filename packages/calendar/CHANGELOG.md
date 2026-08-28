@@ -1,5 +1,24 @@
 # @fluid-ds/calendar
 
+## 0.4.0
+
+### Minor Changes
+
+- Add live inherited localization for month and weekday names, visible numbers,
+  navigation labels, event counts, and overflow actions. An explicit `locale`
+  continues to control `Intl` formatting independently, while application event
+  titles, identifiers, colors, and ISO date payloads remain unchanged.
+
+### Patch Changes
+
+- Improve event-grid keyboard behavior with focus preservation across month
+  changes, F2/Escape transitions between a day and its event buttons, and
+  direction-aware horizontal movement. RTL navigation icons now mirror with the
+  rendered direction.
+
+- Publish the generated custom-elements manifest and make package entry points
+  importable in Node-based tooling.
+
 ## 0.0.3
 
 ### Patch Changes

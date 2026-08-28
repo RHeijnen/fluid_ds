@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
+import { autoUpdate, computePosition, flip, offset, shift } from "../../internal/position.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
 import { reducedMotion } from "../../internal/motion.js";
 import {
@@ -42,15 +42,16 @@ function toHHMM(minutes: number): string {
 }
 
 /** Format a canonical 24h "HH:MM" for display in the chosen format. */
-function formatLabel(value: string, format: FluidTimeFormat): string {
+function formatLabel(value: string, format: FluidTimeFormat, locale: string | undefined): string {
   const mins = toMinutes(value);
   if (mins === null) return value;
   const h = Math.floor(mins / 60);
   const mm = mins % 60;
-  if (format === "24h") return `${String(h).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
-  const period = h < 12 ? "AM" : "PM";
-  const h12 = h % 12 === 0 ? 12 : h % 12;
-  return `${h12}:${String(mm).padStart(2, "0")} ${period}`;
+  return new Intl.DateTimeFormat(locale, {
+    hour: "numeric",
+    minute: "2-digit",
+    hourCycle: format === "24h" ? "h23" : "h12"
+  }).format(new Date(2000, 0, 1, h, mm));
 }
 
 /**
@@ -94,6 +95,7 @@ function formatLabel(value: string, format: FluidTimeFormat): string {
  * @cssproperty --fluid-time-picker-border-focus - Focused border color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-time-picker-radius - Field corner radius. Falls back to --fluid-field-border-radius then --fluid-radius-md.
  * @cssproperty --fluid-time-picker-listbox-bg - Popover background. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-time-picker-listbox-shadow - Popover elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-time-picker-option-fg - Option text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-time-picker-option-active-bg - Active/hovered option background. Falls back to --fluid-surface-muted.
  * @cssproperty --fluid-time-picker-option-selected-bg - Selected option background. Falls back to --fluid-accent-base.
@@ -118,8 +120,17 @@ function formatLabel(value: string, format: FluidTimeFormat): string {
  * @fires fluid-change - The committed time changed. `detail: { value }` where value is the 24h "HH:MM" (or null when cleared).
  * @fires fluid-open - The listbox opened.
  * @fires fluid-close - The listbox closed.
+ * @cssproperty --fluid-time-picker-accent-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-time-picker-border-default - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-time-picker-text-primary - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-time-picker-text-secondary - Component override for the corresponding semantic token.
  */
 export class FluidTimePicker extends FluidFormAssociated {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override formAssociated = true;
 
   static override styles = [
@@ -147,13 +158,20 @@ export class FluidTimePicker extends FluidFormAssociated {
         color: var(--fluid-time-picker-fg, var(--fluid-input-fg, var(--fluid-text-primary)));
         border: var(--fluid-field-border-width, 1px) solid
           var(--fluid-time-picker-border, var(--fluid-input-border, var(--fluid-border-default)));
-        border-radius: var(--fluid-time-picker-radius, var(--fluid-field-border-radius, var(--fluid-radius-md)));
-        transition: border-color 120ms ease, box-shadow 120ms ease;
+        border-radius: var(
+          --fluid-time-picker-radius,
+          var(--fluid-field-border-radius, var(--fluid-radius-md))
+        );
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease;
       }
       /* Font scales with the size, as it does on every other field. The
          size-scoped font rules further down style the dropdown rows, not the
          field — see fluid-date-range-picker. */
-      .base { font-size: var(--fluid-font-size-md); }
+      .base {
+        font-size: var(--fluid-font-size-md);
+      }
       :host([size="sm"]) .base {
         height: var(--fluid-field-height-sm, 2rem);
         padding-inline: var(--fluid-field-padding-x-sm, 0.6rem);
@@ -181,7 +199,10 @@ export class FluidTimePicker extends FluidFormAssociated {
         padding: 0;
       }
       input::placeholder {
-        color: var(--fluid-input-placeholder-fg, var(--fluid-text-secondary));
+        color: var(
+          --fluid-input-placeholder-fg,
+          var(--fluid-time-picker-text-secondary, var(--fluid-text-secondary))
+        );
       }
       .trigger {
         display: inline-grid;
@@ -192,14 +213,15 @@ export class FluidTimePicker extends FluidFormAssociated {
         border: 0;
         border-radius: var(--fluid-radius-sm, 4px);
         background: transparent;
-        color: var(--fluid-text-secondary);
+        color: var(--fluid-time-picker-text-secondary, var(--fluid-text-secondary));
         cursor: pointer;
       }
       .trigger:hover {
-        color: var(--fluid-text-primary);
+        color: var(--fluid-time-picker-text-primary, var(--fluid-text-primary));
       }
       .trigger:focus-visible {
-        outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base);
+        outline: var(--fluid-focus-ring-width, 2px) solid
+          var(--fluid-time-picker-accent-base, var(--fluid-accent-base));
         outline-offset: 1px;
       }
       svg {
@@ -207,7 +229,7 @@ export class FluidTimePicker extends FluidFormAssociated {
         height: 1.1em;
       }
       /* Rendered in the top layer via popover="manual" so it is never clipped
-         by an ancestor overflow / transform / contain. floating-ui drives
+         by an ancestor overflow / transform / contain. the positioning engine drives
          placement. */
       .listbox {
         position: fixed;
@@ -222,9 +244,12 @@ export class FluidTimePicker extends FluidFormAssociated {
         min-width: 8rem;
         list-style: none;
         background: var(--fluid-time-picker-listbox-bg, var(--fluid-surface-base));
-        border: 1px solid var(--fluid-border-default);
+        border: 1px solid var(--fluid-time-picker-border-default, var(--fluid-border-default));
         border-radius: var(--fluid-radius-lg, 0.75rem);
-        box-shadow: var(--fluid-shadow-lg, 0 12px 32px -8px rgba(0, 0, 0, 0.25));
+        box-shadow: var(
+          --fluid-time-picker-listbox-shadow,
+          var(--fluid-shadow-lg, 0 12px 32px -8px rgba(0, 0, 0, 0.25))
+        );
         opacity: 0;
         transform: scale(0.97);
         transform-origin: top left;
@@ -266,7 +291,7 @@ export class FluidTimePicker extends FluidFormAssociated {
       .empty {
         padding: 0.5rem 0.6rem;
         font-size: var(--fluid-font-size-sm);
-        color: var(--fluid-text-secondary);
+        color: var(--fluid-time-picker-text-secondary, var(--fluid-text-secondary));
       }
     `
   ];
@@ -289,6 +314,9 @@ export class FluidTimePicker extends FluidFormAssociated {
   /** Display format for the field + options. The form value stays 24h. */
   @property() format: FluidTimeFormat = "24h";
 
+  /** BCP-47 locale for display labels. Defaults to inherited language. */
+  @property() locale: string | undefined = undefined;
+
   /** Disabled state. */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
@@ -299,10 +327,20 @@ export class FluidTimePicker extends FluidFormAssociated {
   @property({ reflect: true }) size: "sm" | "md" | "lg" = "md";
 
   /** Placeholder when no time is selected. */
-  @property() placeholder = "Select a time";
+  @property()
+  get placeholder(): string {
+    return this.placeholderOverride ?? this.term("selectTime");
+  }
+  set placeholder(value: string | null) {
+    this.placeholderOverride = value;
+  }
+  private placeholderOverride: string | null = null;
 
   /** Whether the listbox popover is open. */
   @property({ type: Boolean, reflect: true }) open = false;
+
+  /** Open the time options when the text input is clicked. */
+  @property({ type: Boolean, attribute: "open-on-input-click" }) openOnInputClick = false;
 
   /** Live text in the input (drives type-to-filter). */
   @state() private typed = "";
@@ -323,18 +361,18 @@ export class FluidTimePicker extends FluidFormAssociated {
   private cleanup?: () => void;
   private listboxId = `fluid-time-picker-${++counter}`;
   private defaultValue: string | null = null;
+  private lastDisplayText = "";
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.defaultValue = this.value;
     if (this.value) this.syncFormValue();
-    document.addEventListener("pointerdown", this.onDocPointerDown, true);
+    this.listen(document, "pointerdown", this.onDocPointerDown, { capture: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.cleanup?.();
-    document.removeEventListener("pointerdown", this.onDocPointerDown, true);
   }
 
   override focus(options?: FocusOptions): void {
@@ -349,7 +387,11 @@ export class FluidTimePicker extends FluidFormAssociated {
     const out: TimeOption[] = [];
     for (let m = start; m <= end; m += step) {
       const value = toHHMM(m);
-      out.push({ value, label: formatLabel(value, this.format), id: `${this.listboxId}-opt-${m}` });
+      out.push({
+        value,
+        label: formatLabel(value, this.format, this.displayLocale),
+        id: `${this.listboxId}-opt-${m}`
+      });
     }
     return out;
   }
@@ -362,22 +404,52 @@ export class FluidTimePicker extends FluidFormAssociated {
   }
 
   private get displayText(): string {
-    return this.value ? formatLabel(this.value, this.format) : "";
+    return this.value ? formatLabel(this.value, this.format, this.displayLocale) : "";
+  }
+
+  /** Explicit locale wins; otherwise time display follows the reactive language context. */
+  private get displayLocale(): string | undefined {
+    const locale = this.locale === undefined ? this.localize.locale : this.locale;
+    if (locale === "") return undefined;
+    try {
+      Intl.getCanonicalLocales(locale);
+      return locale;
+    } catch {
+      return this.locale === undefined ? "en" : undefined;
+    }
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value")) {
-      this.typed = this.displayText;
-      this.syncFormValue();
-      if (this.required && !this.value) this.setValidity({ valueMissing: true }, "Please choose a time.");
-      else this.setValidity({});
+    const displayText = this.displayText;
+    if (
+      changed.has("value") ||
+      changed.has("format") ||
+      changed.has("locale") ||
+      this.typed === this.lastDisplayText
+    ) {
+      this.typed = displayText;
     }
-    if (changed.has("format") && !changed.has("value")) {
-      this.typed = this.displayText;
+    this.lastDisplayText = displayText;
+    if (changed.has("value")) {
+      this.syncFormValue();
+    }
+    if (changed.has("open")) {
+      if (this.open) {
+        const opts = this.filteredOptions;
+        const selectedIdx = this.value ? opts.findIndex((o) => o.value === this.value) : -1;
+        this.activeIndex = selectedIdx >= 0 ? selectedIdx : opts.length > 0 ? 0 : -1;
+      } else this.activeIndex = -1;
     }
   }
 
   protected override updated(changed: PropertyValues): void {
+    // Native form validation needs the rendered input as its focus anchor.
+    // Refresh localized text on every update without discarding custom errors.
+    if (this.required && !this.value) {
+      this.setValidity({ valueMissing: true }, this.term("chooseTimeRequired"), this.inputEl);
+    } else {
+      this.setValidity({});
+    }
     if (changed.has("open")) {
       if (this.open) void this.openListbox();
       else this.closeListbox();
@@ -411,10 +483,6 @@ export class FluidTimePicker extends FluidFormAssociated {
 
   private async openListbox(): Promise<void> {
     if (!this.listboxEl || !this.triggerEl) return;
-    // Seed the active option from the current value (or the first match).
-    const opts = this.filteredOptions;
-    const selectedIdx = this.value ? opts.findIndex((o) => o.value === this.value) : -1;
-    this.activeIndex = selectedIdx >= 0 ? selectedIdx : opts.length > 0 ? 0 : -1;
     this.dispatchEvent(new CustomEvent("fluid-open", { bubbles: true, composed: true }));
     const popover = this.listboxEl as HTMLElement & { showPopover?: () => void };
     try {
@@ -430,7 +498,6 @@ export class FluidTimePicker extends FluidFormAssociated {
   private closeListbox(): void {
     this.cleanup?.();
     this.cleanup = undefined;
-    this.activeIndex = -1;
     const popover = this.listboxEl as HTMLElement & { hidePopover?: () => void };
     try {
       popover?.hidePopover?.();
@@ -449,7 +516,7 @@ export class FluidTimePicker extends FluidFormAssociated {
     const { x, y } = await computePosition(this.base, this.listboxEl, {
       placement: "bottom-start",
       strategy: "fixed",
-      middleware: [offset(6), flip({ rootBoundary: "viewport" }), shift({ padding: 8 })]
+      middleware: [offset(6), flip(), shift({ padding: 8 })]
     });
     Object.assign(this.listboxEl.style, { left: `${x}px`, top: `${y}px` });
   }
@@ -471,13 +538,19 @@ export class FluidTimePicker extends FluidFormAssociated {
     this.open = !this.open;
   }
 
+  private onInputClick = (): void => {
+    if (!this.openOnInputClick || this.disabled) return;
+    this.open = true;
+  };
+
   private moveActive(delta: number): void {
     const opts = this.filteredOptions;
     if (opts.length === 0) {
       this.activeIndex = -1;
       return;
     }
-    const next = this.activeIndex < 0 ? (delta > 0 ? 0 : opts.length - 1) : this.activeIndex + delta;
+    const next =
+      this.activeIndex < 0 ? (delta > 0 ? 0 : opts.length - 1) : this.activeIndex + delta;
     this.activeIndex = Math.max(0, Math.min(opts.length - 1, next));
   }
 
@@ -563,71 +636,80 @@ export class FluidTimePicker extends FluidFormAssociated {
     return renderFieldChrome(
       { label: this.label, helpText: this.helpText, for: "input" },
       html`
-      <div part="base" class="base">
-        <input
-          id="input"
-          part="input"
-          type="text"
-          .value=${this.typed}
-          placeholder=${this.placeholder}
-          ?disabled=${this.disabled}
-          role="combobox"
-          autocomplete="off"
-          spellcheck="false"
-          aria-haspopup="listbox"
-          aria-expanded=${this.open ? "true" : "false"}
-          aria-controls=${this.listboxId}
-          aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
-          aria-activedescendant=${this.open && active ? active.id : ""}
-          @input=${this.onInput}
-          @change=${this.commitTyped}
-          @keydown=${this.onInputKeydown}
-        />
-        <button
-          part="trigger"
-          class="trigger"
-          type="button"
-          tabindex="-1"
-          aria-label="Choose time"
-          aria-haspopup="listbox"
-          aria-expanded=${this.open ? "true" : "false"}
-          ?disabled=${this.disabled}
-          @click=${() => this.toggle()}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="9"></circle>
-            <path d="M12 7v5l3 2"></path>
-          </svg>
-        </button>
-      </div>
+        <div part="base" class="base">
+          <input
+            id="input"
+            part="input"
+            type="text"
+            .value=${this.typed}
+            placeholder=${this.placeholder}
+            ?disabled=${this.disabled}
+            role="combobox"
+            autocomplete="off"
+            spellcheck="false"
+            aria-haspopup="listbox"
+            aria-expanded=${this.open ? "true" : "false"}
+            aria-controls=${this.listboxId}
+            aria-describedby=${ifDefined(fieldHelpDescribedBy(this.helpText))}
+            aria-activedescendant=${this.open && active ? active.id : ""}
+            @click=${this.onInputClick}
+            @input=${this.onInput}
+            @change=${this.commitTyped}
+            @keydown=${this.onInputKeydown}
+          />
+          <button
+            part="trigger"
+            class="trigger"
+            type="button"
+            tabindex="-1"
+            aria-label=${this.term("chooseTime")}
+            aria-haspopup="listbox"
+            aria-expanded=${this.open ? "true" : "false"}
+            ?disabled=${this.disabled}
+            @click=${() => this.toggle()}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 7v5l3 2"></path>
+            </svg>
+          </button>
+        </div>
 
-      <ul
-        part="listbox"
-        id=${this.listboxId}
-        class="listbox"
-        role="listbox"
-        aria-label="Time options"
-        popover="manual"
-      >
-        ${opts.length === 0
-          ? html`<li class="empty" role="presentation">No matching times</li>`
-          : opts.map(
-              (opt, i) => html`
-                <li
-                  part="option"
-                  class="option ${i === this.activeIndex ? "active" : ""}"
-                  id=${opt.id}
-                  role="option"
-                  aria-selected=${opt.value === this.value ? "true" : "false"}
-                  @click=${() => this.onOptionClick(opt)}
-                  @pointermove=${() => (this.activeIndex = i)}
-                >
-                  ${opt.label}
-                </li>
-              `
-            )}
-      </ul>
-    `
+        <ul
+          part="listbox"
+          id=${this.listboxId}
+          class="listbox"
+          role="listbox"
+          aria-label=${this.term("timeOptions")}
+          popover="manual"
+        >
+          ${opts.length === 0
+            ? html`<li class="empty" role="presentation">${this.term("noMatchingTimes")}</li>`
+            : opts.map(
+                (opt, i) => html`
+                  <li
+                    part="option"
+                    class="option ${i === this.activeIndex ? "active" : ""}"
+                    id=${opt.id}
+                    role="option"
+                    aria-selected=${opt.value === this.value ? "true" : "false"}
+                    @click=${() => this.onOptionClick(opt)}
+                    @pointermove=${() => (this.activeIndex = i)}
+                  >
+                    ${opt.label}
+                  </li>
+                `
+              )}
+        </ul>
+      `
     );
   }
 }

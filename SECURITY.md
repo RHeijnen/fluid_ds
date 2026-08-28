@@ -31,8 +31,10 @@ The following are out of scope:
 
 - Issues that require a malicious consumer to deliberately pass attacker-
   controlled HTML/SVG to components designed for trusted markup (e.g.
-  `<fluid-include allow-scripts>`, `<fluid-markdown>` with a hostile
-  source). These are documented as trust requirements.
+  `<fluid-include allow-scripts>`, or `<fluid-markdown trusted>` when the
+  consumer explicitly disables sanitization). These are documented as trust
+  requirements. Ordinary `<fluid-markdown>` sanitizes untrusted source by
+  default; a bypass of that default protection is in scope.
 - Visual / UX issues that don't affect security.
 - Cross-browser quirks that don't expose a vulnerability.
 

@@ -1,5 +1,5 @@
-import { html, css, type TemplateResult } from "lit";
-import { property } from "lit/decorators.js";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
+import { property, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { reducedMotion } from "../../internal/motion.js";
 import { FluidElement } from "../../internal/base-element.js";
@@ -57,6 +57,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @fires fluid-select - Fired when an `interactive` row is activated (click,
  *   Enter, or Space). Bubbles and is composed. Not fired for link rows or when
  *   disabled.
+ * @cssproperty --fluid-list-item-accent-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-list-item-focus-ring-color - Component override for the corresponding semantic token.
  */
 export class FluidListItem extends FluidElement {
   static override shadowRootOptions: ShadowRootInit = {
@@ -73,6 +75,21 @@ export class FluidListItem extends FluidElement {
 
       :host([hidden]) {
         display: none;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        background: var(--fluid-list-item-bg, transparent);
+      }
+
+      .row > .base {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .row > .trailing {
+        padding-inline-end: var(--fluid-list-item-padding, var(--fluid-space-3));
       }
 
       .base {
@@ -116,7 +133,13 @@ export class FluidListItem extends FluidElement {
       button.base:focus-visible,
       a.base:focus-visible {
         outline: var(--fluid-focus-ring-width, 2px) solid
-          var(--fluid-focus-ring-color, var(--fluid-accent-base));
+          var(
+            --fluid-list-item-focus-ring-color,
+            var(
+              --fluid-focus-ring-color,
+              var(--fluid-list-item-accent-base, var(--fluid-accent-base))
+            )
+          );
         outline-offset: calc(-1 * var(--fluid-focus-ring-width, 2px));
       }
 
@@ -157,6 +180,10 @@ export class FluidListItem extends FluidElement {
         flex: 0 0 auto;
       }
 
+      .trailing[hidden] {
+        display: none;
+      }
+
       /* Slotted content inherits the host PAGE's CSS, not these shadow styles,
          so reset margins on everything we slot in to survive a prose context. */
       ::slotted(*) {
@@ -177,6 +204,8 @@ export class FluidListItem extends FluidElement {
   /** Disable interaction on an interactive or link row. */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
+  @state() private hasTrailing = false;
+
   override connectedCallback(): void {
     super.connectedCallback();
     // The host is the listitem; the inner button/a/div is the row body so the
@@ -190,10 +219,15 @@ export class FluidListItem extends FluidElement {
       e.stopPropagation();
       return;
     }
-    this.dispatchEvent(
-      new CustomEvent("fluid-select", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent("fluid-select", { bubbles: true, composed: true }));
   };
+
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed);
+    if (changed.has("disabled") && this.disabled) {
+      (this.shadowRoot?.activeElement as HTMLElement | null)?.blur();
+    }
+  }
 
   private renderInner(): TemplateResult {
     return html`
@@ -204,8 +238,19 @@ export class FluidListItem extends FluidElement {
         <span part="primary" class="primary"><slot></slot></span>
         <span part="description" class="description"><slot name="description"></slot></span>
       </span>
-      <span part="trailing" class="trailing">
-        <slot name="trailing"></slot>
+    `;
+  }
+
+  private renderTrailing(): TemplateResult {
+    return html`
+      <span part="trailing" class="trailing" ?hidden=${!this.hasTrailing}>
+        <slot
+          name="trailing"
+          @slotchange=${(event: Event) => {
+            this.hasTrailing =
+              (event.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
+          }}
+        ></slot>
       </span>
     `;
   }
@@ -215,32 +260,38 @@ export class FluidListItem extends FluidElement {
     // inert and not focusable, matching the disabled visual.
     if (this.href !== null) {
       return html`
-        <a
-          part="base"
-          class="base"
-          href=${ifDefined(this.disabled ? undefined : this.href)}
-          target=${ifDefined(this.target ?? undefined)}
-          aria-disabled=${this.disabled ? "true" : "false"}
-        >
-          ${this.renderInner()}
-        </a>
+        <div class="row">
+          <a
+            part="base"
+            class="base"
+            href=${ifDefined(this.disabled ? undefined : this.href)}
+            target=${ifDefined(this.target ?? undefined)}
+            aria-disabled=${this.disabled ? "true" : "false"}
+          >
+            ${this.renderInner()}
+          </a>
+          ${this.renderTrailing()}
+        </div>
       `;
     }
 
     if (this.interactive) {
       return html`
-        <button
-          part="base"
-          class="base"
-          type="button"
-          ?disabled=${this.disabled}
-          @click=${this.handleActivate}
-        >
-          ${this.renderInner()}
-        </button>
+        <div class="row">
+          <button
+            part="base"
+            class="base"
+            type="button"
+            ?disabled=${this.disabled}
+            @click=${this.handleActivate}
+          >
+            ${this.renderInner()}
+          </button>
+          ${this.renderTrailing()}
+        </div>
       `;
     }
 
-    return html`<div part="base" class="base">${this.renderInner()}</div>`;
+    return html`<div part="base" class="base">${this.renderInner()}${this.renderTrailing()}</div>`;
   }
 }

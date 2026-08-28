@@ -28,12 +28,27 @@ export const Default: Story = {
     <div data-story style="position: relative; min-height: 12rem;">
       <div style="display:flex; gap: var(--fluid-space-2); flex-wrap: wrap;">
         ${(["neutral", "info", "success", "warning", "danger"] as const).map(
-          (v) => html`
-            <fluid-button @click=${(e: Event) => launchToast(e, v)}>${v}</fluid-button>
-          `
+          (v) => html` <fluid-button @click=${(e: Event) => launchToast(e, v)}>${v}</fluid-button> `
         )}
       </div>
       <fluid-toast placement="top-end"></fluid-toast>
+    </div>
+  `
+};
+
+/** A notification that stays available until the user dismisses it. */
+export const Persistent: Story = {
+  render: () => html`
+    <div data-story style="min-height: 12rem;">
+      <fluid-button
+        @click=${(event: Event) =>
+          (event.target as HTMLElement)
+            .closest("[data-story]")!
+            .querySelector<FluidToast>("fluid-toast")!
+            .toast({ message: "Your changes have been saved.", duration: 0 })}
+        >Show persistent toast</fluid-button
+      >
+      <fluid-toast placement="bottom-end"></fluid-toast>
     </div>
   `
 };

@@ -1,5 +1,10 @@
 import { expect, fixture, html, elementUpdated, oneEvent, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "@fluid-ds/components/locales/nl";
+import "@fluid-ds/components/locales/de";
+import "@fluid-ds/components/locales/fr";
+import "@fluid-ds/components/locales/es";
+import "@fluid-ds/components/locales/ar";
 import type { FluidEventCalendar, CalendarEvent } from "./fluid-event-calendar.js";
 
 const events: CalendarEvent[] = [
@@ -10,7 +15,9 @@ const events: CalendarEvent[] = [
   { id: "e", date: "2026-06-10", title: "Incident", tone: "danger" }
 ];
 
-async function cal(extra: Partial<{ weekStart: number; maxPerDay: number }> = {}): Promise<FluidEventCalendar> {
+async function cal(
+  extra: Partial<{ weekStart: number; maxPerDay: number }> = {}
+): Promise<FluidEventCalendar> {
   const el = await fixture<FluidEventCalendar>(html`
     <fluid-event-calendar
       .month=${"2026-06"}
@@ -39,6 +46,27 @@ describe("<fluid-event-calendar>", () => {
     const el = await cal();
     expect(el.shadowRoot!.querySelector("#ec-title")!.textContent).to.contain("June");
     expect(el.shadowRoot!.querySelector("#ec-title")!.textContent).to.contain("2026");
+  });
+
+  it("falls back safely for invalid month, week-start and event entries", async () => {
+    const el = await fixture<FluidEventCalendar>(html`
+      <fluid-event-calendar month="2026-13" week-start="99"></fluid-event-calendar>
+    `);
+    el.events = [
+      null,
+      { id: "missing-date", title: "Missing date" },
+      { id: "valid", date: "2026-06-03", title: "Valid" }
+    ] as unknown as CalendarEvent[];
+    await elementUpdated(el);
+
+    const now = new Date();
+    const expectedMonth = new Intl.DateTimeFormat("en", {
+      month: "long",
+      year: "numeric"
+    }).format(new Date(now.getFullYear(), now.getMonth(), 1));
+    expect(el.shadowRoot!.querySelector("#ec-title")!.textContent!.trim()).to.equal(expectedMonth);
+    expect(el.shadowRoot!.querySelectorAll('[role="gridcell"]').length).to.equal(42);
+    expect(el.shadowRoot!.querySelectorAll('[part="event"]').length).to.equal(0);
   });
 
   it("places events on their day and shows their title text", async () => {
@@ -119,9 +147,7 @@ describe("<fluid-event-calendar>", () => {
     expect(active.getAttribute("data-iso")).to.equal("2026-06-28");
 
     // Exactly one cell is ever the roving tab stop.
-    expect(
-      el.shadowRoot!.querySelectorAll('[role="gridcell"][tabindex="0"]').length
-    ).to.equal(1);
+    expect(el.shadowRoot!.querySelectorAll('[role="gridcell"][tabindex="0"]').length).to.equal(1);
   });
 
   it("steps the month with PageDown", async () => {
@@ -158,7 +184,9 @@ describe("<fluid-event-calendar>", () => {
     const el = await cal();
     let dayFired = false;
     el.addEventListener("fluid-day-click", () => (dayFired = true));
-    const chip = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-03"] [part="event"]')!;
+    const chip = el.shadowRoot!.querySelector<HTMLElement>(
+      '[data-iso="2026-06-03"] [part="event"]'
+    )!;
     setTimeout(() => chip.click());
     const ev = await oneEvent(el, "fluid-event-click");
     expect(ev.detail.id).to.equal("a");
@@ -223,5 +251,137 @@ describe("<fluid-event-calendar>", () => {
     await elementUpdated(el);
     await aTimeout(20);
     await expect(el).to.be.accessible();
+  });
+
+  it("offers keyboard access to event and overflow buttons without activating the day", async () => {
+    const el = await cal({ maxPerDay: 2 });
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-10"]')!;
+    const seen: string[] = [];
+    el.addEventListener("fluid-day-click", () => seen.push("day"));
+    el.addEventListener("fluid-event-click", (event) =>
+      seen.push((event as CustomEvent).detail.id)
+    );
+    cell.focus();
+    cell.dispatchEvent(new KeyboardEvent("keydown", { key: "F2", bubbles: true }));
+    const first = cell.querySelector<HTMLButtonElement>("button")!;
+    expect(el.shadowRoot!.activeElement).to.equal(first);
+    const enter = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true });
+    first.dispatchEvent(enter);
+    expect(enter.defaultPrevented).to.be.false;
+    first.click();
+    expect(seen).to.deep.equal(["b"]);
+    first.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    const second = cell.querySelectorAll<HTMLButtonElement>("button")[1]!;
+    expect(el.shadowRoot!.activeElement).to.equal(second);
+    second.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await elementUpdated(el);
+    expect(el.shadowRoot!.activeElement).to.equal(cell);
+  });
+
+  it("preserves a valid focused day after PageDown and external month replacement", async () => {
+    const el = await cal();
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-30"]')!;
+    cell.focus();
+    cell.dispatchEvent(new KeyboardEvent("keydown", { key: "PageDown", bubbles: true }));
+    await elementUpdated(el);
+    expect(el.shadowRoot!.activeElement?.getAttribute("data-iso")).to.equal("2026-07-30");
+    expect(el.shadowRoot!.activeElement?.getAttribute("tabindex")).to.equal("0");
+    el.month = "2026-02";
+    await elementUpdated(el);
+    expect(el.shadowRoot!.activeElement?.getAttribute("tabindex")).to.equal("0");
+    expect(el.shadowRoot!.activeElement?.getAttribute("data-iso")).to.equal("2026-02-01");
+  });
+
+  it("localizes inherited dates, counts and navigation live without touching event content", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="en">
+        <fluid-event-calendar
+          month="2026-06"
+          max-per-day="2"
+          .events=${[...events, { id: "odd", date: "2026-06-03", title: "<Caller & title>" }]}
+        ></fluid-event-calendar>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidEventCalendar>("fluid-event-calendar")!;
+    wrapper.lang = "ar";
+    await elementUpdated(el);
+    const base = el.shadowRoot!.querySelector<HTMLElement>('[part="base"]')!;
+    expect(base.dir).to.equal("rtl");
+    expect(el.shadowRoot!.querySelector('[part="prev"]')!.getAttribute("aria-label")).to.equal(
+      "الشهر السابق"
+    );
+    const cell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-10"]')!;
+    const dateLabel = new Intl.DateTimeFormat("ar", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(new Date(2026, 5, 10));
+    expect(cell.getAttribute("aria-label")).to.contain(dateLabel);
+    expect(cell.querySelector('[part="more"]')!.textContent).to.contain(
+      new Intl.NumberFormat("ar", { useGrouping: false }).format(2)
+    );
+    expect(
+      el
+        .shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-03"] [part="event"]')!
+        .textContent.trim()
+    ).to.equal("Standup");
+    expect(el.events.at(-1)!.title).to.equal("<Caller & title>");
+
+    wrapper.lang = "fr-CA";
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector('[part="next"]')!.getAttribute("aria-label")).to.equal(
+      "Mois suivant"
+    );
+    expect(base.dir).to.equal("ltr");
+  });
+
+  it("keeps explicit Intl locale separate from inherited dictionary language", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar">
+        <fluid-event-calendar month="2026-06" locale="de"></fluid-event-calendar>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidEventCalendar>("fluid-event-calendar")!;
+    expect(el.shadowRoot!.querySelector("#ec-title")!.textContent).to.equal("Juni 2026");
+    expect(el.shadowRoot!.querySelector('[part="next"]')!.getAttribute("aria-label")).to.equal(
+      "الشهر التالي"
+    );
+  });
+
+  it("follows the rendered Arabic grid and event-chip direction while preserving ISO payloads", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar" dir="rtl">
+        <fluid-event-calendar
+          month="2026-06"
+          max-per-day="2"
+          .events=${events}
+        ></fluid-event-calendar>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidEventCalendar>("fluid-event-calendar")!;
+    const start = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-15"]')!;
+    start.focus();
+    start.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector('[tabindex="0"]')!.getAttribute("data-iso")).to.equal(
+      "2026-06-16"
+    );
+
+    const eventCell = el.shadowRoot!.querySelector<HTMLElement>('[data-iso="2026-06-10"]')!;
+    eventCell.focus();
+    eventCell.dispatchEvent(new KeyboardEvent("keydown", { key: "F2", bubbles: true }));
+    const buttons = eventCell.querySelectorAll<HTMLButtonElement>("button");
+    buttons[1]!.focus();
+    buttons[1]!.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(el.shadowRoot!.activeElement).to.equal(buttons[0]);
+
+    setTimeout(() => start.click());
+    const event = await oneEvent(el, "fluid-day-click");
+    expect(event.detail.date).to.equal("2026-06-15");
+    const transform = getComputedStyle(
+      el.shadowRoot!.querySelector<SVGElement>('[part="prev"] svg')!
+    ).transform;
+    expect(new DOMMatrixReadOnly(transform).a).to.equal(-1);
   });
 });

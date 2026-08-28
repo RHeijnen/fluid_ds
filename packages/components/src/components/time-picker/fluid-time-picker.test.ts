@@ -1,13 +1,160 @@
 import { expect, fixture, html, oneEvent, aTimeout, elementUpdated } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidTimePicker } from "./fluid-time-picker.js";
 
 describe("<fluid-time-picker>", () => {
+  describe("<fluid-time-picker> localized validation", () => {
+    for (const [locale, message] of [
+      ["nl", "Kies een tijd."],
+      ["de", "Bitte wählen Sie eine Uhrzeit."],
+      ["fr", "Veuillez choisir une heure."],
+      ["es", "Elige una hora."],
+      ["ar", "يرجى اختيار وقت."],
+      ["fr-CA", "Veuillez choisir une heure."]
+    ] as const) {
+      it(`refreshes current required validation in ${locale}`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en">
+            <fluid-time-picker required aria-label="Application label"></fluid-time-picker>
+          </div>
+        `);
+        const control = wrapper.querySelector<FluidTimePicker>("fluid-time-picker")!;
+        await control.updateComplete;
+        expect(control.validity.valueMissing).to.equal(true);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(control.validationMessage).to.equal(message);
+        expect(control.validity.valueMissing).to.equal(true);
+        expect(control.checkValidity()).to.equal(false);
+        expect(control.getAttribute("aria-label")).to.equal("Application label");
+      });
+    }
+
+    it("tracks dynamic required and preserves custom validity in a changing closed-shadow language context", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const root = host.attachShadow({ mode: "closed" });
+      const wrapper = document.createElement("section");
+      wrapper.lang = "nl";
+      const control = document.createElement("fluid-time-picker") as FluidTimePicker;
+      control.setAttribute("aria-label", "Application label");
+
+      wrapper.append(control);
+      root.append(wrapper);
+      await control.updateComplete;
+      expect(control.checkValidity()).to.equal(true);
+      control.required = true;
+      await control.updateComplete;
+      expect(control.validity.valueMissing).to.equal(true);
+      expect(control.validationMessage).to.equal("Kies een tijd.");
+      control.setCustomValidity("Application validation");
+      wrapper.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Application validation");
+      expect(control.validity.customError).to.equal(true);
+      control.setCustomValidity("");
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Uhrzeit.");
+      expect(control.validity.customError).to.equal(false);
+      expect(control.validity.valueMissing).to.equal(true);
+      control.required = false;
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("");
+      expect(control.checkValidity()).to.equal(true);
+      expect(control.getAttribute("aria-label")).to.equal("Application label");
+    });
+
+    it("preserves a scoped language override and refreshes invalid text after reconnect", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="nl">
+          <fluid-time-picker lang="fr" required aria-label="Application label"></fluid-time-picker>
+        </div>
+      `);
+      const control = wrapper.querySelector<FluidTimePicker>("fluid-time-picker")!;
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Veuillez choisir une heure.");
+      wrapper.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Veuillez choisir une heure.");
+      control.removeAttribute("lang");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Uhrzeit.");
+      control.remove();
+      wrapper.lang = "ar";
+      wrapper.append(control);
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("يرجى اختيار وقت.");
+      expect(control.validity.valueMissing).to.equal(true);
+    });
+
+    it("keeps submitted data canonical and restores current-language validation after form reset", async () => {
+      const form = await fixture<HTMLFormElement>(html`
+        <form lang="nl">
+          <fluid-time-picker
+            name="control"
+            required
+            aria-label="Application label"
+          ></fluid-time-picker>
+        </form>
+      `);
+      const control = form.querySelector<FluidTimePicker>("fluid-time-picker")!;
+      await control.updateComplete;
+      control.value = "09:30";
+      await control.updateComplete;
+      expect(control.checkValidity()).to.equal(true);
+      expect(new FormData(form).get("control")).to.equal("09:30");
+      form.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      form.reset();
+      await control.updateComplete;
+      expect(control.validity.valueMissing).to.equal(true);
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Uhrzeit.");
+    });
+  });
+
   it("renders closed by default", async () => {
     const el = await fixture<FluidTimePicker>(
       html`<fluid-time-picker aria-label="Time"></fluid-time-picker>`
     );
     expect(el.open).to.be.false;
+  });
+
+  it("renders the active option in the popup's opening and closing update", async () => {
+    const el = await fixture<FluidTimePicker>(html`
+      <fluid-time-picker
+        value="09:30"
+        min="09:00"
+        max="10:00"
+        step="30"
+        label="Time"
+      ></fluid-time-picker>
+    `);
+    const input = el.shadowRoot!.querySelector("input")!;
+    el.open = true;
+    expect(await el.updateComplete).to.equal(true);
+    expect(input.getAttribute("aria-activedescendant")).to.equal(
+      el.shadowRoot!.querySelector('[aria-selected="true"]')!.id
+    );
+    expect(input.getAttribute("aria-expanded")).to.equal("true");
+    el.open = false;
+    expect(await el.updateComplete).to.equal(true);
+    expect(input.getAttribute("aria-activedescendant")).to.equal("");
+    expect(input.getAttribute("aria-expanded")).to.equal("false");
+    el.value = null;
+    await el.updateComplete;
+    el.open = true;
+    expect(await el.updateComplete).to.equal(true);
+    expect(input.getAttribute("aria-activedescendant")).to.equal(
+      el.shadowRoot!.querySelector('[role="option"]')!.id
+    );
   });
 
   it("is form-associated: submits the canonical 24h value", async () => {
@@ -39,6 +186,23 @@ describe("<fluid-time-picker>", () => {
       html`<fluid-time-picker aria-label="Time"></fluid-time-picker>`
     );
     el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!.click();
+    await elementUpdated(el);
+    expect(el.open).to.be.true;
+  });
+
+  it("optionally opens when the text input is clicked", async () => {
+    const el = await fixture<FluidTimePicker>(
+      html`<fluid-time-picker aria-label="Time"></fluid-time-picker>`
+    );
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+
+    input.click();
+    await elementUpdated(el);
+    expect(el.open).to.be.false;
+
+    el.openOnInputClick = true;
+    await elementUpdated(el);
+    input.click();
     await elementUpdated(el);
     expect(el.open).to.be.true;
   });
@@ -145,7 +309,7 @@ describe("<fluid-time-picker>", () => {
     expect(el.validity.valueMissing).to.be.true;
   });
 
-  it("disconnect tears down the document pointerdown listener and floating-ui autoUpdate", async () => {
+  it("disconnect tears down the document pointerdown listener and positioning autoUpdate", async () => {
     const el = await fixture<FluidTimePicker>(
       html`<fluid-time-picker min="09:00" max="10:00" step="30"></fluid-time-picker>`
     );
@@ -164,6 +328,67 @@ describe("<fluid-time-picker>", () => {
     document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
     await aTimeout(0);
     expect(el.open).to.be.true;
+  });
+
+  it("localizes time labels live while preserving canonical form values and empty prompts", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form lang="en" dir="rtl">
+        <fluid-time-picker
+          name="time"
+          value="13:30"
+          format="12h"
+          min="13:30"
+          max="14:30"
+          step="60"
+          placeholder=""
+        ></fluid-time-picker>
+      </form>
+    `);
+    const el = form.querySelector<FluidTimePicker>("fluid-time-picker")!;
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+    const expected = (locale: string, hour: number, minute: number) =>
+      new Intl.DateTimeFormat(locale, {
+        hour: "numeric",
+        minute: "2-digit",
+        hourCycle: "h12"
+      }).format(new Date(2000, 0, 1, hour, minute));
+    expect(input.value).to.equal(expected("en", 13, 30));
+    form.lang = "ar";
+    await elementUpdated(el);
+    expect(input.value).to.equal(expected("ar", 13, 30));
+    expect(input.getAttribute("placeholder")).to.equal("");
+    expect(new FormData(form).get("time")).to.equal("13:30");
+
+    input.value = "";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    await elementUpdated(el);
+    const options = [...el.shadowRoot!.querySelectorAll<HTMLElement>('[role="option"]')];
+    expect(options.map((option) => option.textContent?.trim())).to.deep.equal([
+      expected("ar", 13, 30),
+      expected("ar", 14, 30)
+    ]);
+    options[1]!.click();
+    await elementUpdated(el);
+    expect(el.value).to.equal("14:30");
+    expect(new FormData(form).get("time")).to.equal("14:30");
+  });
+
+  it("keeps an explicit display locale independent from inherited control language", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar">
+        <fluid-time-picker value="09:15" format="24h" locale="de"></fluid-time-picker>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidTimePicker>("fluid-time-picker")!;
+    const expected = new Intl.DateTimeFormat("de", {
+      hour: "numeric",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }).format(new Date(2000, 0, 1, 9, 15));
+    expect(el.shadowRoot!.querySelector<HTMLInputElement>("input")!.value).to.equal(expected);
+    wrapper.lang = "nl";
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector<HTMLInputElement>("input")!.value).to.equal(expected);
   });
 
   it("passes a11y audit (closed)", async () => {
@@ -188,7 +413,13 @@ describe("<fluid-time-picker>", () => {
           --fluid-motion: 0;
         "
       >
-        <fluid-time-picker value="09:30" aria-label="Time" min="09:00" max="11:00" step="30"></fluid-time-picker>
+        <fluid-time-picker
+          value="09:30"
+          aria-label="Time"
+          min="09:00"
+          max="11:00"
+          step="30"
+        ></fluid-time-picker>
       </div>
     `);
     const el = host.querySelector<FluidTimePicker>("fluid-time-picker")!;

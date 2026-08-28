@@ -12,17 +12,18 @@ const meta: Meta<Args> = {
   argTypes: {
     effect: { control: "inline-radio", options: ["pulse", "sheen", "none"] }
   },
-  args: { effect: "pulse" }
+  args: { effect: "pulse" },
+  render: (args) => html`
+    <fluid-skeleton effect=${args.effect} style="height: 1.25rem; max-width: 280px;">
+    </fluid-skeleton>
+  `
 };
 
 export default meta;
 type Story = StoryObj<Args>;
 
 export const Default: Story = {
-  render: (args) => html`
-    <fluid-skeleton effect=${args.effect} style="height: 1.25rem; max-width: 280px;">
-    </fluid-skeleton>
-  `
+  args: { effect: "pulse" }
 };
 
 export const ProfileCard: Story = {

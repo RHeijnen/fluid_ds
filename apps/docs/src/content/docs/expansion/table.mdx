@@ -37,6 +37,11 @@ import "@fluid-ds/table/define/infinite-table";
 Pass `columns` and `rows` as properties (use property binding in your
 framework, or set them in script). Each row is a plain object keyed by
 `column.key`; an `id` field, when present, becomes the stable row key.
+Use unique IDs when filtering or replacing records: without an ID, selection
+uses the record's index in the supplied `rows` array. Sorting retains that
+original index, including when the same object appears more than once.
+Empty and nullish sort values remain last in both directions. Filtering and
+paging are application-owned; replace `rows` with the desired result set.
 
 ```html
 <fluid-table id="people" caption="Contributors" selectable></fluid-table>
@@ -105,8 +110,20 @@ table.total = firstPage.count;
 table.hasMore = table.rows.length < table.total;
 
 table.addEventListener("fluid-load-more", async (event) => {
-  const nextPage = await loadTerminals(event.detail.offset);
-  table.rows = [...table.rows, ...nextPage.documents];
+  if (table.loading) return;
+  table.loading = true;
+  table.error = "";
+  try {
+    const nextPage = await loadTerminals(event.detail.offset);
+    table.rows = [...table.rows, ...nextPage.documents];
+    table.total = nextPage.count;
+    table.hasMore = table.rows.length < table.total;
+  } catch {
+    table.error = "Could not load more terminals. Try again.";
+    table.hasMore = false; // Re-enable deliberately when the user retries.
+  } finally {
+    table.loading = false;
+  }
 });
 
 table.addEventListener("fluid-column-layout-change", (event) => {
@@ -132,6 +149,70 @@ Fluid emits serializable layout data but does not choose a persistence
 mechanism. Applications can store it in a user profile, local storage, a
 database, or another preference service.
 
+Windowing assumes a fixed row height. Set `row-height` to match your rendered
+rows; zero, negative, or non-finite values fall back to 64px. Overscan is a
+non-negative integer. Replacing a deeply scrolled dataset with fewer results
+clamps the rendered window to available rows, and removing/reinserting the
+element reattaches its scroll and intersection observers.
+
+### Column reorder and resize
+
+With `reorderable-columns`, a header is dragged by any point of itself and
+the columns rearrange live under the pointer as a preview of the drop;
+Escape puts the original order back. Each header also carries a keyboard
+grab handle: Enter or Space picks the column up, arrow keys move it, Enter
+drops it. With `resizable-columns`, each header carries a grip on its
+trailing edge: drag it, double-click (or press Enter) to auto-fit the column
+to its contents, arrow keys to size it a step at a time (Shift for a bigger
+step), Home to restore the declared width.
+
+Order and width are the same kind of fact as visibility, so all three travel
+in one `layout` and leave in one `fluid-column-layout-change`. A consumer
+that already persists a layout persists a resize and a reorder for free. Set
+`resizable: false` on an individual column definition to pin its width.
+
+The handle names and the move announcement are localizable through the
+`resize-column-label`, `reorder-column-label`, and `column-position-label`
+properties; `{column}`, `{position}`, and `{count}` are substituted.
+
+### Column scrolling (`column-scroll`)
+
+By default the table trusts its container to scroll or grow when the columns
+are wider than the viewport. Set `column-scroll` and the table owns the
+problem instead: columns wider than the container scroll behind a horizontal
+scrollbar of the table's own. The scrollbar lives between the header and the
+rows (a bar at the bottom of a windowed list is wherever the list currently
+ends, which is nowhere to look for it), and it moves the header and the rows
+together, so columns never shear against their own headers. It only appears
+while there is somewhere to scroll to.
+
+```html
+<fluid-infinite-table column-scroll></fluid-infinite-table>
+```
+
+### Toolbar slots and the column manager
+
+The sticky toolbar accepts host content in two slots: `toolbar-actions`
+places controls at the end of the toolbar, after the row count and the
+built-in Columns button, and `toolbar-secondary` renders a full-width second
+toolbar line (removed from layout when empty). To replace the built-in
+Columns button with your own control, set `configurable` to `false` and call
+the public `openColumnManager()` method: the dialog is rendered regardless
+of `configurable`, only the button is gated.
+
+```html
+<fluid-infinite-table id="fleet" caption="Terminal fleet">
+  <fluid-button slot="toolbar-actions" id="cols">Columns</fluid-button>
+  <div slot="toolbar-secondary">Bulk actions…</div>
+</fluid-infinite-table>
+
+<script>
+  document.getElementById("cols").addEventListener("click", () => {
+    document.getElementById("fleet").openColumnManager();
+  });
+</script>
+```
+
 ### Infinite table properties
 
 | Property | Type | Default | Notes |
@@ -149,6 +230,30 @@ database, or another preference service.
 | `configurable` | `boolean` | `false` | Exposes the column visibility and ordering dialog. |
 | `clickable` | `boolean` | `false` | Makes rows keyboard-focusable and emits row activation from Enter or Space. |
 | `layout` | `FluidInfiniteTableLayoutItem[]` | `[]` | Restores a previously saved layout. |
+| `reorderable-columns` | `boolean` | `false` | Columns can be dragged, or moved from the keyboard, into another order. |
+| `resizable-columns` | `boolean` | `false` | Column widths can be dragged, auto-fitted, or stepped from the keyboard. |
+| `column-scroll` | `boolean` | `false` | Opt-in horizontal column scrollbar between header and rows (see above). |
+| `row-key` | `string` | `"id"` | Row field used as the stable row identity. |
+| `error` | `string` | `""` | Error message; when set, the error state (or the `error` slot) is shown. |
+| `resize-column-label` | `string` | `"Resize {column}"` | Accessible name for a resize grip. |
+| `reorder-column-label` | `string` | `"Reorder {column}"` | Accessible name for a reorder handle. |
+| `column-position-label` | `string` | `"{column}, column {position} of {count}"` | Announcement while a column is moved. |
+
+### Infinite table methods
+
+| Method | Purpose |
+| --- | --- |
+| `openColumnManager()` | Opens the column configuration dialog. Public so a host that hides the built-in button (`configurable=false`) can reach the dialog from its own toolbar control. |
+
+### Infinite table slots
+
+| Slot | Content |
+| --- | --- |
+| `filters` | Application-owned filter controls rendered above the header. |
+| `toolbar-actions` | Host controls placed at the end of the toolbar, after the row count and the built-in Columns button. |
+| `toolbar-secondary` | Full-width second toolbar line; removed from layout when empty. |
+| `empty` | Empty-result content. |
+| `error` | Error content, shown when `error` is set. |
 
 ### Infinite table events
 
@@ -156,8 +261,28 @@ database, or another preference service.
 | --- | --- | --- |
 | `fluid-load-more` | `{ offset }` | The load sentinel approaches the viewport. |
 | `fluid-sort` | `{ key, dir }` | A sortable header is activated. |
-| `fluid-column-layout-change` | `{ layout }` | Visibility or ordering changes. |
+| `fluid-column-layout-change` | `{ layout }` | Column visibility, order, or width changes; complete and ready to persist. |
 | `fluid-row-click` | `{ row, rowIndex, originalEvent }` | A non-interactive row area is activated. |
+
+### Infinite table theming
+
+Each styled property reads a `--fluid-infinite-table-*` token that falls back
+to a Fluid semantic variable:
+
+| Token | Purpose |
+| --- | --- |
+| `--fluid-infinite-table-bg` | Table background. |
+| `--fluid-infinite-table-fg` | Table foreground. |
+| `--fluid-infinite-table-border` | Border color. |
+| `--fluid-infinite-table-header-bg` | Sticky header background. |
+| `--fluid-infinite-table-toolbar-bg` | Sticky toolbar background. |
+| `--fluid-infinite-table-row-hover-bg` | Hovered row background. |
+| `--fluid-infinite-table-radius` | Outer radius. |
+| `--fluid-infinite-table-cell-padding` | Cell padding. |
+| `--fluid-infinite-table-height` | Container-scroll height. |
+| `--fluid-infinite-table-sticky-offset` | Offset below app chrome. |
+| `--fluid-infinite-table-grip-color` | Resting color of a resize grip and a reorder handle. |
+| `--fluid-infinite-table-grip-active-color` | Color of a grip being hovered, focused, or dragged. |
 
 ## API
 
@@ -214,6 +339,10 @@ Turn on zebra striping by setting `--fluid-table-zebra-bg`.
   control is a real `<button>` so it is keyboard operable.
 - Selection uses native checkboxes with descriptive `aria-label`s; the
   select-all box reflects an indeterminate state when only some rows are picked.
+- The infinite table exposes absolute `aria-rowindex` values for windowed rows.
+  Its `aria-rowcount` includes the header, so 100 data records are reported as
+  101 table rows. When `has-more` is true and no total is known, the count is
+  `-1`. Hidden spacers do not masquerade as data rows.
 - This is a static data table, not an interactive grid: Tab moves between the
   header buttons and the checkboxes, and cells are not individually focusable.
   Reach for a Grid when cells must be navigable with arrow keys.
@@ -221,6 +350,13 @@ Turn on zebra striping by setting `--fluid-table-zebra-bg`.
   `--fluid-target-min`, so the table scales to AAA sizing when an ancestor opts
   in. The sort-icon transition is removed under
   `prefers-reduced-motion: reduce`.
+
+The automated contracts cover representative sorting, stable selection, column
+configuration, row activation, data replacement, and next-page requests. They
+do not establish complete accessibility conformance. Manual assistive-technology
+review and full localization remain open: built-in selection, dialog, and
+loading strings are still English, apart from the three configurable column
+handle labels listed above.
 
 ## License
 

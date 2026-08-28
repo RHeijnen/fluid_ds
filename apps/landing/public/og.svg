@@ -16,10 +16,10 @@
   <text x="80" y="320" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="26" fill="#94a3b8">Drop the tags into React, Vue, Angular, Svelte, or plain HTML.</text>
 
   <g font-family="Inter, Segoe UI, system-ui, sans-serif">
-    <text x="80" y="470" font-size="64" font-weight="800" fill="url(#accent)">101</text>
-    <text x="80" y="510" font-size="24" fill="#94a3b8">components</text>
+    <text x="80" y="470" font-size="64" font-weight="800" fill="url(#accent)">124</text>
+    <text x="80" y="510" font-size="24" fill="#94a3b8">core elements</text>
 
-    <text x="340" y="470" font-size="64" font-weight="800" fill="url(#accent)">11</text>
+    <text x="340" y="470" font-size="64" font-weight="800" fill="url(#accent)">13</text>
     <text x="340" y="510" font-size="24" fill="#94a3b8">expansion packs</text>
 
     <text x="650" y="470" font-size="64" font-weight="800" fill="url(#accent)">AA</text>

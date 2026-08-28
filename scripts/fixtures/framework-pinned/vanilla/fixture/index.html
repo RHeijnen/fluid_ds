@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fluid plain TypeScript contract</title>
+  </head>
+  <body>
+    <fluid-card id="contract-card">
+      <h1 id="slot-header" slot="header">Plain TypeScript packed contract</h1>
+      <form id="contract-form">
+        <fluid-input id="project" name="project" label="Project name" value="Reset value" required>
+          <span id="slot-prefix" slot="prefix">Prefix</span>
+        </fluid-input>
+        <fluid-checkbox id="approved" name="approved" value="yes" checked required>
+          Approved
+        </fluid-checkbox>
+        <fluid-button id="save" type="submit">Save project</fluid-button>
+        <button id="reset" type="reset">Reset project</button>
+      </form>
+      <p id="slot-footer" slot="footer">Plain HTML footer</p>
+    </fluid-card>
+    <output id="contract-output" aria-live="polite">Not submitted</output>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

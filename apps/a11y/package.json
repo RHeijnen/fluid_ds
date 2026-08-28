@@ -1,0 +1,22 @@
+{
+  "name": "@fluid-ds/a11y",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-level accessibility gates for Fluid Storybook fixtures.",
+  "scripts": {
+    "generate": "node ./scripts/generate-catalog.mjs",
+    "test:fixtures": "node --test scripts/fixture-selection.test.mjs",
+    "pretest": "pnpm run test:fixtures && pnpm run generate",
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "install-browsers": "playwright install --with-deps chromium firefox webkit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.5",
+    "axe-core": "^4.11.0",
+    "http-server": "^14.1.1",
+    "typescript": "^5.7.2"
+  }
+}

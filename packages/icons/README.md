@@ -37,7 +37,7 @@ import "@fluid-ds/icons/lucide/zap";
 Or lazy-register at runtime:
 
 ```ts
-import { loadIcon } from "@fluid-ds/icons";
+import { loadIcon } from "@fluid-ds/icons/load-icon";
 
 await loadIcon("rocket");
 // <fluid-icon name="rocket"> now works

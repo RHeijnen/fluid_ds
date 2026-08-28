@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import "../button/define.js";
+import "../field/define.js";
 import type { FluidOtp } from "./fluid-otp.js";
 
 type Args = Pick<FluidOtp, "length" | "value" | "type" | "mask" | "disabled" | "required">;
@@ -64,6 +66,38 @@ export const Disabled: Story = {
 
 export const Required: Story = {
   args: { required: true }
+};
+
+export const InAForm: Story = {
+  render: () => html`
+    <form
+      style="display:grid; gap:var(--fluid-space-3); max-width:max-content;"
+      @submit=${(event: Event) => event.preventDefault()}
+    >
+      <fluid-field
+        label="Verification code"
+        description="Enter the six-digit code sent to your device."
+        required
+      >
+        <fluid-otp
+          name="verification-code"
+          required
+          aria-label="Verification code"
+          @invalid=${(event: Event) => {
+            const control = event.currentTarget as FluidOtp;
+            const field = control.closest("fluid-field") as HTMLElement & { error: string };
+            field.error = control.validationMessage;
+          }}
+          @fluid-input=${(event: Event) => {
+            const control = event.currentTarget as FluidOtp;
+            const field = control.closest("fluid-field") as HTMLElement & { error: string };
+            if (control.validity.valid) field.error = "";
+          }}
+        ></fluid-otp>
+      </fluid-field>
+      <fluid-button style="justify-self:start;" type="submit">Verify</fluid-button>
+    </form>
+  `
 };
 
 export const Lengths: Story = {

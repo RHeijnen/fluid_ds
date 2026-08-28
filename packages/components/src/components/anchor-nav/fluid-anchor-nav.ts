@@ -16,6 +16,14 @@ export interface FluidAnchorNavItem {
   level?: number;
 }
 
+/** Active target carried by the anchor nav's active-change event. */
+export interface FluidAnchorNavActiveChangeDetail {
+  /** The active target id, or `null` when no tracked target is in view. */
+  id: string | null;
+}
+
+export type FluidAnchorNavActiveChangeEvent = CustomEvent<FluidAnchorNavActiveChangeDetail>;
+
 /**
  * In-page table of contents that scroll-spies. Renders a navigation landmark of
  * anchor links, one per section, and tracks which section is currently in view
@@ -53,10 +61,10 @@ export interface FluidAnchorNavItem {
  * @uses-token --fluid-target-min - Minimum interactive target size (conformance).
  * @uses-token --fluid-focus-ring-width - Focus ring width (conformance).
  *
- * @fires fluid-active-change - Dispatched with `{ id }` when the section in view
+ * @fires {FluidAnchorNavActiveChangeEvent} fluid-active-change - Dispatched with `{ id }` when the section in view
  *   changes. `id` is the target id of the now-active section, or `null` when no
  *   tracked section is in view.
- */
+*/
 export class FluidAnchorNav extends FluidElement {
   static override styles = [
     css`
@@ -154,7 +162,14 @@ export class FluidAnchorNav extends FluidElement {
   @property({ type: Array }) items: FluidAnchorNavItem[] = [];
 
   /** Accessible name for the navigation landmark. */
-  @property({ attribute: "nav-label" }) navLabel = "On this page";
+  @property({ attribute: "nav-label" })
+  get navLabel(): string {
+    return this.navLabelOverride ?? this.term("onThisPage");
+  }
+  set navLabel(value: string | null) {
+    this.navLabelOverride = value;
+  }
+  private navLabelOverride: string | null = null;
 
   /**
    * CSS selector for headings to auto-collect when `items` is empty.
@@ -203,7 +218,11 @@ export class FluidAnchorNav extends FluidElement {
       changed.has("scope") ||
       changed.has("topOffset")
     ) {
-      this._rebuild();
+      // Resolving headings changes reactive render state. Run it after this
+      // update completes so hydration never schedules an update from updated().
+      queueMicrotask(() => {
+        if (this.isConnected) this._rebuild();
+      });
     }
   }
 
@@ -294,7 +313,7 @@ export class FluidAnchorNav extends FluidElement {
     if (id === this._activeId) return;
     this._activeId = id;
     this.dispatchEvent(
-      new CustomEvent<{ id: string | null }>("fluid-active-change", {
+      new CustomEvent<FluidAnchorNavActiveChangeDetail>("fluid-active-change", {
         detail: { id },
         bubbles: true,
         composed: true,

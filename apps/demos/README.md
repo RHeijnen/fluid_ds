@@ -8,7 +8,7 @@ the components in context, switch brands to see theming flow.
 | --- | --- | --- |
 | **Settings dashboard** | [`/settings/`](./settings/) | SaaS settings page: profile, notifications, billing chart, form fields |
 | **Admin / data** | [`/admin/`](./admin/) | Table + filter bar + bulk actions + confirm dialogs |
-| **Landing** | [`/landing/`](./landing/) | Marketing layout: hero, feature cards, comparison slider |
+| **Data table** | [`/data-table/`](./data-table/) | The infinite table: windowed rows, infinite loading, sorting, filters, column manager, persistent layout |
 
 Run:
 

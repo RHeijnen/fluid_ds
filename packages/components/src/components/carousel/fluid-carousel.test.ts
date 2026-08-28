@@ -59,6 +59,7 @@ describe("<fluid-carousel>", () => {
       el.shadowRoot!.querySelectorAll<HTMLButtonElement>(".nav-button")
     );
     // At index 0, prev is disabled, next is enabled.
+    if (!prev || !next) throw new Error("Carousel navigation buttons are missing");
     expect(prev.disabled).to.be.true;
     expect(next.disabled).to.be.false;
   });

@@ -19,6 +19,31 @@ export interface ParseFileOptions {
   delimiter?: Delimiter;
 }
 
+/** Stable machine-readable codes for parser-owned file errors. */
+export type ParserFileErrorCode = "invalidJsonSyntax" | "invalidJsonShape";
+
+/** Typed interpolation values for parser-owned file errors. */
+export interface ParserFileErrorParameters {
+  invalidJsonSyntax: { reason: string };
+  invalidJsonShape: Record<string, never>;
+}
+
+/**
+ * An Error with structured detail for localized UIs. `message` intentionally
+ * retains the existing English contract for backwards compatibility.
+ */
+export class ParserFileError<Code extends ParserFileErrorCode = ParserFileErrorCode> extends Error {
+  readonly code: Code;
+  readonly parameters: ParserFileErrorParameters[Code];
+
+  constructor(code: Code, parameters: ParserFileErrorParameters[Code], message: string) {
+    super(message);
+    this.name = "ParserFileError";
+    this.code = code;
+    this.parameters = parameters;
+  }
+}
+
 /** Detect the format from a filename extension + a content sniff. */
 export function detectFormat(name: string, sample: string): FileFormat {
   const ext = name.toLowerCase().split(".").pop() ?? "";
@@ -79,7 +104,8 @@ export function parseJson(text: string): RawTable {
   try {
     data = JSON.parse(text);
   } catch (err) {
-    throw new Error(`Invalid JSON: ${(err as Error).message}`);
+    const reason = (err as Error).message;
+    throw new ParserFileError("invalidJsonSyntax", { reason }, `Invalid JSON: ${reason}`);
   }
 
   let records: unknown[];
@@ -96,7 +122,11 @@ export function parseJson(text: string): RawTable {
       records = [obj];
     }
   } else {
-    throw new Error("JSON must be an array of objects or an object with a rows/data array.");
+    throw new ParserFileError(
+      "invalidJsonShape",
+      {},
+      "JSON must be an array of objects or an object with a rows/data array."
+    );
   }
 
   const columns: string[] = [];
@@ -139,7 +169,9 @@ export function gridToTable(grid: string[][], headerRow: number | "auto"): RawTa
   }
 
   const header = grid[headerIndex] ?? [];
-  const columns = dedupeHeaders(header.map((h, i) => (h.trim() === "" ? `column_${i + 1}` : h.trim())));
+  const columns = dedupeHeaders(
+    header.map((h, i) => (h.trim() === "" ? `column_${i + 1}` : h.trim()))
+  );
 
   const rows: Record<string, unknown>[] = [];
   for (let r = headerIndex + 1; r < grid.length; r += 1) {
@@ -159,11 +191,17 @@ export function gridToTable(grid: string[][], headerRow: number | "auto"): RawTa
 
 /** Make header names unique (a, a -> a, a_2) so two columns never collide. */
 function dedupeHeaders(headers: string[]): string[] {
-  const counts = new Map<string, number>();
+  const used = new Set<string>();
+  const reserved = new Set(headers);
   return headers.map((name) => {
-    const seen = counts.get(name) ?? 0;
-    counts.set(name, seen + 1);
-    return seen === 0 ? name : `${name}_${seen + 1}`;
+    let unique = name;
+    let suffix = 2;
+    while (used.has(unique)) {
+      unique = `${name}_${suffix++}`;
+      while (reserved.has(unique)) unique = `${name}_${suffix++}`;
+    }
+    used.add(unique);
+    return unique;
   });
 }
 

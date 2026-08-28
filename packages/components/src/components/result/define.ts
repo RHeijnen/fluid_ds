@@ -1,6 +1,6 @@
 import { FluidResult } from "./fluid-result.js";
 
-if (!customElements.get("fluid-result")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-result")) {
   customElements.define("fluid-result", FluidResult);
 }
 

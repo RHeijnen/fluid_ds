@@ -6,10 +6,16 @@ import "@fluid-ds/components/define/dropzone";
 import "@fluid-ds/components/define/button";
 import "@fluid-ds/components/define/callout";
 import "../column-mapper/define.js";
-import { parseFile } from "../../core/parse-file.js";
+import { parseFile, ParserFileError } from "../../core/parse-file.js";
 import { applyBlueprint } from "../../core/apply-blueprint.js";
 import { toCSV, toJSON } from "../../core/export.js";
-import type { Blueprint, CellError, ParseResult, RawTable } from "../../core/types.js";
+import type {
+  Blueprint,
+  CellError,
+  ParseResult,
+  ParserDiagnostic,
+  RawTable
+} from "../../core/types.js";
 
 /**
  * Drag a JSON / CSV / TSV / Excel file onto a Fluid file-drop and get
@@ -26,8 +32,8 @@ import type { Blueprint, CellError, ParseResult, RawTable } from "../../core/typ
  * Accessibility: the dropzone is the keyboard-operable WAI-ARIA button intake;
  * the preview is a real semantic `<table>` with `<th scope>` headers and bad
  * cells carrying `aria-invalid` + a `title`; the validation summary is a
- * `fluid-callout` rendered into a `role="status"` / `aria-live="polite"` region
- * so it is announced when parsing finishes (errors use `role="alert"`).
+ * `fluid-callout` whose native status/alert semantics announce parsing results.
+ * Do not wrap it in a second live region, which duplicates announcements.
  *
  * @summary Parse + validate a dropped data file against a blueprint.
  *
@@ -181,8 +187,17 @@ export class FluidFileParser extends FluidElement {
   /** Accepted file extensions for the intake dropzone. */
   @property() accept = ".csv,.tsv,.json,.xlsx,.xls";
 
-  /** Prompt text shown inside the dropzone. */
-  @property() label = "Drop a CSV, JSON, or Excel file here, or click to browse";
+  private labelOverride: string | null = null;
+
+  /** Prompt text shown inside the dropzone. An explicit empty string remains empty. */
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("parserDropFile");
+  }
+
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
 
   /** Max rows shown in the preview table (the full result is still emitted). */
   @property({ type: Number, attribute: "preview-rows" }) previewRows = 50;
@@ -194,7 +209,16 @@ export class FluidFileParser extends FluidElement {
   @state() private result: ParseResult | null = null;
   @state() private fileName = "";
   @state() private parseError = "";
+  @state() private parseErrorDiagnostic: ParserFileError | null = null;
+  @state() private parseErrorUsesFallback = false;
   @state() private busy = false;
+  private readGeneration = 0;
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.readGeneration++;
+    this.busy = false;
+  }
 
   /** The most recent parse result (after mapping), or null before a file loads. */
   get currentResult(): ParseResult | null {
@@ -204,12 +228,21 @@ export class FluidFileParser extends FluidElement {
   private async handleFiles(event: Event): Promise<void> {
     const detail = (event as CustomEvent<{ files: File[] }>).detail;
     const file = detail?.files?.[0];
-    if (!file) return;
+    if (!file) {
+      if (detail?.files) this.reset();
+      return;
+    }
+    const generation = ++this.readGeneration;
     this.parseError = "";
+    this.parseErrorDiagnostic = null;
+    this.parseErrorUsesFallback = false;
     this.busy = true;
+    this.raw = null;
+    this.result = null;
     this.fileName = file.name;
     try {
       const raw = await parseFile(file, { headerRow: this.blueprint.headerRow ?? "auto" });
+      if (generation !== this.readGeneration || !this.isConnected) return;
       this.raw = raw;
       this.recompute();
       this.dispatchEvent(
@@ -220,8 +253,12 @@ export class FluidFileParser extends FluidElement {
         })
       );
     } catch (err) {
-      const message = (err as Error).message || "Could not parse the file.";
+      if (generation !== this.readGeneration || !this.isConnected) return;
+      const rawMessage = err instanceof Error ? err.message : String(err ?? "");
+      const message = rawMessage || "Could not parse the file.";
       this.parseError = message;
+      this.parseErrorDiagnostic = err instanceof ParserFileError ? err : null;
+      this.parseErrorUsesFallback = rawMessage.length === 0;
       this.raw = null;
       this.result = null;
       this.dispatchEvent(
@@ -232,7 +269,7 @@ export class FluidFileParser extends FluidElement {
         })
       );
     } finally {
-      this.busy = false;
+      if (generation === this.readGeneration) this.busy = false;
     }
   }
 
@@ -247,7 +284,7 @@ export class FluidFileParser extends FluidElement {
   }
 
   private confirm(): void {
-    if (!this.result) return;
+    if (!this.result || this.busy) return;
     const valid = this.result.errors.length === 0;
     this.dispatchEvent(
       new CustomEvent("fluid-parse", {
@@ -265,11 +302,21 @@ export class FluidFileParser extends FluidElement {
 
   /** Clear the loaded file + result and return to the intake step. */
   reset(): void {
+    const restoreIntakeFocus = (this.getRootNode() as Document | ShadowRoot).activeElement === this;
+    this.readGeneration++;
+    this.busy = false;
     this.raw = null;
     this.result = null;
     this.fileName = "";
     this.parseError = "";
+    this.parseErrorDiagnostic = null;
+    this.parseErrorUsesFallback = false;
     this.dropzoneEl?.clear?.();
+    if (restoreIntakeFocus) {
+      void this.updateComplete.then(() => {
+        if (this.isConnected) this.dropzoneEl?.shadowRoot?.querySelector<HTMLElement>('[role="button"]')?.focus();
+      });
+    }
   }
 
   /**
@@ -293,24 +340,144 @@ export class FluidFileParser extends FluidElement {
     return text;
   }
 
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.localize.locale).format(value);
+  }
+
+  private localizedFileError(): string {
+    const diagnostic = this.parseErrorDiagnostic;
+    if (diagnostic?.code === "invalidJsonSyntax") {
+      return this.term("parserInvalidJsonSyntax", diagnostic.parameters.reason);
+    }
+    if (diagnostic?.code === "invalidJsonShape") return this.term("parserInvalidJsonShape");
+    if (this.parseErrorUsesFallback) return this.term("parserCouldNotParseFile");
+    return this.parseError;
+  }
+
+  private localizedCellError(error: CellError): string {
+    const diagnostic = error.diagnostic;
+    if (!diagnostic || diagnostic.code === "customValidation") return error.message;
+    return this.localizedDiagnostic(diagnostic);
+  }
+
+  private localizedDiagnostic(diagnostic: Exclude<ParserDiagnostic, { code: "customValidation" }>): string {
+    switch (diagnostic.code) {
+      case "required":
+        return this.term("parserFieldRequired", diagnostic.parameters.label);
+      case "stringTooShort":
+        return this.term(
+          "parserStringTooShort",
+          diagnostic.parameters.label,
+          this.formatNumber(diagnostic.parameters.minimum)
+        );
+      case "stringTooLong":
+        return this.term(
+          "parserStringTooLong",
+          diagnostic.parameters.label,
+          this.formatNumber(diagnostic.parameters.maximum)
+        );
+      case "patternMismatch":
+        return this.term("parserPatternMismatch", diagnostic.parameters.label);
+      case "invalidNumber":
+        return this.term(
+          "parserInvalidNumber",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "invalidInteger":
+        return this.term(
+          "parserInvalidInteger",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "numberBelowMinimum":
+        return this.term(
+          "parserNumberBelowMinimum",
+          diagnostic.parameters.label,
+          this.formatNumber(diagnostic.parameters.minimum)
+        );
+      case "numberAboveMaximum":
+        return this.term(
+          "parserNumberAboveMaximum",
+          diagnostic.parameters.label,
+          this.formatNumber(diagnostic.parameters.maximum)
+        );
+      case "invalidBoolean":
+        return this.term(
+          "parserInvalidBoolean",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "invalidDate":
+        return this.term(
+          "parserInvalidDate",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "dateBeforeMinimum":
+        return this.term("parserDateBeforeMinimum", diagnostic.parameters.label);
+      case "dateAfterMaximum":
+        return this.term("parserDateAfterMaximum", diagnostic.parameters.label);
+      case "invalidEmail":
+        return this.term(
+          "parserInvalidEmail",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "invalidUrl":
+        return this.term(
+          "parserInvalidUrl",
+          diagnostic.parameters.label,
+          diagnostic.parameters.value
+        );
+      case "invalidEnum":
+        return this.term(
+          "parserInvalidEnum",
+          diagnostic.parameters.label,
+          diagnostic.parameters.options.map(String).join(", ")
+        );
+      case "invalidJson":
+        return this.term("parserInvalidJson", diagnostic.parameters.label);
+      case "unmappedRequired":
+        return this.term("parserUnmappedRequired", diagnostic.parameters.label);
+      case "transformFailed":
+        return this.term(
+          "parserTransformFailed",
+          diagnostic.parameters.label,
+          diagnostic.parameters.reason
+        );
+    }
+  }
+
   private renderSummary(result: ParseResult): TemplateResult {
     const { stats } = result;
     const hasErrors = stats.errorCount > 0;
-    const parts: string[] = [`${stats.kept} of ${stats.total} rows ready`];
-    if (stats.duplicates > 0) parts.push(`${stats.duplicates} duplicate(s) removed`);
-    if (stats.truncated > 0) parts.push(`${stats.truncated} over the row cap`);
-    const message = parts.join(", ");
+    const message = this.term(
+      "parserReadySummary",
+      stats.kept,
+      stats.total,
+      stats.duplicates,
+      stats.truncated,
+      this.formatNumber(stats.kept),
+      this.formatNumber(stats.total),
+      this.formatNumber(stats.duplicates),
+      this.formatNumber(stats.truncated)
+    );
 
     return html`
       <div
         part="summary"
         class="summary"
-        role=${hasErrors ? "alert" : "status"}
-        aria-live=${hasErrors ? "assertive" : "polite"}
       >
         <fluid-callout variant=${hasErrors ? "danger" : "success"}>
           <span slot="header">
-            ${hasErrors ? `${stats.errorCount} cell error(s) found` : "All rows valid"}
+            ${hasErrors
+              ? this.term(
+                  "parserCellErrorsFound",
+                  stats.errorCount,
+                  this.formatNumber(stats.errorCount)
+                )
+              : this.term("parserAllRowsValid")}
           </span>
           ${message}
         </fluid-callout>
@@ -331,8 +498,13 @@ export class FluidFileParser extends FluidElement {
       <div class="table-scroll">
         <table part="table">
           <caption>
-            Preview of ${rows.length}${result.rows.length > rows.length ? ` of ${result.rows.length}` : ""}
-            cleaned row(s). Highlighted cells failed validation.
+            ${this.term(
+              "parserPreviewCaption",
+              rows.length,
+              this.formatNumber(rows.length),
+              result.rows.length,
+              this.formatNumber(result.rows.length)
+            )}
           </caption>
           <thead>
             <tr>
@@ -347,7 +519,7 @@ export class FluidFileParser extends FluidElement {
               const realIndex = index; // preview slice starts at 0 = result row 0
               return html`
                 <tr>
-                  <td class="row-index">${realIndex + 1}</td>
+                  <td class="row-index">${this.formatNumber(realIndex + 1)}</td>
                   ${fields.map((field) => {
                     const error = errorMap.get(`${realIndex}:${field.key}`);
                     const value = row[field.key];
@@ -356,7 +528,7 @@ export class FluidFileParser extends FluidElement {
                       <td
                         part=${error ? "cell-invalid" : "cell"}
                         class=${error ? "invalid" : ""}
-                        title=${error ? error.message : display}
+                        title=${error ? this.localizedCellError(error) : display}
                         aria-invalid=${error ? "true" : "false"}
                       >
                         ${display}
@@ -375,7 +547,12 @@ export class FluidFileParser extends FluidElement {
   override render(): TemplateResult {
     const loaded = this.raw !== null && this.result !== null;
     return html`
-      <div part="base" class="base">
+      <div
+        part="base"
+        class="base"
+        dir=${this.localize.dir}
+        aria-busy=${this.busy ? "true" : "false"}
+      >
         <fluid-dropzone
           part="dropzone"
           accept=${this.accept}
@@ -386,10 +563,10 @@ export class FluidFileParser extends FluidElement {
 
         ${this.parseError
           ? html`
-              <div role="alert" aria-live="assertive">
+              <div>
                 <fluid-callout variant="danger">
-                  <span slot="header">Could not read ${this.fileName || "the file"}</span>
-                  ${this.parseError}
+                  <span slot="header">${this.term("parserCouldNotReadFile", this.fileName)}</span>
+                  ${this.localizedFileError()}
                 </fluid-callout>
               </div>
             `
@@ -400,7 +577,7 @@ export class FluidFileParser extends FluidElement {
               ${!this.hideMapping
                 ? html`
                     <div part="mapping" class="step">
-                      <p class="step-heading">Map columns</p>
+                      <p class="step-heading">${this.term("parserMapColumns")}</p>
                       <fluid-column-mapper
                         .blueprint=${this.blueprint}
                         .columns=${this.raw?.columns ?? []}
@@ -412,22 +589,28 @@ export class FluidFileParser extends FluidElement {
                 : nothing}
 
               <div class="step">
-                <p class="step-heading">Preview</p>
+                <p class="step-heading">${this.term("parserPreview")}</p>
                 ${this.renderSummary(this.result)} ${this.renderTable(this.result)}
               </div>
 
               <div part="actions" class="actions">
                 <fluid-button variant="primary" @click=${this.confirm}>
-                  Import ${this.result.stats.kept} row(s)
+                  ${this.term(
+                    "parserImportRows",
+                    this.result.stats.kept,
+                    this.formatNumber(this.result.stats.kept)
+                  )}
                 </fluid-button>
                 <fluid-button variant="ghost" @click=${() => this.export("csv")}>
-                  Download CSV
+                  ${this.term("parserDownloadFormat", "CSV")}
                 </fluid-button>
                 <fluid-button variant="ghost" @click=${() => this.export("json")}>
-                  Download JSON
+                  ${this.term("parserDownloadFormat", "JSON")}
                 </fluid-button>
                 <span class="spacer"></span>
-                <fluid-button variant="ghost" @click=${this.reset}>Reset</fluid-button>
+                <fluid-button variant="ghost" @click=${this.reset}>
+                  ${this.term("parserReset")}
+                </fluid-button>
               </div>
             `
           : nothing}

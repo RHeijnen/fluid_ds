@@ -335,6 +335,9 @@ The cross-component contract is in the
 When `clickable`, each step is a native `<button>`, so it is in the Tab order and
 activates with <kbd>Enter</kbd> / <kbd>Space</kbd>. Presentational steps are not
 focusable (there's nothing to do).
+Calling a clickable step's `focus()` delegates to its native button. Activation
+requests a change through `fluid-step-change`; the consumer remains responsible
+for updating the parent's `current` index.
 
 | Key | Action |
 | --- | --- |
@@ -348,7 +351,8 @@ focusable (there's nothing to do).
 
 ### AA vs AAA
 
-Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
+Targets **WCAG 2.2 AA**, with manual assistive-technology review still required.
+The header **Conformance** toggle (or an ancestor
 `[data-fluid-conformance="aaa"]`) lifts:
 
 | Token | AA | AAA | Criterion |

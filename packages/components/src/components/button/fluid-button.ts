@@ -7,6 +7,13 @@ import { FluidElement } from "../../internal/base-element.js";
 
 export type FluidButtonVariant = "primary" | "secondary" | "ghost";
 export type FluidButtonSize = "sm" | "md" | "lg";
+
+export interface FluidButtonChangeDetail {
+  pressed: boolean;
+}
+export type FluidButtonChangeEvent = CustomEvent<FluidButtonChangeDetail>;
+/** Cancelable activation; preventing its default stops the requested form action. */
+export type FluidButtonClickEvent = CustomEvent<null>;
 /**
  * Semantic intent of the button. Orthogonal to variant (which is the
  * visual treatment). `brand` = the current accent token; `neutral` =
@@ -40,13 +47,18 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * the `@uses-token` list is every main var those knobs fall back to.
  *
  * @cssproperty --fluid-button-bg - Background. Falls back per variant to accent / surface.
+ * @cssproperty --fluid-button-hover-bg - Hover background. Falls back to --fluid-button-bg, then the variant state color.
+ * @cssproperty --fluid-button-active-bg - Active background. Falls back to --fluid-button-bg, then the variant state color.
+ * @cssproperty --fluid-button-pressed-bg - Toggle-pressed background. Falls back to the active/background ladder.
  * @cssproperty --fluid-button-fg - Text/icon color. Falls back per variant to accent-text / accent / text.
  * @cssproperty --fluid-button-border - Outline color (secondary variant). Falls back to --fluid-border-default.
+ * @cssproperty --fluid-button-active-border - Active outline color. Falls back to --fluid-button-border.
  * @cssproperty --fluid-button-radius - Corner radius. Falls back to --fluid-radius-md.
  * @cssproperty --fluid-button-gap - Gap between icon and label. Falls back to --fluid-space-2.
  * @cssproperty --fluid-button-font-family - Label font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-button-font-weight - Label weight. Falls back to --fluid-font-weight-medium.
  * @cssproperty --fluid-button-line-height - Label line-height. Falls back to --fluid-font-line-height-tight.
+ * @cssproperty --fluid-button-height-md - Medium button height. Falls back to --fluid-space-8, then 2rem.
  * @cssproperty --fluid-button-focus-ring-color - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-button-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  * @cssproperty --fluid-button-focus-ring-offset - Focus ring offset. Falls back to --fluid-focus-ring-offset.
@@ -76,12 +88,13 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @uses-token --fluid-font-size-lg - Label size at size="lg".
  * @uses-token --fluid-space-2 - Icon/label gap + padding scale.
  * @uses-token --fluid-space-3 - Horizontal padding.
+ * @uses-token --fluid-space-8 - Medium button height.
  * @uses-token --fluid-gradient-glossy - Subtle sheen overlay on solid fills.
  * @uses-token --fluid-duration-fast - Hover/press transition duration.
  * @uses-token --fluid-easing-standard - Hover/press transition easing.
  *
- * @fires fluid-click - Cancelable event dispatched before the requested form action.
- * @fires fluid-change - Dispatched by a toggle button when `pressed` flips;
+ * @fires {FluidButtonClickEvent} fluid-click - Cancelable event dispatched before the requested form action.
+ * @fires {FluidButtonChangeEvent} fluid-change - Dispatched by a toggle button when `pressed` flips;
  *   `detail` is `{ pressed: boolean }`.
  */
 export class FluidButton extends FluidElement {
@@ -250,8 +263,8 @@ export class FluidButton extends FluidElement {
     }
 
     .button:focus-visible {
-      outline: var(--fluid-button-focus-ring-width, var(--fluid-focus-ring-width))
-        solid var(--fluid-button-focus-ring-color, var(--fluid-focus-ring-color));
+      outline: var(--fluid-button-focus-ring-width, var(--fluid-focus-ring-width)) solid
+        var(--fluid-focus-ring-color);
       outline-offset: var(--fluid-button-focus-ring-offset, var(--fluid-focus-ring-offset));
     }
 
@@ -288,7 +301,11 @@ export class FluidButton extends FluidElement {
       gap: 0.375rem;
     }
     .size-md {
-      padding-block: var(--fluid-space-2);
+      min-block-size: max(
+        var(--fluid-button-height-md, var(--fluid-space-8, 2rem)),
+        var(--fluid-target-min, 24px)
+      );
+      padding-block: 0;
       padding-inline: var(--fluid-space-4);
     }
     .size-lg {
@@ -296,12 +313,24 @@ export class FluidButton extends FluidElement {
       padding-inline: var(--fluid-space-5);
     }
 
-    .size-sm.has-prefix { padding-inline-start: var(--fluid-space-2); }
-    .size-sm.has-suffix { padding-inline-end: var(--fluid-space-2); }
-    .size-md.has-prefix { padding-inline-start: var(--fluid-space-3); }
-    .size-md.has-suffix { padding-inline-end: var(--fluid-space-3); }
-    .size-lg.has-prefix { padding-inline-start: var(--fluid-space-4); }
-    .size-lg.has-suffix { padding-inline-end: var(--fluid-space-4); }
+    .size-sm.has-prefix {
+      padding-inline-start: var(--fluid-space-2);
+    }
+    .size-sm.has-suffix {
+      padding-inline-end: var(--fluid-space-2);
+    }
+    .size-md.has-prefix {
+      padding-inline-start: var(--fluid-space-3);
+    }
+    .size-md.has-suffix {
+      padding-inline-end: var(--fluid-space-3);
+    }
+    .size-lg.has-prefix {
+      padding-inline-start: var(--fluid-space-4);
+    }
+    .size-lg.has-suffix {
+      padding-inline-end: var(--fluid-space-4);
+    }
 
     /*
      * Icon-only buttons (no label slot, just prefix or suffix). Drop the
@@ -315,7 +344,9 @@ export class FluidButton extends FluidElement {
       aspect-ratio: 1 / 1;
       justify-content: center;
     }
-    .button.icon-only.size-lg { padding-inline: var(--fluid-space-3); }
+    .button.icon-only.size-lg {
+      padding-inline: var(--fluid-space-3);
+    }
 
     /*
      * Variants, primary + secondary wear the glossy gradient overlay. The
@@ -331,10 +362,16 @@ export class FluidButton extends FluidElement {
         inset 0 1px 0 rgb(255 255 255 / 0.12);
     }
     .variant-primary:hover {
-      background-color: var(--fluid-accent-hover);
+      background-color: var(
+        --fluid-button-hover-bg,
+        var(--fluid-button-bg, var(--fluid-accent-hover))
+      );
     }
     .variant-primary:active:not([aria-disabled="true"]) {
-      background-color: var(--fluid-accent-active);
+      background-color: var(
+        --fluid-button-active-bg,
+        var(--fluid-button-bg, var(--fluid-accent-active))
+      );
       box-shadow:
         0 1px 1px rgb(0 0 0 / 0.08),
         inset 0 1px 2px rgb(0 0 0 / 0.1);
@@ -358,11 +395,18 @@ export class FluidButton extends FluidElement {
         inset 0 1px 0 rgb(255 255 255 / 0.4);
     }
     .variant-secondary:hover {
-      background-color: color-mix(in srgb, var(--fluid-accent-base) 6%, var(--fluid-surface-base));
+      background-color: var(
+        --fluid-button-hover-bg,
+        var(
+          --fluid-button-bg,
+          color-mix(in srgb, var(--fluid-accent-base) 6%, var(--fluid-surface-base))
+        )
+      );
     }
     .variant-secondary:active:not([aria-disabled="true"]) {
       box-shadow:
-        inset 0 0 0 1px var(--fluid-border-strong),
+        inset 0 0 0 1px
+          var(--fluid-button-active-border, var(--fluid-button-border, var(--fluid-border-strong))),
         inset 0 1px 2px rgb(0 0 0 / 0.05);
     }
 
@@ -374,11 +418,14 @@ export class FluidButton extends FluidElement {
      * muted hover, so existing call sites stay visually consistent.
      */
     .variant-ghost {
-      background: transparent;
+      background: var(--fluid-button-bg, transparent);
       color: var(--fluid-button-fg, var(--fluid-accent-base));
     }
     .variant-ghost:hover {
-      background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
+      background: var(
+        --fluid-button-hover-bg,
+        var(--fluid-button-bg, color-mix(in srgb, var(--fluid-accent-base) 12%, transparent))
+      );
     }
 
     /*
@@ -389,7 +436,13 @@ export class FluidButton extends FluidElement {
     .button.variant-primary[aria-pressed="true"],
     .button.variant-secondary[aria-pressed="true"],
     .button.variant-ghost[aria-pressed="true"] {
-      background-color: color-mix(in srgb, var(--fluid-accent-base) 22%, transparent);
+      background-color: var(
+        --fluid-button-pressed-bg,
+        var(
+          --fluid-button-active-bg,
+          var(--fluid-button-bg, color-mix(in srgb, var(--fluid-accent-base) 22%, transparent))
+        )
+      );
       box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
     }
 
@@ -456,7 +509,7 @@ export class FluidButton extends FluidElement {
        keep their natural position so the group isn't nudged off-origin. */
     :host([data-fluid-group="inner"]),
     :host([data-fluid-group="last"]) {
-      margin-left: -1px !important;
+      margin-inline-start: -1px !important;
     }
     :host([data-fluid-group="first"]) .button {
       border-top-right-radius: 0;
@@ -473,7 +526,7 @@ export class FluidButton extends FluidElement {
     /* Vertical groups overlap upward and flatten the top/bottom seams. */
     :host([data-fluid-group-orientation="vertical"][data-fluid-group="inner"]),
     :host([data-fluid-group-orientation="vertical"][data-fluid-group="last"]) {
-      margin-left: 0 !important;
+      margin-inline-start: 0 !important;
       margin-top: -1px !important;
     }
     :host([data-fluid-group-orientation="vertical"][data-fluid-group="first"]) .button {
@@ -709,7 +762,7 @@ export class FluidButton extends FluidElement {
     if (this.toggle) {
       this.pressed = !this.pressed;
       this.dispatchEvent(
-        new CustomEvent("fluid-change", {
+        new CustomEvent<FluidButtonChangeDetail>("fluid-change", {
           detail: { pressed: this.pressed },
           bubbles: true,
           composed: true
@@ -717,7 +770,8 @@ export class FluidButton extends FluidElement {
       );
     }
 
-    const activation = new CustomEvent("fluid-click", {
+    const activation = new CustomEvent<null>("fluid-click", {
+      detail: null,
       bubbles: true,
       composed: true,
       cancelable: true
@@ -735,7 +789,6 @@ export class FluidButton extends FluidElement {
     } else if (this.type === "reset") {
       form?.reset();
     }
-
   };
 
   override render() {
@@ -752,8 +805,7 @@ export class FluidButton extends FluidElement {
           // (label) slot is not. Gives the button a near-square
           // footprint and tight, symmetric padding so the icon sits
           // centered instead of biased to one side.
-          "icon-only":
-            !this.hasLabel && (this.hasPrefix || this.hasSuffix || this.caret),
+          "icon-only": !this.hasLabel && (this.hasPrefix || this.hasSuffix || this.caret),
           "is-loading": this.loading
         })}
         type="button"

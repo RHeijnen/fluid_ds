@@ -1,6 +1,6 @@
 import { FluidInput } from "./fluid-input.js";
 
-if (!customElements.get("fluid-input")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-input")) {
   customElements.define("fluid-input", FluidInput);
 }
 

@@ -20,7 +20,7 @@
  * `pnpm check:tokens`; wired into `pnpm verify`.
  */
 import { readdir, readFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -98,6 +98,21 @@ const SEMANTIC_PREFIXES = [
   "--fluid-conformance-"
 ];
 const isSemantic = (t) => SEMANTIC_PREFIXES.some((p) => t.startsWith(p));
+const OVERRIDE_LADDER_PREFIXES = [
+  "--fluid-color-",
+  "--fluid-accent-",
+  "--fluid-success-",
+  "--fluid-danger-",
+  "--fluid-warning-",
+  "--fluid-info-",
+  "--fluid-surface-",
+  "--fluid-text-",
+  "--fluid-border-",
+  "--fluid-shadow-",
+  "--fluid-focus-ring-color"
+];
+const needsComponentOverride = (token) =>
+  OVERRIDE_LADDER_PREFIXES.some((prefix) => token.startsWith(prefix));
 
 /** Tokens that MUST resolve to a real definition: any bare `var()` (no
  *  fallback), any reference to a primitive/semantic namespace (even with a
@@ -112,6 +127,45 @@ function collectRequired(text, into) {
   for (const m of text.matchAll(GETPROP_RE)) {
     if (!m[1].endsWith("-")) into.add(m[1]);
   }
+}
+
+/**
+ * Find semantic-token reads that bypass a component-scoped override. The
+ * declaration containing `var(--fluid-accent-base)` must first expose a
+ * `var(--fluid-button-*, ...)` style knob. This enforces the documented
+ * brand -> component -> instance ladder without requiring a CSS parser for
+ * Lit's tagged template strings.
+ */
+function collectLadderViolations(file, text) {
+  const normalized = file.replaceAll("\\", "/");
+  if (!normalized.includes("/packages/components/src/components/")) return [];
+
+  const component = basename(file, ".ts").replace(/^fluid-/, "");
+  if (!component || component.endsWith(".test") || component.endsWith(".stories")) return [];
+  const componentPrefix = `--fluid-${component}-`;
+  const componentVar = new RegExp(`var\\(\\s*${componentPrefix}`);
+  const violations = [];
+
+  for (const match of text.matchAll(VAR_RE)) {
+    const token = match[1];
+    if (!needsComponentOverride(token) || match.index === undefined) continue;
+    if (token.startsWith(`--fluid-${component}-`)) continue;
+    const before = text.slice(0, match.index);
+    const boundary = Math.max(
+      before.lastIndexOf(";"),
+      before.lastIndexOf("{"),
+      before.lastIndexOf("`")
+    );
+    const declaration = before.slice(boundary + 1);
+    // Private/custom-property mappings are inputs to a later styled property,
+    // not a styled property themselves. The final read is checked separately.
+    if (declaration.trimStart().startsWith("--")) continue;
+    if (!componentVar.test(declaration)) {
+      const line = before.split("\n").length;
+      violations.push({ file: relative(root, file), line, token, component });
+    }
+  }
+  return violations;
 }
 
 async function main() {
@@ -139,6 +193,7 @@ async function main() {
 
   // 3. References: every var(--fluid-*) / getPropertyValue("--fluid-*").
   const violations = [];
+  const ladderViolations = [];
   for (const f of sourceFiles) {
     const text = await readFile(f, "utf8");
     const refs = new Set();
@@ -148,10 +203,13 @@ async function main() {
         violations.push({ file: relative(root, f), token });
       }
     }
+    ladderViolations.push(...collectLadderViolations(f, text));
   }
 
-  if (!violations.length) {
-    console.log(`✓ Token check OK, ${vocab.size} tokens in vocabulary, no phantom references.`);
+  if (!violations.length && !ladderViolations.length) {
+    console.log(
+      `✓ Token check OK, ${vocab.size} tokens in vocabulary, no phantom references or override-ladder bypasses.`
+    );
     return;
   }
 
@@ -161,15 +219,27 @@ async function main() {
     if (!byToken.has(v.token)) byToken.set(v.token, new Set());
     byToken.get(v.token).add(v.file);
   }
-  console.error("✗ Phantom token references (referenced but never defined/annotated):\n");
-  for (const [token, files] of [...byToken].sort()) {
-    console.error(`  ${token}`);
-    for (const file of [...files].sort()) console.error(`      ${file}`);
+  if (violations.length) {
+    console.error("✗ Phantom token references (referenced but never defined/annotated):\n");
+    for (const [token, files] of [...byToken].sort()) {
+      console.error(`  ${token}`);
+      for (const file of [...files].sort()) console.error(`      ${file}`);
+    }
+  }
+  if (ladderViolations.length) {
+    console.error("\n✗ Component styles that bypass their override ladder:\n");
+    for (const { file, line, token, component } of ladderViolations) {
+      console.error(
+        `  ${file}:${line} reads ${token} without a --fluid-${component}-* wrapper`
+      );
+    }
   }
   console.error(
-    `\n${byToken.size} phantom token(s) across ${violations.length} reference(s).` +
+    `\n${byToken.size} phantom token(s) across ${violations.length} reference(s), ` +
+      `${ladderViolations.length} override-ladder bypass(es).` +
       `\nFix: point at a real token, declare it, or annotate the component token` +
-      ` with @cssproperty / the semantic var with @uses-token. Truly external` +
+      ` with @cssproperty / the semantic var with @uses-token. Wrap component` +
+      ` styles as var(--fluid-<component>-<role>, var(--fluid-semantic)). Truly external` +
       ` tokens can be added to ALLOW in scripts/check-tokens.mjs.`
   );
   process.exit(1);

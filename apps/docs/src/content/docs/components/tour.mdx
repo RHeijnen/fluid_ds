@@ -97,6 +97,31 @@ persist progress or fire analytics.
 </script>
 ```
 
+### Localization
+
+Import the desired [locale pack](/guides/localization/) and set `lang` on the
+tour or an ancestor, including a containing shadow host. The registry provides
+`skip`, `back`, `next`, `done`, `tourStep(current, total)` and
+`tourStepAnnouncement(current, total, title, body)`. Both count arguments are
+display strings formatted using the registry's effective language and numbering
+system, including document/browser fallback when no usable declaration exists.
+Malformed Intl tags use English count formatting; an empty nearest language
+follows the registry's document/browser fallback. Complete-message callbacks
+can reorder arguments without assembling translated sentence fragments.
+
+Application step titles and bodies remain plain text owned by the application;
+translate them before passing `steps`. The diagnostic pseudo packs transform
+the full announcement, including interpolated text, but do not rewrite visible
+step content or the supplied objects. A language change refreshes the existing
+announcement and controls without replaying a step, moving focus or firing a
+tour event. Explicit custom registry strings are preserved, including empty
+ones; applications must still supply meaningful visible control names.
+
+The official Dutch, German, French, Spanish and Arabic messages are draft
+translations awaiting fluent review. This message coverage does not certify
+RTL arrow-key behavior, layout, screen-reader output or native-ancestor SSR
+inheritance.
+
 ### Framework usage
 
 <Tabs syncKey="framework">
@@ -224,17 +249,20 @@ covered by a token.
 
 ## Accessibility
 
-The tour popover follows the WAI-ARIA APG
-[Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) pattern.
+The tour is a **nonmodal dialog**: the spotlight target and surrounding page stay
+usable. Unlike a [modal dialog](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/),
+it does not make the background inert or claim `aria-modal="true"`.
 
-- The popover is `role="dialog"` with `aria-modal="true"`, labelled by its step
+- The popover is `role="dialog"`, labelled by its step
   title (`aria-labelledby`) and described by its body (`aria-describedby`).
-- On open, focus moves into the popover and is trapped: Tab from the last control
-  wraps to the first, Shift+Tab from the first wraps to the last.
+- On open, focus moves to Next / Done. Tab and Shift+Tab follow the document
+  order. Moving focus outside dismisses the tour and preserves the destination,
+  so the keyboard can reach the same page controls as the pointer.
 - Each step is mirrored into a polite `aria-live` region ("Step n of m" plus the
   title and body) so a screen reader announces every change.
 - Keyboard: <kbd>→</kbd> / <kbd>←</kbd> step forward / back, <kbd>Esc</kbd> skips
-  the tour. When the tour closes, focus returns to whatever had it before.
+  the tour. Done, Skip, and Escape return focus to the opener. An outside pointer
+  press dismisses the tour without swallowing the page interaction.
 - Buttons honor the conformance target-size token, so they grow to 44×44 under
   `data-fluid-conformance="aaa"`.
 - Motion (the spotlight glide and the popover fade) honors

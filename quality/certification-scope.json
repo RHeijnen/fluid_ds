@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "proposedAt": "2026-08-26",
+  "status": "proposed-for-section-1-sign-off",
+  "maturitySource": "quality/maturity.json",
+  "policy": "A certification candidate is not stable. Keep all existing public maturity labels until the production-readiness exit evidence is accepted.",
+  "candidateGroups": {
+    "foundations": [
+      "fluid-aspect-ratio",
+      "fluid-avatar",
+      "fluid-avatar-group",
+      "fluid-badge",
+      "fluid-card",
+      "fluid-col",
+      "fluid-divider",
+      "fluid-grid",
+      "fluid-icon",
+      "fluid-loading-overlay",
+      "fluid-progress-bar",
+      "fluid-progress-ring",
+      "fluid-skeleton",
+      "fluid-spinner",
+      "fluid-stack"
+    ],
+    "forms": [
+      "fluid-button",
+      "fluid-button-group",
+      "fluid-checkbox",
+      "fluid-field",
+      "fluid-fieldset",
+      "fluid-form",
+      "fluid-input",
+      "fluid-number-input",
+      "fluid-option",
+      "fluid-radio",
+      "fluid-radio-group",
+      "fluid-range-slider",
+      "fluid-rating",
+      "fluid-segment",
+      "fluid-segmented-control",
+      "fluid-select",
+      "fluid-slider",
+      "fluid-switch",
+      "fluid-textarea"
+    ],
+    "overlays-and-disclosures": [
+      "fluid-accordion",
+      "fluid-banner",
+      "fluid-callout",
+      "fluid-details",
+      "fluid-dialog",
+      "fluid-drawer",
+      "fluid-dropdown",
+      "fluid-dropdown-item",
+      "fluid-menu",
+      "fluid-menu-item",
+      "fluid-menu-label",
+      "fluid-popover",
+      "fluid-popup",
+      "fluid-toast",
+      "fluid-toast-item",
+      "fluid-tooltip"
+    ],
+    "navigation": [
+      "fluid-breadcrumb",
+      "fluid-breadcrumb-item",
+      "fluid-list",
+      "fluid-list-item",
+      "fluid-pagination",
+      "fluid-tab",
+      "fluid-tab-panel",
+      "fluid-tabs",
+      "fluid-toolbar"
+    ]
+  },
+  "remainder": {
+    "core": "Keep the current maturity label. Advanced controls and secondary utilities still receive catalog-wide gates and applicable interaction contracts, but are not in the first stable cohort.",
+    "expansion": "Keep the current beta or experimental label. Complex expansion workflows require their own depth, performance, localization, accessibility, and security certification before promotion."
+  },
+  "requiredEvidenceForPromotion": [
+    "public-api-and-docs",
+    "behavior-and-coverage",
+    "keyboard-and-browser-a11y",
+    "manual-at-where-applicable",
+    "ssr-and-hydration",
+    "localization-and-rtl-where-applicable",
+    "interaction-contracts-where-applicable",
+    "visual-states",
+    "performance-budget",
+    "no-open-p0-or-p1"
+  ]
+}

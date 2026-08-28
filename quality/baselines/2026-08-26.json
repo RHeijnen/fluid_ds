@@ -1,0 +1,1350 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-26",
+  "status": "ready-for-section-1-owner-sign-off",
+  "scope": "local-dirty-worktree-baseline-not-release-certification",
+  "ownerSignedOff": false,
+  "sourceInventoryMeasurement": "source-attribution-not-execution",
+  "inventory": {
+    "packages": 14,
+    "components": 155,
+    "unitTested": 155,
+    "accessibilityAudited": 155,
+    "accessibilityExempt": 0,
+    "storybookCovered": 155,
+    "storybookInteractions": 64,
+    "interactionClassification": {
+      "interactive": 39,
+      "composite": 64,
+      "presentational": 29,
+      "helper": 23
+    },
+    "interactionRequired": 103,
+    "interactionCovered": 64,
+    "interactionMissing": 39,
+    "interactionCoveragePercent": 62.1,
+    "interactionCatalogCoveragePercent": 41.3,
+    "visualCovered": 155,
+    "browserAccessibilityCovered": 155,
+    "ssrRenderedFixtures": 155,
+    "localized": 45,
+    "rtlAware": 16,
+    "blockingGaps": 0
+  },
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "win32",
+    "release": "10.0.26200",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz",
+    "logicalCpus": 6,
+    "pnpm": "9.15.0",
+    "playwright": "1.60.0",
+    "browserRevisions": [
+      {
+        "name": "chromium",
+        "revision": "1223",
+        "installByDefault": true,
+        "browserVersion": "148.0.7778.96",
+        "title": "Chrome for Testing"
+      },
+      {
+        "name": "chromium-headless-shell",
+        "revision": "1223",
+        "installByDefault": true,
+        "browserVersion": "148.0.7778.96",
+        "title": "Chrome Headless Shell"
+      },
+      {
+        "name": "chromium-tip-of-tree",
+        "revision": "1427",
+        "installByDefault": false,
+        "browserVersion": "149.0.7827.0",
+        "title": "Chrome Canary for Testing"
+      },
+      {
+        "name": "chromium-tip-of-tree-headless-shell",
+        "revision": "1427",
+        "installByDefault": false,
+        "browserVersion": "149.0.7827.0",
+        "title": "Chrome Canary Headless Shell"
+      },
+      {
+        "name": "firefox",
+        "revision": "1522",
+        "installByDefault": true,
+        "browserVersion": "150.0.2",
+        "title": "Firefox"
+      },
+      {
+        "name": "firefox-beta",
+        "revision": "1512",
+        "installByDefault": false,
+        "browserVersion": "151.0b5",
+        "title": "Firefox Beta"
+      },
+      {
+        "name": "webkit",
+        "revision": "2287",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "mac14": "2251",
+          "mac14-arm64": "2251",
+          "debian11-x64": "2105",
+          "debian11-arm64": "2105",
+          "ubuntu20.04-x64": "2092",
+          "ubuntu20.04-arm64": "2092"
+        },
+        "browserVersion": "26.4",
+        "title": "WebKit"
+      },
+      {
+        "name": "ffmpeg",
+        "revision": "1011",
+        "installByDefault": true,
+        "revisionOverrides": {
+          "mac12": "1010",
+          "mac12-arm64": "1010"
+        }
+      },
+      {
+        "name": "winldd",
+        "revision": "1007",
+        "installByDefault": false
+      },
+      {
+        "name": "android",
+        "revision": "1001",
+        "installByDefault": false
+      }
+    ],
+    "browserLaunch": {
+      "chromium": {
+        "status": "passed",
+        "version": "148.0.7778.96"
+      },
+      "firefox": {
+        "status": "failed",
+        "error": "Required browser binary not installed; see raw environment log."
+      },
+      "webkit": {
+        "status": "failed",
+        "error": "Required browser binary not installed; see raw environment log."
+      }
+    },
+    "fixtures": {
+      "admin-react": {
+        "react": "19.2.6"
+      },
+      "admin-next": {
+        "react": "19.2.6",
+        "next": "15.5.18"
+      },
+      "admin-angular": {
+        "@angular/core": "20.3.23"
+      },
+      "framework-vue": {
+        "vue": "3.5.41"
+      },
+      "framework-astro": {
+        "astro": "5.18.2"
+      },
+      "framework-sveltekit": {
+        "svelte": "5.56.10",
+        "@sveltejs/kit": "2.70.3"
+      }
+    },
+    "benchmarkProbe": {
+      "metricCountWithoutPerformanceEnable": 0,
+      "metricCountWithPerformanceEnable": 36,
+      "registrySurvivesSetContent": true
+    }
+  },
+  "coverage": {
+    "animations": {
+      "lines": {
+        "total": 1998,
+        "covered": 1653,
+        "skipped": 0,
+        "pct": 82.73
+      },
+      "statements": {
+        "total": 1998,
+        "covered": 1653,
+        "skipped": 0,
+        "pct": 82.73
+      },
+      "functions": {
+        "total": 89,
+        "covered": 78,
+        "skipped": 0,
+        "pct": 87.64
+      },
+      "branches": {
+        "total": 266,
+        "covered": 199,
+        "skipped": 0,
+        "pct": 74.81
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "calendar": {
+      "lines": {
+        "total": 566,
+        "covered": 549,
+        "skipped": 0,
+        "pct": 96.99
+      },
+      "statements": {
+        "total": 566,
+        "covered": 549,
+        "skipped": 0,
+        "pct": 96.99
+      },
+      "functions": {
+        "total": 19,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 88,
+        "covered": 74,
+        "skipped": 0,
+        "pct": 84.09
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "charts": {
+      "lines": {
+        "total": 587,
+        "covered": 564,
+        "skipped": 0,
+        "pct": 96.08
+      },
+      "statements": {
+        "total": 587,
+        "covered": 564,
+        "skipped": 0,
+        "pct": 96.08
+      },
+      "functions": {
+        "total": 30,
+        "covered": 28,
+        "skipped": 0,
+        "pct": 93.33
+      },
+      "branches": {
+        "total": 76,
+        "covered": 53,
+        "skipped": 0,
+        "pct": 69.73
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "components": {
+      "lines": {
+        "total": 34029,
+        "covered": 32598,
+        "skipped": 0,
+        "pct": 95.79
+      },
+      "statements": {
+        "total": 34029,
+        "covered": 32598,
+        "skipped": 0,
+        "pct": 95.79
+      },
+      "functions": {
+        "total": 1456,
+        "covered": 1220,
+        "skipped": 0,
+        "pct": 83.79
+      },
+      "branches": {
+        "total": 3940,
+        "covered": 3308,
+        "skipped": 0,
+        "pct": 83.95
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "editor": {
+      "lines": {
+        "total": 310,
+        "covered": 273,
+        "skipped": 0,
+        "pct": 88.06
+      },
+      "statements": {
+        "total": 310,
+        "covered": 273,
+        "skipped": 0,
+        "pct": 88.06
+      },
+      "functions": {
+        "total": 17,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 70.58
+      },
+      "branches": {
+        "total": 31,
+        "covered": 26,
+        "skipped": 0,
+        "pct": 83.87
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "kanban": {
+      "lines": {
+        "total": 402,
+        "covered": 386,
+        "skipped": 0,
+        "pct": 96.01
+      },
+      "statements": {
+        "total": 402,
+        "covered": 386,
+        "skipped": 0,
+        "pct": 96.01
+      },
+      "functions": {
+        "total": 12,
+        "covered": 12,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 53,
+        "covered": 36,
+        "skipped": 0,
+        "pct": 67.92
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "map": {
+      "lines": {
+        "total": 432,
+        "covered": 429,
+        "skipped": 0,
+        "pct": 99.3
+      },
+      "statements": {
+        "total": 432,
+        "covered": 429,
+        "skipped": 0,
+        "pct": 99.3
+      },
+      "functions": {
+        "total": 17,
+        "covered": 17,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 57,
+        "covered": 47,
+        "skipped": 0,
+        "pct": 82.45
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "markdown": {
+      "lines": {
+        "total": 157,
+        "covered": 157,
+        "skipped": 0,
+        "pct": 100
+      },
+      "statements": {
+        "total": 157,
+        "covered": 157,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 6,
+        "covered": 6,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 19,
+        "covered": 19,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "media": {
+      "lines": {
+        "total": 1135,
+        "covered": 1078,
+        "skipped": 0,
+        "pct": 94.97
+      },
+      "statements": {
+        "total": 1135,
+        "covered": 1078,
+        "skipped": 0,
+        "pct": 94.97
+      },
+      "functions": {
+        "total": 57,
+        "covered": 45,
+        "skipped": 0,
+        "pct": 78.94
+      },
+      "branches": {
+        "total": 107,
+        "covered": 91,
+        "skipped": 0,
+        "pct": 85.04
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "node-graph": {
+      "lines": {
+        "total": 1056,
+        "covered": 907,
+        "skipped": 0,
+        "pct": 85.89
+      },
+      "statements": {
+        "total": 1056,
+        "covered": 907,
+        "skipped": 0,
+        "pct": 85.89
+      },
+      "functions": {
+        "total": 48,
+        "covered": 38,
+        "skipped": 0,
+        "pct": 79.16
+      },
+      "branches": {
+        "total": 222,
+        "covered": 157,
+        "skipped": 0,
+        "pct": 70.72
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "parser": {
+      "lines": {
+        "total": 1422,
+        "covered": 1351,
+        "skipped": 0,
+        "pct": 95
+      },
+      "statements": {
+        "total": 1422,
+        "covered": 1351,
+        "skipped": 0,
+        "pct": 95
+      },
+      "functions": {
+        "total": 44,
+        "covered": 42,
+        "skipped": 0,
+        "pct": 95.45
+      },
+      "branches": {
+        "total": 361,
+        "covered": 296,
+        "skipped": 0,
+        "pct": 81.99
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "qr": {
+      "lines": {
+        "total": 548,
+        "covered": 496,
+        "skipped": 0,
+        "pct": 90.51
+      },
+      "statements": {
+        "total": 548,
+        "covered": 496,
+        "skipped": 0,
+        "pct": 90.51
+      },
+      "functions": {
+        "total": 23,
+        "covered": 21,
+        "skipped": 0,
+        "pct": 91.3
+      },
+      "branches": {
+        "total": 102,
+        "covered": 91,
+        "skipped": 0,
+        "pct": 89.21
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": "Unknown"
+      }
+    },
+    "scheduler": {
+      "lines": {
+        "total": 1227,
+        "covered": 1194,
+        "skipped": 0,
+        "pct": 97.31
+      },
+      "statements": {
+        "total": 1227,
+        "covered": 1194,
+        "skipped": 0,
+        "pct": 97.31
+      },
+      "functions": {
+        "total": 54,
+        "covered": 50,
+        "skipped": 0,
+        "pct": 92.59
+      },
+      "branches": {
+        "total": 240,
+        "covered": 194,
+        "skipped": 0,
+        "pct": 80.83
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
+    "table": {
+      "lines": {
+        "total": 2325,
+        "covered": 2217,
+        "skipped": 0,
+        "pct": 95.35
+      },
+      "statements": {
+        "total": 2325,
+        "covered": 2217,
+        "skipped": 0,
+        "pct": 95.35
+      },
+      "functions": {
+        "total": 78,
+        "covered": 72,
+        "skipped": 0,
+        "pct": 92.3
+      },
+      "branches": {
+        "total": 359,
+        "covered": 278,
+        "skipped": 0,
+        "pct": 77.43
+      },
+      "branchesTrue": {
+        "total": 0,
+        "covered": 0,
+        "skipped": 0,
+        "pct": 100
+      }
+    }
+  },
+  "fixturePresence": {
+    "browser": "148.0.7778.96",
+    "elements": 155,
+    "stories": 125,
+    "missing": [
+      {
+        "tag": "fluid-bubble-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-doughnut-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-line-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-pie-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-polar-area-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-radar-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-scatter-chart",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-sparkline",
+        "storyId": "charts-gallery--bar"
+      },
+      {
+        "tag": "fluid-celebrate",
+        "storyId": "animations-effects--gallery"
+      },
+      {
+        "tag": "fluid-col",
+        "storyId": "components-layout-grid--intrinsic"
+      },
+      {
+        "tag": "fluid-menu-label",
+        "storyId": "components-navigation-menu--default"
+      },
+      {
+        "tag": "fluid-toast-item",
+        "storyId": "components-feedback-toast--default"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "gate": "package-build",
+      "status": "interrupted",
+      "command": ["corepack", "pnpm", "build"],
+      "directory": "quality/evidence/2026-08-26T07-08-45-339Z-package-build",
+      "startedAt": "2026-08-26T07:08:45.339Z",
+      "finishedAt": null,
+      "durationSeconds": null,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d7952dacb7bae50feb1d44d48ae67664cee745e0a68e2a91cfcf5960ced5b949",
+      "sourceSha256After": null,
+      "sourceChangedDuringRun": null,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": null,
+        "reason": "Recorder process stopped during initial evidence setup; no completed gate result. Superseded by the 07:10:00 package-build attempt."
+      }
+    },
+    {
+      "gate": "package-build",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "build"],
+      "directory": "quality/evidence/2026-08-26T07-10-00-352Z-package-build",
+      "startedAt": "2026-08-26T07:10:00.352Z",
+      "finishedAt": "2026-08-26T07:10:41.973Z",
+      "durationSeconds": 41.621,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "5d8ed4daf39d6725ee255dbaaa8fe4e21153c4b9cd09be3da5318fc2fbc68615",
+      "sourceSha256After": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "storybook-build",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "storybook:build"],
+      "directory": "quality/evidence/2026-08-26T07-11-01-467Z-storybook-build",
+      "startedAt": "2026-08-26T07:11:01.467Z",
+      "finishedAt": "2026-08-26T07:11:48.550Z",
+      "durationSeconds": 47.083,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceSha256After": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "unit-coverage",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "test:coverage"],
+      "directory": "quality/evidence/2026-08-26T07-11-13-071Z-unit-coverage",
+      "startedAt": "2026-08-26T07:11:13.071Z",
+      "finishedAt": "2026-08-26T07:14:19.314Z",
+      "durationSeconds": 186.243,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceSha256After": "73cdc99a34c707cf0ba9b52fb57b94df2a581836bb200fe4f3e3cfda79241a22",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "ssr-import-render",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:ssr"],
+      "directory": "quality/evidence/2026-08-26T07-11-25-209Z-ssr-import-render",
+      "startedAt": "2026-08-26T07:11:25.209Z",
+      "finishedAt": "2026-08-26T07:11:32.081Z",
+      "durationSeconds": 6.872,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceSha256After": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "browser-hydration",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "test:ssr-browser", "--workers=1"],
+      "directory": "quality/evidence/2026-08-26T07-12-07-232Z-browser-hydration",
+      "startedAt": "2026-08-26T07:12:07.232Z",
+      "finishedAt": "2026-08-26T07:12:49.299Z",
+      "durationSeconds": 42.067,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d7cd3a515d0506930cf598e8c20ecee82d9bd4a634ffba84c6daa665fdbd26e1",
+      "sourceSha256After": "0f0990314d65930f99bf9d9bfc045a5808a987687d5568aa53f84e0c6fae889d",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "browser-a11y",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "test:a11y", "--workers=2"],
+      "directory": "quality/evidence/2026-08-26T07-12-18-581Z-browser-a11y",
+      "startedAt": "2026-08-26T07:12:18.581Z",
+      "finishedAt": "2026-08-26T07:14:07.500Z",
+      "durationSeconds": 108.919,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "0f0990314d65930f99bf9d9bfc045a5808a987687d5568aa53f84e0c6fae889d",
+      "sourceSha256After": "73cdc99a34c707cf0ba9b52fb57b94df2a581836bb200fe4f3e3cfda79241a22",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "storybook-interactions",
+      "status": "passed",
+      "command": [
+        "corepack",
+        "pnpm",
+        "--filter",
+        "@fluid-ds/storybook",
+        "exec",
+        "test-storybook",
+        "--url",
+        "http://127.0.0.1:6010",
+        "--includeTags",
+        "interaction-contract",
+        "--maxWorkers=2"
+      ],
+      "directory": "quality/evidence/2026-08-26T07-14-44-447Z-storybook-interactions",
+      "startedAt": "2026-08-26T07:14:44.447Z",
+      "finishedAt": "2026-08-26T07:17:50.814Z",
+      "durationSeconds": 186.367,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "c9622ea75196bf979aac2d726a1a6646adc81e1294c636ec59f28f9b05a0c249",
+      "sourceSha256After": "d539842c61e3faaf1f5592b8fa337fe5b8331263692ebcc3693073cb0ffc03e1",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "visual-regression",
+      "status": "failed",
+      "command": [
+        "corepack",
+        "pnpm",
+        "--filter",
+        "@fluid-ds/visual-regression",
+        "test",
+        "--workers=2"
+      ],
+      "directory": "quality/evidence/2026-08-26T07-14-56-168Z-visual-regression",
+      "startedAt": "2026-08-26T07:14:56.168Z",
+      "finishedAt": "2026-08-26T07:14:57.656Z",
+      "durationSeconds": 1.488,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "c9622ea75196bf979aac2d726a1a6646adc81e1294c636ec59f28f9b05a0c249",
+      "sourceSha256After": "c9622ea75196bf979aac2d726a1a6646adc81e1294c636ec59f28f9b05a0c249",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-packages",
+      "status": "passed",
+      "command": ["node", "scripts/check-package-artifacts.mjs", "--install"],
+      "directory": "quality/evidence/2026-08-26T07-15-00-009Z-packed-packages",
+      "startedAt": "2026-08-26T07:15:00.009Z",
+      "finishedAt": "2026-08-26T07:17:44.658Z",
+      "durationSeconds": 164.649,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "c9622ea75196bf979aac2d726a1a6646adc81e1294c636ec59f28f9b05a0c249",
+      "sourceSha256After": "d539842c61e3faaf1f5592b8fa337fe5b8331263692ebcc3693073cb0ffc03e1",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "visual-regression",
+      "status": "passed",
+      "command": [
+        "corepack",
+        "pnpm",
+        "--filter",
+        "@fluid-ds/visual-regression",
+        "run",
+        "test",
+        "--workers=2"
+      ],
+      "directory": "quality/evidence/2026-08-26T07-15-17-576Z-visual-regression",
+      "startedAt": "2026-08-26T07:15:17.576Z",
+      "finishedAt": "2026-08-26T07:32:06.089Z",
+      "durationSeconds": 1008.513,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "c9622ea75196bf979aac2d726a1a6646adc81e1294c636ec59f28f9b05a0c249",
+      "sourceSha256After": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-admin-react",
+      "status": "failed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/admin-react"],
+      "directory": "quality/evidence/2026-08-26T07-16-08-883Z-packed-admin-react",
+      "startedAt": "2026-08-26T07:16:08.883Z",
+      "finishedAt": "2026-08-26T07:19:41.651Z",
+      "durationSeconds": 212.768,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "c78c9f4b1b8ba1ffa8c1c4bf34a06a2ae903a944a69a9f97ad1c79802be70489",
+      "sourceSha256After": "df60625a4b8a2071c16ca2ee1595a11d9ac8fb8b191ac06002fa56e16cc993ba",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "fixture-presence",
+      "status": "failed",
+      "command": ["node", "scripts/audit-storybook-fixtures.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-16-21-712Z-fixture-presence",
+      "startedAt": "2026-08-26T07:16:21.712Z",
+      "finishedAt": "2026-08-26T07:17:20.631Z",
+      "durationSeconds": 58.919,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "4e243c92c3ce1a37d8bf54e6df5696ea35b1f58ba851a44409189d995de6fd36",
+      "sourceSha256After": "4e243c92c3ce1a37d8bf54e6df5696ea35b1f58ba851a44409189d995de6fd36",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "scope-integrity",
+      "status": "passed",
+      "command": ["node", "scripts/check-certification-scope.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-17-31-021Z-scope-integrity",
+      "startedAt": "2026-08-26T07:17:31.021Z",
+      "finishedAt": "2026-08-26T07:17:35.628Z",
+      "durationSeconds": 4.607,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "d539842c61e3faaf1f5592b8fa337fe5b8331263692ebcc3693073cb0ffc03e1",
+      "sourceSha256After": "d539842c61e3faaf1f5592b8fa337fe5b8331263692ebcc3693073cb0ffc03e1",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "fixture-presence",
+      "status": "failed",
+      "command": ["node", "scripts/audit-storybook-fixtures.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-18-10-896Z-fixture-presence",
+      "startedAt": "2026-08-26T07:18:10.896Z",
+      "finishedAt": "2026-08-26T07:20:16.495Z",
+      "durationSeconds": 125.599,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "a4e81fc68a441a13f339a29196aa4305c584ab393bb7710250fcdcbe79ab1787",
+      "sourceSha256After": "df60625a4b8a2071c16ca2ee1595a11d9ac8fb8b191ac06002fa56e16cc993ba",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "typecheck",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "typecheck"],
+      "directory": "quality/evidence/2026-08-26T07-18-23-285Z-typecheck",
+      "startedAt": "2026-08-26T07:18:23.285Z",
+      "finishedAt": "2026-08-26T07:23:58.293Z",
+      "durationSeconds": 335.008,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "a4e81fc68a441a13f339a29196aa4305c584ab393bb7710250fcdcbe79ab1787",
+      "sourceSha256After": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "docs-build",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:docs"],
+      "directory": "quality/evidence/2026-08-26T07-18-35-443Z-docs-build",
+      "startedAt": "2026-08-26T07:18:35.443Z",
+      "finishedAt": "2026-08-26T07:25:39.693Z",
+      "durationSeconds": 424.25,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "a4e81fc68a441a13f339a29196aa4305c584ab393bb7710250fcdcbe79ab1787",
+      "sourceSha256After": "f2be90abaa1b5b7a92ade51702f1c9bd4331b3f1c8791b7231790f23d15c214a",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "environment",
+      "status": "failed",
+      "command": ["node", "scripts/inspect-quality-environment.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-19-38-587Z-environment",
+      "startedAt": "2026-08-26T07:19:38.587Z",
+      "finishedAt": "2026-08-26T07:20:02.944Z",
+      "durationSeconds": 24.357,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "df60625a4b8a2071c16ca2ee1595a11d9ac8fb8b191ac06002fa56e16cc993ba",
+      "sourceSha256After": "df60625a4b8a2071c16ca2ee1595a11d9ac8fb8b191ac06002fa56e16cc993ba",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-admin-next",
+      "status": "passed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/admin-next"],
+      "directory": "quality/evidence/2026-08-26T07-19-47-082Z-packed-admin-next",
+      "startedAt": "2026-08-26T07:19:47.082Z",
+      "finishedAt": "2026-08-26T07:26:58.021Z",
+      "durationSeconds": 430.939,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "df60625a4b8a2071c16ca2ee1595a11d9ac8fb8b191ac06002fa56e16cc993ba",
+      "sourceSha256After": "af808d31867df632e33e03d546e4a2d14da0284f5f1d7b6fbb8258111cc20db0",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "lint",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "lint"],
+      "directory": "quality/evidence/2026-08-26T07-22-28-846Z-lint",
+      "startedAt": "2026-08-26T07:22:28.846Z",
+      "finishedAt": "2026-08-26T07:25:51.130Z",
+      "durationSeconds": 202.284,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "df46d1c426a5f7f08ecab38a653f97dc155115050d6336a5061bb35d5c1d1f78",
+      "sourceSha256After": "f2be90abaa1b5b7a92ade51702f1c9bd4331b3f1c8791b7231790f23d15c214a",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "browser-a11y-presence-enforced",
+      "status": "failed",
+      "command": ["corepack", "pnpm", "test:a11y", "--workers=2"],
+      "directory": "quality/evidence/2026-08-26T07-23-07-150Z-browser-a11y-presence-enforced",
+      "startedAt": "2026-08-26T07:23:07.150Z",
+      "finishedAt": "2026-08-26T07:27:48.628Z",
+      "durationSeconds": 281.478,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceSha256After": "af808d31867df632e33e03d546e4a2d14da0284f5f1d7b6fbb8258111cc20db0",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    },
+    {
+      "gate": "quality",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:quality"],
+      "directory": "quality/evidence/2026-08-26T07-23-17-880Z-quality",
+      "startedAt": "2026-08-26T07:23:17.880Z",
+      "finishedAt": "2026-08-26T07:25:16.305Z",
+      "durationSeconds": 118.425,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceSha256After": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "performance-smoke",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:performance"],
+      "directory": "quality/evidence/2026-08-26T07-23-47-823Z-performance-smoke",
+      "startedAt": "2026-08-26T07:23:47.823Z",
+      "finishedAt": "2026-08-26T07:24:24.403Z",
+      "durationSeconds": 36.58,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceSha256After": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "catalog-surface",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:coverage"],
+      "directory": "quality/evidence/2026-08-26T07-25-19-517Z-catalog-surface",
+      "startedAt": "2026-08-26T07:25:19.517Z",
+      "finishedAt": "2026-08-26T07:25:32.086Z",
+      "durationSeconds": 12.569,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "8a33f23b67095d262e1083b1508bef25036a2acbde0d43346cc1814b3e0c8f8b",
+      "sourceSha256After": "f2be90abaa1b5b7a92ade51702f1c9bd4331b3f1c8791b7231790f23d15c214a",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "tokens",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:tokens"],
+      "directory": "quality/evidence/2026-08-26T07-25-34-997Z-tokens",
+      "startedAt": "2026-08-26T07:25:34.997Z",
+      "finishedAt": "2026-08-26T07:26:12.412Z",
+      "durationSeconds": 37.415,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "f2be90abaa1b5b7a92ade51702f1c9bd4331b3f1c8791b7231790f23d15c214a",
+      "sourceSha256After": "f2be90abaa1b5b7a92ade51702f1c9bd4331b3f1c8791b7231790f23d15c214a",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-admin-angular",
+      "status": "passed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/admin-angular"],
+      "directory": "quality/evidence/2026-08-26T07-27-00-145Z-packed-admin-angular",
+      "startedAt": "2026-08-26T07:27:00.145Z",
+      "finishedAt": "2026-08-26T07:32:20.989Z",
+      "durationSeconds": 320.844,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "af808d31867df632e33e03d546e4a2d14da0284f5f1d7b6fbb8258111cc20db0",
+      "sourceSha256After": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "scope-regressions",
+      "status": "passed",
+      "command": ["node", "--test", "scripts/check-certification-scope.test.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-29-18-468Z-scope-regressions",
+      "startedAt": "2026-08-26T07:29:18.468Z",
+      "finishedAt": "2026-08-26T07:29:20.723Z",
+      "durationSeconds": 2.255,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "4cc7bc7fe087ca9797bd8c97542a0d9efeb7d130c403f4167f3a56708fd62ebd",
+      "sourceSha256After": "4cc7bc7fe087ca9797bd8c97542a0d9efeb7d130c403f4167f3a56708fd62ebd",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "quality-final",
+      "status": "passed",
+      "command": ["corepack", "pnpm", "check:quality"],
+      "directory": "quality/evidence/2026-08-26T07-31-27-763Z-quality-final",
+      "startedAt": "2026-08-26T07:31:27.763Z",
+      "finishedAt": "2026-08-26T07:31:34.736Z",
+      "durationSeconds": 6.973,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceSha256After": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-framework-vue",
+      "status": "passed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/framework-vue"],
+      "directory": "quality/evidence/2026-08-26T07-32-21-589Z-packed-framework-vue",
+      "startedAt": "2026-08-26T07:32:21.589Z",
+      "finishedAt": "2026-08-26T07:32:58.027Z",
+      "durationSeconds": 36.438,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceSha256After": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-framework-astro",
+      "status": "passed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/framework-astro"],
+      "directory": "quality/evidence/2026-08-26T07-32-58-611Z-packed-framework-astro",
+      "startedAt": "2026-08-26T07:32:58.611Z",
+      "finishedAt": "2026-08-26T07:34:14.738Z",
+      "durationSeconds": 76.127,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "7506d9433ffa14e1bf313f1282fbf1aaf89b370bd59963540876e838e23cd522",
+      "sourceSha256After": "22ceed2f808d79225ad5f6ebdf97e236a285b1544efb68bd3e28b9d6abeddf39",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "packed-framework-sveltekit",
+      "status": "passed",
+      "command": ["node", "scripts/check-framework-fixture.mjs", "@fluid-ds/framework-sveltekit"],
+      "directory": "quality/evidence/2026-08-26T07-34-15-327Z-packed-framework-sveltekit",
+      "startedAt": "2026-08-26T07:34:15.327Z",
+      "finishedAt": "2026-08-26T07:35:01.699Z",
+      "durationSeconds": 46.372,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "22ceed2f808d79225ad5f6ebdf97e236a285b1544efb68bd3e28b9d6abeddf39",
+      "sourceSha256After": "16647f4d07843207eb6c7317a077d27e6ccba62a5a80ea565f061cb0137a31b1",
+      "sourceChangedDuringRun": true,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 0,
+        "signal": null
+      }
+    },
+    {
+      "gate": "environment-confirmed",
+      "status": "failed",
+      "command": ["node", "scripts/inspect-quality-environment.mjs"],
+      "directory": "quality/evidence/2026-08-26T07-34-51-994Z-environment-confirmed",
+      "startedAt": "2026-08-26T07:34:51.994Z",
+      "finishedAt": "2026-08-26T07:34:54.444Z",
+      "durationSeconds": 2.45,
+      "branch": "main",
+      "head": "6ec86455dd72b451874ed374bcd209b9ffaa3c9e",
+      "dirty": true,
+      "sourceSha256Before": "16647f4d07843207eb6c7317a077d27e6ccba62a5a80ea565f061cb0137a31b1",
+      "sourceSha256After": "16647f4d07843207eb6c7317a077d27e6ccba62a5a80ea565f061cb0137a31b1",
+      "sourceChangedDuringRun": false,
+      "lockfileSha256": "c3319cd37bccc50ea7dc4d0a6a29ca91b15a9ef5711379cbe9e6fa7ff093589e",
+      "result": {
+        "exitCode": 1,
+        "signal": null
+      }
+    }
+  ],
+  "limitations": [
+    "No immutable release-candidate run or owner sign-off is claimed.",
+    "Existing benchmark budget pass does not validate heap or hydration measurement.",
+    "The presence-enforced a11y gate fails on 13 missing element mappings.",
+    "Packed React fails; the other five framework fixtures pass typecheck/build, not browser-runtime contracts.",
+    "Raw logs and artifacts are retained locally in ignored quality/evidence directories.",
+    "Earlier failed invocation attempts remain in this index and are not component failures.",
+    "Changing documentation and generated source during baseline collection is recorded by the source fingerprints."
+  ]
+}

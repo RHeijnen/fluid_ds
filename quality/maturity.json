@@ -1,0 +1,786 @@
+{
+  "schemaVersion": 1,
+  "statuses": {
+    "experimental": "API and behavior may change without a deprecation cycle.",
+    "beta": "API is settling; migration notes accompany breaking changes.",
+    "stable": "Covered by the public compatibility and deprecation policy.",
+    "deprecated": "Supported only through the documented removal window."
+  },
+  "components": {
+    "fluid-accordion": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-anchor-nav": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-animated-image": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-animation": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-app-bar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-aspect-ratio": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-audio": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-availability-editor": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-avatar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-avatar-group": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-badge": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-banner": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-bar-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-breadcrumb": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-breadcrumb-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-bubble-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-button": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-button-group": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-calendar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-callout": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-card": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-carousel": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-carousel-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-celebrate": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-checkbox": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-code-block": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-col": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-color-picker": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-column-mapper": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-command-palette": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-comparison": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-context-menu": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-copy-button": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-countdown": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-date-picker": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-date-range-picker": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-description-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-description-list": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-details": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-dialog": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-divider": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-doughnut-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-drawer": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-dropdown": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-dropdown-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-dropzone": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-empty-state": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-event-calendar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-field": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-fieldset": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-file-input": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-file-parser": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-fold": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-form": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-format-bytes": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-format-date": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-format-number": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-grid": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-hero": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-hotkey": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-icon": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-image": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-include": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-infinite-table": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-input": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-intersection-observer": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-kanban": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-kbd": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-lightbox": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-line-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-list": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-list-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-loading-overlay": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-map": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-markdown": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-masked-input": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-menu": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-menu-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-menu-label": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-meter": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-mosaic": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-mosaic-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-mutation-observer": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-nav-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-nav-list": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-node-graph": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-number-input": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-option": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-otp": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-page": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-pagination": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-pie-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-polar-area-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-popconfirm": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-popover": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-popup": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-pricing-table": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-pricing-tier": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-progress-bar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-progress-ring": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-qr-code": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-radar-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-radio": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-radio-group": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-range-slider": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-rating": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-relative-time": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-resize-observer": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-result": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-rich-text-editor": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-scatter-chart": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-scheduler": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-scroller": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-segment": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-segmented-control": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-select": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-sidebar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-signature-pad": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-skeleton": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-slider": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-sparkline": {
+      "status": "beta",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-speed-dial": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-spinner": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-split-panel": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-stack": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-stat": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-step": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-steps": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-switch": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tab": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tab-panel": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-table": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tabs": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tag": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tag-input": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-textarea": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-theme-toggle": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-time-picker": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-time-slots": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-timeline": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-timeline-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-toast": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-toast-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-toolbar": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tooltip": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tour": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-transfer": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tree": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-tree-item": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-truncate": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-typeahead": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-video": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-video-playlist": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    },
+    "fluid-zoomable-frame": {
+      "status": "experimental",
+      "since": "0.4.0",
+      "support": "best-effort"
+    }
+  }
+}

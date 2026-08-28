@@ -47,7 +47,8 @@ export type FluidImageLoading = "eager" | "lazy";
  * @fires fluid-load - Dispatched when the image finishes loading successfully.
  * @fires fluid-error - Dispatched when the image fails to load (after the
  *   fallback src, if any, also fails).
- */
+ * @cssproperty --fluid-image-text-secondary - Component override for the corresponding semantic token.
+*/
 export class FluidImage extends FluidElement {
   static override styles = [
     css`
@@ -91,7 +92,7 @@ export class FluidImage extends FluidElement {
         justify-content: center;
         width: 100%;
         height: 100%;
-        color: var(--fluid-text-secondary, #3f3f46);
+        color: var(--fluid-image-text-secondary, var(--fluid-text-secondary, #3f3f46));
         font-family: var(--fluid-font-family-sans);
         font-size: var(--fluid-font-size-sm);
       }

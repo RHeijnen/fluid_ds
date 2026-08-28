@@ -1,5 +1,6 @@
-import { LitElement, html, css, type TemplateResult } from "lit";
+import { html, css, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 /** A single card on the board. */
 export interface KanbanCard {
@@ -20,18 +21,27 @@ interface CardPosition {
   cardIndex: number;
 }
 
+type KanbanAnnouncement =
+  | { kind: "moved"; card: string; column: string; position: number; total: number }
+  | { kind: "dropped-in"; column: string }
+  | { kind: "dropped" }
+  | { kind: "picked-up-in"; column: string }
+  | { kind: "picked-up" }
+  | { kind: "cancelled" };
+
 /**
  * A drag-and-drop kanban board. Pass an array of `columns`, each with a
  * `title` and an ordered list of `cards`. Columns render side by side; each is
  * a labelled region containing a list (role="list") of draggable cards
  * (role="listitem").
  *
- * Cards move two ways. With a pointer, use native HTML5 drag and drop: press a
+ * Cards move with native buttons, native HTML5 drag and drop, or keyboard pickup.
+ * The buttons provide a single-pointer alternative to dragging. Press a
  * card and drop it onto another card or column. With the keyboard, focus a card
- * and press Space to pick it up, then ArrowLeft / ArrowRight to move it between
- * columns and ArrowUp / ArrowDown to reorder within a column; press Space again
- * to drop or Escape to cancel. Every move is announced through a polite
- * aria-live region.
+ * and press Space to pick it up, then ArrowLeft / ArrowRight to move it along
+ * the rendered column track (including RTL) and ArrowUp / ArrowDown to reorder
+ * within a column; press Space again to drop or Escape to cancel. Every move is
+ * announced through a polite aria-live region.
  *
  * Either way the board updates its internal `columns` state and emits
  * `fluid-move` with the card id, source column, target column, and target
@@ -44,6 +54,8 @@ interface CardPosition {
  * @csspart column-header - A column's title bar.
  * @csspart list - The card list inside a column.
  * @csspart card - A single draggable card.
+ * @csspart move-controls - The card's non-drag move controls.
+ * @csspart move-button - A native move control.
  *
  * @cssproperty --fluid-kanban-gap - Gap between columns and between cards. Falls back to --fluid-space-md.
  * @cssproperty --fluid-kanban-radius - Corner radius of columns and cards. Falls back to --fluid-radius-md.
@@ -69,7 +81,7 @@ interface CardPosition {
  *
  * @fires fluid-move - A card moved. detail: { cardId, fromColumn, toColumn, index }.
  */
-export class FluidKanban extends LitElement {
+export class FluidKanban extends FluidElement {
   static override styles = css`
     :host {
       display: block;
@@ -97,8 +109,7 @@ export class FluidKanban extends LitElement {
        outset outline / outline-offset, so the indicator showed only partially.
        An inset box-shadow paints inside the column box and is never clipped. */
     .column.drop-target {
-      box-shadow: inset 0 0 0 var(--fluid-focus-ring-width, 2px)
-        var(--fluid-accent-base, #4f46e5);
+      box-shadow: inset 0 0 0 var(--fluid-focus-ring-width, 2px) var(--fluid-accent-base, #4f46e5);
       background: color-mix(
         in srgb,
         var(--fluid-accent-base, #4f46e5) 8%,
@@ -139,14 +150,12 @@ export class FluidKanban extends LitElement {
       cursor: grab;
     }
     .card:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
       outline-offset: var(--fluid-focus-ring-offset, 2px);
     }
     .card[aria-grabbed="true"] {
       cursor: grabbing;
-      outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-accent-base, #4f46e5);
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
       outline-offset: var(--fluid-focus-ring-offset, 2px);
       opacity: 0.85;
     }
@@ -159,6 +168,31 @@ export class FluidKanban extends LitElement {
       margin: 0;
       font-size: var(--fluid-font-size-xs, 0.75rem);
       color: var(--fluid-text-secondary, #3f3f46);
+    }
+    .move-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    .horizontal-symbol {
+      display: inline-block;
+    }
+    :dir(rtl) .horizontal-symbol {
+      transform: scaleX(-1);
+    }
+    .move-controls button {
+      min-width: var(--fluid-target-min, 24px);
+      min-height: var(--fluid-target-min, 24px);
+      border: 1px solid var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
+      border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
+      background: var(--fluid-kanban-card-bg, var(--fluid-surface-base, #ffffff));
+      color: var(--fluid-kanban-fg, var(--fluid-text-primary, #18181b));
+      font: inherit;
+      cursor: pointer;
+    }
+    .move-controls button:focus-visible {
+      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-accent-base, #4f46e5);
+      outline-offset: var(--fluid-focus-ring-offset, 2px);
     }
     .sr-only {
       position: absolute;
@@ -176,14 +210,94 @@ export class FluidKanban extends LitElement {
   /** The board data: an ordered list of columns, each with ordered cards. */
   @property({ type: Array }) columns: KanbanColumn[] = [];
 
+  /** Localizable accessible names for the non-drag controls. Card title is appended. */
+  @property({ attribute: "move-up-label" })
+  get moveUpLabel(): string {
+    return this.moveUpLabelOverride ?? this.term("kanbanMoveUp");
+  }
+  set moveUpLabel(value: string | null) {
+    this.moveUpLabelOverride = value;
+  }
+  private moveUpLabelOverride: string | null = null;
+
+  @property({ attribute: "move-down-label" })
+  get moveDownLabel(): string {
+    return this.moveDownLabelOverride ?? this.term("kanbanMoveDown");
+  }
+  set moveDownLabel(value: string | null) {
+    this.moveDownLabelOverride = value;
+  }
+  private moveDownLabelOverride: string | null = null;
+
+  @property({ attribute: "move-previous-label" })
+  get movePreviousLabel(): string {
+    return this.movePreviousLabelOverride ?? this.term("kanbanMovePreviousColumn");
+  }
+  set movePreviousLabel(value: string | null) {
+    this.movePreviousLabelOverride = value;
+  }
+  private movePreviousLabelOverride: string | null = null;
+
+  @property({ attribute: "move-next-label" })
+  get moveNextLabel(): string {
+    return this.moveNextLabelOverride ?? this.term("kanbanMoveNextColumn");
+  }
+  set moveNextLabel(value: string | null) {
+    this.moveNextLabelOverride = value;
+  }
+  private moveNextLabelOverride: string | null = null;
+
   /** The id of the card currently picked up via the keyboard, if any. */
   @state() private grabbedId: string | null = null;
 
   /** Index of the column being hovered during a pointer drag, if any. */
   @state() private dragOverColumn: number | null = null;
 
-  /** Live-region message announcing the latest move action. */
-  @state() private liveMessage = "";
+  /** Semantic live-region state so a live locale change can re-render the current announcement. */
+  @state() private announcement: KanbanAnnouncement | null = null;
+  private pickupPosition: { columnId: string; cardIndex: number } | null = null;
+
+  private formatNumber(value: number): string {
+    try {
+      return new Intl.NumberFormat(this.localize.locale || undefined, {
+        useGrouping: false
+      }).format(value);
+    } catch {
+      return new Intl.NumberFormat("en", { useGrouping: false }).format(value);
+    }
+  }
+
+  private announcementText(): string {
+    const announcement = this.announcement;
+    if (!announcement) return "";
+    switch (announcement.kind) {
+      case "moved":
+        return this.term(
+          "kanbanMovedCard",
+          announcement.card,
+          announcement.column,
+          this.formatNumber(announcement.position),
+          this.formatNumber(announcement.total)
+        );
+      case "dropped-in":
+        return this.term("kanbanDroppedIn", announcement.column);
+      case "dropped":
+        return this.term("kanbanDropped");
+      case "picked-up-in":
+        return this.term("kanbanPickedUpIn", announcement.column);
+      case "picked-up":
+        return this.term("kanbanPickedUp");
+      case "cancelled":
+        return this.term("kanbanMoveCancelled");
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this.grabbedId = null;
+    this.pickupPosition = null;
+    this.dragOverColumn = null;
+  }
 
   private findCard(cardId: string): CardPosition | null {
     for (let c = 0; c < this.columns.length; c++) {
@@ -201,6 +315,7 @@ export class FluidKanban extends LitElement {
    * was not found.
    */
   moveCard(cardId: string, toColumn: number, toIndex: number): CardPosition | null {
+    if (!Number.isInteger(toColumn) || !Number.isFinite(toIndex)) return null;
     const from = this.findCard(cardId);
     if (!from) return null;
     const source = this.columns[from.columnIndex];
@@ -219,14 +334,21 @@ export class FluidKanban extends LitElement {
     nextSource.cards.splice(from.cardIndex, 1);
 
     // Clamp the destination index into the target list as it stands now.
-    let index = toIndex;
+    let index = Math.trunc(toIndex);
     if (index < 0) index = 0;
     if (index > nextTarget.cards.length) index = nextTarget.cards.length;
+    if (from.columnIndex === toColumn && from.cardIndex === index) return from;
     nextTarget.cards.splice(index, 0, moving);
 
     this.columns = next;
 
-    this.liveMessage = `Moved ${moving.title} to ${target.title}, position ${index + 1} of ${nextTarget.cards.length}.`;
+    this.announcement = {
+      kind: "moved",
+      card: moving.title,
+      column: target.title,
+      position: index + 1,
+      total: nextTarget.cards.length
+    };
 
     this.dispatchEvent(
       new CustomEvent("fluid-move", {
@@ -246,8 +368,9 @@ export class FluidKanban extends LitElement {
 
   private async refocusCard(cardId: string): Promise<void> {
     await this.updateComplete;
-    const el = this.renderRoot.querySelector<HTMLElement>(
-      `[data-card-id="${cardId}"]`
+    if (!this.isConnected) return;
+    const el = [...this.renderRoot.querySelectorAll<HTMLElement>("[data-card-id]")].find(
+      (element) => element.dataset.cardId === cardId
     );
     el?.focus();
   }
@@ -273,7 +396,13 @@ export class FluidKanban extends LitElement {
     if (!cardId) return;
     const target = this.columns[columnIndex];
     if (!target) return;
-    const index = beforeIndex ?? target.cards.length;
+    const source = this.findCard(cardId);
+    const index =
+      beforeIndex === undefined
+        ? target.cards.length
+        : source?.columnIndex === columnIndex && source.cardIndex < beforeIndex
+          ? beforeIndex - 1
+          : beforeIndex;
     const result = this.moveCard(cardId, columnIndex, index);
     if (result) void this.refocusCard(cardId);
   }
@@ -281,30 +410,38 @@ export class FluidKanban extends LitElement {
   // --- Keyboard moves ---
 
   private onCardKeydown(e: KeyboardEvent, cardId: string): void {
+    if (e.target !== e.currentTarget) return;
     if (e.key === " " || e.key === "Enter") {
       e.preventDefault();
       if (this.grabbedId === cardId) {
         this.grabbedId = null;
+        this.pickupPosition = null;
         const pos = this.findCard(cardId);
         const col = pos ? this.columns[pos.columnIndex] : undefined;
-        this.liveMessage = col
-          ? `Dropped in ${col.title}.`
-          : "Dropped.";
+        this.announcement = col ? { kind: "dropped-in", column: col.title } : { kind: "dropped" };
       } else {
         this.grabbedId = cardId;
         const pos = this.findCard(cardId);
         const col = pos ? this.columns[pos.columnIndex] : undefined;
-        this.liveMessage = col
-          ? `Picked up. Use arrow keys to move, Space to drop, Escape to cancel. In ${col.title}.`
-          : "Picked up.";
+        this.pickupPosition = col && pos ? { columnId: col.id, cardIndex: pos.cardIndex } : null;
+        this.announcement = col
+          ? { kind: "picked-up-in", column: col.title }
+          : { kind: "picked-up" };
       }
       return;
     }
 
     if (e.key === "Escape" && this.grabbedId === cardId) {
       e.preventDefault();
+      const origin = this.pickupPosition;
       this.grabbedId = null;
-      this.liveMessage = "Move cancelled.";
+      this.pickupPosition = null;
+      if (origin) {
+        const columnIndex = this.columns.findIndex((column) => column.id === origin.columnId);
+        if (columnIndex >= 0) this.moveCard(cardId, columnIndex, origin.cardIndex);
+      }
+      this.announcement = { kind: "cancelled" };
+      void this.refocusCard(cardId);
       return;
     }
 
@@ -323,20 +460,22 @@ export class FluidKanban extends LitElement {
       void this.refocusCard(cardId);
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
-      if (pos.columnIndex > 0) {
-        this.moveCard(cardId, pos.columnIndex - 1, pos.cardIndex);
+      const targetColumn = pos.columnIndex + (this.isRtl ? 1 : -1);
+      if (targetColumn >= 0 && targetColumn < this.columns.length) {
+        this.moveCard(cardId, targetColumn, pos.cardIndex);
         void this.refocusCard(cardId);
       }
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      if (pos.columnIndex < this.columns.length - 1) {
-        this.moveCard(cardId, pos.columnIndex + 1, pos.cardIndex);
+      const targetColumn = pos.columnIndex + (this.isRtl ? -1 : 1);
+      if (targetColumn >= 0 && targetColumn < this.columns.length) {
+        this.moveCard(cardId, targetColumn, pos.cardIndex);
         void this.refocusCard(cardId);
       }
     }
   }
 
-  private renderCard(card: KanbanCard): TemplateResult {
+  private renderCard(card: KanbanCard, columnIndex: number, cardIndex: number): TemplateResult {
     const grabbed = this.grabbedId === card.id;
     // The <li> is itself the draggable card. Wrapping the card in an extra
     // element with role="listitem" would put a listitem inside a listitem,
@@ -352,14 +491,76 @@ export class FluidKanban extends LitElement {
         tabindex="0"
         draggable="true"
         aria-grabbed=${grabbed ? "true" : "false"}
-        aria-roledescription="Draggable card"
+        aria-roledescription=${this.term("kanbanDraggableCard")}
         @dragstart=${(e: DragEvent) => this.onDragStart(e, card.id)}
+        @dragend=${() => {
+          this.dragOverColumn = null;
+        }}
+        @drop=${(e: DragEvent) => this.onColumnDrop(e, columnIndex, cardIndex)}
         @keydown=${(e: KeyboardEvent) => this.onCardKeydown(e, card.id)}
       >
         <p class="card-title">${card.title}</p>
-        ${card.description
-          ? html`<p class="card-desc">${card.description}</p>`
-          : ""}
+        ${card.description ? html`<p class="card-desc">${card.description}</p>` : ""}
+        <div class="move-controls" part="move-controls">
+          ${[
+            {
+              name: "up",
+              label: this.moveUpLabel,
+              symbol: "↑",
+              column: columnIndex,
+              index: cardIndex - 1,
+              disabled: cardIndex === 0
+            },
+            {
+              name: "down",
+              label: this.moveDownLabel,
+              symbol: "↓",
+              column: columnIndex,
+              index: cardIndex + 1,
+              disabled: cardIndex >= this.columns[columnIndex]!.cards.length - 1
+            },
+            {
+              name: "previous",
+              label: this.movePreviousLabel,
+              symbol: "←",
+              column: columnIndex - 1,
+              index: cardIndex,
+              disabled: columnIndex === 0
+            },
+            {
+              name: "next",
+              label: this.moveNextLabel,
+              symbol: "→",
+              column: columnIndex + 1,
+              index: cardIndex,
+              disabled: columnIndex >= this.columns.length - 1
+            }
+          ].map(
+            (move) => html`
+              <button
+                part="move-button"
+                data-move=${move.name}
+                type="button"
+                draggable="false"
+                ?disabled=${move.disabled}
+                aria-label=${this.term("kanbanMoveAction", move.label, card.title)}
+                @click=${() => {
+                  this.grabbedId = null;
+                  this.pickupPosition = null;
+                  if (this.moveCard(card.id, move.column, move.index))
+                    void this.refocusCard(card.id);
+                }}
+              >
+                <span
+                  class=${move.name === "previous" || move.name === "next"
+                    ? "horizontal-symbol"
+                    : ""}
+                  >${move.symbol}</span
+                >
+              </button>
+            `
+          )}
+        </div>
       </li>
     `;
   }
@@ -380,10 +581,10 @@ export class FluidKanban extends LitElement {
       >
         <h3 part="column-header" class="column-header" id=${labelId}>
           <span>${column.title}</span>
-          <span class="count" aria-hidden="true">${column.cards.length}</span>
+          <span class="count" aria-hidden="true">${this.formatNumber(column.cards.length)}</span>
         </h3>
         <ul part="list" class="list" role="list">
-          ${column.cards.map((card) => this.renderCard(card))}
+          ${column.cards.map((card, cardIndex) => this.renderCard(card, columnIndex, cardIndex))}
         </ul>
       </section>
     `;
@@ -391,11 +592,23 @@ export class FluidKanban extends LitElement {
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="board" role="group" aria-label="Kanban board">
+      <div
+        part="base"
+        class="board"
+        role="group"
+        aria-label=${this.term("kanbanBoard")}
+        dir=${this.localize.dir}
+      >
         ${this.columns.map((column, i) => this.renderColumn(column, i))}
       </div>
-      <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        ${this.liveMessage}
+      <div
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        dir=${this.localize.dir}
+      >
+        ${this.announcementText()}
       </div>
     `;
   }

@@ -26,6 +26,10 @@ export type FluidCardVariant = "elevated" | "outlined" | "filled";
  * @uses-token --fluid-surface-subtle - Footer background.
  * @uses-token --fluid-border-default - Header/footer separators.
  * @uses-token --fluid-text-primary - Text color.
+ * @cssproperty --fluid-card-border-default - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-card-shadow-md - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-card-surface-subtle - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-card-text-primary - Component override for the corresponding semantic token.
  */
 export class FluidCard extends FluidElement {
   static override styles = css`
@@ -42,12 +46,12 @@ export class FluidCard extends FluidElement {
       flex-direction: column;
       background: var(--fluid-card-bg, var(--fluid-surface-base));
       border-radius: var(--fluid-radius-lg);
-      color: var(--fluid-text-primary);
+      color: var(--fluid-card-text-primary, var(--fluid-text-primary));
       overflow: hidden;
     }
 
     .variant-elevated {
-      box-shadow: var(--fluid-shadow-md);
+      box-shadow: var(--fluid-card-shadow-md, var(--fluid-shadow-md));
     }
 
     .variant-outlined {
@@ -61,17 +65,19 @@ export class FluidCard extends FluidElement {
     .header,
     .body,
     .footer {
+      min-width: 0;
       padding: var(--fluid-card-padding, var(--fluid-space-4));
+      overflow-wrap: anywhere;
     }
 
     .header {
-      border-bottom: 1px solid var(--fluid-border-default);
+      border-bottom: 1px solid var(--fluid-card-border-default, var(--fluid-border-default));
       font-weight: var(--fluid-font-weight-semibold);
     }
 
     .footer {
-      border-top: 1px solid var(--fluid-border-default);
-      background: var(--fluid-surface-subtle);
+      border-top: 1px solid var(--fluid-card-border-default, var(--fluid-border-default));
+      background: var(--fluid-card-surface-subtle, var(--fluid-surface-subtle));
     }
 
     .empty {
@@ -89,7 +95,7 @@ export class FluidCard extends FluidElement {
           <slot name="header" @slotchange=${this.toggleSection}></slot>
         </header>
         <div part="body" class="body">
-          <slot></slot>
+          <slot @slotchange=${this.toggleSection}></slot>
         </div>
         <footer part="footer" class="footer">
           <slot name="footer" @slotchange=${this.toggleSection}></slot>
@@ -99,21 +105,25 @@ export class FluidCard extends FluidElement {
   }
 
   private toggleSection = (e: Event) => {
-    const slot = e.target as HTMLSlotElement;
-    const parent = slot.parentElement;
-    if (!parent) return;
-    const hasContent = slot.assignedNodes({ flatten: true }).length > 0;
-    parent.classList.toggle("empty", !hasContent);
+    this.updateSection(e.target as HTMLSlotElement);
   };
 
+  private updateSection(slot: HTMLSlotElement): void {
+    const parent = slot.parentElement;
+    if (!parent) return;
+    const hasContent = slot
+      .assignedNodes({ flatten: true })
+      .some((node) => node instanceof Element || Boolean(node.textContent?.trim()));
+    parent.classList.toggle("empty", !hasContent);
+  }
+
   protected override firstUpdated(): void {
-    // Hide header/footer if no slotted content (initial pass).
+    // Hide sections with no slotted content (initial pass).
     const root = this.shadowRoot!;
-    for (const name of ["header", "footer"]) {
-      const slot = root.querySelector<HTMLSlotElement>(`slot[name="${name}"]`);
-      if (slot && slot.assignedNodes({ flatten: true }).length === 0) {
-        slot.parentElement?.classList.add("empty");
-      }
+    for (const name of ["header", "", "footer"]) {
+      const selector = name ? `slot[name="${name}"]` : "slot:not([name])";
+      const slot = root.querySelector<HTMLSlotElement>(selector);
+      if (slot) this.updateSection(slot);
     }
   }
 }

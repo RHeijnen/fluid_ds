@@ -1,6 +1,6 @@
 import { FluidFold } from "./fluid-fold.js";
 
-if (!customElements.get("fluid-fold")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-fold")) {
   customElements.define("fluid-fold", FluidFold);
 }
 

@@ -1,6 +1,6 @@
 import { FluidHero } from "./fluid-hero.js";
 
-if (!customElements.get("fluid-hero")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-hero")) {
   customElements.define("fluid-hero", FluidHero);
 }
 

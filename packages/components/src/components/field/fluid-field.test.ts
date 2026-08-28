@@ -14,17 +14,13 @@ describe("<fluid-field>", () => {
   });
 
   it("does not render a description when none is set", async () => {
-    const el = await fixture<FluidField>(
-      html`<fluid-field label="Email"><input /></fluid-field>`
-    );
+    const el = await fixture<FluidField>(html`<fluid-field label="Email"><input /></fluid-field>`);
     expect(el.shadowRoot!.querySelector('[part="description"]')).to.be.null;
   });
 
   it("renders the description and links it via aria-describedby", async () => {
     const el = await fixture<FluidField>(
-      html`<fluid-field label="Email" description="Help text"
-        ><input
-      /></fluid-field>`
+      html`<fluid-field label="Email" description="Help text"><input /></fluid-field>`
     );
     await elementUpdated(el);
     const desc = el.shadowRoot!.querySelector<HTMLElement>('[part="description"]')!;
@@ -49,9 +45,7 @@ describe("<fluid-field>", () => {
 
   it("describes by both description and error when both are present", async () => {
     const el = await fixture<FluidField>(
-      html`<fluid-field label="Email" description="Help" error="Bad"
-        ><input
-      /></fluid-field>`
+      html`<fluid-field label="Email" description="Help" error="Bad"><input /></fluid-field>`
     );
     await elementUpdated(el);
     const desc = el.shadowRoot!.querySelector<HTMLElement>('[part="description"]')!;
@@ -100,6 +94,81 @@ describe("<fluid-field>", () => {
     expect(err.getAttribute("role")).to.equal("alert");
     const input = el.querySelector("input")!;
     expect(input.getAttribute("aria-invalid")).to.equal("true");
+  });
+
+  it("rewires live label, help, error, and control replacements without leaving old ownership", async () => {
+    const el = await fixture<FluidField>(html`
+      <fluid-field>
+        <span slot="label">Old label</span>
+        <span slot="description">Old help</span>
+        <input id="old-control" />
+        <span slot="error">Old error</span>
+      </fluid-field>
+    `);
+    await elementUpdated(el);
+    const oldControl = el.querySelector<HTMLInputElement>("#old-control")!;
+    expect(oldControl.getAttribute("aria-label")).to.equal("Old label");
+    expect(oldControl.getAttribute("aria-invalid")).to.equal("true");
+    expect(oldControl.getAttribute("aria-describedby")).to.match(
+      /fluid-field-desc-.*fluid-field-error-/
+    );
+
+    el.querySelector('[slot="label"]')!.replaceWith(
+      Object.assign(document.createElement("span"), { slot: "label", textContent: "New label" })
+    );
+    el.querySelector('[slot="description"]')!.replaceWith(
+      Object.assign(document.createElement("span"), {
+        slot: "description",
+        textContent: "New help"
+      })
+    );
+    el.querySelector('[slot="error"]')!.replaceWith(
+      Object.assign(document.createElement("span"), { slot: "error", textContent: "New error" })
+    );
+    const newControl = Object.assign(document.createElement("input"), { id: "new-control" });
+    oldControl.replaceWith(newControl);
+    await aTimeout(0);
+    await elementUpdated(el);
+
+    expect(oldControl.hasAttribute("aria-label")).to.be.false;
+    expect(oldControl.hasAttribute("aria-describedby")).to.be.false;
+    expect(oldControl.hasAttribute("aria-invalid")).to.be.false;
+    expect(oldControl.hasAttribute("data-fluid-field-label")).to.be.false;
+    expect(newControl.getAttribute("aria-label")).to.equal("New label");
+    expect(newControl.getAttribute("aria-invalid")).to.equal("true");
+    expect(newControl.getAttribute("aria-describedby")).to.match(
+      /fluid-field-desc-.*fluid-field-error-/
+    );
+
+    el.querySelector('[slot="description"]')!.remove();
+    el.querySelector('[slot="error"]')!.remove();
+    await aTimeout(0);
+    await elementUpdated(el);
+    expect(newControl.hasAttribute("aria-describedby")).to.be.false;
+    expect(newControl.hasAttribute("aria-invalid")).to.be.false;
+  });
+
+  it("mirrors in-place slotted label text edits and reacquires them on reconnect", async () => {
+    const el = await fixture<FluidField>(html`
+      <fluid-field><span slot="label">Initial label</span><input /></fluid-field>
+    `);
+    const label = el.querySelector<HTMLElement>('[slot="label"]')!;
+    const control = el.querySelector<HTMLInputElement>("input")!;
+    expect(control.getAttribute("aria-label")).to.equal("Initial label");
+
+    label.textContent = "Live label";
+    await aTimeout(0);
+    expect(control.getAttribute("aria-label")).to.equal("Live label");
+
+    const parent = el.parentElement!;
+    el.remove();
+    label.textContent = "Detached label";
+    await aTimeout(0);
+    expect(control.getAttribute("aria-label")).to.equal("Live label");
+    parent.append(el);
+    await el.updateComplete;
+    await aTimeout(0);
+    expect(control.getAttribute("aria-label")).to.equal("Detached label");
   });
 
   it("passes an a11y audit", async () => {

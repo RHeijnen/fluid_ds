@@ -1,5 +1,15 @@
 # @fluid-ds/qr
 
+## 0.4.0
+
+### Patch Changes
+
+- Derived QR accessible names now follow the active Fluid locale and text direction while
+  preserving explicit labels and encoded content. QR matrices are reused when only locale or
+  direction changes, and server rendering no longer depends on browser-only style APIs.
+- Add package metadata and an exported custom-elements manifest for editor and integration
+  tooling.
+
 ## 0.1.0
 
 ### Minor Changes

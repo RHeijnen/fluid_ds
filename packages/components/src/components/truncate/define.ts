@@ -1,6 +1,6 @@
 import { FluidTruncate } from "./fluid-truncate.js";
 
-if (!customElements.get("fluid-truncate")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-truncate")) {
   customElements.define("fluid-truncate", FluidTruncate);
 }
 

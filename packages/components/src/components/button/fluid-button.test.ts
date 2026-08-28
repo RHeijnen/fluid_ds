@@ -93,6 +93,51 @@ describe("<fluid-button>", () => {
     expect(input.value).to.equal("original");
   });
 
+  it("preserves loading and disabled activation boundaries across reconnect and form-owner moves", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div>
+        <form id="first"><fluid-button type="submit">Save</fluid-button></form>
+        <form id="second"></form>
+      </div>
+    `);
+    const first = wrapper.querySelector<HTMLFormElement>("#first")!;
+    const second = wrapper.querySelector<HTMLFormElement>("#second")!;
+    const el = first.querySelector<FluidButton>("fluid-button")!;
+    const submissions = { first: 0, second: 0 };
+    first.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submissions.first += 1;
+    });
+    second.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submissions.second += 1;
+    });
+
+    el.disabled = true;
+    await el.updateComplete;
+    el.shadowRoot!.querySelector<HTMLButtonElement>("button")!.click();
+    expect(submissions).to.deep.equal({ first: 0, second: 0 });
+
+    el.remove();
+    el.disabled = false;
+    el.loading = true;
+    second.append(el);
+    await el.updateComplete;
+    const inner = el.shadowRoot!.querySelector<HTMLButtonElement>("button")!;
+    expect(inner.disabled).to.be.false;
+    expect(inner.getAttribute("aria-disabled")).to.equal("true");
+    expect(inner.getAttribute("aria-busy")).to.equal("true");
+    inner.focus();
+    expect(el.shadowRoot!.activeElement).to.equal(inner);
+    inner.click();
+    expect(submissions).to.deep.equal({ first: 0, second: 0 });
+
+    el.loading = false;
+    await el.updateComplete;
+    inner.click();
+    expect(submissions).to.deep.equal({ first: 0, second: 1 });
+  });
+
   it("does not fire fluid-click when disabled", async () => {
     const el = await fixture<FluidButton>(html`<fluid-button disabled>Click</fluid-button>`);
     let fired = false;
@@ -127,6 +172,26 @@ describe("<fluid-button>", () => {
     const rect = inner.getBoundingClientRect();
     expect(rect.width).to.be.at.least(24);
     expect(rect.height).to.be.at.least(24);
+  });
+
+  it("uses an intentional 32px medium height and preserves the configured target floor", async () => {
+    const el = await fixture<FluidButton>(html`<fluid-button>Save</fluid-button>`);
+    const inner = el.shadowRoot!.querySelector("button")!;
+
+    expect(inner.getBoundingClientRect().height).to.be.closeTo(32, 0.1);
+    expect(el.getBoundingClientRect().height).to.be.closeTo(
+      inner.getBoundingClientRect().height,
+      0.1
+    );
+
+    el.style.setProperty("--fluid-target-min", "44px");
+    await el.updateComplete;
+
+    expect(inner.getBoundingClientRect().height).to.be.closeTo(44, 0.1);
+    expect(el.getBoundingClientRect().height).to.be.closeTo(
+      inner.getBoundingClientRect().height,
+      0.1
+    );
   });
 
   /*
@@ -221,9 +286,7 @@ describe("<fluid-button>", () => {
    * the visual change docs are based on).
    */
   it("explicit tone reflects to data-tone", async () => {
-    const el = await fixture<FluidButton>(
-      html`<fluid-button tone="danger">Delete</fluid-button>`
-    );
+    const el = await fixture<FluidButton>(html`<fluid-button tone="danger">Delete</fluid-button>`);
     expect(el.dataset.tone).to.equal("danger");
   });
 
@@ -234,9 +297,7 @@ describe("<fluid-button>", () => {
       html`<fluid-button variant="secondary">S</fluid-button>`
     );
     expect(secondary.dataset.tone).to.equal("neutral");
-    const ghost = await fixture<FluidButton>(
-      html`<fluid-button variant="ghost">G</fluid-button>`
-    );
+    const ghost = await fixture<FluidButton>(html`<fluid-button variant="ghost">G</fluid-button>`);
     expect(ghost.dataset.tone).to.equal("neutral");
   });
 
@@ -295,6 +356,7 @@ describe("<fluid-button>", () => {
       // assert the stylesheet carries the slowed override regardless by reading
       // the matching rule from the component's CSS.
       const sheet = el.shadowRoot!.adoptedStyleSheets[0];
+      if (!sheet) throw new Error("Button stylesheet is missing");
       const cssText = Array.from(sheet.cssRules)
         .map((r) => r.cssText)
         .join("\n");
@@ -322,27 +384,22 @@ describe("<fluid-button>", () => {
 
   it("non-toggle buttons do not expose aria-pressed", async () => {
     const el = await fixture<FluidButton>(html`<fluid-button>Go</fluid-button>`);
-    expect(el.shadowRoot!.querySelector("button")!.hasAttribute("aria-pressed")).to.be
-      .false;
+    expect(el.shadowRoot!.querySelector("button")!.hasAttribute("aria-pressed")).to.be.false;
   });
 
   /* Caret, built-in dropdown chevron. */
   it("caret: renders the chevron part; a label-less caret is icon-only", async () => {
-    const labelled = await fixture<FluidButton>(
-      html`<fluid-button caret>Menu</fluid-button>`
-    );
+    const labelled = await fixture<FluidButton>(html`<fluid-button caret>Menu</fluid-button>`);
     expect(labelled.shadowRoot!.querySelector(".caret")).to.exist;
-    expect(
-      labelled.shadowRoot!.querySelector("button")!.classList.contains("icon-only")
-    ).to.be.false;
+    expect(labelled.shadowRoot!.querySelector("button")!.classList.contains("icon-only")).to.be
+      .false;
 
     const caretOnly = await fixture<FluidButton>(
       html`<fluid-button caret aria-label="More"></fluid-button>`
     );
     await caretOnly.updateComplete;
-    expect(
-      caretOnly.shadowRoot!.querySelector("button")!.classList.contains("icon-only")
-    ).to.be.true;
+    expect(caretOnly.shadowRoot!.querySelector("button")!.classList.contains("icon-only")).to.be
+      .true;
   });
 
   it("does not render a caret by default", async () => {

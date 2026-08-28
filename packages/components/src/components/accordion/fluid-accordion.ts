@@ -14,6 +14,8 @@ import type { FluidDetails } from "./fluid-details.js";
  * @csspart base - The outer container.
  */
 export class FluidAccordion extends FluidElement {
+  private panelObserver?: MutationObserver;
+
   static override styles = css`
     :host {
       display: block;
@@ -31,28 +33,45 @@ export class FluidAccordion extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("fluid-toggle", this.handleToggle);
+    this.listen(this, "fluid-toggle", this.handleToggle as EventListener);
+    this.panelObserver ??= new MutationObserver(() => this.reconcileOpenPanels());
+    this.panelObserver.observe(this, { childList: true });
+    this.reconcileOpenPanels();
   }
 
   override disconnectedCallback(): void {
+    this.panelObserver?.disconnect();
     super.disconnectedCallback();
-    this.removeEventListener("fluid-toggle", this.handleToggle);
   }
 
-  protected override updated(_: PropertyValues<this>): void {
-    /* No specific update logic needed here yet. */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("single")) this.reconcileOpenPanels();
   }
 
   private handleToggle = (e: Event) => {
     if (!this.single) return;
     const target = e.target as FluidDetails;
-    if (!target.open) return;
-    for (const detail of this.querySelectorAll("fluid-details")) {
-      if (detail !== target) (detail as FluidDetails).open = false;
+    if (target.parentElement !== this || !target.open) return;
+    for (const detail of this.getPanels()) {
+      if (detail !== target) detail.open = false;
     }
   };
 
+  private handleSlotChange = () => this.reconcileOpenPanels();
+
+  private getPanels(): FluidDetails[] {
+    return Array.from(this.children).filter(
+      (child): child is FluidDetails => child.localName === "fluid-details"
+    );
+  }
+
+  private reconcileOpenPanels(): void {
+    if (!this.single) return;
+    const openPanels = this.getPanels().filter((panel) => panel.open);
+    for (const panel of openPanels.slice(1)) panel.open = false;
+  }
+
   override render(): TemplateResult {
-    return html`<div part="base"><slot></slot></div>`;
+    return html`<div part="base"><slot @slotchange=${this.handleSlotChange}></slot></div>`;
   }
 }

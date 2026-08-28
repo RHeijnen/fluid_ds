@@ -25,6 +25,20 @@ function endCurrentClip(el: FluidVideoPlaylist): void {
 }
 
 describe("<fluid-video-playlist>", () => {
+  it("passes an a11y audit with titled playlist entries", async () => {
+    const el = await fixture<FluidVideoPlaylist>(html`
+      <fluid-video-playlist></fluid-video-playlist>
+    `);
+    // Keep the audit deterministic: no network or media decoder activity is
+    // needed to verify the playlist's roles, names, and pressed states.
+    el.entries = [
+      { src: "", title: "Introduction" },
+      { src: "", title: "Configuration" }
+    ];
+    await elementUpdated(el);
+    await expect(el).to.be.accessible();
+  });
+
   it("auto-advances to the next entry when the current clip ends", async () => {
     const el = await makePlaylist();
     endCurrentClip(el);
@@ -123,5 +137,41 @@ describe("<fluid-video-playlist>", () => {
       expect(item.hasAttribute("aria-pressed")).to.be.true;
       expect(item.hasAttribute("aria-current")).to.be.false;
     });
+  });
+
+  it("resumes auto-advance after reconnect without duplicate change events", async () => {
+    const el = await makePlaylist();
+    const parent = el.parentElement!;
+    const seen: number[] = [];
+    el.addEventListener("fluid-change", (event) => seen.push((event as CustomEvent).detail.index));
+    el.remove();
+    endCurrentClip(el);
+    parent.append(el);
+    endCurrentClip(el);
+    await elementUpdated(el);
+    expect(seen).to.deep.equal([1]);
+    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal("Two");
+  });
+
+  it("rejects fractional and non-finite indexes without emitting change", async () => {
+    const el = await makePlaylist();
+    const seen: Event[] = [];
+    el.addEventListener("fluid-change", (event) => seen.push(event));
+    for (const index of [0.5, NaN, Infinity, -Infinity]) el.goTo(index);
+    await elementUpdated(el);
+    expect(seen).to.deep.equal([]);
+    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal("One");
+  });
+
+  it("keeps selection and the player name valid when entries shrink", async () => {
+    const el = await makePlaylist();
+    el.goTo(2);
+    await elementUpdated(el);
+    el.entries = [ENTRIES[0]!];
+    await elementUpdated(el);
+    const player = el.shadowRoot!.querySelector("fluid-video")!;
+    expect(player.getAttribute("label")).to.equal("One");
+    expect(player.getAttribute("src")).to.equal("a.mp4");
+    expect(el.shadowRoot!.querySelectorAll('[aria-pressed="true"]').length).to.equal(1);
   });
 });

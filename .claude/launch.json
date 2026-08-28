@@ -8,6 +8,12 @@
       "port": 5173
     },
     {
+      "name": "storybook",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@fluid-ds/storybook", "exec", "storybook", "dev", "-p", "6006", "--no-open", "--disable-telemetry"],
+      "port": 6006
+    },
+    {
       "name": "wizard",
       "runtimeExecutable": "corepack",
       "runtimeArgs": ["pnpm", "--filter", "@fluid-ds/wizard", "dev"],

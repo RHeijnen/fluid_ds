@@ -1,0 +1,2 @@
+# Unified-diff context markers look like trailing spaces to Git's outer diff.
+*.patch whitespace=-blank-at-eol

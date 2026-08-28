@@ -58,6 +58,7 @@ let counter = 0;
  * @cssproperty --fluid-command-palette-bg - Panel background. Falls back to --fluid-surface-base.
  * @cssproperty --fluid-command-palette-fg - Panel text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-command-palette-radius - Panel corner radius. Falls back to --fluid-radius-lg.
+ * @cssproperty --fluid-command-palette-shadow - Panel elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-command-palette-font-family - Panel font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-command-palette-max-width - Panel max width. Falls back to 36rem.
  * @cssproperty --fluid-command-palette-border-width - Search separator + option border width. Falls back to 1px.
@@ -137,7 +138,7 @@ export class FluidCommandPalette extends FluidElement {
         background: var(--fluid-command-palette-bg, var(--fluid-surface-base));
         color: var(--fluid-command-palette-fg, var(--fluid-text-primary));
         border-radius: var(--fluid-command-palette-radius, var(--fluid-radius-lg));
-        box-shadow: var(--fluid-shadow-lg);
+        box-shadow: var(--fluid-command-palette-shadow, var(--fluid-shadow-lg));
         font-family: var(--fluid-command-palette-font-family, var(--fluid-font-family-sans));
         overflow: hidden;
         animation: var(--fluid-command-palette-enter-animation, fluid-scale-in)
@@ -282,10 +283,10 @@ export class FluidCommandPalette extends FluidElement {
   @property({ type: Array }) items: FluidCommandItem[] = [];
 
   /** Input placeholder. */
-  @property() placeholder = "Type a command or search…";
+  @property() placeholder = "";
 
   /** Accessible label for the dialog. */
-  @property({ attribute: "aria-label" }) override ariaLabel: string | null = "Command palette";
+  @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private query = "";
   @state() private activeIndex = 0;
@@ -306,12 +307,11 @@ export class FluidCommandPalette extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("keydown", this.handleGlobalKeydown, true);
+    this.listen(document, "keydown", this.handleGlobalKeydown, { capture: true });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("keydown", this.handleGlobalKeydown, true);
   }
 
   /** Items left after the substring filter, preserving input order. */
@@ -475,7 +475,7 @@ export class FluidCommandPalette extends FluidElement {
   private renderResults(): TemplateResult {
     const items = this.filteredItems;
     if (items.length === 0) {
-      return html`<li part="empty" class="empty" role="presentation">No results found.</li>`;
+      return html`<li part="empty" class="empty" role="presentation">${this.term("noResults")}</li>`;
     }
     let lastGroup: string | undefined;
     return html`
@@ -517,7 +517,7 @@ export class FluidCommandPalette extends FluidElement {
           class="panel"
           role="dialog"
           aria-modal="true"
-          aria-label=${ifDefined(this.ariaLabel ?? undefined)}
+          aria-label=${this.ariaLabel ?? this.term("commandPalette")}
         >
           <div part="search" class="search">
             <input
@@ -536,8 +536,8 @@ export class FluidCommandPalette extends FluidElement {
               aria-activedescendant=${ifDefined(
                 hasResults ? this.optionId(this.activeIndex) : undefined
               )}
-              aria-label=${ifDefined(this.ariaLabel ?? undefined)}
-              placeholder=${this.placeholder}
+              aria-label=${this.ariaLabel ?? this.term("commandPalette")}
+              placeholder=${this.placeholder || this.term("commandPlaceholder")}
               .value=${this.query}
               @input=${this.handleInput}
               @keydown=${this.handleInputKeydown}

@@ -2,7 +2,7 @@ import { html, css, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 
@@ -21,6 +21,18 @@ registerIcon(
 
 /** Reason a file was rejected by validation. */
 export type FluidDropzoneRejectReason = "type" | "size";
+
+export interface FluidDropzoneChangeDetail {
+  files: File[];
+}
+
+export interface FluidDropzoneRejectDetail {
+  files: File[];
+  reason: FluidDropzoneRejectReason;
+}
+
+export type FluidDropzoneChangeEvent = CustomEvent<FluidDropzoneChangeDetail>;
+export type FluidDropzoneRejectEvent = CustomEvent<FluidDropzoneRejectDetail>;
 
 interface RejectedFile {
   file: File;
@@ -85,8 +97,8 @@ interface RejectedFile {
  * @uses-token --fluid-focus-ring-offset - Focus ring offset.
  * @uses-token --fluid-target-min - Minimum interactive-target size (24px AA / 44px AAA).
  *
- * @fires fluid-change - Fires when valid files are accepted. detail: { files: File[] }.
- * @fires fluid-reject - Fires when one or more files fail validation.
+ * @fires {FluidDropzoneChangeEvent} fluid-change - Fires when valid files are accepted. detail: { files: File[] }.
+ * @fires {FluidDropzoneRejectEvent} fluid-reject - Fires when one or more files fail validation.
  *   detail: { files: File[]; reason: "type" | "size" }.
  */
 export class FluidDropzone extends FluidElement {
@@ -147,7 +159,11 @@ export class FluidDropzone extends FluidElement {
         border-style: solid;
         background-color: var(
           --fluid-dropzone-active-bg,
-          color-mix(in srgb, var(--fluid-dropzone-accent, var(--fluid-accent-base)) 8%, var(--fluid-surface-muted))
+          color-mix(
+            in srgb,
+            var(--fluid-dropzone-accent, var(--fluid-accent-base)) 8%,
+            var(--fluid-surface-muted)
+          )
         );
       }
 
@@ -299,7 +315,14 @@ export class FluidDropzone extends FluidElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
 
   /** Prompt text shown inside the drop region. */
-  @property() label = "Drag files here or click to browse";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("dropFilesOrBrowse");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   /** The currently accepted files. */
   @state() private files: File[] = [];
@@ -439,7 +462,7 @@ export class FluidDropzone extends FluidElement {
     if (accepted.length > 0) {
       this.files = this.multiple ? [...this.files, ...accepted] : accepted;
       this.dispatchEvent(
-        new CustomEvent("fluid-change", {
+        new CustomEvent<FluidDropzoneChangeDetail>("fluid-change", {
           detail: { files: this.files.slice() },
           bubbles: true,
           composed: true
@@ -457,7 +480,7 @@ export class FluidDropzone extends FluidElement {
       }
       for (const [reason, files] of byReason) {
         this.dispatchEvent(
-          new CustomEvent("fluid-reject", {
+          new CustomEvent<FluidDropzoneRejectDetail>("fluid-reject", {
             detail: { files, reason },
             bubbles: true,
             composed: true
@@ -474,7 +497,7 @@ export class FluidDropzone extends FluidElement {
     if (removed) this.revokeThumbUrl(removed);
     this.files = next;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidDropzoneChangeDetail>("fluid-change", {
         detail: { files: this.files.slice() },
         bubbles: true,
         composed: true
@@ -492,7 +515,7 @@ export class FluidDropzone extends FluidElement {
     this.files = [];
   }
 
-  private static formatSize(bytes: number): string {
+  private formatSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     const units = ["KB", "MB", "GB", "TB"];
     let value = bytes / 1024;
@@ -502,7 +525,16 @@ export class FluidDropzone extends FluidElement {
       unitIndex += 1;
     }
     const unit = units[unitIndex] ?? "KB";
-    return `${value.toFixed(value >= 10 || value % 1 === 0 ? 0 : 1)} ${unit}`;
+    const maximumFractionDigits = value >= 10 || value % 1 === 0 ? 0 : 1;
+    let formatted: string;
+    try {
+      formatted = new Intl.NumberFormat([this.localize.locale, "en"], {
+        maximumFractionDigits
+      }).format(value);
+    } catch {
+      formatted = new Intl.NumberFormat("en", { maximumFractionDigits }).format(value);
+    }
+    return `${formatted} ${unit}`;
   }
 
   private renderFile(file: File, index: number): TemplateResult {
@@ -517,13 +549,13 @@ export class FluidDropzone extends FluidElement {
         </span>
         <span class="meta">
           <span class="name" title=${file.name}>${file.name}</span>
-          <span class="size">${FluidDropzone.formatSize(file.size)}</span>
+          <span class="size">${this.formatSize(file.size)}</span>
         </span>
         <button
           part="remove"
           class="remove"
           type="button"
-          aria-label="Remove ${file.name}"
+          aria-label=${this.term("removeFile", file.name)}
           ?disabled=${this.disabled}
           @click=${() => this.removeFile(index)}
         >

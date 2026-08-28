@@ -29,11 +29,12 @@ Every Fluid component ships with:
 4. **Reduced-motion compliance.** Anything that animates checks
    `prefers-reduced-motion: reduce` and falls back to opacity / no
    transition.
-5. **An automated audit.** Every component has a unit test that runs
-   [`@open-wc/testing`](https://open-wc.org)'s
-   [`expect(...).to.be.accessible()`][owc-a11y] assertion, wrapping
-   axe, against its default + a few key states. 380+ tests today, all
-   passing in Chromium + WebKit.
+5. **Automated audits and interaction contracts.** The frozen-source catalog axe,
+   keyboard, focus, form, target-size, environment, lifecycle, and recovery matrix
+   passes 765 cases: 255 in each of Chromium, Firefox, and Playwright WebKit. The
+   catalog axe executions cover every published element, while deeper critical-mode
+   coverage varies by component. This machine result is not release-candidate,
+   conformance, native Safari/mobile, manual visual, or assistive-technology approval.
 
 What this means in practice: you don't need to add `role="button"`,
 `aria-haspopup`, or arrow-key handlers to a Fluid component. They're
@@ -86,15 +87,15 @@ language-localised or custom-styled error messages, call
 The full keyboard map for every interactive component is on its API
 page. Quick reference for the most-asked patterns:
 
-| Component | Open / Activate | Navigate | Close |
-| --- | --- | --- | --- |
-| [Button](/components/button/) | <kbd>Space</kbd> / <kbd>Enter</kbd> |, |, |
-| [Tabs](/components/tabs/) | <kbd>Enter</kbd> (manual mode) | <kbd>←</kbd> <kbd>→</kbd>, <kbd>Home</kbd>/<kbd>End</kbd> |, |
-| [Dropdown](/components/dropdown/) | <kbd>Enter</kbd> | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead | <kbd>Esc</kbd>, <kbd>Tab</kbd> |
-| [Dialog](/components/dialog/) | (call `show()`) | <kbd>Tab</kbd> (trapped) | <kbd>Esc</kbd> |
-| [Drawer](/components/drawer/) | (call `show()`) | <kbd>Tab</kbd> (trapped) | <kbd>Esc</kbd> |
-| [Tree](/components/tree/) | <kbd>Enter</kbd> | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> |, |
-| [Select](/components/select/) | <kbd>Space</kbd> | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead | <kbd>Esc</kbd> |
+| Component                         | Open / Activate                     | Navigate                                                  | Close                          |
+| --------------------------------- | ----------------------------------- | --------------------------------------------------------- | ------------------------------ |
+| [Button](/components/button/)     | <kbd>Space</kbd> / <kbd>Enter</kbd> | ,                                                         | ,                              |
+| [Tabs](/components/tabs/)         | <kbd>Enter</kbd> (manual mode)      | <kbd>←</kbd> <kbd>→</kbd>, <kbd>Home</kbd>/<kbd>End</kbd> | ,                              |
+| [Dropdown](/components/dropdown/) | <kbd>Enter</kbd>                    | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead                     | <kbd>Esc</kbd>, <kbd>Tab</kbd> |
+| [Dialog](/components/dialog/)     | (call `show()`)                     | <kbd>Tab</kbd> (trapped)                                  | <kbd>Esc</kbd>                 |
+| [Drawer](/components/drawer/)     | (call `show()`)                     | <kbd>Tab</kbd> (trapped)                                  | <kbd>Esc</kbd>                 |
+| [Tree](/components/tree/)         | <kbd>Enter</kbd>                    | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd>       | ,                              |
+| [Select](/components/select/)     | <kbd>Space</kbd>                    | <kbd>↑</kbd> <kbd>↓</kbd>, type-ahead                     | <kbd>Esc</kbd>                 |
 
 ## Focus rings
 
@@ -120,7 +121,9 @@ in the same media query:
 
 ```css
 @media (prefers-reduced-motion: no-preference) {
-  .custom-bouncy { animation: bounce 400ms ease; }
+  .custom-bouncy {
+    animation: bounce 400ms ease;
+  }
 }
 ```
 
@@ -141,12 +144,13 @@ WebAIM is the canonical alternative.
   to white. If your new primary is pale (yellow, light blue), white
   text on it fails contrast. Override `--fluid-accent-text` too:
 
-  ```css
-  [data-fluid-brand="custom"] {
-    --fluid-color-primary: #fbbf24;
-    --fluid-accent-text: #1f2937;  /* dark text on yellow */
-  }
-  ```
+```css
+[data-fluid-brand="custom"] {
+  --fluid-color-primary: #fbbf24;
+  --fluid-accent-text: #1f2937; /* dark text on yellow */
+}
+```
+
 </Aside>
 
 ## Testing
@@ -157,10 +161,10 @@ Use [axe DevTools][axe] (browser extension) on every page you ship.
 It catches the broad strokes, missing labels, contrast, landmark
 structure, in under a second.
 
-### Component-level (already done for you)
+### Component-level
 
-Fluid itself runs `@open-wc/testing`'s a11y audit per component as
-part of `pnpm verify`. If you fork or extend a component, do the same:
+Fluid itself runs `@open-wc/testing`'s a11y audit per component and separate
+browser interaction suites. If you fork or extend a component, do the same:
 
 ```ts
 import { expect, fixture, html } from "@open-wc/testing";
@@ -188,18 +192,21 @@ For screen readers:
 You don't need to be fluent, just hit the major routes once, listen
 for "unlabeled button" or "image", and fix what comes up.
 
-## What we don't ship
+## Evidence boundaries
 
-Some components could go further; we don't yet:
+Automation is broad, but it is not a conformance certificate:
 
-- **No language localisation** for built-in strings ("Close", "Loading",
-  "Required"). Set the relevant `*-label` attribute or override with a
-  translated slot.
-- **No high-contrast-mode tuning** beyond what the browser does by
-  default. If you need WCAG AAA contrast (7:1), audit and override the
-  semantic tokens.
-- **No automated focus-trap testing** beyond "does it trap": the order
-  of focusable elements is on you.
+- Built-in Fluid-owned messages use the shared localization registry and the
+  guarded audit has no confirmed migration gap. Application content, native
+  browser text, dependency UI, and canonical values remain separate ownership
+  boundaries; fluent-speaker review is still required.
+- The automated environment matrix covers light/dark themes, forced colors, RTL,
+  reduced motion, keyboard operation, and 200%-equivalent reflow on the installed
+  Playwright engines. It does not replace native Safari, physical-device, human
+  visual, or assistive-technology testing.
+- Critical-mode depth is not uniform across all stable candidates. Applications
+  still own page-level focus order, accessible names, content, and contrast after
+  token overrides.
 
 If you hit a real a11y bug, please open an issue with a minimal repro.
 We treat a11y bugs the same as crashes, they block a release.

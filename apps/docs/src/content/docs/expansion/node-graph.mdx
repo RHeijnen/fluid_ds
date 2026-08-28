@@ -1,0 +1,215 @@
+---
+title: "@fluid-ds/node-graph"
+description: "An accessible node graph editor web component with typed ports and Bezier edges."
+---
+
+A node graph editor for Fluid: draggable nodes with typed connection ports,
+joined by Bezier edges, with pan, zoom, fit-to-view, and keyboard controls for
+node movement, selection and connection editing. Expansion pack. Applications
+must provide a keyboard-operated add-node action if they offer a drag palette.
+
+The graph knows nothing about what a node means. A `nodeTypes` registry
+supplies each type's label, accent, height and port topology, and a
+`renderNode` callback can take over the node body entirely, so the same
+component draws a workflow builder, a data pipeline, or an automation
+scheduler. Everything domain-shaped (what nodes exist, what a connection
+implies, validation) stays in your application.
+
+## Install
+
+```bash
+pnpm add @fluid-ds/node-graph
+```
+
+Import only the piece you use:
+
+```ts
+import "@fluid-ds/node-graph/define/node-graph";
+```
+
+## Components
+
+| Tag | Use |
+| --- | --- |
+| `<fluid-node-graph>` | An editable canvas of typed nodes and connections. Nodes move by pointer drag or arrow keys; connections are drawn from output ports by drag or keyboard; every mutation emits an event. |
+
+## Use
+
+Pass the graph data as properties (arrays and objects, so set them as
+properties, not attributes):
+
+```html
+<fluid-node-graph id="graph" style="height: 480px" label="Deployment flow"></fluid-node-graph>
+
+<script type="module">
+  import "@fluid-ds/node-graph/define/node-graph";
+
+  const graph = document.getElementById("graph");
+
+  graph.nodeTypes = {
+    trigger: { label: "Trigger", input: false, removable: false },
+    task: {
+      label: "Task",
+      height: 116,
+      outputs: [
+        { id: "success", label: "On success", tone: "success" },
+        { id: "error", label: "On error", tone: "danger" }
+      ]
+    },
+    stop: { label: "Stop", outputs: [] }
+  };
+
+  graph.nodes = [
+    { id: "a", type: "trigger", x: 40, y: 96, label: "Every night", summary: "Daily at 02:00" },
+    { id: "b", type: "task", x: 344, y: 40, label: "Sync data" },
+    { id: "c", type: "stop", x: 648, y: 96, label: "Stop" }
+  ];
+  graph.edges = [{ id: "e1", from: "a", port: "next", to: "b" }];
+
+  graph.addEventListener("fluid-connect", (event) => {
+    console.log(event.detail); // { id, from, port, to }
+  });
+</script>
+```
+
+The component applies each mutation (move, connect, disconnect, remove) to its
+own `nodes` / `edges` state and emits an event for it, so you can treat it as
+the owner of the drawing, or mirror every event into your own store and write
+the properties back.
+
+Replacing `nodes` / `edges` re-renders the drawing. Removing and reconnecting
+the editor cancels in-progress pointer gestures and keyboard connection
+previews; completed node and edge data remain on the element. Custom node
+inputs, text areas, editable content, links and buttons own their text-editing
+and pointer interactions: graph deletion and dragging do not intercept them.
+
+### Node types
+
+Port topology belongs to the type, not the node: every node of a type has the
+same connection points, which keeps a serialized graph replayable against a
+changed catalog.
+
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | the type key | Human label, used in default rendering and accessible names. |
+| `accent` | `string` | accent token | CSS color for the node's leading edge. |
+| `height` | `number` | `92` | Node height in world pixels. |
+| `input` | `boolean` | `true` | Whether nodes of this type accept incoming connections. |
+| `outputs` | `NodeGraphPort[]` | one `next` port | Output ports, top to bottom: `{ id, label?, tone? }`. Tones: `neutral`, `accent`, `success`, `danger`, `warning`, `info`. |
+| `removable` | `boolean` | `true` | Whether nodes of this type can be deleted. |
+
+### Adding nodes
+
+The graph has no built-in palette. Add nodes by writing to `nodes` from any UI,
+or drag from your palette using HTML5 drag and drop: set the drag data with the
+type named by `drop-format` (default `text/fluid-node-graph`) and listen for
+`fluid-node-drop`, which carries the data and the drop point in world
+coordinates.
+
+### Showing a run
+
+Traversal display is data, not behavior. Paint per-node badges through
+`runStates` (`{ [nodeId]: "running" | "success" | "error" }`) and dashed
+marching-ants edges through `traversedEdges` (edge ids). The host runs the
+traversal, or replays a server log; the graph only shows it. The marching-ants
+animation is disabled under reduced motion.
+
+## API
+
+### Properties
+
+| Property | Attribute | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `nodes` | – | `NodeGraphNode[]` | `[]` | The nodes: `{ id, type, x, y, label?, summary? }` in world pixels. |
+| `edges` | – | `NodeGraphEdge[]` | `[]` | The connections: `{ id, from, port, to }`. |
+| `nodeTypes` | – | `Record<string, NodeGraphNodeType>` | `{}` | The type registry (see above). |
+| `renderNode` | – | `(node) => unknown` | – | Optional renderer for a node's body. |
+| `runStates` | – | `Record<string, NodeGraphRunState>` | `{}` | Traversal paint state per node. |
+| `traversedEdges` | – | `string[]` | `[]` | Edges painted with the traversed style. |
+| `messages` | – | `Partial<NodeGraphMessages>` | `{}` | Overrides for the announcement strings (localization). |
+| `label` | `label` | `string` | `"Node graph"` | Accessible name of the editor. |
+| `grid` | `grid` | `number` | `8` | Snap step in world pixels; `0` disables snapping. |
+| `nodeWidth` | `node-width` | `number` | `230` | Shared node width in world pixels. |
+| `minZoom` / `maxZoom` | `min-zoom` / `max-zoom` | `number` | `0.4` / `2` | Zoom clamp. |
+| `readonly` | `readonly` | `boolean` | `false` | Blocks every mutation; pan, zoom and selection stay live. |
+| `dropFormat` | `drop-format` | `string` | `"text/fluid-node-graph"` | The dataTransfer type accepted on drop. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `connectNodes(from, port, to)` | Create an edge through the same guards the gestures use (no self-links, duplicates, unknown ports, or targets without input). Returns the edge or `null`. |
+| `fitView()` | Fit every node into view. |
+| `resetViewport()` | Reset pan and zoom. |
+| `zoomBy(factor)` | Zoom around the canvas center, clamped to the range. |
+| `centerOn(nodeId)` | Center the viewport on a node. |
+
+### Events
+
+All events bubble and are composed.
+
+| Event | Detail | Fired when |
+| --- | --- | --- |
+| `fluid-node-move` | `{ id, x, y }` | A node settles after a drag, or moves by keyboard. |
+| `fluid-node-remove` | `{ id }` | A node (and its edges) is removed. |
+| `fluid-connect` | `{ id, from, port, to }` | An edge is created by drag, keyboard, or `connectNodes`. |
+| `fluid-edge-remove` | `{ id, from, port, to }` | An edge is removed. |
+| `fluid-selection-change` | `{ nodeId, edgeId }` | The selection changes (either or both `null`). |
+| `fluid-viewport-change` | `{ x, y, zoom }` | Pan or zoom settles. |
+| `fluid-node-drop` | `{ data, x, y }` | A matching drag is dropped, in world coordinates. |
+
+## Keyboard
+
+The keyboard path is a first-class peer of the pointer gestures, not a
+fallback.
+
+| Focus | Key | Action |
+| --- | --- | --- |
+| Canvas | `Arrow keys` | Pan. |
+| Canvas | `+` / `-` | Zoom in / out. |
+| Canvas | `Home` | Fit the graph into view. |
+| Node | `Arrow keys` | Nudge by one grid step (`Shift` for four). |
+| Node | `Enter` / `Space` | Select the node. |
+| Node | `Delete` | Remove the node and its connections. |
+| Output port | `Enter` / `Space` | Start a connection; then arrows cycle valid targets (previewed on the canvas), `Enter` connects, `Escape` cancels. `Tab` cancels and continues normal focus navigation. |
+| Input port | `Enter` / `Space` | Select the newest incoming connection, so `Delete` can remove it. |
+
+Nodes live in a `list` with focusable `listitem` children; ports are real
+buttons whose targets meet the minimum size (scaling to 44px under AAA
+conformance); and every move, connection, removal, selection, and zoom change
+is announced through a polite `aria-live` region. The announcement strings are
+overridable through the `messages` property for localization.
+
+### Verification and remaining limits
+
+The interaction contract exercises node selection and movement, exact mutation
+event payloads, keyboard connection cancellation/commit/removal, replacement
+data, deletion focus recovery and read-only guards. Native browser checks also
+exercise pointer dragging, nested text-input ownership and reconnect cleanup.
+These checks do not replace screen-reader review of the application-mode
+editor. Provide an application-level list or form for essential graph data
+where appropriate, and an accessible add-node action beside any drag palette.
+
+`messages` overrides announcements and port/node names, but the canvas role
+description and visual summary labels are still English. A complete
+localization audit and representative assistive-technology signoff remain
+release gates; the presence of keyboard tests is not a claim of complete
+accessibility conformance.
+
+## Theming
+
+The editor reads the same `--fluid-*` semantic tokens as the rest of the
+system, so themes and brands flow through with no extra work; port and edge
+tones (`success`, `danger`, `warning`, `info`) are theme-independent status
+colors. For fine-grained control it exposes component tokens:
+`--fluid-node-graph-bg`, `--fluid-node-graph-grid-color`,
+`--fluid-node-graph-node-bg`, `--fluid-node-graph-node-border`,
+`--fluid-node-graph-node-radius`, `--fluid-node-graph-edge-color`,
+`--fluid-node-graph-edge-width`, and `--fluid-node-graph-fg`. Each falls back
+to a semantic var, so you can retheme one graph, every graph, or the whole
+brand. Use `::part(base | node | node-body | port | edge | hud)` for anything
+the tokens do not cover.
+
+## License
+
+MIT.

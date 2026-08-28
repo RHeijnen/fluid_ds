@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "stable": false,
+  "generatedAt": "2026-08-27T15:51:54.507Z",
+  "error": "Visual nondeterminism detected in 1 comparisons: [{\"run\":34,\"name\":\"components-forms-button--keyboard-focus-reduced-motion.png\"}]"
+}

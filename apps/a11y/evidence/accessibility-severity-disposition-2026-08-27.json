@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "kind": "automated-accessibility-severity-disposition",
+  "source": {
+    "report": "full-accessibility-regression-2026-08-27-final.json",
+    "sha256": "6499ada859fb5a745a41f4bf8eb78c2e9f45b2b998d234ca0a263ca3835534aa"
+  },
+  "run": {
+    "engines": ["chromium", "firefox", "webkit"],
+    "tests": 642,
+    "passed": 642,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0,
+    "catalogAxeAudits": 465,
+    "catalogAxeAuditsByEngine": {
+      "chromium": 155,
+      "firefox": 155,
+      "webkit": 155
+    }
+  },
+  "automatedViolations": {
+    "total": 0,
+    "byImpact": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "unknown": 0
+    },
+    "disposition": "no-automated-violations-observed"
+  },
+  "manualAssistiveTechnology": {
+    "covered": false,
+    "disposition": "pending-human-evidence",
+    "inferenceFromAutomatedResultProhibited": true
+  },
+  "boundaries": [
+    "Severity counts describe the retained automated catalog axe audits only.",
+    "Passing interaction tests are not manual assistive-technology evidence.",
+    "Zero automated violations does not approve screen-reader, native Safari, mobile, or fluent-language review."
+  ]
+}

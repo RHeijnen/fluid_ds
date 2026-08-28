@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 

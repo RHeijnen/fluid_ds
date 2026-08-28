@@ -1,6 +1,6 @@
 import { FluidBubbleChart } from "./fluid-bubble-chart.js";
 
-if (!customElements.get("fluid-bubble-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-bubble-chart")) {
   customElements.define("fluid-bubble-chart", FluidBubbleChart);
 }
 

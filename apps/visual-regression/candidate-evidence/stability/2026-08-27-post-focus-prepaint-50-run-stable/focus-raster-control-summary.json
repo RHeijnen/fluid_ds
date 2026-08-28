@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "intendedExperiment": "focus-prepaint-plus-two-frame-compositor-settle",
+  "branchExecuted": false,
+  "reason": "The attempted predicate read focusTarget from the top-level catalog fixture, but generated catalog data stores it inside fixture.fixtures entries.",
+  "controlIterations": 50,
+  "modesPerIteration": 5,
+  "controlImages": 250,
+  "uniqueHashesPerMode": 1,
+  "hashes": {
+    "light": "c32536ccf62fe5e0688b659bcc74f57d768172b2063e61c14658dff8363ce7c5",
+    "dark": "a7054edba79e3fb4e7e4d5251ac4e8096d21e4942e66e74d6dc8b53092efd0bb",
+    "forced-colors": "0e53d062e728903f55ce67eb81f96e04029704e37bf1f52f2085d7fece8d6fdf",
+    "rtl": "d8045bf516fb19d0852208d37b1f23db207cf8c8a559a9ca2cb5ef9ffdae9a90",
+    "reduced-motion": "c32536ccf62fe5e0688b659bcc74f57d768172b2063e61c14658dff8363ce7c5"
+  },
+  "disposition": "This is unchanged-harness control evidence, not proof of the intended causal fix."
+}

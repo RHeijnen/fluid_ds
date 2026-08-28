@@ -25,6 +25,14 @@ describe("<fluid-nav-list>", () => {
 });
 
 describe("<fluid-nav-item>", () => {
+  it("delegates its public focus method to the native link", async () => {
+    const el = await fixture<FluidNavItem>(
+      html`<fluid-nav-item href="#projects">Projects</fluid-nav-item>`
+    );
+    el.focus();
+    expect(el.shadowRoot!.activeElement).to.equal(el.shadowRoot!.querySelector("a"));
+  });
+
   it("renders an anchor with the given href", async () => {
     const el = await fixture<FluidNavItem>(
       html`<fluid-nav-item href="/projects">Projects</fluid-nav-item>`

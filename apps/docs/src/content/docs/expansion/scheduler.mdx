@@ -10,7 +10,8 @@ engine turns those hours plus existing bookings into concrete slots (it runs
 server-side too, with no DOM).
 
 Built on standard web components, so it drops into React, Vue, Angular, Svelte,
-or plain HTML. WCAG 2.2 AA, AAA-ready.
+or plain HTML. The components target WCAG 2.2 AA and expose conformance-aware
+controls; production accessibility certification remains pending.
 
 ## Install
 
@@ -91,7 +92,7 @@ const availability = {
 | `locale` | document | BCP-47 locale for labels. |
 | `time-format` | `"24h"` | `"12h"` or `"24h"`. |
 | `size` | `"md"` | `sm` / `md` / `lg`. |
-| `loading` | `false` | Show a spinner overlay on the slot panel. |
+| `loading` | `false` | Show a spinner, expose busy state, and block new day/slot interaction while availability is being fetched. |
 | `disabled` / `required` / `readonly` | `false` | Form control flags. |
 
 ### `<fluid-scheduler>` events + methods
@@ -102,6 +103,19 @@ const availability = {
 | `fluid-day-select` | `{ date }`: a day was chosen. |
 | `fluid-change` | `{ value, start, end }`: a slot was committed. |
 | `refresh()` | Re-generate slots + dots after an out-of-band change. |
+
+`value` participates in native `FormData`; a form reset restores the original
+default even after disconnect/reconnect. Changing `value` updates the displayed
+date, and clearing it returns to the day-selection prompt. `required` changes
+update validity without requiring another selection. If bookings or bounds
+make the selected slot unavailable, the value is retained but marked invalid;
+the application must obtain a fresh valid selection before submission.
+
+Disabled controls are removed from keyboard interaction and form submission.
+Read-only and loading controls cannot commit another day or slot. The scheduler
+rechecks a slot against current availability and bookings before emitting a
+commit. This is client-side validation only: applications must still perform
+an authoritative availability check when saving a booking.
 
 ## Use the slot list on its own
 
@@ -132,7 +146,15 @@ they are announced but skipped by arrow-key navigation.
 
 The editor renders a weekly-hours grid (toggle each day open, add one or more
 time windows), the global slot rules, and a list of closed dates. It emits a
-complete `availability` config on every edit.
+complete `availability` config once per valid edit. Child-control change events
+are consumed rather than bubbling out as a second, incompatible payload.
+Removing and reconnecting the editor preserves its current edits.
+
+Invalid or reversed time windows remain visible as a marked draft, with an
+associated error, and are not emitted until corrected. Unedited `stepMinutes`,
+`bufferMinutes`, `timeZone`, fractional-hour notice settings, and special-date
+windows are preserved. Special-date windows are retained but are not edited by
+the closed-date interface. Changing `availability` to `null` resets the editor.
 
 ## The engine, standalone
 
@@ -147,6 +169,12 @@ const slots = generateSlots("2026-06-15", availability, bookings);
 
 dayState("2026-06-15", availability, bookings); // "open" | "some" | "full" | "closed" | "unavailable"
 ```
+
+Slot lengths and resolved start increments must be finite whole minutes in the
+range 1–1440. Invalid increments produce no slots instead of entering an
+unbounded generation loop. All times remain viewer-local wall-clock times;
+the preserved `timeZone` field is reserved and does not enable IANA-zone
+conversion or guarantee daylight-saving-time behavior.
 
 ## Theming
 
@@ -172,6 +200,11 @@ status track:
   Enter / Space selects, and a live region announces the count for the day.
 - Every control reads the conformance tokens, so it scales to 44x44 targets and
   thicker focus rings under `data-fluid-conformance="aaa"`.
+
+Automated contracts cover selection, real form submission/reset, disabled and
+busy interaction, booking invalidation, availability edits, and reconnect.
+They do not certify all date/time-zone cases, every translated string, or manual
+assistive-technology behavior.
 
 ## When to use
 

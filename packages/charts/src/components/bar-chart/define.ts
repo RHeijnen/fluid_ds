@@ -1,6 +1,6 @@
 import { FluidBarChart } from "./fluid-bar-chart.js";
 
-if (!customElements.get("fluid-bar-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-bar-chart")) {
   customElements.define("fluid-bar-chart", FluidBarChart);
 }
 

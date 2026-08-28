@@ -41,7 +41,14 @@ export class FluidPricingTable extends FluidElement {
   `;
 
   /** Accessible label for the group of tiers. */
-  @property({ attribute: "label" }) label = "Pricing plans";
+  @property({ attribute: "label" })
+  get label(): string {
+    return this.labelOverride ?? this.term("pricingPlans");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   override render(): TemplateResult {
     return html`

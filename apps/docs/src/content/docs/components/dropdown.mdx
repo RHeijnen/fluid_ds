@@ -266,16 +266,25 @@ Implements the WAI-ARIA Menu pattern. The cross-component contract is in the
 | _type a letter_ | Jump to the next item starting with it. |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the item. |
 | <kbd>Escape</kbd> | Close the menu (focus returns to the trigger). |
-| <kbd>Tab</kbd> | Close + advance focus. |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Close and move forward / backward from the trigger. |
 
-Opening the menu focuses the first non-disabled item; closing returns focus to
-the trigger.
+Opening the menu keeps DOM focus on the menu panel and marks the first enabled
+item active. Escape and item activation restore focus to the trigger. Tab and
+outside-pointer dismissal allow focus to move to the next intended control.
 
 ### Names & roles
 
-- The host is `role="menu"`; items are `role="menuitem"` (or
+- The inner panel is `role="menu"`; items are `role="menuitem"` (or
   `menuitemcheckbox`); the trigger gets `aria-haspopup="menu"` +
   `aria-expanded`. The menu renders in the **top layer**, so it's never clipped.
+- Checkbox items expose `aria-checked`; ordinary items and separators do not.
+  Disabled items cannot activate, and separators are not selectable.
+- The panel uses `ariaActiveDescendantElement` to reference the active slotted
+  item across the shadow boundary. This targets current browsers with ARIA
+  element reflection; older engines without that API are outside this contract.
+  The optional trigger `aria-controls` string is omitted because its ID cannot
+  resolve a panel in another tree. Browser automation does not replace manual
+  assistive-technology testing.
 
 ### Motion & target size
 
@@ -285,7 +294,8 @@ the trigger.
 
 ### AA vs AAA
 
-Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+Targets **WCAG 2.2 AA**; manual assistive-technology review remains required.
+An ancestor `[data-fluid-conformance="aaa"]` lifts:
 
 | Token | AA | AAA | Criterion |
 | --- | --- | --- | --- |

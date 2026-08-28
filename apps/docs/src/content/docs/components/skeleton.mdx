@@ -142,11 +142,21 @@ skeleton-specific.
 ### Names & roles
 
 - The host is `role="status"` + `aria-busy="true"` + `aria-live="polite"` with a
-  default `aria-label` of "Loading", so assistive tech announces "Loading" when
-  skeletons appear and falls silent once they're removed
+  localized "Loading" default name. These attributes describe the loading region;
+  actual announcement timing still needs assistive-technology verification
   ([SC 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages)).
 - Use **one** skeleton (or a single wrapper carrying `aria-busy`) per logical
   loading region, many `role="status"` nodes get noisy.
+
+The owned fallback follows the nearest `lang` after mounting and reconnecting.
+Explicit `aria-label` values, including empty strings and English defaults, remain
+application-owned. Removing that attribute restores the current localized default.
+An authored `aria-labelledby` takes precedence; its references are not rewritten.
+Preserving an empty override does not establish an accessible loading announcement.
+
+Hydration limitation: an `aria-label` already present in server-rendered markup
+is preserved as authored. Automatic locale updates for a server-generated default
+need explicit ownership provenance and are not yet verified.
 
 ### Motion
 
@@ -173,7 +183,7 @@ back to a static placeholder).
   />
   <LinkCard
     title="Theming guide"
-    href="/guides/theming/"
+    href="/theming/basics/"
     description="How brand, component, and instance tokens compose."
   />
 </CardGrid>

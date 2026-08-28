@@ -1,5 +1,10 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidTransfer, FluidTransferItem } from "./fluid-transfer.js";
 
 const items: FluidTransferItem[] = [
@@ -29,6 +34,120 @@ const optionsIn = (list: HTMLElement) =>
   Array.from(list.querySelectorAll<HTMLElement>('[role="option"]'));
 
 describe("<fluid-transfer>", () => {
+  describe("<fluid-transfer> localized defaults", () => {
+    it("translates action phrases with current panel defaults while preserving item and explicit panel names", async () => {
+      const control = await fixture<FluidTransfer>(
+        html`<fluid-transfer lang="nl"></fluid-transfer>`
+      );
+      control.items = [{ id: "application", label: "Application item" }];
+      await control.updateComplete;
+      const names = () =>
+        Array.from(control.shadowRoot!.querySelectorAll("button")).map((button) =>
+          button.getAttribute("aria-label")
+        );
+      expect(names()).to.deep.equal([
+        "Selectie verplaatsen naar Geselecteerd",
+        "Selectie verplaatsen naar Beschikbaar"
+      ]);
+      control.sourceLabel = "Application source";
+      control.targetLabel = "Application destination";
+      control.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(names()).to.deep.equal([
+        "نقل التحديد إلى Application destination",
+        "نقل التحديد إلى Application source"
+      ]);
+      expect(control.shadowRoot!.querySelector('[role="option"]')!.textContent!.trim()).to.equal(
+        "Application item"
+      );
+    });
+
+    const readLabels = (control: FluidTransfer) => [
+      control.shadowRoot!.querySelector("#transfer-source-label")!.textContent!.trim(),
+      control.shadowRoot!.querySelector("#transfer-target-label")!.textContent!.trim()
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Beschikbaar", "Geselecteerd"]],
+      ["de", ["Verfügbar", "Ausgewählt"]],
+      ["fr", ["Disponibles", "Sélectionnés"]],
+      ["es", ["Disponibles", "Seleccionados"]],
+      ["ar", ["المتاح", "المحدد"]],
+      ["fr-CA", ["Disponibles", "Sélectionnés"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-transfer></fluid-transfer></div>
+        `);
+        const control = wrapper.querySelector<FluidTransfer>("fluid-transfer")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("source-label")).to.equal(false);
+        expect(control.hasAttribute("target-label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.sourceLabel).to.equal(expected[0]);
+        expect(control.targetLabel).to.equal(expected[1]);
+        expect(control.hasAttribute("source-label")).to.equal(false);
+        expect(control.hasAttribute("target-label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidTransfer>(html`<fluid-transfer></fluid-transfer>`);
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Beschikbaar", "Geselecteerd"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Verfügbar", "Ausgewählt"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["المتاح", "المحدد"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-transfer></fluid-transfer></div>
+      `);
+      const control = wrapper.querySelector<FluidTransfer>("fluid-transfer")!;
+      control.sourceLabel = "Available";
+      control.targetLabel = "Selected";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Available", "Selected"]);
+      control.setAttribute("source-label", "Available");
+      control.setAttribute("target-label", "Selected");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Available", "Selected"]);
+      control.removeAttribute("source-label");
+      control.removeAttribute("target-label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Disponibles", "Sélectionnés"]);
+      control.sourceLabel = "";
+      control.targetLabel = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["", ""]);
+      Reflect.set(control, "sourceLabel", null);
+      Reflect.set(control, "targetLabel", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["المتاح", "المحدد"]);
+    });
+  });
+
   it("renders two multi-selectable listboxes", async () => {
     const el = await makeTransfer();
     const lists = el.shadowRoot!.querySelectorAll('[role="listbox"]');
@@ -43,9 +162,7 @@ describe("<fluid-transfer>", () => {
       "Cherry",
       "Date"
     ]);
-    expect(optionsIn(targetList(el)).map((o) => o.textContent?.trim())).to.deep.equal([
-      "Banana"
-    ]);
+    expect(optionsIn(targetList(el)).map((o) => o.textContent?.trim())).to.deep.equal(["Banana"]);
   });
 
   it("labels each listbox via aria-labelledby", async () => {

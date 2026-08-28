@@ -1,6 +1,17 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
-import type { FluidForm } from "./fluid-form.js";
+import type {
+  FluidForm,
+  FluidFormInvalidDetail,
+  FluidFormInvalidEvent,
+  FluidFormSubmitDetail,
+  FluidFormSubmitEvent
+} from "../../index.js";
+
+const repeatedValues: FluidFormSubmitDetail = { values: { tag: ["a", "b"] } };
+// @ts-expect-error Form values are strings or string arrays, never numbers.
+const invalidSubmitDetail: FluidFormSubmitDetail = { values: { count: 2 } };
+void invalidSubmitDetail;
 
 describe("<fluid-form>", () => {
   it("renders an inner native form", async () => {
@@ -21,7 +32,7 @@ describe("<fluid-form>", () => {
     `);
     const button = el.querySelector("button")!;
     setTimeout(() => button.click());
-    const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
+    const event = (await oneEvent(el, "fluid-submit")) as FluidFormSubmitEvent;
     expect(event.detail.values).to.deep.equal({ first: "Ada", last: "Lovelace" });
   });
 
@@ -35,8 +46,9 @@ describe("<fluid-form>", () => {
     `);
     const button = el.querySelector("button")!;
     setTimeout(() => button.click());
-    const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
+    const event = (await oneEvent(el, "fluid-submit")) as FluidFormSubmitEvent;
     expect(event.detail.values.tag).to.deep.equal(["a", "b"]);
+    expect(repeatedValues).to.deep.equal({ values: { tag: ["a", "b"] } });
   });
 
   it("emits fluid-invalid and focuses the first invalid control when invalid", async () => {
@@ -50,8 +62,9 @@ describe("<fluid-form>", () => {
     const button = el.querySelector("button")!;
     const email = el.querySelector<HTMLInputElement>("input[name='email']")!;
     setTimeout(() => button.click());
-    const event = (await oneEvent(el, "fluid-invalid")) as CustomEvent;
-    expect(event.detail.invalid).to.equal(email);
+    const event = (await oneEvent(el, "fluid-invalid")) as FluidFormInvalidEvent;
+    const detail: FluidFormInvalidDetail = event.detail;
+    expect(detail).to.deep.equal({ invalid: email });
     expect(el.ownerDocument.activeElement).to.equal(email);
   });
 
@@ -79,6 +92,40 @@ describe("<fluid-form>", () => {
     el.querySelector("button")!.click();
     const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
     expect(event.detail.values).to.deep.equal({ email: "" });
+  });
+
+  it("excludes controls disabled through a native fieldset from validity and values", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="active" value="included" />
+        <fieldset disabled>
+          <input name="email" type="email" required value="" />
+          <input name="ignored" value="excluded" />
+        </fieldset>
+        <button slot="actions" type="submit">Go</button>
+      </fluid-form>
+    `);
+    expect(el.checkValidity()).to.be.true;
+    setTimeout(() => el.querySelector<HTMLButtonElement>("button")!.click());
+    const event = (await oneEvent(el, "fluid-submit")) as FluidFormSubmitEvent;
+    expect(event.detail.values).to.deep.equal({ active: "included" });
+  });
+
+  it("keeps nested fluid-form controls out of the outer validity and value contract", async () => {
+    const outer = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="outer" value="parent" />
+        <fluid-form>
+          <input name="inner" required value="" />
+        </fluid-form>
+      </fluid-form>
+    `);
+    const inner = outer.querySelector<FluidForm>("fluid-form")!;
+    expect(outer.checkValidity()).to.be.true;
+    expect(inner.checkValidity()).to.be.false;
+    setTimeout(() => outer.submit());
+    const event = (await oneEvent(outer, "fluid-submit")) as FluidFormSubmitEvent;
+    expect(event.detail.values).to.deep.equal({ outer: "parent" });
   });
 
   it("reset() restores controls to their initial values", async () => {
@@ -114,9 +161,7 @@ describe("<fluid-form>", () => {
     `);
     const input = el.querySelector<HTMLInputElement>("input")!;
     setTimeout(() =>
-      input.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      )
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }))
     );
     const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
     expect(event.detail.values).to.deep.equal({ first: "Ada" });
@@ -159,6 +204,61 @@ describe("<fluid-form>", () => {
     setTimeout(() => el.submit());
     const event = (await oneEvent(el, "fluid-submit")) as CustomEvent;
     expect(event.detail.values).to.deep.equal({ first: "Ada" });
+  });
+
+  it("snapshots values when submission is requested rather than when the queued event runs", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="first" value="Ada" />
+      </fluid-form>
+    `);
+    const input = el.querySelector<HTMLInputElement>("input")!;
+    const submitted = oneEvent(el, "fluid-submit") as Promise<FluidFormSubmitEvent>;
+    el.submit();
+    input.value = "Grace";
+
+    expect((await submitted).detail.values).to.deep.equal({ first: "Ada" });
+  });
+
+  it("does not deliver a queued submission after the form disconnects", async () => {
+    const el = await fixture<FluidForm>(html`
+      <fluid-form>
+        <input name="first" value="Ada" />
+      </fluid-form>
+    `);
+    let submissions = 0;
+    el.addEventListener("fluid-submit", () => submissions++);
+    el.submit();
+    el.remove();
+    await aTimeout(0);
+
+    expect(submissions).to.equal(0);
+  });
+
+  it("reconnects without duplicating submit handling and resets live controls", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div>
+        <fluid-form>
+          <input name="first" value="Ada" />
+          <button slot="actions" type="submit">Go</button>
+        </fluid-form>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidForm>("fluid-form")!;
+    const input = el.querySelector<HTMLInputElement>("input")!;
+    const button = el.querySelector<HTMLButtonElement>("button")!;
+    el.remove();
+    input.value = "Grace";
+    wrapper.append(el);
+    await el.updateComplete;
+
+    let submissions = 0;
+    el.addEventListener("fluid-submit", () => submissions++);
+    el.reset();
+    expect(input.value).to.equal("Ada");
+    button.click();
+    await aTimeout(0);
+    expect(submissions).to.equal(1);
   });
 
   it("the actions region exposes part=actions", async () => {

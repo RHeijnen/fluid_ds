@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "preFixHistory": {
+    "executions": 34,
+    "flakyExecutions": 1,
+    "flakeRate": 0.029411764705882353,
+    "failure": "components-forms-button--keyboard-focus-reduced-motion.png",
+    "pixelDiagnosis": {
+      "changedPixels": 1,
+      "changedChannels": 1,
+      "maximumChannelDelta": 1,
+      "coordinate": [14, 23],
+      "location": "left rounded focus-ring edge"
+    }
+  },
+  "unchangedHarnessContinuation": {
+    "consecutiveExecutions": 52,
+    "flakyExecutions": 0,
+    "flakeRate": 0,
+    "candidateComparisons": 3060,
+    "acceptedSmokeComparisons": 255,
+    "warning": "The intended prepaint branch did not execute, so this is not post-fix evidence."
+  },
+  "cumulativeFullRunHistory": {
+    "executions": 86,
+    "flakyExecutions": 1,
+    "flakeRate": 0.011627906976744186,
+    "requiredMaximumFlakeRate": 0.01,
+    "gatePassed": false
+  },
+  "currentTreeBoundaryCheck": {
+    "execution": 52,
+    "candidateComparisonsAfterCheck": 3060,
+    "acceptedSmokeComparisonsAfterCheck": 255,
+    "candidateVariance": 0,
+    "acceptedSmokeVariance": 0,
+    "hostFileCount": 4582,
+    "hostContainerFileAggregate": "4c734756c6e9ea544ed2db43c873c054b36ec436",
+    "pnpmLockSha256": "768ad80fc2a8b1ecf4f80cde725a9bf9e56e1cd860adf5e0b59e591dd5e4f96a",
+    "acceptedBaselineAggregateSha256": "369356a6da2903f0040998a59c00c370886e6c0e028362fe8b390bec61b01c0f",
+    "install": "successful offline frozen verification against the final integrity-pinned lock",
+    "storybookBuild": "passed"
+  },
+  "boundaryPolicy": "Continuation runs 1-50 use one immutable pre-freeze Storybook build. Run 51 checked an earlier current-tree boundary. Run 52 uses the exact final frozen current tree and final lock after a clean Storybook rebuild. Both current-tree comparisons passed, but this is unchanged-harness evidence: the proposed prepaint was unproven and reverted, and the cumulative visual-flake gate remains red."
+}

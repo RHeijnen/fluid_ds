@@ -1,0 +1,38 @@
+name: Package contracts
+
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  packed-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # test:packed builds all package outputs before creating clean consumers.
+      - run: pnpm test:packed
+      - run: pnpm check:cem:packed
+      - name: Retain packed contract evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: packed-package-contracts
+          path: |
+            quality/evidence/packed-packages/
+            quality/evidence/package-artifact-tests/
+            quality/evidence/*-cem-publication/
+          if-no-files-found: error

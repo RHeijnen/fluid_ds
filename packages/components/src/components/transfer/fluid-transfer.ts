@@ -97,6 +97,7 @@ type Side = "source" | "target";
  *
  * @fires fluid-change - Fired whenever items move between lists.
  *   `event.detail.value` is the current array of target ids.
+ * @cssproperty --fluid-transfer-focus-ring-color - Component override for the corresponding semantic token.
  */
 export class FluidTransfer extends FluidFormAssociated {
   static override formAssociated = true;
@@ -155,7 +156,7 @@ export class FluidTransfer extends FluidFormAssociated {
 
       .listbox:focus-visible {
         outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width))
-          solid var(--fluid-transfer-focus-ring-color, var(--fluid-focus-ring-color));
+          solid var(--fluid-focus-ring-color);
         outline-offset: 2px;
       }
 
@@ -229,7 +230,7 @@ export class FluidTransfer extends FluidFormAssociated {
 
       .button:focus-visible {
         outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width))
-          solid var(--fluid-transfer-focus-ring-color, var(--fluid-focus-ring-color));
+          solid var(--fluid-focus-ring-color);
         outline-offset: 2px;
       }
 
@@ -259,10 +260,24 @@ export class FluidTransfer extends FluidFormAssociated {
   @property({ reflect: true }) override name = "";
 
   /** Visible label for the source (left) list. */
-  @property({ attribute: "source-label" }) sourceLabel = "Available";
+  @property({ attribute: "source-label" })
+  get sourceLabel(): string {
+    return this.sourceLabelOverride ?? this.term("available");
+  }
+  set sourceLabel(value: string | null) {
+    this.sourceLabelOverride = value;
+  }
+  private sourceLabelOverride: string | null = null;
 
   /** Visible label for the target (right) list. */
-  @property({ attribute: "target-label" }) targetLabel = "Selected";
+  @property({ attribute: "target-label" })
+  get targetLabel(): string {
+    return this.targetLabelOverride ?? this.term("selected");
+  }
+  set targetLabel(value: string | null) {
+    this.targetLabelOverride = value;
+  }
+  private targetLabelOverride: string | null = null;
 
   /** Disabled state. No items can be moved. */
   @property({ type: Boolean, reflect: true }) disabled = false;
@@ -562,7 +577,7 @@ export class FluidTransfer extends FluidFormAssociated {
             part="button"
             class="button"
             type="button"
-            aria-label="Move selected to ${this.targetLabel}"
+            aria-label=${this.term("moveSelectedTo", this.targetLabel)}
             ?disabled=${!canMoveRight}
             @click=${this.moveToTarget}
           >
@@ -584,7 +599,7 @@ export class FluidTransfer extends FluidFormAssociated {
             part="button"
             class="button"
             type="button"
-            aria-label="Move selected to ${this.sourceLabel}"
+            aria-label=${this.term("moveSelectedTo", this.sourceLabel)}
             ?disabled=${!canMoveLeft}
             @click=${this.moveToSource}
           >

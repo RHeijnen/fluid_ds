@@ -1,6 +1,6 @@
 import { FluidDivider } from "./fluid-divider.js";
 
-if (!customElements.get("fluid-divider")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-divider")) {
   customElements.define("fluid-divider", FluidDivider);
 }
 

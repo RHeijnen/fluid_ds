@@ -274,6 +274,8 @@ for any CSS a token does not cover.
   count and structure are conveyed to assistive tech.
 - Each item is a real `<a href>`, so Tab / Shift+Tab move between links and
   Enter follows the link. No special keys to learn ([SC 2.1.1]).
+- Calling an item's `focus()` delegates to its native anchor. Space does not
+  activate a link; an item without `href` is not in the native Tab sequence.
 - The current item carries `aria-current="page"`, conveying location both
   visually (the active style) and programmatically ([SC 1.3.1]).
 - The focus ring reads the conformance tokens, so it strengthens automatically
@@ -282,12 +284,14 @@ for any CSS a token does not cover.
 
 ### AA vs AAA
 
-By default the component meets WCAG 2.2 **Level AA**: a visible focus ring, a
+The component targets WCAG 2.2 **Level AA**: a visible focus ring, a
 24×24 minimum target, and text contrast at 4.5:1. Set
 `data-fluid-conformance="aaa"` on an ancestor and, with no per-component code,
 the focus ring widens (`--fluid-focus-ring-width`) and each link grows to a
 44×44 target (`--fluid-target-min`) for **Level AAA** target size (SC 2.5.5) and
 focus appearance (SC 2.4.13).
+Automated keyboard checks do not constitute a complete conformance audit;
+manual assistive-technology review remains required.
 
 ## API
 

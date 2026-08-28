@@ -1,6 +1,6 @@
 import { FluidMaskedInput } from "./fluid-masked-input.js";
 
-if (!customElements.get("fluid-masked-input")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-masked-input")) {
   customElements.define("fluid-masked-input", FluidMaskedInput);
 }
 

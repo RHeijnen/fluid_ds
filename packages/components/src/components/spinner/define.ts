@@ -1,6 +1,6 @@
 import { FluidSpinner } from "./fluid-spinner.js";
 
-if (!customElements.get("fluid-spinner")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-spinner")) {
   customElements.define("fluid-spinner", FluidSpinner);
 }
 

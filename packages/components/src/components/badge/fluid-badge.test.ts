@@ -31,9 +31,7 @@ describe("<fluid-badge>", () => {
   });
 
   it("success variant background falls back to a theming token, not a hardcoded hex", async () => {
-    const el = await fixture<FluidBadge>(
-      html`<fluid-badge variant="success">Done</fluid-badge>`
-    );
+    const el = await fixture<FluidBadge>(html`<fluid-badge variant="success">Done</fluid-badge>`);
     const styles = (el.constructor as typeof FluidBadge).styles.toString();
     expect(styles).to.contain("var(--fluid-badge-success-bg, var(--fluid-color-emerald-100))");
     expect(styles).to.contain("var(--fluid-badge-warning-bg, var(--fluid-color-amber-100))");
@@ -47,6 +45,34 @@ describe("<fluid-badge>", () => {
     );
     expect(el.getAttribute("variant")).to.equal("warning");
     expect(el.getAttribute("size")).to.equal("sm");
+  });
+
+  it("updates variant, dot semantics and accessible name live", async () => {
+    const el = await fixture<FluidBadge>(html`<fluid-badge>Online</fluid-badge>`);
+    let base = el.shadowRoot!.querySelector(".base")!;
+    expect(base.classList.contains("variant-neutral")).to.equal(true);
+    expect(base.hasAttribute("role")).to.equal(false);
+
+    el.variant = "danger";
+    el.dot = true;
+    el.setAttribute("aria-label", "Offline");
+    await el.updateComplete;
+    base = el.shadowRoot!.querySelector(".base")!;
+    expect(base.classList.contains("variant-danger")).to.equal(true);
+    expect(base.getAttribute("role")).to.equal("status");
+    expect(base.getAttribute("aria-label")).to.equal("Offline");
+    expect(base.querySelector(".dot")?.getAttribute("aria-hidden")).to.equal("true");
+    expect(base.querySelector("slot")).to.equal(null);
+
+    el.setAttribute("aria-label", "Connection lost");
+    await el.updateComplete;
+    expect(base.getAttribute("aria-label")).to.equal("Connection lost");
+
+    el.dot = false;
+    await el.updateComplete;
+    expect(base.hasAttribute("role")).to.equal(false);
+    expect(base.hasAttribute("aria-label")).to.equal(false);
+    expect(base.querySelector("slot")).not.to.equal(null);
   });
 
   it("passes a11y audit", async () => {

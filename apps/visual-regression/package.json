@@ -8,6 +8,8 @@
     "prebuild-storybook": "pnpm --filter @fluid-ds/tokens build",
     "build-storybook": "pnpm --filter @fluid-ds/storybook build",
     "generate": "node ./scripts/generate-tests.mjs",
+    "test:fixtures": "node --test scripts/fixture-selection.test.mjs",
+    "test:guards": "playwright test --config playwright.guard.config.ts",
     "pretest": "pnpm run generate",
     "test": "playwright test",
     "test:visual": "playwright test",

@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 
@@ -11,6 +11,7 @@ registerIcon(
 );
 
 export type FluidBannerVariant = "info" | "success" | "warning" | "danger" | "neutral";
+export type FluidBannerDismissEvent = CustomEvent<null>;
 
 /**
  * Full-width announcement / notification bar that spans the top of a page,
@@ -59,7 +60,7 @@ export type FluidBannerVariant = "info" | "success" | "warning" | "danger" | "ne
  * @uses-token --fluid-border-default - Bottom border.
  * @uses-token --fluid-color-brand-50 - Info accent background.
  *
- * @fires fluid-dismiss - Fired when the dismiss button is clicked. The banner
+ * @fires {FluidBannerDismissEvent} fluid-dismiss - Fired when the dismiss button is clicked. The banner
  *   removes itself from the DOM after dispatching.
  */
 export class FluidBanner extends FluidElement {
@@ -180,7 +181,14 @@ export class FluidBanner extends FluidElement {
    * name comes from the variant ("Notification" / "Alert"), so a screen-reader
    * landmark list still identifies the bar.
    */
-  @property() label = "";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term(this.variant === "danger" || this.variant === "warning" ? "alert" : "notification");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   /** Tracks whether the `actions` slot has assigned content (hides the wrapper otherwise). */
   @state() private hasActions = false;
@@ -192,7 +200,7 @@ export class FluidBanner extends FluidElement {
 
   private handleDismiss = () => {
     this.dispatchEvent(
-      new CustomEvent("fluid-dismiss", { bubbles: true, composed: true })
+      new CustomEvent<null>("fluid-dismiss", { detail: null, bubbles: true, composed: true })
     );
     this.remove();
   };
@@ -203,8 +211,7 @@ export class FluidBanner extends FluidElement {
     // screen reader can jump to them and announce the accessible name.
     const polite = this.variant === "info" || this.variant === "success";
     const role = polite ? "status" : "region";
-    const label =
-      this.label || (this.variant === "danger" || this.variant === "warning" ? "Alert" : "Notification");
+    const label = this.label;
 
     return html`
       <div
@@ -225,7 +232,7 @@ export class FluidBanner extends FluidElement {
                 part="dismiss"
                 class="dismiss"
                 type="button"
-                aria-label="Dismiss"
+                aria-label=${this.term("dismiss")}
                 @click=${this.handleDismiss}
               >
                 <fluid-icon name="close"></fluid-icon>

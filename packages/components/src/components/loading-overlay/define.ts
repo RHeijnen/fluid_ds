@@ -1,6 +1,6 @@
 import { FluidLoadingOverlay } from "./fluid-loading-overlay.js";
 
-if (!customElements.get("fluid-loading-overlay")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-loading-overlay")) {
   customElements.define("fluid-loading-overlay", FluidLoadingOverlay);
 }
 

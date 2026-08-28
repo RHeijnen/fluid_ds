@@ -1,5 +1,148 @@
 import { expect, fixture, html, aTimeout } from "@open-wc/testing";
 import { FluidElement } from "./base-element.js";
+import "../locales/nl.js";
+import "../locales/fr.js";
+
+class DefaultNameProbe extends FluidElement {
+  static override properties = { marker: { type: String } };
+  marker = "initial";
+  updates = 0;
+
+  protected override willUpdate(): void {
+    this.updates++;
+    this.updateDefaultAriaLabel(this.term("progress"));
+  }
+}
+customElements.define("default-name-probe", DefaultNameProbe);
+
+describe("FluidElement default host names", () => {
+  async function settle(control: DefaultNameProbe): Promise<void> {
+    await aTimeout(0);
+    await control.updateComplete;
+  }
+
+  it("observes naming attributes without losing subclass reactive attributes", async () => {
+    expect(DefaultNameProbe.observedAttributes).to.include.members([
+      "aria-label",
+      "aria-labelledby",
+      "marker"
+    ]);
+    const control = await fixture<DefaultNameProbe>(
+      html`<default-name-probe lang="en"></default-name-probe>`
+    );
+    control.setAttribute("marker", "changed");
+    await settle(control);
+    expect(control.marker).to.equal("changed");
+  });
+
+  it("does not treat a same-value author write as a library default", async () => {
+    const control = await fixture<DefaultNameProbe>(
+      html`<default-name-probe lang="en"></default-name-probe>`
+    );
+    control.setAttribute("aria-label", "Progress");
+    control.lang = "nl";
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progress");
+    control.removeAttribute("aria-label");
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Voortgang");
+  });
+
+  it("preserves an explicit empty name and restores a removed override without another property change", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`<div lang="nl"></div>`);
+    const control = document.createElement("default-name-probe") as DefaultNameProbe;
+    // Deliberately invalid caller naming tests ownership, not conformance.
+    control.setAttribute("aria-label", "");
+    wrapper.append(control);
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("");
+    control.removeAttribute("aria-label");
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Voortgang");
+  });
+
+  it("never promotes a library write into application ownership or an update loop", async () => {
+    const control = await fixture<DefaultNameProbe>(
+      html`<default-name-probe lang="en"></default-name-probe>`
+    );
+    control.lang = "nl";
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Voortgang");
+    control.lang = "fr";
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progression");
+    const updates = control.updates;
+    await aTimeout(20);
+    expect(control.updates).to.equal(updates);
+    expect(control.isUpdatePending).to.equal(false);
+  });
+
+  it("defers owned names to authored aria-labelledby without deleting an authored fallback", async () => {
+    const control = await fixture<DefaultNameProbe>(
+      html`<default-name-probe lang="nl"></default-name-probe>`
+    );
+    control.setAttribute("aria-labelledby", "external-heading");
+    await settle(control);
+    expect(control.hasAttribute("aria-label")).to.equal(false);
+    control.setAttribute("aria-label", "Caller fallback");
+    control.lang = "fr";
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Caller fallback");
+    control.removeAttribute("aria-label");
+    control.removeAttribute("aria-labelledby");
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progression");
+  });
+
+  it("treats server or pre-upgrade attributes as authored even when they match English defaults", async () => {
+    const wrapper = await fixture<HTMLDivElement>(
+      html`<div><upgrade-name-probe lang="fr" aria-label="Progress"></upgrade-name-probe></div>`
+    );
+    customElements.define("upgrade-name-probe", class extends DefaultNameProbe {});
+    const control = wrapper.firstElementChild as DefaultNameProbe;
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progress");
+    control.removeAttribute("aria-label");
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progression");
+  });
+
+  it("tracks detached overrides and removal across reconnect without an observer", async () => {
+    const wrapper = await fixture<HTMLDivElement>(
+      html`<div lang="en"><default-name-probe></default-name-probe></div>`
+    );
+    const control = wrapper.firstElementChild as DefaultNameProbe;
+    control.remove();
+    control.ariaLabel = "Progress";
+    wrapper.lang = "fr";
+    wrapper.append(control);
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progress");
+    control.remove();
+    control.ariaLabel = null;
+    wrapper.append(control);
+    await settle(control);
+    expect(control.getAttribute("aria-label")).to.equal("Progression");
+  });
+
+  it("does not schedule name-only updates for components that never opt into defaults", async () => {
+    class NoDefaultProbe extends FluidElement {
+      updates = 0;
+      protected override willUpdate(): void {
+        this.updates++;
+      }
+    }
+    customElements.define("no-default-name-probe", NoDefaultProbe);
+    const control = await fixture<NoDefaultProbe>(
+      html`<no-default-name-probe></no-default-name-probe>`
+    );
+    const updates = control.updates;
+    control.ariaLabel = "Caller name";
+    control.setAttribute("aria-labelledby", "caller-heading");
+    await aTimeout(0);
+    expect(control.updates).to.equal(updates);
+  });
+});
 
 /**
  * A throwaway element that exercises every teardown helper so we can prove a

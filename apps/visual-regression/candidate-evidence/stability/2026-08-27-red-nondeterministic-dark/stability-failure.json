@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "stable": false,
+  "generatedAt": "2026-08-27T13:57:33.250Z",
+  "error": "Visual nondeterminism detected in 4 comparisons: [{\"run\":2,\"name\":\"animations-effects--declarative-auto-dark.png\"},{\"run\":2,\"name\":\"components-forms-button--keyboard-focus-dark.png\"},{\"run\":3,\"name\":\"animations-effects--declarative-auto-dark.png\"},{\"run\":3,\"name\":\"components-forms-button--keyboard-focus-dark.png\"}]"
+}

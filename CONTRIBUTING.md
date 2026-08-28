@@ -96,8 +96,18 @@ Scope is the component or area touched.
 Releases are automated via [Changesets](https://github.com/changesets/changesets):
 
 1. Every PR with a feature or fix includes a `.changeset/*.md` entry.
-2. On merge to `main`, the changesets bot opens (or updates) a release PR.
-3. Merging that PR publishes to npm with provenance via GitHub Actions.
+2. On merge to `main`, all nine release prerequisite workflows must succeed for
+   that commit before the Changesets bot can open or update a release PR.
+3. Merging that PR runs the same prerequisites before publishing to npm with
+   provenance. Manual dispatch is main-only and does not bypass those gates.
 
-Pre-release versions land on the `alpha` dist-tag so they don't surprise
-people running `npm install @fluid-ds/components`.
+The prerequisites cover verification, measured coverage, browser SSR,
+accessibility, Storybook interactions, performance, package and framework
+contracts, and visual regression. Missing baselines or failed checks block
+publication. See [release gate wiring](docs/reviews/release-gates-2026-08-26.md)
+for local verification scope and the remaining remote/manual sign-offs.
+
+The current workflow explicitly passes `--tag latest`. It does not implement an
+automatic `alpha` channel based on a version suffix. A reviewed prerelease-channel
+policy remains required before using this workflow for prereleases; do not assume
+the earlier alpha-tag documentation describes the current command.

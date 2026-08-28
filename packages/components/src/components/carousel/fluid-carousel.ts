@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import type { FluidCarouselItem } from "./fluid-carousel-item.js";
 
@@ -45,7 +45,8 @@ registerIcon(
  * @uses-token --fluid-border-default - Inactive pagination dot color.
  *
  * @fires fluid-slide-change - Fired when the active slide changes; detail = { index }.
- */
+ * @cssproperty --fluid-carousel-shadow-sm - Component override for the corresponding semantic token.
+*/
 export class FluidCarousel extends FluidElement {
   static override styles = css`
     :host {
@@ -87,7 +88,7 @@ export class FluidCarousel extends FluidElement {
       border-radius: 50%;
       background: var(--fluid-carousel-nav-bg, var(--fluid-surface-base));
       color: var(--fluid-carousel-nav-fg, var(--fluid-text-primary));
-      box-shadow: var(--fluid-shadow-sm);
+      box-shadow: var(--fluid-carousel-shadow-sm, var(--fluid-shadow-sm));
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -114,13 +115,20 @@ export class FluidCarousel extends FluidElement {
     .dot {
       all: unset;
       cursor: pointer;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: inline-grid;
+      place-items: center;
+    }
+    .dot::before {
+      content: "";
       width: 0.5rem;
       height: 0.5rem;
       border-radius: 50%;
       background: var(--fluid-carousel-dot-bg, var(--fluid-border-default));
       transition: background 120ms ease, transform 120ms ease;
     }
-    .dot[aria-current="true"] {
+    .dot[aria-current="true"]::before {
       background: var(--fluid-carousel-dot-active-bg, var(--fluid-accent-base));
       transform: scale(1.3);
     }
@@ -165,21 +173,16 @@ export class FluidCarousel extends FluidElement {
     if (!this.hasAttribute("role")) this.setAttribute("role", "region");
     if (!this.hasAttribute("aria-roledescription"))
       this.setAttribute("aria-roledescription", "carousel");
-    this.addEventListener("mouseenter", this.onMouseEnter);
-    this.addEventListener("mouseleave", this.onMouseLeave);
-    this.addEventListener("focusin", this.onFocusIn);
-    this.addEventListener("focusout", this.onFocusOut);
-    this.addEventListener("keydown", this.onKeyDown);
+    this.listen(this, "mouseenter", this.onMouseEnter);
+    this.listen(this, "mouseleave", this.onMouseLeave);
+    this.listen(this, "focusin", this.onFocusIn);
+    this.listen(this, "focusout", this.onFocusOut);
+    this.listen(this, "keydown", this.onKeyDown);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.stopAutoplay();
-    this.removeEventListener("mouseenter", this.onMouseEnter);
-    this.removeEventListener("mouseleave", this.onMouseLeave);
-    this.removeEventListener("focusin", this.onFocusIn);
-    this.removeEventListener("focusout", this.onFocusOut);
-    this.removeEventListener("keydown", this.onKeyDown);
   }
 
   protected override firstUpdated(): void {
@@ -201,7 +204,7 @@ export class FluidCarousel extends FluidElement {
     const items = Array.from(this.querySelectorAll("fluid-carousel-item")) as FluidCarouselItem[];
     this.slideCount = items.length;
     items.forEach((it, i) => {
-      it.setAttribute("aria-label", `Slide ${i + 1} of ${this.slideCount}`);
+      it.setAttribute("aria-label", this.term("slideOf", i + 1, this.slideCount));
     });
   }
 
@@ -279,10 +282,10 @@ export class FluidCarousel extends FluidElement {
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      this.previous();
+      if (this.isRtl) this.next(); else this.previous();
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      this.next();
+      if (this.isRtl) this.previous(); else this.next();
     } else if (e.key === "Home") {
       e.preventDefault();
       this.goTo(0);
@@ -310,7 +313,7 @@ export class FluidCarousel extends FluidElement {
           part="button"
           class="nav-button"
           type="button"
-          aria-label="Previous slide"
+          aria-label=${this.term("previousSlide")}
           ?disabled=${atStart}
           @click=${() => this.previous()}
         >
@@ -320,14 +323,14 @@ export class FluidCarousel extends FluidElement {
           part="button"
           class="nav-button"
           type="button"
-          aria-label="Next slide"
+          aria-label=${this.term("nextSlide")}
           ?disabled=${atEnd}
           @click=${() => this.next()}
         >
           <fluid-icon name="chevron-right"></fluid-icon>
         </button>
       </div>
-      <div part="pagination" class="pagination" role="group" aria-label="Slides">
+      <div part="pagination" class="pagination" role="group" aria-label=${this.term("slides")}>
         ${Array.from(
           { length: this.slideCount },
           (_, i) => html`
@@ -336,7 +339,7 @@ export class FluidCarousel extends FluidElement {
               class="dot"
               type="button"
               aria-current=${i === this.activeIndex ? "true" : "false"}
-              aria-label=${`Go to slide ${i + 1}`}
+              aria-label=${this.term("goToSlide", i + 1)}
               @click=${() => this.goTo(i)}
             ></button>
           `

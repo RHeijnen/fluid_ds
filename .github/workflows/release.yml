@@ -9,30 +9,82 @@ on:
   # no way to release it but another push that may not fire either.
   workflow_dispatch:
 
-# Don't compete with verify on the same SHA, let it finish first.
+# Serialize release attempts. Verification dependencies below enforce ordering.
 concurrency:
   group: release-${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: read
+
 jobs:
+  release-context:
+    name: Require the main release context
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "$GITHUB_REF" = "refs/heads/main"
+
+  # Local reusable references and default checkout use this event's exact commit.
+  # Manual dispatch runs the same gates; missing push events cannot bypass them.
+  verify:
+    needs: release-context
+    uses: ./.github/workflows/verify.yml
+  coverage:
+    needs: release-context
+    uses: ./.github/workflows/coverage.yml
+  ssr:
+    needs: release-context
+    uses: ./.github/workflows/ssr-hydration.yml
+  accessibility:
+    needs: release-context
+    uses: ./.github/workflows/accessibility.yml
+  interactions:
+    needs: release-context
+    uses: ./.github/workflows/storybook-interactions.yml
+  performance:
+    needs: release-context
+    uses: ./.github/workflows/performance.yml
+  packages:
+    needs: release-context
+    uses: ./.github/workflows/package-contracts.yml
+  frameworks:
+    needs: release-context
+    uses: ./.github/workflows/framework-contracts.yml
+  visual:
+    needs: release-context
+    uses: ./.github/workflows/visual-regression.yml
+
   release:
     name: Changesets, version + publish
+    needs:
+      [
+        verify,
+        coverage,
+        ssr,
+        accessibility,
+        interactions,
+        performance,
+        packages,
+        frameworks,
+        visual
+      ]
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      contents: write   # needed so changesets can push the version PR
+      contents: write # needed so changesets can push the version PR
       pull-requests: write
-      id-token: write   # needed for npm provenance
+      id-token: write # needed for npm provenance
     steps:
       - name: Checkout (full history)
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          fetch-depth: 0   # changesets reads tags
+          fetch-depth: 0 # changesets reads tags
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: "24"
           cache: pnpm
@@ -45,8 +97,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Offline supply-chain guard
+        run: pnpm check:supply-chain
+
       - name: Build packages
         run: pnpm build
+
+      - name: Offline release integrity dry-run
+        run: pnpm publish:dry
 
       # The changesets action does both of the following, depending on
       # whether there are pending changeset files in the repo:
@@ -59,8 +117,18 @@ jobs:
       #
       # Stable packages are published to npm's default `latest` dist-tag.
       # Prerelease versions remain identifiable by their semver suffix.
+      - name: Reject an unverified or superseded release checkout
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          release_tip="$(git ls-remote --exit-code origin refs/heads/main | cut -f1)"
+          if [ "$release_tip" != "$GITHUB_SHA" ]; then
+            echo "Main moved after this release started. Run the gates for the new commit."
+            exit 1
+          fi
+
       - name: Create release PR or publish
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
         with:
           publish: pnpm exec changeset publish --tag latest
           version: pnpm exec changeset version

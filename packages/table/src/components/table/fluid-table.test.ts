@@ -1,5 +1,10 @@
 import { expect, fixture, html, elementUpdated, oneEvent, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "@fluid-ds/components/locales/nl";
+import "@fluid-ds/components/locales/de";
+import "@fluid-ds/components/locales/fr";
+import "@fluid-ds/components/locales/es";
+import "@fluid-ds/components/locales/ar";
 import type { FluidTable, FluidTableColumn, FluidTableRow } from "./fluid-table.js";
 
 const columns: FluidTableColumn[] = [
@@ -24,6 +29,39 @@ async function table(props: Partial<FluidTable> = {}): Promise<FluidTable> {
 }
 
 describe("<fluid-table>", () => {
+  it("keeps empty values last in both sort directions", async () => {
+    const el = await table({
+      rows: [
+        { id: "a", age: 2 },
+        { id: "b", age: null },
+        { id: "c", age: 10 }
+      ]
+    });
+    for (const dir of ["asc", "desc"] as const) {
+      el.sort = { key: "age", dir };
+      await elementUpdated(el);
+      const values = [...el.shadowRoot!.querySelectorAll("tbody tr")].map((row) =>
+        row.querySelectorAll("td")[1]!.textContent!.trim()
+      );
+      expect(values).to.deep.equal(dir === "asc" ? ["2", "10", ""] : ["10", "2", ""]);
+    }
+  });
+
+  it("keeps index-keyed duplicate row objects independently selectable through sorting", async () => {
+    const shared = { name: "Shared", age: 2 };
+    const el = await table({
+      selectable: true,
+      rows: [shared, { name: "Other", age: 1 }, shared],
+      sort: { key: "age", dir: "asc" }
+    });
+    const boxes = [...el.shadowRoot!.querySelectorAll<HTMLInputElement>("tbody input")];
+    boxes[2]!.click();
+    await elementUpdated(el);
+    expect(el.selectedKeys).to.deep.equal(["2"]);
+    expect(boxes[1]!.checked).to.be.false;
+    expect(boxes[2]!.getAttribute("aria-label")).to.equal("Select row 3");
+  });
+
   it("renders a semantic table with caption, scoped headers, and a row per datum", async () => {
     const el = await table();
     const root = el.shadowRoot!;
@@ -127,5 +165,50 @@ describe("<fluid-table>", () => {
     await elementUpdated(t);
     await aTimeout(20);
     await expect(t).to.be.accessible();
+  });
+
+  it("updates inherited Arabic and regional French controls without changing table state or data", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div lang="ar">
+        <fluid-table caption="<Caller caption>" selectable></fluid-table>
+      </div>
+    `);
+    const el = wrapper.querySelector<FluidTable>("fluid-table")!;
+    el.columns = columns;
+    el.rows = rows;
+    el.sort = { key: "age", dir: "desc" };
+    await elementUpdated(el);
+    const rowBox = el.shadowRoot!.querySelector<HTMLInputElement>('[part="select-row"]')!;
+    rowBox.click();
+    await elementUpdated(el);
+    const rowReference = el.rows;
+    const columnReference = el.columns;
+    const selected = [...el.selectedKeys];
+    const sort = el.sort;
+    const events: Event[] = [];
+    el.addEventListener("fluid-sort", (event) => events.push(event));
+    el.addEventListener("fluid-selection-change", (event) => events.push(event));
+    expect(el.shadowRoot!.querySelector<HTMLElement>("table")!.dir).to.equal("rtl");
+    expect(
+      el.shadowRoot!.querySelector('[part="select-all"]')!.getAttribute("aria-label")
+    ).to.equal("تحديد كل الصفوف");
+    const firstPosition = new Intl.NumberFormat("ar", { useGrouping: false }).format(1);
+    expect(rowBox.getAttribute("aria-label")).to.equal(`تحديد الصف ${firstPosition}`);
+    expect(el.shadowRoot!.querySelector("caption")!.textContent?.trim()).to.equal(
+      "<Caller caption>"
+    );
+    expect(el.shadowRoot!.querySelector("tbody")!.textContent).to.contain("Oslo");
+
+    wrapper.lang = "fr-CA";
+    await aTimeout(0);
+    await el.updateComplete;
+    expect(
+      el.shadowRoot!.querySelector('[part="select-all"]')!.getAttribute("aria-label")
+    ).to.equal("Sélectionner toutes les lignes");
+    expect(el.rows).to.equal(rowReference);
+    expect(el.columns).to.equal(columnReference);
+    expect(el.sort).to.equal(sort);
+    expect(el.selectedKeys).to.deep.equal(selected);
+    expect(events).to.deep.equal([]);
   });
 });

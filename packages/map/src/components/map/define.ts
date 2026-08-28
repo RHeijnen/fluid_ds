@@ -1,6 +1,6 @@
 import { FluidMap } from "./fluid-map.js";
 
-if (!customElements.get("fluid-map")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-map")) {
   customElements.define("fluid-map", FluidMap);
 }
 

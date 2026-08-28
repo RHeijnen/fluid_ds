@@ -1,3 +1,5 @@
+import type { FluidBadgeVariant } from "@fluid-ds/components";
+
 export interface User {
   id: number;
   name: string;
@@ -24,7 +26,7 @@ export const INITIAL_USERS: User[] = [
   { id: 6, name: "Linus Torvalds", email: "linus@fluid.dev", role: "Admin", status: "active" }
 ];
 
-export const STATUS_TONE: Record<User["status"], string> = {
+export const STATUS_TONE: Record<User["status"], FluidBadgeVariant> = {
   active: "success",
   invited: "info",
   suspended: "danger"

@@ -1,6 +1,6 @@
 import { FluidForm } from "./fluid-form.js";
 
-if (!customElements.get("fluid-form")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-form")) {
   customElements.define("fluid-form", FluidForm);
 }
 

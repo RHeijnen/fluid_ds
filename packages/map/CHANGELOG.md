@@ -1,5 +1,21 @@
 # @fluid-ds/map
 
+## 0.4.0
+
+### Minor Changes
+
+- Support disabling and replacing tile layers at runtime, custom marker tones
+  and icons, and keyboard marker activation through the existing
+  `fluid-marker-click` event.
+
+### Patch Changes
+
+- Localize fallback map and marker names with live language and direction
+  updates while preserving caller labels, coordinates, attribution and map
+  position.
+- Harden first-load Leaflet assets and rapid disconnect/reconnect cleanup, and
+  keep tile, marker and attribution updates from recreating the map unnecessarily.
+
 ## 0.0.3
 
 ### Patch Changes

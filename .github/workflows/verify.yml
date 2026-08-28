@@ -1,10 +1,14 @@
 name: verify
 
 on:
+  workflow_call:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+
+permissions:
+  contents: read
 
 # Cancel older runs on the same PR / branch when a new commit lands.
 concurrency:
@@ -13,42 +17,76 @@ concurrency:
 
 jobs:
   verify:
-    name: pnpm verify
+    name: pnpm verify (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
           cache: pnpm
+
+      - name: Setup native process-handle test helper
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Workspace builds run in dependency order, including icons and tokens.
+      # verify begins with typecheck, so a clean checkout needs these first.
+      - name: Build workspace prerequisites
+        run: pnpm build
 
       # Playwright ships its own browser binaries; we need all three so the
       # cross-engine test matrix can run. The cache key bakes in the version
       # so a Playwright bump invalidates the cache cleanly.
       - name: Cache Playwright browsers
         id: playwright-cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          # A lockfile bump should top up the previous cache, not cold-start it.
+          restore-keys: playwright-${{ runner.os }}-
 
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      # Run through the components package: playwright is a devDependency of
+      # the leaf packages, not the workspace root, so a bare `pnpm exec` at the
+      # root cannot see the binary (this exact miss kept verify red whenever
+      # the cache missed). Install is idempotent, so running it on a partial
+      # cache restore only downloads what changed. Cached browser binaries do
+      # not include Linux system dependencies, so --with-deps always runs.
+      - name: Install Playwright browsers and system dependencies
+        run: pnpm --filter @fluid-ds/components exec playwright install --with-deps chromium firefox webkit
 
       # The verify pipeline runs the full suite. Cross-engine is opted in
       # via FLUID_BROWSERS=all (read by packages/components/web-test-runner.config.js).
-      - name: Verify (typecheck + lint + coverage + tests across 3 engines + build)
+      - name: Verify (types, lint, contracts, three-engine units, SSR imports, docs)
         env:
           FLUID_BROWSERS: all
         run: pnpm verify
+      - name: Retain browser lifecycle diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: browser-lifecycle-node-${{ matrix.node }}
+          path: |
+            quality/evidence/wtr-lifecycle/
+            quality/evidence/wtr-lifecycle-tests/
+            quality/evidence/wtr-watchdog-tests/
+            quality/evidence/unit-matrix-tests/
+            quality/evidence/wtr-mocha-policy/
+            quality/evidence/package-artifact-tests/
+          if-no-files-found: warn

@@ -13,29 +13,31 @@
 name: Visual regression
 
 on:
+  workflow_call:
   pull_request:
     paths:
-      - "packages/components/**"
-      - "packages/tokens/**"
-      - "packages/themes/**"
-      - "packages/icons/**"
+      - "packages/**"
+      - "apps/a11y/scripts/fixture-selection.mjs"
+      - "apps/a11y/tests/fixture-helpers.ts"
+      - "quality/component-quality.json"
+      - "pnpm-lock.yaml"
       - "apps/storybook/**"
       - "apps/visual-regression/**"
       - ".github/workflows/visual-regression.yml"
   push:
     branches: [main]
     paths:
-      - "packages/components/**"
-      - "packages/tokens/**"
-      - "packages/themes/**"
-      - "packages/icons/**"
+      - "packages/**"
+      - "apps/a11y/scripts/fixture-selection.mjs"
+      - "apps/a11y/tests/fixture-helpers.ts"
+      - "quality/component-quality.json"
+      - "pnpm-lock.yaml"
       - "apps/storybook/**"
       - "apps/visual-regression/**"
       - ".github/workflows/visual-regression.yml"
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   visual:
@@ -43,12 +45,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 20
+          node-version: "22"
           # We don't enable pnpm cache here because the action needs a
           # pnpm version pinned via packageManager, corepack picks it up.
 
@@ -66,7 +68,19 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: apps/visual-regression
-        run: corepack pnpm exec playwright install --with-deps chromium
+        run: corepack pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Check visual fixture selection
+        working-directory: apps/visual-regression
+        run: corepack pnpm run test:fixtures
+
+      - name: Generate visual fixtures
+        working-directory: apps/visual-regression
+        run: corepack pnpm run generate
+
+      - name: Check browser fixture guards
+        working-directory: apps/visual-regression
+        run: corepack pnpm run test:guards
 
       - name: Run visual regression
         id: vr
@@ -75,7 +89,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-report
           path: apps/visual-regression/playwright-report/
@@ -83,27 +97,36 @@ jobs:
 
       - name: Upload diff snapshots on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: visual-diffs
           path: apps/visual-regression/test-results/
           retention-days: 14
 
+  comment:
+    name: Report visual failure
+    needs: visual
+    if: always() && needs.visual.result == 'failure' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # This privileged job never checks out or executes pull-request content.
       - name: Comment on PR with diff link
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             const body = [
-              '### Visual regression, diffs detected',
+              '### Visual verification failed',
               '',
-              `The screenshot tests in [\`apps/visual-regression\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}/apps/visual-regression) found pixel differences from the committed baselines.`,
+              `The visual checks in [\`apps/visual-regression\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}/apps/visual-regression) did not complete successfully. Inspect the failed step: causes include setup errors, missing or invalid fixtures, absent baselines, and pixel differences.`,
               '',
               `- **Playwright report (side-by-side actual vs expected vs diff):** download the \`playwright-report\` artifact from [this run](${runUrl}) and open \`index.html\`.`,
               `- **Raw diff images:** download the \`visual-diffs\` artifact.`,
               '',
-              'If the new look is intentional, refresh the baselines and commit them:',
+              'Only refresh baselines after reviewing the actual images in the canonical environment and obtaining the required approval. A missing fixture or setup error is not a reason to update snapshots:',
               '',
               '```bash',
               'corepack pnpm --filter @fluid-ds/storybook build',
@@ -112,7 +135,7 @@ jobs:
               'git commit -m "test(visual): refresh baselines"',
               '```',
               '',
-              'If not, the diff is a real regression, fix the component or token change that caused it.'
+              'Keep unexpected differences and infrastructure failures visible until their cause is fixed; do not accept snapshots merely to make the job green.'
             ].join('\n');
             await github.rest.issues.createComment({
               owner: context.repo.owner,

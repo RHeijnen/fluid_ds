@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-27",
+  "environment": {
+    "platform": "linux",
+    "container": "fluid-readiness-linux-20260826",
+    "engines": ["chromium", "firefox", "webkit"],
+    "server": "direct Vite binary with readiness polling and explicit process cleanup"
+  },
+  "scope": {
+    "forms": ["fluid-select", "fluid-option"],
+    "overlaysAndDisclosures": ["fluid-dialog"],
+    "navigation": ["fluid-pagination"],
+    "representative": true,
+    "exhaustiveCatalogCoverage": false,
+    "manualAssistiveTechnologyCoverage": false,
+    "nativeSafariOrMobileCoverage": false
+  },
+  "retainedFailures": [
+    {
+      "phase": "initial",
+      "passed": 3,
+      "failed": 6,
+      "engines": ["chromium", "firefox", "webkit"],
+      "failures": [
+        "Removing the selected beta option left Select.value and FormData stale at beta in all engines.",
+        "Removing and reconnecting an open Dialog left its native dialog open but outside the modal top layer in Chromium.",
+        "Firefox and WebKit stopped earlier because native showModal focus did not consistently choose the authored slotted autofocus target."
+      ]
+    },
+    {
+      "phase": "after-structural-recovery-repairs",
+      "passed": 8,
+      "failed": 1,
+      "engines": ["chromium", "firefox", "webkit"],
+      "failure": "WebKit still left focus outside the Dialog after showModal, exposing the need for an explicit focus fallback."
+    },
+    {
+      "phase": "after-first-focus-fallback",
+      "passed": 8,
+      "failed": 1,
+      "engines": ["chromium", "firefox", "webkit"],
+      "failure": "Firefox focused the built-in close control natively, so an early focus-within return prevented the authored slotted autofocus target from taking precedence."
+    }
+  ],
+  "final": {
+    "passed": 9,
+    "failed": 0,
+    "focusedComponentTestsPerEngine": 64,
+    "assertions": [
+      "runtime custom-element upgrade and shadow-root presence",
+      "Select selected-option removal fallback, disabled and invalid-to-valid recovery, FormData, ARIA and exact change payloads",
+      "Dialog open and close focus lifecycle, modal top-layer restoration after reconnect and exact show/hide counts",
+      "Pagination shrinking-range fallback, dynamic expansion, reconnect, focus, ARIA and exact page-change payloads",
+      "no duplicate public events after reconnect",
+      "no page errors, console errors, unexpected warnings, failed requests or HTTP error responses"
+    ]
+  }
+}

@@ -12,18 +12,17 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@angular/common": "^20.3.0",
-    "@angular/compiler": "^20.3.0",
-    "@angular/core": "^20.3.0",
-    "@angular/forms": "^20.3.0",
-    "@angular/platform-browser": "^20.3.0",
-    "@angular/router": "^20.3.0",
+    "@angular/common": "^20.3.27",
+    "@angular/compiler": "^20.3.27",
+    "@angular/core": "^20.3.27",
+    "@angular/forms": "^20.3.27",
+    "@angular/platform-browser": "^20.3.27",
+    "@angular/router": "^20.3.27",
     "@fluid-ds/charts": "workspace:*",
     "@fluid-ds/components": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",
-    "@floating-ui/dom": "^1.6.13",
     "chart.js": "^4.4.7",
     "lit": "^3.2.1",
     "rxjs": "^7.8.0",
@@ -31,9 +30,9 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.0",
-    "@angular/cli": "^20.3.0",
-    "@angular/compiler-cli": "^20.3.0",
+    "@angular/build": "^20.3.34",
+    "@angular/cli": "^20.3.34",
+    "@angular/compiler-cli": "^20.3.27",
     "typescript": "~5.8.3"
   }
 }

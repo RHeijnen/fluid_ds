@@ -8,7 +8,7 @@ import {
   shift,
   arrow,
   type Placement
-} from "@floating-ui/dom";
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
 import "../button/define.js";
@@ -195,18 +195,39 @@ export class FluidPopconfirm extends FluidElement {
   @property({ type: Boolean, reflect: true }) open = false;
 
   /** The confirmation message shown in the prompt. */
-  @property() message = "Are you sure?";
+  @property()
+  get message(): string {
+    return this.messageOverride ?? this.term("areYouSure");
+  }
+  set message(value: string | null) {
+    this.messageOverride = value;
+  }
+  private messageOverride: string | null = null;
 
   /** Label for the confirm button. */
-  @property({ attribute: "confirm-text" }) confirmText = "Confirm";
+  @property({ attribute: "confirm-text" })
+  get confirmText(): string {
+    return this.confirmTextOverride ?? this.term("confirm");
+  }
+  set confirmText(value: string | null) {
+    this.confirmTextOverride = value;
+  }
+  private confirmTextOverride: string | null = null;
 
   /** Label for the cancel button. */
-  @property({ attribute: "cancel-text" }) cancelText = "Cancel";
+  @property({ attribute: "cancel-text" })
+  get cancelText(): string {
+    return this.cancelTextOverride ?? this.term("cancel");
+  }
+  set cancelText(value: string | null) {
+    this.cancelTextOverride = value;
+  }
+  private cancelTextOverride: string | null = null;
 
   /** Tone of the prompt. Drives the leading icon color and the confirm button. */
   @property({ reflect: true }) tone: FluidPopconfirmTone = "danger";
 
-  /** Floating-ui placement. */
+  /** Placement relative to the anchor. */
   @property() placement: Placement = "top";
 
   /** Distance (px) between the trigger and the panel. */
@@ -218,21 +239,23 @@ export class FluidPopconfirm extends FluidElement {
   @state() private messageId = `fluid-popconfirm-${++popconfirmIdCounter}`;
 
   private trigger: HTMLElement | null = null;
+  private disposeTrigger?: () => void;
   private cleanup?: () => void;
   private previouslyFocused: HTMLElement | null = null;
   private hasOpened = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsideClick, true);
-    document.addEventListener("keydown", this.handleKeyDown);
+    this.listen(document, "pointerdown", this.handleOutsideClick, { capture: true });
+    this.listen(document, "keydown", this.handleKeyDown);
+    if (this.hasUpdated) this.attachTrigger();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsideClick, true);
-    document.removeEventListener("keydown", this.handleKeyDown);
     this.cleanup?.();
+    this.trigger = null;
+    this.disposeTrigger = undefined;
   }
 
   protected override firstUpdated(): void {
@@ -270,9 +293,9 @@ export class FluidPopconfirm extends FluidElement {
     const slotted = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
     if (!slotted) return;
     if (this.trigger !== slotted) {
-      this.trigger?.removeEventListener("click", this.handleTriggerClick);
+      this.disposeTrigger?.();
       this.trigger = slotted;
-      this.trigger.addEventListener("click", this.handleTriggerClick);
+      this.disposeTrigger = this.listen(this.trigger, "click", this.handleTriggerClick);
       if (!this.trigger.hasAttribute("aria-haspopup")) {
         this.trigger.setAttribute("aria-haspopup", "dialog");
       }
@@ -312,7 +335,7 @@ export class FluidPopconfirm extends FluidElement {
         strategy: "fixed",
         middleware: [
           offset(this.distance),
-          flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }),
+          flip(),
           shift({ padding: 8 }),
           this.arrowEl ? arrow({ element: this.arrowEl, padding: 8 }) : undefined
         ].filter((m): m is NonNullable<typeof m> => m !== undefined)
@@ -449,6 +472,7 @@ export class FluidPopconfirm extends FluidElement {
         aria-labelledby=${this.messageId}
         aria-describedby=${this.messageId}
       >
+        <div part="arrow" class="arrow" aria-hidden="true"></div>
         <div class="body">
           <span class="icon" aria-hidden="true">${this.renderIcon()}</span>
           <p part="message" class="message" id=${this.messageId}>${this.message}</p>

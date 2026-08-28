@@ -7,9 +7,12 @@ import {
   offset,
   shift,
   type Placement
-} from "@floating-ui/dom";
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
+
+export type FluidPopoverShowEvent = CustomEvent<null>;
+export type FluidPopoverHideEvent = CustomEvent<null>;
 
 /**
  * Click-triggered floating panel anchored to a trigger element. Useful for
@@ -37,6 +40,7 @@ import { reducedMotion } from "../../internal/motion.js";
  * @cssproperty --fluid-popover-border-width - Panel border width. Falls back to 1px.
  * @cssproperty --fluid-popover-fg - Panel text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-popover-radius - Panel corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-popover-shadow - Panel elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-popover-font-family - Panel font family. Falls back to --fluid-font-family-sans.
  *
  * @uses-token --fluid-surface-base - Default panel background.
@@ -46,49 +50,49 @@ import { reducedMotion } from "../../internal/motion.js";
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
  *
- * @fires fluid-show - Fired when the popover becomes visible.
- * @fires fluid-hide - Fired when the popover is dismissed.
+ * @fires {FluidPopoverShowEvent} fluid-show - Fired when the popover becomes visible.
+ * @fires {FluidPopoverHideEvent} fluid-hide - Fired when the popover is dismissed.
  */
 export class FluidPopover extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: contents;
-    }
+      :host {
+        display: contents;
+      }
 
-    .panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      min-width: 12rem;
-      max-width: 24rem;
-      padding: var(--fluid-space-3) var(--fluid-space-4);
-      background: var(--fluid-popover-bg, var(--fluid-surface-base));
-      border: var(--fluid-popover-border-width, 1px) solid
-        var(--fluid-popover-border, var(--fluid-border-default));
-      border-radius: var(--fluid-popover-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-shadow-lg);
-      font-family: var(--fluid-popover-font-family, var(--fluid-font-family-sans));
-      color: var(--fluid-popover-fg, var(--fluid-text-primary));
-      opacity: 0;
-      visibility: hidden;
-      transform: scale(0.97);
-      transform-origin: top left;
-      transition:
-        opacity var(--fluid-duration-fast) var(--fluid-easing-standard),
-        transform var(--fluid-duration-fast) var(--fluid-easing-standard),
-        visibility 0s var(--fluid-duration-fast);
-    }
+      .panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        min-width: 12rem;
+        max-width: 24rem;
+        padding: var(--fluid-space-3) var(--fluid-space-4);
+        background: var(--fluid-popover-bg, var(--fluid-surface-base));
+        border: var(--fluid-popover-border-width, 1px) solid
+          var(--fluid-popover-border, var(--fluid-border-default));
+        border-radius: var(--fluid-popover-radius, var(--fluid-radius-md));
+        box-shadow: var(--fluid-popover-shadow, var(--fluid-shadow-lg));
+        font-family: var(--fluid-popover-font-family, var(--fluid-font-family-sans));
+        color: var(--fluid-popover-fg, var(--fluid-text-primary));
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.97);
+        transform-origin: top left;
+        transition:
+          opacity var(--fluid-duration-fast) var(--fluid-easing-standard),
+          transform var(--fluid-duration-fast) var(--fluid-easing-standard),
+          visibility 0s var(--fluid-duration-fast);
+      }
 
-    :host([open]) .panel {
-      opacity: 1;
-      visibility: visible;
-      transform: scale(1);
-      transition-delay: 0s;
-    }
-  `
+      :host([open]) .panel {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+        transition-delay: 0s;
+      }
+    `
   ];
 
   @query(".panel") private panelEl!: HTMLElement;
@@ -96,7 +100,7 @@ export class FluidPopover extends FluidElement {
   /** Open state. */
   @property({ type: Boolean, reflect: true }) open = false;
 
-  /** Floating-ui placement. */
+  /** Placement relative to the anchor. */
   @property() placement: Placement = "bottom-start";
 
   /** Distance (px) between the trigger and the panel. */
@@ -108,22 +112,31 @@ export class FluidPopover extends FluidElement {
   /** Disable the popover (clicks on the trigger don't open it). */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
+  /** Accessible name for the dialog panel. */
+  @property() label = "";
+
   private trigger: HTMLElement | null = null;
+  private disposeTrigger?: () => void;
   private cleanup?: () => void;
   private previouslyFocused: HTMLElement | null = null;
   private hasOpened = false;
+  private focusRequest = 0;
+  private triggerAriaExpanded: string | null = null;
+  private ownsTriggerHaspopup = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsideClick, true);
-    document.addEventListener("keydown", this.handleKeyDown);
+    this.listen(document, "pointerdown", this.handleOutsideClick, { capture: true });
+    this.listen(document, "keydown", this.handleKeyDown);
+    if (this.hasUpdated) this.attachTrigger();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsideClick, true);
-    document.removeEventListener("keydown", this.handleKeyDown);
     this.cleanup?.();
+    this.cleanup = undefined;
+    this.focusRequest += 1;
+    this.detachTrigger();
   }
 
   protected override firstUpdated(): void {
@@ -143,7 +156,7 @@ export class FluidPopover extends FluidElement {
 
   /** Show the popover. */
   show(): void {
-    if (this.disabled || this.open) return;
+    if (this.disabled || this.open || !this.trigger) return;
     this.open = true;
   }
 
@@ -161,43 +174,80 @@ export class FluidPopover extends FluidElement {
 
   private attachTrigger(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>("slot[name='trigger']");
-    const slotted = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
-    if (!slotted) return;
-    if (this.trigger !== slotted) {
-      this.trigger?.removeEventListener("click", this.handleTriggerClick);
-      this.trigger = slotted;
-      this.trigger.addEventListener("click", this.handleTriggerClick);
-      // Wire ARIA, popover is described by its panel.
-      if (!this.trigger.hasAttribute("aria-haspopup")) {
-        this.trigger.setAttribute("aria-haspopup", "true");
+    const next = slot?.assignedElements({ flatten: true })[0] as HTMLElement | undefined;
+    if (this.trigger !== next) {
+      this.cleanup?.();
+      this.cleanup = undefined;
+      this.detachTrigger();
+      if (!next) {
+        if (this.open) this.hide();
+        return;
       }
+      this.trigger = next;
+      this.triggerAriaExpanded = next.getAttribute("aria-expanded");
+      this.disposeTrigger = this.listen(next, "click", this.handleTriggerClick);
+      // Wire ARIA, popover is described by its panel.
+      this.ownsTriggerHaspopup = !next.hasAttribute("aria-haspopup");
+      if (this.ownsTriggerHaspopup) {
+        next.setAttribute("aria-haspopup", "true");
+      }
+      if (this.open) this.startTracking();
     }
+    if (!this.trigger) return;
     this.trigger.setAttribute("aria-expanded", this.open ? "true" : "false");
+  }
+
+  private detachTrigger(): void {
+    this.disposeTrigger?.();
+    this.disposeTrigger = undefined;
+    if (!this.trigger) return;
+    if (this.triggerAriaExpanded === null) this.trigger.removeAttribute("aria-expanded");
+    else this.trigger.setAttribute("aria-expanded", this.triggerAriaExpanded);
+    if (this.ownsTriggerHaspopup) this.trigger.removeAttribute("aria-haspopup");
+    this.trigger = null;
+    this.triggerAriaExpanded = null;
+    this.ownsTriggerHaspopup = false;
+  }
+
+  private startTracking(): void {
+    if (!this.trigger || !this.panelEl || !this.open) return;
+    this.cleanup?.();
+    this.cleanup = autoUpdate(this.trigger, this.panelEl, () => this.reposition());
+    void this.reposition();
   }
 
   private async handleOpen(): Promise<void> {
     this.previouslyFocused = (this.getRootNode() as Document).activeElement as HTMLElement | null;
     if (!this.trigger || !this.panelEl) return;
     this.trigger.setAttribute("aria-expanded", "true");
-    this.cleanup = autoUpdate(this.trigger, this.panelEl, () => this.reposition());
+    this.startTracking();
     await this.reposition();
     // Move focus into the popover after the panel paints.
+    const focusRequest = ++this.focusRequest;
     requestAnimationFrame(() => {
-      const focusable = this.panelEl.querySelector<HTMLElement>(
-        '[autofocus], button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
+      if (focusRequest !== this.focusRequest || !this.open || !this.isConnected) return;
+      const focusable = Array.from(
+        this.querySelectorAll<HTMLElement>(
+          '[autofocus], button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).find((candidate) => candidate !== this.trigger && !this.trigger?.contains(candidate));
       focusable?.focus();
     });
-    this.dispatchEvent(new CustomEvent("fluid-show", { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-show", { detail: null, bubbles: true, composed: true })
+    );
   }
 
   private handleClose(): void {
+    this.focusRequest += 1;
     this.cleanup?.();
     this.cleanup = undefined;
     if (this.trigger) this.trigger.setAttribute("aria-expanded", "false");
     this.previouslyFocused?.focus();
     this.previouslyFocused = null;
-    this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
+    );
   }
 
   private async reposition(): Promise<void> {
@@ -207,7 +257,7 @@ export class FluidPopover extends FluidElement {
       strategy: "fixed",
       middleware: [
         offset({ mainAxis: this.distance, crossAxis: this.skidding }),
-        flip({ boundary: "clippingAncestors", rootBoundary: "viewport" }),
+        flip(),
         shift({ padding: 8 })
       ]
     });
@@ -237,7 +287,12 @@ export class FluidPopover extends FluidElement {
   override render(): TemplateResult {
     return html`
       <slot name="trigger" @slotchange=${() => this.attachTrigger()}></slot>
-      <div part="panel" class="panel" role="dialog">
+      <div
+        part="panel"
+        class="panel"
+        role="dialog"
+        aria-label=${this.label || this.term("popover")}
+      >
         <slot></slot>
       </div>
     `;

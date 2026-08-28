@@ -25,9 +25,7 @@ describe("<fluid-pagination>", () => {
     const el = await fixture<FluidPagination>(
       html`<fluid-pagination total-pages="5" label="Results"></fluid-pagination>`
     );
-    expect(el.shadowRoot!.querySelector("nav")!.getAttribute("aria-label")).to.equal(
-      "Results"
-    );
+    expect(el.shadowRoot!.querySelector("nav")!.getAttribute("aria-label")).to.equal("Results");
   });
 
   it("derives page count from total and page-size", async () => {
@@ -135,7 +133,9 @@ describe("<fluid-pagination>", () => {
     );
     let fired = false;
     el.addEventListener("fluid-page-change", () => (fired = true));
-    pageButtons(el).find((b) => b.getAttribute("aria-current") === "page")!.click();
+    pageButtons(el)
+      .find((b) => b.getAttribute("aria-current") === "page")!
+      .click();
     expect(fired).to.be.false;
   });
 
@@ -145,6 +145,76 @@ describe("<fluid-pagination>", () => {
     );
     await elementUpdated(el);
     expect(el.page).to.equal(5);
+  });
+
+  it("normalizes non-finite totals before building page controls", () => {
+    const el = document.createElement("fluid-pagination") as FluidPagination;
+    el.totalPages = Number.POSITIVE_INFINITY;
+    const pageCount = (el as unknown as { pageCount: number }).pageCount;
+    // Restore a finite value before Lit's queued initial render runs.
+    el.totalPages = 1;
+    expect(pageCount).to.equal(1);
+  });
+
+  it("reconciles invalid live totals and current-page mutations", async () => {
+    const el = await fixture<FluidPagination>(
+      html`<fluid-pagination total-pages="10" page="10"></fluid-pagination>`
+    );
+    el.totalPages = -4;
+    el.page = Number.NaN;
+    await el.updateComplete;
+    expect(el.page).to.equal(1);
+    expect(pageButtons(el).map((button) => button.textContent?.trim())).to.deep.equal(["1"]);
+    expect(prevButton(el).disabled).to.equal(true);
+    expect(nextButton(el).disabled).to.equal(true);
+  });
+
+  it("keeps controls operable when embedded in a form", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fluid-pagination total-pages="3"></fluid-pagination>
+      </form>
+    `);
+    const el = form.querySelector<FluidPagination>("fluid-pagination")!;
+    let submits = 0;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submits++;
+    });
+    nextButton(el).click();
+    await el.updateComplete;
+    expect(submits).to.equal(0);
+    expect(el.page).to.equal(2);
+    expect(
+      Array.from(el.shadowRoot!.querySelectorAll("button")).every(
+        (button) => button.type === "button"
+      )
+    ).to.equal(true);
+  });
+
+  it("updates edge direction after a live RTL mutation", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div dir="ltr"><fluid-pagination total-pages="3" page="2"></fluid-pagination></div>
+    `);
+    const el = wrapper.querySelector<FluidPagination>("fluid-pagination")!;
+    const previousPath = () => prevButton(el).querySelector("path")?.getAttribute("d") ?? "";
+    const ltrPath = previousPath();
+    wrapper.dir = "rtl";
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await el.updateComplete;
+    expect(previousPath()).to.not.equal(ltrPath);
+  });
+
+  it("allows its control list to reflow in narrow containers", async () => {
+    const el = await fixture<FluidPagination>(
+      html`<fluid-pagination
+        style="inline-size: 8rem"
+        total-pages="20"
+        page="10"
+      ></fluid-pagination>`
+    );
+    const list = el.shadowRoot!.querySelector<HTMLElement>(".list")!;
+    expect(getComputedStyle(list).flexWrap).to.equal("wrap");
   });
 
   it("each page button exposes an accessible name", async () => {

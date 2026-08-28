@@ -1,6 +1,6 @@
 import { FluidPopconfirm } from "./fluid-popconfirm.js";
 
-if (!customElements.get("fluid-popconfirm")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-popconfirm")) {
   customElements.define("fluid-popconfirm", FluidPopconfirm);
 }
 

@@ -1,6 +1,6 @@
 import { FluidSidebar } from "./fluid-sidebar.js";
 
-if (!customElements.get("fluid-sidebar")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-sidebar")) {
   customElements.define("fluid-sidebar", FluidSidebar);
 }
 

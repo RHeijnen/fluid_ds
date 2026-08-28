@@ -5,7 +5,13 @@ import "@fluid-ds/components/define/switch";
 import "@fluid-ds/components/define/button";
 import "@fluid-ds/components/define/number-input";
 import "@fluid-ds/components/define/date-picker";
-import type { Availability, TimeWindow, Weekday } from "../../internal/availability.js";
+import {
+  parseTime,
+  type Availability,
+  type AvailabilityException,
+  type TimeWindow,
+  type Weekday
+} from "../../internal/availability.js";
 
 const DEFAULT_WINDOW: TimeWindow = { start: "09:00", end: "17:00" };
 
@@ -155,14 +161,12 @@ export class FluidAvailabilityEditor extends FluidElement {
   @state() private capacity = 1;
   @state() private minNoticeHours = 0;
   @state() private maxAdvanceDays = 60;
-
-  override connectedCallback(): void {
-    super.connectedCallback();
-    if (this.availability) this.hydrate(this.availability);
-  }
+  private preservedSettings: Partial<Availability> = {};
+  private specialHours: AvailabilityException[] = [];
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("availability") && this.availability) this.hydrate(this.availability);
+    if (changed.has("availability"))
+      this.hydrate(this.availability ?? { weekly: {}, slotMinutes: 30 });
   }
 
   private hydrate(a: Availability): void {
@@ -173,37 +177,93 @@ export class FluidAvailabilityEditor extends FluidElement {
     this.weekly = weekly;
     this.slotMinutes = a.slotMinutes ?? 30;
     this.capacity = a.capacity ?? 1;
-    this.minNoticeHours = Math.round((a.minNoticeMinutes ?? 0) / 60);
-    this.maxAdvanceDays = a.maxAdvanceDays ?? 60;
-    this.exceptions = (a.exceptions ?? []).map((e) => ({ date: e.date, closed: e.closed ?? true }));
+    this.minNoticeHours = (a.minNoticeMinutes ?? 0) / 60;
+    this.maxAdvanceDays = a.maxAdvanceDays ?? 0;
+    this.preservedSettings = {
+      ...(a.stepMinutes === undefined ? {} : { stepMinutes: a.stepMinutes }),
+      ...(a.bufferMinutes === undefined ? {} : { bufferMinutes: a.bufferMinutes }),
+      ...(a.timeZone === undefined ? {} : { timeZone: a.timeZone })
+    };
+    this.specialHours = (a.exceptions ?? [])
+      .filter((e) => !e.closed && e.windows !== undefined)
+      .map((e) => ({ ...e, windows: e.windows?.map((window) => ({ ...window })) }));
+    this.exceptions = (a.exceptions ?? [])
+      .filter((e) => e.closed || e.windows === undefined)
+      .map((e) => ({ date: e.date, closed: true }));
   }
 
   private get orderedDays(): number[] {
-    return Array.from({ length: 7 }, (_, i) => (this.weekStart + i) % 7);
+    const start =
+      Number.isInteger(this.weekStart) && this.weekStart >= 0 && this.weekStart <= 6
+        ? this.weekStart
+        : 1;
+    return Array.from({ length: 7 }, (_, i) => (start + i) % 7);
+  }
+
+  private get displayLocale(): string | undefined {
+    const locale = this.locale === undefined ? this.localize.locale : this.locale;
+    if (locale === "") return undefined;
+    try {
+      Intl.getCanonicalLocales(locale);
+      return locale;
+    } catch {
+      return this.locale === undefined ? "en" : undefined;
+    }
+  }
+
+  private formatNumber(value: number): string {
+    return new Intl.NumberFormat(this.displayLocale, { useGrouping: false }).format(value);
   }
 
   private dayName(d: number): string {
     // 2024-01-07 is a Sunday (getDay 0); offset to weekday d.
-    return new Intl.DateTimeFormat(this.locale || undefined, { weekday: "long" }).format(new Date(2024, 0, 7 + d));
+    return new Intl.DateTimeFormat(this.displayLocale, { weekday: "long" }).format(
+      new Date(2024, 0, 7 + d)
+    );
   }
 
   private emit(): void {
+    if (
+      Object.values(this.weekly).some((windows) =>
+        windows.some((window) => !this.validWindow(window))
+      )
+    )
+      return;
     const weekly: Availability["weekly"] = {};
     for (const d of Object.keys(this.weekly).map(Number)) {
       const wins = this.weekly[d];
       if (wins && wins.length) weekly[d as Weekday] = wins.map((w) => ({ ...w }));
     }
     const availability: Availability = {
+      ...this.preservedSettings,
       weekly,
       slotMinutes: this.slotMinutes,
       ...(this.capacity > 1 ? { capacity: this.capacity } : {}),
       ...(this.minNoticeHours > 0 ? { minNoticeMinutes: this.minNoticeHours * 60 } : {}),
       ...(this.maxAdvanceDays > 0 ? { maxAdvanceDays: this.maxAdvanceDays } : {}),
-      ...(this.exceptions.length
-        ? { exceptions: this.exceptions.filter((e) => e.date).map((e) => ({ date: e.date, closed: e.closed })) }
+      ...(this.exceptions.length || this.specialHours.length
+        ? {
+            exceptions: [
+              ...this.specialHours.map((e) => ({
+                ...e,
+                windows: e.windows?.map((window) => ({ ...window }))
+              })),
+              ...this.exceptions
+                .filter((e) => e.date)
+                .map((e) => ({ date: e.date, closed: e.closed }))
+            ]
+          }
         : {})
     };
-    this.dispatchEvent(new CustomEvent("fluid-change", { detail: { availability }, bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent("fluid-change", { detail: { availability }, bubbles: true, composed: true })
+    );
+  }
+
+  private validWindow(window: TimeWindow): boolean {
+    const start = parseTime(window.start);
+    const end = parseTime(window.end);
+    return start !== null && end !== null && start < end;
   }
 
   private toggleDay(d: number, open: boolean): void {
@@ -255,7 +315,13 @@ export class FluidAvailabilityEditor extends FluidElement {
     this.emit();
   }
 
-  private numberField(label: string, value: number, min: number, step: number, onChange: (n: number) => void): TemplateResult {
+  private numberField(
+    label: string,
+    value: number,
+    min: number,
+    step: number,
+    onChange: (n: number) => void
+  ): TemplateResult {
     return html`
       <label class="field">
         <span>${label}</span>
@@ -265,8 +331,9 @@ export class FluidAvailabilityEditor extends FluidElement {
           min=${min}
           step=${step}
           @fluid-change=${(e: Event) => {
+            e.stopPropagation();
             const v = Number((e.target as HTMLElement & { value: string }).value);
-            if (!Number.isNaN(v)) onChange(v);
+            if (Number.isFinite(v) && v >= min) onChange(v);
           }}
         ></fluid-number-input>
       </label>
@@ -275,31 +342,31 @@ export class FluidAvailabilityEditor extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="base">
+      <div part="base" class="base" dir=${this.localize.dir}>
         <section part="settings">
-          <h3>Slot rules</h3>
+          <h3>${this.term("slotRules")}</h3>
           <div class="settings">
-            ${this.numberField("Slot length (min)", this.slotMinutes, 5, 5, (n) => {
+            ${this.numberField(this.term("slotLengthMinutes"), this.slotMinutes, 5, 5, (n) => {
               this.slotMinutes = n;
               this.emit();
             })}
-            ${this.numberField("Capacity per slot", this.capacity, 1, 1, (n) => {
+            ${this.numberField(this.term("capacityPerSlot"), this.capacity, 1, 1, (n) => {
               this.capacity = n;
               this.emit();
             })}
-            ${this.numberField("Min notice (hours)", this.minNoticeHours, 0, 1, (n) => {
+            ${this.numberField(this.term("minimumNoticeHours"), this.minNoticeHours, 0, 1, (n) => {
               this.minNoticeHours = n;
               this.emit();
             })}
-            ${this.numberField("Book up to (days)", this.maxAdvanceDays, 0, 1, (n) => {
+            ${this.numberField(this.term("bookUpToDays"), this.maxAdvanceDays, 0, 1, (n) => {
               this.maxAdvanceDays = n;
               this.emit();
             })}
           </div>
         </section>
 
-        <section part="week" role="group" aria-label="Weekly hours">
-          <h3>Weekly hours</h3>
+        <section part="week" role="group" aria-label=${this.term("weeklyHours")}>
+          <h3>${this.term("weeklyHours")}</h3>
           ${this.orderedDays.map((d) => {
             const wins = this.weekly[d] ?? [];
             const open = wins.length > 0;
@@ -308,9 +375,12 @@ export class FluidAvailabilityEditor extends FluidElement {
               <div class="day" part="day">
                 <span class="day-name">${name}</span>
                 <fluid-switch
-                  aria-label=${`Open on ${name}`}
+                  aria-label=${this.term("openOnDay", name)}
                   ?checked=${open}
-                  @fluid-change=${(e: Event) => this.toggleDay(d, (e as CustomEvent).detail.checked)}
+                  @fluid-change=${(e: Event) => {
+                    e.stopPropagation();
+                    this.toggleDay(d, (e as CustomEvent).detail.checked);
+                  }}
                 ></fluid-switch>
                 ${open
                   ? html`
@@ -320,55 +390,98 @@ export class FluidAvailabilityEditor extends FluidElement {
                             <span class="window">
                               <input
                                 type="time"
-                                aria-label=${`${name} opening time ${i + 1}`}
+                                aria-label=${this.term(
+                                  "openingTime",
+                                  name,
+                                  this.formatNumber(i + 1)
+                                )}
                                 .value=${w.start}
-                                @change=${(e: Event) => this.setWindow(d, i, "start", (e.target as HTMLInputElement).value)}
+                                aria-invalid=${this.validWindow(w) ? "false" : "true"}
+                                aria-describedby=${`window-error-${d}-${i}`}
+                                @change=${(e: Event) =>
+                                  this.setWindow(
+                                    d,
+                                    i,
+                                    "start",
+                                    (e.target as HTMLInputElement).value
+                                  )}
                               />
                               <span aria-hidden="true">–</span>
                               <input
                                 type="time"
-                                aria-label=${`${name} closing time ${i + 1}`}
+                                aria-label=${this.term(
+                                  "closingTime",
+                                  name,
+                                  this.formatNumber(i + 1)
+                                )}
                                 .value=${w.end}
-                                @change=${(e: Event) => this.setWindow(d, i, "end", (e.target as HTMLInputElement).value)}
+                                aria-invalid=${this.validWindow(w) ? "false" : "true"}
+                                aria-describedby=${`window-error-${d}-${i}`}
+                                @change=${(e: Event) =>
+                                  this.setWindow(d, i, "end", (e.target as HTMLInputElement).value)}
                               />
                               <button
                                 class="icon-btn"
                                 type="button"
-                                aria-label=${`Remove ${name} window ${i + 1}`}
+                                aria-label=${this.term(
+                                  "removeTimeWindow",
+                                  name,
+                                  this.formatNumber(i + 1)
+                                )}
                                 @click=${() => this.removeWindow(d, i)}
                               >
                                 ×
                               </button>
+                              <span
+                                id=${`window-error-${d}-${i}`}
+                                ?hidden=${this.validWindow(w)}
+                                role="alert"
+                              >
+                                ${this.term("openingBeforeClosing")}
+                              </span>
                             </span>
                           `
                         )}
-                        <fluid-button size="sm" variant="ghost" @click=${() => this.addWindow(d)}>+ Hours</fluid-button>
+                        <fluid-button size="sm" variant="ghost" @click=${() => this.addWindow(d)}
+                          >${this.term("addHours")}</fluid-button
+                        >
                       </div>
                     `
-                  : html`<span class="closed-note">Closed</span>`}
+                  : html`<span class="closed-note">${this.term("closed")}</span>`}
               </div>
             `;
           })}
         </section>
 
-        <section part="exceptions" role="group" aria-label="Closed dates">
-          <h3>Closed dates</h3>
+        <section part="exceptions" role="group" aria-label=${this.term("closedDates")}>
+          <h3>${this.term("closedDates")}</h3>
           ${this.exceptions.map(
             (e, i) => html`
               <div class="exception">
                 <fluid-date-picker
-                  aria-label="Closed date"
+                  aria-label=${this.term("closedDate")}
+                  .locale=${this.locale}
                   value=${e.date}
-                  @fluid-change=${(ev: Event) => this.setExceptionDate(i, (ev as CustomEvent).detail.value)}
+                  @fluid-change=${(ev: Event) => {
+                    ev.stopPropagation();
+                    this.setExceptionDate(i, (ev as CustomEvent).detail.value);
+                  }}
                 ></fluid-date-picker>
-                <span class="closed-note">Closed all day</span>
-                <button class="icon-btn" type="button" aria-label="Remove closed date" @click=${() => this.removeException(i)}>
+                <span class="closed-note">${this.term("closedAllDay")}</span>
+                <button
+                  class="icon-btn"
+                  type="button"
+                  aria-label=${this.term("removeClosedDate")}
+                  @click=${() => this.removeException(i)}
+                >
                   ×
                 </button>
               </div>
             `
           )}
-          <fluid-button size="sm" variant="ghost" @click=${() => this.addException()}>+ Add closed date</fluid-button>
+          <fluid-button size="sm" variant="ghost" @click=${() => this.addException()}
+            >${this.term("addClosedDate")}</fluid-button
+          >
         </section>
       </div>
     `;

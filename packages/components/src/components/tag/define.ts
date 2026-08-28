@@ -1,6 +1,6 @@
 import { FluidTag } from "./fluid-tag.js";
 
-if (!customElements.get("fluid-tag")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tag")) {
   customElements.define("fluid-tag", FluidTag);
 }
 

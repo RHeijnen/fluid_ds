@@ -1,0 +1,2553 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/infinite-table/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-infinite-table",
+          "declaration": {
+            "name": "FluidInfiniteTable",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTable",
+          "declaration": {
+            "name": "FluidInfiniteTable",
+            "module": "src/components/infinite-table/define.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableCellContext",
+          "declaration": {
+            "name": "FluidInfiniteTableCellContext",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableColumn",
+          "declaration": {
+            "name": "FluidInfiniteTableColumn",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableLayoutItem",
+          "declaration": {
+            "name": "FluidInfiniteTableLayoutItem",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableRow",
+          "declaration": {
+            "name": "FluidInfiniteTableRow",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableSort",
+          "declaration": {
+            "name": "FluidInfiniteTableSort",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/infinite-table/fluid-infinite-table.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A semantic, template-driven table for asynchronously loaded datasets.\n\nUnlike `fluid-table`, this component is intended for operational datasets.\nIt supports fixed-height windowing, an infinite-load sentinel, projected\nfilter content, sticky filters and headers, and user-configurable columns.\nCell renderers receive the complete row context and may return rich Lit\ntemplates, custom elements, links, buttons, badges, or plain values.\n\nThe table keeps native table semantics. Interactive controls rendered in\ncells retain their native keyboard behavior. The table itself does not use\nthe ARIA Grid pattern and does not add cell-level arrow-key navigation.\n\nOrder and width are the same kind of fact as visibility, so all three travel\nin one `layout` and leave in one `fluid-column-layout-change`. A consumer\nthat already persists a layout persists a resize and a reorder for free.\n\nWith `reorderable-columns`, a header is dragged by any point of itself, and\nthe columns rearrange live under the pointer as a preview of the drop —\nreleasing keeps what is shown, dropping elsewhere or pressing Escape puts\nthe original order back. Each header also carries a keyboard grab handle:\nfocus it and press Enter or Space to pick the column up, arrow keys to move\nit, Enter to drop and Escape to put it back. With `resizable-columns`, each\nheader carries a grip on its\ntrailing edge: drag it, double-click (or press Enter) to fit the column to\nits contents, arrow keys to size it a step at a time (Shift for a bigger\nstep), and Home to restore the declared width.",
+          "name": "FluidInfiniteTable",
+          "cssProperties": [
+            {
+              "description": "Table background.",
+              "name": "--fluid-infinite-table-bg"
+            },
+            {
+              "description": "Table foreground.",
+              "name": "--fluid-infinite-table-fg"
+            },
+            {
+              "description": "Border color.",
+              "name": "--fluid-infinite-table-border"
+            },
+            {
+              "description": "Sticky header background.",
+              "name": "--fluid-infinite-table-header-bg"
+            },
+            {
+              "description": "Sticky toolbar background.",
+              "name": "--fluid-infinite-table-toolbar-bg"
+            },
+            {
+              "description": "Hovered row background.",
+              "name": "--fluid-infinite-table-row-hover-bg"
+            },
+            {
+              "description": "Outer radius.",
+              "name": "--fluid-infinite-table-radius"
+            },
+            {
+              "description": "Cell padding.",
+              "name": "--fluid-infinite-table-cell-padding"
+            },
+            {
+              "description": "Container-scroll height.",
+              "name": "--fluid-infinite-table-height"
+            },
+            {
+              "description": "Offset below app chrome.",
+              "name": "--fluid-infinite-table-sticky-offset"
+            },
+            {
+              "description": "Resting colour of a resize grip and a reorder handle.",
+              "name": "--fluid-infinite-table-grip-color"
+            },
+            {
+              "description": "Colour of a grip being hovered, focused or dragged.",
+              "name": "--fluid-infinite-table-grip-active-color"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The scroll container.",
+              "name": "viewport"
+            },
+            {
+              "description": "Sticky filter and table-control region.",
+              "name": "toolbar"
+            },
+            {
+              "description": "Loaded/total result indicator.",
+              "name": "progress"
+            },
+            {
+              "description": "Native table.",
+              "name": "base"
+            },
+            {
+              "description": "Table header row.",
+              "name": "header-row"
+            },
+            {
+              "description": "Table header cells.",
+              "name": "header-cell"
+            },
+            {
+              "description": "Data rows.",
+              "name": "row"
+            },
+            {
+              "description": "Data cells.",
+              "name": "cell"
+            },
+            {
+              "description": "Infinite-load sentinel.",
+              "name": "sentinel"
+            },
+            {
+              "description": "Column configuration dialog.",
+              "name": "column-dialog"
+            },
+            {
+              "description": "Resize handle on a header cell's trailing edge.",
+              "name": "column-grip"
+            },
+            {
+              "description": "Reorder handle inside a header cell.",
+              "name": "column-grab"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Application-owned filter controls rendered above the header.",
+              "name": "filters"
+            },
+            {
+              "description": "Host controls placed at the end of the toolbar, after the row count and the built-in Columns button. Pair with `configurable=false` and {@link openColumnManager} to replace that button with your own.",
+              "name": "toolbar-actions"
+            },
+            {
+              "description": "Empty-result content.",
+              "name": "empty"
+            },
+            {
+              "description": "Error content, shown when `error` is set.",
+              "name": "error"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "FluidInfiniteTableColumn[]"
+              },
+              "default": "[]",
+              "attribute": "columns"
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "FluidInfiniteTableRow[]"
+              },
+              "default": "[]",
+              "attribute": "rows"
+            },
+            {
+              "kind": "field",
+              "name": "layout",
+              "type": {
+                "text": "FluidInfiniteTableLayoutItem[]"
+              },
+              "default": "[]",
+              "attribute": "layout"
+            },
+            {
+              "kind": "field",
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "total"
+            },
+            {
+              "kind": "field",
+              "name": "availableTotal",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "available-total"
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "loading"
+            },
+            {
+              "kind": "field",
+              "name": "hasMore",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "has-more"
+            },
+            {
+              "kind": "field",
+              "name": "configurable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "configurable"
+            },
+            {
+              "kind": "field",
+              "name": "clickable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "clickable",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "virtual",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "attribute": "virtual"
+            },
+            {
+              "kind": "field",
+              "name": "rowHeight",
+              "type": {
+                "text": "number"
+              },
+              "default": "64",
+              "attribute": "row-height"
+            },
+            {
+              "kind": "field",
+              "name": "overscan",
+              "type": {
+                "text": "number"
+              },
+              "default": "6",
+              "attribute": "overscan"
+            },
+            {
+              "kind": "field",
+              "name": "scrollMode",
+              "type": {
+                "text": "\"document\" | \"container\""
+              },
+              "default": "\"document\"",
+              "attribute": "scroll-mode",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "attribute": "caption"
+            },
+            {
+              "kind": "field",
+              "name": "hideCaption",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "hide-caption"
+            },
+            {
+              "kind": "field",
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "attribute": "error"
+            },
+            {
+              "kind": "field",
+              "name": "sort",
+              "type": {
+                "text": "FluidInfiniteTableSort | null"
+              },
+              "default": "null",
+              "attribute": "sort"
+            },
+            {
+              "kind": "field",
+              "name": "rowKey",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"id\"",
+              "attribute": "row-key"
+            },
+            {
+              "kind": "field",
+              "name": "reorderableColumns",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Columns can be dragged, or moved from the keyboard, into another order.",
+              "attribute": "reorderable-columns"
+            },
+            {
+              "kind": "field",
+              "name": "resizableColumns",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Column widths can be dragged, auto-fitted, or stepped from the keyboard.",
+              "attribute": "resizable-columns"
+            },
+            {
+              "kind": "field",
+              "name": "resizeColumnLabel",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible names for the two handles and for the move announcement.\n`{column}`, `{position}` and `{count}` are substituted. They are properties\nrather than fixed strings because the application, not the table, knows\nwhat language its reader speaks.",
+              "attribute": "resize-column-label"
+            },
+            {
+              "kind": "field",
+              "name": "resizeColumnLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "reorderColumnLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "reorder-column-label"
+            },
+            {
+              "kind": "field",
+              "name": "reorderColumnLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "columnPositionLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "column-position-label"
+            },
+            {
+              "kind": "field",
+              "name": "columnPositionLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "columnScroll",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Columns wider than the container scroll instead of bursting out of it.\n\nOpt-in, because it changes what \"too many columns\" means: without it the\ntable trusts its container to scroll or grow, with it the table owns the\nproblem and offers a horizontal scrollbar of its own. The scrollbar lives\nbetween the header and the rows — a bar at the bottom of a windowed list\nis wherever the list currently ends, which is nowhere to look for it —\nand it moves the header and the rows together, because columns that shear\nagainst their own headers stop being columns.\n\nThe mechanics are deliberate: the wrapper *clips* rather than scrolls,\nand the table is moved with a transform driven by the strip. An\n`overflow-x: auto` wrapper would become the scroll container for every\nsticky descendant, and the header would stop following the page.",
+              "attribute": "column-scroll",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "viewScrollTop",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "viewportHeight",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "800"
+            },
+            {
+              "kind": "field",
+              "name": "internalLayout",
+              "type": {
+                "text": "FluidInfiniteTableLayoutItem[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "grabbedKey",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The column a keyboard user has picked up, if any."
+            },
+            {
+              "kind": "field",
+              "name": "draggingKey",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "announcementKey",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "hasToolbarSecondary",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "handleToolbarSecondaryChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "columnWidths",
+              "type": {
+                "text": "Record<string, number>"
+              },
+              "privacy": "private",
+              "default": "{}",
+              "description": "What each column currently measures, for the grip to report.\n\nMeasured on a layout change and on a resize of the table rather than on\nevery render, because rendering happens on every scroll frame and reading\na rectangle there would force a reflow per frame."
+            },
+            {
+              "kind": "field",
+              "name": "viewport",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "toolbar",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "sentinel",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "columnDialog",
+              "type": {
+                "text": "HTMLDialogElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "table",
+              "type": {
+                "text": "HTMLTableElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "columnScrollStrip",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "tableScroll",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "intersectionObserver",
+              "type": {
+                "text": "IntersectionObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "resizeObserver",
+              "type": {
+                "text": "ResizeObserver | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "frame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "measureFrame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "columnOverflowFrame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "columnOverflowMeasured",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "grabSnapshot",
+              "type": {
+                "text": "FluidInfiniteTableLayoutItem[] | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Where a column sat before it was picked up, so Escape can put it back."
+            },
+            {
+              "kind": "field",
+              "name": "dragSnapshot",
+              "type": {
+                "text": "FluidInfiniteTableLayoutItem[] | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The order as it stood when a pointer drag began. The drag rearranges the\nlive layout as a preview, so a cancelled drag needs the original to put\nback and a completed one needs to know whether anything actually moved."
+            },
+            {
+              "kind": "field",
+              "name": "dragMoved",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "resizing",
+              "type": {
+                "text": "{\n    key: string;\n    pointerId: number;\n    startX: number;\n    startWidth: number;\n    width: number;\n    grip: HTMLElement;\n  } | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "emitTimer",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0",
+              "description": "A keyboard resize is a burst of keystrokes, and a consumer persists every\nlayout it is handed. One event per burst rather than one per keypress."
+            },
+            {
+              "kind": "field",
+              "name": "minColumnWidth",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "56",
+              "description": "No drag or keystroke may leave a column too narrow to read."
+            },
+            {
+              "kind": "field",
+              "name": "maxColumnWidth",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "640",
+              "description": "Auto-fit stops here; a single long value should not own the table."
+            },
+            {
+              "kind": "field",
+              "name": "resizeStep",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "16"
+            },
+            {
+              "kind": "field",
+              "name": "resizeStepLarge",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "64"
+            },
+            {
+              "kind": "method",
+              "name": "scheduleMeasure",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Refreshes what the grips report, without churning renders.\n\nOff the update cycle, because measuring during it and then writing the\nresult back is the render loop Lit warns about."
+            },
+            {
+              "kind": "method",
+              "name": "measureColumnWidths",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncLayout",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "observeGeometry",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "measureColumnOverflow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Whether the columns outgrow the container, and by how much.\n\nWritten as host state and custom properties rather than Lit state: this\nruns from a ResizeObserver, and the strip's geometry is the only thing\nthat depends on it — pushing it through a render would re-draw every row\nto move a scrollbar."
+            },
+            {
+              "kind": "field",
+              "name": "onColumnStripScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onColumnWheel",
+              "privacy": "private",
+              "readonly": true,
+              "description": "A trackpad swipe over the rows reaches the columns.\n\nThe clip box is not a scroll container, so the gesture that scrolls every\nother wide surface would otherwise do nothing here. Forwarded to the strip\nso the strip stays the one owner of the position; vertical wheel is left\nalone for the page."
+            },
+            {
+              "kind": "field",
+              "name": "onContainerScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onDocumentScroll",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "measureScroll",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "observeSentinel",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "visibleColumns",
+              "type": {
+                "text": "FluidInfiniteTableColumn[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "valueAt",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "unknown"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "FluidInfiniteTableRow"
+                  }
+                },
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "FluidInfiniteTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "rowIdentity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "FluidInfiniteTableRow"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "effectiveRowHeight",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "accessibleRowCount",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "windowedRows",
+              "type": {
+                "text": "{\n    rows: Array<{ row: FluidInfiniteTableRow; index: number }>;\n    top: number;\n    bottom: number;\n  }"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "columnAriaSort",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "\"ascending\" | \"descending\" | \"none\""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "FluidInfiniteTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "requestSort",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "FluidInfiniteTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "openColumnManager",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Open the column manager.\n\nPublic so a host that hides the built-in button (`configurable=false`)\ncan still reach the dialog from its own toolbar control — the dialog is\nrendered regardless of `configurable`, only the button is gated."
+            },
+            {
+              "kind": "method",
+              "name": "openColumns",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "updateColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "visible",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "moveColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "-1 | 1"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emitLayout",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "scheduleLayoutEmit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "One layout event per gesture rather than one per keystroke, because the\nconsumer on the other end of it is usually writing to a server."
+            },
+            {
+              "kind": "method",
+              "name": "columnFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "FluidInfiniteTableColumn | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "canReorder",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "A column that cannot be configured cannot be dragged out of its place."
+            },
+            {
+              "kind": "method",
+              "name": "canResize",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "label",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "template",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "values",
+                  "type": {
+                    "text": "Record<string, string | number>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "progressText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "sentinelText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "headerCell",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "columnElement",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setColumnWidth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "width",
+                  "type": {
+                    "text": "string | undefined"
+                  }
+                },
+                {
+                  "name": "debounce",
+                  "default": "false"
+                }
+              ],
+              "description": "Width is stored on the layout item beside visibility and order, so a\nresize persists through whatever already persists a hidden column.\n`undefined` puts the column back on the width it was declared with."
+            },
+            {
+              "kind": "method",
+              "name": "measuredWidth",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "freezeFlexibleColumns",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Pins every flexible column at the width it happens to be rendered at, so\na resize moves one edge and nothing else. Without this the space a drag\nfrees is re-shared among the width-less columns, and the whole table\nshuffles under the pointer. The resized column is frozen along with the\nrest — left flexible it would inherit all of their slack the moment they\nstop being flexible — and the gesture then overwrites its width anyway.\nColumns that already have a width, declared or previously dragged, are\nleft exactly as written."
+            },
+            {
+              "kind": "field",
+              "name": "direction",
+              "type": {
+                "text": "1 | -1"
+              },
+              "privacy": "private",
+              "description": "Which way \"wider\" points, so a right-to-left reader drags the same way.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onGripPointerDown",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onGripPointerMove",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onGripPointerUp",
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "autoFitColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The column's own contents decide its width.\n\nMeasured with wrapping switched off and the column collapsed, because a\ncell that has already been given room reports the room rather than the\ncontent, and auto-fit would then only ever grow a column."
+            },
+            {
+              "kind": "method",
+              "name": "onGripKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "placeColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "targetKey",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "edge",
+                  "type": {
+                    "text": "\"start\" | \"end\""
+                  }
+                }
+              ],
+              "description": "Puts `key` on the near or far side of `targetKey`, silently. Placement\nand reporting are separate because a pointer drag places on every\n`dragover` as a live preview, and a consumer persists every layout it is\nhanded — the report belongs to the drop, not to the preview."
+            },
+            {
+              "kind": "method",
+              "name": "reorderColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "targetKey",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "edge",
+                  "type": {
+                    "text": "\"start\" | \"end\""
+                  }
+                }
+              ],
+              "description": "Places `key` beside `targetKey`, and reports it."
+            },
+            {
+              "kind": "method",
+              "name": "moveColumnStep",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "delta",
+                  "type": {
+                    "text": "-1 | 1"
+                  }
+                }
+              ],
+              "description": "One place along the row of visible columns, for the keyboard path."
+            },
+            {
+              "kind": "method",
+              "name": "announceColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "announcementText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "onGrabKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onGrabDragStart",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onHeaderDragStart",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The whole header is the drag surface — a hover-revealed handle the size\nof a coin is a target nobody was hitting. A drag that begins on the\nresize grip is a resize, and is refused here rather than raced."
+            },
+            {
+              "kind": "method",
+              "name": "dropEdge",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "\"start\" | \"end\""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                }
+              ],
+              "description": "Which side of `key` the pointer is asking for."
+            },
+            {
+              "kind": "method",
+              "name": "onHeaderDragOver",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The preview: crossing a header moves the dragged column there, whole and\nlive, so what is on screen during the drag is the table the drop would\nproduce. After a move the slot under the pointer holds the dragged column\nitself, which the `dragged === key` guard turns into a resting state\nrather than a flicker."
+            },
+            {
+              "kind": "method",
+              "name": "onHeaderDrop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "onDragEnd",
+              "privacy": "private",
+              "readonly": true,
+              "description": "After a drop this is bookkeeping; without one it is a cancel, and the\norder the drag started from comes back."
+            },
+            {
+              "kind": "method",
+              "name": "handleRowClick",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "MouseEvent"
+                  }
+                },
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "FluidInfiniteTableRow"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "handleRowKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "FluidInfiniteTableRow"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderHeader",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "unknown"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "FluidInfiniteTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderHeaderContent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "unknown"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "FluidInfiniteTableColumn"
+                  }
+                }
+              ],
+              "description": "The header content, with whichever handles this column has earned.\n\nThe handles sit beside the sort control rather than inside it: a grip\nnested in a button is a button that cannot be pressed and a grip that\ncannot be dragged. The pointer drags the header cell itself; the grab\nbutton is the keyboard's way in, overlaid so it costs the label nothing."
+            },
+            {
+              "kind": "method",
+              "name": "renderColumnsDialog",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-column-layout-change",
+              "description": "Column visibility, order or width\n *   changed. `detail: { layout }`, complete and ready to persist.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-load-more",
+              "description": "Requests the next result page.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-row-click",
+              "description": "A non-interactive part of a row was activated.\n *\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-sort",
+              "description": "Requests sorting. `detail: { key, dir }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "FluidInfiniteTableColumn[]"
+              },
+              "default": "[]",
+              "fieldName": "columns"
+            },
+            {
+              "name": "rows",
+              "type": {
+                "text": "FluidInfiniteTableRow[]"
+              },
+              "default": "[]",
+              "fieldName": "rows"
+            },
+            {
+              "name": "layout",
+              "type": {
+                "text": "FluidInfiniteTableLayoutItem[]"
+              },
+              "default": "[]",
+              "fieldName": "layout"
+            },
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "fieldName": "total"
+            },
+            {
+              "name": "available-total",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "fieldName": "availableTotal"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "loading"
+            },
+            {
+              "name": "has-more",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "hasMore"
+            },
+            {
+              "name": "configurable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "configurable"
+            },
+            {
+              "name": "clickable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "clickable"
+            },
+            {
+              "name": "virtual",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "fieldName": "virtual"
+            },
+            {
+              "name": "row-height",
+              "type": {
+                "text": "number"
+              },
+              "default": "64",
+              "fieldName": "rowHeight"
+            },
+            {
+              "name": "overscan",
+              "type": {
+                "text": "number"
+              },
+              "default": "6",
+              "fieldName": "overscan"
+            },
+            {
+              "name": "scroll-mode",
+              "type": {
+                "text": "\"document\" | \"container\""
+              },
+              "default": "\"document\"",
+              "fieldName": "scrollMode"
+            },
+            {
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "fieldName": "caption"
+            },
+            {
+              "name": "hide-caption",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "hideCaption"
+            },
+            {
+              "name": "error",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "fieldName": "error"
+            },
+            {
+              "name": "sort",
+              "type": {
+                "text": "FluidInfiniteTableSort | null"
+              },
+              "default": "null",
+              "fieldName": "sort"
+            },
+            {
+              "name": "row-key",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"id\"",
+              "fieldName": "rowKey"
+            },
+            {
+              "name": "reorderable-columns",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Columns can be dragged, or moved from the keyboard, into another order.",
+              "fieldName": "reorderableColumns"
+            },
+            {
+              "name": "resizable-columns",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Column widths can be dragged, auto-fitted, or stepped from the keyboard.",
+              "fieldName": "resizableColumns"
+            },
+            {
+              "name": "resize-column-label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible names for the two handles and for the move announcement.\n`{column}`, `{position}` and `{count}` are substituted. They are properties\nrather than fixed strings because the application, not the table, knows\nwhat language its reader speaks.",
+              "fieldName": "resizeColumnLabel"
+            },
+            {
+              "name": "reorder-column-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "reorderColumnLabel"
+            },
+            {
+              "name": "column-position-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "columnPositionLabel"
+            },
+            {
+              "name": "column-scroll",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Columns wider than the container scroll instead of bursting out of it.\n\nOpt-in, because it changes what \"too many columns\" means: without it the\ntable trusts its container to scroll or grow, with it the table owns the\nproblem and offers a horizontal scrollbar of its own. The scrollbar lives\nbetween the header and the rows — a bar at the bottom of a windowed list\nis wherever the list currently ends, which is nowhere to look for it —\nand it moves the header and the rows together, because columns that shear\nagainst their own headers stop being columns.\n\nThe mechanics are deliberate: the wrapper *clips* rather than scrolls,\nand the table is moved with a transform driven by the strip. An\n`overflow-x: auto` wrapper would become the scroll container for every\nsticky descendant, and the header would stop following the page.",
+              "fieldName": "columnScroll"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Infinite, windowed and template-driven semantic data table.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base"
+            },
+            {
+              "name": "--fluid-surface-muted"
+            },
+            {
+              "name": "--fluid-text-primary"
+            },
+            {
+              "name": "--fluid-text-secondary"
+            },
+            {
+              "name": "--fluid-border-default"
+            },
+            {
+              "name": "--fluid-accent-base"
+            },
+            {
+              "name": "--fluid-radius-md"
+            },
+            {
+              "name": "--fluid-shadow-lg"
+            },
+            {
+              "name": "--fluid-focus-ring-width"
+            },
+            {
+              "name": "--fluid-focus-ring-offset"
+            },
+            {
+              "name": "--fluid-target-min"
+            }
+          ],
+          "tagName": "fluid-infinite-table",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTable",
+          "declaration": {
+            "name": "FluidInfiniteTable",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/table/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-table",
+          "declaration": {
+            "name": "FluidTable",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/table/fluid-table.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An accessible data table. Renders a real semantic `<table>` with a\n`<caption>`, `<th scope=\"col\">` headers, and a `<tbody>` of rows driven by\nthe `columns` and `rows` properties. Sortable columns get a header `<button>`\nthat toggles the sort and sets `aria-sort` on the `<th>`; sorting is\nstring + numeric aware and happens internally. When `selectable`, a leading\ncolumn adds a \"select all\" header checkbox and per-row checkboxes.\n\nRows are tracked by a stable key: the row's `id` field when present, else its\nindex. Selection and sort are surfaced as events so a host can persist them.\n\nThis is a static data table (the WAI-ARIA Table pattern), not an interactive\nGrid: cells are not individually focusable, Tab moves between the controls in\nthe header and the selection checkboxes, and native table semantics carry the\nrest.",
+          "name": "FluidTable",
+          "cssProperties": [
+            {
+              "description": "Table background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-table-bg"
+            },
+            {
+              "description": "Text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-table-fg"
+            },
+            {
+              "description": "Header row background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-table-header-bg"
+            },
+            {
+              "description": "Header text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-table-header-fg"
+            },
+            {
+              "description": "Cell border color. Falls back to --fluid-border-default.",
+              "name": "--fluid-table-border"
+            },
+            {
+              "description": "Row hover background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-table-row-hover-bg"
+            },
+            {
+              "description": "Selected row background. Falls back to a tint of --fluid-accent-base.",
+              "name": "--fluid-table-selected-bg"
+            },
+            {
+              "description": "Zebra (odd-row) background. Falls back to transparent (off).",
+              "name": "--fluid-table-zebra-bg"
+            },
+            {
+              "description": "Outer corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-table-radius"
+            },
+            {
+              "description": "Cell padding. Falls back to 0.625rem 0.75rem.",
+              "name": "--fluid-table-cell-padding"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The `<table>` element.",
+              "name": "base"
+            },
+            {
+              "description": "The table caption.",
+              "name": "caption"
+            },
+            {
+              "description": "The header `<tr>`.",
+              "name": "header-row"
+            },
+            {
+              "description": "Each header `<th>`.",
+              "name": "header-cell"
+            },
+            {
+              "description": "The sort toggle button inside a sortable header.",
+              "name": "sort-button"
+            },
+            {
+              "description": "Each body `<tr>`.",
+              "name": "row"
+            },
+            {
+              "description": "Each body `<td>`.",
+              "name": "cell"
+            },
+            {
+              "description": "The select-all header checkbox.",
+              "name": "select-all"
+            },
+            {
+              "description": "A per-row selection checkbox.",
+              "name": "select-row"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "FluidTableColumn[]"
+              },
+              "default": "[]",
+              "description": "Column definitions.",
+              "attribute": "columns"
+            },
+            {
+              "kind": "field",
+              "name": "rows",
+              "type": {
+                "text": "FluidTableRow[]"
+              },
+              "default": "[]",
+              "description": "Row data, each a plain object keyed by column.key.",
+              "attribute": "rows"
+            },
+            {
+              "kind": "field",
+              "name": "selectable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show a leading selection column with checkboxes.",
+              "attribute": "selectable"
+            },
+            {
+              "kind": "field",
+              "name": "sort",
+              "type": {
+                "text": "FluidTableSort | null"
+              },
+              "default": "null",
+              "description": "Current sort, or null for the rows' natural order.",
+              "attribute": "sort"
+            },
+            {
+              "kind": "field",
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible (or screen-reader-only) table caption.",
+              "attribute": "caption"
+            },
+            {
+              "kind": "field",
+              "name": "hideCaption",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, the caption is present for AT but visually hidden.",
+              "attribute": "hide-caption"
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "privacy": "private",
+              "default": "new Set<string>()",
+              "description": "Selected row keys."
+            },
+            {
+              "kind": "method",
+              "name": "rowKey",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "row",
+                  "type": {
+                    "text": "FluidTableRow"
+                  }
+                },
+                {
+                  "name": "index",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Stable key for a row: its \"id\" field when present, else its index."
+            },
+            {
+              "kind": "field",
+              "name": "sortedRows",
+              "type": {
+                "text": "Array<{ row: FluidTableRow; index: number }>"
+              },
+              "privacy": "private",
+              "description": "Rows in the order they should render, applying the current sort.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "compare",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": {
+                    "text": "unknown"
+                  }
+                },
+                {
+                  "name": "b",
+                  "type": {
+                    "text": "unknown"
+                  }
+                },
+                {
+                  "name": "factor",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "String + numeric aware comparison. Nullish values sort last."
+            },
+            {
+              "kind": "method",
+              "name": "ariaSortFor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "\"ascending\" | \"descending\" | \"none\""
+                }
+              },
+              "parameters": [
+                {
+                  "name": "col",
+                  "type": {
+                    "text": "FluidTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onSort",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "col",
+                  "type": {
+                    "text": "FluidTableColumn"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emitSelection",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "allKeys",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[]"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "toggleRow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "checked",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "toggleAll",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "checked",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "selectedKeys",
+              "type": {
+                "text": "string[]"
+              },
+              "description": "Programmatically read the selected row keys.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderSortIcon",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-selection-change",
+              "description": "The row selection changed. `detail: { selected: rowKeys[] }`.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-sort",
+              "description": "The sort changed. `detail: { key, dir }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "FluidTableColumn[]"
+              },
+              "default": "[]",
+              "description": "Column definitions.",
+              "fieldName": "columns"
+            },
+            {
+              "name": "rows",
+              "type": {
+                "text": "FluidTableRow[]"
+              },
+              "default": "[]",
+              "description": "Row data, each a plain object keyed by column.key.",
+              "fieldName": "rows"
+            },
+            {
+              "name": "selectable",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show a leading selection column with checkboxes.",
+              "fieldName": "selectable"
+            },
+            {
+              "name": "sort",
+              "type": {
+                "text": "FluidTableSort | null"
+              },
+              "default": "null",
+              "description": "Current sort, or null for the rows' natural order.",
+              "fieldName": "sort"
+            },
+            {
+              "name": "caption",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Visible (or screen-reader-only) table caption.",
+              "fieldName": "caption"
+            },
+            {
+              "name": "hide-caption",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "When true, the caption is present for AT but visually hidden.",
+              "fieldName": "hideCaption"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Accessible, sortable, selectable data table.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base",
+              "description": "Table background."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Header + hover background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Text color."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Caption color."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Cell borders."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Selection tint + focus ring."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Outer radius."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum interactive target (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-table",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidTable",
+          "declaration": {
+            "name": "FluidTable",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTable",
+          "declaration": {
+            "name": "FluidInfiniteTable",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableCellContext",
+          "declaration": {
+            "name": "FluidInfiniteTableCellContext",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableColumn",
+          "declaration": {
+            "name": "FluidInfiniteTableColumn",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableLayoutItem",
+          "declaration": {
+            "name": "FluidInfiniteTableLayoutItem",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableRow",
+          "declaration": {
+            "name": "FluidInfiniteTableRow",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidInfiniteTableSort",
+          "declaration": {
+            "name": "FluidInfiniteTableSort",
+            "module": "src/components/infinite-table/fluid-infinite-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidTable",
+          "declaration": {
+            "name": "FluidTable",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidTableColumn",
+          "declaration": {
+            "name": "FluidTableColumn",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidTableRow",
+          "declaration": {
+            "name": "FluidTableRow",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidTableSort",
+          "declaration": {
+            "name": "FluidTableSort",
+            "module": "src/components/table/fluid-table.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

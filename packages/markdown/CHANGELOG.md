@@ -1,5 +1,14 @@
 # @fluid-ds/markdown
 
+## 0.4.0
+
+### Patch Changes
+
+- Replace the built-in sanitizer with DOMPurify while retaining the explicit
+  `trusted` opt-out for known-safe Markdown.
+- Render localized, direction-aware remote-load failures as alerts without
+  inserting diagnostic text as HTML.
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,7 +1,7 @@
 {
   "name": "@fluid-ds/components",
-  "version": "0.3.8",
-  "description": "Framework-agnostic web components for Fluid, ~50 standard custom elements (buttons, inputs, dialogs, drawers, tabs, trees, …). Drop into any HTML page; React/Vue/Angular/Svelte/Solid friendly.",
+  "version": "0.4.0",
+  "description": "Framework-agnostic web components for Fluid: 124 standard custom elements in 103 component families. For HTML, React, Vue, Angular, Svelte and Solid.",
   "type": "module",
   "license": "MIT",
   "author": "Fluid contributors",
@@ -33,15 +33,30 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
+      "node": "./dist/index.js",
       "import": "./src/index.ts"
     },
     "./define/*": {
       "types": "./src/components/*/define.ts",
+      "node": "./dist/components/*/define.js",
       "import": "./src/components/*/define.ts"
     },
     "./internal/*": {
       "types": "./src/internal/*.ts",
+      "node": "./dist/internal/*.js",
       "import": "./src/internal/*.ts"
+    },
+    "./ssr-client": {
+      "types": "./src/ssr-client.ts",
+      "import": "./src/ssr-client.ts"
+    },
+    "./ssr": {
+      "types": "./src/ssr.ts",
+      "import": "./src/ssr.ts"
+    },
+    "./locales/*": {
+      "types": "./src/locales/*.ts",
+      "import": "./src/locales/*.ts"
     },
     "./custom-elements.json": "./custom-elements.json"
   },
@@ -61,6 +76,18 @@
         "types": "./dist/internal/*.d.ts",
         "import": "./dist/internal/*.js"
       },
+      "./ssr-client": {
+        "types": "./dist/ssr-client.d.ts",
+        "import": "./dist/ssr-client.js"
+      },
+      "./ssr": {
+        "types": "./dist/ssr.d.ts",
+        "import": "./dist/ssr.js"
+      },
+      "./locales/*": {
+        "types": "./dist/locales/*.d.ts",
+        "import": "./dist/locales/*.js"
+      },
       "./custom-elements.json": "./custom-elements.json"
     }
   },
@@ -69,23 +96,33 @@
     "src",
     "custom-elements.json",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
+    "./src/ssr-client.ts",
+    "./dist/ssr-client.js",
     "**/define.js",
-    "**/define.ts"
+    "**/define.ts",
+    "**/locales/*.js",
+    "**/locales/*.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && pnpm analyze",
-    "analyze": "cem analyze",
+    "analyze": "node ../../scripts/cem/generate.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "web-test-runner --config web-test-runner.config.js",
+    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js",
     "test:watch": "web-test-runner --config web-test-runner.config.js --watch",
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.6.13",
+    "@lit-labs/ssr": "^4.1.0",
+    "@lit-labs/ssr-client": "^1.1.8",
     "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*",
+    "parse5": "^7.3.0"
+  },
+  "peerDependencies": {
     "lit": "^3.2.1"
   },
   "devDependencies": {
@@ -97,6 +134,7 @@
     "@web/test-runner-commands": "^0.9.0",
     "@web/test-runner-playwright": "^0.11.0",
     "playwright": "^1.49.1",
+    "lit": "^3.2.1",
     "typescript": "^5.7.2"
   }
 }

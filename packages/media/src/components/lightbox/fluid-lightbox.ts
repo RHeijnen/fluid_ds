@@ -1,5 +1,7 @@
-import { LitElement, html, css, type TemplateResult } from "lit";
+import { html, css, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
+import { formatMediaNumber } from "../../internal/format.js";
 
 /**
  * An image gallery with a full-screen lightbox. Slot in `<img>` thumbnails;
@@ -38,9 +40,11 @@ import { property, state, query } from "lit/decorators.js";
  * @fires fluid-change - The shown image changed. `detail: { index }`.
  * @fires fluid-close - The lightbox closed.
  */
-export class FluidLightbox extends LitElement {
+export class FluidLightbox extends FluidElement {
   static override styles = css`
-    :host { display: block; }
+    :host {
+      display: block;
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(var(--fluid-lightbox-thumb-size, 7rem), 1fr));
@@ -97,9 +101,20 @@ export class FluidLightbox extends LitElement {
       outline: var(--fluid-focus-ring-width, 2px) solid #fff;
       outline-offset: 2px;
     }
-    .prev { left: 0.5rem; top: 50%; transform: translateY(-50%); }
-    .next { right: 0.5rem; top: 50%; transform: translateY(-50%); }
-    .close { top: 0.5rem; right: 0.5rem; }
+    .prev {
+      left: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .next {
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .close {
+      top: 0.5rem;
+      right: 0.5rem;
+    }
     .counter {
       position: absolute;
       bottom: 0.75rem;
@@ -113,7 +128,10 @@ export class FluidLightbox extends LitElement {
       font-size: var(--fluid-font-size-sm, 0.875rem);
       font-variant-numeric: tabular-nums;
     }
-    svg { width: 1.5rem; height: 1.5rem; }
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
   `;
 
   /** Wrap navigation past the first / last image. */
@@ -127,7 +145,9 @@ export class FluidLightbox extends LitElement {
 
   private onSlotChange(e: Event): void {
     const slot = e.target as HTMLSlotElement;
-    this.imgs = slot.assignedElements({ flatten: true }).filter((el): el is HTMLImageElement => el.tagName === "IMG");
+    this.imgs = slot
+      .assignedElements({ flatten: true })
+      .filter((el): el is HTMLImageElement => el.tagName === "IMG");
     this.imgs.forEach((img, i) => {
       img.setAttribute("role", "button");
       img.tabIndex = 0;
@@ -150,7 +170,9 @@ export class FluidLightbox extends LitElement {
     this.index = i;
     this.open = true;
     this.updateComplete.then(() => this.dialog?.showModal());
-    this.dispatchEvent(new CustomEvent("fluid-open", { detail: { index: i }, bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent("fluid-open", { detail: { index: i }, bubbles: true, composed: true })
+    );
   }
 
   /** Close the lightbox. */
@@ -165,7 +187,9 @@ export class FluidLightbox extends LitElement {
     if (next < 0) next = this.loop ? n - 1 : 0;
     if (next >= n) next = this.loop ? 0 : n - 1;
     this.index = next;
-    this.dispatchEvent(new CustomEvent("fluid-change", { detail: { index: next }, bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent("fluid-change", { detail: { index: next }, bubbles: true, composed: true })
+    );
   }
 
   private onKeydown(e: KeyboardEvent): void {
@@ -182,7 +206,11 @@ export class FluidLightbox extends LitElement {
     const current = this.imgs[this.index];
     const total = this.imgs.length;
     const src = current?.dataset.full || current?.src || "";
-    const alt = current?.alt || `Image ${this.index + 1} of ${total}`;
+    const currentNumber = formatMediaNumber(this.index + 1, this.localize.locale);
+    const totalNumber = formatMediaNumber(total, this.localize.locale);
+    const alt = current?.hasAttribute("alt")
+      ? current.alt
+      : this.term("imagePosition", currentNumber, totalNumber);
     return html`
       <div part="base" class="grid">
         <slot @slotchange=${this.onSlotChange}></slot>
@@ -190,7 +218,7 @@ export class FluidLightbox extends LitElement {
 
       <dialog
         part="dialog"
-        aria-label="Image viewer"
+        aria-label=${this.term("imageViewer")}
         @keydown=${this.onKeydown}
         @close=${() => {
           this.open = false;
@@ -203,17 +231,68 @@ export class FluidLightbox extends LitElement {
                 <img part="image" src=${src} alt=${alt} />
                 ${total > 1
                   ? html`
-                      <button part="prev" class="control prev" type="button" aria-label="Previous image" @click=${() => this.nav(-1)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+                      <button
+                        part="prev"
+                        class="control prev"
+                        type="button"
+                        aria-label=${this.term("previousImage")}
+                        @click=${() => this.nav(-1)}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="m15 18-6-6 6-6"></path>
+                        </svg>
                       </button>
-                      <button part="next" class="control next" type="button" aria-label="Next image" @click=${() => this.nav(1)}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+                      <button
+                        part="next"
+                        class="control next"
+                        type="button"
+                        aria-label=${this.term("nextImage")}
+                        @click=${() => this.nav(1)}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="m9 18 6-6-6-6"></path>
+                        </svg>
                       </button>
-                      <span part="counter" class="counter" role="status" aria-live="polite">${this.index + 1} of ${total}</span>
+                      <span part="counter" class="counter" role="status" aria-live="polite"
+                        >${this.term("positionOf", currentNumber, totalNumber)}</span
+                      >
                     `
                   : ""}
-                <button part="close" class="control close" type="button" aria-label="Close" @click=${() => this.close()}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                <button
+                  part="close"
+                  class="control close"
+                  type="button"
+                  aria-label=${this.term("closeViewer")}
+                  @click=${() => this.close()}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
                 </button>
               </div>
             `

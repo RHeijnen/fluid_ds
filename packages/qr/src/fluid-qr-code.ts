@@ -1,5 +1,6 @@
-import { LitElement, html, svg, css, type PropertyValues, type TemplateResult } from "lit";
+import { html, svg, css, type PropertyValues, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 import * as qrcodeModule from "qrcode-generator";
 
 type EcLevel = "L" | "M" | "Q" | "H";
@@ -84,7 +85,7 @@ interface EyeOrigin {
  * @uses-token --fluid-text-primary - Default module / eye color.
  * @uses-token --fluid-surface-base - Default background and logo-plate color.
  */
-export class FluidQrCode extends LitElement {
+export class FluidQrCode extends FluidElement {
   static override styles = css`
     :host {
       display: inline-block;
@@ -182,6 +183,8 @@ export class FluidQrCode extends LitElement {
   /** Opacity of the modules in artistic mode (0 to 1). */
   @property({ type: Number, attribute: "artistic-opacity" }) artisticOpacity = 0.85;
 
+  private qrCache?: { value: string; level: EcLevel; result: QRCode | null };
+
   /** The effective error-correction level after logo/artistic overrides. */
   private get effectiveEcLevel(): EcLevel {
     return this.logo || this.artistic ? "H" : this.ecLevel;
@@ -201,15 +204,26 @@ export class FluidQrCode extends LitElement {
   }
 
   private build(): QRCode | null {
-    if (!this.value) return null;
+    const level = this.effectiveEcLevel;
+    if (this.qrCache?.value === this.value && this.qrCache.level === level) {
+      return this.qrCache.result;
+    }
+    let result: QRCode | null = null;
+    if (!this.value) {
+      this.qrCache = { value: this.value, level, result };
+      return result;
+    }
     try {
-      const qr = factory(0, this.effectiveEcLevel);
+      const qr = factory(0, level);
       qr.addData(this.value);
       qr.make();
-      return qr;
+      result = qr;
     } catch {
-      return null;
+      // Encoding failures remain represented by the existing empty SVG. The
+      // dependency diagnostic is intentionally not user-facing or translated.
     }
+    this.qrCache = { value: this.value, level, result };
+    return result;
   }
 
   /** The three finder-pattern origins for a code of `count` modules. */
@@ -253,6 +267,7 @@ export class FluidQrCode extends LitElement {
 
   /** Resolve the inter-module gap (fraction of one module) from the token, clamped to [0, 0.4]. */
   private resolveGap(): number {
+    if (typeof getComputedStyle === "undefined") return this.moduleShape === "dots" ? 0.1 : 0;
     const raw = getComputedStyle(this).getPropertyValue("--fluid-qr-gap").trim();
     const n = raw ? Number.parseFloat(raw) : NaN;
     if (Number.isFinite(n)) return Math.min(Math.max(n, 0), 0.4);
@@ -260,7 +275,13 @@ export class FluidQrCode extends LitElement {
   }
 
   /** Render one data module at module coords (x, y) with the active shape. */
-  private renderModule(x: number, y: number, paint: string, opacity: number, gap: number): TemplateResult {
+  private renderModule(
+    x: number,
+    y: number,
+    paint: string,
+    opacity: number,
+    gap: number
+  ): TemplateResult {
     const inset = gap / 2;
     const w = 1 - gap;
     if (this.moduleShape === "dots" || this.artistic) {
@@ -424,14 +445,16 @@ export class FluidQrCode extends LitElement {
   override render(): TemplateResult {
     const qr = this.build();
     const bg = this.background || "var(--fluid-qr-bg, var(--fluid-surface-base, transparent))";
-    const name = this.label || (this.value ? `QR code for ${this.value}` : "Empty QR code");
+    const name =
+      this.label || (this.value ? this.term("qrCodeFor", this.value) : this.term("emptyQrCode"));
     if (!qr) {
       return html`<svg
         part="base svg"
         viewBox="0 0 1 1"
         xmlns="http://www.w3.org/2000/svg"
         role="img"
-        aria-label="Empty QR code"
+        aria-label=${name}
+        dir=${this.localize.dir}
       ></svg>`;
     }
     const count = qr.getModuleCount();
@@ -461,8 +484,9 @@ export class FluidQrCode extends LitElement {
     const gradientDef = this.renderGradientDef();
     const logoEl = this.renderLogo(count, total);
 
-    const bgImage = this.artistic && this.logo
-      ? svg`<image
+    const bgImage =
+      this.artistic && this.logo
+        ? svg`<image
           part="image"
           href=${this.logo}
           x="0"
@@ -471,7 +495,7 @@ export class FluidQrCode extends LitElement {
           height=${total}
           preserveAspectRatio="xMidYMid slice"
         />`
-      : null;
+        : null;
 
     return html`<svg
       part="base svg"
@@ -480,6 +504,7 @@ export class FluidQrCode extends LitElement {
       xmlns="http://www.w3.org/2000/svg"
       role="img"
       aria-label=${name}
+      dir=${this.localize.dir}
     >
       ${gradientDef ? svg`<defs>${gradientDef}</defs>` : null}
       <rect part="background" width=${total} height=${total} fill=${bg} />

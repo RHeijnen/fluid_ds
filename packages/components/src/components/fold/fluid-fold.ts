@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { motionStyles, reducedMotion } from "../../internal/motion.js";
 
@@ -155,7 +155,14 @@ export class FluidFold extends FluidElement {
   @property({ type: Boolean, reflect: true }) disabled = false;
 
   /** What the toggle says while folded. */
-  @property() label = "Show more";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("showMore");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   /** What the toggle says while unfolded. Falls back to `label`. */
   @property({ attribute: "open-label" }) openLabel = "";

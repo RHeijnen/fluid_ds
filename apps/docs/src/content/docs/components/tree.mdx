@@ -263,12 +263,22 @@ the [Accessibility guide](/guides/accessibility/).
 | <kbd>→</kbd> | Expand the focused item (or move to its first child if already expanded). |
 | <kbd>←</kbd> | Collapse (or move to the parent if already collapsed). |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last visible item. |
-| <kbd>Enter</kbd> | Activate the item (fires `fluid-select`). |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused item (fires one bubbling `fluid-select`). |
+| Type a label prefix | Move focus to the next matching visible, enabled item. |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Leave the tree, which has one tab stop. |
+
+Focus and selection are independent. Disabled nodes are skipped and cannot be
+activated. Collapsing a branch containing focus restores focus to a visible
+ancestor. In RTL, the horizontal expand/collapse keys are reversed.
+
+Selection events originate on the selected item and bubble through the tree,
+with `event.detail.item` identifying that item. Listen on either the tree or
+an ancestor; each pointer or keyboard activation delivers one event.
 
 ### Names & roles
 
 The host is `role="tree"`; each item is `role="treeitem"` with `aria-expanded`
-(parents), `aria-selected`, and `aria-level`
+(parents only), `aria-selected`, `aria-disabled`, and `aria-level`
 ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
 
 ### Motion & target size
@@ -279,7 +289,8 @@ The host is `role="tree"`; each item is `role="treeitem"` with `aria-expanded`
 
 ### AA vs AAA
 
-Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+Targets **WCAG 2.2 AA**; automated checks do not replace assistive-technology
+review. An ancestor `[data-fluid-conformance="aaa"]` lifts:
 
 | Token | AA | AAA | Criterion |
 | --- | --- | --- | --- |

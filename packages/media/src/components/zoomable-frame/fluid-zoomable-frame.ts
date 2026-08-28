@@ -1,10 +1,12 @@
-import { LitElement, html, css, type PropertyValues, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 /**
  * A pan + zoom container. Wraps any element (image, iframe, SVG) and
  * lets the user zoom with the scroll wheel and pan by dragging.
- * Buttons for zoom in/out/reset are shown by default.
+ * Native buttons provide zoom and pan without dragging, including keyboard
+ * activation. No composite APG pattern applies; each action is a native button.
  *
  * @summary Pan + zoom container.
  *
@@ -28,10 +30,11 @@ import { property, query } from "lit/decorators.js";
  * @uses-token --fluid-shadow-sm - Zoom button elevation.
  * @uses-token --fluid-space-3 - Controls strip inset from the edges.
  * @uses-token --fluid-space-2 - Gap between zoom buttons.
+ * @uses-token --fluid-target-min - Conformance-aware control target size.
  *
  * @fires fluid-zoom - Fired when the zoom level changes; detail = { scale }.
  */
-export class FluidZoomableFrame extends LitElement {
+export class FluidZoomableFrame extends FluidElement {
   static override styles = css`
     :host {
       position: relative;
@@ -63,6 +66,8 @@ export class FluidZoomableFrame extends LitElement {
       bottom: var(--fluid-space-3);
       right: var(--fluid-space-3);
       display: flex;
+      flex-wrap: wrap;
+      max-width: calc(100% - 2 * var(--fluid-space-3));
       gap: var(--fluid-space-2);
       z-index: 1;
     }
@@ -72,6 +77,8 @@ export class FluidZoomableFrame extends LitElement {
       cursor: pointer;
       width: 2rem;
       height: 2rem;
+      min-width: var(--fluid-target-min, 24px);
+      min-height: var(--fluid-target-min, 24px);
       border-radius: 50%;
       background: var(--fluid-zoom-button-bg, var(--fluid-surface-base));
       color: var(--fluid-zoom-button-fg, var(--fluid-text-primary));
@@ -86,6 +93,12 @@ export class FluidZoomableFrame extends LitElement {
     .button:focus-visible {
       outline: 2px solid var(--fluid-zoom-focus-ring, var(--fluid-focus-ring-color));
       outline-offset: 2px;
+    }
+    /* Keep native pointer focus on the button, not its decorative descendants.
+       WebKit can otherwise restart shadow-root Tab navigation after a click. */
+    .button > svg,
+    .button > span {
+      pointer-events: none;
     }
   `;
 
@@ -104,6 +117,60 @@ export class FluidZoomableFrame extends LitElement {
   /** Hide the floating zoom buttons. */
   @property({ type: Boolean, attribute: "no-controls" }) noControls = false;
 
+  /** Distance in CSS pixels moved by each pan control. Panning is unbounded. */
+  @property({ type: Number, attribute: "pan-step" }) panStep = 40;
+
+  /** Translatable names for the native controls. */
+  @property({ attribute: "zoom-in-label" }) get zoomInLabel(): string {
+    return this.zoomInLabelOverride ?? this.term("zoomIn");
+  }
+  set zoomInLabel(value: string | null) {
+    this.zoomInLabelOverride = value;
+  }
+  private zoomInLabelOverride: string | null = null;
+  @property({ attribute: "zoom-out-label" }) get zoomOutLabel(): string {
+    return this.zoomOutLabelOverride ?? this.term("zoomOut");
+  }
+  set zoomOutLabel(value: string | null) {
+    this.zoomOutLabelOverride = value;
+  }
+  private zoomOutLabelOverride: string | null = null;
+  @property({ attribute: "reset-label" }) get resetLabel(): string {
+    return this.resetLabelOverride ?? this.term("resetZoom");
+  }
+  set resetLabel(value: string | null) {
+    this.resetLabelOverride = value;
+  }
+  private resetLabelOverride: string | null = null;
+  @property({ attribute: "pan-left-label" }) get panLeftLabel(): string {
+    return this.panLeftLabelOverride ?? this.term("panLeft");
+  }
+  set panLeftLabel(value: string | null) {
+    this.panLeftLabelOverride = value;
+  }
+  private panLeftLabelOverride: string | null = null;
+  @property({ attribute: "pan-right-label" }) get panRightLabel(): string {
+    return this.panRightLabelOverride ?? this.term("panRight");
+  }
+  set panRightLabel(value: string | null) {
+    this.panRightLabelOverride = value;
+  }
+  private panRightLabelOverride: string | null = null;
+  @property({ attribute: "pan-up-label" }) get panUpLabel(): string {
+    return this.panUpLabelOverride ?? this.term("panUp");
+  }
+  set panUpLabel(value: string | null) {
+    this.panUpLabelOverride = value;
+  }
+  private panUpLabelOverride: string | null = null;
+  @property({ attribute: "pan-down-label" }) get panDownLabel(): string {
+    return this.panDownLabelOverride ?? this.term("panDown");
+  }
+  set panDownLabel(value: string | null) {
+    this.panDownLabelOverride = value;
+  }
+  private panDownLabelOverride: string | null = null;
+
   @query(".content") private contentEl!: HTMLDivElement;
 
   private x = 0;
@@ -120,6 +187,7 @@ export class FluidZoomableFrame extends LitElement {
     this.addEventListener("pointermove", this.onPointerMove);
     this.addEventListener("pointerup", this.onPointerUp);
     this.addEventListener("pointercancel", this.onPointerUp);
+    this.addEventListener("lostpointercapture", this.onPointerUp);
     this.addEventListener("wheel", this.onWheel, { passive: false });
   }
 
@@ -129,7 +197,15 @@ export class FluidZoomableFrame extends LitElement {
     this.removeEventListener("pointermove", this.onPointerMove);
     this.removeEventListener("pointerup", this.onPointerUp);
     this.removeEventListener("pointercancel", this.onPointerUp);
+    this.removeEventListener("lostpointercapture", this.onPointerUp);
     this.removeEventListener("wheel", this.onWheel);
+    if (this.activePointer !== null) this.releaseDrag(this.activePointer);
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("scale") || changed.has("minScale") || changed.has("maxScale")) {
+      this.scale = this.clampScale(this.scale);
+    }
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -152,7 +228,10 @@ export class FluidZoomableFrame extends LitElement {
   }
 
   private clampScale(s: number) {
-    return Math.max(this.minScale, Math.min(this.maxScale, s));
+    const min = Number.isFinite(this.minScale) && this.minScale > 0 ? this.minScale : 0.5;
+    const max =
+      Number.isFinite(this.maxScale) && this.maxScale >= min ? this.maxScale : Math.max(min, 5);
+    return Math.max(min, Math.min(max, Number.isFinite(s) ? s : 1));
   }
 
   private onWheel = (e: WheelEvent) => {
@@ -169,8 +248,18 @@ export class FluidZoomableFrame extends LitElement {
   };
 
   private onPointerDown = (e: PointerEvent) => {
-    // Ignore presses that originated on a control button.
-    if ((e.target as HTMLElement | null)?.closest("[part=button]")) return;
+    // Host listeners see retargeted shadow events. Inspect the composed path so
+    // control presses retain native focus and activation instead of starting a drag.
+    if (
+      e.button !== 0 ||
+      this.dragging ||
+      e
+        .composedPath()
+        .some(
+          (node) => node instanceof Element && node.matches("button, a, input, select, textarea")
+        )
+    )
+      return;
     this.dragging = true;
     this.activePointer = e.pointerId;
     this.lastX = e.clientX;
@@ -195,29 +284,49 @@ export class FluidZoomableFrame extends LitElement {
 
   private onPointerUp = (e: PointerEvent) => {
     if (e.pointerId !== this.activePointer) return;
+    this.releaseDrag(e.pointerId);
+  };
+
+  private releaseDrag(pointerId: number): void {
     this.dragging = false;
     this.activePointer = null;
     this.removeAttribute("data-dragging");
     try {
-      if (this.hasPointerCapture(e.pointerId)) this.releasePointerCapture(e.pointerId);
+      if (this.hasPointerCapture(pointerId)) this.releasePointerCapture(pointerId);
     } catch {
       // pointer capture state can be invalidated on disconnect.
     }
-  };
+  }
 
   /** Zoom in by the configured step. */
   zoomIn(): void {
-    this.scale = this.clampScale(this.scale + this.step);
+    this.scale = this.clampScale(this.scale + this.zoomStep);
   }
 
   /** Zoom out by the configured step. */
   zoomOut(): void {
-    this.scale = this.clampScale(this.scale - this.step);
+    this.scale = this.clampScale(this.scale - this.zoomStep);
+  }
+
+  private get zoomStep(): number {
+    return Number.isFinite(this.step) && this.step > 0 ? this.step : 0.25;
+  }
+
+  private get panDistance(): number {
+    return Number.isFinite(this.panStep) && this.panStep > 0 ? this.panStep : 40;
+  }
+
+  /** Pan by CSS pixels without requiring a drag gesture. */
+  panBy(x: number, y: number): void {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    this.x += x;
+    this.y += y;
+    this.applyTransform();
   }
 
   /** Reset zoom + pan. */
   reset(): void {
-    this.scale = 1;
+    this.scale = this.clampScale(1);
     this.x = 0;
     this.y = 0;
     this.applyTransform();
@@ -234,28 +343,92 @@ export class FluidZoomableFrame extends LitElement {
                 part="button"
                 class="button"
                 type="button"
-                aria-label="Zoom out"
+                aria-label=${this.zoomOutLabel}
                 @click=${() => this.zoomOut()}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M5 12h14" />
+                </svg>
               </button>
               <button
                 part="button"
                 class="button"
                 type="button"
-                aria-label="Reset zoom"
+                aria-label=${this.resetLabel}
                 @click=${() => this.reset()}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 12a9 9 0 1 0 3-6.7" />
+                  <path d="M3 4v5h5" />
+                </svg>
               </button>
               <button
                 part="button"
                 class="button"
                 type="button"
-                aria-label="Zoom in"
+                aria-label=${this.zoomInLabel}
                 @click=${() => this.zoomIn()}
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+              <button
+                part="button"
+                class="button"
+                type="button"
+                aria-label=${this.panLeftLabel}
+                @click=${() => this.panBy(-this.panDistance, 0)}
+              >
+                <span aria-hidden="true">←</span>
+              </button>
+              <button
+                part="button"
+                class="button"
+                type="button"
+                aria-label=${this.panRightLabel}
+                @click=${() => this.panBy(this.panDistance, 0)}
+              >
+                <span aria-hidden="true">→</span>
+              </button>
+              <button
+                part="button"
+                class="button"
+                type="button"
+                aria-label=${this.panUpLabel}
+                @click=${() => this.panBy(0, -this.panDistance)}
+              >
+                <span aria-hidden="true">↑</span>
+              </button>
+              <button
+                part="button"
+                class="button"
+                type="button"
+                aria-label=${this.panDownLabel}
+                @click=${() => this.panBy(0, this.panDistance)}
+              >
+                <span aria-hidden="true">↓</span>
               </button>
             </div>
           `}

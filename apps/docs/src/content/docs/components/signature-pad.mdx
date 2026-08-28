@@ -1,0 +1,371 @@
+---
+title: "Signature pad"
+description: "Pointer-drawn signature capture with pressure, undo, image placement, and PNG export. Form-associated."
+---
+
+import Demo from "../../../components/Demo.astro";
+import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+
+`<fluid-signature-pad>` captures a signature as ink, not as a picture: strokes
+are recorded as point sequences and replayed, so the pad resizes losslessly,
+undoes one stroke at a time, and exports a crisp PNG at the device's real
+resolution. Line width follows pen pressure where the hardware reports it and
+stroke velocity where it does not. Form-associated.
+
+<Demo>
+  <fluid-signature-pad aria-label="Signature"></fluid-signature-pad>
+</Demo>
+
+## Install
+
+<Tabs syncKey="install">
+  <TabItem label="CDN">
+    ```html
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/signature-pad/define.js">
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="npm">
+    ```bash
+    pnpm add @fluid-ds/components @fluid-ds/tokens
+    ```
+
+    ```ts
+    import "@fluid-ds/tokens/base.css";
+    import "@fluid-ds/tokens/light.css";
+    import "@fluid-ds/components/define/signature-pad";
+    ```
+  </TabItem>
+</Tabs>
+
+## Examples
+
+### Basic
+
+Draw with a mouse, pen, or finger. Once ink is on the pad, Undo steps back one
+stroke and Clear wipes everything.
+
+<Demo>
+  <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
+</Demo>
+
+<ConformanceCode code={`<fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>`} />
+
+### Placeholder and labels
+
+All visible copy comes in through properties (your application knows what
+language its reader speaks), with English defaults so a bare tag is already
+usable.
+
+<Demo>
+  <fluid-signature-pad
+    placeholder="Hier tekenen"
+    clear-label="Wissen"
+    undo-label="Ongedaan maken"
+    upload-label="Uploaden"
+    fit-label="Passend"
+    aria-label="Handtekening"
+  ></fluid-signature-pad>
+</Demo>
+
+<ConformanceCode code={`<fluid-signature-pad
+  placeholder="Hier tekenen"
+  clear-label="Wissen"
+  undo-label="Ongedaan maken"
+  upload-label="Uploaden"
+  fit-label="Passend"
+  aria-label="Handtekening"
+></fluid-signature-pad>`} />
+
+### Disabled
+
+<Demo>
+  <fluid-signature-pad disabled aria-label="Signature"></fluid-signature-pad>
+</Demo>
+
+<ConformanceCode code={`<fluid-signature-pad disabled></fluid-signature-pad>`} />
+
+### Placing a prepared image
+
+Plenty of people keep a scanned signature on their machine. The Upload button
+and dropping an image file onto the pad both call `placeImage`, which layers
+the bitmap beneath any strokes, fits it inside the pad without upscaling, and
+includes it in the export. The placed layer stays adjustable: drag it to move,
+pull the corner grip to scale, Fit to return to the centred contain-fit.
+
+```ts
+const pad = document.querySelector("fluid-signature-pad");
+await pad.placeImage(file);   // a File / Blob, or an image URL
+pad.refit();                  // back to the centred contain-fit
+```
+
+### Undo, clear, export
+
+The same actions the built-in buttons trigger are available as methods, and the
+ink exports as a PNG data URL at device resolution (or `undefined` while the
+pad is empty).
+
+```ts
+const pad = document.querySelector("fluid-signature-pad");
+pad.undo();                   // most recent stroke first, placed image last
+pad.clear();
+const png = pad.toDataURL();  // "data:image/png;base64,…" or undefined
+```
+
+## Listening for fluid-change
+
+The pad fires **`fluid-change`** whenever the ink changes: a stroke completed,
+an image placed or adjusted, an undo, or a clear. `detail.signed` says whether
+any ink remains; `detail.strokes` is the stroke count.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-signature-pad id="sig" aria-label="Signature"></fluid-signature-pad>
+
+    <script type="module">
+      const el = document.getElementById("sig");
+      el.addEventListener("fluid-change", (e) => {
+        console.log("signed:", e.detail.signed, "strokes:", e.detail.strokes);
+      });
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="SignatureField.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/signature-pad";
+
+    export function SignatureField() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onChange = (e: Event) =>
+          console.log((e as CustomEvent).detail.signed);
+        el.addEventListener("fluid-change", onChange);
+        return () => el.removeEventListener("fluid-change", onChange);
+      }, []);
+      return <fluid-signature-pad ref={ref} aria-label="Signature" />;
+    }
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="SignatureField.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/signature-pad";
+    const onChange = (e: CustomEvent) => console.log(e.detail.signed);
+    </script>
+
+    <template>
+      <fluid-signature-pad aria-label="Signature" @fluid-change="onChange" />
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="signature-field.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/signature-pad";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "signature-field",
+      template: `<fluid-signature-pad aria-label="Signature" (fluid-change)="onChange($event)"></fluid-signature-pad>`
+    })
+    export class SignatureField {
+      onChange(e: CustomEvent) {
+        console.log(e.detail.signed);
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="SignatureField.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/signature-pad";
+      function onChange(e: CustomEvent) {
+        console.log(e.detail.signed);
+      }
+    </script>
+
+    <fluid-signature-pad aria-label="Signature" on:fluid-change={onChange} />
+    ```
+  </TabItem>
+</Tabs>
+
+## Inside a form
+
+The pad is form-associated: it submits `name=<PNG data URL>`, an empty string
+while nothing has been drawn, and a form reset clears the ink.
+
+<Demo>
+  <form style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
+    <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
+    <div style="display:flex; gap: var(--fluid-space-2);">
+      <fluid-button type="submit">Save</fluid-button>
+      <fluid-button type="reset" variant="ghost">Reset</fluid-button>
+    </div>
+  </form>
+</Demo>
+
+<ConformanceCode code={`<form>
+  <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
+  <fluid-button type="submit">Save</fluid-button>
+</form>`} />
+
+See the [Forms guide](/guides/forms/) for validation and submission patterns.
+
+## Theming
+
+Every styled property of the pad reads a **component-scoped
+`--fluid-signature-pad-*` token that falls back to a main semantic var** (the
+override ladder), so you get brand, component, and instance overrides for free.
+The most-reached-for knobs are the ink color, the surface, the height, and the
+maximum width; the **complete list** is in the [API table below](#api).
+
+```css title="brand.css"
+/* Every signature pad in the brand */
+[data-fluid-brand="custom"] {
+  --fluid-signature-pad-ink: #1d4ed8;
+  --fluid-signature-pad-height: 8rem;
+}
+
+/* Just this one */
+[data-fluid-id="contract-signature"] {
+  --fluid-signature-pad-max-width: 40rem;
+  --fluid-signature-pad-border: var(--fluid-accent-base);
+}
+```
+
+<Aside type="tip">
+  Select a `fluid-signature-pad` in the [Theme builder](/playground/) to tweak
+  the ink, surface, border, and guideline tokens visually.
+</Aside>
+
+### Beyond tokens: `::part()`
+
+The container is [`part="base"`](#api), the drawing surface is `part="canvas"`,
+and the Undo/Clear/Upload cluster is `part="actions"`. Reach them with
+[`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any
+CSS not covered by a token, for example a heavier dashed border or a repositioned
+action row.
+
+## When to use
+
+- Capturing a **handwritten signature or initials** on a form: consent,
+  delivery, contract, visitor sign-in.
+- Anywhere a **drawn mark** is the required artifact and you need it back as an
+  image (the pad exports PNG at device resolution).
+
+### When *not* to use
+
+- **Typed legal consent**: a [`<fluid-checkbox>`](/components/checkbox/) next to
+  the terms is simpler and often legally equivalent.
+- **Collecting signature files as documents**: use
+  [`<fluid-dropzone>`](/components/dropzone/) or
+  [`<fluid-file-input>`](/components/file-input/); the pad's upload path is for
+  placing an image *into* the composite ink.
+- **Free-form sketching or annotation**: the pad is tuned for signatures
+  (baseline guide, velocity-based width), not for a general drawing canvas.
+
+## Accessibility
+
+The drawing surface is a `<canvas role="img">` with an accessible name, so
+screen readers announce it as an image rather than a mystery region; the
+Undo, Clear, and Upload controls are real [`<fluid-button>`](/components/button/)s
+with visible labels. The cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are pad-specific.
+
+### Keyboard
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | Moves focus to the canvas, then through the visible action buttons. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused action button (Undo, Clear, Upload, Fit). |
+
+Drawing itself is inherently a pointer gesture. The **Upload** path is the
+pointer-free equivalent: a keyboard user can pick a prepared signature image
+through the native file dialog instead of drawing one, which keeps the
+component's outcome achievable without a drag gesture
+([SC 2.5.7 Dragging Movements](https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements)).
+The canvas shows a focus ring via `:focus-visible`, read from the
+focus-ring tokens.
+
+### Names
+
+Set `aria-label` on the element; it forwards to the canvas (default
+"Signature"). The action buttons take their accessible names from their visible
+labels, so localized `clear-label` / `undo-label` / `upload-label` /
+`fit-label` copy keeps name and label in sync
+([SC 2.5.3 Label in Name](https://www.w3.org/WAI/WCAG22/Understanding/label-in-name)).
+
+### State semantics
+
+- `disabled` dims the pad, blocks pointer input, and removes the canvas from
+  the tab order.
+- `signed` reflects while ink is on the pad (it drives the solid accent border
+  and the Undo/Clear buttons); treat it as read-only.
+- The baseline guide and placeholder are decorative CSS, never exported ink,
+  and they disappear once signed.
+
+### Motion & target size
+
+- The only animation is a brief border-color transition; there is no looping or
+  decorative motion.
+- The Undo, Clear, Upload, and Fit controls are `<fluid-button size="sm">`, so
+  they inherit the button's `--fluid-target-min` floor: at least **24px** (AA)
+  and **44px** (AAA).
+
+### AA vs AAA
+
+Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
+
+| Token | AA | AAA | Criterion |
+| --- | --- | --- | --- |
+| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+
+The target floor applies through the member buttons (see the
+[button page](/components/button/) for the full table); the canvas focus ring
+reads `--fluid-focus-ring-width` directly.
+
+## API
+
+<ComponentApi tag="fluid-signature-pad" />
+
+## Related
+
+<CardGrid>
+  <LinkCard
+    title="File input"
+    href="/components/file-input/"
+    description="A picked file as the value, no drawing surface."
+  />
+  <LinkCard
+    title="Dropzone"
+    href="/components/dropzone/"
+    description="Drag-and-drop file collection for documents and images."
+  />
+  <LinkCard
+    title="Checkbox"
+    href="/components/checkbox/"
+    description="Typed consent when a drawn mark is not required."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="Form validation + submission patterns across frameworks."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup, TypeScript, and custom-event nuances per framework."
+  />
+</CardGrid>

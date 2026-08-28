@@ -2,6 +2,12 @@ import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { FormDisabledController } from "../../internal/form-disabled.js";
+
+export interface FluidCheckboxValueDetail {
+  checked: boolean;
+}
+export type FluidCheckboxChangeEvent = CustomEvent<FluidCheckboxValueDetail>;
 
 /**
  * Two- or three-state checkbox. Toggles a single option on/off, or sits in
@@ -27,6 +33,7 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
  * @cssproperty --fluid-checkbox-bg-on - Box background when checked/indeterminate. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-checkbox-border - Box border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-checkbox-border-hover - Box border on hover. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-checkbox-invalid-border - Invalid box border color. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-checkbox-border-width - Box border width. Falls back to --fluid-field-border-width.
  * @cssproperty --fluid-checkbox-radius - Box corner radius. Falls back to --fluid-radius-sm.
  * @cssproperty --fluid-checkbox-fg - Label text color. Falls back to --fluid-text-primary.
@@ -42,6 +49,7 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
  * @uses-token --fluid-border-strong - Border on hover.
  * @uses-token --fluid-accent-base - Checked background.
  * @uses-token --fluid-accent-text - Check mark color.
+ * @uses-token --fluid-danger-base - Invalid border color.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum hit-target height (24px AA / 44px AAA).
@@ -55,9 +63,16 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
  * @uses-token --fluid-duration-fast - State transition duration.
  * @uses-token --fluid-easing-standard - State transition easing.
  *
- * @fires fluid-change - Fired when the checked state changes. detail.checked is the new boolean.
+ * @fires {FluidCheckboxChangeEvent} fluid-change - Fired when the checked state changes. detail.checked is the new boolean.
  */
 export class FluidCheckbox extends FluidFormAssociated {
+  private readonly formDisabled = new FormDisabledController(this);
+  // Native constraint validation must be able to focus the shadow control.
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-flex;
@@ -122,9 +137,12 @@ export class FluidCheckbox extends FluidFormAssociated {
     }
 
     .base.focused .control {
-      box-shadow: 0 0 0
-        var(--fluid-checkbox-focus-ring-width, var(--fluid-focus-ring-width))
+      box-shadow: 0 0 0 var(--fluid-checkbox-focus-ring-width, var(--fluid-focus-ring-width))
         var(--fluid-checkbox-focus-ring, var(--fluid-focus-ring-color));
+    }
+
+    .base.invalid .control {
+      border-color: var(--fluid-checkbox-invalid-border, var(--fluid-danger-base));
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -211,14 +229,49 @@ export class FluidCheckbox extends FluidFormAssociated {
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private focused = false;
+  @state() private invalid = false;
+  private defaultChecked = false;
+  private defaultIndeterminate = false;
+  private reflectingState = false;
+
+  constructor() {
+    super();
+    // Required validity is active immediately, while the visual error waits
+    // until blur or a form validation attempt.
+    this.addEventListener("invalid", this.handleInvalid);
+  }
+
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value);
+    // Explicit attribute writes define reset defaults. Lit reflection of the
+    // live checked/indeterminate properties must not redefine those defaults.
+    if (!this.reflectingState) {
+      if (name === "checked") this.defaultChecked = value !== null;
+      if (name === "indeterminate") this.defaultIndeterminate = value !== null;
+    }
+  }
+
+  protected override update(changed: PropertyValues<this>): void {
+    this.reflectingState = true;
+    try {
+      super.update(changed);
+    } finally {
+      this.reflectingState = false;
+    }
+  }
 
   override formResetCallback(): void {
-    this.checked = this.hasAttribute("checked");
-    this.indeterminate = this.hasAttribute("indeterminate");
+    this.checked = this.defaultChecked;
+    this.indeterminate = this.defaultIndeterminate;
+    this.invalid = false;
   }
 
   override formDisabledCallback(disabled: boolean): void {
-    this.disabled = disabled;
+    this.formDisabled.preserve(
+      disabled,
+      () => this.disabled,
+      (value) => (this.disabled = value)
+    );
   }
 
   override formStateRestoreCallback(state: string | File | FormData | null): void {
@@ -237,28 +290,35 @@ export class FluidCheckbox extends FluidFormAssociated {
     if (changed.has("checked") || changed.has("value")) {
       this.internals.setFormValue(this.checked ? this.value : null);
     }
-    if (changed.has("required") || changed.has("checked")) {
-      if (this.required && !this.checked) {
-        this.setValidity({ valueMissing: true }, "Please check this box.");
-      } else {
-        this.setValidity({});
-      }
-    }
+    if (changed.has("required") && !this.required) this.invalid = false;
+    if (changed.has("required") || changed.has("checked")) this.refreshValidity();
   }
 
   protected override updated(): void {
     if (this.inputEl) this.inputEl.indeterminate = this.indeterminate;
-    if (this.required && !this.checked && this.inputEl) {
-      this.setValidity({ valueMissing: true }, "Please check this box.", this.inputEl);
+    this.refreshValidity(this.invalid);
+  }
+
+  private refreshValidity(showInvalid = this.invalid): void {
+    if (this.required && !this.checked) {
+      this.setValidity({ valueMissing: true }, this.term("checkThisBox"), this.inputEl ?? undefined);
+      this.invalid = showInvalid;
+    } else {
+      this.setValidity({});
+      this.invalid = false;
     }
   }
+
+  private handleInvalid = (): void => {
+    this.refreshValidity(true);
+  };
 
   private handleChange = () => {
     this.checked = this.inputEl.checked;
     // Checking always clears indeterminate (consistent with native behavior).
     this.indeterminate = false;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidCheckboxValueDetail>("fluid-change", {
         detail: { checked: this.checked },
         bubbles: true,
         composed: true
@@ -267,7 +327,10 @@ export class FluidCheckbox extends FluidFormAssociated {
   };
 
   private handleFocus = () => (this.focused = true);
-  private handleBlur = () => (this.focused = false);
+  private handleBlur = () => {
+    this.focused = false;
+    this.refreshValidity(true);
+  };
 
   override render(): TemplateResult {
     return html`
@@ -278,7 +341,8 @@ export class FluidCheckbox extends FluidFormAssociated {
           checked: this.checked,
           indeterminate: this.indeterminate,
           disabled: this.disabled,
-          focused: this.focused
+          focused: this.focused,
+          invalid: this.invalid
         })}
       >
         <input
@@ -286,11 +350,8 @@ export class FluidCheckbox extends FluidFormAssociated {
           .checked=${this.checked}
           ?disabled=${this.disabled}
           ?required=${this.required}
-          aria-checked=${this.indeterminate
-            ? "mixed"
-            : this.checked
-              ? "true"
-              : "false"}
+          aria-checked=${this.indeterminate ? "mixed" : this.checked ? "true" : "false"}
+          aria-invalid=${this.invalid ? "true" : "false"}
           aria-label=${this.ariaLabel ?? ""}
           @change=${this.handleChange}
           @focus=${this.handleFocus}

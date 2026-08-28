@@ -91,12 +91,11 @@ export class FluidSteps extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("click", this.handleClick);
+    this.listen(this, "click", this.handleClick);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("click", this.handleClick);
   }
 
   protected override firstUpdated(): void {

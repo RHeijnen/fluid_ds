@@ -1,6 +1,6 @@
 import { FluidColumnMapper } from "./fluid-column-mapper.js";
 
-if (!customElements.get("fluid-column-mapper")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-column-mapper")) {
   customElements.define("fluid-column-mapper", FluidColumnMapper);
 }
 

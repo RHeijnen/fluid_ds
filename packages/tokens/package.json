@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/tokens",
-  "version": "0.0.3",
+  "version": "0.4.0",
   "description": "Design tokens for Fluid, typed source, generates CSS + a programmatic manifest. Drop the CSS files in your <head> or import them in your bundler.",
   "type": "module",
   "license": "MIT",
@@ -41,7 +41,8 @@
     "dist",
     "src",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsx scripts/build.ts",

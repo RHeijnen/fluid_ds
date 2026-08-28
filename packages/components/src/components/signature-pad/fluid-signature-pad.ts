@@ -60,6 +60,10 @@ interface SignaturePoint {
  * @fires fluid-change - Fired when the ink changes: a stroke completed, an
  *   image placed, an undo, or a clear. `detail.signed` says whether any ink
  *   remains; `detail.strokes` is the stroke count.
+ * @cssproperty --fluid-signature-pad-accent-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-signature-pad-focus-ring-color - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-signature-pad-surface-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-signature-pad-text-secondary - Component override for the corresponding semantic token.
  */
 export class FluidSignaturePad extends FluidElement {
   static formAssociated = true;
@@ -76,15 +80,42 @@ export class FluidSignaturePad extends FluidElement {
   /** True while at least one stroke of ink is on the pad. Read-only. */
   @property({ type: Boolean, reflect: true }) signed = false;
   /**
-   * Invitation shown while the pad is empty. Copy comes in through properties
-   * rather than a catalogue - the application knows what language its reader
-   * speaks - with English defaults so a bare tag is already usable.
+   * Invitation shown while the pad is empty. Owned defaults follow the locale;
+   * explicit application copy remains unchanged.
    */
-  @property() placeholder = "Sign here";
-  @property({ attribute: "clear-label" }) clearLabel = "Clear";
-  @property({ attribute: "undo-label" }) undoLabel = "Undo";
-  @property({ attribute: "upload-label" }) uploadLabel = "Upload";
-  @property({ attribute: "fit-label" }) fitLabel = "Fit";
+  @property() placeholder = "";
+  @property({ attribute: "clear-label" })
+  get clearLabel(): string {
+    return this.clearLabelOverride ?? this.term("clear");
+  }
+  set clearLabel(value: string | null) {
+    this.clearLabelOverride = value;
+  }
+  private clearLabelOverride: string | null = null;
+  @property({ attribute: "undo-label" })
+  get undoLabel(): string {
+    return this.undoLabelOverride ?? this.term("undo");
+  }
+  set undoLabel(value: string | null) {
+    this.undoLabelOverride = value;
+  }
+  private undoLabelOverride: string | null = null;
+  @property({ attribute: "upload-label" })
+  get uploadLabel(): string {
+    return this.uploadLabelOverride ?? this.term("upload");
+  }
+  set uploadLabel(value: string | null) {
+    this.uploadLabelOverride = value;
+  }
+  private uploadLabelOverride: string | null = null;
+  @property({ attribute: "fit-label" })
+  get fitLabel(): string {
+    return this.fitLabelOverride ?? this.term("fit");
+  }
+  set fitLabel(value: string | null) {
+    this.fitLabelOverride = value;
+  }
+  private fitLabelOverride: string | null = null;
 
   @state() private strokes: SignaturePoint[][] = [];
   /**
@@ -125,8 +156,7 @@ export class FluidSignaturePad extends FluidElement {
     }
     .base {
       position: relative;
-      border: 1px dashed
-        var(--fluid-signature-pad-border, var(--fluid-border-default, #d5dbe3));
+      border: 1px dashed var(--fluid-signature-pad-border, var(--fluid-border-default, #d5dbe3));
       border-radius: var(--fluid-signature-pad-radius, var(--fluid-radius-sm, 0.5rem));
       background: var(--fluid-signature-pad-bg, var(--fluid-surface-base, #fff));
       /* A whisper of depth reads as a writable surface rather than a gap. */
@@ -135,11 +165,11 @@ export class FluidSignaturePad extends FluidElement {
       transition: border-color var(--fluid-duration-fast, 120ms) ease;
     }
     .base:hover {
-      border-color: var(--fluid-accent-base, #4f46e5);
+      border-color: var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
     }
     :host([signed]) .base {
       border-style: solid;
-      border-color: var(--fluid-accent-base, #4f46e5);
+      border-color: var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
     }
     :host([disabled]) .base {
       opacity: 0.55;
@@ -154,7 +184,10 @@ export class FluidSignaturePad extends FluidElement {
     }
     canvas:focus-visible {
       outline: var(--fluid-focus-ring-width, 2px) solid
-        var(--fluid-focus-ring-color, var(--fluid-accent-base, #4f46e5));
+        var(
+          --fluid-signature-pad-focus-ring-color,
+          var(--fluid-focus-ring-color, var(--fluid-accent-base, #4f46e5))
+        );
       outline-offset: -2px;
     }
     /*
@@ -177,7 +210,7 @@ export class FluidSignaturePad extends FluidElement {
     .guide .cross {
       font-size: 0.85rem;
       line-height: 1.6;
-      color: var(--fluid-text-secondary, #5b6b7b);
+      color: var(--fluid-signature-pad-text-secondary, var(--fluid-text-secondary, #5b6b7b));
     }
     .hint {
       position: absolute;
@@ -185,7 +218,7 @@ export class FluidSignaturePad extends FluidElement {
       padding-top: 1.5rem;
       display: grid;
       place-items: center;
-      color: var(--fluid-text-secondary, #5b6b7b);
+      color: var(--fluid-signature-pad-text-secondary, var(--fluid-text-secondary, #5b6b7b));
       font-size: var(--fluid-font-size-sm, 0.85rem);
       opacity: 0.7;
       pointer-events: none;
@@ -204,7 +237,7 @@ export class FluidSignaturePad extends FluidElement {
      */
     .frame {
       position: absolute;
-      border: 1px dashed var(--fluid-accent-base, #4f46e5);
+      border: 1px dashed var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
       border-radius: 2px;
       pointer-events: none;
     }
@@ -214,9 +247,9 @@ export class FluidSignaturePad extends FluidElement {
       bottom: -5px;
       width: 10px;
       height: 10px;
-      border: 1px solid var(--fluid-surface-base, #fff);
+      border: 1px solid var(--fluid-signature-pad-surface-base, var(--fluid-surface-base, #fff));
       border-radius: 2px;
-      background: var(--fluid-accent-base, #4f46e5);
+      background: var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
     }
   `;
 
@@ -564,6 +597,9 @@ export class FluidSignaturePad extends FluidElement {
 
   private onPointerDown(event: PointerEvent): void {
     if (this.disabled || !this.canvas) return;
+    // Drawing and image adjustments prevent default pointer behavior below,
+    // so explicitly retain focus on the surface the user is interacting with.
+    this.canvas.focus({ preventScroll: true });
     const { x, y } = this.samplePoint(event);
     if (this.onHandle(x, y)) {
       event.preventDefault();
@@ -579,7 +615,13 @@ export class FluidSignaturePad extends FluidElement {
     // edge mid-word; the stroke ends when the pointer lifts, not when it
     // leaves.
     event.preventDefault();
-    this.canvas.setPointerCapture(event.pointerId);
+    try {
+      this.canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer capture can fail if the browser has already retired the
+      // pointer. Keep drawing while events remain on the canvas instead of
+      // turning a recoverable platform race into an uncaught exception.
+    }
     this.active = [this.samplePoint(event)];
   }
 
@@ -629,7 +671,7 @@ export class FluidSignaturePad extends FluidElement {
         ${this.signed
           ? ""
           : html`
-              <div class="hint">${this.placeholder}</div>
+              <div class="hint">${this.placeholder || this.term("signHere")}</div>
               <div class="guide"><span class="cross">✕</span></div>
               <div class="actions" part="actions">
                 <fluid-button size="sm" variant="ghost" @click=${this.pickFile}>
@@ -641,7 +683,7 @@ export class FluidSignaturePad extends FluidElement {
           part="canvas"
           role="img"
           tabindex=${this.disabled ? -1 : 0}
-          aria-label=${this.ariaLabel ?? "Signature"}
+          aria-label=${this.ariaLabel ?? this.term("signature")}
           @pointerdown=${this.onPointerDown}
           @pointermove=${this.onPointerMove}
           @pointerup=${this.onPointerUp}

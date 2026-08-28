@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "status": "complete",
+  "completedExecutions": 50,
+  "targetExecutions": 50,
+  "flakyExecutions": 0,
+  "flakeRate": 0,
+  "requiredMaximumFlakeRate": 0.01,
+  "candidateScreenshotsPerExecution": 60,
+  "acceptedSmokeScreenshotsPerExecution": 5,
+  "candidateComparisons": 2940,
+  "acceptedSmokeComparisons": 245,
+  "candidateAggregateSha256": "a1a8017600e03079bf53db01e17666f480ac58122c10fa01d94ff8d46743d540",
+  "acceptedSmokeAggregateSha256": "365d491f874777ca00fb51f55a29f876a4b941d1573e2f0c4b5a8d822161811d",
+  "candidateVariance": [],
+  "acceptedSmokeVariance": [],
+  "sourceRevision": "543eb8dfce244aa276b37e2415394056d4d05f15",
+  "pnpmLockSha256": "17ec483e01ecc1fc4cb109ecf076428b640fd62a3541842516277755e1a0eec0",
+  "frozenStorybookAggregateSha256": "364096f5ba24f1394c4e9aa62b7e4e37a005cac286f4b3308c874ce7eeded938",
+  "rasterPolicy": {
+    "sha256": "6a16216ea5b4a998019d3a198a90a7eef11880cc8e833bb0e6c6c03a5030ab88",
+    "rasterThreads": 1,
+    "chromiumLaunchArgs": ["--num-raster-threads=1"]
+  },
+  "acceptedBaseline": {
+    "fileCount": 1009,
+    "aggregateSha256": "369356a6da2903f0040998a59c00c370886e6c0e028362fe8b390bec61b01c0f",
+    "unchangedAcrossRuns": true,
+    "worktreeClean": true,
+    "freshByteMismatchCount": 250,
+    "comparisonPolicy": "Fresh accepted-smoke captures are byte-identical to each other. Their immutable accepted-baseline comparison remains governed by the configured Playwright pixel tolerance."
+  },
+  "containerEvidence": {
+    "root": "/workspace/apps/visual-regression/candidate-evidence/stability/2026-08-27-raster1-full-50",
+    "retainedRunDirectories": 50,
+    "retainedFiles": 6750,
+    "failureRecord": null,
+    "stabilitySummarySha256": "4f9ddbc8627a1024d4ac1743932634f193707166eefcc285ccd781ba443be387"
+  }
+}

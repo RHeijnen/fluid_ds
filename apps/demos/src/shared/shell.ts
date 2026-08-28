@@ -22,8 +22,8 @@ import { mountThemePicker } from "./theme-picker.js";
 
 export interface ShellOptions {
   title: string;
-  /** One of `index`, `settings`, `admin`, drives sidebar `aria-current`. */
-  currentRoute: "index" | "settings" | "admin";
+  /** One of `index`, `settings`, `admin`, `data-table`, drives sidebar `aria-current`. */
+  currentRoute: "index" | "settings" | "admin" | "data-table";
 }
 
 /** Vite substitutes this at build time: `/` in dev, `/demos/` in prod. */
@@ -33,7 +33,8 @@ const BASE = import.meta.env.BASE_URL;
 const DEMO_ROUTES: { id: ShellOptions["currentRoute"]; href: string; label: string }[] = [
   { id: "index", href: BASE, label: "All demos" },
   { id: "settings", href: `${BASE}settings/`, label: "Settings dashboard" },
-  { id: "admin", href: `${BASE}admin/`, label: "Admin / data" }
+  { id: "admin", href: `${BASE}admin/`, label: "Admin / data" },
+  { id: "data-table", href: `${BASE}data-table/`, label: "Data table" }
 ];
 
 /** Cross-surface nav (matches the landing's primary nav). */

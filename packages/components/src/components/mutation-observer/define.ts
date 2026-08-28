@@ -1,6 +1,6 @@
 import { FluidMutationObserver } from "./fluid-mutation-observer.js";
 
-if (!customElements.get("fluid-mutation-observer")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-mutation-observer")) {
   customElements.define("fluid-mutation-observer", FluidMutationObserver);
 }
 

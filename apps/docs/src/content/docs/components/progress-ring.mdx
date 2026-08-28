@@ -137,11 +137,22 @@ progress-ring-specific.
 
 - The host is `role="progressbar"` with `aria-valuemin="0"`,
   `aria-valuemax="100"`, and `aria-valuenow` reflecting the value.
-- The default `aria-label` is "Progress": override with a specific name
+- The default `aria-label` is the localized "Progress": override with a specific name
   ("Onboarding completion", "Storage used")
   ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
 - Pair with `show-value` or a slotted label so the value isn't conveyed by the
   arc color alone ([SC 1.4.1](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)).
+
+The owned fallback follows the nearest `lang` after mounting and reconnecting.
+Explicit `aria-label` values, including empty strings and English defaults, remain
+application-owned. Removing that attribute restores the current localized default.
+An authored `aria-labelledby` takes precedence; its references are not rewritten.
+Provide a meaningful name rather than relying on an empty override.
+
+Hydration limitation: an `aria-label` already present in server-rendered markup
+is preserved as authored. Automatic locale updates for a server-generated default
+need explicit ownership provenance and are not yet verified. Center-value formatting
+and application-supplied slot content are separate from the fallback name.
 
 ### Motion
 
@@ -167,7 +178,7 @@ The arc transition honors `prefers-reduced-motion`.
   />
   <LinkCard
     title="Theming guide"
-    href="/guides/theming/"
+    href="/theming/basics/"
     description="How brand, component, and instance tokens compose."
   />
 </CardGrid>

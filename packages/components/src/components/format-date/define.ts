@@ -1,6 +1,6 @@
 import { FluidFormatDate } from "./fluid-format-date.js";
 
-if (!customElements.get("fluid-format-date")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-format-date")) {
   customElements.define("fluid-format-date", FluidFormatDate);
 }
 

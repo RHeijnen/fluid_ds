@@ -1,0 +1,36 @@
+name: Storybook interactions
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storybook-interactions-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  interactions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build workspace prerequisites
+        run: pnpm build
+      - run: pnpm --filter @fluid-ds/storybook build
+      # Storybook's runner uses Playwright transitively; the CLI is declared by
+      # the components package, not by Storybook itself.
+      - run: pnpm --filter @fluid-ds/components exec playwright install --with-deps chromium
+      - name: Run interaction stories
+        run: pnpm exec concurrently -k -s first "pnpm --filter @fluid-ds/storybook exec http-server storybook-static -p 6006 --silent" "pnpm --filter @fluid-ds/storybook exec wait-on http://127.0.0.1:6006 && pnpm --filter @fluid-ds/storybook test:runner && pnpm --filter @fluid-ds/storybook exec test-storybook --url http://127.0.0.1:6006 --includeTags interaction-contract --failOnConsole"

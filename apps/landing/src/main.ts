@@ -9,18 +9,6 @@
  * pitch in one interaction.
  */
 import "./register-fluid.js";
-import {
-  confetti,
-  fireworks,
-  emojiBurst,
-  pride,
-  sparkles,
-  snow,
-  stars,
-  hearts,
-  emojiFountain,
-  bubbles
-} from "@fluid-ds/animations/effects";
 
 const GH = "https://github.com/RHeijnen/fluid_ds";
 
@@ -43,34 +31,72 @@ const LOGO = `
   </svg>`;
 
 const features = [
-  ["blocks", "101 components, no framework", "Standard custom elements. Drop the tags into React, Vue, Angular, Svelte, Solid, or a plain HTML file. Same code, same result."],
-  ["palette", "Theme with one variable", "A small palette of semantic tokens drives everything. Override one value, retheme the whole app. Down to a single element if you want."],
-  ["circle-check", "Accessible by default", "Every component ships the right ARIA pattern, keyboard support, 24px targets, and an axe audit. AA today, AAA on a switch."],
-  ["sparkles", "Lean core, opt-in power", "The core stays small. Charts, data grids, calendars, a scheduler, a rich-text editor, kanban, maps, media, and more live in separate packages you add only when you need them."]
+  [
+    "blocks",
+    "103 component families, no framework",
+    "Standard custom elements. Use the tags directly in React, Vue, Angular, Svelte, Solid, or a plain HTML file; framework-specific setup is documented."
+  ],
+  [
+    "palette",
+    "Theme with one variable",
+    "A small palette of semantic tokens drives everything. Override one value, retheme the whole app. Down to a single element if you want."
+  ],
+  [
+    "circle-check",
+    "Accessible by default",
+    "Catalog-wide axe and server-rendering inventories cover every published element. Three-engine keyboard, focus, environment, and recovery contracts add depth without replacing manual review."
+  ],
+  [
+    "sparkles",
+    "Lean core, opt-in power",
+    "The core stays small. Charts, data grids, calendars, a scheduler, a rich-text editor, kanban, maps, media, and more live in separate packages you add only when you need them."
+  ]
 ];
 
 const stats = [
-  ["101", "components"],
-  ["12", "expansion packs"],
-  ["4", "frameworks proven"],
-  ["1,000+", "tests passing"],
+  ["124", "core elements"],
+  ["13", "expansion packs"],
+  ["7", "packed consumers"],
+  ["3", "browser engines"],
   ["AA", "WCAG 2.2 (AAA opt-in)"],
   ["1,500+", "icons available"]
 ];
 
 const packs = [
-  ["@fluid-ds/charts", "Chart.js-backed line, bar, doughnut, sparkline and more, themed by your tokens."],
-  ["@fluid-ds/scheduler", "Appointment scheduler: calendar with bookable time slots, plus an hours editor."],
-  ["@fluid-ds/table", "Accessible data grid: sortable, selectable, semantic table."],
+  [
+    "@fluid-ds/charts",
+    "Chart.js-backed line, bar, doughnut, sparkline and more, themed by your tokens."
+  ],
+  [
+    "@fluid-ds/scheduler",
+    "Appointment scheduler: calendar with bookable time slots, plus an hours editor."
+  ],
+  [
+    "@fluid-ds/table",
+    "Accessible data grid: sortable, selectable, plus infinite scrolling, virtual rows, and column reorder/resize with a persistable layout."
+  ],
   ["@fluid-ds/calendar", "Event calendar: a month view of events."],
   ["@fluid-ds/editor", "Lightweight accessible rich-text editor."],
   ["@fluid-ds/kanban", "Drag-and-drop board with a full keyboard path."],
   ["@fluid-ds/map", "Themed Leaflet map wrapper with markers."],
-  ["@fluid-ds/media", "Video player, playlists, animated images, zoomable frames, audio, lightbox."],
+  [
+    "@fluid-ds/node-graph",
+    "Node graph editor: typed ports, Bezier edges, drag or keyboard connections."
+  ],
+  [
+    "@fluid-ds/media",
+    "Video player, playlists, animated images, zoomable frames, audio, lightbox."
+  ],
   ["@fluid-ds/markdown", "Render Markdown to themed HTML with one element."],
   ["@fluid-ds/qr", "Themable QR codes as crisp SVG, including logo-embedded fancy codes."],
-  ["@fluid-ds/parser", "Drag JSON, CSV or Excel onto a file-drop and parse it against a blueprint."],
-  ["@fluid-ds/animations", "Keyframe animations plus event effects like confetti, reduced-motion aware."]
+  [
+    "@fluid-ds/parser",
+    "Drag JSON, CSV or Excel onto a file-drop and parse it against a blueprint."
+  ],
+  [
+    "@fluid-ds/animations",
+    "Keyframe animations plus event effects like confetti, reduced-motion aware."
+  ]
 ];
 
 const surfaces = [
@@ -83,7 +109,7 @@ const surfaces = [
 const frameworks = [
   ["Native HTML", "Buildless, via an import map.", "/demos/native/"],
   ["React", "React 19 + Vite.", "/demos/react/"],
-  ["Next.js", "App Router, SSR-safe.", "/demos/next/"],
+  ["Next.js", "App Router, static host demo.", "/demos/next/"],
   ["Angular", "Angular 20 standalone.", "/demos/angular/"]
 ];
 
@@ -97,11 +123,9 @@ document.body.innerHTML = `
       <a href="/playground/">Theme builder</a>
       <a href="/wizard/">Bundle builder</a>
       <a href="/demos/">Demos</a>
-      <a class="cta" href="${GH}" target="_blank" rel="noopener" aria-label="GitHub repository">
-        <fluid-button size="sm" variant="secondary">
-          <fluid-icon slot="prefix" name="github"></fluid-icon>
-          GitHub
-        </fluid-button>
+      <a class="cta landing-button secondary compact" href="${GH}" target="_blank" rel="noopener" aria-label="GitHub repository">
+        <fluid-icon name="github"></fluid-icon>
+        GitHub
       </a>
     </nav>
   </header>
@@ -109,23 +133,23 @@ document.body.innerHTML = `
   <!-- ============================ HERO ============================ -->
   <section class="hero">
     <div class="hero-badges">
-      <fluid-badge variant="info">stable 0.x</fluid-badge>
-      <fluid-badge variant="success">WCAG 2.2 AA · AAA-ready</fluid-badge>
+      <fluid-badge variant="info">pre-1.0</fluid-badge>
+      <fluid-badge variant="success">AA contrast tokens · AAA mode</fluid-badge>
       <fluid-badge>npm: @fluid-ds/*@latest</fluid-badge>
       <fluid-badge>MIT licensed</fluid-badge>
     </div>
     <h1>Build it once.<br /><span class="accent">Drop it anywhere.</span></h1>
     <p class="lead">
-      A framework-agnostic design system of <strong>101 standard web components</strong>,
-      themable down to a single CSS variable and accessible out of the box.
+      A framework-agnostic design system with <strong>124 core elements in 103 component families</strong>,
+      themable down to a single CSS variable and tested across the published catalog.
       Works in every framework, and in the page that doesn't have one.
     </p>
     <div class="hero-actions">
-      <a href="/docs/" style="text-decoration:none;">
-        <fluid-button>Get started <fluid-icon slot="suffix" name="arrow-right"></fluid-icon></fluid-button>
+      <a href="/docs/" class="landing-button">
+        Get started <fluid-icon name="arrow-right"></fluid-icon>
       </a>
-      <a href="/playground/" style="text-decoration:none;">
-        <fluid-button variant="secondary">Open the theme builder</fluid-button>
+      <a href="/playground/" class="landing-button secondary">
+        Open the theme builder
       </a>
       <fluid-button id="start-tour" variant="ghost"><fluid-icon slot="prefix" name="sparkles"></fluid-icon>Take the tour</fluid-button>
     </div>
@@ -187,17 +211,21 @@ document.body.innerHTML = `
     <h2>Drop in, look right, ship</h2>
     <p class="subhead">Four properties that set Fluid apart from the component library you considered last quarter.</p>
     <div class="feature-grid">
-      ${features.map(([icon, title, body]) => `
+      ${features
+        .map(
+          ([icon, title, body]) => `
         <fluid-card variant="outline">
           <div class="feature-head"><fluid-icon name="${icon}" style="--fluid-icon-size:1.5rem;"></fluid-icon><strong>${title}</strong></div>
           <p style="margin:0; color:var(--fluid-text-secondary);">${body}</p>
-        </fluid-card>`).join("")}
+        </fluid-card>`
+        )
+        .join("")}
     </div>
   </section>
 
   <!-- ====================== COMPONENT WALL ====================== -->
   <section class="row">
-    <h2>One design language, 57 ways</h2>
+    <h2>One design language, 124 core elements</h2>
     <p class="subhead">A taste of the library. Flip the switcher up top and watch every one of these retheme at once.</p>
     <fluid-card variant="outline">
       <div class="wall">
@@ -239,7 +267,7 @@ document.body.innerHTML = `
       </div>
     </fluid-card>
     <p style="text-align:center; margin-top:1rem;">
-      <a href="/storybook/" style="text-decoration:none;"><fluid-button variant="secondary">See all 101 in Storybook <fluid-icon slot="suffix" name="arrow-right"></fluid-icon></fluid-button></a>
+      <a href="/storybook/" class="landing-button secondary">Explore the catalog in Storybook <fluid-icon name="arrow-right"></fluid-icon></a>
     </p>
   </section>
 
@@ -269,42 +297,60 @@ document.body.innerHTML = `
   <!-- ====================== WHAT'S NEW (v0.3) ====================== -->
   <section class="row" id="whatsnew">
     <h2>New in <span class="accent">v0.3</span></h2>
-    <p class="subhead">Three fresh ways to delight: logo-embedded QR codes, drag-and-drop file parsing, and a celebration effects engine.</p>
+    <p class="subhead">Fresh off the workbench: ink-true signature capture, a folding divider, managed table columns, built-in field labels, and a multi-pick typeahead.</p>
     <div class="whatsnew-grid">
       <fluid-card variant="outline" class="wn-card">
-        <code class="pack-name">@fluid-ds/qr</code>
-        <p class="wn-blurb">Scannable QR codes with your logo in the centre, dot modules, and recoloured finder eyes.</p>
+        <code class="pack-name">&lt;fluid-signature-pad&gt;</code>
+        <p class="wn-blurb">Signatures captured as ink, not pixels: lossless redraw, per-stroke undo, pressure-aware lines, crisp export. Go on, scribble.</p>
         <div class="wn-stage">
-          <fluid-qr-code id="wn-qr" value="https://fluid-web.dev" size="156"
-            module-shape="dots" eye-shape="rounded" eye-color="var(--fluid-accent-base)" logo-size="0.24"></fluid-qr-code>
-        </div>
-      </fluid-card>
-
-      <fluid-card variant="outline" class="wn-card" id="fx-card">
-        <code class="pack-name">@fluid-ds/animations</code>
-        <p class="wn-blurb">A tiny canvas effects engine: confetti, fireworks, emoji bursts, and more. Reduced-motion aware.</p>
-        <div class="wn-stage fx-actions">
-          <fluid-button id="fx-confetti" variant="primary" size="sm"><fluid-icon slot="prefix" name="sparkles"></fluid-icon>Confetti</fluid-button>
-          <fluid-button id="fx-fireworks" variant="secondary" size="sm">Fireworks</fluid-button>
-          <fluid-button id="fx-emoji" variant="secondary" size="sm">Emoji</fluid-button>
-          <fluid-button id="fx-pride" variant="secondary" size="sm">Pride</fluid-button>
-          <fluid-button id="fx-snow" variant="secondary" size="sm">Snow</fluid-button>
-          <fluid-button id="fx-sparkles" variant="secondary" size="sm">Sparkles</fluid-button>
-          <fluid-button id="fx-stars" variant="secondary" size="sm">Stars</fluid-button>
-          <fluid-button id="fx-hearts" variant="secondary" size="sm">Hearts</fluid-button>
-          <fluid-button id="fx-fountain" variant="secondary" size="sm">Fountain</fluid-button>
-          <fluid-button id="fx-bubbles" variant="secondary" size="sm">Bubbles</fluid-button>
+          <fluid-signature-pad id="wn-signature" aria-label="Try the signature pad" style="width:100%;"></fluid-signature-pad>
         </div>
       </fluid-card>
 
       <fluid-card variant="outline" class="wn-card">
-        <code class="pack-name">@fluid-ds/parser</code>
-        <p class="wn-blurb">Drop a JSON, CSV, or Excel file and parse it against a blueprint: typed, validated rows out.</p>
+        <code class="pack-name">&lt;fluid-typeahead keep-open&gt;</code>
+        <p class="wn-blurb">One attribute turns the typeahead into a multi-picker: the list stays open after a choice and every pick lands below.</p>
+        <div class="wn-stage">
+          <div class="wn-stack">
+            <fluid-typeahead id="wn-pick" keep-open aria-label="Add toppings" placeholder="Add toppings…"
+              options='["Basil","Mozzarella","Mushroom","Olive","Pepperoni","Ricotta"]'></fluid-typeahead>
+            <div class="wn-picks" id="wn-picks" aria-live="polite"></div>
+          </div>
+        </div>
+      </fluid-card>
+
+      <fluid-card variant="outline" class="wn-card">
+        <code class="pack-name">label + help-text</code>
+        <p class="wn-blurb">Inputs, selects, textareas, typeaheads, and the time and date pickers grow a real label and help row from two attributes. No wrapper needed.</p>
+        <div class="wn-stage">
+          <fluid-input label="Workspace name" help-text="Visible to everyone on your team." placeholder="acme-inc" style="width:100%; max-width:16rem;"></fluid-input>
+        </div>
+      </fluid-card>
+
+      <fluid-card variant="outline" class="wn-card">
+        <code class="pack-name">&lt;fluid-fold&gt;</code>
+        <p class="wn-blurb">A divider with a disclosure at its centre: tuck away the long tail of a page without accordion chrome.</p>
+        <div class="wn-stage">
+          <div class="wn-stack">
+            <p class="wn-fold-copy">Fluid ships 124 core elements across 103 families. The headliners fit right here&hellip;</p>
+            <fluid-fold label="Show the rest">
+              <p class="wn-fold-copy">&hellip;and the long tail unfolds on demand: signature pads, speed dials, tours, transfer lists, OTP inputs, and about 90 more.</p>
+            </fluid-fold>
+          </div>
+        </div>
+      </fluid-card>
+
+      <fluid-card variant="outline" class="wn-card">
+        <code class="pack-name">@fluid-ds/table</code>
+        <p class="wn-blurb">Infinite-table columns are now fully manageable: drag or keyboard reorder, resize with double-click auto-fit, an opt-in column scrollbar. One persistable layout.</p>
         <div class="wn-stage">
           <div class="wn-parser">
-            <div class="wn-drop"><fluid-icon name="upload"></fluid-icon><span>members.csv</span></div>
-            <fluid-meter value="312" max="320" label="Rows valid" style="width:100%;"></fluid-meter>
-            <span class="wn-parser-note">312 of 320 rows valid &middot; 8 flagged</span>
+            <div class="wn-columns" aria-hidden="true">
+              <div class="wn-col" style="flex:1.4;"><span>Terminal</span><i></i></div>
+              <div class="wn-col"><span>Status</span><i></i></div>
+              <div class="wn-col"><span>Site</span><i></i></div>
+            </div>
+            <span class="wn-parser-note">reorder &middot; resize &middot; auto-fit &middot; column-scroll</span>
           </div>
         </div>
       </fluid-card>
@@ -314,13 +360,17 @@ document.body.innerHTML = `
   <!-- ====================== EXPANSION PACKS ====================== -->
   <section class="row">
     <h2>Lean core, opt-in power</h2>
-    <p class="subhead">Twelve expansion packs keep the base bundle small. Add only what you reach for.</p>
+    <p class="subhead">Thirteen expansion packs keep the base bundle small. Add only what you reach for.</p>
     <div class="feature-grid">
-      ${packs.map(([name, body]) => `
+      ${packs
+        .map(
+          ([name, body]) => `
         <fluid-card variant="outline">
           <code class="pack-name">${name}</code>
           <p style="margin:0.5rem 0 0; color:var(--fluid-text-secondary); font-size:0.95rem;">${body}</p>
-        </fluid-card>`).join("")}
+        </fluid-card>`
+        )
+        .join("")}
     </div>
   </section>
 
@@ -329,28 +379,36 @@ document.body.innerHTML = `
     <h2>Four ways to work with it</h2>
     <p class="subhead">Documented, explorable, designable, and configurable, all from the same components.</p>
     <div class="feature-grid">
-      ${surfaces.map(([title, body, href]) => `
+      ${surfaces
+        .map(
+          ([title, body, href]) => `
         <a href="${href}" class="surface-card">
           <fluid-card variant="outline">
             <strong>${title} <fluid-icon name="arrow-right" style="--fluid-icon-size:0.9rem;"></fluid-icon></strong>
             <p style="margin:0.4rem 0 0; color:var(--fluid-text-secondary); font-size:0.95rem;">${body}</p>
           </fluid-card>
-        </a>`).join("")}
+        </a>`
+        )
+        .join("")}
     </div>
   </section>
 
   <!-- ====================== FRAMEWORKS ====================== -->
   <section class="row">
     <h2>Don't take "agnostic" on faith</h2>
-    <p class="subhead">Standard custom elements run in every framework, and in none. As proof, here's the same admin portal, the same components, built in plain HTML, React, Next.js, and Angular (Vue, Svelte, and Solid work just the same). Pixel-for-pixel identical.</p>
+    <p class="subhead">Compare the same admin portal in plain HTML, React, Next.js, and Angular. The repository maintains representative packed Vue, Astro, and SvelteKit consumers; see the docs for exact CSR, static DSD, reproducible replay, and the bounded local Next request-time contract.</p>
     <div class="feature-grid">
-      ${frameworks.map(([title, body, href]) => `
+      ${frameworks
+        .map(
+          ([title, body, href]) => `
         <a href="${href}" class="surface-card">
           <fluid-card variant="outline">
             <strong>${title} <fluid-icon name="arrow-right" style="--fluid-icon-size:0.9rem;"></fluid-icon></strong>
             <p style="margin:0.4rem 0 0; color:var(--fluid-text-secondary); font-size:0.95rem;">${body}</p>
           </fluid-card>
-        </a>`).join("")}
+        </a>`
+        )
+        .join("")}
     </div>
   </section>
 
@@ -375,11 +433,11 @@ document.body.innerHTML = `
         <h2 style="margin:0;">Open source, on the platform you trust</h2>
         <p class="subhead" style="margin:0.5rem auto 1.5rem;">MIT licensed, built on standard web APIs, and developed in the open. Stars, issues, and PRs welcome.</p>
         <div class="hero-actions">
-          <a href="${GH}" target="_blank" rel="noopener" style="text-decoration:none;">
-            <fluid-button><fluid-icon slot="prefix" name="github"></fluid-icon>View on GitHub</fluid-button></a>
-          <a href="https://www.npmjs.com/package/@fluid-ds/components" target="_blank" rel="noopener" style="text-decoration:none;">
-            <fluid-button variant="secondary">View on npm</fluid-button></a>
-          <a href="/docs/" style="text-decoration:none;"><fluid-button variant="ghost">Read the docs</fluid-button></a>
+          <a href="${GH}" target="_blank" rel="noopener" class="landing-button">
+            <fluid-icon name="github"></fluid-icon>View on GitHub</a>
+          <a href="https://www.npmjs.com/package/@fluid-ds/components" target="_blank" rel="noopener" class="landing-button secondary">
+            View on npm</a>
+          <a href="/docs/" class="landing-button ghost">Read the docs</a>
         </div>
       </div>
     </fluid-card>
@@ -438,57 +496,24 @@ if (dc) {
 }
 
 /* ---------------------------------------------------------------- */
-/* New in v0.3: live QR logo, the effects engine buttons, a subtle   */
-/* one-time celebration when the section scrolls in, and the tour.   */
+/* New in v0.4: the keep-open typeahead demo collects each pick as a */
+/* tag under the field, so the multi-pick behavior is visible.       */
 /* ---------------------------------------------------------------- */
-
-// A small inline "F" mark for the QR logo (data URI, brand accent).
-const QR_LOGO =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='11' fill='%234f46e5'/%3E%3Ctext x='24' y='33' font-size='27' font-weight='700' font-family='Inter,system-ui,sans-serif' fill='white' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E";
-const wnQr = document.getElementById("wn-qr") as (HTMLElement & { logo?: string }) | null;
-if (wnQr) wnQr.logo = QR_LOGO;
-
-// Effects engine, fired from the "New in v0.3" buttons (origin = the button).
-// Bursts (confetti, emoji, fireworks, pride, stars, hearts) self-terminate.
-// Ambient effects (snow, sparkles, fountain, bubbles) stop SPAWNING after their
-// `duration`, then let the particles already on screen finish naturally: each
-// drifts / falls off the viewport and is dropped, and the shared overlay canvas
-// tears itself down once the last particle is gone. No hard stop, so nothing is
-// yanked off screen mid-flight.
-const fromEl = (id: string, run: (el: HTMLElement) => void): void => {
-  const el = document.getElementById(id);
-  el?.addEventListener("click", () => run(el));
-};
-fromEl("fx-confetti", (el) => confetti({ origin: el }));
-fromEl("fx-fireworks", () => fireworks());
-fromEl("fx-emoji", (el) => emojiBurst({ origin: el, emojis: ["🎉", "✨", "💧", "🫧"] }));
-fromEl("fx-pride", (el) => pride({ origin: el }));
-fromEl("fx-stars", (el) => stars({ origin: el }));
-fromEl("fx-hearts", (el) => hearts({ origin: el }));
-fromEl("fx-fountain", (el) => emojiFountain({ origin: el, duration: 2500 }));
-fromEl("fx-snow", () => snow({ duration: 2500 }));
-fromEl("fx-sparkles", (el) => sparkles({ origin: el, duration: 2500 }));
-fromEl("fx-bubbles", () => bubbles({ duration: 2500 }));
-
-// Subtle, one-time delight: when the effects card first scrolls into view,
-// shimmer a few sparkles from it. The engine no-ops under reduced-motion.
-const fxCard = document.getElementById("fx-card");
-if (fxCard && "IntersectionObserver" in window) {
-  let played = false;
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting && !played) {
-          played = true;
-          sparkles({ origin: fxCard, duration: 2200 });
-          io.disconnect();
-        }
-      }
-    },
-    { threshold: 0.6 }
-  );
-  io.observe(fxCard);
-}
+const wnPick = document.getElementById("wn-pick");
+const wnPicks = document.getElementById("wn-picks");
+wnPick?.addEventListener("fluid-change", (e) => {
+  const option = (e as CustomEvent).detail?.option as
+    | { value?: unknown; label?: string }
+    | undefined;
+  if (!option || !wnPicks) return;
+  const label = option.label ?? String(option.value ?? "");
+  // One tag per distinct pick; re-picking the same value is a no-op.
+  if (Array.from(wnPicks.children).some((c) => c.textContent === label)) return;
+  const tag = document.createElement("fluid-tag");
+  tag.setAttribute("size", "sm");
+  tag.textContent = label;
+  wnPicks.appendChild(tag);
+});
 
 /* ---------------------------------------------------------------- */
 /* Guided product tour: walk the hero theme switcher, the new-in-0.3 */
@@ -508,14 +533,14 @@ if (tour) {
     },
     {
       target: "#whatsnew",
-      title: "New in v0.3",
-      body: "Logo-embedded QR codes, blueprint-driven file parsing, and a celebration effects engine. Try the confetti.",
+      title: "New in v0.4",
+      body: "Ink-true signature capture, a folding divider, managed table columns, built-in field labels, and a multi-pick typeahead.",
       placement: "top"
     },
     {
-      target: "#fx-confetti",
-      title: "A little delight",
-      body: "The effects engine fires from any element and is reduced-motion aware. Go on, press it.",
+      target: "#wn-signature",
+      title: "Sign on the line",
+      body: "The signature pad records strokes as ink: undo one stroke, resize losslessly, export crisp. Go on, scribble.",
       placement: "top"
     },
     {

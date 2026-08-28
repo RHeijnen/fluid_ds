@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult, nothing } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -73,6 +73,11 @@ export type FluidStepState = "complete" | "current" | "upcoming";
  * @uses-token --fluid-radius-sm - Focus ring corner radius.
  */
 export class FluidStep extends FluidElement {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidElement.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       --_indicator: var(--fluid-step-indicator-size, 1.75rem);

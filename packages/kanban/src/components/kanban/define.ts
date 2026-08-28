@@ -1,6 +1,6 @@
 import { FluidKanban } from "./fluid-kanban.js";
 
-if (!customElements.get("fluid-kanban")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-kanban")) {
   customElements.define("fluid-kanban", FluidKanban);
 }
 

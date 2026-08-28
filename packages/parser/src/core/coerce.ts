@@ -3,13 +3,24 @@
  * and a {@link FieldSpec} and returns either a coerced value or a human error
  * message. Pure and DOM-free.
  */
-import type { FieldSpec } from "./types.js";
+import type {
+  FieldSpec,
+  ParserDiagnostic,
+  ParserErrorCode,
+  ParserErrorParameters
+} from "./types.js";
 
 /** Result of coercing one cell. */
-export type CoerceResult = { ok: true; value: unknown } | { ok: false; message: string };
+export type CoerceResult =
+  | { ok: true; value: unknown }
+  | ({ ok: false; message: string } & ParserDiagnostic);
 
 const ok = (value: unknown): CoerceResult => ({ ok: true, value });
-const fail = (message: string): CoerceResult => ({ ok: false, message });
+const fail = <Code extends ParserErrorCode>(
+  code: Code,
+  parameters: ParserErrorParameters[Code],
+  message: string
+): CoerceResult => ({ ok: false, code, parameters, message }) as CoerceResult;
 
 const DEFAULT_TRUTHY = ["true", "yes", "y", "1", "on"] as const;
 const DEFAULT_FALSY = ["false", "no", "n", "0", "off"] as const;
@@ -18,7 +29,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Is a source cell effectively empty (missing / blank string)? */
 export function isEmpty(value: unknown): boolean {
-  return value === null || value === undefined || (typeof value === "string" && value.trim() === "");
+  return (
+    value === null || value === undefined || (typeof value === "string" && value.trim() === "")
+  );
 }
 
 function label(field: FieldSpec): string {
@@ -86,10 +99,11 @@ function toISODate(value: unknown, format: FieldSpec["format"]): string | null {
 
 /** Coerce + range/format-check one cell against a field. Custom validate runs in applyBlueprint. */
 export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
+  const fieldLabel = label(field);
   // Empty -> default / required check.
   if (isEmpty(raw)) {
     if (field.default !== undefined) return ok(field.default);
-    if (field.required) return fail(`${label(field)} is required`);
+    if (field.required) return fail("required", { label: fieldLabel }, `${fieldLabel} is required`);
     return ok(field.type === "string" ? "" : null);
   }
 
@@ -97,24 +111,53 @@ export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
     case "string": {
       const value = typeof raw === "string" ? raw : String(raw);
       if (field.min !== undefined && value.length < field.min)
-        return fail(`${label(field)} must be at least ${field.min} characters`);
+        return fail(
+          "stringTooShort",
+          { label: fieldLabel, minimum: field.min },
+          `${fieldLabel} must be at least ${field.min} characters`
+        );
       if (field.max !== undefined && value.length > field.max)
-        return fail(`${label(field)} must be at most ${field.max} characters`);
+        return fail(
+          "stringTooLong",
+          { label: fieldLabel, maximum: field.max },
+          `${fieldLabel} must be at most ${field.max} characters`
+        );
       if (field.pattern && !toRegExp(field.pattern).test(value))
-        return fail(`${label(field)} does not match the required format`);
+        return fail(
+          "patternMismatch",
+          { label: fieldLabel },
+          `${fieldLabel} does not match the required format`
+        );
       return ok(value);
     }
 
     case "number":
     case "integer": {
       const n = toNumber(raw);
-      if (n === null) return fail(`${label(field)} is not a number: "${String(raw)}"`);
+      if (n === null)
+        return fail(
+          "invalidNumber",
+          { label: fieldLabel, value: String(raw) },
+          `${fieldLabel} is not a number: "${String(raw)}"`
+        );
       if (field.type === "integer" && !Number.isInteger(n))
-        return fail(`${label(field)} must be a whole number: "${String(raw)}"`);
+        return fail(
+          "invalidInteger",
+          { label: fieldLabel, value: String(raw) },
+          `${fieldLabel} must be a whole number: "${String(raw)}"`
+        );
       if (field.min !== undefined && n < field.min)
-        return fail(`${label(field)} must be ≥ ${field.min}`);
+        return fail(
+          "numberBelowMinimum",
+          { label: fieldLabel, minimum: field.min },
+          `${fieldLabel} must be ≥ ${field.min}`
+        );
       if (field.max !== undefined && n > field.max)
-        return fail(`${label(field)} must be ≤ ${field.max}`);
+        return fail(
+          "numberAboveMaximum",
+          { label: fieldLabel, maximum: field.max },
+          `${fieldLabel} must be ≤ ${field.max}`
+        );
       return ok(n);
     }
 
@@ -128,24 +171,47 @@ export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
       if ((DEFAULT_FALSY as readonly string[]).includes(s)) return ok(false);
       // A non-empty unrecognized token is false only when no custom truthy set
       // was given, otherwise it is an error so typos are caught.
-      if (field.truthy) return fail(`${label(field)} is not a recognized boolean: "${String(raw)}"`);
+      if (field.truthy)
+        return fail(
+          "invalidBoolean",
+          { label: fieldLabel, value: String(raw) },
+          `${fieldLabel} is not a recognized boolean: "${String(raw)}"`
+        );
       return ok(false);
     }
 
     case "date": {
       const iso = toISODate(raw, field.format);
-      if (iso === null) return fail(`${label(field)} is not a valid date: "${String(raw)}"`);
+      if (iso === null)
+        return fail(
+          "invalidDate",
+          { label: fieldLabel, value: String(raw) },
+          `${fieldLabel} is not a valid date: "${String(raw)}"`
+        );
       const time = new Date(iso).getTime();
       if (field.min !== undefined && time < field.min)
-        return fail(`${label(field)} is before the allowed range`);
+        return fail(
+          "dateBeforeMinimum",
+          { label: fieldLabel },
+          `${fieldLabel} is before the allowed range`
+        );
       if (field.max !== undefined && time > field.max)
-        return fail(`${label(field)} is after the allowed range`);
+        return fail(
+          "dateAfterMaximum",
+          { label: fieldLabel },
+          `${fieldLabel} is after the allowed range`
+        );
       return ok(iso);
     }
 
     case "email": {
       const value = String(raw).trim();
-      if (!EMAIL_RE.test(value)) return fail(`${label(field)} is not a valid email: "${value}"`);
+      if (!EMAIL_RE.test(value))
+        return fail(
+          "invalidEmail",
+          { label: fieldLabel, value },
+          `${fieldLabel} is not a valid email: "${value}"`
+        );
       return ok(value.toLowerCase());
     }
 
@@ -155,7 +221,11 @@ export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
         const url = new URL(value);
         return ok(url.href);
       } catch {
-        return fail(`${label(field)} is not a valid URL: "${value}"`);
+        return fail(
+          "invalidUrl",
+          { label: fieldLabel, value },
+          `${fieldLabel} is not a valid URL: "${value}"`
+        );
       }
     }
 
@@ -169,7 +239,11 @@ export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
           return ok(option);
         }
       }
-      return fail(`${label(field)} must be one of: ${options.join(", ")}`);
+      return fail(
+        "invalidEnum",
+        { label: fieldLabel, options },
+        `${fieldLabel} must be one of: ${options.join(", ")}`
+      );
     }
 
     case "json": {
@@ -177,7 +251,7 @@ export function coerceCell(raw: unknown, field: FieldSpec): CoerceResult {
       try {
         return ok(JSON.parse(String(raw)));
       } catch {
-        return fail(`${label(field)} is not valid JSON`);
+        return fail("invalidJson", { label: fieldLabel }, `${fieldLabel} is not valid JSON`);
       }
     }
 

@@ -30,3 +30,5 @@ export {
   playElementAnimation,
   stopElementAnimation
 } from "./controller.js";
+
+export { FluidCelebrate } from "./effects/fluid-celebrate.js";

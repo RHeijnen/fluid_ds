@@ -21,6 +21,14 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://fluid-web.dev/storybook/</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://fluid-web.dev/wizard/</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://fluid-web.dev/demos/</loc>
     <priority>0.5</priority>
   </url>

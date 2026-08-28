@@ -16,9 +16,7 @@ describe("<fluid-list>", () => {
     const el = await fixture<FluidList>(html`
       <fluid-list label="People"><fluid-list-item>One</fluid-list-item></fluid-list>
     `);
-    expect(el.shadowRoot!.querySelector(".base")!.getAttribute("aria-label")).to.equal(
-      "People"
-    );
+    expect(el.shadowRoot!.querySelector(".base")!.getAttribute("aria-label")).to.equal("People");
   });
 
   it("does not emit an empty aria-label when no label is set", async () => {
@@ -62,9 +60,62 @@ describe("<fluid-list>", () => {
     await aTimeout(20);
     await expect(el).to.be.accessible();
   });
+
+  it("preserves list semantics as items are inserted, removed, and reconnected", async () => {
+    const el = await fixture<FluidList>(html`<fluid-list label="Queue"></fluid-list>`);
+    const item = document.createElement("fluid-list-item") as FluidListItem;
+    item.textContent = "One";
+    el.append(item);
+    await item.updateComplete;
+    expect(item.getAttribute("role")).to.equal("listitem");
+    expect(el.shadowRoot!.querySelector("[role=list]")?.getAttribute("aria-label")).to.equal(
+      "Queue"
+    );
+
+    item.remove();
+    el.remove();
+    document.body.append(el);
+    el.append(item);
+    await Promise.all([el.updateComplete, item.updateComplete]);
+    expect(item.getAttribute("role")).to.equal("listitem");
+    expect(el.shadowRoot!.querySelector("[role=list]")?.getAttribute("aria-label")).to.equal(
+      "Queue"
+    );
+  });
 });
 
 describe("<fluid-list-item>", () => {
+  it("keeps trailing actions outside the row button and never selects the row for them", async () => {
+    const el = await fixture<FluidListItem>(html`
+      <fluid-list-item interactive>
+        Project
+        <button slot="trailing">Archive project</button>
+      </fluid-list-item>
+    `);
+    const slot = el.shadowRoot!.querySelector('slot[name="trailing"]')!;
+    expect(slot.closest("button, a")).to.equal(null);
+    let selections = 0;
+    el.addEventListener("fluid-select", () => selections++);
+    el.querySelector("button")!.click();
+    expect(selections).to.equal(0);
+    el.shadowRoot!.querySelector("button")!.click();
+    expect(selections).to.equal(1);
+  });
+
+  it("resolves the configured focus outline instead of falling back to a UA outline", async () => {
+    const el = await fixture<FluidListItem>(
+      html`<fluid-list-item interactive>Project</fluid-list-item>`
+    );
+    el.style.setProperty("--fluid-focus-ring-width", "4px");
+    el.style.setProperty("--fluid-list-item-focus-ring-color", "rgb(1, 2, 3)");
+    const button = el.shadowRoot!.querySelector("button")!;
+    button.focus();
+    expect(button.matches(":focus-visible")).to.be.true;
+    expect(getComputedStyle(button).outlineStyle).to.equal("solid");
+    expect(getComputedStyle(button).outlineWidth).to.equal("4px");
+    expect(getComputedStyle(button).outlineColor).to.equal("rgb(1, 2, 3)");
+  });
+
   it("has role=listitem on the host", async () => {
     const el = await fixture<FluidListItem>(html`<fluid-list-item>One</fluid-list-item>`);
     expect(el.getAttribute("role")).to.equal("listitem");
@@ -124,6 +175,38 @@ describe("<fluid-list-item>", () => {
     );
     expect(el.shadowRoot!.querySelector("a.base")).to.exist;
     expect(el.shadowRoot!.querySelector("button.base")).to.be.null;
+  });
+
+  it("withdraws a focused interactive row from the tab order when disabled", async () => {
+    const el = await fixture<FluidListItem>(
+      html`<fluid-list-item interactive>One</fluid-list-item>`
+    );
+    const button = el.shadowRoot!.querySelector<HTMLButtonElement>("button.base")!;
+    button.focus();
+    expect(el.shadowRoot!.activeElement?.tagName).to.equal("BUTTON");
+    el.disabled = true;
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector<HTMLButtonElement>("button.base")!.disabled).to.equal(true);
+    expect(el.shadowRoot!.activeElement?.tagName ?? null).to.equal(null);
+  });
+
+  it("reconciles button, disabled link, active link, and passive modes", async () => {
+    const el = await fixture<FluidListItem>(
+      html`<fluid-list-item interactive>One</fluid-list-item>`
+    );
+    expect(el.shadowRoot!.querySelector("button.base")?.getAttribute("type")).to.equal("button");
+    el.href = "/one";
+    el.disabled = true;
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector("a.base")?.hasAttribute("href")).to.equal(false);
+    expect(el.shadowRoot!.querySelector("a.base")?.getAttribute("aria-disabled")).to.equal("true");
+    el.disabled = false;
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector("a.base")?.getAttribute("href")).to.equal("/one");
+    el.href = null;
+    el.interactive = false;
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector("button, a")).to.equal(null);
   });
 
   it("honors the --fluid-font-line-height-normal token on the row (no phantom var)", async () => {

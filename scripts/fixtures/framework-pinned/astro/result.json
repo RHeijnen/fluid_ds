@@ -1,0 +1,129 @@
+{
+  "status": "passed",
+  "framework": "Astro",
+  "lane": "latest-compatible-packed-production-runtime",
+  "node": "v22.22.2",
+  "platform": "linux",
+  "packageManager": "pnpm@9.15.0",
+  "commandOutcomes": [
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70196,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 392
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70208,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3397
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70220,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1314
+    },
+    {
+      "stage": "install",
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70232,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 4626
+    },
+    {
+      "stage": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70247,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3980
+    },
+    {
+      "stage": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 70289,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2621
+    }
+  ],
+  "runtimeStatus": "passed",
+  "commands": [
+    "pnpm --filter @fluid-ds/framework-astro typecheck",
+    "pnpm --filter @fluid-ds/framework-astro build",
+    "node scripts/check-framework-astro-ssr.mjs"
+  ],
+  "limitations": [
+    "Astro output is production static SSR generated during astro build, not an on-demand adapter server.",
+    "This is a latest-compatible install lane; the retained lock and tarballs permit a later frozen replay but this script does not perform that replay.",
+    "Four representative core elements do not certify the full 155-element catalog or other frameworks.",
+    "Package tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by the separate package build and artifact gates."
+  ]
+}

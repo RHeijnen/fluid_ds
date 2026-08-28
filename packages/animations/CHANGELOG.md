@@ -1,5 +1,17 @@
 # @fluid-ds/animations
 
+## 0.4.0
+
+### Patch Changes
+
+- Make the animation controller and `<fluid-celebrate>` safe to import in
+  server-rendering processes where DOM constructors and observers are absent.
+  Browser behavior remains lazy: observation begins only when the controller is
+  started and falls back cleanly when `IntersectionObserver` is unavailable.
+
+- Publish the package's generated custom-elements manifest alongside its
+  existing controller, registration, keyframe, and event-effect entry points.
+
 ## 0.1.0
 
 ### Minor Changes

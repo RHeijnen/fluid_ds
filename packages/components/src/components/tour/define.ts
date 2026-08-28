@@ -1,6 +1,6 @@
 import { FluidTour } from "./fluid-tour.js";
 
-if (!customElements.get("fluid-tour")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tour")) {
   customElements.define("fluid-tour", FluidTour);
 }
 

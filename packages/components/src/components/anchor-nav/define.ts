@@ -1,6 +1,6 @@
 import { FluidAnchorNav } from "./fluid-anchor-nav.js";
 
-if (!customElements.get("fluid-anchor-nav")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-anchor-nav")) {
   customElements.define("fluid-anchor-nav", FluidAnchorNav);
 }
 

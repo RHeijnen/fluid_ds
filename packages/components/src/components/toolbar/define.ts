@@ -1,6 +1,6 @@
 import { FluidToolbar } from "./fluid-toolbar.js";
 
-if (!customElements.get("fluid-toolbar")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-toolbar")) {
   customElements.define("fluid-toolbar", FluidToolbar);
 }
 

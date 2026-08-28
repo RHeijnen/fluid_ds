@@ -66,17 +66,39 @@ export class FluidSpinner extends FluidElement {
         stroke-dasharray: 4 6;
       }
     }
+
+    @media (forced-colors: active) {
+      .track {
+        stroke: GrayText;
+      }
+
+      .indicator {
+        stroke: CanvasText;
+      }
+    }
   `;
 
   /**
    * Accessible label announced by screen readers. Defaults to "Loading".
+   * The legacy `arialabel` attribute remains an alias for native `aria-label`.
    */
-  @property() override ariaLabel: string | null = "Loading";
+  @property({ attribute: "arialabel", noAccessor: true })
+  override get ariaLabel(): string | null {
+    return this.getAttribute("aria-label");
+  }
+  override set ariaLabel(value: string | null) {
+    if (value === null) this.removeAttribute("aria-label");
+    else this.setAttribute("aria-label", value);
+  }
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute("role", "progressbar");
-    if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Loading");
+    this.updateDefaultAriaLabel(this.term("loading"));
+  }
+
+  protected override updated(): void {
+    this.updateDefaultAriaLabel(this.term("loading"));
   }
 
   override render(): TemplateResult {

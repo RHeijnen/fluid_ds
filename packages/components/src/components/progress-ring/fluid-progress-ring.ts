@@ -79,6 +79,15 @@ export class FluidProgressRing extends FluidElement {
         transition-duration: 0s;
       }
     }
+
+    @media (forced-colors: active) {
+      .track {
+        stroke: GrayText;
+      }
+      .indicator {
+        stroke: CanvasText;
+      }
+    }
   `;
 
   /** Progress value, 0–100. */
@@ -98,16 +107,17 @@ export class FluidProgressRing extends FluidElement {
     this.setAttribute("role", "progressbar");
     this.setAttribute("aria-valuemin", "0");
     this.setAttribute("aria-valuemax", "100");
-    if (!this.hasAttribute("aria-label")) this.setAttribute("aria-label", "Progress");
+    this.updateDefaultAriaLabel(this.term("progress"));
   }
 
   protected override updated(): void {
-    const clamped = Math.max(0, Math.min(100, this.value));
+    this.updateDefaultAriaLabel(this.term("progress"));
+    const clamped = clampProgress(this.value);
     this.setAttribute("aria-valuenow", String(Math.round(clamped)));
   }
 
   override render(): TemplateResult {
-    const clamped = Math.max(0, Math.min(100, this.value));
+    const clamped = clampProgress(this.value);
     // Geometry: SVG viewBox 100×100, radius adjusts to leave room for stroke.
     // thickness drives both the visual stroke AND the radius/dasharray math, so
     // it's a numeric property rather than a CSS var (a var couldn't reach JS).
@@ -139,9 +149,13 @@ export class FluidProgressRing extends FluidElement {
           stroke-dashoffset=${offset}
         ></circle>
       </svg>
-      ${this.showValue || this.children.length
+      ${this.showValue || (this.children?.length ?? 0)
         ? html`<div part="label" class="label"><slot>${formatted}</slot></div>`
         : ""}
     `;
   }
+}
+
+function clampProgress(value: number): number {
+  return Math.max(0, Math.min(100, Number.isNaN(value) ? 0 : value));
 }

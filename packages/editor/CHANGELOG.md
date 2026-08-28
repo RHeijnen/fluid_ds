@@ -1,5 +1,26 @@
 # @fluid-ds/editor
 
+## 0.4.0
+
+### Minor Changes
+
+- Sanitize HTML assigned through `value`, pasted into the editor, or emitted by
+  editing, and add a `readonly` mode that keeps content focusable and selectable
+  while preventing toolbar and input mutations.
+
+- Localize Fluid-owned toolbar commands, editor names, and link prompts through
+  the inherited language context. Toolbar arrow navigation now follows the
+  rendered direction while explicit labels and placeholders remain authoritative.
+
+### Patch Changes
+
+- Preserve forward and backward selections across toolbar actions, including
+  selections inside nested shadow roots, and discard saved ranges when content
+  replacement or sanitization makes them stale.
+
+- Publish the generated custom-elements manifest and make package entry points
+  importable in Node-based tooling.
+
 ## 0.0.3
 
 ### Patch Changes

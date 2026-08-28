@@ -19,6 +19,21 @@ Thumbs.db
 !.vscode/settings.json
 .idea
 coverage
+apps/benchmarks/results.json
+apps/benchmarks/expansion-results.json
+apps/benchmarks/*.heapsnapshot
+# Runtime evidence is normally machine-local. The bounded dependency patch proof
+# is release input, however, and must remain available in a clean checkout.
+quality/evidence/*
+!quality/evidence/dependency-risk/
+quality/evidence/dependency-risk/*
+!quality/evidence/dependency-risk/local-patches/
+quality/evidence/dependency-risk/local-patches/*
+!quality/evidence/dependency-risk/local-patches/extract-zip-2.0.1-linux.json
+.codex-tmp/
+**/playwright-report/
+**/test-results/
+**/.svelte-kit/
 *.tsbuildinfo
 .env
 .env.local

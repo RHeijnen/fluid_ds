@@ -7,6 +7,7 @@ import "../badge/define.js";
 const meta: Meta = {
   title: "Components/Layout/Hero",
   component: "fluid-hero",
+  parameters: { status: { type: "experimental" } },
   tags: ["autodocs"],
   argTypes: {
     align: {

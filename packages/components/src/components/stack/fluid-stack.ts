@@ -53,6 +53,7 @@ export class FluidStack extends FluidElement {
       align-items: var(--fluid-stack-align, stretch);
       justify-content: var(--fluid-stack-justify, flex-start);
       min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     :host([hidden]) {
@@ -69,6 +70,10 @@ export class FluidStack extends FluidElement {
 
     :host([wrap]) {
       flex-wrap: wrap;
+    }
+
+    ::slotted(*) {
+      min-width: 0;
     }
   `;
 
@@ -103,13 +108,20 @@ export class FluidStack extends FluidElement {
     else this.style.setProperty(name, value);
   }
 
+  private validCssValue(property: string, value: string | undefined): string | undefined {
+    return value && CSS.supports(property, value) ? value : undefined;
+  }
+
+  private validLength(value: string | undefined): string | undefined {
+    return value && CSS.supports("width", `calc(${value} + 0px)`) ? value : undefined;
+  }
+
   protected override updated(): void {
-    this.setVar("--fluid-stack-gap", this.gap);
-    this.setVar("--fluid-stack-align", this.align ? (ALIGN[this.align] ?? this.align) : undefined);
-    this.setVar(
-      "--fluid-stack-justify",
-      this.justify ? (JUSTIFY[this.justify] ?? this.justify) : undefined
-    );
+    this.setVar("--fluid-stack-gap", this.validLength(this.gap));
+    const align = this.align ? (ALIGN[this.align] ?? this.align) : undefined;
+    const justify = this.justify ? (JUSTIFY[this.justify] ?? this.justify) : undefined;
+    this.setVar("--fluid-stack-align", this.validCssValue("align-items", align));
+    this.setVar("--fluid-stack-justify", this.validCssValue("justify-content", justify));
   }
 
   override render(): TemplateResult {

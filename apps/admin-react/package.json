@@ -15,6 +15,7 @@
     "@fluid-ds/charts": "workspace:*",
     "@fluid-ds/components": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
+    "@fluid-ds/react": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",
     "react": "^19.0.0",
@@ -26,6 +27,6 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^6.4.3"
   }
 }

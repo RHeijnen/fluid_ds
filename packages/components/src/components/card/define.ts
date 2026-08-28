@@ -1,6 +1,6 @@
 import { FluidCard } from "./fluid-card.js";
 
-if (!customElements.get("fluid-card")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-card")) {
   customElements.define("fluid-card", FluidCard);
 }
 

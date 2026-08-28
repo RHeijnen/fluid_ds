@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -65,7 +65,7 @@ registerIcon(
  * @fires fluid-menu-toggle - Dispatched when the built-in hamburger button is
  *   pressed. `event.detail.expanded` carries the new intended expanded state
  *   (the negation of the current `expanded` value). Bubbles and is composed.
- */
+*/
 export class FluidAppBar extends FluidElement {
   static override styles = css`
     :host {
@@ -188,7 +188,14 @@ export class FluidAppBar extends FluidElement {
   @property({ type: Boolean, reflect: true }) expanded = false;
 
   /** Accessible name for the built-in menu button. */
-  @property({ attribute: "menu-label" }) menuLabel = "Open menu";
+  @property({ attribute: "menu-label" })
+  get menuLabel(): string {
+    return this.menuLabelOverride ?? this.term("openMenu");
+  }
+  set menuLabel(value: string | null) {
+    this.menuLabelOverride = value;
+  }
+  private menuLabelOverride: string | null = null;
 
   private handleMenuToggle = (): void => {
     const next = !this.expanded;

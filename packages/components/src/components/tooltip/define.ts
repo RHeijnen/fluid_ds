@@ -1,6 +1,6 @@
 import { FluidTooltip } from "./fluid-tooltip.js";
 
-if (!customElements.get("fluid-tooltip")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tooltip")) {
   customElements.define("fluid-tooltip", FluidTooltip);
 }
 

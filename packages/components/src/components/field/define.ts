@@ -1,6 +1,6 @@
 import { FluidField } from "./fluid-field.js";
 
-if (!customElements.get("fluid-field")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-field")) {
   customElements.define("fluid-field", FluidField);
 }
 

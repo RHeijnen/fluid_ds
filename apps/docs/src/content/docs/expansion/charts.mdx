@@ -74,6 +74,48 @@ Charts pick up the same `--fluid-*` semantic tokens as the rest of the
 system, text color, grid color, and the default palette flow through
 without extra wiring. Customize per-chart via Chart.js's `options`.
 
+The default legend is now HTML, not canvas-only: real buttons sit below the
+plot within `--fluid-chart-height`. This intentionally changes chart layout;
+existing screenshot baselines need review, not automatic replacement. The
+canvas retains `part="base"`; `part="plot"`, `part="legend"`, and
+`part="legend-button"` expose the additional surfaces. Legend colors, spacing,
+target size, and focus rings have `--fluid-chart-legend-*` overrides with Fluid
+token fallbacks.
+
+Chart.js legend label generation, filtering, sorting, reverse order, and the
+resolved `onClick` callback also drive the HTML controls. A custom `onClick`
+remains responsible for the action and its chart update. Setting
+`options.plugins.legend.display = false` hides both legends. Setting it to
+`true` explicitly also shows the canvas legend; the HTML controls remain the
+keyboard-accessible equivalent. See the [Chart.js legend options](https://www.chartjs.org/docs/latest/configuration/legend.html).
+
+## Accessibility and interaction
+
+Give every chart a meaningful `label`, such as `label="Quarterly revenue"`.
+The canvas is an image, not a data table. Supply a `slot="fallback"` table or
+summary with the actual values, and keep it synchronized when data changes.
+The component does not infer a complete accessible data presentation from
+arbitrary Chart.js datasets.
+
+- Tab visits native legend buttons in their rendered order, then leaves the
+  chart. Enter and Space perform the same action as a pointer click.
+- `aria-pressed="true"` means the series or segment is visible. Hidden entries
+  retain their names and use a line-through so state is not color-only.
+- Pie, doughnut, and polar-area legends toggle individual segments. The other
+  chart types toggle datasets.
+- `fluid-legend-change` bubbles across shadow roots after HTML legend activation.
+  Its detail contains `label`, `visible`, and either `index` (segment) or
+  `datasetIndex` (series). The underlying Chart.js instance remains available as
+  `instance` for more advanced integration.
+- Disconnecting destroys Chart.js resources. Reconnecting recreates the chart
+  and restores visibility by dataset/label position; changing chart type resets
+  those visibility choices. Theme changes also preserve visibility.
+- Reduced-motion preference disables Chart.js animation, including when the
+  preference changes while the chart is mounted.
+
+These automated interaction checks do not certify screen-reader interpretation,
+data-table completeness, chart palette contrast, or every custom plugin.
+
 ## License
 
 MIT, Chart.js is MIT-licensed.

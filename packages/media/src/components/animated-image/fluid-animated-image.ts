@@ -1,5 +1,6 @@
-import { LitElement, html, css, type PropertyValues, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
 /**
  * Plays/pauses animated images (GIF, APNG, WebP). When paused, draws the
@@ -16,7 +17,7 @@ import { property, query, state } from "lit/decorators.js";
  * @fires fluid-load - Fired when the image finishes loading.
  * @fires fluid-error - Fired when the image fails to load.
  */
-export class FluidAnimatedImage extends LitElement {
+export class FluidAnimatedImage extends FluidElement {
   static override styles = css`
     :host {
       position: relative;
@@ -64,6 +65,11 @@ export class FluidAnimatedImage extends LitElement {
     .control:focus-visible {
       outline: 2px solid white;
       outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .control {
+        transition-duration: 0.01ms;
+      }
     }
   `;
 
@@ -137,7 +143,7 @@ export class FluidAnimatedImage extends LitElement {
               part="control"
               class="control"
               type="button"
-              aria-label=${this.paused ? "Play animation" : "Pause animation"}
+              aria-label=${this.term(this.paused ? "playAnimation" : "pauseAnimation")}
               @click=${() => this.toggle()}
             >
               ${this.paused

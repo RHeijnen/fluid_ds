@@ -1,6 +1,6 @@
 /**
  * Side-effect entry that registers the curated default animation set.
- * Importing this file registers all 12 common animations.
+ * Importing this file registers all 13 common animations.
  *
  * If you only need a couple of them, skip this and import the individual
  * modules instead, they're tree-shakable:

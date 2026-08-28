@@ -80,7 +80,11 @@ export class FluidToast extends FluidElement {
   override connectedCallback(): void {
     super.connectedCallback();
     this.setAttribute("role", "region");
-    this.setAttribute("aria-label", "Notifications");
+    this.updateDefaultAriaLabel(this.term("notifications"));
+  }
+
+  protected override updated(): void {
+    this.updateDefaultAriaLabel(this.term("notifications"));
   }
 
   /**
@@ -96,7 +100,7 @@ export class FluidToast extends FluidElement {
     } else {
       item.appendChild(options.message);
     }
-    item.addEventListener("fluid-dismiss", () => item.remove(), { once: true });
+    this.listen(item, "fluid-dismiss", () => item.remove(), { once: true });
     this.appendChild(item);
     return item;
   }

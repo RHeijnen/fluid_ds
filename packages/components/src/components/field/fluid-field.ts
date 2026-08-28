@@ -182,16 +182,47 @@ export class FluidField extends FluidElement {
   private readonly uid = ++fieldIdCounter;
   private readonly descriptionId = `fluid-field-desc-${this.uid}`;
   private readonly errorId = `fluid-field-error-${this.uid}`;
+  private wiredControl?: HTMLElement;
+  private readonly invalidValues = new WeakMap<HTMLElement, string | null>();
+  private labelObserver?: MutationObserver;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    if (typeof MutationObserver !== "undefined") {
+      this.labelObserver = new MutationObserver((records) => {
+        if (records.some((record) => this.isLabelMutation(record))) this.wireControl();
+      });
+      this.labelObserver.observe(this, { childList: true, subtree: true, characterData: true });
+    }
+    if (this.hasUpdated) void this.updateComplete.then(() => this.wireControl());
+  }
+
+  override disconnectedCallback(): void {
+    this.labelObserver?.disconnect();
+    this.labelObserver = undefined;
+    super.disconnectedCallback();
+  }
 
   private get control(): HTMLElement | undefined {
-    return this.controlElements?.find(
-      (el) => el.nodeType === Node.ELEMENT_NODE
-    );
+    return this.controlElements?.find((el) => el.nodeType === Node.ELEMENT_NODE);
   }
 
   private handleSlotChange = (): void => {
     this.wireControl();
   };
+
+  private handleContentSlotChange = (): void => {
+    this.requestUpdate();
+    void this.updateComplete.then(() => this.wireControl());
+  };
+
+  private isLabelMutation(record: MutationRecord): boolean {
+    const element =
+      record.target.nodeType === Node.ELEMENT_NODE
+        ? (record.target as Element)
+        : record.target.parentElement;
+    return element?.closest('[slot="label"]')?.parentElement === this;
+  }
 
   protected override updated(changed: PropertyValues<this>): void {
     if (
@@ -211,9 +242,17 @@ export class FluidField extends FluidElement {
    */
   private wireControl(): void {
     const control = this.control;
+    if (this.wiredControl && this.wiredControl !== control) {
+      this.clearControl(this.wiredControl);
+      this.wiredControl = undefined;
+    }
     if (!control) return;
+    this.wiredControl = control;
 
-    const described: string[] = [];
+    const described = (control.getAttribute("aria-describedby") ?? "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((id) => id !== this.descriptionId && id !== this.errorId);
     if (this.hasDescription) described.push(this.descriptionId);
     if (this.hasError) described.push(this.errorId);
 
@@ -224,12 +263,44 @@ export class FluidField extends FluidElement {
     }
 
     if (this.hasError) {
+      if (!control.hasAttribute("data-fluid-field-invalid")) {
+        this.invalidValues.set(control, control.getAttribute("aria-invalid"));
+      }
       control.setAttribute("aria-invalid", "true");
-    } else {
-      control.removeAttribute("aria-invalid");
+      control.setAttribute("data-fluid-field-invalid", "");
+    } else if (control.hasAttribute("data-fluid-field-invalid")) {
+      this.clearManagedInvalid(control);
     }
 
     this.wireLabel(control);
+  }
+
+  private clearControl(control: HTMLElement): void {
+    const described = (control.getAttribute("aria-describedby") ?? "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .filter((id) => id !== this.descriptionId && id !== this.errorId);
+    if (described.length) control.setAttribute("aria-describedby", described.join(" "));
+    else control.removeAttribute("aria-describedby");
+
+    if (control.hasAttribute("data-fluid-field-invalid")) {
+      this.clearManagedInvalid(control);
+    }
+    if (control.hasAttribute("data-fluid-field-label")) {
+      control.removeAttribute("aria-label");
+      control.removeAttribute("data-fluid-field-label");
+    }
+  }
+
+  private clearManagedInvalid(control: HTMLElement): void {
+    const previous = this.invalidValues.get(control);
+    if (typeof previous !== "string") {
+      control.removeAttribute("aria-invalid");
+    } else {
+      control.setAttribute("aria-invalid", previous);
+    }
+    this.invalidValues.delete(control);
+    control.removeAttribute("data-fluid-field-invalid");
   }
 
   /**
@@ -245,9 +316,7 @@ export class FluidField extends FluidElement {
   private wireLabel(control: HTMLElement): void {
     const ownsName = control.hasAttribute("data-fluid-field-label");
     const authorLabelled =
-      !ownsName &&
-      (control.hasAttribute("aria-label") ||
-        control.hasAttribute("aria-labelledby"));
+      !ownsName && (control.hasAttribute("aria-label") || control.hasAttribute("aria-labelledby"));
     if (authorLabelled) return;
 
     const text = this.labelText();
@@ -264,7 +333,8 @@ export class FluidField extends FluidElement {
   private labelText(): string {
     const fromAttr = this.label.trim();
     if (fromAttr) return fromAttr;
-    const slotted = this.querySelector('[slot="label"]');
+    const slotted =
+      typeof this.querySelector === "function" ? this.querySelector('[slot="label"]') : null;
     return slotted?.textContent?.trim() ?? "";
   }
 
@@ -281,7 +351,9 @@ export class FluidField extends FluidElement {
   }
 
   private hasSlotted(name: string): boolean {
-    return this.querySelector(`[slot="${name}"]`) !== null;
+    return (
+      typeof this.querySelector === "function" && this.querySelector(`[slot="${name}"]`) !== null
+    );
   }
 
   override render(): TemplateResult {
@@ -290,22 +362,23 @@ export class FluidField extends FluidElement {
 
     return html`
       <div part="base" class="base">
-        <label
-          part="label"
-          class="label"
-          for=${ifDefined(this.for)}
-          ?hidden=${!this.hasLabel}
-        >
-          <span><slot name="label">${this.label}</slot></span>
+        <label part="label" class="label" for=${ifDefined(this.for)} ?hidden=${!this.hasLabel}>
+          <span
+            ><slot name="label" @slotchange=${this.handleContentSlotChange}
+              >${this.label}</slot
+            ></span
+          >
           ${this.required
             ? html`<span part="required" class="required" aria-hidden="true">*</span
-                ><span class="sr-only">required</span>`
+                ><span class="sr-only">${this.term("required")}</span>`
             : ""}
         </label>
 
         ${showDescription
           ? html`<div part="description" class="description" id=${this.descriptionId}>
-              <slot name="description">${this.description}</slot>
+              <slot name="description" @slotchange=${this.handleContentSlotChange}
+                >${this.description}</slot
+              >
             </div>`
           : ""}
 
@@ -314,13 +387,8 @@ export class FluidField extends FluidElement {
         </div>
 
         ${showError
-          ? html`<div
-              part="error"
-              class="error"
-              id=${this.errorId}
-              role="alert"
-            >
-              <slot name="error">${this.error}</slot>
+          ? html`<div part="error" class="error" id=${this.errorId} role="alert">
+              <slot name="error" @slotchange=${this.handleContentSlotChange}>${this.error}</slot>
             </div>`
           : ""}
       </div>

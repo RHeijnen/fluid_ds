@@ -1,0 +1,2014 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/availability-editor/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-availability-editor",
+          "declaration": {
+            "name": "FluidAvailabilityEditor",
+            "module": "src/components/availability-editor/fluid-availability-editor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/availability-editor/fluid-availability-editor.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "The owner-side editor for a scheduler's availability: a weekly-hours grid\n(toggle each weekday open, add one or more time windows) plus global slot\nrules and a list of closed-date exceptions. It emits a complete\n`Availability` config on every edit, ready to hand to `fluid-scheduler`.",
+          "name": "FluidAvailabilityEditor",
+          "cssProperties": [
+            {
+              "description": "Vertical gap between sections. Falls back to 1.5rem.",
+              "name": "--fluid-availability-editor-gap"
+            },
+            {
+              "description": "Weekday row background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-availability-editor-row-bg"
+            },
+            {
+              "description": "Row corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-availability-editor-radius"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The editor container.",
+              "name": "base"
+            },
+            {
+              "description": "The global settings grid.",
+              "name": "settings"
+            },
+            {
+              "description": "The weekly-hours group.",
+              "name": "week"
+            },
+            {
+              "description": "A single weekday row.",
+              "name": "day"
+            },
+            {
+              "description": "The exceptions group.",
+              "name": "exceptions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Initial / controlled availability. Editing emits a new config via `fluid-change`.",
+              "attribute": "availability"
+            },
+            {
+              "kind": "field",
+              "name": "weekStart",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First weekday to list: 0 = Sunday … 6 = Saturday (default Monday).",
+              "attribute": "week-start"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for weekday names.",
+              "resolveInitializer": {
+                "module": "src/components/availability-editor/fluid-availability-editor.ts"
+              },
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "weekly",
+              "type": {
+                "text": "Record<number, TimeWindow[]>"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "exceptions",
+              "type": {
+                "text": "{ date: string; closed: boolean }[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "slotMinutes",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "30"
+            },
+            {
+              "kind": "field",
+              "name": "capacity",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "minNoticeHours",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "maxAdvanceDays",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "60"
+            },
+            {
+              "kind": "field",
+              "name": "preservedSettings",
+              "type": {
+                "text": "Partial<Availability>"
+              },
+              "privacy": "private",
+              "default": "{}"
+            },
+            {
+              "kind": "field",
+              "name": "specialHours",
+              "type": {
+                "text": "AvailabilityException[]"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "method",
+              "name": "hydrate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": {
+                    "text": "Availability"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "orderedDays",
+              "type": {
+                "text": "number[]"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "displayLocale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "dayName",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "d",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "emit",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "validWindow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "window",
+                  "type": {
+                    "text": "TimeWindow"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "toggleDay",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "d",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "open",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "addWindow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "d",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeWindow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "d",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "i",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "setWindow",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "d",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "i",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "field",
+                  "type": {
+                    "text": "\"start\" | \"end\""
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "addException",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "setExceptionDate",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "i",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "removeException",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "i",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "numberField",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "label",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "min",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "step",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "onChange",
+                  "type": {
+                    "text": "(n: number) => void"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "The availability config changed. `detail: { availability }`.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Initial / controlled availability. Editing emits a new config via `fluid-change`.",
+              "fieldName": "availability"
+            },
+            {
+              "name": "week-start",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First weekday to list: 0 = Sunday … 6 = Saturday (default Monday).",
+              "fieldName": "weekStart"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for weekday names.",
+              "fieldName": "locale"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Define when a business is open for bookings.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Row background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Labels."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Helper text."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Time-input borders."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Row radius."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Time-input focus ring (2px AA / 3px AAA)."
+            }
+          ],
+          "tagName": "fluid-availability-editor",
+          "customElement": true
+        },
+        {
+          "kind": "variable",
+          "name": "weekly",
+          "type": {
+            "text": "Record<number, TimeWindow[]>"
+          },
+          "default": "{}"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidAvailabilityEditor",
+          "declaration": {
+            "name": "FluidAvailabilityEditor",
+            "module": "src/components/availability-editor/fluid-availability-editor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/scheduler/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-scheduler",
+          "declaration": {
+            "name": "FluidScheduler",
+            "module": "src/components/scheduler/fluid-scheduler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/scheduler/fluid-scheduler.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An accessible appointment picker: a fluid-calendar (with per-day availability\ndots) beside a fluid-time-slots panel. The visitor picks a day, then a slot;\nthe chosen slot is the form value (ISO `YYYY-MM-DDTHH:MM`).\n\nAvailability is a plain config object (recurring weekly hours + date\nexceptions + slot rules). Bookings are subtracted from it. As the visitor\nnavigates months, `fluid-range-change` fires so you can lazily fetch only the\nvisible month's bookings and feed them back via the `bookings` property;\n`refresh()` re-generates after any external change.",
+          "name": "FluidScheduler",
+          "cssProperties": [
+            {
+              "description": "Gap between calendar and slots. Falls back to 1.25rem.",
+              "name": "--fluid-scheduler-gap"
+            },
+            {
+              "description": "Background. Falls back to transparent.",
+              "name": "--fluid-scheduler-bg"
+            },
+            {
+              "description": "Min width of the slot panel. Falls back to 14rem.",
+              "name": "--fluid-scheduler-panel-min"
+            },
+            {
+              "description": "Container width to stack at. Falls back to 560px.",
+              "name": "--fluid-scheduler-stack-below"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The grid container.",
+              "name": "base"
+            },
+            {
+              "description": "The inner fluid-calendar.",
+              "name": "calendar"
+            },
+            {
+              "description": "The slot panel column.",
+              "name": "panel"
+            },
+            {
+              "description": "The inner fluid-time-slots.",
+              "name": "slots"
+            },
+            {
+              "description": "The \"choose a day\" placeholder.",
+              "name": "prompt"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...FluidFormAssociated.shadowRootOptions, delegatesFocus: true }"
+            },
+            {
+              "kind": "field",
+              "name": "formAssociated",
+              "type": {
+                "text": "boolean"
+              },
+              "static": true,
+              "default": "true"
+            },
+            {
+              "kind": "field",
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Availability configuration (object or JSON attribute).",
+              "attribute": "availability"
+            },
+            {
+              "kind": "field",
+              "name": "bookings",
+              "type": {
+                "text": "Booking[]"
+              },
+              "default": "[]",
+              "description": "Known bookings to subtract from availability.",
+              "attribute": "bookings"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Selected slot start, ISO `YYYY-MM-DDTHH:MM` (the form value).",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Field name for form submission.",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Earliest selectable day, `YYYY-MM-DD`. Defaults to today.",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Latest selectable day, `YYYY-MM-DD`. Defaults to today + `maxAdvanceDays`.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "weekStart",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First weekday: 0 = Sunday … 6 = Saturday (default Monday).",
+              "attribute": "week-start"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for labels.",
+              "resolveInitializer": {
+                "module": "src/components/scheduler/fluid-scheduler.ts"
+              },
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "timeFormat",
+              "type": {
+                "text": "TimeFormat"
+              },
+              "default": "\"24h\"",
+              "description": "Clock format for slot labels.",
+              "attribute": "time-format"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "\"sm\" | \"md\" | \"lg\""
+              },
+              "default": "\"md\"",
+              "description": "Size passed through to the slot panel.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show a loading overlay on the slot panel (e.g. while fetching bookings).",
+              "attribute": "loading"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "required"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "selectedDate",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The day whose slots are shown, `YYYY-MM-DD`."
+            },
+            {
+              "kind": "field",
+              "name": "viewISO",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "The calendar's displayed month (any `YYYY-MM-DD` within it)."
+            },
+            {
+              "kind": "field",
+              "name": "calendarEl",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "slotsEl",
+              "type": {
+                "text": "HTMLElement | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "defaultValue",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "lastRange",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "method",
+              "name": "validityAnchor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "HTMLElement | undefined"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refreshValidity",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "availableSlot",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Slot | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "start",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "formResetCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formDisabledCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "disabled",
+                  "type": {
+                    "text": "boolean"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "formStateRestoreCallback",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "state",
+                  "type": {
+                    "text": "string | File | FormData | null"
+                  }
+                },
+                {
+                  "name": "_mode",
+                  "type": {
+                    "text": "\"restore\" | \"autocomplete\""
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-generate slots + day states (call after availability/bookings change out of band)."
+            },
+            {
+              "kind": "field",
+              "name": "minISO",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "description": "Resolved earliest day: explicit `min`, else today.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "maxISO",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "description": "Resolved latest day: explicit `max`, else today + maxAdvanceDays (if set).",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "dayStateMap",
+              "type": {
+                "text": "Record<string, string>"
+              },
+              "privacy": "private",
+              "description": "Per-day availability states for the visible month (drives the calendar dots).",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "emitRangeChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "onViewChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onDateActivate",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onSlotChange",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "A slot was committed. `detail: { value, start, end }`.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-day-select",
+              "description": "A day was chosen. `detail: { date }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-range-change",
+              "description": "The visible month changed. `detail: { start, end }` (first/last day, `YYYY-MM-DD`).\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Availability configuration (object or JSON attribute).",
+              "fieldName": "availability"
+            },
+            {
+              "name": "bookings",
+              "type": {
+                "text": "Booking[]"
+              },
+              "default": "[]",
+              "description": "Known bookings to subtract from availability.",
+              "fieldName": "bookings"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Selected slot start, ISO `YYYY-MM-DDTHH:MM` (the form value).",
+              "fieldName": "value"
+            },
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Field name for form submission.",
+              "fieldName": "name"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Earliest selectable day, `YYYY-MM-DD`. Defaults to today.",
+              "fieldName": "min"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Latest selectable day, `YYYY-MM-DD`. Defaults to today + `maxAdvanceDays`.",
+              "fieldName": "max"
+            },
+            {
+              "name": "week-start",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "First weekday: 0 = Sunday … 6 = Saturday (default Monday).",
+              "fieldName": "weekStart"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for labels.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "time-format",
+              "type": {
+                "text": "TimeFormat"
+              },
+              "default": "\"24h\"",
+              "description": "Clock format for slot labels.",
+              "fieldName": "timeFormat"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "\"sm\" | \"md\" | \"lg\""
+              },
+              "default": "\"md\"",
+              "description": "Size passed through to the slot panel.",
+              "fieldName": "size"
+            },
+            {
+              "name": "loading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show a loading overlay on the slot panel (e.g. while fetching bookings).",
+              "fieldName": "loading"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "required",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "required"
+            },
+            {
+              "name": "readonly",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "fieldName": "readonly"
+            }
+          ],
+          "superclass": {
+            "name": "FluidFormAssociated",
+            "package": "@fluid-ds/components/internal/form-associated"
+          },
+          "summary": "Book an appointment from available time slots.",
+          "usesTokens": [
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Placeholder + overlay text."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Loading overlay backdrop."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Availability dots / selection (via children)."
+            }
+          ],
+          "tagName": "fluid-scheduler",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidScheduler",
+          "declaration": {
+            "name": "FluidScheduler",
+            "module": "src/components/scheduler/fluid-scheduler.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/time-slots/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-time-slots",
+          "declaration": {
+            "name": "FluidTimeSlots",
+            "module": "src/components/time-slots/fluid-time-slots.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/time-slots/fluid-time-slots.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A single day's bookable time slots, rendered as an accessible\n**radiogroup** (WAI-ARIA APG Radio Group pattern): one slot is tabbable,\narrow keys move between selectable slots, Enter/Space picks. Fully-booked and\npast slots render as disabled radios so they are announced but skipped.\n\nFeed it either a pre-generated `slots` array, or a `date` + `availability`\n(+ optional `bookings`) and it generates the slots itself via the package's\navailability engine.",
+          "name": "FluidTimeSlots",
+          "cssProperties": [
+            {
+              "description": "Gap between slots. Falls back to 0.5rem.",
+              "name": "--fluid-time-slots-gap"
+            },
+            {
+              "description": "Min slot width (grid track). Falls back to 5rem.",
+              "name": "--fluid-time-slots-min"
+            },
+            {
+              "description": "Slot background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-time-slots-bg"
+            },
+            {
+              "description": "Slot text. Falls back to --fluid-text-primary.",
+              "name": "--fluid-time-slots-fg"
+            },
+            {
+              "description": "Slot border. Falls back to --fluid-border-default.",
+              "name": "--fluid-time-slots-border"
+            },
+            {
+              "description": "Slot corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-time-slots-radius"
+            },
+            {
+              "description": "Slot hover background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-time-slots-hover-bg"
+            },
+            {
+              "description": "Selected slot fill. Falls back to --fluid-accent-base.",
+              "name": "--fluid-time-slots-selected-bg"
+            },
+            {
+              "description": "Selected slot text. Falls back to --fluid-accent-text.",
+              "name": "--fluid-time-slots-selected-fg"
+            },
+            {
+              "description": "Focus ring width. Falls back to --fluid-focus-ring-width.",
+              "name": "--fluid-time-slots-focus-ring-width"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The container.",
+              "name": "base"
+            },
+            {
+              "description": "The date heading above the grid.",
+              "name": "heading"
+            },
+            {
+              "description": "The radiogroup grid.",
+              "name": "list"
+            },
+            {
+              "description": "Every slot button.",
+              "name": "slot"
+            },
+            {
+              "description": "The chosen slot button.",
+              "name": "slot-selected"
+            },
+            {
+              "description": "The \"no openings\" message.",
+              "name": "empty"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "shadowRootOptions",
+              "type": {
+                "text": "ShadowRootInit"
+              },
+              "static": true,
+              "default": "{ ...FluidElement.shadowRootOptions, delegatesFocus: true }"
+            },
+            {
+              "kind": "field",
+              "name": "date",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Day to show, `YYYY-MM-DD`. Used with `availability` to generate slots.",
+              "attribute": "date"
+            },
+            {
+              "kind": "field",
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Availability config (object or JSON). Generates slots when paired with `date`.",
+              "attribute": "availability"
+            },
+            {
+              "kind": "field",
+              "name": "bookings",
+              "type": {
+                "text": "Booking[]"
+              },
+              "default": "[]",
+              "description": "Existing bookings to subtract from availability.",
+              "attribute": "bookings"
+            },
+            {
+              "kind": "field",
+              "name": "slots",
+              "type": {
+                "text": "Slot[] | null"
+              },
+              "default": "null",
+              "description": "Pre-generated slots. When set, used as-is (overrides `availability`)."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Selected slot start, ISO `YYYY-MM-DDTHH:MM`.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "timeFormat",
+              "type": {
+                "text": "TimeFormat"
+              },
+              "default": "\"24h\"",
+              "description": "Clock format for slot labels.",
+              "attribute": "time-format"
+            },
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "description": "Fixed column count; defaults to responsive auto-fill.",
+              "attribute": "columns"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for time + date labels.",
+              "resolveInitializer": {
+                "module": "src/components/time-slots/fluid-time-slots.ts"
+              },
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "\"sm\" | \"md\" | \"lg\""
+              },
+              "default": "\"md\"",
+              "description": "Slot size.",
+              "attribute": "size",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disable the whole group.",
+              "attribute": "disabled",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "noHeading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the date heading above the grid.",
+              "attribute": "no-heading"
+            },
+            {
+              "kind": "field",
+              "name": "activeIndex",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "-1",
+              "description": "Index (into the resolved slots) of the currently tabbable slot."
+            },
+            {
+              "kind": "field",
+              "name": "slotEls",
+              "type": {
+                "text": "NodeListOf<HTMLButtonElement>"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "optional": true,
+                  "type": {
+                    "text": "FocusOptions"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "resolved",
+              "type": {
+                "text": "Slot[]"
+              },
+              "privacy": "private",
+              "description": "The slots to render: explicit `slots`, else generated from date + availability.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "isSelectable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "slot",
+                  "type": {
+                    "text": "Slot"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "initialActiveIndex",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "description": "Tabbable slot: the selected one if selectable, else the first selectable."
+            },
+            {
+              "kind": "method",
+              "name": "columnStyle",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "formatTime",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "iso",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "headingText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "select",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "slot",
+                  "type": {
+                    "text": "Slot"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "onKeydown",
+              "privacy": "private"
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-change",
+              "description": "A slot was selected. `detail: { value, slot }`.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "date",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Day to show, `YYYY-MM-DD`. Used with `availability` to generate slots.",
+              "fieldName": "date"
+            },
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability | null"
+              },
+              "default": "null",
+              "description": "Availability config (object or JSON). Generates slots when paired with `date`.",
+              "fieldName": "availability"
+            },
+            {
+              "name": "bookings",
+              "type": {
+                "text": "Booking[]"
+              },
+              "default": "[]",
+              "description": "Existing bookings to subtract from availability.",
+              "fieldName": "bookings"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string | null"
+              },
+              "default": "null",
+              "description": "Selected slot start, ISO `YYYY-MM-DDTHH:MM`.",
+              "fieldName": "value"
+            },
+            {
+              "name": "time-format",
+              "type": {
+                "text": "TimeFormat"
+              },
+              "default": "\"24h\"",
+              "description": "Clock format for slot labels.",
+              "fieldName": "timeFormat"
+            },
+            {
+              "name": "columns",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "description": "Fixed column count; defaults to responsive auto-fill.",
+              "fieldName": "columns"
+            },
+            {
+              "name": "locale",
+              "type": {
+                "text": "string | undefined"
+              },
+              "default": "undefined",
+              "description": "BCP-47 locale for time + date labels.",
+              "fieldName": "locale"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "\"sm\" | \"md\" | \"lg\""
+              },
+              "default": "\"md\"",
+              "description": "Slot size.",
+              "fieldName": "size"
+            },
+            {
+              "name": "disabled",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disable the whole group.",
+              "fieldName": "disabled"
+            },
+            {
+              "name": "no-heading",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the date heading above the grid.",
+              "fieldName": "noHeading"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Pick a time slot for one day.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base",
+              "description": "Slot background."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Slot hover."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Slot text."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Heading + empty text."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Slot border."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Selected fill + focus ring."
+            },
+            {
+              "name": "--fluid-accent-text",
+              "description": "Selected text."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Slot radius."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum slot height (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-time-slots",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidTimeSlots",
+          "declaration": {
+            "name": "FluidTimeSlots",
+            "module": "src/components/time-slots/fluid-time-slots.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidAvailabilityEditor",
+          "declaration": {
+            "name": "FluidAvailabilityEditor",
+            "module": "src/components/availability-editor/fluid-availability-editor.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidScheduler",
+          "declaration": {
+            "name": "FluidScheduler",
+            "module": "src/components/scheduler/fluid-scheduler.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidTimeSlots",
+          "declaration": {
+            "name": "FluidTimeSlots",
+            "module": "src/components/time-slots/fluid-time-slots.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/internal/availability.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "dayState",
+          "return": {
+            "type": {
+              "text": "DayState"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iso",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability"
+              }
+            },
+            {
+              "name": "bookings",
+              "default": "[]",
+              "type": {
+                "text": "Booking[]"
+              }
+            },
+            {
+              "name": "now",
+              "default": "new Date()",
+              "type": {
+                "text": "Date"
+              }
+            }
+          ],
+          "description": "Coarse day classification for a calendar dot:\n- `closed`: the business is not open that day.\n- `open`: every generated slot is bookable.\n- `some`: at least one slot is bookable, but not all.\n- `full`: open, but every slot is fully booked.\n- `unavailable`: open, but every slot is in the past / outside the booking horizon."
+        },
+        {
+          "kind": "function",
+          "name": "fromISODate",
+          "return": {
+            "type": {
+              "text": "Date | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iso",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "`YYYY-MM-DD` → local-midnight `Date`, or `null` if malformed."
+        },
+        {
+          "kind": "function",
+          "name": "fromLocalISO",
+          "return": {
+            "type": {
+              "text": "Date | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iso",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Parse `YYYY-MM-DDTHH:MM` (or a date-only string) to a local `Date`."
+        },
+        {
+          "kind": "function",
+          "name": "generateSlots",
+          "return": {
+            "type": {
+              "text": "Slot[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iso",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability"
+              }
+            },
+            {
+              "name": "bookings",
+              "default": "[]",
+              "type": {
+                "text": "Booking[]"
+              }
+            },
+            {
+              "name": "now",
+              "default": "new Date()",
+              "type": {
+                "text": "Date"
+              }
+            }
+          ],
+          "description": "Generate every slot for one day, marking each available / full / past /\nblocked. `now` is injected for testability (the component passes `new Date()`)."
+        },
+        {
+          "kind": "function",
+          "name": "minutesToTime",
+          "return": {
+            "type": {
+              "text": "Time"
+            }
+          },
+          "parameters": [
+            {
+              "name": "total",
+              "type": {
+                "text": "number"
+              }
+            }
+          ],
+          "description": "Minutes since midnight → `\"HH:MM\"` (wraps defensively at 24h)."
+        },
+        {
+          "kind": "function",
+          "name": "parseTime",
+          "return": {
+            "type": {
+              "text": "number | null"
+            }
+          },
+          "parameters": [
+            {
+              "name": "time",
+              "type": {
+                "text": "Time"
+              }
+            }
+          ],
+          "description": "`\"HH:MM\"` → minutes since local midnight, or `null` if malformed."
+        },
+        {
+          "kind": "function",
+          "name": "toISODate",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "date",
+              "type": {
+                "text": "Date"
+              }
+            }
+          ],
+          "description": "Local `Date` → `YYYY-MM-DD`."
+        },
+        {
+          "kind": "function",
+          "name": "toLocalISO",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "date",
+              "type": {
+                "text": "Date"
+              }
+            }
+          ],
+          "description": "Local `Date` → `YYYY-MM-DDTHH:MM` (no zone, wall-clock)."
+        },
+        {
+          "kind": "function",
+          "name": "windowsForDate",
+          "return": {
+            "type": {
+              "text": "TimeWindow[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "iso",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "availability",
+              "type": {
+                "text": "Availability"
+              }
+            }
+          ],
+          "description": "The open windows that apply to a date: an exception (closed → none, or its\nown windows) takes precedence over the recurring weekly rule."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "dayState",
+          "declaration": {
+            "name": "dayState",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fromISODate",
+          "declaration": {
+            "name": "fromISODate",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fromLocalISO",
+          "declaration": {
+            "name": "fromLocalISO",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "generateSlots",
+          "declaration": {
+            "name": "generateSlots",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "minutesToTime",
+          "declaration": {
+            "name": "minutesToTime",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseTime",
+          "declaration": {
+            "name": "parseTime",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toISODate",
+          "declaration": {
+            "name": "toISODate",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toLocalISO",
+          "declaration": {
+            "name": "toLocalISO",
+            "module": "src/internal/availability.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "windowsForDate",
+          "declaration": {
+            "name": "windowsForDate",
+            "module": "src/internal/availability.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

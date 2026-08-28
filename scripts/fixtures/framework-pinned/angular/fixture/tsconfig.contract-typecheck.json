@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.contract.json",
+  "compilerOptions": {
+    "paths": {
+      "@fluid-ds/components": ["./node_modules/@fluid-ds/components/dist/index.d.ts"],
+      "@fluid-ds/components/define/*": [
+        "./node_modules/@fluid-ds/components/dist/components/*/define.d.ts"
+      ]
+    }
+  }
+}

@@ -143,6 +143,12 @@ not covered by a token, e.g. a custom scroll-snap behavior.
   <kbd>←</kbd>/<kbd>→</kbd> for horizontal) when focused.
 - The fade overlays are `pointer-events: none` and have no semantics:
   they're purely visual.
+- Tab enters the scroll container, then follows the slotted controls in document
+  order. Focusing an offscreen control uses native browser scrolling.
+- Horizontal fades follow the logical start/end in both LTR and RTL. They update
+  when slotted content resizes, including after the component is reconnected.
+- `no-scrollbar` can change after rendering; hiding the scrollbar does not remove
+  keyboard scrolling or the focus indicator.
 
 ## Related
 

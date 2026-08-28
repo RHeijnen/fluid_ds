@@ -5,18 +5,385 @@ whatever you write here travels to the other device on the next `git pull`. Use 
 to hand off context when you switch machines.
 
 **How to use**
+
 - **Start of a session:** read the _Current state_ snapshot below to see where things left off.
 - **End of a session:** overwrite _Current state_ to reflect reality, and add one
   dated entry to the _Log_. Then commit (`docs: update handoff`) and push.
 - Keep it honest and short. Stale notes are worse than none.
-- Private, machine-local notes (toolchain quirks for *this* box, scratch thoughts)
+- Private, machine-local notes (toolchain quirks for _this_ box, scratch thoughts)
   belong in Claude's `memory/`, that folder is **not** synced. This file is.
 
 ---
 
 ## Current state
 
-> **2026-08-09 (uncommitted working tree):** form controls gained first-class
+> **Current continuation, 2026-08-28.** All 59 rows in the stable critical-mode
+> ledger are now covered by executable recovery/interaction evidence or an
+> explicit API/manual-policy boundary. This closes the former 39/59 machine
+> implementation checkpoint; it does not promote maturity or substitute for
+> owner, visual or assistive-technology approval.
+>
+> The authoritative exact-tree
+> `FLUID_BROWSERS=all corepack pnpm@9.15.0 verify` passes on product HEAD
+> `049a530`: 7,506 unit/browser assertions across Chromium, Firefox and WebKit
+> (2,502 per engine), all unchanged coverage floors, typechecks, lint, release,
+> package, framework, browser, lifecycle and token guards, all 18 builds, 1,904
+> isolated Node imports, 155/155 renders (154 declarative-shadow-DOM results),
+> and 136 documentation pages with 26,043 local links. The exact-product-tree
+> broad accessibility run passes 657/657, and the all-engine browser
+> SSR/hydration run passes 231/231. The production website build and three-engine
+> visitor journeys pass 24/24 cases over 275 requests with zero browser
+> diagnostics. Dialog measures 13,996 B against its unchanged 14,000 B ceiling.
+>
+> Exact-product-tree package verification passes 32/32 policy tests across all
+> 18 real tarball installs and 16 runtime plus 16 type roots; packed CEM passes
+> 14/14; and the pinned React, Astro, Next, SvelteKit, Vue, Angular and vanilla
+> consumers install, typecheck and build. Packed request-time Next SSR passes,
+> and the final Storybook lane passes 102 selected interactions with 125
+> intentionally untagged stories skipped. The offline `publish:dry` evidence at
+> `quality/evidence/release-dry-run/2026-08-28T16-01-37-694Z` records all 18
+> packages at `0.4.0`; no network or publish command was executed.
+> The current dependency-risk evidence retains lock SHA-256
+> `17ec483e01ecc1fc4cb109ecf076428b640fd62a3541842516277755e1a0eec0`:
+> 0 critical / 1 high / 20 moderate / 6 low registry findings, zero blocking
+> high/critical paths and zero publishable production/optional paths. The sole
+> raw high is confined to 14 exact, locally patched, development-only
+> `extract-zip` paths.
+>
+> Human/external blockers remain separate and red: approval of 60 visual
+> candidates plus stale Chart and hermetic AspectRatio/Lightbox/Map pixels;
+> fluent `nl`/`de`/`fr`/`es`/`ar` and visual RTL review; NVDA, VoiceOver/native
+> Safari, physical iOS/touch and human desktop/mobile keyboard/focus/light-dark
+> review; deployed/external validation; governance, support, security and Figma
+> decisions; remote workflow, trusted-publisher/provenance/environment/signing
+> proof; owner sign-offs, two independent frozen RCs and final competitive
+> review. The 50/50 raster-thread-1 stability window is machine-green but covers
+> 60 candidates plus five accepted-smoke images, not all 1,009 accepted PNGs.
+> No baseline was accepted or changed.
+>
+> Work remains local for later squashing. Nothing has been pushed, published,
+> deployed or tagged. Do not push, publish, deploy or tag.
+
+> **Agent continuation documents, 2026-08-27:** start with the
+> [quick-start handoff](handoff-agent-quick-start-2026-08-27.md), then read the
+> [detailed production-readiness handoff](handoff-production-readiness-2026-08-27.md).
+> They capture the dirty-worktree rules, current verification inventory,
+> container synchronization boundary, remaining exact-tree gates and red release
+> blockers. The dated entries below are retained history and may describe earlier
+> counts or then-open implementation work.
+
+> **Owner visual review, 2026-08-28:** use the canonical
+> [0.4.0 component visual-audit ledger](reviews/component-visual-audit-0.4.0.md).
+> It contains all 155 public custom elements across 14 packages, maps every row
+> to an existing Storybook view and remains pending until the owner explicitly
+> approves each component (or its parent review covers a companion element).
+
+> **Localization/RTL wave in progress, 2026-08-27.** The owner-authorized
+> checkpoint is local commit `5d9c494` (`wip: checkpoint production readiness handoff`);
+> it was not pushed. Work after that checkpoint is intentionally
+> uncommitted. A guarded 155-element owned-string inventory, core unit/file-size/
+> meter localization, core calendar RTL/reactivity, six localized media elements,
+> parser structured diagnostics and rewritten localization/SSR guidance are now
+> implemented. Components, media and parser pass 1,840, 60 and 110 browser tests
+> per engine; typecheck, lint, builds, CEM, quality, docs (24,231 links) and SSR
+> (1,903 cold imports, 155 renders) pass on the synchronized dedicated Linux
+> container. A second parallel wave adds core date/range/time localization
+> (68 focused tests per engine), editor RTL (46), kanban RTL (16) and node-graph
+> RTL (29). This is still a bounded tranche: event-calendar/availability,
+> remaining expansion strings, localized parser UI, pseudo-locale visuals,
+> fluent review and manual AT remain open. See CERT-059 and the dated reviews under
+> `docs/reviews/`. Do not commit or push the new wave without owner instruction.
+
+> **Implementation resumed at owner request, 2026-08-26.** Follow the
+> [recorded continuation plan](plans/production-readiness-plan.md#resume-plan-27-august-2026).
+> Color-picker passes 18 focused browser checks and 87 unit executions. File-input
+> passes 18 focused browser checks and 93 unit executions. OTP passes 18 focused
+> browser checks and 90 unit executions. Radio-group passes 18 focused browser
+> checks and 57 unit executions. Date-range-picker passes 18 focused browser
+> checks and 60 unit executions. Scheduler passes 18 focused browser checks,
+> 186 package-unit executions, 36 calendar executions and 150 localization
+> executions. The integrated pinned-Linux SSR gate now passes 213 cases. Native
+> required-focus coverage is now 16/16. Full all-engine
+> workspace verification also passes on the exact completed SSR state/context
+> batch: 6,978 unit
+> executions across 42 runs,
+> 18 builds, 1,903 cold imports, 155 renders and 24,224 local docs links. The
+> native-focus and SSR state/context batches and their coordinated full-workspace
+> checkpoints are complete. Pre-registration state
+> adoption is 14/14 applicable elements, native-ancestor locale SSR is parser-
+> correct and request-isolated, and all 14 render-cycle warning exceptions have
+> been deleted after causal repairs. Its 213/213 integrated all-engine gate
+> passes; Node renderer coverage is 100% for lines, branches and functions, and
+> `FLUID_BROWSERS=all pnpm verify` is green. Next is localization and RTL. See
+> [file-input evidence](reviews/file-input-form-contract-2026-08-26.md) and
+> [color-picker evidence](reviews/color-picker-form-contract-2026-08-26.md), plus
+> [OTP evidence](reviews/otp-form-contract-2026-08-26.md),
+> [radio-group evidence](reviews/radio-group-form-contract-2026-08-26.md) and
+> [date-range evidence](reviews/date-range-picker-form-contract-2026-08-27.md) and
+> [scheduler evidence](reviews/scheduler-form-contract-2026-08-27.md).
+> The plan retains ordered batches, exit criteria and human gates. No overnight
+> jobs or reminder are scheduled. The dedicated Linux container was used for
+> verification; other project containers are untouched. All 42 latest unit runs exited
+> normally without forced cleanup or remaining observed processes.
+> The dedicated `fluid-readiness-linux-20260826` container is running after the
+> full-workspace verification. Revalidate its source snapshot before the next heavy run;
+> final handoff documentation was updated on the host after verification.
+> The owner explicitly added website/documentation readiness to Section 7:
+> landing content, documentation drift, internal/external and cross-application
+> links, working demos and responsive/keyboard/light-dark visitor journeys.
+> Audit and estimate this scope; the prior effort range did not fully include it.
+> Preserve the current branch and all uncommitted changes. The owner authorized
+> local WIP commit `5957252`; nothing was pushed and later changes are uncommitted.
+
+> **Earlier broad checkpoint, 2026-08-26:** Pinned Linux passes 96 SSR checks and 102
+> representative Storybook interaction contracts. Required native form-focus
+> coverage remains 10/16; pre-hydration adoption adapters remain input/checkbox
+> only. Fresh packed React and frozen replay each pass 21 representative checks,
+> not individual runtime coverage of every typed event mapping.
+>
+> The complete verification command now passes: all 42 package/engine runs have
+> 6,888 passing executions and normal shutdown, followed by 18 package builds,
+> 1,903 cold Node imports, 155 server renders and 24,224 checked local docs links.
+> Fresh measured coverage passes 2,296 cases and all 14 unchanged package floors,
+> with no missing required runtime files. Browser-test typechecking covers 142 files.
+> Real browser controls exposed and repaired an upstream adapter that treated
+> forbidden pending tests as successful skips. Eight execution controls and five
+> Node guards now pass; raw unsupervised WTR is outside that certification fix.
+>
+> The full Linux accessibility rerun passes all 621 cases (207 per engine), with
+> zero retries and normal exit. The prior 618/621 failure remains retained.
+> The rebuilt Storybook passes 102 tagged contracts, not the 125 untagged stories.
+> Packed target completeness and evidence integrity have 32 passing guards;
+> the final cleanup repair and targeted lint pass separately from the full
+> verification snapshot. Fresh packing/install passes all 18 packages, strict
+> peers, public-file targets and 16 runtime/type roots. All 14 packed manifests
+> also pass, including inspection of the exact installed-consumer archives.
+> Performance measurement guards and the unchanged budgets pass on Linux;
+> this is one representative sample, not complete catalog performance history.
+> Release ordering has 12 local workflow guards, not remote Actions certification.
+> Angular/Next compatible patches pass strict frozen installs on Windows/Linux,
+> typechecks and actual production builds. Other security findings remain.
+>
+> See `docs/reviews/linux-verification-2026-08-26.md` and
+> `docs/reviews/framework-security-patches-2026-08-26.md`. No commits, section
+> sign-offs, maturity promotions or production-readiness claim.
+
+## Earlier checkpoints and retained project notes
+
+> **2026-08-26 parallel readiness work, uncommitted by user instruction:**
+> 102/102 applicable Storybook contracts now pass without retries, 102/155
+> catalog-wide (65.8 percent). Mosaic is a layout helper, not a newly covered
+> interaction. New child, chart, media, parser, table, scheduling, editor,
+> kanban, map and graph flows exposed genuine defects and test-driver issues.
+> Local pinned fonts eliminate external font requests. Three-engine catalog
+> axe audits pass; the full native run is 617 passed / 4 failed of 621.
+> Chromium and Firefox pass 207 each; Windows WebKit passes 203, with native
+> link and media limits remaining explicit failures (including two hung workers).
+> Localization shadow-context inheritance and initial validation/truncate
+> migration pass 312 targeted tests across three engines. A subsequent seven-form
+> localization slice passes 630 tests (210 per engine), after 89 added regressions
+> failed before the fix. Further core and expansion strings remain.
+> Sixteen further tags now use localized defaults (22 new typed terms). Separate
+> Chromium/Firefox/WebKit processes pass 359 tests each with normal shutdown.
+> A combined 1,077-assertion pass still failed teardown and remains failed evidence.
+> Visual attribution now requires real retained fixtures (42 guard checks pass), with 55 missing
+> baselines and no PNG acceptance. Corrected benchmarks pass unchanged budgets
+> and uncovered a production tree-shaking bug: `ssr-client` is now declared
+> side-effectful. React/Angular compiler isolation is repaired and unit-tested;
+> an isolated packed React install/typecheck/build passes with its resolved lock
+> and tarballs retained. Fresh packed React CSR contracts pass 21/21 across three
+> engines with clean teardown and no browser errors; the earlier 20/21 failure is
+> retained. Strict-peer packaging and a relocated frozen React replay also pass
+> 21/21 each with unchanged source/lock/six-tarball hashes and no peer warnings.
+> Other frameworks, framework SSR and cross-platform replay remain pending. SSR
+> form-state hardening passes 36 browser and 162 targeted unit executions across
+> three engines, including Firefox native invalid-input focus. Named render-cycle
+> warning debt remains recorded. Input/checkbox adapters are not all-form coverage.
+> A further five-control native focus fix passes 36 additional client/DSD browser
+> cases and 384 targeted units across three engines, after reproducing 40 Firefox
+> errors. Native invalid-focus coverage is now 6/16 required controls. The full
+> combined 72-case SSR run later passes assertions but fails Playwright shutdown
+> at its unchanged 300-second deadline; 14 exact render-cycle warning debts remain.
+> The helper edge-case suite passes 78 executions (26 per engine), and new
+> animation-entry/offline-map checks pass 51. Coverage now checks fresh artifact
+> timestamps and runtime-file completeness; its full rerun remains pending.
+> The signature Storybook play now asserts behavior, with an actually executed
+> no-op mutation rejected. Earlier setup-only execution was weak evidence.
+> The rebuilt Storybook rerun after signature strengthening and localized host
+> defaults passes all 102 contracts (`14-29-44-961Z-storybook-102-integrated-localized-cem`).
+> A parsed documentation link gate
+> found and fixed 13 broken links; all 24,214 local links across 136 rebuilt pages
+> pass, alongside seven checker regressions. External links are not validated.
+> See `quality/baselines/2026-08-26-section-2-parallel.md` and `quality/defects.md`.
+> No commits, maturity promotions, owner sign-offs or release claims.
+
+> **2026-08-26 wider checkpoint failed, source unchanged:**
+> `2026-08-26T13-41-10-196Z-full-workspace-three-engine-checkpoint` passes Chromium
+> packages, then exposes four Firefox core failures and a WebKit chart shutdown
+> hang even with serial engines. Later build/SSR/docs stages were not reached.
+> The image test fixture was corrupt; corrected bytes and listener ordering pass
+> 33 targeted executions with native decoder checks. Detached keyboard commands
+> and clipboard stub restoration have targeted passing repairs. The shutdown cause remains
+> open; only verified owned processes were stopped, not unrelated processes.
+> This supersedes any suggestion that serial execution guarantees clean teardown.
+> Node SSR checks now separate 161 cold-process imports from 155 catalog renders.
+> Six cold-import guards and six server-wrapper behavior tests pass; the small
+> built wrapper has separate 100 percent line/function/branch coverage, not catalog
+> coverage. Latest evidence: `2026-08-26T13-53-51-455Z-isolated-node-ssr-import-and-renderer`.
+> All 141 browser test files now pass a separate strict TypeScript gate across
+> 14 packages. Seven detached keyboard commands are fixed; the six affected
+> files pass 315 executions with normal exits. The next full run remains required.
+> A new SSR localization probe fails all five native-ancestor language cases
+> while explicit host languages pass. CERT-038 records this actual server gap;
+> the guide discloses the workaround without claiming full locale inheritance.
+
+> **2026-08-26 later integration:** the export-map-based Node gate passes 1,903
+> isolated built-JavaScript imports and 155 renders; three additional inventory
+> guards prevent missing export files and silently reduced render catalogs.
+> Canonical manifests cover 14 packages and 155 React wrappers, with six verified
+> payload types among 166 event mappings (160 remain unknown). All 14 actual CEM
+> tarballs pass. The new packed React output passes 21 browser checks across three
+> engines and another 21 in a relocated frozen replay with identical artifact hashes.
+> Host-ARIA ownership adds 137 regressions:
+> 249 pass in Chromium and Firefox; WebKit passes assertions but fails teardown.
+> Fresh coverage is interrupted by CERT-039, a supervisor ownership safety defect:
+> a reused parent PID caused cleanup to terminate an older Windows notification
+> process. Temporal ancestry/root-identity and stable-handle guards now pass;
+> an actual source-stable 53-test media run exits cleanly with no forced cleanup.
+> Browser jobs resumed, while the historical incident remains recorded.
+> No successful full-coverage result, stable promotion or release claim follows.
+
+> **2026-08-26 next bounded slices:** four locale-aware formatters add 98 regressions.
+> All 136 cases pass separately in Chromium, Firefox and WebKit with unchanged
+> source fingerprints and clean teardown. Explicit locale wins over inherited
+> language, with deterministic English fallback; calendar/time-picker context,
+> binary long-unit grammar and native-ancestor server language remain open.
+> Translation message argument tuples now reject invalid call-site types, with
+> two compiler guards and retained failing-before/passing-after evidence.
+> Canonical events now have 21 typed mappings and 145 unknown among 166; all 14
+> actual packed manifests pass again (`14-38-59-340Z-cem-publication-21-typed`).
+> New payload runtime checks and fresh packed React replay are queued, not yet
+> credited. SSR focus for masked-input/select/time-picker now passes 18 cases
+> across all three engines with clean exit and unchanged source; 89 Chromium
+> units pass too. Native required-focus coverage is 9/16, not all form semantics
+> or adapters. Full 90-case integration remains. Countdown/tour messages and
+> newly exposed timer/context regressions are active. No section is signed off.
+
+> **2026-08-26 integration gate:** pinned Node 22 / pnpm 9.15 verification
+> passes: 1,661 unit tests across 14 packages (1,221 core), all workspace
+> typechecks, lint, coverage-presence/quality/selector/token checks, package
+> build, 159 Node SSR imports, 155 renders, and 136 documentation pages.
+> Evidence: `2026-08-26T12-45-57-272Z-readiness-pinned-toolchain-verify`.
+> Unit execution here is Chromium-only; targeted cross-engine matrices are
+> separate. The working-tree fingerprint changed during integration, so this
+> is not a frozen RC run, and predates the later form, React and docs changes
+> summarized above. Native JSX event-name typings now use exact event names;
+> CEM-derived payload types remain pending. Toolchain recording
+> now rejects nested pnpm version mismatches. Test CI targets Node 22/24, with
+> fresh-checkout bootstrap fixes, but remote jobs have not been run.
+
+> **2026-08-26 Section 2 option/tree slice, uncommitted by user instruction:**
+> added verified option and tree-item contracts: 71/103 applicable elements
+> (68.9 percent), 71/155 catalog-wide (45.8 percent), 32 gaps remain. These are
+> representative interaction gaps, not counts of missing components or bugs.
+> Fixed recursive tree selection dispatch, native Tab entry/nested re-entry,
+> disabled activation, rapid selection, collapse focus, and reconnect routing.
+> Select rejects disabled initial/hover options and uses a resolved ARIA element
+> reference across the shadow boundary. Added nine core and three native browser
+> regressions. Latest runs pass 71 contracts without retries, 169 browser cases,
+> and 1,144 core tests. All 14 package test suites pass. See
+> `quality/baselines/2026-08-26-section-2-option-tree.md` for full gate evidence.
+> CERT-017 remains open: a prior run failed on external Google Fonts loading,
+> proven by its retained trace. Next: deterministic Storybook fonts, remaining
+> child contracts, then complex flows. No commits, promotions, exemptions, or
+> owner sign-offs. Section 2 and later certification sections remain open.
+
+> **2026-08-26 production certification, uncommitted by user instruction:**
+> the owner approved the eight-section plan. Section 1 baseline collection is
+> complete and ready for owner sign-off; no section completion or maturity
+> promotion has been signed off.
+> The inventory is 155 elements (124 core, 31 expansion), 145 experimental and
+> 10 beta. A proposed 59-element stable cohort lives in
+> `quality/certification-scope.json`. Auditing applicability corrected the
+> interaction denominator from 82 to 103: 64 attributed contracts, 39 gaps.
+> A separate browser presence audit found 13 false-positive a11y mappings; the
+> regular a11y gate now enforces host presence and reports 142 passed / 13 failed.
+> Benchmark heap collection and hydration measurement are also not valid proof,
+> and the clean React fixture fails on a missing workspace-root TypeScript config.
+> See `quality/baselines/2026-08-26.md` and `quality/defects.md` for the evidence
+> and ownership. Raw logs and reports live under ignored `quality/evidence/`.
+> The earlier competitive review has a correction; its grades are not current
+> certification. No component runtime implementation was changed in this slice.
+
+> **2026-08-25 architecture catch-up, uncommitted by explicit user request:**
+> the review's project-specific main issues are implemented on top of the
+> existing dirty tree. Security: DOMPurify now protects markdown and editor
+> HTML paths, SheetJS uses the patched 0.20.3 distribution, and clearing a
+> custom form error restores built-in validity. Packaging: Lit is a peer across
+> published Lit packages and the icon manifest is isolated from component
+> imports. System infrastructure: automatic OS dark mode plus explicit theme
+> override, reduced-motion tokens, shared lifecycle teardown adoption, an
+> override-ladder gate across every core semantic paint read, guarded
+> registration modules, Lit declarative shadow DOM SSR plus client hydration
+> entry, and an executable Node SSR gate (149
+> imports). Leaflet and animations no longer touch browser globals at import
+> time. Localization now has a public reactive translation registry, regional
+> fallback, dynamic terms, and the built-in English UI strings migrated; main
+> physical CSS edges use logical properties and horizontal keyboard behavior
+> follows RTL. Typeahead required validity and dialog/drawer accessible naming
+> are fixed. Verification: lint, all 28 workspace typechecks, coverage, token
+> gate, SSR gate, and 1,100 core tests green. `pnpm audit --prod` no longer
+> reports xlsx; 46 advisories remain in unrelated Angular/Astro/Next demo and
+> docs dependency trees. No commit has been made.
+
+> **2026-08-25 (uncommitted working tree, pending user approval to commit):**
+> a large four-track session, all tracks verified:
+>
+> 1. **New expansion pack `@fluid-ds/node-graph` 0.1.0** (13 packs now): the
+>    TMS operations scheduler's canvas, ported generic. One element
+>    `<fluid-node-graph>`: data-driven nodes/edges/nodeTypes registry (port
+>    topology lives on the TYPE), DOM nodes + SVG Bezier edges, pan/zoom/fit,
+>    drag-to-connect, detach-by-in-port regrab, grid snap, and a first-class
+>    keyboard path (arrow nudge, keyboard connect with candidate cycling +
+>    canvas preview, live-region announcements, localizable via `messages`).
+>    Traversal painting (`runStates`/`traversedEdges`) is data-only. 21 tests
+>    incl. axe + target-size; verified live in Storybook (a real silent-fail
+>    bug in keyboard connect was caught in-browser and fixed: already-connected
+>    targets are excluded from the candidate cycle). Wired: storybook glob +
+>    storySort, playground card, docs expansion page + sidebar, root test
+>    filter, FEATURES + README + landing counts (12→13 packs, og.png
+>    regenerated).
+> 2. **New website demo `/demos/data-table/`**: fluid-infinite-table with
+>    every bell and whistle (4,200 fake orders, infinite load, windowing,
+>    container scroll, sorting, filters + chips in toolbar-secondary, column
+>    manager, reorder/resize, column-scroll strip, clickable rows + dialog,
+>    layout persisted to localStorage + reset). Browser-verified end to end.
+> 3. **Website copy refresh** (was badly stale): counts corrected everywhere
+>    (103 families / 124 core elements), "New in v0.3" section rebuilt around
+>    the actually-new features, JSON-LD softwareVersion 0.0.3-alpha.0 → 0.4.0,
+>    admin-native CDN pins @alpha → @latest, FEATURES.md matrix completed
+>    (all packs), sitemap + og assets fixed, table/typeahead/field-chrome docs
+>    filled in. docs:build (135 pages) + landing:build green.
+> 4. **CI fixes**: verify.yml's red streak was `pnpm exec playwright` at the
+>    workspace ROOT (playwright is a leaf devDep, so every cache miss died
+>    before tests); now runs via `--filter @fluid-ds/components` +
+>    restore-keys. Also fluid-signature-pad got its missing story + docs page
+>    - playground card + sidebar entry, so `check:coverage` passes again.
+>      (deploy.yml was fixed and deployed green earlier today, see the 08-25 log
+>      entry below.)
+> 5. **Lockstep versioning adopted (user decision):** all 17 `@fluid-ds/*`
+>    packages now sit at **0.4.0** and `.changeset/config.json` has
+>    `"fixed": [["@fluid-ds/*"]]`, so from here every release moves every
+>    package together (the Angular/Storybook model). The next release
+>    publishes everything as 0.4.0; "1.0.0" becomes a single decision. The
+>    per-package CHANGELOGs are behind (they stopped at the pre-lockstep
+>    versions); consider one "Fluid 0.4.0" entry per package at release.
+>
+> Full `pnpm verify` run locally before handing over (re-verified after the
+> version alignment). Machine note: Playwright Firefox does not spawn on this
+> box (chromium+webkit fine); Firefox coverage comes from CI.
+>
+> **2026-08-09 (previous entry):** form controls gained first-class
 > `label` and `help-text` attributes: a shared internal helper
 > (`src/internal/field-chrome.ts`) renders a visible label above and help text
 > below the control, with a real `<label for>` inside the shadow root and
@@ -43,16 +410,21 @@ to hand off context when you switch machines.
 > finance page now uses `@fluid-ds/charts` for its bar, doughnut and
 > sparklines, and folds its analytics row behind `fluid-fold`.
 >
-> **TODO (next session): drop the `@floating-ui/dom` dependency, make
-> positioning fully in-house.** Floating UI is our only runtime positioning
-> dep; it's pulled in by every overlay component (tooltip, popover, popup,
-> dropdown, select, typeahead, menu, context-menu, date pickers, etc.) and is
-> the bare `import "@floating-ui/dom"` the docs CDN import-map has to shim.
-> Goal: a small internal `positioning` util in `packages/components/src/internal`
-> (anchor rect + placement + flip/shift/offset/arrow) replacing
-> `computePosition`/`autoUpdate`, so the design system ships zero third-party
-> positioning code. Audit usages first (`grep -r "@floating-ui/dom"`), keep the
-> same call sites, swap the implementation, re-verify overlays in-browser.
+> **DONE 2026-08-25: `@floating-ui/dom` dropped, positioning fully in-house.**
+> All 11 overlay components now import `internal/position.js`; the dep is gone
+> from `packages/components` and `apps/admin-angular`, the CDN import maps
+> (docs cdn.mdx + admin-native) no longer shim it, and `lit` is the only bare
+> import the core dist ships. Two real fixes surfaced during the swap: the
+> engine's `size` middleware did not pass `elements` to its `apply` callback
+> (select/popup/typeahead width-matching silently threw; now it does, matching
+> the Floating UI signature), and popconfirm's arrow was dead code all along
+> (its CSS + positioning existed but no `.arrow` div was ever rendered; the
+> element is now in the template and browser-verified pointing at the
+> trigger). Tooltip additionally moved from quirky absolute positioning with
+> no scroll tracking to `strategy: "fixed"` + `autoUpdate` like every other
+> overlay. Verified live in Storybook: select listbox exact placement + width,
+> tooltip all four placements, flip at the viewport edge, scroll-follow, and
+> the popconfirm arrow. Full component suite green (1090 tests).
 >
 > **Release flow:** bump the package version in the change commit itself (no
 > changeset files). CI then finds no pending changesets and publishes straight
@@ -84,7 +456,7 @@ to hand off context when you switch machines.
     animations 24 / qr 14 / parser 87), build, docs:build (132 pages),
     storybook:build. Pending the credentialed publish + Cloudflare deploy. Run
     `corepack pnpm build:website` before deploying (landing badge now `v0.3
-    alpha`, new playground cards, new docs pages). Not in changesets pre-mode, so
+alpha`, new playground cards, new docs pages). Not in changesets pre-mode, so
     versions are set manually (the pending `.changeset/*.md` files document the
     changes but are NOT consumed by `changeset version`).
   - **0.0.3 features (this session):** QR logo-embedded "fancy" codes
@@ -95,7 +467,7 @@ to hand off context when you switch machines.
     storybook globs / playground cards / docs sidebar, and browser-verified.
   - Model: **git is the source of truth; npm package + website are two outputs
     of the same commit.** The website consumes `@fluid-ds/*` via `workspace:*`,
-    so they can't drift. The *user-facing* references (README/docs CDN snippets,
+    so they can't drift. The _user-facing_ references (README/docs CDN snippets,
     native demo import map) point at the published `@alpha`.
   - ✅ **History squashed** to a single public commit; **repo is public**.
   - ✅ **All 9 `@fluid-ds/*` packages published** to npm at `0.0.1-alpha.0`
@@ -110,7 +482,7 @@ to hand off context when you switch machines.
     project keeps that name), served from the custom domain
     **https://fluid-web.dev**. Astro `site` is set to it (override via
     `DOCS_SITE`). The site is currently shipped via **local `wrangler pages
-    deploy website --project-name=fluid-25z --branch=main`** (run after
+deploy website --project-name=fluid-25z --branch=main`** (run after
     `pnpm build:website`).
   - **CI auto-deploy fixed 2026-08-25 (pending first green run):** the failure
     was never the Cloudflare token. `cloudflare/wrangler-action@v3` tried to
@@ -132,8 +504,8 @@ to hand off context when you switch machines.
   `build` step only compiles the component packages (tsc + cem); the Astro docs
   (MDX) are never touched. **After editing any `*.mdx`, run `pnpm docs:build`**
   (fast, ~22s) to catch MDX/JSX compile errors, e.g. the recurring
-  backtick-in-a-`css\`\`` bug, or unclosed inline code that makes MDX parse a
-  later `<fluid-*>` as JSX. A green `verify` says nothing about the docs.
+  backtick-in-a-`css\`\``bug, or unclosed inline code that makes MDX parse a
+later`<fluid-\*>`as JSX. A green`verify` says nothing about the docs.
 - **Follow-up bundle (2026-05-30, committed `bcbc0eb` + `0f79af4`, NOT pushed):**
   - **Dropdown menu → top layer.** The split-button menu hid behind the docs
     nav pane. Switched `fluid-dropdown`'s menu to the Popover API
@@ -171,28 +543,28 @@ to hand off context when you switch machines.
   reference).** A `component-authoring` skill + hard
   coverage gate (`pnpm check:coverage` requires a story, playground card,
   AND docs page per component) now enforce the bar; `verify-in-browser`
-  + `accessibility` skills back it. This session brought the button to
-  standard and added two features:
-  - **`loading`**: inline spinner, `aria-busy` + `aria-disabled` (NOT
+  - `accessibility` skills back it. This session brought the button to
+    standard and added two features:
+  * **`loading`**: inline spinner, `aria-busy` + `aria-disabled` (NOT
     native `disabled`, so it stays focusable), clicks blocked, label
     stays so the accessible name is unchanged; spinner respects
     reduced-motion. New `spinner` csspart.
-  - **`toggle`**: WAI-ARIA toggle-button: `aria-pressed` flips on
+  * **`toggle`**: WAI-ARIA toggle-button: `aria-pressed` flips on
     activation, inset pressed visual, fires `fluid-change {pressed}`.
     `pressed` sets the initial state.
-  - Docs (`button.mdx`) reworked: reordered examples (Variants → Sizes →
+  * Docs (`button.mdx`) reworked: reordered examples (Variants → Sizes →
     Tones → With icon → Disabled → Loading → Toggle), trimmed marketing
     tone, dropped redundant `variant="primary"` from framework snippets.
-  - Earlier in the arc (already committed): semantic `tone` prop
+  * Earlier in the arc (already committed): semantic `tone` prop
     (brand/neutral/success/danger/warning/info, theme-independent),
     slotted-content typography hardening (the docs-vs-Storybook 48px bug),
     `docs/FEATURES.md` capability list, three lessons captured as skills.
-  - **Migrated to standard so far:** `button`, `button-group`, `input`,
+  * **Migrated to standard so far:** `button`, `button-group`, `input`,
     `number-input`, `textarea`, `switch`, `checkbox`, `radio` / `radio-group`,
     **`select`, `typeahead`, `slider`, `color-picker`, `rating`, `file-input`**
     (last six this session, committed locally, NOT pushed). The whole
     **input/form-control family is now on standard.**
-  - **This session's input batch (one commit each):** every component got the
+  * **This session's input batch (one commit each):** every component got the
     override ladder (own `--fluid-<name>-*` tokens falling through to
     `--fluid-field-*` / semantic vars incl. new `border-width` / `radius` /
     `font-family` / `focus-ring-width` aliases), an AAA target-size floor
@@ -206,7 +578,7 @@ to hand off context when you switch machines.
     (→ `var(--fluid-color-amber-500)`) and **no visible focus ring on the
     slider host** (added). `pnpm verify` green at **302 component tests**;
     target floors + ladder verified in-browser by the new Chromium tests.
-  - **Layout system landed (this session, committed locally, NOT pushed):**
+  * **Layout system landed (this session, committed locally, NOT pushed):**
     `fluid-grid` + `fluid-col` (column/grid) and `fluid-mosaic` +
     `fluid-mosaic-item` (bento/mosaic). All four are `:host { display: grid }`
     primitives with a bare `<slot>`, so slotted children are real grid items.
@@ -221,7 +593,7 @@ to hand off context when you switch machines.
     PREVIEW_EXEMPT (layout primitives, like page/split-panel). Recurring
     gotcha re-hit + fixed: a backtick inside a `css\`\`` **comment** terminates
     the template, keep CSS comments backtick-free.
-  - **Next candidates:** remaining un-migrated visual components can follow the
+  * **Next candidates:** remaining un-migrated visual components can follow the
     input checklist; layout could later gain a `fluid-stack` / `fluid-cluster`
     flow primitive if wanted. (Build-time token-contrast validator + a
     slotted-content sweep remain good follow-ups.)
@@ -321,7 +693,7 @@ README start resolving, jsDelivr and unpkg auto-mirror npm.
 - **After 72 hours**: you can only `npm deprecate <pkg> "message"`.
   The version stays available; consumers see a warning. **Don't
   unpublish**, anyone who pinned to that version would 404. Deprecate
-  + roll forward to a fixed version.
+  - roll forward to a fixed version.
 
 ---
 
@@ -342,7 +714,252 @@ Things true across machines (machine-specific quirks go in private memory):
 
 ## Log
 
+### 2026-08-27: first localization and RTL tranche verified
+
+- Created a machine-guarded owned-string inventory for all 155 elements and a
+  reconciliation review for the remaining expansion-package work.
+- Localized binary long units, file-size punctuation, meter sentences and six
+  media components; preserved explicit overrides, filenames, canonical form/
+  event values, physical media pan actions and browser-owned native video UI.
+- Made core calendar locale/direction reactive with Arabic numerals, safe locale
+  fallback, mirrored RTL navigation and canonical ISO activation.
+- Added typed parser diagnostics for every built-in error family while retaining
+  legacy messages and caller-owned validator text.
+- Rewrote the localization guide and linked SSR process-global versus
+  request-local isolation guidance. Five non-English dictionaries remain drafts.
+- Synchronized Linux verification passes the complete changed-package browser
+  suites (1,840/60/110 per engine), typecheck, lint, builds, CEM, quality, docs
+  and SSR. No full-workspace `pnpm verify`, fluent review, visual acceptance,
+  manual AT, Section 4 sign-off, commit of this wave or push.
+- A second parallel wave localizes date/range/time picker display, presets and
+  prompts and adds explicit editor, kanban and node-graph RTL contracts. Focused
+  all-engine suites pass 68, 46, 16 and 29 tests per engine respectively while
+  preserving application content, canonical values/events and physical graph
+  geometry. Expansion-package strings and the remaining human gates stay open.
+
+### 2026-08-26: second resumed todo complete, file-input native form/SSR
+
+- Real file-chooser browser contracts now pass 18/18 across client/DSD modes and
+  Chromium, Firefox and WebKit. They verify actual names, MIME types and bytes,
+  native/Fluid submission, reset, multiple append, removal, disabled behavior,
+  event-time FormData, reconnect and retained server nodes.
+- The unit file passes 31 cases per engine, 93 executions. The complete browser
+  SSR gate has expanded to 132/132 passing checks with no retries.
+- Full all-engine workspace verification passes 6,906 unit executions across 42
+  package/engine runs, 18 builds, 1,903 cold imports, 155 renders and 24,224
+  checked local docs links. All 42 lifecycle records show normal exit, closed
+  server, zero sockets/processes, no ownership uncertainty and no forced cleanup.
+- Repaired missing invalid focus, stale multipart data during events, enabled
+  remove buttons while disabled, late disabled selection, removal focus loss and
+  the inaccurate `FileList` event docs. The visible control is now a native
+  non-submit button with delegated host validation focus.
+- Retained WebKit failures measured the focused picker at zero height when an
+  explicit descendant validation anchor caused the fallback UI to add a UA
+  shadow root. Host anchoring is the causal passing control. Live Storybook
+  measurement is 420×132 with a visible 2px/2px-offset focus ring.
+- Checked off only the bounded file-input task. Required native-focus coverage is
+  12/16; OTP is next. Pre-registration selection adoption, reload restoration,
+  unnamed-control parity, manual AT, themes and complete localization remain open.
+- See [the review](reviews/file-input-form-contract-2026-08-26.md). No commit,
+  sign-off, promotion or publication.
+
+### 2026-08-26: first resumed todo complete, color-picker native form/SSR
+
+- Added the missing client/DSD native focus contract and repaired reproduced
+  validation focus, duplicate child/parent events, disabled editing surfaces,
+  WebKit normalization commits and shorthand native-color values.
+- Retained initial and intermediate failures. Final focused checks pass 18 browser
+  cases and 87 unit executions; the integrated SSR gate passes 114/114.
+- Full workspace verification passes 6,897 unit executions in 42 package/engine
+  runs, all 18 package builds, 1,903 cold imports, 155 server renders and 24,224
+  local docs links. The full run took 587.853 seconds with stable source and lock.
+- Refreshed generated core CEM and quality inventory. All 42 lifecycle records
+  show normal exit, no forced cleanup, zero remaining sockets or observed processes.
+- Checked off the bounded color-picker task, not the whole component or Section 4.
+  Required native-focus coverage is 11/16; file-input is next, followed by OTP,
+  radio-group, date-range-picker and scheduler. State adoption remains input/checkbox
+  only. No release, stable promotion, owner sign-off or commit.
+- See [the review](reviews/color-picker-form-contract-2026-08-26.md) for exact
+  records, source hashes, retained failures and excluded certification scope.
+
+### 2026-08-26: website and documentation readiness added to the plan
+
+- At the owner's request, made the website/docs refresh an explicit required
+  Section 7 deliverable, with detailed PR-10 tasks and overall completion gates.
+- Included content accuracy, navigation/anchors/redirects, separately built and
+  external links, executable examples/demos and browser-tested visitor journeys.
+  Existing passing local docs links are not whole-website acceptance.
+- Required an initial bounded audit and revised estimate, then automated evidence
+  and owner review. No website implementation, deployment, tests or commits in
+  this planning-only update; the implementation pause remains in effect.
+
+### 2026-08-26: readiness continuation plan recorded; work paused
+
+- Added a dated resumption sequence to the existing canonical production-readiness
+  plan, preserving the approved eight-section structure and today's passing evidence.
+- Ordered the remaining work: native form focus, SSR state/context, localization,
+  packed framework fixtures, behavioral/accessibility depth, visual/performance
+  history, security/docs/release operations, then two candidate runs and a fresh
+  Web Awesome/Spectrum comparison.
+- Recorded per-batch exit criteria, owner/human gates and tomorrow's first
+  color-picker slice. Representative coverage is explicitly not complete
+  behavioral, localization, accessibility or framework certification.
+- Planning-only documentation update. No implementation, heavy verification,
+  container restart, overnight work, reminder, commit, release or sign-off.
+
+### 2026-08-26: complete pinned-Linux verification checkpoint
+
+- Fixed the Angular icon-registry build mapping and added a causal configuration
+  regression. Angular and Next production builds pass after compatible patches.
+- Full verification passes 6,888 unit executions across 42 package/engine runs,
+  all package builds, cold Node SSR and 24,224 local documentation links.
+- Fresh coverage passes 2,296 cases and all 14 unchanged package floors; all
+  202 required runtime files are measured. Rebuilt Storybook passes 102 tagged
+  contracts. The full accessibility suite passes 621 cases with zero retries.
+- Hardened packed consumers preserve peer ranges, require strict peers and a
+  portable lock, bound commands and finalize evidence only after cleanup.
+  All 32 guards and the actual 18-package install pass. Archives, lock and
+  command logs are retained; 14 canonical manifests pass in those same archives.
+- Eight performance measurement guards and unchanged budgets pass. This does
+  not establish expansion-package performance, repeated-run stability or parity
+  with competitors. Earlier failures remain retained, including a Storybook
+  invocation that omitted its server and failed before executing stories.
+- Remaining work includes six native form-focus contracts, broader state
+  adoption/framework SSR, localization completion, visual acceptance/history,
+  security remediation and human review. No section sign-offs, stable promotions,
+  commits or releases. See the latest summary in the Linux verification review.
+- All evidence is retained locally. The dedicated verification container is
+  stopped but retained for reproduction; other project containers are untouched.
+
+### 2026-08-26: integrated measurement and generated-contract hardening
+
+- Expanded asynchronous browser-command ownership to all 18 installed APIs,
+  including native media emulation. Eleven guards pass.
+- Added strict browser-test typechecking, separately measured Node renderer
+  contracts and published-JS cold imports. The expanded import run passes
+  1,903 entries, with non-JS/source exports explicitly outside its guarantee.
+- Reconciled aggregate coverage counts against every measured file; nine
+  controls pass. Fresh coverage remains unverified after a process-ownership
+  safety failure, which is retained and reported rather than waived.
+- Canonical CEM and React generation preserve verified event payload contracts
+  while leaving the remaining payloads unknown. Actual packed consumer and
+  complete runtime verification of the new output remain required.
+- Preserved all existing work; no commits, pushes or owner sign-offs.
+
+### 2026-08-26: parallel interaction closure and next-section hardening
+
+- Used three user-authorized background agents with bounded file ownership.
+  Preserved all existing work and made no commits.
+- Reached 102 passing built contracts. Strengthened source attribution with an
+  AST scanner and retained failed integration attempts rather than hiding them.
+- Added cross-engine native interaction coverage and deterministic fonts.
+  Recorded Windows WebKit native platform limits separately from runtime fixes.
+- Started SSR, localization, visual-presence, benchmark-validity and framework
+  isolation follow-ups. Current snapshot and evidence distinguish passing
+  implementation checks from unfinished production certification.
+- Source changes span ongoing slices; immutable release-candidate runs and
+  human review remain open. Update this snapshot after final integrated gates.
+- Later slices verify native invalid-form focus, 16-tag localized defaults,
+  strict packed React and relocated frozen replay. Preserve the combined
+  Windows WebKit teardown failure alongside clean per-engine results.
+- Hardened generated-output drift, documentation link checks, Storybook mutation
+  controls and runtime coverage-file accounting. Unit verification now runs
+  selected engines in separate processes with serial packages, without retrying
+  failed cases. The wider checkpoint exposed corrupt image data, detached
+  keyboard commands and another WebKit teardown hang. The image repair passes
+  33 targeted executions. Added 161 isolated cold Node imports and six renderer
+  behavior checks with a separately scoped built-wrapper coverage gate.
+
+### 2026-08-26: Section 2 option/tree contracts and genuine behavior fixes
+
+- Continued on the existing dirty branch without commits. Explained why source
+  attributions and parent stories do not automatically close child behavior gaps.
+- Added option/tree-item Storybook contracts, nine core regressions, and three
+  native Playwright cases. Corrected recursive selection, focus/Tab behavior,
+  disabled options, reconnect routing, and unresolved select active references.
+- Latest built runs: 71 contracts, 169 browser cases, no retries. The full
+  verification run passes all 14 package test suites, including 1,144 core tests;
+  the evidence report records the overall exit result. Raised the floor to 71.
+- Retained failed native Tab, diagnostic recursion, and external-font timeout
+  evidence. CERT-017 remains open rather than hiding the network failure behind
+  a passing rerun. Continue its deterministic-asset fix and the other 32 gaps.
+
+### 2026-08-26: Section 2 runner stability and child keyboard contracts
+
+- Kept all work on the existing branch and did not commit. Added a pnpm patch
+  for the installed runner's view-mode substitution and story-completion race,
+  plus a CI regression checking no reloads and real play-failure propagation.
+- Added three explicitly attributed interaction contracts and five native
+  Playwright keyboard cases. Fixed the genuine menu and tab defects they exposed;
+  added six core regressions. Accessibility guidance informed the focus/state
+  assertions and native-keyboard checks, not merely rendered-markup checks.
+- Verified 69 contracts with zero retries, 1,135 core tests, and all 166 browser
+  cases. Raised the source-attribution floor to 69 only after the built run passed.
+- Continue the remaining 34 applicable gaps and stable-cohort depth. Do not
+  interpret representative contract coverage as full accessibility certification.
+
+### 2026-08-26: Section 2 fixture integrity and two interaction contracts
+
+- Corrected story selection and action setup for the 13 absent hosts. Added a
+  generic chart story and a persistent toast story using the public API.
+- Strengthened the a11y harness: host presence, registered upgrade, Lit readiness,
+  attachment through axe, and console/page errors checked after the scan.
+- Verified 155 catalog audits plus six negative/positive browser guard tests,
+  nine generator tests, and an independent 155-element presence audit.
+- Added toast-item keyboard/pointer dismissal and truncate disclosure contracts
+  with state, focus, and public-event assertions. The complete tagged Storybook
+  runner passes 66 contracts, but still logs the known navigation retries.
+- A11y, Storybook, charts typechecks and targeted lint/format/quality checks pass.
+  No runtime component implementation, maturity label, commit, or release changed.
+- Next: investigate runner retries, then continue the 37 representative gaps and
+  deeper stable-cohort contracts. Section 2 is not ready for sign-off.
+
+### 2026-08-26: approved production plan, audited baseline and coverage truth
+
+- Started Section 1 of `docs/plans/production-readiness-plan.md` after explicit
+  approval. Owner sign-off remains separate from implementation completion.
+- Audited applicability, kept all 155 elements in scope, and proposed a
+  59-element first stable cohort without changing existing maturity labels.
+- Added a source-attribution label to the generated report, scope-integrity
+  checks with 13 regression tests, and a browser host-presence assertion before
+  axe. Missing fixtures now fail instead of appearing covered.
+- Recorded reproducible commands, environment, hashes, statuses, raw output,
+  coverage, and browser artifacts. Retained failed attempts as well as passes.
+- Established the defect register for fixture omissions, benchmark validity,
+  framework isolation, browser/human certification, and documentation drift.
+- Baseline collection completed: 14 unit/coverage packages, 64 Storybook
+  contracts, 1,009 visual scenarios (1,536 policy skips), four hydration checks,
+  18 packed packages, and five of six packed framework fixtures passed. React
+  fails; the strengthened a11y gate reports 142 passed and 13 absent-host
+  failures. Scope checker regression suite: 13 passed. See the baseline index
+  for failed setup attempts, exact commands, environment, and limitations.
+- Work remains on the existing `main` working tree. No commit, push, release,
+  or public maturity promotion was performed.
+
 Newest first. One short entry per working session.
+
+### 2026-08-25 (later still): @floating-ui/dom dropped, lockstep 0.4.0
+
+Positioning is fully in-house (see the DONE block in Current state: import
+swap across 11 overlays, the `size`-middleware `elements` fix, popconfirm's
+never-rendered arrow fixed, tooltip moved to fixed + autoUpdate, all
+browser-verified). Separately, the user chose lockstep versioning: every
+`@fluid-ds/*` package is 0.4.0 and `.changeset/config.json` fixes them
+together from now on.
+
+### 2026-08-25 (later): node-graph pack, data-table demo, website refresh, CI verify fix
+
+Four tracks in one session (multi-agent), detailed in Current state above. The
+headline: `@fluid-ds/node-graph` 0.1.0 ports the TMS scheduler canvas as a
+generic, keyboard-first graph editor (the TMS app keeps its business logic and
+can migrate to the pack later); `/demos/data-table/` showcases every
+fluid-infinite-table feature; the website's stale marketing numbers (still
+claiming 101/57/~50 components and an alpha version in JSON-LD) were corrected
+to 103 families / 124 elements / 13 packs; and the verify workflow's red
+streak turned out to be `pnpm exec playwright` at the workspace root, where no
+playwright devDep exists. TMS follow-up for a future session: swap
+`scheduler-view.ts`'s inline canvas for `<fluid-node-graph>` and delete the
+duplicated geometry in `scheduler-demo.ts`.
 
 ### 2026-08-25: website CI deploy unblocked (wrangler-action → pnpm dlx)
 
@@ -521,9 +1138,9 @@ bug classes can't come back:
     `trusted`. Wired markdown's missing test infra (web-test-runner + devDeps +
     tsconfig exclude + root `test` filter).
   - Re-found two recurring gotchas the agents reintroduced: a backtick inside a
-    `css\`\`` **comment** terminates the template (breadcrumb-item); a `dataset`
-    key can't contain a hyphen (`pointerenter-bound` → switched the animation
-    controller to a `WeakMap`). The controller also now only re-plays a one-shot
+    `css\`\``**comment** terminates the template (breadcrumb-item); a`dataset`
+key can't contain a hyphen (`pointerenter-bound`→ switched the animation
+controller to a`WeakMap`). The controller also now only re-plays a one-shot
     animation when the attribute value actually **changed** (echo guard).
 - **Roadmap written:** [`docs/plans/component-animation-roadmap.md`](plans/component-animation-roadmap.md)
   (P0/P1/P2 themes + net-new infra: a teardown mixin on `FluidElement`, a
@@ -555,7 +1172,7 @@ bug classes can't come back:
     remaining particles play out. New regression test (sparkles with a short
     `duration` drains to zero emitters on its own, no `stop()`).
 - **Verified in-browser (Chrome DevTools MCP, :5175):** snow coverage rises to a
-  peak while spawning then *gradually* declines (0.28 → 0.23 → 0.15 → 0.06 →
+  peak while spawning then _gradually_ declines (0.28 → 0.23 → 0.15 → 0.06 →
   0.01) as flakes fall off, and the overlay is removed by ~13s. No abrupt clear.
   (Needed a Vite dep-cache clear + dev-server restart to pick up the rebuilt
   animations dist; the optimizeDeps cache had masked the fix.)
@@ -563,8 +1180,8 @@ bug classes can't come back:
   package tests incl. animations 28 / scheduler 50 / parser 87 → build + CEM);
   `pnpm build:website` rebuilt the unified `website/` for deploy. Still pending
   the credentialed npm publish (16 packages @ `0.0.3-alpha.0`, dist-tag `alpha`)
-  + the local `wrangler pages deploy website --project-name=fluid-25z
-  --branch=main`.
+  - the local `wrangler pages deploy website --project-name=fluid-25z
+--branch=main`.
 
 ### 2026-06-01: fluid-tour fixes (shadow-root targets + Fluid buttons)
 
@@ -591,10 +1208,10 @@ bug classes can't come back:
   - `apps/playground/src/preview.ts`: moved the start handler onto the anchor
     row and resolve the tour via `getRootNode()`.
 - **Verified:** 15/15 tour tests green (added shadow-root target-resolution test
-  + fluid-button assertion); components build + CEM clean; playground typecheck
-  clean; lint clean. Browser (Chrome DevTools MCP, :5173): Start opens the tour,
-  spotlight lands on the target, Back/Next/Done advance, buttons are styled
-  `fluid-button`s.
+  - fluid-button assertion); components build + CEM clean; playground typecheck
+    clean; lint clean. Browser (Chrome DevTools MCP, :5173): Start opens the tour,
+    spotlight lands on the target, Back/Next/Done advance, buttons are styled
+    `fluid-button`s.
 
 ### 2026-06-01: +26 core components (75 → 101)
 
@@ -624,7 +1241,7 @@ bug classes can't come back:
 - Storybook sidebar now splits **per package**: each expansion pack is its own
   top-level header (Scheduler, Charts, Media, Table, Calendar, Editor, Kanban,
   Map) instead of a shared "Expansion" bucket; `storySort` in `.storybook/
-  preview.ts` lists core categories first then the packs. Added the missing
+preview.ts` lists core categories first then the packs. Added the missing
   charts stories glob to `.storybook/main.ts` + a `Charts/Gallery` story (charts
   had none), and moved the core `fluid-comparison` story out of the `Media/`
   group into `Components/`. Also tidied the `fluid-truncate` Lit
@@ -691,7 +1308,7 @@ bug classes can't come back:
   Workflow** (one subagent per component) returning structured wiring data,
   which the orchestrator applied to index.ts / playground / docs Head / sidebar.
   Then an orchestrated fix-up pass (typecheck + lint + 6 flaky/logic test fixes
-  + 1 MDX parse fix in command-palette).
+  - 1 MDX parse fix in command-palette).
 - **Storybook**: the glob already includes `packages/scheduler`; core stories
   were already covered. All 15 new stories bundle (`storybook:build` green).
 - **Core change**: `FluidFormAssociated.value` widened to allow `string[]` (for
@@ -799,6 +1416,7 @@ bug classes can't come back:
 ### 2026-05-31: configuration wizard W2 (real config steps + resume)
 
 Commits `8864e93` (steps), `04cc064` (resume).
+
 - **Real tones / type / shape steps** (replaced W1 placeholders), all writing
   live to the theme store: tones = 4 tone pickers + contrast badges (collapsed
   advanced); type = curated font select + scale slider (rescales the
@@ -830,16 +1448,16 @@ Commit `6a6dd76`.
   live WCAG contrast verdicts (`contrast.ts`). Verified in Chrome: rose seed
   recolors the preview (accent re-resolves to #d1003d), verdicts compute, export
   yields the `[data-fluid-brand="custom"]` delta CSS + install snippet + download
-  + resume link.
+  - resume link.
 - **Architecture:** copied the playground engine into the wizard
   (`theme-store.ts` / `theme-manifest.ts`) for W1 robustness across the Vite app
   boundary; **W2 extracts a shared `packages/theme-engine` and repoints both
   apps** (the playground is the regression canary). Persistent `<wizard-preview>`
-  rail; steps share a focus-managing base; dogfoods fluid-* throughout.
+  rail; steps share a focus-managing base; dogfoods fluid-\* throughout.
 - Gates: wizard typecheck + lint clean, `pnpm wizard:build` green.
 - **W2 next:** extract theme-engine; real tones/type/shape steps; URL `#wizard`
-  + localStorage resume. **W3:** fine-tune drawer, `build-website.mjs` wiring
-  (stage `website/wizard/`, nav links), docs guide + FEATURES.
+  - localStorage resume. **W3:** fine-tune drawer, `build-website.mjs` wiring
+    (stage `website/wizard/`, nav links), docs guide + FEATURES.
 
 ### 2026-05-31: motion system (whole plan, P0–P4) + animation extraction
 
@@ -851,10 +1469,10 @@ lives in **core**, not a standalone package (components consume it).
   is now purely media. New core docs page + sidebar group renamed
   "⚙️ Utilities & motion". (`1344895`)
 - **P1**: motion foundation: tokens (`--fluid-easing-decelerate/accelerate/
-  emphasized`, `--fluid-duration-slower`) + `packages/components/src/internal/
-  motion.ts`, shared `@keyframes` fragment (fade/scale/slide/backdrop) + a
+emphasized`, `--fluid-duration-slower`) + `packages/components/src/internal/
+motion.ts`, shared `@keyframes` fragment (fade/scale/slide/backdrop) + a
   drop-in `reducedMotion` guard. Keyframes ship as an adopted `css` fragment so
-  the animation *name* is a swappable token inside each shadow root. (`d8ea0ca`)
+  the animation _name_ is a swappable token inside each shadow root. (`d8ea0ca`)
 - **P2**: enter/exit on dialog, drawer, toast, popover, tooltip, accordion;
   **NEW sliding indicators** on segmented-control (`part="thumb"`) and tabs
   (`part="indicator"`), both getBoundingClientRect-measured (+ ResizeObserver,
@@ -905,7 +1523,7 @@ override-first), W1→W3.
     switched it to Astro's built-in `<Code>` from `astro:components` with the
     same dual-theme config + our transformer.
   - Audit first confirmed the docs only use highlighting + `title=` (183 blocks)
-    + copy, no EC line-markers/diff/`[!code]`, so nothing else regressed.
+    - copy, no EC line-markers/diff/`[!code]`, so nothing else regressed.
 - Verified: component build + tests green, `pnpm lint` clean, `pnpm docs:build`
   green (74 pages); Chrome MCP confirmed highlighting, header bar, copy, and the
   light⇄dark token swap on real pages.
@@ -941,8 +1559,8 @@ override-first), W1→W3.
 - **KEYSTONE FIX: `--fluid-color-primary` was a phantom token.** The entire
   `custom.css` accent bridge read `var(--fluid-color-primary)`, which **doesn't
   exist** (the accent track is `--fluid-accent-*`). It resolved invalid, so
-  Starlight fell back to its **stock purple**, that's *why the docs "looked
-  like vanilla Starlight."* Swept every accent reference to `--fluid-accent-base`
+  Starlight fell back to its **stock purple**, that's _why the docs "looked
+  like vanilla Starlight."_ Swept every accent reference to `--fluid-accent-base`
   / `-active` / `-text`. **Specificity gotcha:** the `--sl-color-accent*`
   remap had to move INTO the `:root[data-theme="light"|"dark"]` blocks, because
   Starlight defines its own accent at that scope (0,2,0) and beats a plain
@@ -1012,7 +1630,7 @@ override-first), W1→W3.
     `--fluid-color-primary` → `--fluid-accent-base`.
 - **Wizard plan delivered (background agent):**
   [`docs/plans/configuration-wizard-plan.md`](plans/configuration-wizard-plan.md)
-, found `apps/wizard/` already scaffolded; plan builds on it, reuses the
+  , found `apps/wizard/` already scaffolded; plan builds on it, reuses the
   playground theme engine (`themeStore`/`elementOverridesStore`/`manifest`/
   `url-state`), a 9-step flow (preset→scheme→accent→tones→type→shape→
   conformance→review→export), W1/W2/W3 phases. Open question flagged: keep the
@@ -1032,7 +1650,7 @@ Theming(+`::part`) / structured-Accessibility(+keyboard table + AA/AAA) refresh.
   which **is not a real token**, the `color-mix` resolved invalid and the
   selection highlight silently never applied. Switched to `--fluid-accent-base`;
   confirmed live in Chrome (selected row now renders accent text + 15% tint).
-- **Notable:** breadcrumb links use the target-size *inline exception* (no
+- **Notable:** breadcrumb links use the target-size _inline exception_ (no
   min-height); dropdown items floor to target-min but separators are exempt;
   popup is documented as a headless primitive (no visual tokens, you wire the
   roles). Added a **test file for `fluid-tree`** (none existed).
@@ -1055,7 +1673,7 @@ Theming(+`::part`) / structured-Accessibility(+keyboard table + AA/AAA) refresh.
   Theming(+::part) / structured-Accessibility(+AA/AAA where interactive)
   refresh. **Hardcoded hex removed:** toast + callout variant colors now use
   the semantic tone tokens / color primitives (`--fluid-success/danger/warning/
-  info-base`, `--fluid-color-{emerald,amber,red}-*`). **Bug fixes:** rating had
+info-base`, `--fluid-color-{emerald,amber,red}-*`). **Bug fixes:** rating had
   a hardcoded `#f59e0b` + missing focus ring (fixed earlier); progress-ring's
   documented `--fluid-progress-ring-thickness` CSS var never reached the JS
   geometry, replaced with a real numeric `thickness` property driving both
@@ -1083,7 +1701,7 @@ side by side at `cols=2`).
 - Wiring: index exports, docs `Head.astro` registration, Storybook stories,
   18 tests, `grid.mdx` + `mosaic.mdx` (Install / examples / theming + `::part`
   / presentational-a11y notes), sidebar entries, FEATURES.md bump.
-- **Gotcha re-hit:** a backtick inside a `css\`\`` *comment* terminates the
+- **Gotcha re-hit:** a backtick inside a `css\`\`` _comment_ terminates the
   template literal (TS1005 cascade). Keep CSS comments backtick-free.
 
 `pnpm verify` green at **321 component tests** / 67 components / 54 families.
@@ -1094,13 +1712,13 @@ Finished the input/form-control family with the same per-component playbook, one
 commit each (all local, **not pushed**):
 
 - **select**: added `--fluid-select-border-width / -radius / -font-family /
-  -focus-ring-width` aliases; all three size rules + listbox now floor to
+-focus-ring-width` aliases; all three size rules + listbox now floor to
   `--fluid-target-min`.
 - **typeahead**: same alias set falling through to `--fluid-field-*`; focus halo
   reads `--fluid-focus-ring-width`; keyboard table in docs corrected to the
   actual handler (no Home/End).
 - **slider**: new `--fluid-slider-track-size / -radius / -font-family /
-  -value-fg / -focus-ring / -focus-ring-width`; the input *row* floors to
+-value-fg / -focus-ring / -focus-ring-width`; the input _row_ floors to
   `--fluid-target-min` so the drag target hits 44px at AAA without thickening the
   track.
 - **color-picker**: preset chips floor to `--fluid-target-min`; added
@@ -1115,8 +1733,9 @@ commit each (all local, **not pushed**):
 Each: full `@cssproperty`/`@uses-token` JSDoc (flows to CEM → docs API tables +
 Theme Builder), two rework regression tests (ladder color + measured target
 height, run in real Chromium), and a doc page rewritten to the requirement.
-`pnpm verify` green at **302 component tests**. **Next: the layout system (column
-+ grid + mosaic).**
+`pnpm verify` green at **302 component tests**. \*\*Next: the layout system (column
+
+- grid + mosaic).\*\*
 
 ### 2026-05-30: number-input, textarea, switch, checkbox → standard (one by one)
 
@@ -1148,6 +1767,7 @@ danger/warning tone tokens replacing hard-coded hex, conformance wiring, full
 
 Second component migrated (after button + button-group). `fluid-input` now
 follows the full standard:
+
 - **Override ladder**: every styled property reads a `--fluid-input-*` token
   → main var (was only bg/border/border-focus). 17 component tokens
   (`@cssproperty`) + 26 main vars (`@uses-token`), docs API tables + Theme
@@ -1228,7 +1848,7 @@ Two follow-ups after the split-button work.
 
 - **Split-button menu hid behind the docs nav pane.** Measured (Chrome MCP):
   the left nav pane is `position:fixed; z-index:5`; the menu's z-index:1000 beat
-  it on z-order but was *clipped*, not z-stacked, behind it (a fixed-containing-
+  it on z-order but was _clipped_, not z-stacked, behind it (a fixed-containing-
   block / stacking pathology, not pure z-index). Fix: render `fluid-dropdown`'s
   menu in the browser **top layer** via the Popover API (`popover="manual"` +
   showPopover/hidePopover), which escapes every clipping/stacking context.
@@ -1290,7 +1910,7 @@ only fuses.
   guard, new `--fluid-dropdown-radius`. dropdown-item gained the 2px accent
   rail to match fluid-option.
 - **Cascade gotcha (new skill lesson)**: a page `* { margin: 0 }` reset
-  (Tailwind preflight, Starlight, normalize) overrides a *normal* `:host`
+  (Tailwind preflight, Starlight, normalize) overrides a _normal_ `:host`
   margin, found via Chrome MCP (rule present + `matches()` true but computed
   `margin-left: 0`; an injected `!important` copy proved cascade loss). So the
   fusion overlap margin is `!important`, same as `::slotted(*){margin:0}`.
@@ -1402,7 +2022,7 @@ Three related changes in one session.
   `element-animations-store.ts`, the dep, and the rendering hook).
   Kept the package + controller + Storybook + docs.
 - Verified: `pnpm verify` green, `pnpm --filter @fluid-ds/docs
-  build` = 71 pages, Storybook builds clean.
+build` = 71 pages, Storybook builds clean.
 
 ### 2026-05-29: demos header parity + sidebar 404 fix
 
@@ -1482,7 +2102,7 @@ Two bugs surfaced after the marketing-landing routing pass.
      `<!doctype html>` blob and its CSS are gone; the real Vite-built
      landing has replaced it.
   4. **`_redirects`** updated with `/docs → /docs/`, `/storybook →
-     /storybook/`, etc. (301s) so the bare names work too.
+/storybook/`, etc. (301s) so the bare names work too.
   5. **`_headers`** updated with `/assets/*` (landing bundles) +
      `/docs/_astro/*` (Astro hashed) etc. for the long-cache
      immutable header.
@@ -1495,7 +2115,7 @@ Two bugs surfaced after the marketing-landing routing pass.
   with the same routing the host will use.
 - Verified: every sub-app builds; full `pnpm build:website` produces
   the expected `website/` tree (index.html, assets, docs/, storybook/,
-  playground/, demos/, _headers, _redirects).
+  playground/, demos/, \_headers, \_redirects).
 
 ### 2026-05-29: big sweep (a11y + SSR guides, 50 component pages, demo polish, theme overlay)
 
@@ -1648,9 +2268,11 @@ Pre-flight robustness pass before the first npm publish.
 - **Release workflow** at `.github/workflows/release.yml`: changesets
   action opens a "Version Packages" PR; merging it triggers
   `changeset publish --tag alpha` with provenance.
-- **Dry-run publish** at `scripts/dry-run-publish.mjs` (wired as
-  `pnpm publish:dry`): runs `pnpm publish --dry-run` on every package
-  and surfaces the tarball contents. All 8 packages publish cleanly.
+- **Historical dry-run publish** at `scripts/dry-run-publish.mjs` was initially
+  described here as invoking `pnpm publish --dry-run` for eight packages. That
+  behavior is superseded: the current 18-package command is an offline audit
+  that executes no pack, network or publish command; see the 28 August current
+  state and retained release review above.
 - **HANDOFF.md** now carries a dedicated "npm publish setup" section
   documenting the account / org / token / `NPM_TOKEN` secret steps and
   the "can you unpublish?" rules.
@@ -1721,7 +2343,7 @@ components, deliverable from a CDN with no build step.
   Astro component reads `packages/components/custom-elements.json` at
   build time and emits properties/events/slots/parts/CSS-vars tables.
   Each table is overridable per page (`<ComponentApi tag="..."
-  events={[...]} />`), pick CEM defaults, hand-write the rest.
+events={[...]} />`), pick CEM defaults, hand-write the rest.
 - **Live web components in MDX**: a Starlight Head override
   (`src/components/Head.astro`) wraps the default and injects a single
   `<script>` block importing every `@fluid-ds/components/define/*` plus

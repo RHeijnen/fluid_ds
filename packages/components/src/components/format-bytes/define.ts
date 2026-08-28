@@ -1,6 +1,6 @@
 import { FluidFormatBytes } from "./fluid-format-bytes.js";
 
-if (!customElements.get("fluid-format-bytes")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-format-bytes")) {
   customElements.define("fluid-format-bytes", FluidFormatBytes);
 }
 

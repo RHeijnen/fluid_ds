@@ -1,7 +1,8 @@
-import { LitElement, html, css, type PropertyValues, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
 import "../video/define.js";
-import type { FluidVideo } from "../video/fluid-video.js";
+import { formatMediaNumber } from "../../internal/format.js";
 
 export interface PlaylistEntry {
   src: string;
@@ -25,14 +26,17 @@ export interface PlaylistEntry {
  * @cssproperty --fluid-video-playlist-list-border - Playlist border + row separator color.
  * @cssproperty --fluid-video-playlist-item-hover-bg - Hover background for inactive rows.
  * @cssproperty --fluid-video-playlist-active-accent - Active row accent color.
+ * @cssproperty --fluid-video-playlist-focus-ring - Keyboard focus ring color.
  *
  * @uses-token --fluid-accent-base - Active row tint.
  * @uses-token --fluid-surface-base - Default background.
  * @uses-token --fluid-border-default - Row separator.
+ * @uses-token --fluid-focus-ring-color - Keyboard focus ring.
+ * @uses-token --fluid-focus-ring-width - Conformance-aware focus ring width.
  *
  * @fires fluid-change - Fired when the active index changes; detail = { index, entry }.
  */
-export class FluidVideoPlaylist extends LitElement {
+export class FluidVideoPlaylist extends FluidElement {
   static override styles = css`
     :host {
       display: grid;
@@ -64,13 +68,18 @@ export class FluidVideoPlaylist extends LitElement {
     .item:hover {
       background: var(--fluid-video-playlist-item-hover-bg, var(--fluid-surface-muted));
     }
+    .item:focus-visible {
+      outline: var(--fluid-focus-ring-width) solid
+        var(--fluid-video-playlist-focus-ring, var(--fluid-focus-ring-color));
+      outline-offset: calc(-1 * var(--fluid-focus-ring-width));
+    }
     .item[aria-pressed="true"] {
       background: color-mix(
         in srgb,
         var(--fluid-video-playlist-active-accent, var(--fluid-accent-base)) 15%,
         transparent
       );
-      color: var(--fluid-video-playlist-active-accent, var(--fluid-accent-base));
+      color: var(--fluid-video-playlist-active-fg, var(--fluid-accent-active));
       font-weight: var(--fluid-font-weight-medium);
     }
 
@@ -92,16 +101,10 @@ export class FluidVideoPlaylist extends LitElement {
 
   @state() private activeIndex = 0;
 
-  private videoEl: FluidVideo | null = null;
-
-  protected override firstUpdated(): void {
-    this.videoEl = this.renderRoot.querySelector("fluid-video") as FluidVideo | null;
-    this.videoEl?.addEventListener("fluid-ended", this.onEnded);
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.videoEl?.removeEventListener("fluid-ended", this.onEnded);
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("entries") && this.activeIndex >= this.entries.length) {
+      this.activeIndex = Math.max(0, this.entries.length - 1);
+    }
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -123,7 +126,7 @@ export class FluidVideoPlaylist extends LitElement {
   }
 
   private onEnded = () => {
-    if (!this.autoAdvance) return;
+    if (!this.isConnected || !this.autoAdvance || this.entries.length === 0) return;
     const next = this.activeIndex + 1;
     if (next < this.entries.length) {
       this.activeIndex = next;
@@ -134,7 +137,7 @@ export class FluidVideoPlaylist extends LitElement {
 
   /** Jump to a specific entry. */
   goTo(index: number): void {
-    if (index < 0 || index >= this.entries.length) return;
+    if (!Number.isInteger(index) || index < 0 || index >= this.entries.length) return;
     this.activeIndex = index;
   }
 
@@ -145,21 +148,24 @@ export class FluidVideoPlaylist extends LitElement {
         part="video"
         src=${active?.src ?? ""}
         poster=${active?.poster ?? ""}
+        label=${active?.title ?? this.term("video")}
         controls
         autoplay
         muted
         plays-inline
+        @fluid-ended=${this.onEnded}
       ></fluid-video>
-      <div part="list" class="list" role="group" aria-label="Playlist">
+      <div part="list" class="list" role="group" aria-label=${this.term("playlist")}>
         ${this.entries.map(
           (e, i) => html`
             <button
+              type="button"
               part="item"
               class="item"
               aria-pressed=${i === this.activeIndex ? "true" : "false"}
               @click=${() => this.goTo(i)}
             >
-              ${e.title ?? `Track ${i + 1}`}
+              ${e.title ?? this.term("trackNumber", formatMediaNumber(i + 1, this.localize.locale))}
             </button>
           `
         )}

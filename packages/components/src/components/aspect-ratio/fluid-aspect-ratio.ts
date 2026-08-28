@@ -62,11 +62,26 @@ export class FluidAspectRatio extends FluidElement {
    */
   @property({ reflect: true }) ratio = "1/1";
 
+  private resolvedRatio(): string {
+    const parts = (typeof this.ratio === "string" ? this.ratio : "").trim().split("/");
+    if (parts.length > 2) return "1 / 1";
+
+    const validNumber = /^(?:\d+(?:\.\d+)?|\.\d+)$/;
+    const values = parts.map((part) => part.trim());
+    if (
+      values.some(
+        (value) => !validNumber.test(value) || !Number.isFinite(Number(value)) || Number(value) <= 0
+      )
+    ) {
+      return "1 / 1";
+    }
+
+    return values.join(" / ");
+  }
+
   override render(): TemplateResult {
-    // Pass the ratio straight through as the aspect-ratio value. CSS accepts
-    // "16/9", "16 / 9", and "1" alike, so no parsing is needed.
     return html`
-      <div part="base" class="base" style="--_fluid-aspect-ratio-value: ${this.ratio};">
+      <div part="base" class="base" style="--_fluid-aspect-ratio-value: ${this.resolvedRatio()};">
         <slot></slot>
       </div>
     `;

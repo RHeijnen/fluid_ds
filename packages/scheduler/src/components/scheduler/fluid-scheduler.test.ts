@@ -1,5 +1,6 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "@fluid-ds/components/locales/nl";
 import type { FluidScheduler } from "./fluid-scheduler.js";
 import type { Availability } from "../../internal/availability.js";
 
@@ -66,13 +67,14 @@ describe("<fluid-scheduler>", () => {
   });
 
   it("shows the slot panel and sets the form value when value is provided", async () => {
-    const el = await schedulerFixture({ value: FUTURE_SLOT });
+    const form = await fixture<HTMLFormElement>(html`
+      <form><fluid-scheduler name="appointment" .availability=${ALL_DAYS} value=${FUTURE_SLOT}></fluid-scheduler></form>
+    `);
+    const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
+    await elementUpdated(el);
     expect(el.shadowRoot!.querySelector("fluid-time-slots")).to.exist;
-    const data = new FormData();
-    // The control participates in forms via ElementInternals; value is reflected.
     expect(el.value).to.equal(FUTURE_SLOT);
-    data.append("x", el.value ?? "");
-    expect(data.get("x")).to.equal(FUTURE_SLOT);
+    expect(new FormData(form).get("appointment")).to.equal(FUTURE_SLOT);
   });
 
   it("fires fluid-day-select and reveals slots when a calendar day is activated", async () => {
@@ -100,6 +102,101 @@ describe("<fluid-scheduler>", () => {
     expect(ev.detail.start).to.equal(`${FUTURE_DATE}T11:00`);
     expect(ev.detail.end).to.equal(`${FUTURE_DATE}T12:00`);
     expect(el.value).to.equal(`${FUTURE_DATE}T11:00`);
+  });
+
+  it("synchronizes FormData before fluid-change observers run", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fluid-scheduler
+          name="appointment"
+          .availability=${ALL_DAYS}
+          value=${FUTURE_SLOT}
+        ></fluid-scheduler>
+      </form>
+    `);
+    const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
+    await elementUpdated(el);
+    const slots = el.shadowRoot!.querySelector("fluid-time-slots")!;
+    const slot = {
+      start: `${FUTURE_DATE}T11:00`,
+      end: `${FUTURE_DATE}T12:00`,
+      remaining: 1,
+      state: "available"
+    };
+    const data = oneEvent(el, "fluid-change").then(() => [...new FormData(form)]);
+    slots.dispatchEvent(
+      new CustomEvent("fluid-change", {
+        detail: { value: slot.start, slot },
+        bubbles: true,
+        composed: true
+      })
+    );
+    expect(await data).to.deep.equal([["appointment", slot.start]]);
+  });
+
+  it("restores canonical form state and its selected day", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form><fluid-scheduler name="appointment" .availability=${ALL_DAYS}></fluid-scheduler></form>
+    `);
+    const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
+    el.formStateRestoreCallback(FUTURE_SLOT, "restore");
+    await elementUpdated(el);
+    expect(el.value).to.equal(FUTURE_SLOT);
+    expect(new FormData(form).get("appointment")).to.equal(FUTURE_SLOT);
+    expect(el.shadowRoot!.querySelector("fluid-time-slots")?.getAttribute("date")).to.equal(
+      FUTURE_DATE
+    );
+  });
+
+  it("localizes required validation, prompt and nested slot labels", async () => {
+    const el = await schedulerFixture();
+    el.lang = "nl";
+    el.required = true;
+    await elementUpdated(el);
+    expect(el.validationMessage).to.equal("Kies een afspraak.");
+    expect(el.shadowRoot!.querySelector('[part="prompt"]')?.textContent).to.contain(
+      "Selecteer een dag"
+    );
+    el.shadowRoot!.querySelector("fluid-calendar")!.dispatchEvent(
+      new CustomEvent("fluid-date-activate", {
+        detail: { iso: FUTURE_DATE },
+        bubbles: true,
+        composed: true
+      })
+    );
+    await elementUpdated(el);
+    const slots = el.shadowRoot!.querySelector("fluid-time-slots") as
+      | (HTMLElement & { updateComplete: Promise<unknown> })
+      | null;
+    await slots?.updateComplete;
+    expect(slots?.shadowRoot?.querySelector('[role="radiogroup"]')?.getAttribute("aria-label")).to.contain(
+      "Tijdsloten voor"
+    );
+  });
+
+  it("focuses an enabled correction day when the roving day is unavailable", async () => {
+    const today = new Date();
+    const todayISO = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, "0"),
+      String(today.getDate()).padStart(2, "0")
+    ].join("-");
+    const availability: Availability = {
+      ...ALL_DAYS,
+      exceptions: [{ date: todayISO, closed: true }]
+    };
+    const form = await fixture<HTMLFormElement>(html`
+      <form><fluid-scheduler required .availability=${availability}></fluid-scheduler></form>
+    `);
+    const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
+    const calendar = el.shadowRoot!.querySelector<HTMLElement>("fluid-calendar")!;
+    await (calendar as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete;
+
+    expect(calendar.shadowRoot!.querySelector("button.day[tabindex='0']")?.hasAttribute("disabled"))
+      .to.equal(true);
+    expect(el.reportValidity()).to.equal(false);
+    await aTimeout(0);
+    expect(calendar.shadowRoot!.activeElement).to.match("button.day:not(:disabled)");
   });
 
   it("exposes a refresh() method", async () => {
@@ -156,5 +253,58 @@ describe("<fluid-scheduler>", () => {
     if (slots) await slots.updateComplete;
     await aTimeout(20);
     await expect(el).to.be.accessible();
+  });
+
+  it("blocks day and slot commits while disabled, readonly, or loading", async () => {
+    const el = await schedulerFixture({ value: FUTURE_SLOT });
+    const seen: Event[] = [];
+    el.addEventListener("fluid-change", (event) => seen.push(event));
+    el.addEventListener("fluid-day-select", (event) => seen.push(event));
+    for (const state of ["disabled", "readonly", "loading"] as const) {
+      el[state] = true;
+      await elementUpdated(el);
+      el.shadowRoot!.querySelector("fluid-calendar")!.dispatchEvent(new CustomEvent("fluid-date-activate", {
+        detail: { iso: "2035-06-19" }, bubbles: true, composed: true
+      }));
+      el.shadowRoot!.querySelector("fluid-time-slots")!.dispatchEvent(new CustomEvent("fluid-change", {
+        detail: { slot: { start: `${FUTURE_DATE}T11:00`, end: `${FUTURE_DATE}T12:00`, state: "available" } },
+        bubbles: true, composed: true
+      }));
+      expect(el.value).to.equal(FUTURE_SLOT);
+      el[state] = false;
+    }
+    expect(seen).to.deep.equal([]);
+  });
+
+  it("updates required validity and invalidates a selection booked by another visitor", async () => {
+    const el = await schedulerFixture();
+    el.required = true;
+    await elementUpdated(el);
+    expect(el.validity.valueMissing).to.be.true;
+    el.value = FUTURE_SLOT;
+    await elementUpdated(el);
+    expect(el.checkValidity()).to.be.true;
+    el.bookings = [{ start: FUTURE_SLOT }];
+    await elementUpdated(el);
+    expect(el.validity.customError).to.be.true;
+    el.bookings = [];
+    el.value = null;
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector("fluid-time-slots")).to.equal(null);
+    expect(el.validity.valueMissing).to.be.true;
+  });
+
+  it("retains the original form-reset default after reconnect", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form><fluid-scheduler name="appointment" .availability=${ALL_DAYS} value=${FUTURE_SLOT}></fluid-scheduler></form>
+    `);
+    const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
+    el.value = `${FUTURE_DATE}T11:00`;
+    await elementUpdated(el);
+    el.remove();
+    form.append(el);
+    form.reset();
+    await elementUpdated(el);
+    expect(new FormData(form).get("appointment")).to.equal(FUTURE_SLOT);
   });
 });

@@ -31,62 +31,80 @@ import type { FluidSegment } from "./fluid-segment.js";
  * @uses-token --fluid-space-1 - Default gap between segments.
  *
  * @fires fluid-change - Fired when the value changes. `event.detail.value`.
+ * @cssproperty --fluid-segmented-control-shadow-sm - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-segmented-control-surface-base - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-segmented-control-surface-muted - Component override for the corresponding semantic token.
  */
 export class FluidSegmentedControl extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: inline-flex;
-    }
+      :host {
+        display: inline-flex;
+      }
 
-    .base {
-      position: relative;
-      display: inline-flex;
-      gap: var(--fluid-segmented-gap, var(--fluid-space-1));
-      padding: var(--fluid-space-1);
-      background: var(--fluid-segmented-bg, var(--fluid-surface-muted));
-      border-radius: var(--fluid-segmented-radius, var(--fluid-radius-lg));
-    }
+      .base {
+        position: relative;
+        display: inline-flex;
+        gap: var(--fluid-segmented-gap, var(--fluid-space-1));
+        padding: var(--fluid-space-1);
+        background: var(
+          --fluid-segmented-bg,
+          var(--fluid-segmented-control-surface-muted, var(--fluid-surface-muted))
+        );
+        border-radius: var(--fluid-segmented-radius, var(--fluid-radius-lg));
+      }
 
-    /* Sliding active indicator. Positioned over the selected segment via
+      /* Sliding active indicator. Positioned over the selected segment via
        JS-measured custom props; the segments render transparent and sit above
        it (z-index) so only this thumb provides the "raised" selected surface. */
-    .thumb {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: var(--_seg-w, 0);
-      height: var(--_seg-h, 0);
-      transform: translate(var(--_seg-x, 0), var(--_seg-y, 0));
-      background: var(--fluid-segmented-thumb-bg, var(--fluid-surface-base));
-      border-radius: var(--fluid-segment-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-shadow-sm);
-      opacity: 0;
-      pointer-events: none;
-      transition:
-        transform
-          calc(var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized)),
-        width
-          calc(var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized)),
-        height
-          calc(var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized));
-    }
-    .thumb.ready {
-      opacity: 1;
-    }
-    /* First positioning must not slide in from 0,0. */
-    .thumb.no-anim {
-      transition: none;
-    }
-    ::slotted(fluid-segment) {
-      position: relative;
-      z-index: 1;
-    }
-  `
+      .thumb {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: var(--_seg-w, 0);
+        height: var(--_seg-h, 0);
+        transform: translate(var(--_seg-x, 0), var(--_seg-y, 0));
+        background: var(
+          --fluid-segmented-thumb-bg,
+          var(--fluid-segmented-control-surface-base, var(--fluid-surface-base))
+        );
+        border-radius: var(--fluid-segment-radius, var(--fluid-radius-md));
+        box-shadow: var(--fluid-segmented-control-shadow-sm, var(--fluid-shadow-sm));
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          transform
+            calc(
+              var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) *
+                var(--fluid-motion, 1)
+            )
+            var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized)),
+          width
+            calc(
+              var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) *
+                var(--fluid-motion, 1)
+            )
+            var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized)),
+          height
+            calc(
+              var(--fluid-segmented-thumb-duration, var(--fluid-duration-normal)) *
+                var(--fluid-motion, 1)
+            )
+            var(--fluid-segmented-thumb-easing, var(--fluid-easing-emphasized));
+      }
+      .thumb.ready {
+        opacity: 1;
+      }
+      /* First positioning must not slide in from 0,0. */
+      .thumb.no-anim {
+        transition: none;
+      }
+      ::slotted(fluid-segment) {
+        position: relative;
+        z-index: 1;
+      }
+    `
   ];
 
   /** Currently selected value. */
@@ -98,6 +116,7 @@ export class FluidSegmentedControl extends FluidElement {
   @query(".base") private baseEl!: HTMLElement;
   @query(".thumb") private thumbEl!: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  private segmentObserver?: MutationObserver;
   /**
    * True for one tick right after the value changes. If a resize lands in the
    * same tick (e.g. a consumer rewrites spacing tokens this control's own
@@ -116,13 +135,25 @@ export class FluidSegmentedControl extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("keydown", this.handleKeyDown);
+    this.listen(this, "keydown", this.handleKeyDown);
+    if (typeof MutationObserver !== "undefined") {
+      this.segmentObserver?.disconnect();
+      this.segmentObserver = new MutationObserver(() => this.reconcileSegments());
+      this.segmentObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled", "value"]
+      });
+    }
+    this.reconcileSegments();
+    this.resizeObserver?.observe(this);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("keydown", this.handleKeyDown);
     this.resizeObserver?.disconnect();
+    this.segmentObserver?.disconnect();
     clearTimeout(this.valueChangeTimer);
   }
 
@@ -194,13 +225,18 @@ export class FluidSegmentedControl extends FluidElement {
 
   private syncSelection(): void {
     const segments = this.getSegments();
-    if (!this.value && segments.length) {
-      const first = segments.find((s) => !s.disabled) ?? segments[0];
-      if (first) this.value = first.value;
+    const selected = segments.find((segment) => segment.value === this.value && !segment.disabled);
+    if (!selected) {
+      this.value = segments.find((segment) => !segment.disabled)?.value ?? "";
     }
     for (const seg of segments) {
-      seg.selected = seg.value === this.value;
+      seg.selected = !seg.disabled && seg.value === this.value;
     }
+  }
+
+  private reconcileSegments(): void {
+    this.syncSelection();
+    this.positionThumb(false);
   }
 
   private handleClick = (e: Event) => {
@@ -217,10 +253,14 @@ export class FluidSegmentedControl extends FluidElement {
     let next = currentIndex;
     switch (e.key) {
       case "ArrowRight":
+        next = (currentIndex + (this.isRtl ? -1 : 1) + segments.length) % segments.length;
+        break;
+      case "ArrowLeft":
+        next = (currentIndex + (this.isRtl ? 1 : -1) + segments.length) % segments.length;
+        break;
       case "ArrowDown":
         next = (currentIndex + 1) % segments.length;
         break;
-      case "ArrowLeft":
       case "ArrowUp":
         next = (currentIndex - 1 + segments.length) % segments.length;
         break;
@@ -239,7 +279,7 @@ export class FluidSegmentedControl extends FluidElement {
     segments[next]!.focus();
   };
 
-  private handleSlotChange = () => this.syncSelection();
+  private handleSlotChange = () => this.reconcileSegments();
 
   override render(): TemplateResult {
     return html`

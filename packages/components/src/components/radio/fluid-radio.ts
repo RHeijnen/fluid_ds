@@ -86,6 +86,7 @@ export class FluidRadio extends FluidElement {
     .control {
       position: relative;
       flex-shrink: 0;
+      box-sizing: border-box;
       width: 1.125rem;
       height: 1.125rem;
       background: var(--fluid-radio-bg, var(--fluid-surface-base));
@@ -123,8 +124,7 @@ export class FluidRadio extends FluidElement {
     }
 
     :host([focused]) .control {
-      box-shadow: 0 0 0
-        var(--fluid-radio-focus-ring-width, var(--fluid-focus-ring-width))
+      box-shadow: 0 0 0 var(--fluid-radio-focus-ring-width, var(--fluid-focus-ring-width))
         var(--fluid-radio-focus-ring, var(--fluid-focus-ring-color));
     }
 
@@ -151,14 +151,12 @@ export class FluidRadio extends FluidElement {
     super.connectedCallback();
     this.setAttribute("role", "radio");
     this.tabIndex = -1;
-    this.addEventListener("focus", this.handleFocus);
-    this.addEventListener("blur", this.handleBlur);
+    this.listen(this, "focus", this.handleFocus);
+    this.listen(this, "blur", this.handleBlur);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("focus", this.handleFocus);
-    this.removeEventListener("blur", this.handleBlur);
   }
 
   protected override updated(): void {

@@ -1,0 +1,24 @@
+{
+  "name": "@fluid-ds/ssr-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser SSR and hydration contract fixtures for Fluid.",
+  "scripts": {
+    "generate": "node ./scripts/generate-fixture.mjs && node ./scripts/generate-form-focus-fixtures.mjs",
+    "pretest": "pnpm run generate",
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/scheduler": "workspace:*",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3"
+  }
+}

@@ -120,6 +120,7 @@ export class FluidProgressBar extends FluidElement {
   @property({ attribute: false }) valueFormatter?: (value: number) => string;
 
   protected override willUpdate(changed: PropertyValues<this>): void {
+    this.updateDefaultAriaLabel(this.term("progress"));
     if (changed.has("value")) {
       this.indeterminate = this.value === null || this.value === undefined;
     }
@@ -129,7 +130,7 @@ export class FluidProgressBar extends FluidElement {
     super.connectedCallback();
     this.setAttribute("role", "progressbar");
     if (!this.hasAttribute("aria-label") && !this.hasAttribute("aria-labelledby")) {
-      this.setAttribute("aria-label", "Progress");
+      this.updateDefaultAriaLabel(this.term("progress"));
     }
   }
 
@@ -137,7 +138,7 @@ export class FluidProgressBar extends FluidElement {
     if (this.indeterminate || this.value === null || this.value === undefined) {
       this.removeAttribute("aria-valuenow");
     } else {
-      const clamped = Math.max(0, Math.min(100, this.value));
+      const clamped = clampProgress(this.value);
       this.setAttribute("aria-valuenow", String(clamped));
       this.setAttribute("aria-valuemin", "0");
       this.setAttribute("aria-valuemax", "100");
@@ -145,12 +146,16 @@ export class FluidProgressBar extends FluidElement {
   }
 
   private renderLabel(): TemplateResult | "" {
-    const hasSlot = this.children.length > 0;
+    const hasSlot = (this.children?.length ?? 0) > 0;
     if (!hasSlot && !this.showValue) return "";
     const value =
-      this.value === null || this.value === undefined ? null : Math.max(0, Math.min(100, this.value));
+      this.value === null || this.value === undefined ? null : clampProgress(this.value);
     const display =
-      value === null ? "" : this.valueFormatter ? this.valueFormatter(value) : `${Math.round(value)}%`;
+      value === null
+        ? ""
+        : this.valueFormatter
+          ? this.valueFormatter(value)
+          : `${Math.round(value)}%`;
     return html`
       <div part="label" class="label">
         <slot></slot>
@@ -160,8 +165,7 @@ export class FluidProgressBar extends FluidElement {
   }
 
   override render(): TemplateResult {
-    const value =
-      this.value === null || this.value === undefined ? 0 : Math.max(0, Math.min(100, this.value));
+    const value = this.value === null || this.value === undefined ? 0 : clampProgress(this.value);
     const scale = this.indeterminate ? 1 : value / 100;
     return html`
       <div part="base" class="base">
@@ -176,4 +180,8 @@ export class FluidProgressBar extends FluidElement {
       </div>
     `;
   }
+}
+
+function clampProgress(value: number): number {
+  return Math.max(0, Math.min(100, Number.isNaN(value) ? 0 : value));
 }

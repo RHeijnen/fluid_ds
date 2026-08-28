@@ -1,6 +1,6 @@
 import { FluidAvatar } from "./fluid-avatar.js";
 
-if (!customElements.get("fluid-avatar")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-avatar")) {
   customElements.define("fluid-avatar", FluidAvatar);
 }
 

@@ -96,6 +96,33 @@ The value is the **fraction**, not a percentage, pass `0.42` for "42%".
 
 ### Locale
 
+An explicit `locale` property or attribute wins. Otherwise the formatter follows
+the nearest declared `lang`, including across shadow hosts, then falls back to
+English (`en`). Changes to that inherited language update the output, including
+after reconnect. This replaces the previous browser-default behavior when no
+locale was supplied; no translation-pack import is needed for Intl formatting.
+
+An empty or malformed nearest `lang` is an English boundary. Unsupported language
+tags use English as their final fallback. Explicit malformed `locale` values are
+not treated as absent: remove the attribute or set the property to `null` to resume
+inheritance. Regional and supported numbering/calendar extensions are preserved.
+
+```html
+<div lang="fr">
+  <fluid-format-number value="1234567.89"></fluid-format-number>
+</div>
+```
+
+Malformed explicit locales, including an empty string, and invalid formatting
+options preserve the existing fallback to the plain numeric value.
+
+<Aside type="note">
+  Native ancestor language inheritance during SSR remains unverified and is not
+  provided by this formatter change. Pass an explicit `locale` for predictable
+  server output; without available context the server uses English. This does
+  not promise full locale hydration parity or request-scoped translation state.
+</Aside>
+
 <Demo>
   <fluid-format-number value="1234567.89" locale="fr-FR"></fluid-format-number><br/>
   <fluid-format-number value="1234567.89" locale="de-DE"></fluid-format-number><br/>

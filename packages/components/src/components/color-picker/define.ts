@@ -1,6 +1,6 @@
 import { FluidColorPicker } from "./fluid-color-picker.js";
 
-if (!customElements.get("fluid-color-picker")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-color-picker")) {
   customElements.define("fluid-color-picker", FluidColorPicker);
 }
 

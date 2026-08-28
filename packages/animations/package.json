@@ -1,8 +1,9 @@
 {
   "name": "@fluid-ds/animations",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Attribute-driven animation system for Fluid. A registry of named keyframes plus a global controller that watches data-fluid-animation attributes on any element.",
   "type": "module",
+  "customElements": "custom-elements.json",
   "license": "MIT",
   "author": "Fluid contributors",
   "homepage": "https://github.com/RHeijnen/fluid_ds",
@@ -26,8 +27,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./custom-elements.json": "./custom-elements.json",
     ".": {
       "types": "./src/index.ts",
+      "node": "./dist/index.js",
       "import": "./src/index.ts"
     },
     "./register-defaults": {
@@ -55,6 +58,7 @@
     "access": "public",
     "tag": "latest",
     "exports": {
+      "./custom-elements.json": "./custom-elements.json",
       ".": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
@@ -82,10 +86,12 @@
     }
   },
   "files": [
+    "custom-elements.json",
     "dist",
     "src",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": [
     "**/register-defaults.js",
@@ -100,7 +106,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test": "web-test-runner --config web-test-runner.config.js",
+    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {

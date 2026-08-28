@@ -16,6 +16,10 @@ export class FluidFormAssociated extends FluidElement {
   static formAssociated = true;
 
   protected readonly internals: ElementInternals;
+  private validationFlags: ValidityStateFlags = {};
+  private validationMessageText = "";
+  private validationAnchor?: HTMLElement;
+  private customValidationMessage = "";
 
   /**
    * The control's name. Submitted with the form alongside `value`.
@@ -63,11 +67,8 @@ export class FluidFormAssociated extends FluidElement {
 
   /** Imperatively set a custom validation message. Pass "" to clear. */
   setCustomValidity(message: string): void {
-    if (message) {
-      this.internals.setValidity({ customError: true }, message);
-    } else {
-      this.internals.setValidity({});
-    }
+    this.customValidationMessage = message;
+    this.applyValidity();
   }
 
   /**
@@ -83,12 +84,20 @@ export class FluidFormAssociated extends FluidElement {
    * Anchor element is the focusable element inside shadow DOM that should
    * receive focus when validation fails (typically the inner <input>).
    */
-  protected setValidity(
-    flags: ValidityStateFlags,
-    message?: string,
-    anchor?: HTMLElement
-  ): void {
-    this.internals.setValidity(flags, message, anchor);
+  protected setValidity(flags: ValidityStateFlags, message?: string, anchor?: HTMLElement): void {
+    this.validationFlags = { ...flags };
+    this.validationMessageText = message ?? "";
+    this.validationAnchor = anchor;
+    this.applyValidity();
+  }
+
+  private applyValidity(): void {
+    const flags: ValidityStateFlags = {
+      ...this.validationFlags,
+      ...(this.customValidationMessage ? { customError: true } : {})
+    };
+    const message = this.customValidationMessage || this.validationMessageText || undefined;
+    this.internals.setValidity(flags, message, this.validationAnchor);
   }
 
   /* Form lifecycle callbacks invoked by the platform. ──────────────────── */

@@ -1,6 +1,6 @@
 import { FluidLightbox } from "./fluid-lightbox.js";
 
-if (!customElements.get("fluid-lightbox")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-lightbox")) {
   customElements.define("fluid-lightbox", FluidLightbox);
 }
 

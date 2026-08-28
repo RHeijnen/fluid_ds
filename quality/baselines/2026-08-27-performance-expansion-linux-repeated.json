@@ -1,0 +1,880 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "measurementValid": true,
+  "generatedAt": "2026-08-27T15:41:11.478Z",
+  "config": {
+    "warmupRuns": 1,
+    "sampleRuns": 5,
+    "reconnectCycles": 20,
+    "budgeted": false
+  },
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "linux",
+    "arch": "x64",
+    "osType": "Linux",
+    "osRelease": "6.6.87.2-microsoft-standard-WSL2",
+    "hostname": "75d610707b15",
+    "cpuModel": "Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz",
+    "cpuCount": 6,
+    "availableParallelism": 6,
+    "totalMemoryBytes": 8290803712,
+    "browser": "chromium",
+    "browserVersion": "148.0.7778.96",
+    "headless": true,
+    "preciseMemoryInfo": true,
+    "ci": false
+  },
+  "bundles": {
+    "table": {
+      "name": "table",
+      "bytes": 39361,
+      "gzipBytes": 13996,
+      "modules": 22,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "chart": {
+      "name": "chart",
+      "bytes": 247338,
+      "gzipBytes": 85296,
+      "modules": 25,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "scheduler": {
+      "name": "scheduler",
+      "bytes": 68229,
+      "gzipBytes": 20864,
+      "modules": 32,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "editor": {
+      "name": "editor",
+      "bytes": 70377,
+      "gzipBytes": 25551,
+      "modules": 25,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "parser": {
+      "name": "parser",
+      "bytes": 611078,
+      "gzipBytes": 195461,
+      "modules": 51,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "map": {
+      "name": "map",
+      "bytes": 189055,
+      "gzipBytes": 57603,
+      "modules": 23,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "node-graph": {
+      "name": "node-graph",
+      "bytes": 58682,
+      "gzipBytes": 18698,
+      "modules": 22,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    }
+  },
+  "cases": {
+    "table": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 85.69999999925494,
+          "updateMilliseconds": 62.099999997764826,
+          "renderedMarker": "table",
+          "reconnectMilliseconds": 720.6000000014901,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2385028,
+          "heapAfterBytes": 2432824,
+          "lifecycleHeapGrowthBytes": 47796,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 55,
+          "updateMilliseconds": 119.69999999925494,
+          "renderedMarker": "table",
+          "reconnectMilliseconds": 691.3999999985099,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2387196,
+          "heapAfterBytes": 2435052,
+          "lifecycleHeapGrowthBytes": 47856,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 47.400000002235174,
+          "updateMilliseconds": 53.399999998509884,
+          "renderedMarker": "table",
+          "reconnectMilliseconds": 689.8000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2385028,
+          "heapAfterBytes": 2432824,
+          "lifecycleHeapGrowthBytes": 47796,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 42,
+          "updateMilliseconds": 61.900000002235174,
+          "renderedMarker": "table",
+          "reconnectMilliseconds": 745.0999999977648,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2386268,
+          "heapAfterBytes": 2434064,
+          "lifecycleHeapGrowthBytes": 47796,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 39.600000001490116,
+          "updateMilliseconds": 37.29999999701977,
+          "renderedMarker": "table",
+          "reconnectMilliseconds": 651.3000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2385040,
+          "heapAfterBytes": 2432836,
+          "lifecycleHeapGrowthBytes": 47796,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 39.600000001490116,
+          "median": 47.400000002235174,
+          "p90": 85.69999999925494,
+          "p95": 85.69999999925494,
+          "p99": 85.69999999925494,
+          "maximum": 85.69999999925494,
+          "mean": 53.940000000596044,
+          "variance": 280.15839997614023,
+          "standardDeviation": 16.737932966054686,
+          "coefficientOfVariation": 0.31030650659751075
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 37.29999999701977,
+          "median": 61.900000002235174,
+          "p90": 119.69999999925494,
+          "p95": 119.69999999925494,
+          "p99": 119.69999999925494,
+          "maximum": 119.69999999925494,
+          "mean": 66.87999999895692,
+          "variance": 778.8576000273764,
+          "standardDeviation": 27.908020353070125,
+          "coefficientOfVariation": 0.4172849933239442
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 651.3000000007451,
+          "median": 691.3999999985099,
+          "p90": 745.0999999977648,
+          "p95": 745.0999999977648,
+          "p99": 745.0999999977648,
+          "maximum": 745.0999999977648,
+          "mean": 699.6399999998509,
+          "variance": 1001.482399959421,
+          "standardDeviation": 31.646206723072215,
+          "coefficientOfVariation": 0.045232128985019375
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 47796,
+          "median": 47796,
+          "p90": 47856,
+          "p95": 47856,
+          "p99": 47856,
+          "maximum": 47856,
+          "mean": 47808,
+          "variance": 576,
+          "standardDeviation": 24,
+          "coefficientOfVariation": 0.000502008032128514
+        }
+      }
+    },
+    "chart": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 94.89999999850988,
+          "updateMilliseconds": 40.80000000074506,
+          "renderedMarker": "chart",
+          "reconnectMilliseconds": 680.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2737376,
+          "heapAfterBytes": 3171508,
+          "lifecycleHeapGrowthBytes": 434132,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 66.59999999776483,
+          "updateMilliseconds": 29,
+          "renderedMarker": "chart",
+          "reconnectMilliseconds": 662.3000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2737376,
+          "heapAfterBytes": 3171384,
+          "lifecycleHeapGrowthBytes": 434008,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 82.89999999850988,
+          "updateMilliseconds": 38.69999999925494,
+          "renderedMarker": "chart",
+          "reconnectMilliseconds": 680.8000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2735872,
+          "heapAfterBytes": 3169344,
+          "lifecycleHeapGrowthBytes": 433472,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 68.30000000074506,
+          "updateMilliseconds": 25.800000000745058,
+          "renderedMarker": "chart",
+          "reconnectMilliseconds": 655.8999999985099,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2737376,
+          "heapAfterBytes": 3171384,
+          "lifecycleHeapGrowthBytes": 434008,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 66.60000000149012,
+          "updateMilliseconds": 29.099999997764826,
+          "renderedMarker": "chart",
+          "reconnectMilliseconds": 647.1000000014901,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2737356,
+          "heapAfterBytes": 3170968,
+          "lifecycleHeapGrowthBytes": 433612,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 66.59999999776483,
+          "median": 68.30000000074506,
+          "p90": 94.89999999850988,
+          "p95": 94.89999999850988,
+          "p99": 94.89999999850988,
+          "maximum": 94.89999999850988,
+          "mean": 75.85999999940395,
+          "variance": 128.14639998496176,
+          "standardDeviation": 11.320176676402262,
+          "coefficientOfVariation": 0.1492245804968522
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 25.800000000745058,
+          "median": 29.099999997764826,
+          "p90": 40.80000000074506,
+          "p95": 40.80000000074506,
+          "p99": 40.80000000074506,
+          "maximum": 40.80000000074506,
+          "mean": 32.67999999970198,
+          "variance": 35.17360000177622,
+          "standardDeviation": 5.930733512962475,
+          "coefficientOfVariation": 0.18147899366635742
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 647.1000000014901,
+          "median": 662.3000000007451,
+          "p90": 680.8000000007451,
+          "p95": 680.8000000007451,
+          "p99": 680.8000000007451,
+          "maximum": 680.8000000007451,
+          "mean": 665.320000000298,
+          "variance": 179.97759999846818,
+          "standardDeviation": 13.415573040256916,
+          "coefficientOfVariation": 0.020164091024245337
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 433472,
+          "median": 434008,
+          "p90": 434132,
+          "p95": 434132,
+          "p99": 434132,
+          "maximum": 434132,
+          "mean": 433846.4,
+          "variance": 65783.04000000001,
+          "standardDeviation": 256.48204615528164,
+          "coefficientOfVariation": 0.0005911816858576713
+        }
+      }
+    },
+    "scheduler": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 52.19999999925494,
+          "updateMilliseconds": 35,
+          "renderedMarker": "scheduler",
+          "reconnectMilliseconds": 656.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2324040,
+          "heapAfterBytes": 2445468,
+          "lifecycleHeapGrowthBytes": 121428,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 73,
+          "updateMilliseconds": 41,
+          "renderedMarker": "scheduler",
+          "reconnectMilliseconds": 637.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2324076,
+          "heapAfterBytes": 2445504,
+          "lifecycleHeapGrowthBytes": 121428,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 63.5,
+          "updateMilliseconds": 47.599999997764826,
+          "renderedMarker": "scheduler",
+          "reconnectMilliseconds": 672.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2324040,
+          "heapAfterBytes": 2445468,
+          "lifecycleHeapGrowthBytes": 121428,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 48.900000002235174,
+          "updateMilliseconds": 31.5,
+          "renderedMarker": "scheduler",
+          "reconnectMilliseconds": 660.8000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2325200,
+          "heapAfterBytes": 2445644,
+          "lifecycleHeapGrowthBytes": 120444,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 68.69999999925494,
+          "updateMilliseconds": 32.80000000074506,
+          "renderedMarker": "scheduler",
+          "reconnectMilliseconds": 644.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2324076,
+          "heapAfterBytes": 2445504,
+          "lifecycleHeapGrowthBytes": 121428,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 48.900000002235174,
+          "median": 63.5,
+          "p90": 73,
+          "p95": 73,
+          "p99": 73,
+          "maximum": 73,
+          "mean": 61.26000000014901,
+          "variance": 86.61039998943208,
+          "standardDeviation": 9.3064708665225,
+          "coefficientOfVariation": 0.1519175786238959
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 31.5,
+          "median": 35,
+          "p90": 47.599999997764826,
+          "p95": 47.599999997764826,
+          "p99": 47.599999997764826,
+          "maximum": 47.599999997764826,
+          "mean": 37.579999999701975,
+          "variance": 35.71359998961687,
+          "standardDeviation": 5.976085674554613,
+          "coefficientOfVariation": 0.15902303551362443
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 637.5,
+          "median": 656.5,
+          "p90": 672.5,
+          "p95": 672.5,
+          "p99": 672.5,
+          "maximum": 672.5,
+          "mean": 654.3600000001491,
+          "variance": 151.31840000191926,
+          "standardDeviation": 12.301154417448764,
+          "coefficientOfVariation": 0.01879875667437796
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 120444,
+          "median": 121428,
+          "p90": 121428,
+          "p95": 121428,
+          "p99": 121428,
+          "maximum": 121428,
+          "mean": 121231.2,
+          "variance": 154920.96000000002,
+          "standardDeviation": 393.6,
+          "coefficientOfVariation": 0.00324668897115594
+        }
+      }
+    },
+    "editor": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 22.700000002980232,
+          "updateMilliseconds": 32.099999997764826,
+          "renderedMarker": "editor",
+          "reconnectMilliseconds": 645.9000000022352,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2206124,
+          "heapAfterBytes": 2260504,
+          "lifecycleHeapGrowthBytes": 54380,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 19.399999998509884,
+          "updateMilliseconds": 29.900000002235174,
+          "renderedMarker": "editor",
+          "reconnectMilliseconds": 649.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2206124,
+          "heapAfterBytes": 2260504,
+          "lifecycleHeapGrowthBytes": 54380,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 20.799999997019768,
+          "updateMilliseconds": 40.600000001490116,
+          "renderedMarker": "editor",
+          "reconnectMilliseconds": 674.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2206124,
+          "heapAfterBytes": 2260504,
+          "lifecycleHeapGrowthBytes": 54380,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 22.299999997019768,
+          "updateMilliseconds": 39.400000002235174,
+          "renderedMarker": "editor",
+          "reconnectMilliseconds": 662.5999999977648,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2206124,
+          "heapAfterBytes": 2260504,
+          "lifecycleHeapGrowthBytes": 54380,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 14.199999999254942,
+          "updateMilliseconds": 33.19999999925494,
+          "renderedMarker": "editor",
+          "reconnectMilliseconds": 643.2000000029802,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2206124,
+          "heapAfterBytes": 2260504,
+          "lifecycleHeapGrowthBytes": 54380,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 14.199999999254942,
+          "median": 20.799999997019768,
+          "p90": 22.700000002980232,
+          "p95": 22.700000002980232,
+          "p99": 22.700000002980232,
+          "maximum": 22.700000002980232,
+          "mean": 19.87999999895692,
+          "variance": 9.429600001358986,
+          "standardDeviation": 3.0707653771265213,
+          "coefficientOfVariation": 0.15446505921970025
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 29.900000002235174,
+          "median": 33.19999999925494,
+          "p90": 40.600000001490116,
+          "p95": 40.600000001490116,
+          "p99": 40.600000001490116,
+          "maximum": 40.600000001490116,
+          "mean": 35.040000000596045,
+          "variance": 17.67440000579357,
+          "standardDeviation": 4.204093244184002,
+          "coefficientOfVariation": 0.11997983002604135
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 643.2000000029802,
+          "median": 649.5,
+          "p90": 674.5,
+          "p95": 674.5,
+          "p99": 674.5,
+          "maximum": 674.5,
+          "mean": 655.140000000596,
+          "variance": 138.04239997083545,
+          "standardDeviation": 11.749144648476989,
+          "coefficientOfVariation": 0.017933792240538357
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 54380,
+          "median": 54380,
+          "p90": 54380,
+          "p95": 54380,
+          "p99": 54380,
+          "maximum": 54380,
+          "mean": 54380,
+          "variance": 0,
+          "standardDeviation": 0,
+          "coefficientOfVariation": 0
+        }
+      }
+    },
+    "parser": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 16.899999998509884,
+          "updateMilliseconds": 58.5,
+          "renderedMarker": "parser",
+          "reconnectMilliseconds": 658.9000000022352,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2334248,
+          "heapAfterBytes": 2375396,
+          "lifecycleHeapGrowthBytes": 41148,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 10.900000002235174,
+          "updateMilliseconds": 81.5,
+          "renderedMarker": "parser",
+          "reconnectMilliseconds": 651.6000000014901,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2334016,
+          "heapAfterBytes": 2375300,
+          "lifecycleHeapGrowthBytes": 41284,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 11.400000002235174,
+          "updateMilliseconds": 50.100000001490116,
+          "renderedMarker": "parser",
+          "reconnectMilliseconds": 651.2000000029802,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2334492,
+          "heapAfterBytes": 2375640,
+          "lifecycleHeapGrowthBytes": 41148,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 13.200000002980232,
+          "updateMilliseconds": 46.5,
+          "renderedMarker": "parser",
+          "reconnectMilliseconds": 652.8999999985099,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2334492,
+          "heapAfterBytes": 2375640,
+          "lifecycleHeapGrowthBytes": 41148,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 21.299999997019768,
+          "updateMilliseconds": 118.70000000298023,
+          "renderedMarker": "parser",
+          "reconnectMilliseconds": 646.8999999985099,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2332968,
+          "heapAfterBytes": 2378484,
+          "lifecycleHeapGrowthBytes": 45516,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 10.900000002235174,
+          "median": 13.200000002980232,
+          "p90": 21.299999997019768,
+          "p95": 21.299999997019768,
+          "p99": 21.299999997019768,
+          "maximum": 21.299999997019768,
+          "mean": 14.740000000596046,
+          "variance": 15.194399982637169,
+          "standardDeviation": 3.897999484689187,
+          "coefficientOfVariation": 0.2644504399275144
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 46.5,
+          "median": 58.5,
+          "p90": 118.70000000298023,
+          "p95": 118.70000000298023,
+          "p99": 118.70000000298023,
+          "maximum": 118.70000000298023,
+          "mean": 71.06000000089406,
+          "variance": 715.7664000442982,
+          "standardDeviation": 26.753810944317788,
+          "coefficientOfVariation": 0.3764960729521697
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 646.8999999985099,
+          "median": 651.6000000014901,
+          "p90": 658.9000000022352,
+          "p95": 658.9000000022352,
+          "p99": 658.9000000022352,
+          "maximum": 658.9000000022352,
+          "mean": 652.3000000007451,
+          "variance": 14.956000007033348,
+          "standardDeviation": 3.8672987998127772,
+          "coefficientOfVariation": 0.005928711942064019
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 41148,
+          "median": 41148,
+          "p90": 45516,
+          "p95": 45516,
+          "p99": 45516,
+          "maximum": 45516,
+          "mean": 42048.8,
+          "variance": 3008143.3600000003,
+          "standardDeviation": 1734.4,
+          "coefficientOfVariation": 0.04124731264625863
+        }
+      }
+    },
+    "map": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 38.399999998509884,
+          "updateMilliseconds": 15.5,
+          "renderedMarker": "map",
+          "reconnectMilliseconds": 654.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2622820,
+          "heapAfterBytes": 3088488,
+          "lifecycleHeapGrowthBytes": 465668,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 50.100000001490116,
+          "updateMilliseconds": 26.5,
+          "renderedMarker": "map",
+          "reconnectMilliseconds": 649.2999999970198,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2622820,
+          "heapAfterBytes": 3088088,
+          "lifecycleHeapGrowthBytes": 465268,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 36.20000000298023,
+          "updateMilliseconds": 24.399999998509884,
+          "renderedMarker": "map",
+          "reconnectMilliseconds": 656,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2622820,
+          "heapAfterBytes": 3088112,
+          "lifecycleHeapGrowthBytes": 465292,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 34.899999998509884,
+          "updateMilliseconds": 16.600000001490116,
+          "renderedMarker": "map",
+          "reconnectMilliseconds": 653.8000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2622820,
+          "heapAfterBytes": 3088032,
+          "lifecycleHeapGrowthBytes": 465212,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 31.300000000745058,
+          "updateMilliseconds": 29.699999999254942,
+          "renderedMarker": "map",
+          "reconnectMilliseconds": 654.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2622820,
+          "heapAfterBytes": 3087524,
+          "lifecycleHeapGrowthBytes": 464704,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 31.300000000745058,
+          "median": 36.20000000298023,
+          "p90": 50.100000001490116,
+          "p95": 50.100000001490116,
+          "p99": 50.100000001490116,
+          "maximum": 50.100000001490116,
+          "mean": 38.18000000044704,
+          "variance": 40.829600004518035,
+          "standardDeviation": 6.389804379205833,
+          "coefficientOfVariation": 0.167359988976716
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 15.5,
+          "median": 24.399999998509884,
+          "p90": 29.699999999254942,
+          "p95": 29.699999999254942,
+          "p99": 29.699999999254942,
+          "maximum": 29.699999999254942,
+          "mean": 22.539999999850988,
+          "variance": 31.050399993216992,
+          "standardDeviation": 5.572288577704586,
+          "coefficientOfVariation": 0.2472177718607553
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 649.2999999970198,
+          "median": 654.5,
+          "p90": 656,
+          "p95": 656,
+          "p99": 656,
+          "maximum": 656,
+          "mean": 653.619999999553,
+          "variance": 5.181600005203486,
+          "standardDeviation": 2.276312809172651,
+          "coefficientOfVariation": 0.0034826241687436242
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 464704,
+          "median": 465268,
+          "p90": 465668,
+          "p95": 465668,
+          "p99": 465668,
+          "maximum": 465668,
+          "mean": 465228.8,
+          "variance": 94824.95999999999,
+          "standardDeviation": 307.9366168548326,
+          "coefficientOfVariation": 0.0006619035985193363
+        }
+      }
+    },
+    "node-graph": {
+      "samples": [
+        {
+          "initialRenderMilliseconds": 54.19999999925494,
+          "updateMilliseconds": 36,
+          "renderedMarker": "node-graph",
+          "reconnectMilliseconds": 653.5,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2420552,
+          "heapAfterBytes": 2502288,
+          "lifecycleHeapGrowthBytes": 81736,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 44.29999999701977,
+          "updateMilliseconds": 24,
+          "renderedMarker": "node-graph",
+          "reconnectMilliseconds": 658.5999999977648,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2420552,
+          "heapAfterBytes": 2502288,
+          "lifecycleHeapGrowthBytes": 81736,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 60.19999999925494,
+          "updateMilliseconds": 38.19999999925494,
+          "renderedMarker": "node-graph",
+          "reconnectMilliseconds": 650,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2420552,
+          "heapAfterBytes": 2502312,
+          "lifecycleHeapGrowthBytes": 81760,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 36.30000000074506,
+          "updateMilliseconds": 29.300000000745058,
+          "renderedMarker": "node-graph",
+          "reconnectMilliseconds": 654.9000000022352,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2420552,
+          "heapAfterBytes": 2502272,
+          "lifecycleHeapGrowthBytes": 81720,
+          "heapCalibrationGrowthBytes": 4000064
+        },
+        {
+          "initialRenderMilliseconds": 63.899999998509884,
+          "updateMilliseconds": 39.5,
+          "renderedMarker": "node-graph",
+          "reconnectMilliseconds": 649.3000000007451,
+          "reconnectCycles": 20,
+          "heapBeforeBytes": 2418608,
+          "heapAfterBytes": 2500304,
+          "lifecycleHeapGrowthBytes": 81696,
+          "heapCalibrationGrowthBytes": 4000064
+        }
+      ],
+      "summaries": {
+        "initialRenderMilliseconds": {
+          "count": 5,
+          "minimum": 36.30000000074506,
+          "median": 54.19999999925494,
+          "p90": 63.899999998509884,
+          "p95": 63.899999998509884,
+          "p99": 63.899999998509884,
+          "maximum": 63.899999998509884,
+          "mean": 51.77999999895692,
+          "variance": 103.84559999384881,
+          "standardDeviation": 10.190466132314498,
+          "coefficientOfVariation": 0.19680313118037426
+        },
+        "updateMilliseconds": {
+          "count": 5,
+          "minimum": 24,
+          "median": 36,
+          "p90": 39.5,
+          "p95": 39.5,
+          "p99": 39.5,
+          "maximum": 39.5,
+          "mean": 33.4,
+          "variance": 34.435999997347594,
+          "standardDeviation": 5.868219491238173,
+          "coefficientOfVariation": 0.1756951943484483
+        },
+        "reconnectMilliseconds": {
+          "count": 5,
+          "minimum": 649.3000000007451,
+          "median": 653.5,
+          "p90": 658.5999999977648,
+          "p95": 658.5999999977648,
+          "p99": 658.5999999977648,
+          "maximum": 658.5999999977648,
+          "mean": 653.260000000149,
+          "variance": 11.51439999551177,
+          "standardDeviation": 3.3932874908430275,
+          "coefficientOfVariation": 0.005194390427765749
+        },
+        "lifecycleHeapGrowthBytes": {
+          "count": 5,
+          "minimum": 81696,
+          "median": 81736,
+          "p90": 81760,
+          "p95": 81760,
+          "p99": 81760,
+          "maximum": 81760,
+          "mean": 81729.6,
+          "variance": 445.43999999999994,
+          "standardDeviation": 21.10544953323667,
+          "coefficientOfVariation": 0.0002582350768049356
+        }
+      }
+    }
+  }
+}

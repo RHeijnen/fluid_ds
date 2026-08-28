@@ -1,9 +1,9 @@
 # @fluid-ds/components
 
 Framework-agnostic web components for [Fluid](https://github.com/RHeijnen/fluid_ds).
-~50 standard custom elements, buttons, inputs, dialogs, drawers, tabs,
-trees, tooltips, popovers, and more. Drop into any HTML page, React, Vue,
-Angular, Svelte, or SolidJS.
+124 standard custom elements across 103 component families, buttons, inputs,
+dialogs, drawers, tabs, trees, tooltips, popovers, and more. Drop into any
+HTML page, React, Vue, Angular, Svelte, or SolidJS.
 
 ```html
 <fluid-button>Hello, Fluid</fluid-button>
@@ -53,17 +53,52 @@ The root `@fluid-ds/components` entry **exports the classes but does not
 register the elements**, always go through `/define/<name>` for
 registration so unused components stay out of your bundle.
 
+## Server rendering and hydration
+
+All package entries and registration modules are safe to import without a DOM.
+Render with Lit SSR as usual, then load the hydration support entry before Lit
+or any Fluid definition in the browser:
+
+```ts
+import "@fluid-ds/components/ssr-client";
+import "@fluid-ds/components/define/button";
+```
+
+The server output uses declarative shadow DOM. Browsers without declarative
+shadow DOM support need an application-level polyfill.
+
+## Localization and RTL
+
+Built-in labels resolve from the nearest `lang` attribute, with English as the
+fallback. Register a dictionary once before rendering components:
+
+```ts
+import { registerTranslation } from "@fluid-ds/components";
+
+registerTranslation({
+  $code: "nl",
+  dismiss: "Sluiten",
+  nextPage: "Volgende pagina",
+  previousPage: "Vorige pagina"
+});
+```
+
+Regional locales fall back to their base language, for example `nl-BE` to
+`nl`. Set `dir="rtl"` on the document or the nearest section for right-to-left
+layout and direction-aware keyboard navigation. A translation may also declare
+`$dir: "rtl"` for programmatic direction checks.
+
 ## What's in the box
 
 Inputs · Layout · Feedback · Navigation · Content · Format helpers:
-~50 elements total. Full reference at
-[the docs site](https://github.com/RHeijnen/fluid_ds#three-surfaces).
+124 elements total. Full reference at
+[the docs site](https://github.com/RHeijnen/fluid_ds#five-surfaces).
 
 ## Documentation
 
-- [Docs site](https://github.com/RHeijnen/fluid_ds#three-surfaces): guides + per-component pages
-- [Storybook](https://github.com/RHeijnen/fluid_ds#three-surfaces): interactive props/states/a11y
-- [Theme builder](https://github.com/RHeijnen/fluid_ds#three-surfaces): live token editor with CSS export
+- [Docs site](https://github.com/RHeijnen/fluid_ds#five-surfaces): guides + per-component pages
+- [Storybook](https://github.com/RHeijnen/fluid_ds#five-surfaces): interactive props/states/a11y
+- [Theme builder](https://github.com/RHeijnen/fluid_ds#five-surfaces): live token editor with CSS export
 
 ## License
 

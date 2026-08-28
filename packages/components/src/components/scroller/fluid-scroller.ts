@@ -1,4 +1,4 @@
-import { html, css, type TemplateResult } from "lit";
+import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
 
@@ -16,8 +16,12 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @cssproperty --fluid-scroller-fade-color - Gradient stop color used for the edge fades.
  * @cssproperty --fluid-scroller-fade-size - Length of the edge fade.
+ * @cssproperty --fluid-scroller-focus-ring-color - Keyboard focus ring color.
+ * @cssproperty --fluid-scroller-focus-ring-width - Keyboard focus ring width.
  *
  * @uses-token --fluid-surface-base - Default fade color (matches background).
+ * @uses-token --fluid-focus-ring-color - Default keyboard focus ring color.
+ * @uses-token --fluid-focus-ring-width - Default keyboard focus ring width.
  */
 export class FluidScroller extends FluidElement {
   static override styles = css`
@@ -33,6 +37,13 @@ export class FluidScroller extends FluidElement {
       height: 100%;
       overflow: auto;
       scrollbar-width: thin;
+    }
+    .container:focus-visible {
+      outline: var(--fluid-scroller-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
+        var(--fluid-scroller-focus-ring-color, var(--fluid-focus-ring-color));
+      outline-offset: calc(
+        -1 * var(--fluid-scroller-focus-ring-width, var(--fluid-focus-ring-width, 2px))
+      );
     }
 
     :host([orientation="horizontal"]) .container {
@@ -50,7 +61,8 @@ export class FluidScroller extends FluidElement {
       position: absolute;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 150ms ease;
+      transition: opacity
+        calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
       background: linear-gradient(
         var(--_dir),
         var(--fluid-scroller-fade-color, var(--fluid-surface-base)),
@@ -74,6 +86,17 @@ export class FluidScroller extends FluidElement {
       width: var(--fluid-scroller-fade-size, 1.5rem);
       height: 100%;
       --_dir: to left;
+    }
+
+    :host(:dir(rtl):not([orientation="vertical"])) .fade.start {
+      left: auto;
+      right: 0;
+      --_dir: to left;
+    }
+    :host(:dir(rtl):not([orientation="vertical"])) .fade.end {
+      left: 0;
+      right: auto;
+      --_dir: to right;
     }
 
     :host([orientation="vertical"]) .fade.start {
@@ -110,37 +133,49 @@ export class FluidScroller extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    window.addEventListener("resize", this.updateFades);
+    this.listen(window, "resize", this.updateFades);
+    if (this.hasUpdated) this.observeContent();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener("resize", this.updateFades);
     this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
   }
 
   protected override firstUpdated(): void {
-    if (this.noScrollbar) {
-      this.container.style.scrollbarWidth = "none";
-      (this.container.style as unknown as Record<string, string>)["msOverflowStyle"] = "none";
+    this.observeContent();
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    if (changed.has("noScrollbar")) {
+      this.container.style.scrollbarWidth = this.noScrollbar ? "none" : "";
+    }
+    if (changed.has("orientation") || changed.has("noScrollbar")) this.updateFades();
+  }
+
+  private observeContent = (): void => {
+    if (!this.container || !this.isConnected) return;
+    this.resizeObserver ??= new ResizeObserver(this.updateFades);
+    this.resizeObserver.disconnect();
+    this.resizeObserver.observe(this.container);
+    // A slot is display:contents, not the actual content box. Observe its
+    // assigned elements so async image/content resizing refreshes the fades.
+    const slot = this.shadowRoot!.querySelector<HTMLSlotElement>("slot")!;
+    for (const child of slot.assignedElements({ flatten: true })) {
+      this.resizeObserver.observe(child);
     }
     this.updateFades();
-    // Re-check after content loads (images, async children).
-    const observer = new ResizeObserver(() => this.updateFades());
-    observer.observe(this.container);
-    for (const child of Array.from(this.container.children)) {
-      observer.observe(child);
-    }
-    this.resizeObserver = observer;
   }
 
   private updateFades = () => {
     if (!this.container) return;
     if (this.orientation === "horizontal") {
-      this.showStart = this.container.scrollLeft > 1;
-      this.showEnd =
-        this.container.scrollLeft + this.container.clientWidth < this.container.scrollWidth - 1;
+      const max = Math.max(0, this.container.scrollWidth - this.container.clientWidth);
+      const rtl = getComputedStyle(this.container).direction === "rtl";
+      const offset = Math.min(max, Math.max(0, rtl ? -this.container.scrollLeft : this.container.scrollLeft));
+      this.showStart = offset > 1;
+      this.showEnd = offset < max - 1;
     } else {
       this.showStart = this.container.scrollTop > 1;
       this.showEnd =
@@ -150,11 +185,11 @@ export class FluidScroller extends FluidElement {
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="container" @scroll=${this.updateFades}>
-        <slot @slotchange=${this.updateFades}></slot>
+      <div part="base" class="container" tabindex="0" @scroll=${this.updateFades}>
+        <slot @slotchange=${this.observeContent}></slot>
       </div>
-      <div class="fade start" ?data-visible=${this.showStart}></div>
-      <div class="fade end" ?data-visible=${this.showEnd}></div>
+      <div class="fade start" aria-hidden="true" ?data-visible=${this.showStart}></div>
+      <div class="fade end" aria-hidden="true" ?data-visible=${this.showEnd}></div>
     `;
   }
 }

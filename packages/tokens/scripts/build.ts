@@ -51,7 +51,12 @@ function resolveValue(value: string): string {
   return `var(${VAR_PREFIX}-${match[1].split(".").map(kebab).join("-")})`;
 }
 
-function emitBlock(selector: string, entries: Entry[], comment: string): string {
+function emitBlock(
+  selector: string,
+  entries: Entry[],
+  comment: string,
+  declarations: string[] = []
+): string {
   const lines: string[] = [];
   lines.push(`/* ${comment} */`);
   lines.push(`/* Generated from src/tokens.ts, do not edit. */`);
@@ -60,6 +65,7 @@ function emitBlock(selector: string, entries: Entry[], comment: string): string 
     const value = resolveValue(leaf.$value);
     lines.push(`  ${cssVar}: ${value};`);
   }
+  for (const declaration of declarations) lines.push(`  ${declaration}`);
   lines.push("}");
   lines.push("");
   return lines.join("\n");
@@ -115,9 +121,23 @@ async function main() {
     "  --fluid-target-min: 44px;\n" +
     "  --fluid-focus-ring-width: 3px;\n" +
     "}\n";
+  const motionOverride =
+    "\n/* Global motion scalar and automatic reduced-motion duration collapse. */\n" +
+    ":root { --fluid-motion: 1; }\n" +
+    "@media (prefers-reduced-motion: reduce) {\n" +
+    "  :root {\n" +
+    "    --fluid-motion: 0;\n" +
+    "    --fluid-duration-fast: 0.01ms;\n" +
+    "    --fluid-duration-normal: 0.01ms;\n" +
+    "    --fluid-duration-slow: 0.01ms;\n" +
+    "    --fluid-duration-slower: 0.01ms;\n" +
+    "  }\n" +
+    "}\n";
   await writeFile(
     resolve(dist, "base.css"),
-    emitBlock(":root", primEntries, "Fluid, base tokens (primitives).") + aaaOverride
+    emitBlock(":root", primEntries, "Fluid, base tokens (primitives).") +
+      aaaOverride +
+      motionOverride
   );
 
   const lightEntries = walk(semantics.light);
@@ -126,14 +146,27 @@ async function main() {
     emitBlock(
       `:root,\n:host,\n[data-fluid-theme="light"]`,
       lightEntries,
-      "Fluid, light scheme semantic tokens."
+      "Fluid, light scheme semantic tokens.",
+      ["color-scheme: light;"]
     )
   );
 
   const darkEntries = walk(semantics.dark);
+  const automaticDark = emitBlock(
+    `:root:not([data-fluid-theme="light"]),\n:host(:not([data-fluid-theme="light"]))`,
+    darkEntries,
+    "Fluid, automatic dark scheme from the operating-system preference.",
+    ["color-scheme: dark;"]
+  );
+  const explicitDark = emitBlock(
+    `[data-fluid-theme="dark"]`,
+    darkEntries,
+    "Fluid, explicit dark scheme semantic tokens.",
+    ["color-scheme: dark;"]
+  );
   await writeFile(
     resolve(dist, "dark.css"),
-    emitBlock(`[data-fluid-theme="dark"]`, darkEntries, "Fluid, dark scheme semantic tokens.")
+    `@media (prefers-color-scheme: dark) {\n${automaticDark}}\n\n${explicitDark}`
   );
 
   const manifest = buildManifest();

@@ -15,6 +15,13 @@ import "@fluid-ds/icons/register-defaults";
 // animation) can use `data-fluid-animation="…"` directly.
 import "@fluid-ds/animations/define/controller";
 import "@fluid-ds/animations/register-defaults";
+import "@fluid-ds/components/locales/ar";
+import "@fluid-ds/components/locales/ar-xb";
+import "@fluid-ds/components/locales/de";
+import "@fluid-ds/components/locales/en-xa";
+import "@fluid-ds/components/locales/es";
+import "@fluid-ds/components/locales/fr";
+import "@fluid-ds/components/locales/nl";
 
 import "./preview.css";
 
@@ -38,6 +45,7 @@ const preview: Preview = {
           "Editor",
           "Kanban",
           "Map",
+          "Node graph",
           "Parser",
           "QR",
           "*"
@@ -82,6 +90,25 @@ const preview: Preview = {
     }
   },
   globalTypes: {
+    locale: {
+      description: "Locale and writing direction",
+      defaultValue: "en",
+      toolbar: {
+        title: "Locale",
+        icon: "globe",
+        items: [
+          { value: "en", title: "English" },
+          { value: "nl", title: "Dutch" },
+          { value: "de", title: "German" },
+          { value: "fr", title: "French" },
+          { value: "es", title: "Spanish" },
+          { value: "ar", title: "Arabic (RTL)" },
+          { value: "en-XA", title: "Pseudo expanded" },
+          { value: "ar-XB", title: "Pseudo mirrored (RTL)" }
+        ],
+        dynamicTitle: true
+      }
+    },
     brand: {
       description: "Brand preset",
       defaultValue: "default",
@@ -104,6 +131,9 @@ const preview: Preview = {
       attributeName: "data-fluid-theme"
     }),
     (story, context) => {
+      const locale = (context.globals.locale ?? "en") as string;
+      document.documentElement.lang = locale;
+      document.documentElement.dir = locale === "ar" || locale === "ar-XB" ? "rtl" : "ltr";
       const brand = (context.globals.brand ?? "default") as string;
       if (brand === "default") {
         document.documentElement.removeAttribute("data-fluid-brand");

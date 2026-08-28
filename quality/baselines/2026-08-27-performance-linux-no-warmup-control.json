@@ -1,0 +1,475 @@
+{
+  "schemaVersion": 3,
+  "status": "failed",
+  "measurementValid": true,
+  "generatedAt": "2026-08-27T13:17:16.206Z",
+  "config": {
+    "browserWarmupRuns": 0,
+    "browserSampleRuns": 3,
+    "ssrWarmupIterations": 0,
+    "ssrSampleRuns": 3,
+    "ssrIterationsPerRun": 10,
+    "budgetStatistic": "p95"
+  },
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "linux",
+    "arch": "x64",
+    "osType": "Linux",
+    "osRelease": "6.6.87.2-microsoft-standard-WSL2",
+    "hostname": "abb864106bd8",
+    "cpuModel": "Intel(R) Core(TM) i5-8600K CPU @ 3.60GHz",
+    "cpuCount": 6,
+    "availableParallelism": 4,
+    "totalMemoryBytes": 8290803712,
+    "freeMemoryBytesAtReport": 6824255488,
+    "browser": "chromium",
+    "browserVersion": "148.0.7778.96",
+    "headless": true,
+    "preciseMemoryInfo": true,
+    "ci": true
+  },
+  "bundles": {
+    "button": {
+      "bytes": 55035,
+      "gzipBytes": 18883,
+      "modules": 27,
+      "budgeted": true,
+      "scenario": "core"
+    },
+    "dialog": {
+      "bytes": 43861,
+      "gzipBytes": 14770,
+      "modules": 29,
+      "budgeted": true,
+      "scenario": "core"
+    },
+    "input": {
+      "bytes": 48881,
+      "gzipBytes": 16533,
+      "modules": 32,
+      "budgeted": true,
+      "scenario": "core"
+    },
+    "react-button": {
+      "bytes": 64841,
+      "gzipBytes": 22397,
+      "modules": 179,
+      "budgeted": true,
+      "scenario": "framework-wrapper"
+    },
+    "kanban": {
+      "bytes": 43838,
+      "gzipBytes": 14921,
+      "modules": 22,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    },
+    "node-graph": {
+      "bytes": 58682,
+      "gzipBytes": 18698,
+      "modules": 22,
+      "budgeted": false,
+      "scenario": "expansion-informational"
+    }
+  },
+  "ssr": {
+    "warmupIterations": 0,
+    "sampleRuns": 3,
+    "iterationsPerRun": 10,
+    "totalIterations": 30,
+    "summary": {
+      "count": 30,
+      "minimum": 0.2331140000000005,
+      "median": 0.35102100000005976,
+      "p90": 0.8005479999999352,
+      "p95": 0.9687579999999798,
+      "p99": 13.464906000000042,
+      "maximum": 13.464906000000042,
+      "mean": 0.8614648666666767,
+      "variance": 5.515611102811609,
+      "standardDeviation": 2.348533819814313,
+      "coefficientOfVariation": 2.7262096351086855
+    },
+    "runs": [
+      {
+        "run": 0,
+        "rawMilliseconds": [
+          13.464906000000042, 0.8005479999999352, 0.4762279999999919, 0.6675400000000309,
+          0.6153360000000703, 0.4876289999999699, 0.736943999999994, 0.8005480000000489,
+          0.9687579999999798, 0.5507330000000366
+        ],
+        "summary": {
+          "count": 10,
+          "minimum": 0.4762279999999919,
+          "median": 0.7022420000000125,
+          "p90": 0.9687579999999798,
+          "p95": 13.464906000000042,
+          "p99": 13.464906000000042,
+          "maximum": 13.464906000000042,
+          "mean": 1.95691700000001,
+          "variance": 14.73639148936648,
+          "standardDeviation": 3.838800787924072,
+          "coefficientOfVariation": 1.9616574376552773
+        }
+      },
+      {
+        "run": 1,
+        "rawMilliseconds": [
+          0.4680280000000039, 0.319419000000039, 0.2854180000000497, 0.3661220000000185,
+          0.26701600000001235, 0.30831799999998566, 0.2580159999999978, 0.5079299999999876,
+          0.3680219999999963, 0.335920000000101
+        ],
+        "summary": {
+          "count": 10,
+          "minimum": 0.2580159999999978,
+          "median": 0.32766950000007,
+          "p90": 0.4680280000000039,
+          "p95": 0.5079299999999876,
+          "p99": 0.5079299999999876,
+          "maximum": 0.5079299999999876,
+          "mean": 0.3484209000000192,
+          "variance": 0.006182133780488595,
+          "standardDeviation": 0.07862654628360956,
+          "coefficientOfVariation": 0.22566541296347387
+        }
+      },
+      {
+        "run": 2,
+        "rawMilliseconds": [
+          0.26751600000000053, 0.3739219999999932, 0.28461700000002566, 0.2466150000000198,
+          0.2331140000000005, 0.23371399999996356, 0.23591399999997975, 0.30771900000002006,
+          0.3074179999999842, 0.30001800000002277
+        ],
+        "summary": {
+          "count": 10,
+          "minimum": 0.2331140000000005,
+          "median": 0.2760665000000131,
+          "p90": 0.30771900000002006,
+          "p95": 0.3739219999999932,
+          "p99": 0.3739219999999932,
+          "maximum": 0.3739219999999932,
+          "mean": 0.279056700000001,
+          "variance": 0.0018309245302103913,
+          "standardDeviation": 0.04278930392294775,
+          "coefficientOfVariation": 0.15333551899290573
+        }
+      }
+    ]
+  },
+  "browser": {
+    "warmupRuns": 0,
+    "sampleRuns": 3,
+    "budgetStatistic": "p95",
+    "budgetObservations": {
+      "definitionMilliseconds": 7,
+      "create100Milliseconds": 24,
+      "update100Milliseconds": 3,
+      "localeSwitch100Milliseconds": 10.899999998509884,
+      "hydrate100Milliseconds": 27.799999997019768,
+      "lifecycleHeapGrowthBytes": 756
+    },
+    "summaries": {
+      "definitionMilliseconds": {
+        "count": 3,
+        "minimum": 5.899999998509884,
+        "median": 6.399999998509884,
+        "p90": 7,
+        "p95": 7,
+        "p99": 7,
+        "maximum": 7,
+        "mean": 6.433333332339923,
+        "variance": 0.20222222278515498,
+        "standardDeviation": 0.449691252733645,
+        "coefficientOfVariation": 0.06990019473623077
+      },
+      "create100Milliseconds": {
+        "count": 3,
+        "minimum": 16.599999997764826,
+        "median": 17.900000002235174,
+        "p90": 24,
+        "p95": 24,
+        "p99": 24,
+        "maximum": 24,
+        "mean": 19.5,
+        "variance": 10.406666668603817,
+        "standardDeviation": 3.225936556816302,
+        "coefficientOfVariation": 0.16543264393929752
+      },
+      "update100Milliseconds": {
+        "count": 3,
+        "minimum": 2.400000002235174,
+        "median": 2.599999997764826,
+        "p90": 3,
+        "p95": 3,
+        "p99": 3,
+        "maximum": 3,
+        "mean": 2.6666666666666665,
+        "variance": 0.062222221924198996,
+        "standardDeviation": 0.24944382518755398,
+        "coefficientOfVariation": 0.09354143444533275
+      },
+      "localeSwitch100Milliseconds": {
+        "count": 3,
+        "minimum": 9.199999999254942,
+        "median": 9.800000000745058,
+        "p90": 10.899999998509884,
+        "p95": 10.899999998509884,
+        "p99": 10.899999998509884,
+        "maximum": 10.899999998509884,
+        "mean": 9.966666666169962,
+        "variance": 0.4955555549263954,
+        "standardDeviation": 0.7039570689512219,
+        "coefficientOfVariation": 0.07063114404544864
+      },
+      "hydrate100Milliseconds": {
+        "count": 3,
+        "minimum": 22.399999998509884,
+        "median": 26.600000001490116,
+        "p90": 27.799999997019768,
+        "p95": 27.799999997019768,
+        "p99": 27.799999997019768,
+        "maximum": 27.799999997019768,
+        "mean": 25.599999999006588,
+        "variance": 5.3599999998013175,
+        "standardDeviation": 2.315167380515136,
+        "coefficientOfVariation": 0.09043622580488189
+      },
+      "lifecycleHeapGrowthBytes": {
+        "count": 3,
+        "minimum": 728,
+        "median": 756,
+        "p90": 756,
+        "p95": 756,
+        "p99": 756,
+        "maximum": 756,
+        "mean": 746.6666666666666,
+        "variance": 174.22222222222226,
+        "standardDeviation": 13.199326582148888,
+        "coefficientOfVariation": 0.01767766952966369
+      }
+    },
+    "cdpSummaries": {
+      "runtimeDeltas": {
+        "TaskDuration": {
+          "count": 3,
+          "minimum": 0.21555200000000002,
+          "median": 0.23203500000000002,
+          "p90": 0.267061,
+          "p95": 0.267061,
+          "p99": 0.267061,
+          "maximum": 0.267061,
+          "mean": 0.238216,
+          "variance": 0.0004612985606666661,
+          "standardDeviation": 0.021477862106519495,
+          "coefficientOfVariation": 0.0901612910405661
+        },
+        "ScriptDuration": {
+          "count": 3,
+          "minimum": 0.041126,
+          "median": 0.042617,
+          "p90": 0.049666,
+          "p95": 0.049666,
+          "p99": 0.049666,
+          "maximum": 0.049666,
+          "mean": 0.044469666666666664,
+          "variance": 0.000013871453555555551,
+          "standardDeviation": 0.0037244400324821384,
+          "coefficientOfVariation": 0.08375237126015798
+        },
+        "LayoutDuration": {
+          "count": 3,
+          "minimum": 0.00223,
+          "median": 0.002481,
+          "p90": 0.004338,
+          "p95": 0.004338,
+          "p99": 0.004338,
+          "maximum": 0.004338,
+          "mean": 0.003016333333333333,
+          "variance": 8.839015555555553e-7,
+          "standardDeviation": 0.0009401603882080734,
+          "coefficientOfVariation": 0.31168981817042996
+        },
+        "RecalcStyleDuration": {
+          "count": 3,
+          "minimum": 0.00257,
+          "median": 0.002737,
+          "p90": 0.003909,
+          "p95": 0.003909,
+          "p99": 0.003909,
+          "maximum": 0.003909,
+          "mean": 0.0030719999999999996,
+          "variance": 3.5493266666666686e-7,
+          "standardDeviation": 0.0005957622568329307,
+          "coefficientOfVariation": 0.193933026312803
+        }
+      },
+      "hydrationDeltas": {
+        "TaskDuration": {
+          "count": 3,
+          "minimum": 0.05688,
+          "median": 0.057034999999999995,
+          "p90": 0.057217000000000004,
+          "p95": 0.057217000000000004,
+          "p99": 0.057217000000000004,
+          "maximum": 0.057217000000000004,
+          "mean": 0.057044000000000004,
+          "variance": 1.8968666666667153e-8,
+          "standardDeviation": 0.00013772678267739776,
+          "coefficientOfVariation": 0.0024143956012446137
+        },
+        "ScriptDuration": {
+          "count": 3,
+          "minimum": 0.00607,
+          "median": 0.006992,
+          "p90": 0.009722,
+          "p95": 0.009722,
+          "p99": 0.009722,
+          "maximum": 0.009722,
+          "mean": 0.007594666666666666,
+          "variance": 0.000002404454222222222,
+          "standardDeviation": 0.001550630266124785,
+          "coefficientOfVariation": 0.20417357787808793
+        },
+        "LayoutDuration": {
+          "count": 3,
+          "minimum": 0.00018,
+          "median": 0.000194,
+          "p90": 0.000358,
+          "p95": 0.000358,
+          "p99": 0.000358,
+          "maximum": 0.000358,
+          "mean": 0.000244,
+          "variance": 6.530666666666665e-9,
+          "standardDeviation": 0.0000808125402809902,
+          "coefficientOfVariation": 0.3311989355778287
+        },
+        "RecalcStyleDuration": {
+          "count": 3,
+          "minimum": 0.000701,
+          "median": 0.000709,
+          "p90": 0.000792,
+          "p95": 0.000792,
+          "p99": 0.000792,
+          "maximum": 0.000792,
+          "mean": 0.000734,
+          "variance": 1.6926666666666645e-9,
+          "standardDeviation": 0.00004114203041497423,
+          "coefficientOfVariation": 0.05605181255446081
+        }
+      }
+    },
+    "rawSamples": [
+      {
+        "run": 0,
+        "definitionMilliseconds": 7,
+        "create100Milliseconds": 24,
+        "update100Milliseconds": 3,
+        "localeSwitch100Milliseconds": 10.899999998509884,
+        "hydrate100Milliseconds": 22.399999998509884,
+        "heapBeforeBytes": 1141636,
+        "heapAfterBytes": 1142364,
+        "heapCalibrationGrowthBytes": 4000064,
+        "hydratedServerNodesPreserved": 100,
+        "hydrationFirstInteractionPassed": true,
+        "lifecycleHeapGrowthBytes": 728,
+        "cdp": {
+          "domainEnabled": true,
+          "requiredMetrics": [
+            "TaskDuration",
+            "ScriptDuration",
+            "LayoutDuration",
+            "RecalcStyleDuration"
+          ],
+          "runtimeDeltas": {
+            "TaskDuration": 0.267061,
+            "ScriptDuration": 0.049666,
+            "LayoutDuration": 0.004338,
+            "RecalcStyleDuration": 0.002737
+          },
+          "hydrationDeltas": {
+            "TaskDuration": 0.05688,
+            "ScriptDuration": 0.006992,
+            "LayoutDuration": 0.000194,
+            "RecalcStyleDuration": 0.000701
+          }
+        }
+      },
+      {
+        "run": 1,
+        "definitionMilliseconds": 6.399999998509884,
+        "create100Milliseconds": 16.599999997764826,
+        "update100Milliseconds": 2.400000002235174,
+        "localeSwitch100Milliseconds": 9.800000000745058,
+        "hydrate100Milliseconds": 26.600000001490116,
+        "heapBeforeBytes": 1141720,
+        "heapAfterBytes": 1142476,
+        "heapCalibrationGrowthBytes": 4000064,
+        "hydratedServerNodesPreserved": 100,
+        "hydrationFirstInteractionPassed": true,
+        "lifecycleHeapGrowthBytes": 756,
+        "cdp": {
+          "domainEnabled": true,
+          "requiredMetrics": [
+            "TaskDuration",
+            "ScriptDuration",
+            "LayoutDuration",
+            "RecalcStyleDuration"
+          ],
+          "runtimeDeltas": {
+            "TaskDuration": 0.21555200000000002,
+            "ScriptDuration": 0.042617,
+            "LayoutDuration": 0.002481,
+            "RecalcStyleDuration": 0.003909
+          },
+          "hydrationDeltas": {
+            "TaskDuration": 0.057034999999999995,
+            "ScriptDuration": 0.009722,
+            "LayoutDuration": 0.000358,
+            "RecalcStyleDuration": 0.000792
+          }
+        }
+      },
+      {
+        "run": 2,
+        "definitionMilliseconds": 5.899999998509884,
+        "create100Milliseconds": 17.900000002235174,
+        "update100Milliseconds": 2.599999997764826,
+        "localeSwitch100Milliseconds": 9.199999999254942,
+        "hydrate100Milliseconds": 27.799999997019768,
+        "heapBeforeBytes": 1141720,
+        "heapAfterBytes": 1142476,
+        "heapCalibrationGrowthBytes": 4000064,
+        "hydratedServerNodesPreserved": 100,
+        "hydrationFirstInteractionPassed": true,
+        "lifecycleHeapGrowthBytes": 756,
+        "cdp": {
+          "domainEnabled": true,
+          "requiredMetrics": [
+            "TaskDuration",
+            "ScriptDuration",
+            "LayoutDuration",
+            "RecalcStyleDuration"
+          ],
+          "runtimeDeltas": {
+            "TaskDuration": 0.23203500000000002,
+            "ScriptDuration": 0.041126,
+            "LayoutDuration": 0.00223,
+            "RecalcStyleDuration": 0.00257
+          },
+          "hydrationDeltas": {
+            "TaskDuration": 0.057217000000000004,
+            "ScriptDuration": 0.00607,
+            "LayoutDuration": 0.00018,
+            "RecalcStyleDuration": 0.000709
+          }
+        }
+      }
+    ]
+  },
+  "failures": [
+    "dialog bundle is 14770 B gzip; budget is 14000 B",
+    "input bundle is 16533 B gzip; budget is 16000 B",
+    "SSR mean is 0.861 ms; budget is 0.5 ms"
+  ]
+}

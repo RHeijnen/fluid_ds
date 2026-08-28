@@ -20,6 +20,7 @@
     "@fluid-ds/editor": "workspace:*",
     "@fluid-ds/kanban": "workspace:*",
     "@fluid-ds/map": "workspace:*",
+    "@fluid-ds/node-graph": "workspace:*",
     "@fluid-ds/table": "workspace:*",
     "@fluid-ds/icons": "workspace:*",
     "@fluid-ds/markdown": "workspace:*",
@@ -35,6 +36,6 @@
   "devDependencies": {
     "@types/node": "^22.10.5",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11"
+    "vite": "^6.4.3"
   }
 }

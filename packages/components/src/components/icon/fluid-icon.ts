@@ -1,7 +1,7 @@
 import { html, css, nothing, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import { getIcon, onIconRegistered } from "@fluid-ds/icons";
+import { getIcon, onIconRegistered } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 /**
@@ -39,6 +39,12 @@ export class FluidIcon extends FluidElement {
       width: 100%;
       height: 100%;
       display: block;
+    }
+
+    @media (forced-colors: active) {
+      :host {
+        color: CanvasText;
+      }
     }
   `;
 

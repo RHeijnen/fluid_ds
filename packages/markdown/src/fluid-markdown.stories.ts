@@ -53,6 +53,6 @@ export const FromValue: Story = {
 export const Sanitized: Story = {
   args: {
     value:
-      'Safe by default: `<img onerror>` and `javascript:` links are removed.\n\n<img src="x" onerror="alert(1)"> <a href="javascript:alert(1)">blocked link</a>'
+      'Safe by default: `<img onerror>` and `javascript:` links are removed.\n\n<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" onerror="alert(1)"> <a href="javascript:alert(1)">blocked link</a>'
   }
 };

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "humanAccepted": false,
+  "stable": true,
+  "generatedAt": "2026-08-27T14:50:05.958Z",
+  "sourceRevision": "28dd7a621bb0321298ec6cc1857fa7f9079b620a",
+  "platform": {
+    "id": "ubuntu-24.04-x64-node22-chromium-playwright1.60",
+    "os": "linux",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "arch": "x64",
+    "node": "v22.22.2",
+    "playwright": "1.60.0"
+  },
+  "candidate": {
+    "runCount": 3,
+    "screenshotCountPerRun": 60,
+    "variance": []
+  },
+  "acceptedSmoke": {
+    "runCount": 3,
+    "screenshotCountPerRun": 5,
+    "variance": []
+  },
+  "acceptedBaseline": {
+    "fileCount": 1009,
+    "aggregateSha256": "369356a6da2903f0040998a59c00c370886e6c0e028362fe8b390bec61b01c0f",
+    "unchangedAcrossRuns": true,
+    "worktreeClean": true,
+    "freshByteMismatches": [
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 1,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 2,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-light.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-dark.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-forced-colors.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-rtl.png"
+      },
+      {
+        "run": 3,
+        "name": "components-navigation-accordion--default-reduced-motion.png"
+      }
+    ],
+    "comparisonPolicy": "Fresh captures are required to be byte-identical to each other; the immutable accepted baseline remains governed by the configured Playwright pixel tolerance."
+  }
+}

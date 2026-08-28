@@ -1,5 +1,20 @@
 # @fluid-ds/kanban
 
+## 0.4.0
+
+### Minor Changes
+
+- Add native move buttons as a single-pointer alternative to dragging, with
+  configurable accessible labels and logical previous/next behavior in RTL.
+
+### Patch Changes
+
+- Integrate board names, card roles, move controls, counts and complete movement
+  announcements with Fluid localization while preserving caller-owned card and
+  column content.
+- Restore a card to its pickup position when a keyboard move is cancelled, fix
+  same-column drop indexing, and harden invalid move input and disconnect cleanup.
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 import { FluidDropzone } from "./fluid-dropzone.js";
 
-if (!customElements.get("fluid-dropzone")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-dropzone")) {
   customElements.define("fluid-dropzone", FluidDropzone);
 }
 

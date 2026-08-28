@@ -2,10 +2,10 @@ import { FluidMenu } from "./fluid-menu.js";
 import { FluidMenuItem } from "./fluid-menu-item.js";
 import { FluidMenuLabel } from "./fluid-menu-label.js";
 
-if (!customElements.get("fluid-menu")) customElements.define("fluid-menu", FluidMenu);
-if (!customElements.get("fluid-menu-item"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-menu")) customElements.define("fluid-menu", FluidMenu);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-menu-item"))
   customElements.define("fluid-menu-item", FluidMenuItem);
-if (!customElements.get("fluid-menu-label"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-menu-label"))
   customElements.define("fluid-menu-label", FluidMenuLabel);
 
 declare global {

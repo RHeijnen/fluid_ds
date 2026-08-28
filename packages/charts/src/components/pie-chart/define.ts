@@ -1,6 +1,6 @@
 import { FluidPieChart } from "./fluid-pie-chart.js";
 
-if (!customElements.get("fluid-pie-chart")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-pie-chart")) {
   customElements.define("fluid-pie-chart", FluidPieChart);
 }
 

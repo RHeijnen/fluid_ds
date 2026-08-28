@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import { offlineLightboxImage } from "./offline-story-fixture.js";
 
-const img = (n: number) =>
-  html`<img src="https://picsum.photos/seed/fluid${n}/200/200" alt="Sample photo ${n}" />`;
+const img = (n: number) => html`<img src=${offlineLightboxImage(n)} alt="Sample photo ${n}" />`;
 
 const meta: Meta = {
   title: "Media/Lightbox",

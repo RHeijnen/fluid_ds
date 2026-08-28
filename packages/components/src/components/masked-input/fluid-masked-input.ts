@@ -31,9 +31,14 @@ export type FluidMaskedInputSize = "sm" | "md" | "lg";
  *
  * @summary Text input that formats as you type against a mask.
  *
+ * @slot prefix - Rendered before the masked value (icons, country codes, etc.).
+ * @slot suffix - Rendered after the masked value (icons, units, country labels, etc.).
+ *
  * @csspart base - The outer container (the bordered field shell).
  * @csspart input - The internal `<input>` element. Reach it with `::part()`
  *   for any CSS not covered by a token (the escape hatch).
+ * @csspart prefix - The prefix affix box (present only when the prefix slot is filled).
+ * @csspart suffix - The suffix affix box (present only when the suffix slot is filled).
  *
  * Every styled property reads a component-scoped `--fluid-masked-input-*` token
  * that falls back to a main semantic var (the override ladder). The
@@ -53,7 +58,23 @@ export type FluidMaskedInputSize = "sm" | "md" | "lg";
  * @cssproperty --fluid-masked-input-invalid-border - Border color when invalid. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-masked-input-disabled-bg - Background when disabled. Falls back to --fluid-surface-subtle.
  * @cssproperty --fluid-masked-input-disabled-fg - Text color when disabled. Falls back to --fluid-text-secondary.
- * @cssproperty --fluid-masked-input-font-family - Font family. Falls back to --fluid-font-family-mono.
+ * @cssproperty --fluid-masked-input-affix-bg - Prefix/suffix background. Falls back to --fluid-surface-subtle.
+ * @cssproperty --fluid-masked-input-affix-fg - Prefix/suffix text color. Falls back to --fluid-text-secondary.
+ * @cssproperty --fluid-masked-input-affix-border - Prefix/suffix divider color. Falls back to --fluid-border-default.
+ * @cssproperty --fluid-masked-input-font-family - Font family. Falls back to --fluid-font-family-sans.
+ * @cssproperty --fluid-masked-input-font-size-sm - Small input text size. Falls back to --fluid-font-size-sm.
+ * @cssproperty --fluid-masked-input-font-size-md - Medium input text size. Falls back to --fluid-font-size-md.
+ * @cssproperty --fluid-masked-input-font-size-lg - Large input text size. Falls back to --fluid-font-size-lg.
+ * @cssproperty --fluid-masked-input-line-height - Input line height. Falls back to --fluid-font-line-height-normal.
+ * @cssproperty --fluid-masked-input-height-sm - Small field height. Falls back to --fluid-field-height-sm.
+ * @cssproperty --fluid-masked-input-height-md - Medium field height. Falls back to --fluid-field-height-md.
+ * @cssproperty --fluid-masked-input-height-lg - Large field height. Falls back to --fluid-field-height-lg.
+ * @cssproperty --fluid-masked-input-padding-x-sm - Small horizontal padding. Falls back to --fluid-field-padding-x-sm.
+ * @cssproperty --fluid-masked-input-padding-x-md - Medium horizontal padding. Falls back to --fluid-field-padding-x-md.
+ * @cssproperty --fluid-masked-input-padding-x-lg - Large horizontal padding. Falls back to --fluid-field-padding-x-lg.
+ * @cssproperty --fluid-masked-input-target-min - Minimum target-size floor. Falls back to --fluid-target-min.
+ * @cssproperty --fluid-masked-input-duration - Transition duration. Falls back to --fluid-duration-fast.
+ * @cssproperty --fluid-masked-input-easing - Transition easing. Falls back to --fluid-easing-standard.
  *
  * @uses-token --fluid-surface-base - Default field background.
  * @uses-token --fluid-surface-subtle - Disabled background.
@@ -74,7 +95,7 @@ export type FluidMaskedInputSize = "sm" | "md" | "lg";
  * @uses-token --fluid-field-padding-x-sm - Inline padding at size="sm".
  * @uses-token --fluid-field-padding-x-md - Inline padding at size="md".
  * @uses-token --fluid-field-padding-x-lg - Inline padding at size="lg".
- * @uses-token --fluid-font-family-mono - Default font family (monospace keeps masked columns aligned).
+ * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-font-size-sm - Text size at size="sm".
  * @uses-token --fluid-font-size-md - Text size at size="md".
  * @uses-token --fluid-font-size-lg - Text size at size="lg".
@@ -88,6 +109,11 @@ export type FluidMaskedInputSize = "sm" | "md" | "lg";
  * @fires fluid-change - Fired when the field loses focus after a value change.
  */
 export class FluidMaskedInput extends FluidFormAssociated {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-flex;
@@ -117,10 +143,13 @@ export class FluidMaskedInput extends FluidFormAssociated {
         inset 0 1px 0 0 rgb(0 0 0 / 0.02),
         0 1px 2px 0 rgb(0 0 0 / 0.04);
       transition:
-        border-color var(--fluid-duration-fast) var(--fluid-easing-standard),
-        box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard),
-        background-color var(--fluid-duration-fast) var(--fluid-easing-standard);
-      font-family: var(--fluid-masked-input-font-family, var(--fluid-font-family-mono));
+        border-color var(--fluid-masked-input-duration, var(--fluid-duration-fast))
+          var(--fluid-masked-input-easing, var(--fluid-easing-standard)),
+        box-shadow var(--fluid-masked-input-duration, var(--fluid-duration-fast))
+          var(--fluid-masked-input-easing, var(--fluid-easing-standard)),
+        background-color var(--fluid-masked-input-duration, var(--fluid-duration-fast))
+          var(--fluid-masked-input-easing, var(--fluid-easing-standard));
+      font-family: var(--fluid-masked-input-font-family, var(--fluid-font-family-sans));
       color: var(--fluid-masked-input-fg, var(--fluid-text-primary));
       overflow: hidden;
     }
@@ -177,16 +206,25 @@ export class FluidMaskedInput extends FluidFormAssociated {
      * (SC 2.5.5) while AA (24px) leaves the design heights untouched.
      */
     .size-sm {
-      font-size: var(--fluid-font-size-sm);
-      min-height: max(var(--fluid-field-height-sm, 1.75rem), var(--fluid-target-min, 0px));
+      font-size: var(--fluid-masked-input-font-size-sm, var(--fluid-font-size-sm));
+      min-height: max(
+        var(--fluid-masked-input-height-sm, var(--fluid-field-height-sm, 1.75rem)),
+        var(--fluid-masked-input-target-min, var(--fluid-target-min, 0px))
+      );
     }
     .size-md {
-      font-size: var(--fluid-font-size-md);
-      min-height: max(var(--fluid-field-height-md, 2.25rem), var(--fluid-target-min, 0px));
+      font-size: var(--fluid-masked-input-font-size-md, var(--fluid-font-size-md));
+      min-height: max(
+        var(--fluid-masked-input-height-md, var(--fluid-field-height-md, 2.25rem)),
+        var(--fluid-masked-input-target-min, var(--fluid-target-min, 0px))
+      );
     }
     .size-lg {
-      font-size: var(--fluid-font-size-lg);
-      min-height: max(var(--fluid-field-height-lg, 2.75rem), var(--fluid-target-min, 0px));
+      font-size: var(--fluid-masked-input-font-size-lg, var(--fluid-font-size-lg));
+      min-height: max(
+        var(--fluid-masked-input-height-lg, var(--fluid-field-height-lg, 2.75rem)),
+        var(--fluid-masked-input-target-min, var(--fluid-target-min, 0px))
+      );
     }
 
     input {
@@ -195,17 +233,18 @@ export class FluidMaskedInput extends FluidFormAssociated {
       min-width: 0;
       box-sizing: border-box;
       font: inherit;
+      font-variant-numeric: tabular-nums;
       color: inherit;
-      line-height: var(--fluid-font-line-height-normal);
+      line-height: var(--fluid-masked-input-line-height, var(--fluid-font-line-height-normal));
     }
     .size-sm input {
-      padding: 0 var(--fluid-field-padding-x-sm);
+      padding: 0 var(--fluid-masked-input-padding-x-sm, var(--fluid-field-padding-x-sm));
     }
     .size-md input {
-      padding: 0 var(--fluid-field-padding-x-md);
+      padding: 0 var(--fluid-masked-input-padding-x-md, var(--fluid-field-padding-x-md));
     }
     .size-lg input {
-      padding: 0 var(--fluid-field-padding-x-lg);
+      padding: 0 var(--fluid-masked-input-padding-x-lg, var(--fluid-field-padding-x-lg));
     }
 
     input::placeholder {
@@ -214,6 +253,44 @@ export class FluidMaskedInput extends FluidFormAssociated {
 
     input:disabled {
       cursor: not-allowed;
+    }
+
+    .affix {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: stretch;
+      flex-shrink: 0;
+      color: var(--fluid-masked-input-affix-fg, var(--fluid-text-secondary));
+      background: var(--fluid-masked-input-affix-bg, var(--fluid-surface-subtle));
+    }
+    .affix[hidden] {
+      display: none;
+    }
+    .prefix {
+      border-inline-end: var(--fluid-masked-input-border-width, var(--fluid-field-border-width))
+        solid var(--fluid-masked-input-affix-border, var(--fluid-border-default));
+    }
+    .suffix {
+      border-inline-start: var(--fluid-masked-input-border-width, var(--fluid-field-border-width))
+        solid var(--fluid-masked-input-affix-border, var(--fluid-border-default));
+    }
+    .size-sm .affix:not(.flush) {
+      padding: 0 var(--fluid-masked-input-padding-x-sm, var(--fluid-field-padding-x-sm));
+    }
+    .size-md .affix:not(.flush) {
+      padding: 0 var(--fluid-masked-input-padding-x-md, var(--fluid-field-padding-x-md));
+    }
+    .size-lg .affix:not(.flush) {
+      padding: 0 var(--fluid-masked-input-padding-x-lg, var(--fluid-field-padding-x-lg));
+    }
+    .affix.flush {
+      padding: 0;
+      align-items: stretch;
+    }
+    ::slotted([slot="prefix"]),
+    ::slotted([slot="suffix"]) {
+      margin: 0;
     }
   `;
 
@@ -246,11 +323,23 @@ export class FluidMaskedInput extends FluidFormAssociated {
   /** Required for form submission. */
   @property({ type: Boolean, reflect: true }) required = false;
 
+  /** Browser autofill hint. Omitted by default so consumers retain control. */
+  @property() autocomplete = "";
+
   /** Accessible label when no visible label is provided. */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private focused = false;
   @state() private invalid = false;
+  @state() private hasPrefix = false;
+  @state() private hasSuffix = false;
+  @state() private prefixFlush = false;
+  @state() private suffixFlush = false;
+
+  constructor() {
+    super();
+    this.addEventListener("invalid", this.handleInvalid);
+  }
 
   /**
    * The raw characters the user typed, with mask literals stripped out.
@@ -301,12 +390,14 @@ export class FluidMaskedInput extends FluidFormAssociated {
       }
       this.syncFormValue();
     }
+    // Once an invalid state has been presented, clear it immediately when the
+    // value becomes valid. Untouched required fields remain visually neutral.
+    if (!this.required || this.complete) this.invalid = false;
   }
 
-  protected override updated(changed: PropertyValues<this>): void {
-    if (changed.has("value") || changed.has("required") || changed.has("mask")) {
-      this.refreshValidity();
-    }
+  protected override updated(): void {
+    // Keep current validity text in sync with inherited language changes too.
+    this.refreshValidity();
   }
 
   /**
@@ -324,13 +415,11 @@ export class FluidMaskedInput extends FluidFormAssociated {
     if (this.required && !this.complete) {
       this.setValidity(
         { valueMissing: true },
-        this.value.length === 0 ? "Please fill out this field." : "Please complete the field.",
+        this.term(this.value.length === 0 ? "fillOutField" : "completeField"),
         this.inputEl
       );
-      this.invalid = true;
     } else {
       this.setValidity({});
-      this.invalid = false;
     }
   }
 
@@ -354,6 +443,18 @@ export class FluidMaskedInput extends FluidFormAssociated {
     );
   };
 
+  private handlePrefixChange = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement;
+    this.hasPrefix = slotHasContent(slot);
+    this.prefixFlush = slotHasFlush(slot);
+  };
+
+  private handleSuffixChange = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement;
+    this.hasSuffix = slotHasContent(slot);
+    this.suffixFlush = slotHasFlush(slot);
+  };
+
   private handleChange = () => {
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
@@ -371,6 +472,12 @@ export class FluidMaskedInput extends FluidFormAssociated {
   private handleBlur = () => {
     this.focused = false;
     this.refreshValidity();
+    this.invalid = this.required && !this.complete;
+  };
+
+  private handleInvalid = () => {
+    this.refreshValidity();
+    this.invalid = this.required && !this.complete;
   };
 
   override render(): TemplateResult {
@@ -385,6 +492,13 @@ export class FluidMaskedInput extends FluidFormAssociated {
           invalid: this.invalid
         })}
       >
+        <span
+          class=${`affix prefix${this.prefixFlush ? " flush" : ""}`}
+          part="prefix"
+          ?hidden=${!this.hasPrefix}
+        >
+          <slot name="prefix" @slotchange=${this.handlePrefixChange}></slot>
+        </span>
         <input
           part="input"
           type="text"
@@ -394,7 +508,7 @@ export class FluidMaskedInput extends FluidFormAssociated {
           ?disabled=${this.disabled}
           ?readonly=${this.readonly}
           ?required=${this.required}
-          autocomplete="off"
+          autocomplete=${ifDefined(this.autocomplete || undefined)}
           autocapitalize="off"
           spellcheck="false"
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
@@ -404,17 +518,37 @@ export class FluidMaskedInput extends FluidFormAssociated {
           @focus=${this.handleFocus}
           @blur=${this.handleBlur}
         />
+        <span
+          class=${`affix suffix${this.suffixFlush ? " flush" : ""}`}
+          part="suffix"
+          ?hidden=${!this.hasSuffix}
+        >
+          <slot name="suffix" @slotchange=${this.handleSuffixChange}></slot>
+        </span>
       </div>
     `;
   }
+}
+
+function slotHasContent(slot: HTMLSlotElement): boolean {
+  return slot
+    .assignedNodes()
+    .some(
+      (node) =>
+        node.nodeType === Node.ELEMENT_NODE ||
+        (node.nodeType === Node.TEXT_NODE && Boolean(node.textContent?.trim()))
+    );
+}
+
+function slotHasFlush(slot: HTMLSlotElement): boolean {
+  return slot.assignedElements().some((element) => element.hasAttribute("data-flush"));
 }
 
 /** Placeholder tokens and the predicate that decides if a char is accepted. */
 const TOKENS: Record<string, (ch: string) => boolean> = {
   "#": (ch) => ch >= "0" && ch <= "9",
   A: (ch) => (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z"),
-  "*": (ch) =>
-    (ch >= "0" && ch <= "9") || (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z")
+  "*": (ch) => (ch >= "0" && ch <= "9") || (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z")
 };
 
 function isToken(ch: string): boolean {
@@ -471,6 +605,9 @@ function formatWithMask(
   // Extract the characters the user actually typed (drop anything that was a
   // literal in the previous render so re-formatting is idempotent).
   const raw = unmask(input, mask);
+  if (raw.length === 0) {
+    return { formatted: "", caret: caretInput == null ? null : 0 };
+  }
 
   let formatted = "";
   let ri = 0;

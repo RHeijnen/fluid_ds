@@ -1,0 +1,39 @@
+diff --git a/index.js b/index.js
+index 23384ea..6f8ad0f 100644
+--- a/index.js
++++ b/index.js
+@@ -62,6 +62,21 @@ class Extractor {
+             throw new Error(`Out of bound path "${canonicalDestDir}" found while processing file ${entry.fileName}`)
+           }
+ 
++          const dest = path.join(this.opts.dir, entry.fileName)
++          try {
++            const destStat = await fs.lstat(dest)
++            if (destStat.isSymbolicLink()) {
++              throw new Error(`Refusing to extract through symbolic link "${dest}" while processing file ${entry.fileName}`)
++            }
++            const canonicalDest = await fs.realpath(dest)
++            const relativeDest = path.relative(this.opts.dir, canonicalDest)
++            if (path.isAbsolute(relativeDest) || relativeDest.split(path.sep).includes('..')) {
++              throw new Error(`Out of bound path "${canonicalDest}" found while processing file ${entry.fileName}`)
++            }
++          } catch (err) {
++            if (err.code !== 'ENOENT') throw err
++          }
++
+           await this.extractEntry(entry)
+           debug('finished processing', entry.fileName)
+           this.zipfile.readEntry()
+@@ -126,6 +141,12 @@ class Extractor {
+ 
+     if (symlink) {
+       const link = await getStream(readStream)
++      const canonicalLink = path.resolve(path.dirname(dest), link)
++      const relativeLink = path.relative(this.opts.dir, canonicalLink)
++      if (path.isAbsolute(relativeLink) || relativeLink.split(path.sep).includes('..')) {
++        throw new Error(`Out of bound symbolic link "${link}" found while processing file ${entry.fileName}`)
++      }
++
+       debug('creating symlink', link, dest)
+       await fs.symlink(link, dest)
+     } else {

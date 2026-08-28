@@ -1,0 +1,1582 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/column-mapper/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-column-mapper",
+          "declaration": {
+            "name": "FluidColumnMapper",
+            "module": "src/components/column-mapper/fluid-column-mapper.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/column-mapper/fluid-column-mapper.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Map source columns to blueprint fields.\n\nGiven a `blueprint` and the list of `columns` read from a file, it shows one\nrow per field with a `<select>` of the available source columns, pre-filled\nfrom the fuzzy auto-map. Changing any select emits `fluid-mapping-change`\nwith the full `{ fieldKey -> column | null }` map. Usable on its own or\ninside `<fluid-file-parser>`.\n\nSemantics: a plain list of labelled native `<select>` controls (the WAI-ARIA\nnative-select pattern), so keyboard + screen-reader support comes for free.\nEach select's accessible name is its field label via a real `<label for>`.",
+          "name": "FluidColumnMapper",
+          "cssProperties": [
+            {
+              "description": "Container background. Falls back to transparent.",
+              "name": "--fluid-mapper-bg"
+            },
+            {
+              "description": "Text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-mapper-fg"
+            },
+            {
+              "description": "Field-label color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-mapper-label-fg"
+            },
+            {
+              "description": "Secondary / required-marker color. Falls back to --fluid-text-secondary.",
+              "name": "--fluid-mapper-muted-fg"
+            },
+            {
+              "description": "Select border. Falls back to --fluid-border-default.",
+              "name": "--fluid-mapper-border"
+            },
+            {
+              "description": "Select background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-mapper-select-bg"
+            },
+            {
+              "description": "Select corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-mapper-radius"
+            },
+            {
+              "description": "Row gap. Falls back to --fluid-space-3.",
+              "name": "--fluid-mapper-gap"
+            },
+            {
+              "description": "Unmapped-required highlight. Falls back to --fluid-danger-base.",
+              "name": "--fluid-mapper-danger"
+            },
+            {
+              "description": "Focus ring color. Falls back to --fluid-focus-ring-color.",
+              "name": "--fluid-mapper-focus-ring"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer container.",
+              "name": "base"
+            },
+            {
+              "description": "One field-to-column mapping row.",
+              "name": "row"
+            },
+            {
+              "description": "A field's label.",
+              "name": "label"
+            },
+            {
+              "description": "A source-column select.",
+              "name": "select"
+            },
+            {
+              "description": "The required-field marker. Every styled property reads a `--fluid-mapper-*` token that falls back to a main semantic var (the override ladder).",
+              "name": "required"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "blueprint",
+              "type": {
+                "text": "Blueprint"
+              },
+              "default": "{ fields: [] }",
+              "description": "The blueprint whose fields are the mapping targets."
+            },
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "description": "Source column names available to map from.",
+              "attribute": "columns"
+            },
+            {
+              "kind": "field",
+              "name": "mapping",
+              "type": {
+                "text": "Record<string, string | null>"
+              },
+              "default": "{}",
+              "description": "Current mapping. Two-way: set it to control, or read it after a change."
+            },
+            {
+              "kind": "method",
+              "name": "onSelect",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "fieldKey",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-mapping-change",
+              "description": "The mapping changed. detail: { mapping: Record<string, string | null> }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]",
+              "description": "Source column names available to map from.",
+              "fieldName": "columns"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Map source columns to blueprint fields.",
+          "usesTokens": [
+            {
+              "name": "--fluid-text-primary",
+              "description": "Field labels + values."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Secondary text + required marker."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Select border."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Select background."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Select radius."
+            },
+            {
+              "name": "--fluid-danger-base",
+              "description": "Unmapped-required highlight."
+            },
+            {
+              "name": "--fluid-focus-ring-color",
+              "description": "Keyboard focus ring."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-focus-ring-offset",
+              "description": "Focus ring offset."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum interactive-target size (24px AA / 44px AAA)."
+            }
+          ],
+          "tagName": "fluid-column-mapper",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidColumnMapper",
+          "declaration": {
+            "name": "FluidColumnMapper",
+            "module": "src/components/column-mapper/fluid-column-mapper.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/file-parser/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-file-parser",
+          "declaration": {
+            "name": "FluidFileParser",
+            "module": "src/components/file-parser/fluid-file-parser.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/file-parser/fluid-file-parser.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Drag a JSON / CSV / TSV / Excel file onto a Fluid file-drop and get\nvalidated, typed rows out.\n\nThe flow is: intake (a `fluid-dropzone`), then an auto-mapping step (a\n`fluid-column-mapper` pre-filled by fuzzy match, with selects to override),\nthen a validated preview table with per-cell error highlighting, then a\nconfirm action. The cleaned, typed rows are emitted on `fluid-parse`, and the\ncleaned data can be downloaded as CSV or JSON via export.\n\nPass the target shape as a Blueprint on the `.blueprint` property.\n\nAccessibility: the dropzone is the keyboard-operable WAI-ARIA button intake;\nthe preview is a real semantic `<table>` with `<th scope>` headers and bad\ncells carrying `aria-invalid` + a `title`; the validation summary is a\n`fluid-callout` whose native status/alert semantics announce parsing results.\nDo not wrap it in a second live region, which duplicates announcements.",
+          "name": "FluidFileParser",
+          "cssProperties": [
+            {
+              "description": "Container background. Falls back to transparent.",
+              "name": "--fluid-parser-bg"
+            },
+            {
+              "description": "Text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-parser-fg"
+            },
+            {
+              "description": "Secondary text color. Falls back to --fluid-text-secondary.",
+              "name": "--fluid-parser-muted-fg"
+            },
+            {
+              "description": "Vertical rhythm between steps. Falls back to --fluid-space-4.",
+              "name": "--fluid-parser-gap"
+            },
+            {
+              "description": "Preview table background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-parser-table-bg"
+            },
+            {
+              "description": "Preview header background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-parser-table-header-bg"
+            },
+            {
+              "description": "Preview table border. Falls back to --fluid-border-default.",
+              "name": "--fluid-parser-table-border"
+            },
+            {
+              "description": "Preview table corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-parser-table-radius"
+            },
+            {
+              "description": "Preview cell padding. Falls back to 0.5rem 0.625rem.",
+              "name": "--fluid-parser-cell-padding"
+            },
+            {
+              "description": "Invalid-cell background. Falls back to a tint of --fluid-danger-base.",
+              "name": "--fluid-parser-invalid-bg"
+            },
+            {
+              "description": "Invalid-cell text color. Falls back to --fluid-danger-text.",
+              "name": "--fluid-parser-invalid-fg"
+            },
+            {
+              "description": "Step-heading color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-parser-heading-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outer container.",
+              "name": "base"
+            },
+            {
+              "description": "The intake dropzone.",
+              "name": "dropzone"
+            },
+            {
+              "description": "The column-mapping step wrapper.",
+              "name": "mapping"
+            },
+            {
+              "description": "The validation summary region.",
+              "name": "summary"
+            },
+            {
+              "description": "The preview table.",
+              "name": "table"
+            },
+            {
+              "description": "A preview header cell.",
+              "name": "header-cell"
+            },
+            {
+              "description": "A preview body cell.",
+              "name": "cell"
+            },
+            {
+              "description": "A preview cell that failed validation.",
+              "name": "cell-invalid"
+            },
+            {
+              "description": "The confirm / reset action bar. Every styled property reads a `--fluid-parser-*` token that falls back to a main semantic var (the override ladder).",
+              "name": "actions"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "dropzoneEl",
+              "type": {
+                "text": "HTMLElement & { clear: () => void } | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "blueprint",
+              "type": {
+                "text": "Blueprint"
+              },
+              "default": "{ fields: [] }",
+              "description": "The target shape every row is mapped + coerced + validated against."
+            },
+            {
+              "kind": "field",
+              "name": "accept",
+              "type": {
+                "text": "string"
+              },
+              "default": "\".csv,.tsv,.json,.xlsx,.xls\"",
+              "description": "Accepted file extensions for the intake dropzone.",
+              "attribute": "accept"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Prompt text shown inside the dropzone. An explicit empty string remains empty.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "previewRows",
+              "type": {
+                "text": "number"
+              },
+              "default": "50",
+              "description": "Max rows shown in the preview table (the full result is still emitted).",
+              "attribute": "preview-rows"
+            },
+            {
+              "kind": "field",
+              "name": "hideMapping",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the column-mapping step (use the auto-map as-is).",
+              "attribute": "hide-mapping"
+            },
+            {
+              "kind": "field",
+              "name": "raw",
+              "type": {
+                "text": "RawTable | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "result",
+              "type": {
+                "text": "ParseResult | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "fileName",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "parseError",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "default": "\"\""
+            },
+            {
+              "kind": "field",
+              "name": "parseErrorDiagnostic",
+              "type": {
+                "text": "ParserFileError | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "parseErrorUsesFallback",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "busy",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "readGeneration",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "currentResult",
+              "type": {
+                "text": "ParseResult | null"
+              },
+              "description": "The most recent parse result (after mapping), or null before a file loads.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "handleFiles",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "recompute",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "mapping",
+                  "optional": true,
+                  "type": {
+                    "text": "Record<string, string | null>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onMappingChange",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "Event"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "confirm",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "reset",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Clear the loaded file + result and return to the intake step."
+            },
+            {
+              "kind": "method",
+              "name": "export",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "format",
+                  "default": "\"csv\"",
+                  "type": {
+                    "text": "\"csv\" | \"json\""
+                  }
+                }
+              ],
+              "description": "Download the cleaned rows. Returns the serialized string too, so callers\nthat want their own download (or none) can use it directly."
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "localizedFileError",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "localizedCellError",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "error",
+                  "type": {
+                    "text": "CellError"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "localizedDiagnostic",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "diagnostic",
+                  "type": {
+                    "text": "Exclude<ParserDiagnostic, { code: \"customValidation\" }>"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderSummary",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "ParseResult"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderTable",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "result",
+                  "type": {
+                    "text": "ParseResult"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-file-loaded",
+              "description": "A file was read into a raw table. detail: { file: File, raw: RawTable }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-parse",
+              "description": "The user confirmed. detail: { valid: boolean, rows, errors, mapping }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-parse-error",
+              "description": "Reading / parsing the file threw. detail: { file: File, message: string }.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "accept",
+              "type": {
+                "text": "string"
+              },
+              "default": "\".csv,.tsv,.json,.xlsx,.xls\"",
+              "description": "Accepted file extensions for the intake dropzone.",
+              "fieldName": "accept"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Prompt text shown inside the dropzone. An explicit empty string remains empty.",
+              "fieldName": "label"
+            },
+            {
+              "name": "preview-rows",
+              "type": {
+                "text": "number"
+              },
+              "default": "50",
+              "description": "Max rows shown in the preview table (the full result is still emitted).",
+              "fieldName": "previewRows"
+            },
+            {
+              "name": "hide-mapping",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the column-mapping step (use the auto-map as-is).",
+              "fieldName": "hideMapping"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Parse + validate a dropped data file against a blueprint.",
+          "usesTokens": [
+            {
+              "name": "--fluid-text-primary",
+              "description": "Body text + headings."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Secondary text."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Table background."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Table header background."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Table borders."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Table radius."
+            },
+            {
+              "name": "--fluid-danger-base",
+              "description": "Invalid-cell highlight."
+            },
+            {
+              "name": "--fluid-danger-text",
+              "description": "Invalid-cell text."
+            }
+          ],
+          "tagName": "fluid-file-parser",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidFileParser",
+          "declaration": {
+            "name": "FluidFileParser",
+            "module": "src/components/file-parser/fluid-file-parser.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/apply-blueprint.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "applyBlueprint",
+          "return": {
+            "type": {
+              "text": "ParseResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "raw",
+              "type": {
+                "text": "RawTable"
+              }
+            },
+            {
+              "name": "blueprint",
+              "type": {
+                "text": "Blueprint"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "ApplyOptions"
+              }
+            }
+          ],
+          "description": "Map, coerce, and validate `raw` against `blueprint`.\n\nThe returned `rows` always contains one cleaned object per kept source row\n(even rows with errors, so a UI can show the bad cell in context); `errors`\nlists every failing cell. Unmapped non-required fields get their default or\n`null`; an unmapped required field marks every row's cell as an error."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "applyBlueprint",
+          "declaration": {
+            "name": "applyBlueprint",
+            "module": "src/core/apply-blueprint.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/coerce.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "coerceCell",
+          "return": {
+            "type": {
+              "text": "CoerceResult"
+            }
+          },
+          "parameters": [
+            {
+              "name": "raw",
+              "type": {
+                "text": "unknown"
+              }
+            },
+            {
+              "name": "field",
+              "type": {
+                "text": "FieldSpec"
+              }
+            }
+          ],
+          "description": "Coerce + range/format-check one cell against a field. Custom validate runs in applyBlueprint."
+        },
+        {
+          "kind": "function",
+          "name": "isEmpty",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "value",
+              "type": {
+                "text": "unknown"
+              }
+            }
+          ],
+          "description": "Is a source cell effectively empty (missing / blank string)?"
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "coerceCell",
+          "declaration": {
+            "name": "coerceCell",
+            "module": "src/core/coerce.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isEmpty",
+          "declaration": {
+            "name": "isEmpty",
+            "module": "src/core/coerce.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/csv.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "parseDelimited",
+          "return": {
+            "type": {
+              "text": "string[][]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "delimiter",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Tokenize delimited text into a grid of raw string cells. Pure: no header /\ntype handling here, that is layered on top."
+        },
+        {
+          "kind": "function",
+          "name": "sniffDelimiter",
+          "return": {
+            "type": {
+              "text": "Delimiter"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Sniff the most likely delimiter from the first few lines by scoring each\ncandidate on how consistently it splits rows into the same column count."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "parseDelimited",
+          "declaration": {
+            "name": "parseDelimited",
+            "module": "src/core/csv.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sniffDelimiter",
+          "declaration": {
+            "name": "sniffDelimiter",
+            "module": "src/core/csv.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/export.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "toCSV",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "Record<string, unknown>[]"
+              }
+            },
+            {
+              "name": "fields",
+              "optional": true,
+              "type": {
+                "text": "FieldSpec[]"
+              }
+            }
+          ],
+          "description": "Serialize rows to CSV. Columns come from `fields` when given (stable order +\nlabels are ignored, keys are the header), otherwise from the union of row keys."
+        },
+        {
+          "kind": "function",
+          "name": "toJSON",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "rows",
+              "type": {
+                "text": "Record<string, unknown>[]"
+              }
+            }
+          ],
+          "description": "Serialize rows to pretty-printed JSON."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "toCSV",
+          "declaration": {
+            "name": "toCSV",
+            "module": "src/core/export.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toJSON",
+          "declaration": {
+            "name": "toJSON",
+            "module": "src/core/export.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ApplyOptions",
+          "declaration": {
+            "name": "ApplyOptions",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Blueprint",
+          "declaration": {
+            "name": "Blueprint",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CellError",
+          "declaration": {
+            "name": "CellError",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "CoerceResult",
+          "declaration": {
+            "name": "CoerceResult",
+            "module": "src/core/coerce.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "Delimiter",
+          "declaration": {
+            "name": "Delimiter",
+            "module": "src/core/csv.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FieldSpec",
+          "declaration": {
+            "name": "FieldSpec",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FieldType",
+          "declaration": {
+            "name": "FieldType",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FileFormat",
+          "declaration": {
+            "name": "FileFormat",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParseFileOptions",
+          "declaration": {
+            "name": "ParseFileOptions",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParseResult",
+          "declaration": {
+            "name": "ParseResult",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParseStats",
+          "declaration": {
+            "name": "ParseStats",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserDiagnostic",
+          "declaration": {
+            "name": "ParserDiagnostic",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserErrorCode",
+          "declaration": {
+            "name": "ParserErrorCode",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserErrorParameters",
+          "declaration": {
+            "name": "ParserErrorParameters",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserFileError",
+          "declaration": {
+            "name": "ParserFileError",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserFileErrorCode",
+          "declaration": {
+            "name": "ParserFileErrorCode",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParserFileErrorParameters",
+          "declaration": {
+            "name": "ParserFileErrorParameters",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "RawTable",
+          "declaration": {
+            "name": "RawTable",
+            "module": "src/core/types.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "applyBlueprint",
+          "declaration": {
+            "name": "applyBlueprint",
+            "module": "src/core/apply-blueprint.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "autoMap",
+          "declaration": {
+            "name": "autoMap",
+            "module": "src/core/mapping.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "coerceCell",
+          "declaration": {
+            "name": "coerceCell",
+            "module": "src/core/coerce.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectFormat",
+          "declaration": {
+            "name": "detectFormat",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "gridToTable",
+          "declaration": {
+            "name": "gridToTable",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isEmpty",
+          "declaration": {
+            "name": "isEmpty",
+            "module": "src/core/coerce.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "normalize",
+          "declaration": {
+            "name": "normalize",
+            "module": "src/core/mapping.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseDelimited",
+          "declaration": {
+            "name": "parseDelimited",
+            "module": "src/core/csv.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseFile",
+          "declaration": {
+            "name": "parseFile",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseJson",
+          "declaration": {
+            "name": "parseJson",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sniffDelimiter",
+          "declaration": {
+            "name": "sniffDelimiter",
+            "module": "src/core/csv.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toCSV",
+          "declaration": {
+            "name": "toCSV",
+            "module": "src/core/export.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "toJSON",
+          "declaration": {
+            "name": "toJSON",
+            "module": "src/core/export.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/mapping.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "autoMap",
+          "return": {
+            "type": {
+              "text": "Record<string, string | null>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "string[]"
+              }
+            },
+            {
+              "name": "blueprint",
+              "type": {
+                "text": "Blueprint"
+              }
+            }
+          ],
+          "description": "Build a `{ fieldKey -> sourceColumn | null }` mapping. Greedy by best score,\nhighest-confidence pairs win first, and each source column is claimed once."
+        },
+        {
+          "kind": "function",
+          "name": "normalize",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Lower-case, strip non-alphanumerics, so naming styles collapse together."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "autoMap",
+          "declaration": {
+            "name": "autoMap",
+            "module": "src/core/mapping.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "normalize",
+          "declaration": {
+            "name": "normalize",
+            "module": "src/core/mapping.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/parse-file.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An Error with structured detail for localized UIs. `message` intentionally\nretains the existing English contract for backwards compatibility.",
+          "name": "ParserFileError",
+          "members": [
+            {
+              "kind": "field",
+              "name": "code",
+              "type": {
+                "text": "Code"
+              },
+              "readonly": true,
+              "default": "code",
+              "resolveInitializer": {
+                "module": "src/core/parse-file.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "parameters",
+              "type": {
+                "text": "ParserFileErrorParameters[Code]"
+              },
+              "readonly": true,
+              "default": "parameters",
+              "resolveInitializer": {
+                "module": "src/core/parse-file.ts"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "name",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"ParserFileError\""
+            }
+          ],
+          "superclass": {
+            "name": "Error",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "function",
+          "name": "detectFormat",
+          "return": {
+            "type": {
+              "text": "FileFormat"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "sample",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Detect the format from a filename extension + a content sniff."
+        },
+        {
+          "kind": "function",
+          "name": "gridToTable",
+          "return": {
+            "type": {
+              "text": "RawTable"
+            }
+          },
+          "parameters": [
+            {
+              "name": "grid",
+              "type": {
+                "text": "string[][]"
+              }
+            },
+            {
+              "name": "headerRow",
+              "type": {
+                "text": "number | \"auto\""
+              }
+            }
+          ],
+          "description": "Convert a raw cell grid into a RawTable, honoring the header-row choice."
+        },
+        {
+          "kind": "function",
+          "name": "parseFile",
+          "return": {
+            "type": {
+              "text": "Promise<RawTable>"
+            }
+          },
+          "parameters": [
+            {
+              "name": "file",
+              "type": {
+                "text": "File"
+              }
+            },
+            {
+              "name": "options",
+              "default": "{}",
+              "type": {
+                "text": "ParseFileOptions"
+              }
+            }
+          ],
+          "description": "Read + parse a dropped file into a RawTable."
+        },
+        {
+          "kind": "function",
+          "name": "parseJson",
+          "return": {
+            "type": {
+              "text": "RawTable"
+            }
+          },
+          "parameters": [
+            {
+              "name": "text",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Parse JSON: an array of objects, or `{ columns, rows }`, or `{ data: [...] }`."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ParserFileError",
+          "declaration": {
+            "name": "ParserFileError",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "detectFormat",
+          "declaration": {
+            "name": "detectFormat",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "gridToTable",
+          "declaration": {
+            "name": "gridToTable",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseFile",
+          "declaration": {
+            "name": "parseFile",
+            "module": "src/core/parse-file.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "parseJson",
+          "declaration": {
+            "name": "parseJson",
+            "module": "src/core/parse-file.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/core/types.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "*",
+          "declaration": {
+            "name": "*",
+            "module": "src/core/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidColumnMapper",
+          "declaration": {
+            "name": "FluidColumnMapper",
+            "module": "src/components/column-mapper/fluid-column-mapper.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidFileParser",
+          "declaration": {
+            "name": "FluidFileParser",
+            "module": "src/components/file-parser/fluid-file-parser.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

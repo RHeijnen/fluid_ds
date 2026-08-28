@@ -21,6 +21,7 @@ export class FluidCol extends FluidElement {
       grid-column: span var(--_active-span, 1);
       grid-row: var(--_row, auto);
       min-width: 0;
+      overflow-wrap: anywhere;
     }
 
     :host([hidden]) {
@@ -70,26 +71,32 @@ export class FluidCol extends FluidElement {
   /** Rows to span. */
   @property({ type: Number, attribute: "row-span" }) rowSpan?: number;
 
+  private validLine(value: number | undefined): number | undefined {
+    return typeof value === "number" && Number.isInteger(value) && value > 0 ? value : undefined;
+  }
+
   private setVar(name: string, value: string | number | undefined | null): void {
     if (value === undefined || value === null || value === "") this.style.removeProperty(name);
     else this.style.setProperty(name, String(value));
   }
 
   protected override updated(): void {
-    this.setVar("--_span", this.span);
-    this.setVar("--_span-sm", this.spanSm);
-    this.setVar("--_span-md", this.spanMd);
-    this.setVar("--_span-lg", this.spanLg);
+    this.setVar("--_span", this.validLine(this.span) ?? 1);
+    this.setVar("--_span-sm", this.validLine(this.spanSm));
+    this.setVar("--_span-md", this.validLine(this.spanMd));
+    this.setVar("--_span-lg", this.validLine(this.spanLg));
 
-    if (this.start != null) {
+    const start = this.validLine(this.start);
+    if (start != null) {
       this.setAttribute("data-has-start", "");
-      this.setVar("--_start", this.start);
+      this.setVar("--_start", start);
     } else {
       this.removeAttribute("data-has-start");
       this.setVar("--_start", undefined);
     }
 
-    this.setVar("--_row", this.rowSpan != null ? `span ${this.rowSpan}` : undefined);
+    const rowSpan = this.validLine(this.rowSpan);
+    this.setVar("--_row", rowSpan != null ? `span ${rowSpan}` : undefined);
   }
 
   override render(): TemplateResult {

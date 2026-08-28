@@ -61,7 +61,7 @@ signal: the chip always renders its title text.
 | `month` | `string` | current month | Visible month as `"YYYY-MM"`. |
 | `events` | `CalendarEvent[]` | `[]` | Events to display. Array property or JSON-string attribute. |
 | `week-start` | `number` (0-6) | `1` (Monday) | First day of the week, `0` Sunday through `6` Saturday. |
-| `locale` | `string` | document locale | BCP-47 locale for month and weekday names. |
+| `locale` | `string` | browser locale | BCP-47 locale for month and weekday names. Internal action text is not yet connected to shared locale bundles. |
 | `max-per-day` | `number` | `3` | Chips shown per day before collapsing into `+N more`. |
 
 ### Events
@@ -84,6 +84,22 @@ accessible name combining its full date with its event count. Navigation
 buttons meet the minimum target size and read the focus-ring and target-size
 conformance tokens, so they scale to 44x44 and a thicker ring under
 `data-fluid-conformance="aaa"`.
+
+For a day containing event chips, F2 focuses the first chip. Arrow keys move
+between that day's chips and its overflow button. Enter or Space activates the
+focused button without also firing a day activation. Escape or F2 restores
+day-grid navigation; Tab leaves the grid. These in-cell controls follow the
+[APG grid navigation conventions](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteractionsettingfocusandnavigatinginsidecells).
+
+PageUp and PageDown preserve the day number where it exists in the destination
+month, otherwise choosing its final day. If the `month` property changes while
+a day has focus, focus moves to the valid roving target in the new grid. The
+overflow button emits `fluid-day-click`; opening a full event list remains the
+application's responsibility.
+
+Automated keyboard and event-payload checks are not a complete accessibility
+certification. Screen-reader review, locale text coverage, and the broader
+cross-browser matrix remain separate readiness gates.
 
 ## Theming
 

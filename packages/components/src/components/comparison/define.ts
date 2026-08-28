@@ -1,6 +1,6 @@
 import { FluidComparison } from "./fluid-comparison.js";
 
-if (!customElements.get("fluid-comparison")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-comparison")) {
   customElements.define("fluid-comparison", FluidComparison);
 }
 

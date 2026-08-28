@@ -1,0 +1,1299 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/bounce.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/fade-in.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/fade-out.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/flash.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/pulse.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/scale-in.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/shake.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/slide-down.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/slide-left.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/slide-right.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/slide-up.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/spin.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/animations/zoom-in.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/controller.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "playElementAnimation",
+          "return": {
+            "type": {
+              "text": "Animation | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "el",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "Imperative trigger, runs the configured animation on this element right now."
+        },
+        {
+          "kind": "function",
+          "name": "startAnimationController",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "root",
+              "optional": true,
+              "type": {
+                "text": "Document | ShadowRoot"
+              }
+            }
+          ],
+          "description": "Boot the controller. Idempotent, calling it multiple times is fine\n(the second call is a no-op). Typically driven by the side-effect\nimport of `@fluid-ds/animations/define/controller`."
+        },
+        {
+          "kind": "function",
+          "name": "stopElementAnimation",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "el",
+              "type": {
+                "text": "HTMLElement"
+              }
+            }
+          ],
+          "description": "Cancel the running animation (if any) on this element."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "playElementAnimation",
+          "declaration": {
+            "name": "playElementAnimation",
+            "module": "src/controller.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "startAnimationController",
+          "declaration": {
+            "name": "startAnimationController",
+            "module": "src/controller.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "stopElementAnimation",
+          "declaration": {
+            "name": "stopElementAnimation",
+            "module": "src/controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/define/celebrate.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-celebrate",
+          "declaration": {
+            "name": "FluidCelebrate",
+            "module": "src/effects/fluid-celebrate.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/define/controller.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/effects/colors.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "RAINBOW",
+          "type": {
+            "text": "array"
+          },
+          "default": "[ \"#e40303\", \"#ff8c00\", \"#ffed00\", \"#008026\", \"#004dff\", \"#750787\" ]",
+          "description": "A cheerful, brand-independent palette used by `pride`-style presets."
+        },
+        {
+          "kind": "function",
+          "name": "defaultColors",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "description": "Read the default Fluid palette from the live document, falling back to\na static set of hues when a token is empty or we are off-DOM."
+        },
+        {
+          "kind": "function",
+          "name": "pick",
+          "return": {
+            "type": {
+              "text": "string"
+            }
+          },
+          "parameters": [
+            {
+              "name": "palette",
+              "type": {
+                "text": "readonly string[]"
+              }
+            }
+          ],
+          "description": "Pick a pseudo-random color from a palette."
+        },
+        {
+          "kind": "function",
+          "name": "resolvePalette",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "colors",
+              "optional": true,
+              "type": {
+                "text": "readonly string[]"
+              }
+            }
+          ],
+          "description": "Resolve an effect's working palette: the caller's `colors` if provided\nand non-empty, otherwise the live Fluid palette."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "RAINBOW",
+          "declaration": {
+            "name": "RAINBOW",
+            "module": "src/effects/colors.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "defaultColors",
+          "declaration": {
+            "name": "defaultColors",
+            "module": "src/effects/colors.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "pick",
+          "declaration": {
+            "name": "pick",
+            "module": "src/effects/colors.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "resolvePalette",
+          "declaration": {
+            "name": "resolvePalette",
+            "module": "src/effects/colors.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/effects/engine.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "activeEmitterCount",
+          "return": {
+            "type": {
+              "text": "number"
+            }
+          },
+          "description": "Test-only: how many emitters are currently active."
+        },
+        {
+          "kind": "function",
+          "name": "addEmitter",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "emitter",
+              "type": {
+                "text": "Emitter"
+              }
+            }
+          ],
+          "description": "Register an emitter with the engine and start the shared loop if it is\nnot already running. When motion is reduced the emitter does NOT\nanimate: its optional static frame is painted once, then it resolves."
+        },
+        {
+          "kind": "function",
+          "name": "isCanvasMounted",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "description": "Test-only: is the shared canvas currently in the DOM."
+        },
+        {
+          "kind": "function",
+          "name": "prefersReducedMotion",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "description": "True when the user asked for reduced motion. SSR-safe."
+        },
+        {
+          "kind": "function",
+          "name": "stopEmitter",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "emitter",
+              "type": {
+                "text": "Emitter"
+              }
+            }
+          ],
+          "description": "Stop an emitter immediately: its remaining particles are dropped."
+        },
+        {
+          "kind": "function",
+          "name": "viewport",
+          "return": {
+            "type": {
+              "text": "{ width: number; height: number }"
+            }
+          },
+          "description": "Current viewport size in CSS px."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "activeEmitterCount",
+          "declaration": {
+            "name": "activeEmitterCount",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "addEmitter",
+          "declaration": {
+            "name": "addEmitter",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCanvasMounted",
+          "declaration": {
+            "name": "isCanvasMounted",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "prefersReducedMotion",
+          "declaration": {
+            "name": "prefersReducedMotion",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "stopEmitter",
+          "declaration": {
+            "name": "stopEmitter",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "viewport",
+          "declaration": {
+            "name": "viewport",
+            "module": "src/effects/engine.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/effects/fluid-celebrate.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "FluidCelebrate",
+          "members": [
+            {
+              "kind": "field",
+              "name": "colors",
+              "type": {
+                "text": "string[] | undefined"
+              },
+              "description": "Color override, settable as a JS property (array) or `colors` attr."
+            },
+            {
+              "kind": "field",
+              "name": "#emojis",
+              "privacy": "private",
+              "type": {
+                "text": "string[] | undefined"
+              },
+              "description": "Emoji glyph override (array), settable as a property or the `emojis` attr."
+            },
+            {
+              "kind": "field",
+              "name": "#handle",
+              "privacy": "private",
+              "type": {
+                "text": "EffectHandle | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#refireQueued",
+              "privacy": "private",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "emojis",
+              "type": {
+                "text": "string[] | undefined"
+              },
+              "description": "Emoji glyphs the emoji presets cycle through, picked at random per\nparticle. Settable as a property (array) or the space/comma-separated\n`emojis` attribute. Updating it while `auto` is set re-fires the effect."
+            },
+            {
+              "kind": "method",
+              "name": "#maybeRefire",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "When `auto` is set and the element is connected, re-run the effect on the\nnext frame after a config change. Coalesced so flipping several attributes\nat once fires only once."
+            },
+            {
+              "kind": "method",
+              "name": "#parseList",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[] | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "raw",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "effect",
+              "type": {
+                "text": "string"
+              },
+              "description": "The configured effect name."
+            },
+            {
+              "kind": "method",
+              "name": "fire",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "description": "Fire the configured effect once. Resolves when the burst ends, having\ndispatched `fluid-celebrate-end`, unless the element was disconnected\nmid-burst (e.g. via `stop()` from `disconnectedCallback`), in which case\nthe end event is suppressed because it could not reach delegated listeners."
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Stop the current effect, if any."
+            },
+            {
+              "kind": "method",
+              "name": "#readOptions",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Record<string, unknown>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#readOrigin",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Origin | undefined"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "#parseColors",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string[] | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "raw",
+                  "type": {
+                    "text": "string | null"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "#num",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number | undefined"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "attr",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-celebrate-end",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "effect"
+            },
+            {
+              "name": "auto"
+            },
+            {
+              "name": "emojis"
+            },
+            {
+              "name": "colors"
+            },
+            {
+              "name": "count"
+            },
+            {
+              "name": "origin"
+            },
+            {
+              "name": "cannons"
+            },
+            {
+              "name": "shells"
+            },
+            {
+              "name": "rate"
+            },
+            {
+              "name": "duration"
+            },
+            {
+              "name": "spread"
+            }
+          ],
+          "superclass": {
+            "name": "HTMLElementBase",
+            "module": "src/effects/fluid-celebrate.ts"
+          },
+          "tagName": "fluid-celebrate",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidCelebrate",
+          "declaration": {
+            "name": "FluidCelebrate",
+            "module": "src/effects/fluid-celebrate.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/effects/index.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "EFFECT_NAMES",
+          "type": {
+            "text": "[\n  \"confetti\",\n  \"fireworks\",\n  \"emojiBurst\",\n  \"emojiRain\",\n  \"emojiFountain\",\n  \"bubbles\",\n  \"snow\",\n  \"sparkles\",\n  \"streamers\",\n  \"pulse\",\n  \"stars\",\n  \"hearts\",\n  \"pride\"\n]"
+          },
+          "default": "[ \"confetti\", \"fireworks\", \"emojiBurst\", \"emojiRain\", \"emojiFountain\", \"bubbles\", \"snow\", \"sparkles\", \"streamers\", \"pulse\", \"stars\", \"hearts\", \"pride\" ]",
+          "description": "Every effect name, for introspection / the docs gallery."
+        },
+        {
+          "kind": "function",
+          "name": "bubbles",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "BubbleOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "confetti",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "ConfettiOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "emojiBurst",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "EmojiBurstOptions"
+              }
+            }
+          ],
+          "description": "A point burst of emoji (or image) particles."
+        },
+        {
+          "kind": "function",
+          "name": "emojiFountain",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "EmojiFountainOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "emojiRain",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "EmojiRainOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "fireworks",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "FireworksOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "hearts",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "BurstOptions"
+              }
+            }
+          ],
+          "description": "A burst of heart glyphs."
+        },
+        {
+          "kind": "function",
+          "name": "pride",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "ConfettiOptions"
+              }
+            }
+          ],
+          "description": "A rainbow-palette confetti preset (fires from both cannons)."
+        },
+        {
+          "kind": "function",
+          "name": "pulse",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "PulseOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "snow",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "SnowOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "sparkles",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "SparklesOptions"
+              }
+            }
+          ]
+        },
+        {
+          "kind": "function",
+          "name": "stars",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "BurstOptions"
+              }
+            }
+          ],
+          "description": "A burst of star glyphs."
+        },
+        {
+          "kind": "function",
+          "name": "streamers",
+          "return": {
+            "type": {
+              "text": "EffectHandle"
+            }
+          },
+          "parameters": [
+            {
+              "name": "opts",
+              "default": "{}",
+              "type": {
+                "text": "StreamersOptions"
+              }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "EFFECT_NAMES",
+          "declaration": {
+            "name": "EFFECT_NAMES",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "ParticleShape",
+          "declaration": {
+            "name": "ParticleShape",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "RAINBOW",
+          "declaration": {
+            "name": "RAINBOW",
+            "module": "src/effects/colors.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "activeEmitterCount",
+          "declaration": {
+            "name": "activeEmitterCount",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "bubbles",
+          "declaration": {
+            "name": "bubbles",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "confetti",
+          "declaration": {
+            "name": "confetti",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "defaultColors",
+          "declaration": {
+            "name": "defaultColors",
+            "module": "src/effects/colors.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "emojiBurst",
+          "declaration": {
+            "name": "emojiBurst",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "emojiFountain",
+          "declaration": {
+            "name": "emojiFountain",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "emojiRain",
+          "declaration": {
+            "name": "emojiRain",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "fireworks",
+          "declaration": {
+            "name": "fireworks",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hearts",
+          "declaration": {
+            "name": "hearts",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "isCanvasMounted",
+          "declaration": {
+            "name": "isCanvasMounted",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "prefersReducedMotion",
+          "declaration": {
+            "name": "prefersReducedMotion",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "pride",
+          "declaration": {
+            "name": "pride",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "pulse",
+          "declaration": {
+            "name": "pulse",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "snow",
+          "declaration": {
+            "name": "snow",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "sparkles",
+          "declaration": {
+            "name": "sparkles",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "stars",
+          "declaration": {
+            "name": "stars",
+            "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "streamers",
+          "declaration": {
+            "name": "streamers",
+            "module": "src/effects/index.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "AnimationDef",
+          "declaration": {
+            "name": "AnimationDef",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidCelebrate",
+          "declaration": {
+            "name": "FluidCelebrate",
+            "module": "src/effects/fluid-celebrate.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidKeyframes",
+          "declaration": {
+            "name": "FluidKeyframes",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "getAnimation",
+          "declaration": {
+            "name": "getAnimation",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hasAnimation",
+          "declaration": {
+            "name": "hasAnimation",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAnimations",
+          "declaration": {
+            "name": "listAnimations",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "onAnimationRegistered",
+          "declaration": {
+            "name": "onAnimationRegistered",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "playElementAnimation",
+          "declaration": {
+            "name": "playElementAnimation",
+            "module": "src/controller.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "registerAnimation",
+          "declaration": {
+            "name": "registerAnimation",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "startAnimationController",
+          "declaration": {
+            "name": "startAnimationController",
+            "module": "src/controller.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "stopElementAnimation",
+          "declaration": {
+            "name": "stopElementAnimation",
+            "module": "src/controller.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/register-defaults.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/registry.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "getAnimation",
+          "return": {
+            "type": {
+              "text": "AnimationDef | undefined"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "Look up a registered animation."
+        },
+        {
+          "kind": "function",
+          "name": "hasAnimation",
+          "return": {
+            "type": {
+              "text": "boolean"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            }
+          ],
+          "description": "True when an animation under this name has been registered."
+        },
+        {
+          "kind": "function",
+          "name": "listAnimations",
+          "return": {
+            "type": {
+              "text": "string[]"
+            }
+          },
+          "description": "Every registered animation name in registration order."
+        },
+        {
+          "kind": "function",
+          "name": "onAnimationRegistered",
+          "return": {
+            "type": {
+              "text": "() => void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "listener",
+              "type": {
+                "text": "(name: string) => void"
+              }
+            }
+          ],
+          "description": "Subscribe to registration events. Returns an unsubscribe function.\nThe controller uses this to (re-)play animations on elements whose\nnamed animation arrived after the attribute was already set."
+        },
+        {
+          "kind": "function",
+          "name": "registerAnimation",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "parameters": [
+            {
+              "name": "name",
+              "type": {
+                "text": "string"
+              }
+            },
+            {
+              "name": "def",
+              "type": {
+                "text": "AnimationDef"
+              }
+            }
+          ],
+          "description": "Register an animation under a name. Overwrites if the name is already\ntaken, useful for theming a default animation without forking the\npackage."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "getAnimation",
+          "declaration": {
+            "name": "getAnimation",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "hasAnimation",
+          "declaration": {
+            "name": "hasAnimation",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "listAnimations",
+          "declaration": {
+            "name": "listAnimations",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "onAnimationRegistered",
+          "declaration": {
+            "name": "onAnimationRegistered",
+            "module": "src/registry.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "registerAnimation",
+          "declaration": {
+            "name": "registerAnimation",
+            "module": "src/registry.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

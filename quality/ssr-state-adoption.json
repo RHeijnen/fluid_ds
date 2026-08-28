@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "scope": "Published form-associated custom elements whose server-rendered DOM may exist before definition",
+  "entries": [
+    {
+      "tag": "fluid-checkbox",
+      "status": "supported",
+      "surface": "native checkbox",
+      "contract": "checked and indeterminate state, focus, validity and FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-color-picker",
+      "status": "supported",
+      "surface": "editable text input inside the server-rendered nested fluid-input",
+      "contract": "nested text edits normalize into the parent value and FormData while retaining native focus and dispatching no synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-date-picker",
+      "status": "supported",
+      "surface": "native text input",
+      "contract": "uncommitted display drafts, focus and selection survive while canonical ISO value and FormData remain unchanged without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-date-range-picker",
+      "status": "supported",
+      "surface": "native text input when typeable",
+      "contract": "uncommitted range drafts, focus and selection survive while canonical start/end state and FormData remain unchanged without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-file-input",
+      "status": "not-applicable",
+      "surface": "hidden native file input",
+      "reason": "the file input is removed from tab order and the accessibility tree; its visible activation button needs component listeners before it can open a picker"
+    },
+    {
+      "tag": "fluid-input",
+      "status": "supported",
+      "surface": "native input",
+      "contract": "value, focus, supported selection, validity and FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-masked-input",
+      "status": "supported",
+      "surface": "native text input",
+      "contract": "value, focus, supported selection, validity and FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-number-input",
+      "status": "supported",
+      "surface": "native number input",
+      "contract": "value, focus, validity and FormData reconcile without synthetic events or unsupported selection calls",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-otp",
+      "status": "supported",
+      "surface": "multiple native one-character inputs",
+      "contract": "captured boxes reconcile into sanitized canonical value, focus and FormData without synthetic input or completion events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-radio-group",
+      "status": "not-applicable",
+      "surface": "light-DOM custom radio hosts",
+      "reason": "there is no editable native control and selection behavior requires component listeners"
+    },
+    {
+      "tag": "fluid-range-slider",
+      "status": "not-applicable",
+      "surface": "custom slider thumbs",
+      "reason": "there is no editable native control and thumb behavior requires component listeners"
+    },
+    {
+      "tag": "fluid-rating",
+      "status": "not-applicable",
+      "surface": "custom rating interaction",
+      "reason": "there is no editable native control and value changes require component listeners"
+    },
+    {
+      "tag": "fluid-scheduler",
+      "status": "not-applicable",
+      "surface": "custom calendar and time-slot buttons",
+      "reason": "appointment selection requires component listeners and resolved availability"
+    },
+    {
+      "tag": "fluid-select",
+      "status": "not-applicable",
+      "surface": "custom trigger and listbox",
+      "reason": "there is no editable native select and option changes require component listeners"
+    },
+    {
+      "tag": "fluid-signature-pad",
+      "status": "not-applicable",
+      "surface": "canvas plus hidden native file input",
+      "reason": "drawing and the visible upload action require component listeners; the hidden file input is not a user-reachable pre-definition surface"
+    },
+    {
+      "tag": "fluid-slider",
+      "status": "supported",
+      "surface": "native range input",
+      "contract": "range value, focus and FormData reconcile without synthetic events or text-selection calls",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-switch",
+      "status": "supported",
+      "surface": "native checkbox",
+      "contract": "checked state, focus, validity and configured-value FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-tag-input",
+      "status": "supported",
+      "surface": "native text draft input",
+      "contract": "uncommitted draft text and focus survive while the committed tag array and FormData remain unchanged without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-textarea",
+      "status": "supported",
+      "surface": "native textarea",
+      "contract": "value, focus, selection, validity and FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    },
+    {
+      "tag": "fluid-time-picker",
+      "status": "supported",
+      "surface": "native text input",
+      "contract": "uncommitted display drafts, focus and selection survive while canonical time state and FormData remain unchanged without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts; apps/ssr-tests/tests/hydration.spec.ts"
+    },
+    {
+      "tag": "fluid-transfer",
+      "status": "not-applicable",
+      "surface": "custom list options and move buttons",
+      "reason": "there is no editable native control and transfers require component listeners"
+    },
+    {
+      "tag": "fluid-typeahead",
+      "status": "supported",
+      "surface": "native text input",
+      "contract": "value, focus, supported selection, validity and FormData reconcile without synthetic events",
+      "evidence": "packages/components/src/ssr-client.test.ts"
+    }
+  ]
+}

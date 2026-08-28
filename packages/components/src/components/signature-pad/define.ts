@@ -1,6 +1,6 @@
 import { FluidSignaturePad } from "./fluid-signature-pad.js";
 
-if (!customElements.get("fluid-signature-pad")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-signature-pad")) {
   customElements.define("fluid-signature-pad", FluidSignaturePad);
 }
 

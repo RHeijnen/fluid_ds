@@ -66,7 +66,12 @@ const PRESETS: Record<string, EffectFn> = {
   pride: pride as EffectFn
 };
 
-export class FluidCelebrate extends HTMLElement {
+// Lit's server shim intentionally does not install a global HTMLElement. The
+// fallback keeps this transparent, zero-dependency controller importable in a
+// server process; browsers always use the native constructor.
+const HTMLElementBase = (globalThis.HTMLElement ?? class {}) as typeof HTMLElement;
+
+export class FluidCelebrate extends HTMLElementBase {
   static get observedAttributes(): string[] {
     return [
       "effect",

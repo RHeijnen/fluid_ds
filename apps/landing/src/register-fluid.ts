@@ -23,7 +23,6 @@ import "@fluid-ds/icons/lucide/github";
 import "@fluid-ds/icons/lucide/sparkles";
 import "@fluid-ds/icons/lucide/palette";
 import "@fluid-ds/icons/lucide/blocks";
-import "@fluid-ds/icons/lucide/upload";
 
 import "@fluid-ds/components/define/avatar";
 import "@fluid-ds/components/define/badge";
@@ -36,6 +35,7 @@ import "@fluid-ds/components/define/checkbox";
 import "@fluid-ds/components/define/code-block";
 import "@fluid-ds/components/define/comparison";
 import "@fluid-ds/components/define/divider";
+import "@fluid-ds/components/define/fold";
 import "@fluid-ds/components/define/icon";
 import "@fluid-ds/components/define/input";
 import "@fluid-ds/components/define/progress-bar";
@@ -43,6 +43,7 @@ import "@fluid-ds/components/define/progress-ring";
 import "@fluid-ds/components/define/rating";
 import "@fluid-ds/components/define/segmented-control";
 import "@fluid-ds/components/define/select";
+import "@fluid-ds/components/define/signature-pad";
 import "@fluid-ds/components/define/skeleton";
 import "@fluid-ds/components/define/slider";
 import "@fluid-ds/components/define/steps";
@@ -51,14 +52,10 @@ import "@fluid-ds/components/define/tabs";
 import "@fluid-ds/components/define/tag";
 import "@fluid-ds/components/define/tooltip";
 import "@fluid-ds/components/define/tour";
-import "@fluid-ds/components/define/meter";
+import "@fluid-ds/components/define/typeahead";
 
 // Charts expansion pack. The line + doughnut on the page read Fluid tokens and
 // re-theme themselves when the switcher flips the brand.
 import "@fluid-ds/charts/define/line-chart";
 import "@fluid-ds/charts/define/doughnut-chart";
 import "@fluid-ds/charts/define/sparkline";
-
-// New in 0.3: a logo-embedded QR code, shown live in the "What's new" section.
-// The event-effects engine (confetti, fireworks, ...) is imported in main.ts.
-import "@fluid-ds/qr/define";

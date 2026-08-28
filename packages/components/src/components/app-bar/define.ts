@@ -1,6 +1,6 @@
 import { FluidAppBar } from "./fluid-app-bar.js";
 
-if (!customElements.get("fluid-app-bar")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-app-bar")) {
   customElements.define("fluid-app-bar", FluidAppBar);
 }
 

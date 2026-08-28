@@ -1,6 +1,6 @@
 import { FluidZoomableFrame } from "./fluid-zoomable-frame.js";
 
-if (!customElements.get("fluid-zoomable-frame")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-zoomable-frame")) {
   customElements.define("fluid-zoomable-frame", FluidZoomableFrame);
 }
 

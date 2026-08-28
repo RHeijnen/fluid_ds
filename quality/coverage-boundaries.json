@@ -1,0 +1,8 @@
+{
+  "components": {
+    "src/ssr.ts": {
+      "reason": "Node-only streaming renderer. Browser unit coverage cannot execute this entry; it is excluded from browser percentages, not counted as covered.",
+      "gate": "pnpm check:ssr (separate Node renderer behavior and 100 percent built-wrapper line/function/branch coverage; not included in browser percentages)"
+    }
+  }
+}

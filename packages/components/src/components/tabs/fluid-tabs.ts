@@ -43,46 +43,52 @@ export class FluidTabs extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: block;
-    }
+      :host {
+        display: block;
+      }
 
-    .nav {
-      position: relative;
-      display: flex;
-      gap: var(--fluid-tabs-gap, var(--fluid-space-1));
-      border-bottom: var(--fluid-tabs-nav-border-width, 1px) solid
-        var(--fluid-tabs-nav-border, var(--fluid-border-default));
-      overflow-x: auto;
-    }
+      .nav {
+        position: relative;
+        display: flex;
+        gap: var(--fluid-tabs-gap, var(--fluid-space-1));
+        border-bottom: var(--fluid-tabs-nav-border-width, 1px) solid
+          var(--fluid-tabs-nav-border, var(--fluid-border-default));
+        overflow-x: auto;
+      }
 
-    /* Sliding active-tab underline, measured over the selected tab. */
-    .indicator {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: var(--fluid-tabs-indicator-size, 2px);
-      width: var(--_w, 0);
-      transform: translateX(var(--_x, 0));
-      background: var(--fluid-tabs-indicator-color, var(--fluid-accent-base));
-      border-radius: var(--fluid-tabs-indicator-size, 2px);
-      opacity: 0;
-      pointer-events: none;
-      transition:
-        transform
-          calc(var(--fluid-tabs-indicator-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-tabs-indicator-easing, var(--fluid-easing-emphasized)),
-        width
-          calc(var(--fluid-tabs-indicator-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-tabs-indicator-easing, var(--fluid-easing-emphasized));
-    }
-    .indicator.ready {
-      opacity: 1;
-    }
-    .indicator.no-anim {
-      transition: none;
-    }
-  `
+      /* Sliding active-tab underline, measured over the selected tab. */
+      .indicator {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: var(--fluid-tabs-indicator-size, 2px);
+        width: var(--_w, 0);
+        transform: translateX(var(--_x, 0));
+        background: var(--fluid-tabs-indicator-color, var(--fluid-accent-base));
+        border-radius: var(--fluid-tabs-indicator-size, 2px);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          transform
+            calc(
+              var(--fluid-tabs-indicator-duration, var(--fluid-duration-normal)) *
+                var(--fluid-motion, 1)
+            )
+            var(--fluid-tabs-indicator-easing, var(--fluid-easing-emphasized)),
+          width
+            calc(
+              var(--fluid-tabs-indicator-duration, var(--fluid-duration-normal)) *
+                var(--fluid-motion, 1)
+            )
+            var(--fluid-tabs-indicator-easing, var(--fluid-easing-emphasized));
+      }
+      .indicator.ready {
+        opacity: 1;
+      }
+      .indicator.no-anim {
+        transition: none;
+      }
+    `
   ];
 
   /** Name of the currently active panel. */
@@ -97,6 +103,7 @@ export class FluidTabs extends FluidElement {
   @query(".nav") private navEl!: HTMLElement;
   @query(".indicator") private indicatorEl!: HTMLElement;
   private resizeObserver?: ResizeObserver;
+  private tabObserver?: MutationObserver;
   /**
    * True once the value change originates from user interaction (click /
    * keyboard) or an explicit external `value` set, as opposed to the initial
@@ -107,13 +114,30 @@ export class FluidTabs extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("keydown", this.handleKeyDown);
+    this.listen(this, "keydown", this.handleKeyDown);
+    if (typeof MutationObserver !== "undefined") {
+      this.tabObserver?.disconnect();
+      this.tabObserver = new MutationObserver(() => this.syncSelection());
+      this.tabObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled", "name", "panel"]
+      });
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("keydown", this.handleKeyDown);
     this.resizeObserver?.disconnect();
+    this.tabObserver?.disconnect();
+  }
+
+  protected override willUpdate(): void {
+    // Initial fallback selection belongs before rendering. Assigning `value`
+    // from firstUpdated schedules a second host update and emits Lit's
+    // change-in-update warning even though no public change event is intended.
+    this.recoverSelection(this.getTabs(), this.getPanels());
   }
 
   protected override firstUpdated(): void {
@@ -122,9 +146,10 @@ export class FluidTabs extends FluidElement {
     this.resizeObserver = new ResizeObserver(() => this.positionIndicator(false));
     this.resizeObserver.observe(this);
     // Keep the underline aligned while the tab strip scrolls horizontally.
-    this.navEl?.addEventListener("scroll", () => this.positionIndicator(false), {
-      passive: true
-    });
+    if (this.navEl)
+      this.listen(this.navEl, "scroll", () => this.positionIndicator(false), {
+        passive: true
+      });
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -173,20 +198,19 @@ export class FluidTabs extends FluidElement {
   }
 
   private getTabs(): FluidTab[] {
+    if (typeof this.querySelectorAll !== "function") return [];
     return Array.from(this.querySelectorAll("fluid-tab")) as FluidTab[];
   }
 
   private getPanels(): FluidTabPanel[] {
+    if (typeof this.querySelectorAll !== "function") return [];
     return Array.from(this.querySelectorAll("fluid-tab-panel")) as FluidTabPanel[];
   }
 
   private syncSelection(): void {
     const tabs = this.getTabs();
     const panels = this.getPanels();
-    if (!this.value && tabs.length) {
-      const first = tabs.find((t) => !t.disabled) ?? tabs[0];
-      if (first) this.value = first.panel;
-    }
+    this.recoverSelection(tabs, panels);
     for (const tab of tabs) {
       tab.selected = tab.panel === this.value;
       const panel = panels.find((p) => p.name === tab.panel);
@@ -200,6 +224,15 @@ export class FluidTabs extends FluidElement {
     }
   }
 
+  private recoverSelection(tabs: FluidTab[], panels: FluidTabPanel[]): void {
+    const available = tabs.filter((tab) => panels.some((panel) => panel.name === tab.panel));
+    const selected = available.find((tab) => tab.panel === this.value);
+    if ((!selected || selected.disabled) && available.length) {
+      const first = available.find((tab) => !tab.disabled);
+      if (first) this.value = first.panel;
+    }
+  }
+
   private handleNavClick = (e: Event) => {
     const tab = (e.target as HTMLElement).closest("fluid-tab") as FluidTab | null;
     if (!tab || tab.disabled) return;
@@ -210,14 +243,17 @@ export class FluidTabs extends FluidElement {
   private handleKeyDown = (e: KeyboardEvent) => {
     const tabs = this.getTabs().filter((t) => !t.disabled);
     if (!tabs.length) return;
-    const currentIndex = tabs.findIndex((t) => t.selected);
+    // Only tab-originated keys belong to this widget. Panel inputs retain their
+    // native arrow behavior. The composed path also works inside outer shadows.
+    const currentIndex = tabs.findIndex((tab) => e.composedPath().includes(tab));
+    if (currentIndex < 0) return;
     let nextIndex = currentIndex;
     switch (e.key) {
       case "ArrowRight":
-        nextIndex = (currentIndex + 1) % tabs.length;
+        nextIndex = (currentIndex + (this.isRtl ? -1 : 1) + tabs.length) % tabs.length;
         break;
       case "ArrowLeft":
-        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        nextIndex = (currentIndex + (this.isRtl ? 1 : -1) + tabs.length) % tabs.length;
         break;
       case "Home":
         nextIndex = 0;
@@ -227,8 +263,9 @@ export class FluidTabs extends FluidElement {
         break;
       case "Enter":
       case " ":
+        e.preventDefault();
         if (this.activation === "manual") {
-          const focused = tabs.find((t) => t === document.activeElement);
+          const focused = tabs[currentIndex];
           if (focused) {
             this.hasInteracted = true;
             this.value = focused.panel;
@@ -239,6 +276,9 @@ export class FluidTabs extends FluidElement {
         return;
     }
     e.preventDefault();
+    // Manual activation separates selection from focus. Keep exactly one tab
+    // stop at the focused tab while arrows leave aria-selected unchanged.
+    for (const tab of this.getTabs()) tab.tabIndex = tab === tabs[nextIndex] ? 0 : -1;
     tabs[nextIndex]?.focus();
     if (this.activation === "auto") {
       this.hasInteracted = true;
@@ -251,12 +291,7 @@ export class FluidTabs extends FluidElement {
   override render(): TemplateResult {
     return html`
       <div part="base">
-        <div
-          part="nav"
-          class="nav"
-          role="tablist"
-          @click=${this.handleNavClick}
-        >
+        <div part="nav" class="nav" role="tablist" @click=${this.handleNavClick}>
           <slot name="nav" @slotchange=${this.handleSlotChange}></slot>
           <div class="indicator no-anim" part="indicator" aria-hidden="true"></div>
         </div>

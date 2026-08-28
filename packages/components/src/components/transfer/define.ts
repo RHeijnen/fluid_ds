@@ -1,6 +1,6 @@
 import { FluidTransfer } from "./fluid-transfer.js";
 
-if (!customElements.get("fluid-transfer")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-transfer")) {
   customElements.define("fluid-transfer", FluidTransfer);
 }
 

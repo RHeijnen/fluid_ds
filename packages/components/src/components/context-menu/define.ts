@@ -1,6 +1,6 @@
 import { FluidContextMenu } from "./fluid-context-menu.js";
 
-if (!customElements.get("fluid-context-menu"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-context-menu"))
   customElements.define("fluid-context-menu", FluidContextMenu);
 
 declare global {

@@ -7,6 +7,16 @@ longer has to shim it).
 
 ## Status
 
+**COMPLETE (2026-08-25).** All 11 overlay components migrated in one pass,
+`@floating-ui/dom` removed from every package.json and import map, overlays
+browser-verified (placement, width-matching, flip at the viewport edge,
+scroll tracking, popconfirm arrow). Two fixes landed during the migration:
+the engine's `size` middleware now passes `elements` to `apply` (Floating UI
+signature parity; select/popup/typeahead width-matching depended on it), and
+popconfirm renders the `.arrow` element its positioning code had always
+expected. Tooltip was upgraded from untracked absolute positioning to
+`strategy: "fixed"` + `autoUpdate`.
+
 - ✅ **Engine built + unit-tested**, `packages/components/src/internal/position.ts`
   (+ `position.test.ts`, 8 deterministic tests). It re-implements the subset of
   Floating UI the components use, with a drop-in-compatible API:

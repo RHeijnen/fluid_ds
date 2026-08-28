@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
 import "./define.js";
+import "../button/define.js";
+import "../field/define.js";
 import type { FluidTagInput } from "./fluid-tag-input.js";
 
-type Args = Pick<
-  FluidTagInput,
-  "name" | "placeholder" | "disabled" | "max" | "allowDuplicates"
-> & { value: string };
+type Args = Pick<FluidTagInput, "name" | "placeholder" | "disabled" | "max" | "allowDuplicates"> & {
+  value: string;
+};
 
 const meta: Meta<Args> = {
   title: "Components/Forms/Tag input",
@@ -33,7 +35,7 @@ const meta: Meta<Args> = {
       name=${args.name}
       placeholder=${args.placeholder}
       value=${args.value}
-      max=${args.max ?? ""}
+      max=${ifDefined(args.max)}
       ?disabled=${args.disabled}
       ?allow-duplicates=${args.allowDuplicates}
     ></fluid-tag-input>
@@ -65,23 +67,49 @@ export const Disabled: Story = {
   args: { value: "frozen,locked", disabled: true }
 };
 
-export const InAForm: Story = {
-  render: () => html`
-    <form
-      @submit=${(e: Event) => {
-        e.preventDefault();
-        const data = new FormData(e.target as HTMLFormElement);
-        alert(`tags = ${data.get("tags")}`);
-      }}
-      style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 24rem;"
+export const WithDescription: Story = {
+  args: { value: "accessibility,design-systems", placeholder: "Add another topic…" },
+  render: (args) => html`
+    <fluid-field
+      label="Topics"
+      description="Press Enter after each topic to add it to the list."
+      style="max-width:24rem;"
     >
       <fluid-tag-input
-        aria-label="Tags"
-        name="tags"
-        value="alpha,beta"
-        placeholder="Add a tag…"
+        aria-label="Topics"
+        name=${args.name}
+        placeholder=${args.placeholder}
+        value=${args.value}
+        max=${ifDefined(args.max)}
+        ?disabled=${args.disabled}
+        ?allow-duplicates=${args.allowDuplicates}
       ></fluid-tag-input>
-      <button type="submit">Submit</button>
+    </fluid-field>
+  `
+};
+
+export const InAForm: Story = {
+  args: { name: "skills", value: "typescript,web components", placeholder: "Add a skill…" },
+  render: (args) => html`
+    <form
+      @submit=${(event: Event) => event.preventDefault()}
+      style="display:grid; gap:var(--fluid-space-3); max-width:24rem;"
+    >
+      <fluid-field
+        label="Skills"
+        description="Add the skills you want to highlight on your profile."
+      >
+        <fluid-tag-input
+          aria-label="Skills"
+          name=${args.name}
+          placeholder=${args.placeholder}
+          value=${args.value}
+          max=${ifDefined(args.max)}
+          ?disabled=${args.disabled}
+          ?allow-duplicates=${args.allowDuplicates}
+        ></fluid-tag-input>
+      </fluid-field>
+      <fluid-button style="justify-self:start;" type="submit">Save profile</fluid-button>
     </form>
   `
 };

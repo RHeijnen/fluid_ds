@@ -13,6 +13,13 @@ const scriptSrc = fragment(
 const badSrc = "https://this-host-definitely-does-not-exist.invalid/fragment.html";
 
 describe("<fluid-include>", () => {
+  it("passes an a11y audit after included content loads", async () => {
+    const el = await fixture<FluidInclude>(html`<fluid-include src=${okSrc}></fluid-include>`);
+    await oneEvent(el, "fluid-load");
+    await elementUpdated(el);
+    await expect(el).to.be.accessible();
+  });
+
   it("fetches and injects the markup, then fires fluid-load with detail.src", async () => {
     const el = await fixture<FluidInclude>(html`<fluid-include src=${okSrc}></fluid-include>`);
     const ev = await oneEvent(el, "fluid-load");

@@ -63,11 +63,36 @@ describe("position: computeCoordsFromPlacement", () => {
     stubRect(ref, { x: 100, y: 100, width: 50, height: 20 });
     stubRect(float, { x: 0, y: 0, width: 80, height: 40 });
 
-    const start = await computePosition(ref, float, { placement: "bottom-start", strategy: "fixed" });
+    const start = await computePosition(ref, float, {
+      placement: "bottom-start",
+      strategy: "fixed"
+    });
     expect(start).to.include({ x: 100, y: 120 });
 
     const end = await computePosition(ref, float, { placement: "bottom-end", strategy: "fixed" });
     expect(end).to.include({ x: 70, y: 120 });
+  });
+
+  it("resolves horizontal start and end logically for RTL references", async () => {
+    const { ref, float } = await elements();
+    ref.dir = "rtl";
+    stubRect(ref, { x: 100, y: 100, width: 50, height: 20 });
+    stubRect(float, { x: 0, y: 0, width: 80, height: 40 });
+
+    const start = await computePosition(ref, float, {
+      placement: "bottom-start",
+      strategy: "fixed"
+    });
+    expect(start).to.include({ x: 70, y: 120 });
+
+    const end = await computePosition(ref, float, { placement: "bottom-end", strategy: "fixed" });
+    expect(end).to.include({ x: 100, y: 120 });
+
+    const leftStart = await computePosition(ref, float, {
+      placement: "left-start",
+      strategy: "fixed"
+    });
+    expect(leftStart).to.include({ x: 20, y: 100 });
   });
 });
 
@@ -138,6 +163,38 @@ describe("position: middleware", () => {
     });
     expect(captured.availableWidth).to.be.greaterThan(0);
     expect(captured.availableHeight).to.be.greaterThan(0);
+  });
+
+  it("size() hands the live elements to apply, the way match-width consumers need", async () => {
+    // Regression: select/popup/typeahead set the floating element's width from
+    // apply({ elements }); omitting elements made every apply throw and the
+    // whole computePosition reject.
+    const { ref, float } = await elements();
+    stubRect(ref, { x: 100, y: 100, width: 50, height: 20 });
+    stubRect(float, { x: 0, y: 0, width: 80, height: 40 });
+    let seen: { reference: Element; floating: HTMLElement } | undefined;
+    await computePosition(ref, float, {
+      placement: "bottom",
+      strategy: "fixed",
+      middleware: [size({ apply: ({ elements: els }) => (seen = els) })]
+    });
+    expect(seen?.reference).to.equal(ref);
+    expect(seen?.floating).to.equal(float);
+  });
+
+  it("offset() accepts the object form with mainAxis and crossAxis skidding", async () => {
+    // Regression: popover/popup pass { mainAxis, crossAxis }; the number-only
+    // implementation multiplied an object and produced NaN coordinates.
+    const { ref, float } = await elements();
+    stubRect(ref, { x: 300, y: 200, width: 100, height: 30 });
+    stubRect(float, { x: 0, y: 0, width: 120, height: 40 });
+    const res = await computePosition(ref, float, {
+      placement: "bottom",
+      strategy: "fixed",
+      middleware: [offset({ mainAxis: 10, crossAxis: 6 })]
+    });
+    expect(res.y).to.equal(240); // 200 + 30 + 10
+    expect(res.x).to.equal(296); // 300 + (100 - 120) / 2 + 6
   });
 });
 

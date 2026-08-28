@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import "../checkbox/define.js";
+import "../field/define.js";
+import "../input/define.js";
+import "../radio/define.js";
 import type { FluidFieldset } from "./fluid-fieldset.js";
 
 type Args = Pick<FluidFieldset, "legend" | "description" | "error" | "disabled">;
@@ -29,14 +33,12 @@ const meta: Meta<Args> = {
       ?disabled=${args.disabled}
       style="max-width: 24rem;"
     >
-      <label style="display:flex; flex-direction:column; gap:0.25rem;">
-        <span>Email</span>
-        <input type="email" name="email" />
-      </label>
-      <label style="display:flex; flex-direction:column; gap:0.25rem;">
-        <span>Phone</span>
-        <input type="tel" name="phone" />
-      </label>
+      <fluid-field label="Email" for="fieldset-email">
+        <fluid-input id="fieldset-email" type="email" name="email"></fluid-input>
+      </fluid-field>
+      <fluid-field label="Phone" for="fieldset-phone">
+        <fluid-input id="fieldset-phone" type="tel" name="phone"></fluid-input>
+      </fluid-field>
     </fluid-fieldset>
   `
 };
@@ -62,12 +64,8 @@ export const LegendSlot: Story = {
   render: () => html`
     <fluid-fieldset style="max-width: 24rem;">
       <span slot="legend">Notification preferences</span>
-      <label style="display:flex; gap:0.5rem; align-items:center;">
-        <input type="checkbox" name="email-updates" /> Email updates
-      </label>
-      <label style="display:flex; gap:0.5rem; align-items:center;">
-        <input type="checkbox" name="sms-updates" /> SMS updates
-      </label>
+      <fluid-checkbox name="email-updates">Email updates</fluid-checkbox>
+      <fluid-checkbox name="sms-updates">SMS updates</fluid-checkbox>
     </fluid-fieldset>
   `
 };
@@ -79,15 +77,11 @@ export const RadioGroup: Story = {
       description="Pick the plan that fits your team."
       style="max-width: 24rem;"
     >
-      <label style="display:flex; gap:0.5rem; align-items:center;">
-        <input type="radio" name="plan" value="free" checked /> Free
-      </label>
-      <label style="display:flex; gap:0.5rem; align-items:center;">
-        <input type="radio" name="plan" value="pro" /> Pro
-      </label>
-      <label style="display:flex; gap:0.5rem; align-items:center;">
-        <input type="radio" name="plan" value="team" /> Team
-      </label>
+      <fluid-radio-group name="plan" value="free" aria-label="Plan">
+        <fluid-radio value="free">Free</fluid-radio>
+        <fluid-radio value="pro">Pro</fluid-radio>
+        <fluid-radio value="team">Team</fluid-radio>
+      </fluid-radio-group>
     </fluid-fieldset>
   `
 };

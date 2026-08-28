@@ -1,10 +1,10 @@
 import { FluidGrid } from "./fluid-grid.js";
 import { FluidCol } from "./fluid-col.js";
 
-if (!customElements.get("fluid-grid")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-grid")) {
   customElements.define("fluid-grid", FluidGrid);
 }
-if (!customElements.get("fluid-col")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-col")) {
   customElements.define("fluid-col", FluidCol);
 }
 

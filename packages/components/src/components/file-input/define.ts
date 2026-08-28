@@ -1,6 +1,6 @@
 import { FluidFileInput } from "./fluid-file-input.js";
 
-if (!customElements.get("fluid-file-input")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-file-input")) {
   customElements.define("fluid-file-input", FluidFileInput);
 }
 

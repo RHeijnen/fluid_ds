@@ -1,5 +1,10 @@
 import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import "../button/define.js";
 import type { FluidPopconfirm } from "./fluid-popconfirm.js";
 
@@ -19,6 +24,105 @@ async function open(el: FluidPopconfirm): Promise<void> {
 }
 
 describe("<fluid-popconfirm>", () => {
+  describe("<fluid-popconfirm> localized defaults", () => {
+    const readLabels = (control: FluidPopconfirm) => [
+      control.shadowRoot!.querySelector(".message")!.textContent!.trim(),
+      control.shadowRoot!.querySelector(".confirm")!.textContent!.trim(),
+      control.shadowRoot!.querySelector(".cancel")!.textContent!.trim()
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Weet je het zeker?", "Bevestigen", "Annuleren"]],
+      ["de", ["Sind Sie sicher?", "Bestätigen", "Abbrechen"]],
+      ["fr", ["Voulez-vous continuer ?", "Confirmer", "Annuler"]],
+      ["es", ["¿Quieres continuar?", "Confirmar", "Cancelar"]],
+      ["ar", ["هل تريد المتابعة؟", "تأكيد", "إلغاء"]],
+      ["fr-CA", ["Voulez-vous continuer ?", "Confirmer", "Annuler"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-popconfirm></fluid-popconfirm></div>
+        `);
+        const control = wrapper.querySelector<FluidPopconfirm>("fluid-popconfirm")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("message")).to.equal(false);
+        expect(control.hasAttribute("confirm-text")).to.equal(false);
+        expect(control.hasAttribute("cancel-text")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.message).to.equal(expected[0]);
+        expect(control.confirmText).to.equal(expected[1]);
+        expect(control.cancelText).to.equal(expected[2]);
+        expect(control.hasAttribute("message")).to.equal(false);
+        expect(control.hasAttribute("confirm-text")).to.equal(false);
+        expect(control.hasAttribute("cancel-text")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidPopconfirm>(html`<fluid-popconfirm></fluid-popconfirm>`);
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Weet je het zeker?", "Bevestigen", "Annuleren"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Sind Sie sicher?", "Bestätigen", "Abbrechen"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["هل تريد المتابعة؟", "تأكيد", "إلغاء"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-popconfirm></fluid-popconfirm></div>
+      `);
+      const control = wrapper.querySelector<FluidPopconfirm>("fluid-popconfirm")!;
+      control.message = "Are you sure?";
+      control.confirmText = "Confirm";
+      control.cancelText = "Cancel";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Are you sure?", "Confirm", "Cancel"]);
+      control.setAttribute("message", "Are you sure?");
+      control.setAttribute("confirm-text", "Confirm");
+      control.setAttribute("cancel-text", "Cancel");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Are you sure?", "Confirm", "Cancel"]);
+      control.removeAttribute("message");
+      control.removeAttribute("confirm-text");
+      control.removeAttribute("cancel-text");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([
+        "Voulez-vous continuer ?",
+        "Confirmer",
+        "Annuler"
+      ]);
+      control.message = "";
+      control.confirmText = "";
+      control.cancelText = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["", "", ""]);
+      Reflect.set(control, "message", null);
+      Reflect.set(control, "confirmText", null);
+      Reflect.set(control, "cancelText", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["هل تريد المتابعة؟", "تأكيد", "إلغاء"]);
+    });
+  });
+
   it("is closed by default", async () => {
     const el = await fixture<FluidPopconfirm>(html`
       <fluid-popconfirm><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
@@ -28,7 +132,9 @@ describe("<fluid-popconfirm>", () => {
 
   it("uses role=alertdialog with aria-modal and aria-describedby", async () => {
     const el = await fixture<FluidPopconfirm>(html`
-      <fluid-popconfirm message="Sure?"><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
+      <fluid-popconfirm message="Sure?"
+        ><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm
+      >
     `);
     const panel = el.shadowRoot!.querySelector(".panel")!;
     expect(panel.getAttribute("role")).to.equal("alertdialog");
@@ -75,9 +181,7 @@ describe("<fluid-popconfirm>", () => {
       <fluid-popconfirm><fluid-button slot="trigger">X</fluid-button></fluid-popconfirm>
     `);
     await open(el);
-    setTimeout(() =>
-      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    );
+    setTimeout(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
     await oneEvent(el, "fluid-cancel");
     expect(el.open).to.be.false;
   });

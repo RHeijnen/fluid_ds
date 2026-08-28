@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -70,7 +70,7 @@ export class FluidTreeItem extends FluidElement {
       border-radius: var(--fluid-tree-item-radius, var(--fluid-radius-sm));
       cursor: pointer;
       user-select: none;
-      padding-left: calc(var(--_level, 0) * var(--_indent) + var(--fluid-space-2));
+      padding-inline-start: calc(var(--_level, 0) * var(--_indent) + var(--fluid-space-2));
     }
     .row:hover {
       background: var(--fluid-tree-item-hover-bg, var(--fluid-surface-muted));
@@ -101,7 +101,7 @@ export class FluidTreeItem extends FluidElement {
       justify-content: center;
       width: 1rem;
       height: 1rem;
-      transition: transform 120ms ease;
+      transition: transform calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
       flex-shrink: 0;
       color: var(--fluid-tree-item-chevron-fg, var(--fluid-text-secondary));
     }
@@ -153,6 +153,9 @@ export class FluidTreeItem extends FluidElement {
     super.connectedCallback();
     if (!this.hasAttribute("role")) this.setAttribute("role", "treeitem");
     this.tabIndex = -1;
+    this.childObserver = new MutationObserver(() => this.routeChildren());
+    this.childObserver.observe(this, { childList: true });
+    this.routeChildren();
   }
 
   override disconnectedCallback(): void {
@@ -163,13 +166,10 @@ export class FluidTreeItem extends FluidElement {
 
   protected override firstUpdated(): void {
     this.routeChildren();
-    this.childObserver = new MutationObserver(() => this.routeChildren());
-    this.childObserver.observe(this, { childList: true });
   }
 
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("expanded")) {
-      this.setAttribute("aria-expanded", String(this.expanded));
       this.dispatchEvent(
         new CustomEvent("fluid-toggle", {
           detail: { expanded: this.expanded },
@@ -178,12 +178,29 @@ export class FluidTreeItem extends FluidElement {
         })
       );
     }
+    if (this.hasChildren) this.setAttribute("aria-expanded", String(this.expanded));
+    else this.removeAttribute("aria-expanded");
+    if (changed.has("disabled")) this.setAttribute("aria-disabled", String(this.disabled));
     if (changed.has("selected")) {
       this.setAttribute("aria-selected", String(this.selected));
     }
     if (changed.has("level")) {
       this.style.setProperty("--_level", String(this.level));
+      this.setAttribute("aria-level", String(this.level + 1));
+      this.routeChildren();
     }
+  }
+
+  /** Visible label without the text of nested descendants. */
+  get label(): string {
+    return (
+      this.getAttribute("aria-label") ??
+      Array.from(this.childNodes)
+        .filter((node) => !(node instanceof Element) || node.getAttribute("slot") !== "children")
+        .map((node) => node.textContent ?? "")
+        .join(" ")
+        .trim()
+    );
   }
 
   /** Move child tree-items into the dedicated `children` slot for layout. */

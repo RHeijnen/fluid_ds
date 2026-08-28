@@ -91,7 +91,12 @@ export function getOppositePlacement(placement: Placement): Placement {
 }
 
 /** Base coordinates for a placement, before any middleware. */
-function computeCoordsFromPlacement(reference: Rect, floating: Dimensions, placement: Placement): Coords {
+function computeCoordsFromPlacement(
+  reference: Rect,
+  floating: Dimensions,
+  placement: Placement,
+  direction: "ltr" | "rtl"
+): Coords {
   const side = getSide(placement);
   const align = getAlignment(placement);
   const refCenterX = reference.x + reference.width / 2;
@@ -116,7 +121,8 @@ function computeCoordsFromPlacement(reference: Rect, floating: Dimensions, place
   // Alignment shifts along the cross axis (start = align leading edge).
   if (align) {
     if (getMainAxis(placement) === "y") {
-      coords.x = align === "start" ? reference.x : reference.x + reference.width - floating.width;
+      const alignStart = direction === "rtl" ? align === "end" : align === "start";
+      coords.x = alignStart ? reference.x : reference.x + reference.width - floating.width;
     } else {
       coords.y = align === "start" ? reference.y : reference.y + reference.height - floating.height;
     }
@@ -138,7 +144,11 @@ function rectFromDom(el: Element): Rect {
   return { x: r.x, y: r.y, width: r.width, height: r.height };
 }
 
-function getElementRects(reference: Element, floating: HTMLElement, strategy: Strategy): ElementRects {
+function getElementRects(
+  reference: Element,
+  floating: HTMLElement,
+  strategy: Strategy
+): ElementRects {
   const ref = rectFromDom(reference);
   const float: Rect = {
     x: 0,
@@ -173,16 +183,22 @@ function detectOverflow(state: MiddlewareState, padding = 0): Record<Side, numbe
 /* Middleware                                                            */
 /* --------------------------------------------------------------------- */
 
-/** Push the floating element away from the reference along the main axis. */
-export function offset(value = 0): Middleware {
+/**
+ * Push the floating element away from the reference. A number moves along the
+ * main axis; the object form adds `crossAxis` skidding (positive toward the
+ * end of the cross axis), matching the Floating UI signature.
+ */
+export function offset(value: number | { mainAxis?: number; crossAxis?: number } = 0): Middleware {
+  const mainAxis = typeof value === "number" ? value : (value.mainAxis ?? 0);
+  const crossAxis = typeof value === "number" ? 0 : (value.crossAxis ?? 0);
   return {
     name: "offset",
     fn(state) {
       const side = getSide(state.placement);
       const sign = side === "top" || side === "left" ? -1 : 1;
       return getMainAxis(state.placement) === "y"
-        ? { y: state.y + sign * value }
-        : { x: state.x + sign * value };
+        ? { y: state.y + sign * mainAxis, x: state.x + crossAxis }
+        : { x: state.x + sign * mainAxis, y: state.y + crossAxis };
     }
   };
 }
@@ -230,7 +246,14 @@ export function shift(options: { padding?: number } = {}): Middleware {
  *  the consumer can cap the floating element's size. */
 export function size(options: {
   padding?: number;
-  apply?: (args: { availableWidth: number; availableHeight: number; rects: ElementRects }) => void;
+  /** Accepted for Floating UI signature compatibility; the viewport is always the boundary. */
+  rootBoundary?: string;
+  apply?: (args: {
+    availableWidth: number;
+    availableHeight: number;
+    rects: ElementRects;
+    elements: { reference: Element; floating: HTMLElement };
+  }) => void;
 }): Middleware {
   const padding = options.padding ?? 0;
   return {
@@ -242,13 +265,17 @@ export function size(options: {
       let availableHeight = vp.height - padding * 2;
       if (side === "top") availableHeight = state.rects.reference.y - vp.y - padding;
       else if (side === "bottom")
-        availableHeight = vp.y + vp.height - (state.rects.reference.y + state.rects.reference.height) - padding;
+        availableHeight =
+          vp.y + vp.height - (state.rects.reference.y + state.rects.reference.height) - padding;
       else if (side === "left") availableWidth = state.rects.reference.x - vp.x - padding;
-      else availableWidth = vp.x + vp.width - (state.rects.reference.x + state.rects.reference.width) - padding;
+      else
+        availableWidth =
+          vp.x + vp.width - (state.rects.reference.x + state.rects.reference.width) - padding;
       options.apply?.({
         availableWidth: Math.max(0, availableWidth),
         availableHeight: Math.max(0, availableHeight),
-        rects: state.rects
+        rects: state.rects,
+        elements: state.elements
       });
       return {};
     }
@@ -299,10 +326,16 @@ export async function computePosition(
   const placement = config.placement ?? "bottom";
   const strategy = config.strategy ?? "absolute";
   const middleware = (config.middleware ?? []).filter(Boolean) as Middleware[];
+  const direction = getComputedStyle(reference).direction === "rtl" ? "rtl" : "ltr";
 
   const rects = getElementRects(reference, floating, strategy);
   let statefulPlacement = placement;
-  let coords = computeCoordsFromPlacement(rects.reference, rects.floating, statefulPlacement);
+  let coords = computeCoordsFromPlacement(
+    rects.reference,
+    rects.floating,
+    statefulPlacement,
+    direction
+  );
   let middlewareData: MiddlewareData = {};
 
   // Sequential run with reset support (flip restarts from the new placement).
@@ -321,11 +354,18 @@ export async function computePosition(
     });
     if (ret.x != null) coords.x = ret.x;
     if (ret.y != null) coords.y = ret.y;
-    if (ret.data) middlewareData = { ...middlewareData, [name]: { ...middlewareData[name], ...ret.data } };
+    if (ret.data)
+      middlewareData = { ...middlewareData, [name]: { ...middlewareData[name], ...ret.data } };
     if (ret.reset && resets < middleware.length + 1) {
       resets += 1;
-      if (typeof ret.reset === "object" && ret.reset.placement) statefulPlacement = ret.reset.placement;
-      coords = computeCoordsFromPlacement(rects.reference, rects.floating, statefulPlacement);
+      if (typeof ret.reset === "object" && ret.reset.placement)
+        statefulPlacement = ret.reset.placement;
+      coords = computeCoordsFromPlacement(
+        rects.reference,
+        rects.floating,
+        statefulPlacement,
+        direction
+      );
       i = -1;
     }
   }
@@ -356,7 +396,9 @@ export function autoUpdate(
   const listeners: Array<() => void> = [];
   if (ancestorScroll) {
     win.addEventListener("scroll", update, { passive: true, capture: true });
-    listeners.push(() => win.removeEventListener("scroll", update, { capture: true } as EventListenerOptions));
+    listeners.push(() =>
+      win.removeEventListener("scroll", update, { capture: true } as EventListenerOptions)
+    );
   }
   if (ancestorResize) {
     win.addEventListener("resize", update, { passive: true });

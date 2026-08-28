@@ -1,6 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import { FluidElement } from "../../internal/base-element.js";
+import { formattingLocales } from "../../internal/formatting-locale.js";
 
 type DateStyle = "full" | "long" | "medium" | "short";
 type TimeStyle = "full" | "long" | "medium" | "short";
@@ -27,7 +28,7 @@ export class FluidFormatDate extends FluidElement {
   /** Time style. */
   @property({ attribute: "time-style" }) timeStyle: TimeStyle | undefined;
 
-  /** Locale. */
+  /** BCP 47 locale. Omit to inherit declared lang, then fall back to English. */
   @property() locale: string | null = null;
 
   /** Hour cycle. */
@@ -36,7 +37,7 @@ export class FluidFormatDate extends FluidElement {
   /** IANA time zone (e.g. "America/Los_Angeles"). */
   @property({ attribute: "time-zone" }) timeZone: string | undefined;
 
-  /** Detailed formatting options (overrides dateStyle/timeStyle if set). */
+  /** Detailed formatting options. Do not combine with dateStyle/timeStyle presets. */
   @property() weekday: "narrow" | "short" | "long" | undefined;
   @property() era: "narrow" | "short" | "long" | undefined;
   @property() year: "numeric" | "2-digit" | undefined;
@@ -75,7 +76,9 @@ export class FluidFormatDate extends FluidElement {
     if (this.hourCycle) opts.hourCycle = this.hourCycle;
     if (this.timeZone) opts.timeZone = this.timeZone;
     try {
-      return html`${new Intl.DateTimeFormat(this.locale ?? undefined, opts).format(date)}`;
+      return html`${new Intl.DateTimeFormat(formattingLocales(this, this.locale), opts).format(
+        date
+      )}`;
     } catch {
       return html`${date.toISOString()}`;
     }

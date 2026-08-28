@@ -1,9 +1,9 @@
 import { FluidBreadcrumb } from "./fluid-breadcrumb.js";
 import { FluidBreadcrumbItem } from "./fluid-breadcrumb-item.js";
 
-if (!customElements.get("fluid-breadcrumb"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-breadcrumb"))
   customElements.define("fluid-breadcrumb", FluidBreadcrumb);
-if (!customElements.get("fluid-breadcrumb-item"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-breadcrumb-item"))
   customElements.define("fluid-breadcrumb-item", FluidBreadcrumbItem);
 
 declare global {

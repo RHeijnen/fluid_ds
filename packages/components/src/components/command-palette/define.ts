@@ -1,6 +1,6 @@
 import { FluidCommandPalette } from "./fluid-command-palette.js";
 
-if (!customElements.get("fluid-command-palette")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-command-palette")) {
   customElements.define("fluid-command-palette", FluidCommandPalette);
 }
 

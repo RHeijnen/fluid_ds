@@ -57,6 +57,11 @@ type TimeFormat = "12h" | "24h";
  * @fires fluid-change - A slot was selected. `detail: { value, slot }`.
  */
 export class FluidTimeSlots extends FluidElement {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidElement.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = [
     reducedMotion,
     css`
@@ -176,6 +181,14 @@ export class FluidTimeSlots extends FluidElement {
 
   @queryAll(".slot") private slotEls!: NodeListOf<HTMLButtonElement>;
 
+  override focus(options?: FocusOptions): void {
+    const target = Array.from(this.slotEls ?? []).find(
+      (slot) => slot.classList.contains("selected") && !slot.disabled
+    ) ?? Array.from(this.slotEls ?? []).find((slot) => slot.tabIndex === 0 && !slot.disabled);
+    if (target) target.focus(options);
+    else super.focus(options);
+  }
+
   /** The slots to render: explicit `slots`, else generated from date + availability. */
   private get resolved(): Slot[] {
     if (this.slots) return this.slots;
@@ -270,14 +283,15 @@ export class FluidTimeSlots extends FluidElement {
 
   override render(): TemplateResult {
     const slots = this.resolved;
-    const groupLabel = this.date ? `Time slots for ${this.headingText()}` : "Time slots";
+    const heading = this.headingText();
+    const groupLabel = this.date ? this.term("timeSlotsFor", heading) : this.term("timeSlots");
 
     if (slots.length === 0) {
       const closed = !!this.date && !!this.availability;
       return html`
         <div part="base">
           ${this.date && !this.noHeading ? html`<p class="heading" part="heading">${this.headingText()}</p>` : ""}
-          <p class="empty" part="empty" role="status">${closed ? "No openings on this day." : "Select a day to see openings."}</p>
+          <p class="empty" part="empty" role="status">${closed ? this.term("noOpeningsOnDay") : this.term("selectDayToSeeOpenings")}</p>
         </div>
       `;
     }
@@ -308,7 +322,7 @@ export class FluidTimeSlots extends FluidElement {
                 aria-checked=${selected ? "true" : "false"}
                 tabindex=${i === this.activeIndex && selectable ? 0 : -1}
                 ?disabled=${!selectable || this.disabled}
-                aria-label=${selectable ? label : `${label}, unavailable`}
+                aria-label=${selectable ? label : this.term("slotUnavailable", label)}
                 @click=${() => this.select(slot)}
               >
                 ${label}
@@ -317,7 +331,7 @@ export class FluidTimeSlots extends FluidElement {
           })}
         </div>
         <span class="sr-only" role="status" aria-live="polite">
-          ${available} ${available === 1 ? "opening" : "openings"} available${this.date ? ` on ${this.headingText()}` : ""}.
+          ${this.term("openingsAvailable", available, this.date ? heading : "")}
         </span>
       </div>
     `;

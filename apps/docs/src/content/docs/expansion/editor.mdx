@@ -11,8 +11,10 @@ rest of the system. Expansion pack.
 import { Aside } from "@astrojs/starlight/components";
 
 <Aside type="note">
-  Formatting uses `document.execCommand`. It is deprecated yet still universally
-  supported across browsers, which keeps this editor tiny and dependency-free.
+  Formatting uses the deprecated `document.execCommand` API. The current browser
+  unit suite exercises Chromium, Firefox and WebKit. These targeted checks do
+  not establish complete editing or assistive-technology compatibility.
+  DOMPurify is used to sanitize HTML.
 </Aside>
 
 ## Install
@@ -68,12 +70,13 @@ the editor's HTML:
 | `value` | `string` | `""` | The editor content as an HTML string. Reading it returns the live HTML; setting it replaces the editable content. |
 | `label` | `string` | `"Rich text editor"` | Accessible name for the editable textbox. |
 | `placeholder` | `string` | `""` | Hint shown while the editor is empty. |
+| `readOnly` / `readonly` | `boolean` | `false` | Keep the textbox selectable and focusable but prevent editing and disable formatting controls. Programmatic `value` assignment remains available. |
 
 ### Events
 
 | Event | Detail | Description |
 | --- | --- | --- |
-| `fluid-change` | `{ value: string }` | Fires on every input with the current HTML. |
+| `fluid-change` | `{ value: string }` | Fires once per content mutation with sanitized HTML. A formatting command and its native input do not emit duplicates. Programmatic assignment does not emit it. |
 
 ### Toolbar
 
@@ -83,6 +86,33 @@ toggle buttons (Bold, Italic, Underline, Bullet list, Numbered list) reflect
 `aria-pressed` from the current selection. Link and Clear formatting are action
 buttons. Every button carries an `aria-label`, a minimum target size, and a
 visible focus ring.
+
+Moving into the toolbar preserves the editor selection for the formatting
+command. Pointer activation keeps that selection, and commands return focus to
+the textbox. Read-only content remains accessible for reading and copying.
+Selection capture includes containing shadow roots when the browser provides
+`Selection.getComposedRanges()`. The older API fallback accepts only ranges
+whose endpoints are both inside this editor; it does not guess retargeted shadow
+endpoints. Replacing `value` discards the old saved selection. Assigning the same
+sanitized HTML without replacing the DOM preserves it.
+Backward selections retain their direction, including after a canceled link
+prompt. Sanitization and read-only rollback discard a saved range when they
+replace the editable DOM.
+Assigned, pasted, and edited HTML is sanitized before it is exposed in a change
+event. This is not a substitute for server-side validation when storing or
+rendering user-generated content elsewhere.
+
+### Verification scope
+
+The 2026-08-26 targeted suite contains 43 test cases, executed separately in
+Chromium, Firefox and WebKit. Native browser keyboard input establishes the
+selection for formatting, link creation and nested-shadow-root restoration.
+Controlled API tests cover the legacy selection fallback and rejected ranges;
+they are not proof of support for older browsers. Synthetic paste tests provide
+an explicit HTML payload and verify sanitization, actual insertion and one
+change event. They do not verify operating-system clipboard permissions or a
+trusted paste gesture. Coverage percentages are measured separately from these
+case counts. Manual assistive-technology review remains outstanding.
 
 ### CSS parts
 

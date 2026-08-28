@@ -37,8 +37,8 @@ type Trigger = "mount" | "in-view" | "hover" | "click" | "manual";
 
 /** Tracks the currently-running animation per element (so we can cancel/restart). */
 const running = new WeakMap<Element, Animation>();
-/** Elements waiting for in-view trigger, one IntersectionObserver entry each. */
-const inViewObserver = createInViewObserver();
+/** Lazily created so importing the package in an SSR process needs no DOM. */
+let inViewObserver: IntersectionObserver | undefined;
 /** Elements that already played a one-shot trigger; don't re-play on attribute echo. */
 const settled = new WeakSet<Element>();
 
@@ -49,7 +49,11 @@ let bootstrapped = false;
  * (the second call is a no-op). Typically driven by the side-effect
  * import of `@fluid-ds/animations/define/controller`.
  */
-export function startAnimationController(root: Document | ShadowRoot = document): void {
+export function startAnimationController(root?: Document | ShadowRoot): void {
+  if (!root) {
+    if (typeof document === "undefined") return;
+    root = document;
+  }
   if (bootstrapped) return;
   bootstrapped = true;
 
@@ -145,7 +149,14 @@ function handleElement(el: HTMLElement): void {
       }
       return;
     case "in-view":
-      if (!settled.has(el)) inViewObserver.observe(el);
+      if (!settled.has(el)) {
+        const observer = getInViewObserver();
+        if (observer) observer.observe(el);
+        else {
+          settled.add(el);
+          play(el, def);
+        }
+      }
       return;
     case "hover":
       // Resolve the current def at fire time: the listener is bound once, but
@@ -241,8 +252,10 @@ function attachOnce(el: HTMLElement, type: string, handler: () => void): void {
   el.addEventListener(type, () => handler(), { passive: true });
 }
 
-function createInViewObserver(): IntersectionObserver {
-  return new IntersectionObserver(
+function getInViewObserver(): IntersectionObserver | undefined {
+  if (inViewObserver) return inViewObserver;
+  if (typeof IntersectionObserver === "undefined") return undefined;
+  inViewObserver = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
@@ -254,9 +267,10 @@ function createInViewObserver(): IntersectionObserver {
         if (!def) continue;
         settled.add(el);
         play(el, def);
-        inViewObserver.unobserve(el);
+        inViewObserver?.unobserve(el);
       }
     },
     { threshold: 0.15 }
   );
+  return inViewObserver;
 }

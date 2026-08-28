@@ -1,6 +1,6 @@
 import { FluidVideoPlaylist } from "./fluid-video-playlist.js";
 
-if (!customElements.get("fluid-video-playlist")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-video-playlist")) {
   customElements.define("fluid-video-playlist", FluidVideoPlaylist);
 }
 

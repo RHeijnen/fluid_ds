@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-27",
+  "environment": {
+    "platform": "linux",
+    "container": "fluid-readiness-linux-20260826",
+    "engines": ["chromium", "firefox", "webkit"],
+    "server": "direct Vite binary with explicit process cleanup"
+  },
+  "scope": {
+    "forms": ["fluid-input"],
+    "overlaysAndDisclosures": ["fluid-details"],
+    "navigation": ["fluid-tabs", "fluid-tab", "fluid-tab-panel"],
+    "representative": true,
+    "exhaustiveCatalogCoverage": false,
+    "manualAssistiveTechnologyCoverage": false
+  },
+  "retainedFailures": [
+    {
+      "phase": "initial",
+      "passed": 6,
+      "failed": 3,
+      "engines": ["chromium", "firefox", "webkit"],
+      "failure": "Removing the selected beta tab-panel pair left fluid-tabs.value at beta instead of recovering to alpha."
+    },
+    {
+      "phase": "after-selection-repair",
+      "passed": 6,
+      "failed": 3,
+      "engines": ["chromium", "firefox", "webkit"],
+      "failure": "Functional beta-to-alpha recovery passed, but the clean-console gate retained Lit's change-in-update warning from initial Tabs auto-selection."
+    }
+  ],
+  "final": {
+    "passed": 9,
+    "failed": 0,
+    "assertions": [
+      "runtime custom-element upgrade and shadow-root presence",
+      "Input reconnect identity, FormData, focus, disabled, readonly, invalid-to-valid recovery and exact input/change payloads",
+      "Details open reconnect, disabled inertness, close recovery and exact toggle events",
+      "Tabs selected-child removal fallback, dynamic addition, reconnect, focus navigation and exact change payloads",
+      "no page errors, console errors or unexpected warnings",
+      "no failed requests or HTTP error responses"
+    ]
+  }
+}

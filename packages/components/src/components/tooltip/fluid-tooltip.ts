@@ -1,8 +1,18 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
-import { computePosition, flip, offset, shift, type Placement } from "@floating-ui/dom";
+import {
+  autoUpdate,
+  computePosition,
+  flip,
+  offset,
+  shift,
+  type Placement
+} from "../../internal/position.js";
 import { FluidElement } from "../../internal/base-element.js";
 import { reducedMotion } from "../../internal/motion.js";
+
+export type FluidTooltipShowEvent = CustomEvent<null>;
+export type FluidTooltipHideEvent = CustomEvent<null>;
 
 let counter = 0;
 
@@ -17,8 +27,8 @@ let counter = 0;
  * </fluid-tooltip>
  * ```
  *
- * Positioning via @floating-ui/dom, automatically flips and shifts to stay
- * in the viewport.
+ * Positioning via Fluid's in-house engine, automatically flips and shifts to
+ * stay in the viewport and tracks the anchor while it is visible.
  *
  * @summary Hover/focus contextual hint.
  *
@@ -37,6 +47,7 @@ let counter = 0;
  * @cssproperty --fluid-tooltip-font-family - Font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-tooltip-font-size - Font size. Falls back to --fluid-font-size-sm.
  * @cssproperty --fluid-tooltip-max-width - Max width of the popover.
+ * @cssproperty --fluid-tooltip-shadow - Popover elevation. Falls back to --fluid-shadow-md.
  *
  * @uses-token --fluid-color-neutral-900 - Default popover background.
  * @uses-token --fluid-color-white - Default popover text.
@@ -45,41 +56,44 @@ let counter = 0;
  * @uses-token --fluid-font-size-sm - Default font size.
  * @uses-token --fluid-shadow-md - Popover elevation.
  *
- * @fires fluid-show - Fired when the tooltip becomes visible.
- * @fires fluid-hide - Fired when the tooltip is dismissed.
+ * @fires {FluidTooltipShowEvent} fluid-show - Fired when the tooltip becomes visible.
+ * @fires {FluidTooltipHideEvent} fluid-hide - Fired when the tooltip is dismissed.
  */
 export class FluidTooltip extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: contents;
-    }
+      :host {
+        display: contents;
+      }
 
-    .popover {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      pointer-events: none;
-      max-width: var(--fluid-tooltip-max-width, 16rem);
-      padding: var(--fluid-space-1) var(--fluid-space-2);
-      background: var(--fluid-tooltip-bg, var(--fluid-color-neutral-900));
-      color: var(--fluid-tooltip-color, var(--fluid-color-white));
-      font-family: var(--fluid-tooltip-font-family, var(--fluid-font-family-sans));
-      font-size: var(--fluid-tooltip-font-size, var(--fluid-font-size-sm));
-      line-height: var(--fluid-font-line-height-tight);
-      border-radius: var(--fluid-tooltip-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-shadow-md);
-      opacity: 0;
-      transform: translate(0, 0);
-      transition: opacity var(--fluid-duration-fast) var(--fluid-easing-standard);
-    }
+      .popover {
+        /* Fixed, like every other Fluid overlay: viewport coordinates make the
+         positioning math exact and immune to clipping/transformed ancestors;
+         autoUpdate keeps it glued to the anchor while scrolling. */
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        pointer-events: none;
+        max-width: var(--fluid-tooltip-max-width, 16rem);
+        padding: var(--fluid-space-1) var(--fluid-space-2);
+        background: var(--fluid-tooltip-bg, var(--fluid-color-neutral-900));
+        color: var(--fluid-tooltip-color, var(--fluid-color-white));
+        font-family: var(--fluid-tooltip-font-family, var(--fluid-font-family-sans));
+        font-size: var(--fluid-tooltip-font-size, var(--fluid-font-size-sm));
+        line-height: var(--fluid-font-line-height-tight);
+        border-radius: var(--fluid-tooltip-radius, var(--fluid-radius-md));
+        box-shadow: var(--fluid-tooltip-shadow, var(--fluid-shadow-md));
+        opacity: 0;
+        transform: translate(0, 0);
+        transition: opacity var(--fluid-duration-fast) var(--fluid-easing-standard);
+      }
 
-    .popover.visible {
-      opacity: 1;
-    }
-  `
+      .popover.visible {
+        opacity: 1;
+      }
+    `
   ];
 
   @query(".popover") private popoverEl!: HTMLElement;
@@ -87,7 +101,7 @@ export class FluidTooltip extends FluidElement {
   /** Tooltip text. */
   @property() content = "";
 
-  /** Floating-ui placement. */
+  /** Placement relative to the anchor. */
   @property() placement: Placement = "top";
 
   /** Show/hide delay in ms. Helps avoid flashing tooltips on quick passes. */
@@ -107,25 +121,30 @@ export class FluidTooltip extends FluidElement {
   private showTimer?: ReturnType<typeof setTimeout>;
   private hideTimer?: ReturnType<typeof setTimeout>;
   private cleanupPosition?: () => void;
+  private pointerInside = false;
+  private focusInside = false;
+  private presented = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("pointerover", this.handlePointerOver);
-    this.addEventListener("pointerleave", this.handlePointerLeave);
-    this.addEventListener("focusin", this.handleFocusIn);
-    this.addEventListener("focusout", this.handleFocusOut);
-    this.addEventListener("keydown", this.handleKeyDown);
+    this.listen(this, "pointerover", this.handlePointerOver);
+    this.listen(this, "pointerleave", this.handlePointerLeave);
+    this.listen(this, "focusin", this.handleFocusIn);
+    this.listen(this, "focusout", this.handleFocusOut);
+    this.listen(this, "keydown", this.handleKeyDown);
+    if (this.hasUpdated) this.attachAnchor();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    this.removeEventListener("pointerover", this.handlePointerOver);
-    this.removeEventListener("pointerleave", this.handlePointerLeave);
-    this.removeEventListener("focusin", this.handleFocusIn);
-    this.removeEventListener("focusout", this.handleFocusOut);
-    this.removeEventListener("keydown", this.handleKeyDown);
     clearTimeout(this.showTimer);
     clearTimeout(this.hideTimer);
+    this.cleanupPosition?.();
+    this.cleanupPosition = undefined;
+    this.pointerInside = false;
+    this.focusInside = false;
+    this.presented = false;
+    this.visible = false;
     this.detachAnchor();
   }
 
@@ -133,18 +152,36 @@ export class FluidTooltip extends FluidElement {
     this.attachAnchor();
   }
 
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.has("open") && this.open && this.visible) this.visible = false;
+  }
+
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
       if (this.open) this.show();
       else this.hide();
+    }
+    if (changed.has("disabled") && this.disabled) {
+      this.open = false;
+      this.hide(true);
     }
   }
 
   private attachAnchor(): void {
     const slot = this.shadowRoot?.querySelector<HTMLSlotElement>("slot:not([name])");
     const slotted = slot?.assignedElements({ flatten: true });
-    this.anchor = slotted?.[0] as HTMLElement | undefined;
-    if (!this.anchor) return;
+    const next = slotted?.[0] as HTMLElement | undefined;
+    if (next === this.anchor) return;
+    const wasPresented = this.presented;
+    this.cleanupPosition?.();
+    this.cleanupPosition = undefined;
+    this.detachAnchor();
+    this.anchor = next;
+    if (!this.anchor) {
+      if (this.open) this.open = false;
+      this.hide(true);
+      return;
+    }
     const existing = this.anchor.getAttribute("aria-describedby")?.split(/\s+/) ?? [];
     if (!existing.includes(this.tooltipId)) {
       this.anchor.setAttribute(
@@ -152,6 +189,8 @@ export class FluidTooltip extends FluidElement {
         [...existing, this.tooltipId].filter(Boolean).join(" ")
       );
     }
+    if (wasPresented) this.startPositioning();
+    else if (this.open) void this.show();
   }
 
   private detachAnchor(): void {
@@ -161,52 +200,90 @@ export class FluidTooltip extends FluidElement {
       .filter((id) => id && id !== this.tooltipId);
     if (existing.length) this.anchor.setAttribute("aria-describedby", existing.join(" "));
     else this.anchor.removeAttribute("aria-describedby");
+    this.anchor = undefined;
   }
 
-  private handlePointerOver = () => this.scheduleShow();
-  private handlePointerLeave = () => this.scheduleHide();
-  private handleFocusIn = () => this.scheduleShow();
-  private handleFocusOut = () => this.scheduleHide();
+  private handlePointerOver = () => {
+    this.pointerInside = true;
+    this.scheduleShow();
+  };
+  private handlePointerLeave = () => {
+    this.pointerInside = false;
+    this.scheduleHideIfInactive();
+  };
+  private handleFocusIn = () => {
+    this.focusInside = true;
+    this.scheduleShow();
+  };
+  private handleFocusOut = (event: FocusEvent) => {
+    if (event.relatedTarget instanceof Node && this.contains(event.relatedTarget)) return;
+    this.focusInside = false;
+    this.scheduleHideIfInactive();
+  };
   private handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape" && this.visible) {
-      e.stopPropagation();
-      this.scheduleHide(0);
-    }
+    if (e.key !== "Escape" || this.open) return;
+    clearTimeout(this.showTimer);
+    clearTimeout(this.hideTimer);
+    e.stopPropagation();
+    this.hide();
   };
 
   private scheduleShow(): void {
     if (this.disabled) return;
     clearTimeout(this.hideTimer);
-    if (this.visible) return;
+    clearTimeout(this.showTimer);
+    if (this.presented) return;
     this.showTimer = setTimeout(() => this.show(), this.showDelay);
   }
 
   private scheduleHide(delay = this.hideDelay): void {
+    if (this.open) return;
     clearTimeout(this.showTimer);
-    if (!this.visible) return;
+    if (!this.presented) return;
     this.hideTimer = setTimeout(() => this.hide(), delay);
   }
 
-  private async show(): Promise<void> {
-    if (this.visible || !this.anchor) return;
-    this.visible = true;
-    await this.updateComplete;
-    await this.reposition();
-    this.dispatchEvent(new CustomEvent("fluid-show", { bubbles: true, composed: true }));
+  private scheduleHideIfInactive(): void {
+    if (!this.pointerInside && !this.focusInside) this.scheduleHide();
   }
 
-  private hide(): void {
-    if (!this.visible) return;
-    this.visible = false;
+  private async show(): Promise<void> {
+    if (this.presented || !this.anchor || this.disabled) return;
+    this.presented = true;
+    if (!this.open) {
+      this.visible = true;
+      await this.updateComplete;
+    }
+    this.startPositioning();
+    await this.reposition();
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-show", { detail: null, bubbles: true, composed: true })
+    );
+  }
+
+  private hide(force = false): void {
+    if (!this.presented || (this.open && !force)) return;
+    this.presented = false;
+    if (this.visible) this.visible = false;
     this.cleanupPosition?.();
     this.cleanupPosition = undefined;
-    this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
+    );
+  }
+
+  private startPositioning(): void {
+    if (!this.anchor || !this.popoverEl || !this.presented) return;
+    this.cleanupPosition?.();
+    this.cleanupPosition = autoUpdate(this.anchor, this.popoverEl, () => void this.reposition());
+    void this.reposition();
   }
 
   private async reposition(): Promise<void> {
     if (!this.anchor || !this.popoverEl) return;
     const { x, y } = await computePosition(this.anchor, this.popoverEl, {
       placement: this.placement,
+      strategy: "fixed",
       middleware: [offset(8), flip(), shift({ padding: 8 })]
     });
     Object.assign(this.popoverEl.style, { left: `${x}px`, top: `${y}px` });
@@ -218,9 +295,9 @@ export class FluidTooltip extends FluidElement {
       <div
         id=${this.tooltipId}
         part="popover"
-        class="popover ${this.visible ? "visible" : ""}"
+        class="popover ${this.open || this.visible ? "visible" : ""}"
         role="tooltip"
-        aria-hidden=${this.visible ? "false" : "true"}
+        aria-hidden=${this.open || this.visible ? "false" : "true"}
       >
         <slot name="content">${this.content}</slot>
       </div>

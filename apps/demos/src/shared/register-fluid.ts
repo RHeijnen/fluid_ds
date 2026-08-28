@@ -57,6 +57,8 @@ import "@fluid-ds/components/define/textarea";
 import "@fluid-ds/components/define/toast";
 import "@fluid-ds/components/define/tooltip";
 
+import "@fluid-ds/table/define/infinite-table";
+
 import "@fluid-ds/charts/define/bar-chart";
 import "@fluid-ds/charts/define/line-chart";
 import "@fluid-ds/charts/define/doughnut-chart";

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import "../button/define.js";
+import "../field/define.js";
 import type { FluidCheckbox } from "./fluid-checkbox.js";
 
 type Args = Pick<FluidCheckbox, "checked" | "indeterminate" | "disabled" | "required"> & {
@@ -42,6 +44,7 @@ type Story = StoryObj<Args>;
 export const Default: Story = {};
 
 export const States: Story = {
+  parameters: { controls: { disable: true } },
   render: () => html`
     <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
       <fluid-checkbox>Unchecked</fluid-checkbox>
@@ -54,14 +57,71 @@ export const States: Story = {
 };
 
 export const PartialSelection: Story = {
+  parameters: { controls: { disable: true } },
   render: () => html`
     <div style="display:flex; flex-direction:column; gap: var(--fluid-space-2);">
       <fluid-checkbox indeterminate>All items</fluid-checkbox>
-      <div style="display:flex; flex-direction:column; gap: var(--fluid-space-2); padding-left: 1.5rem;">
+      <div
+        style="display:flex; flex-direction:column; gap: var(--fluid-space-2); padding-left: 1.5rem;"
+      >
         <fluid-checkbox checked>Apple</fluid-checkbox>
         <fluid-checkbox>Banana</fluid-checkbox>
         <fluid-checkbox checked>Cherry</fluid-checkbox>
       </div>
     </div>
+  `
+};
+
+export const WithDescription: Story = {
+  args: { label: "Send me product updates" },
+  render: (args) => html`
+    <fluid-field description="You can change this preference at any time.">
+      <fluid-checkbox
+        ?checked=${args.checked}
+        ?indeterminate=${args.indeterminate}
+        ?disabled=${args.disabled}
+        ?required=${args.required}
+      >
+        ${args.label}
+      </fluid-checkbox>
+    </fluid-field>
+  `
+};
+
+export const InAForm: Story = {
+  args: { required: true, label: "I agree to the terms" },
+  render: (args) => html`
+    <form
+      style="display:grid; gap:var(--fluid-space-3); max-width:360px;"
+      @submit=${(event: Event) => event.preventDefault()}
+    >
+      <fluid-field
+        label="Terms and conditions"
+        description="You must accept the terms before continuing."
+        ?required=${args.required}
+      >
+        <fluid-checkbox
+          name="terms"
+          .checked=${args.checked}
+          ?indeterminate=${args.indeterminate}
+          ?disabled=${args.disabled}
+          ?required=${args.required}
+          aria-label=${args.label}
+          @invalid=${(event: Event) => {
+            const control = event.currentTarget as FluidCheckbox;
+            const field = control.closest("fluid-field") as HTMLElement & { error: string };
+            field.error = control.validationMessage;
+          }}
+          @fluid-change=${(event: Event) => {
+            const control = event.currentTarget as FluidCheckbox;
+            const field = control.closest("fluid-field") as HTMLElement & { error: string };
+            if (control.validity.valid) field.error = "";
+          }}
+        >
+          ${args.label}
+        </fluid-checkbox>
+      </fluid-field>
+      <fluid-button style="justify-self:start;" type="submit">Continue</fluid-button>
+    </form>
   `
 };

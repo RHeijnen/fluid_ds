@@ -1,11 +1,12 @@
-import { LitElement, html, css, type TemplateResult } from "lit";
+import { html, css, type TemplateResult } from "lit";
 import { property, state, query } from "lit/decorators.js";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
+import { formatMediaNumber } from "../../internal/format.js";
 
-const pad = (n: number): string => String(Math.floor(n)).padStart(2, "0");
-function formatTime(s: number): string {
-  if (!isFinite(s) || s < 0) return "0:00";
+function formatTime(s: number, locale: string): string {
+  if (!isFinite(s) || s < 0) s = 0;
   const m = Math.floor(s / 60);
-  return `${m}:${pad(s % 60)}`;
+  return `${formatMediaNumber(m, locale)}:${formatMediaNumber(Math.floor(s % 60), locale, 2)}`;
 }
 
 /**
@@ -39,7 +40,7 @@ function formatTime(s: number): string {
  * @fires fluid-pause - Playback paused.
  * @fires fluid-ended - Playback reached the end.
  */
-export class FluidAudio extends LitElement {
+export class FluidAudio extends FluidElement {
   static override styles = css`
     :host {
       display: block;
@@ -54,7 +55,9 @@ export class FluidAudio extends LitElement {
       background: var(--fluid-audio-bg, var(--fluid-surface-muted));
       border-radius: var(--fluid-audio-radius, var(--fluid-radius-md, 0.5rem));
     }
-    audio { display: none; }
+    audio {
+      display: none;
+    }
     button {
       display: inline-grid;
       place-items: center;
@@ -67,12 +70,18 @@ export class FluidAudio extends LitElement {
       color: inherit;
       cursor: pointer;
     }
-    button:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+    button:hover {
+      background: color-mix(in srgb, currentColor 12%, transparent);
+    }
     button:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-audio-accent, var(--fluid-accent-base));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-audio-accent, var(--fluid-accent-base));
       outline-offset: 2px;
     }
-    svg { width: 1.25rem; height: 1.25rem; }
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
     .time {
       font-variant-numeric: tabular-nums;
       font-size: var(--fluid-font-size-sm, 0.875rem);
@@ -86,7 +95,8 @@ export class FluidAudio extends LitElement {
       cursor: pointer;
     }
     input[type="range"]:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-audio-accent, var(--fluid-accent-base));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-audio-accent, var(--fluid-accent-base));
       outline-offset: 2px;
       border-radius: 4px;
     }
@@ -102,7 +112,14 @@ export class FluidAudio extends LitElement {
   @property() preload: "none" | "metadata" | "auto" = "metadata";
 
   /** Accessible name for the player group. */
-  @property() label = "Audio player";
+  @property()
+  get label(): string {
+    return this.labelOverride ?? this.term("audioPlayer");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   @state() private playing = false;
   @state() private current = 0;
@@ -137,6 +154,8 @@ export class FluidAudio extends LitElement {
 
   override render(): TemplateResult {
     const remaining = this.duration || 0;
+    const currentTime = formatTime(this.current, this.localize.locale);
+    const duration = formatTime(remaining, this.localize.locale);
     return html`
       <div part="base" class="base" role="group" aria-label=${this.label}>
         <audio
@@ -159,13 +178,23 @@ export class FluidAudio extends LitElement {
           }}
         ></audio>
 
-        <button part="play-button" type="button" aria-label=${this.playing ? "Pause" : "Play"} @click=${() => this.toggle()}>
+        <button
+          part="play-button"
+          type="button"
+          aria-label=${this.term(this.playing ? "pauseMedia" : "playMedia")}
+          @click=${() => this.toggle()}
+        >
           ${this.playing
-            ? html`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>`
-            : html`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>`}
+            ? html`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+                <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+              </svg>`
+            : html`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>`}
         </button>
 
-        <span part="time" class="time">${formatTime(this.current)} / ${formatTime(remaining)}</span>
+        <span part="time" class="time">${currentTime} / ${duration}</span>
 
         <input
           part="scrubber"
@@ -174,15 +203,44 @@ export class FluidAudio extends LitElement {
           max=${remaining || 0}
           step="0.1"
           .value=${String(this.current)}
-          aria-label="Seek"
-          aria-valuetext=${`${formatTime(this.current)} of ${formatTime(remaining)}`}
+          aria-label=${this.term("seekMedia")}
+          aria-valuetext=${this.term("playbackPosition", currentTime, duration)}
           @input=${this.onSeek}
         />
 
-        <button part="mute-button" type="button" aria-label=${this.muted ? "Unmute" : "Mute"} aria-pressed=${this.muted ? "true" : "false"} @click=${() => this.toggleMute()}>
+        <button
+          part="mute-button"
+          type="button"
+          aria-label=${this.term(this.muted ? "unmuteMedia" : "muteMedia")}
+          aria-pressed=${this.muted ? "true" : "false"}
+          @click=${() => this.toggleMute()}
+        >
           ${this.muted
-            ? html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="m23 9-6 6"></path><path d="m17 9 6 6"></path></svg>`
-            : html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>`}
+            ? html`<svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M11 5 6 9H2v6h4l5 4z"></path>
+                <path d="m23 9-6 6"></path>
+                <path d="m17 9 6 6"></path>
+              </svg>`
+            : html`<svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M11 5 6 9H2v6h4l5 4z"></path>
+                <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+              </svg>`}
         </button>
       </div>
     `;

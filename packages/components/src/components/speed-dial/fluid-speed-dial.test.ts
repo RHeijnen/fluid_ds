@@ -1,5 +1,10 @@
 import { expect, fixture, html, oneEvent, aTimeout, elementUpdated } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidSpeedDial } from "./fluid-speed-dial.js";
 
 const actions = html`
@@ -13,6 +18,84 @@ function trigger(el: FluidSpeedDial): HTMLButtonElement {
 }
 
 describe("<fluid-speed-dial>", () => {
+  describe("<fluid-speed-dial> localized defaults", () => {
+    const readLabels = (control: FluidSpeedDial) => [
+      control.shadowRoot!.querySelector(".trigger")!.getAttribute("aria-label"),
+      control.shadowRoot!.querySelector(".menu")!.getAttribute("aria-label")
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Acties", "Acties"]],
+      ["de", ["Aktionen", "Aktionen"]],
+      ["fr", ["Actions", "Actions"]],
+      ["es", ["Acciones", "Acciones"]],
+      ["ar", ["إجراءات", "إجراءات"]],
+      ["fr-CA", ["Actions", "Actions"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-speed-dial></fluid-speed-dial></div>
+        `);
+        const control = wrapper.querySelector<FluidSpeedDial>("fluid-speed-dial")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.label).to.equal(expected[1]);
+        expect(control.hasAttribute("label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidSpeedDial>(html`<fluid-speed-dial></fluid-speed-dial>`);
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Acties", "Acties"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Aktionen", "Aktionen"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["إجراءات", "إجراءات"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-speed-dial></fluid-speed-dial></div>
+      `);
+      const control = wrapper.querySelector<FluidSpeedDial>("fluid-speed-dial")!;
+      control.label = "Actions";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Actions", "Actions"]);
+      control.setAttribute("label", "Actions");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Actions", "Actions"]);
+      control.removeAttribute("label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Actions", "Actions"]);
+      control.label = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["", ""]);
+      Reflect.set(control, "label", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["إجراءات", "إجراءات"]);
+    });
+  });
+
   it("renders closed by default", async () => {
     const el = await fixture<FluidSpeedDial>(html`
       <fluid-speed-dial label="Actions">${actions}</fluid-speed-dial>
@@ -194,9 +277,7 @@ describe("<fluid-speed-dial>", () => {
     // After disconnect, a document pointerdown must not invoke handleOutsideClick
     // (no error, and the detached element's state is untouched).
     el.open = true;
-    document.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, composed: true })
-    );
+    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
     await aTimeout(0);
     expect(el.open).to.be.true;
   });

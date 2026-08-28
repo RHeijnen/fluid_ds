@@ -1,6 +1,6 @@
 import { FluidCheckbox } from "./fluid-checkbox.js";
 
-if (!customElements.get("fluid-checkbox")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-checkbox")) {
   customElements.define("fluid-checkbox", FluidCheckbox);
 }
 

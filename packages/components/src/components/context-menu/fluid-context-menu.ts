@@ -21,6 +21,9 @@ export interface FluidContextMenuItem {
   divider?: boolean;
 }
 
+export type FluidContextMenuShowEvent = CustomEvent<null>;
+export type FluidContextMenuHideEvent = CustomEvent<null>;
+
 /**
  * A right-click (and Shift+F10) context menu. It wraps a `trigger` slot and, on
  * `contextmenu` (or the keyboard context-menu gesture), opens a menu in the top
@@ -69,8 +72,8 @@ export interface FluidContextMenuItem {
  *
  * @fires fluid-select - Fired when a menu entry is activated. `event.detail.value`
  *   carries the chosen value. Bubbles and is composed.
- * @fires fluid-show - Fired when the menu opens.
- * @fires fluid-hide - Fired when the menu closes.
+ * @fires {FluidContextMenuShowEvent} fluid-show - Fired when the menu opens.
+ * @fires {FluidContextMenuHideEvent} fluid-hide - Fired when the menu closes.
  */
 export class FluidContextMenu extends FluidElement {
   static override styles = [
@@ -151,20 +154,27 @@ export class FluidContextMenu extends FluidElement {
   @state() private hasCustomMenu = false;
 
   private trigger: HTMLElement | null = null;
+  private triggerDisposers: Array<() => void> = [];
+  private triggerOriginalAttributes = new Map<string, string | null>();
+  private triggerActsAsButton = false;
   private previouslyFocused: HTMLElement | null = null;
   private anchorX = 0;
   private anchorY = 0;
+  private focusFrame?: number;
+  private surfaceWasOpen = false;
+  private restoreFocusOnClose = true;
 
   override connectedCallback(): void {
     super.connectedCallback();
-    document.addEventListener("pointerdown", this.handleOutsidePointer, true);
-    document.addEventListener("keydown", this.handleDocumentKeyDown, true);
+    this.listen(document, "pointerdown", this.handleOutsidePointer, { capture: true });
+    this.listen(document, "keydown", this.handleDocumentKeyDown, { capture: true });
+    this.listen(document, "focusin", this.handleDocumentFocus, { capture: true });
+    if (this.hasUpdated) this.attachTrigger();
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    document.removeEventListener("pointerdown", this.handleOutsidePointer, true);
-    document.removeEventListener("keydown", this.handleDocumentKeyDown, true);
+    this.cancelFocusFrame();
     this.detachTrigger();
   }
 
@@ -199,15 +209,40 @@ export class FluidContextMenu extends FluidElement {
     if (!slotted || slotted === this.trigger) return;
     this.detachTrigger();
     this.trigger = slotted;
-    this.trigger.addEventListener("contextmenu", this.handleContextMenu);
-    this.trigger.addEventListener("keydown", this.handleTriggerKeyDown);
-    this.trigger.setAttribute("aria-haspopup", "menu");
+    this.triggerDisposers = [
+      this.listen(this.trigger, "contextmenu", this.handleContextMenu),
+      this.listen(this.trigger, "keydown", this.handleTriggerKeyDown)
+    ];
+    const nativeInteractive = /^(A|BUTTON|INPUT|SELECT|TEXTAREA|SUMMARY)$/.test(
+      this.trigger.tagName
+    );
+    this.triggerActsAsButton = !nativeInteractive && !this.trigger.hasAttribute("role");
+    if (this.triggerActsAsButton) {
+      this.setTriggerAttribute("role", "button");
+      if (!this.trigger.hasAttribute("tabindex")) this.setTriggerAttribute("tabindex", "0");
+    }
+    this.setTriggerAttribute("aria-haspopup", "menu");
+    this.setTriggerAttribute("aria-expanded", "false");
+  }
+
+  private setTriggerAttribute(name: string, value: string): void {
+    if (!this.trigger) return;
+    if (!this.triggerOriginalAttributes.has(name)) {
+      this.triggerOriginalAttributes.set(name, this.trigger.getAttribute(name));
+    }
+    this.trigger.setAttribute(name, value);
   }
 
   private detachTrigger(): void {
     if (!this.trigger) return;
-    this.trigger.removeEventListener("contextmenu", this.handleContextMenu);
-    this.trigger.removeEventListener("keydown", this.handleTriggerKeyDown);
+    for (const dispose of this.triggerDisposers) dispose();
+    for (const [name, value] of this.triggerOriginalAttributes) {
+      if (value === null) this.trigger.removeAttribute(name);
+      else this.trigger.setAttribute(name, value);
+    }
+    this.triggerOriginalAttributes.clear();
+    this.triggerActsAsButton = false;
+    this.triggerDisposers = [];
     this.trigger = null;
   }
 
@@ -221,7 +256,10 @@ export class FluidContextMenu extends FluidElement {
     if (this.disabled) return;
     // Shift+F10 and the dedicated ContextMenu key are the keyboard equivalents
     // of a right-click (SC 2.1.1: every pointer action has a keyboard path).
-    const isContextKey = e.key === "ContextMenu" || (e.shiftKey && e.key === "F10");
+    const isContextKey =
+      e.key === "ContextMenu" ||
+      (e.shiftKey && e.key === "F10") ||
+      (this.triggerActsAsButton && (e.key === "Enter" || e.key === " "));
     if (!isContextKey) return;
     e.preventDefault();
     const rect = (this.trigger ?? this).getBoundingClientRect();
@@ -229,6 +267,8 @@ export class FluidContextMenu extends FluidElement {
   };
 
   private handleOpen(): void {
+    this.surfaceWasOpen = true;
+    this.restoreFocusOnClose = true;
     this.previouslyFocused = (this.getRootNode() as Document).activeElement as HTMLElement | null;
     const surface = this.surfaceEl;
     if (!surface) return;
@@ -236,26 +276,42 @@ export class FluidContextMenu extends FluidElement {
       surface.showPopover();
     }
     this.positionSurface();
-    if (this.trigger) this.trigger.setAttribute("aria-expanded", "true");
+    this.setTriggerAttribute("aria-expanded", "true");
     // Focus the menu after the surface paints in the top layer.
-    requestAnimationFrame(() => {
+    this.cancelFocusFrame();
+    this.focusFrame = requestAnimationFrame(() => {
+      this.focusFrame = undefined;
+      if (!this.isConnected || !this.open) return;
       this.positionSurface();
       this.getMenu()?.focus();
     });
-    this.dispatchEvent(new CustomEvent("fluid-show", { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent<null>("fluid-show", { detail: null, bubbles: true, composed: true })
+    );
   }
 
   private handleClose(): void {
+    this.cancelFocusFrame();
     const surface = this.surfaceEl;
     if (surface && typeof surface.hidePopover === "function" && surface.matches(":popover-open")) {
       surface.hidePopover();
     }
-    if (this.trigger) this.trigger.setAttribute("aria-expanded", "false");
+    this.setTriggerAttribute("aria-expanded", "false");
     // Return focus to the trigger (or whatever held it) on close.
-    const restore = this.previouslyFocused ?? this.trigger;
+    const wasOpen = this.surfaceWasOpen;
+    const restore = wasOpen && this.restoreFocusOnClose ? this.previouslyFocused ?? this.trigger : null;
+    this.surfaceWasOpen = false;
     restore?.focus();
     this.previouslyFocused = null;
-    this.dispatchEvent(new CustomEvent("fluid-hide", { bubbles: true, composed: true }));
+    if (wasOpen)
+      this.dispatchEvent(
+        new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
+      );
+  }
+
+  private cancelFocusFrame(): void {
+    if (this.focusFrame !== undefined) cancelAnimationFrame(this.focusFrame);
+    this.focusFrame = undefined;
   }
 
   /** Clamp the surface within the viewport, flipping when it would overflow. */
@@ -294,6 +350,14 @@ export class FluidContextMenu extends FluidElement {
     }
   };
 
+  private handleDocumentFocus = (e: FocusEvent) => {
+    if (!this.open || e.composedPath().includes(this.surfaceEl)) return;
+    // Tab and programmatic focus may leave a popup menu. Do not pull focus
+    // back after the user has already reached another control.
+    this.restoreFocusOnClose = false;
+    this.hide();
+  };
+
   private handleMenuSlotChange = (e: Event) => {
     const slot = e.target as HTMLSlotElement;
     this.hasCustomMenu = slot.assignedElements({ flatten: true }).length > 0;
@@ -301,7 +365,7 @@ export class FluidContextMenu extends FluidElement {
 
   private renderItems(): TemplateResult {
     return html`
-      <fluid-menu class="menu" part="menu" aria-label=${this.ariaLabel ?? "Context menu"}>
+      <fluid-menu class="menu" part="menu" aria-label=${this.ariaLabel ?? this.term("contextMenu")}>
         ${this.items.map((item) =>
           item.divider
             ? html`<fluid-menu-label></fluid-menu-label>`

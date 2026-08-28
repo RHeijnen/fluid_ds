@@ -45,7 +45,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-accent-base - Featured background + accent.
  * @uses-token --fluid-accent-text - Featured foreground.
  * @uses-token --fluid-radius-lg - Corner radius.
- */
+ * @cssproperty --fluid-pricing-tier-shadow-lg - Component override for the corresponding semantic token.
+*/
 export class FluidPricingTier extends FluidElement {
   static override styles = css`
     :host {
@@ -76,7 +77,7 @@ export class FluidPricingTier extends FluidElement {
       background: var(--fluid-pricing-tier-featured-bg, var(--fluid-accent-base));
       color: var(--fluid-pricing-tier-featured-fg, var(--fluid-accent-text));
       border-color: var(--fluid-pricing-tier-featured-border, var(--fluid-accent-base));
-      box-shadow: var(--fluid-shadow-lg);
+      box-shadow: var(--fluid-pricing-tier-shadow-lg, var(--fluid-shadow-lg));
     }
 
     .header {
@@ -185,7 +186,14 @@ export class FluidPricingTier extends FluidElement {
   @property({ type: Boolean, reflect: true }) featured = false;
 
   /** Label for the featured highlight badge. */
-  @property({ attribute: "featured-label" }) featuredLabel = "Most popular";
+  @property({ attribute: "featured-label" })
+  get featuredLabel(): string {
+    return this.featuredLabelOverride ?? this.term("mostPopular");
+  }
+  set featuredLabel(value: string | null) {
+    this.featuredLabelOverride = value;
+  }
+  private featuredLabelOverride: string | null = null;
 
   private renderName(): TemplateResult {
     const level = Math.min(6, Math.max(2, this.headingLevel));

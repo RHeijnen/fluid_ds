@@ -1,6 +1,6 @@
 import { FluidRangeSlider } from "./fluid-range-slider.js";
 
-if (!customElements.get("fluid-range-slider")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-range-slider")) {
   customElements.define("fluid-range-slider", FluidRangeSlider);
 }
 

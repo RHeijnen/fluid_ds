@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
+import "../button/define.js";
+import "../field/define.js";
+import "../input/define.js";
 import "../slider/define.js";
 import type { FluidForm } from "./fluid-form.js";
 
@@ -31,16 +34,25 @@ const meta: Meta<Args> = {
       @fluid-invalid=${onInvalid}
       style="max-width: 24rem;"
     >
-      <label>
-        Name
-        <input name="name" required placeholder="Ada Lovelace" />
-      </label>
-      <label>
-        Email
-        <input name="email" type="email" required placeholder="ada@example.com" />
-      </label>
-      <button slot="actions" type="submit">Submit</button>
-      <button slot="actions" type="reset">Reset</button>
+      <fluid-field label="Name" for="form-name" required>
+        <fluid-input id="form-name" name="name" required placeholder="Ada Lovelace"></fluid-input>
+      </fluid-field>
+      <fluid-field
+        label="Email"
+        for="form-email"
+        description="We will send the confirmation to this address."
+        required
+      >
+        <fluid-input
+          id="form-email"
+          name="email"
+          type="email"
+          required
+          placeholder="ada@example.com"
+        ></fluid-input>
+      </fluid-field>
+      <fluid-button slot="actions" type="submit">Submit</fluid-button>
+      <fluid-button slot="actions" type="reset" variant="secondary">Reset</fluid-button>
     </fluid-form>
   `
 };
@@ -57,16 +69,14 @@ export const NoValidate: Story = {
 export const WithFluidControls: Story = {
   render: () => html`
     <fluid-form @fluid-submit=${onSubmit} @fluid-invalid=${onInvalid} style="max-width: 24rem;">
-      <label>
-        Username
-        <input name="username" required placeholder="ada" />
-      </label>
-      <label>
-        Volume
+      <fluid-field label="Username" for="form-username" required>
+        <fluid-input id="form-username" name="username" required placeholder="ada"></fluid-input>
+      </fluid-field>
+      <fluid-field label="Volume" description="Choose the playback volume.">
         <fluid-slider name="volume" value="40" aria-label="Volume"></fluid-slider>
-      </label>
-      <button slot="actions" type="submit">Save</button>
-      <button slot="actions" type="reset">Reset</button>
+      </fluid-field>
+      <fluid-button slot="actions" type="submit">Save</fluid-button>
+      <fluid-button slot="actions" type="reset" variant="secondary">Reset</fluid-button>
     </fluid-form>
   `
 };

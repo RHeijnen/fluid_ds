@@ -1,9 +1,22 @@
-import { expect, fixture, html, oneEvent, aTimeout } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, aTimeout, waitUntil } from "@open-wc/testing";
 import "./define.js";
 import "../button/define.js";
 import type { FluidPopover } from "./fluid-popover.js";
 
 describe("<fluid-popover>", () => {
+  it("passes a11y audits while closed and open", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">Open help</button>
+        <p>Helpful content</p>
+      </fluid-popover>
+    `);
+    await expect(el).to.be.accessible();
+    el.open = true;
+    await el.updateComplete;
+    await expect(el).to.be.accessible();
+  });
+
   it("starts closed", async () => {
     const el = await fixture<FluidPopover>(html`
       <fluid-popover>
@@ -25,7 +38,8 @@ describe("<fluid-popover>", () => {
     const btn = el.querySelector<HTMLButtonElement>("button")!;
     setTimeout(() => btn.click());
     const event = await oneEvent(el, "fluid-show");
-    expect(event).to.exist;
+    expect(event.detail).to.equal(null);
+    expect([event.bubbles, event.composed, event.cancelable]).to.deep.equal([true, true, false]);
     expect(el.open).to.be.true;
   });
 
@@ -40,7 +54,9 @@ describe("<fluid-popover>", () => {
     setTimeout(() =>
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
     );
-    await oneEvent(el, "fluid-hide");
+    const event = await oneEvent(el, "fluid-hide");
+    expect(event.detail).to.equal(null);
+    expect([event.bubbles, event.composed, event.cancelable]).to.deep.equal([true, true, false]);
     expect(el.open).to.be.false;
   });
 
@@ -76,6 +92,149 @@ describe("<fluid-popover>", () => {
     el.open = true;
     await el.updateComplete;
     expect(btn.getAttribute("aria-expanded")).to.equal("true");
+  });
+
+  it("moves focus into the panel and restores it to the trigger on close", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">Open</button>
+        <button class="action">Apply</button>
+      </fluid-popover>
+    `);
+    const trigger = el.querySelector<HTMLButtonElement>("[slot='trigger']")!;
+    const action = el.querySelector<HTMLButtonElement>(".action")!;
+    trigger.focus();
+
+    const shown = oneEvent(el, "fluid-show");
+    el.show();
+    await shown;
+    await waitUntil(() => document.activeElement === action, "popover moves focus into its panel");
+
+    const hidden = oneEvent(el, "fluid-hide");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await hidden;
+    expect(document.activeElement).to.equal(trigger);
+  });
+
+  it("does not let a pending focus frame enter a panel that has already closed", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">Open</button>
+        <button class="action">Apply</button>
+      </fluid-popover>
+    `);
+    const trigger = el.querySelector<HTMLButtonElement>("[slot='trigger']")!;
+    const action = el.querySelector<HTMLButtonElement>(".action")!;
+    trigger.focus();
+
+    const shown = oneEvent(el, "fluid-show");
+    el.show();
+    await shown;
+    const hidden = oneEvent(el, "fluid-hide");
+    el.hide();
+    await hidden;
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    );
+
+    expect(el.open).to.be.false;
+    expect(document.activeElement).to.equal(trigger);
+    expect(document.activeElement).to.not.equal(action);
+  });
+
+  it("closes on trigger removal and releases the old trigger contract", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">Open</button>
+        <button>Apply</button>
+      </fluid-popover>
+    `);
+    const trigger = el.querySelector<HTMLButtonElement>("[slot='trigger']")!;
+    const shown = oneEvent(el, "fluid-show");
+    el.show();
+    await shown;
+
+    const hidden = oneEvent(el, "fluid-hide");
+    trigger.remove();
+    await hidden;
+
+    expect(el.open).to.be.false;
+    expect(trigger.hasAttribute("aria-expanded")).to.be.false;
+    expect(trigger.hasAttribute("aria-haspopup")).to.be.false;
+    trigger.click();
+    await el.updateComplete;
+    expect(el.open).to.be.false;
+  });
+
+  it("reanchors an open popover when its trigger is replaced", async () => {
+    const el = await fixture<FluidPopover>(html`
+      <fluid-popover>
+        <button slot="trigger">First</button>
+        <button>Apply</button>
+      </fluid-popover>
+    `);
+    const first = el.querySelector<HTMLButtonElement>("[slot='trigger']")!;
+    const panel = el.shadowRoot!.querySelector<HTMLElement>(".panel")!;
+    Object.defineProperty(first, "getBoundingClientRect", {
+      configurable: true,
+      value: () => new DOMRect(20, 20, 40, 20)
+    });
+    const shown = oneEvent(el, "fluid-show");
+    el.show();
+    await shown;
+    await waitUntil(() => panel.style.left === "20px", "popover positions from its first trigger");
+
+    const second = document.createElement("button");
+    second.slot = "trigger";
+    second.textContent = "Second";
+    Object.defineProperty(second, "getBoundingClientRect", {
+      configurable: true,
+      value: () => new DOMRect(220, 20, 40, 20)
+    });
+    first.replaceWith(second);
+
+    await waitUntil(
+      () => panel.style.left === "220px",
+      "popover repositions from its replacement trigger"
+    );
+    expect(el.open).to.be.true;
+    expect(first.hasAttribute("aria-expanded")).to.be.false;
+    expect(first.hasAttribute("aria-haspopup")).to.be.false;
+    expect(second.getAttribute("aria-expanded")).to.equal("true");
+    second.click();
+    await el.updateComplete;
+    expect(el.open).to.be.false;
+  });
+
+  it("resumes positioning and interaction after an open reconnect", async () => {
+    const host = await fixture<HTMLElement>(html`<div></div>`);
+    const el = document.createElement("fluid-popover") as FluidPopover;
+    el.innerHTML = `<button slot="trigger">Open</button><button>Apply</button>`;
+    const trigger = el.querySelector<HTMLButtonElement>("[slot='trigger']")!;
+    Object.defineProperty(trigger, "getBoundingClientRect", {
+      configurable: true,
+      value: () => new DOMRect(40, 30, 40, 20)
+    });
+    host.append(el);
+    await el.updateComplete;
+    const shown = oneEvent(el, "fluid-show");
+    el.show();
+    await shown;
+
+    el.remove();
+    Object.defineProperty(trigger, "getBoundingClientRect", {
+      configurable: true,
+      value: () => new DOMRect(180, 30, 40, 20)
+    });
+    host.append(el);
+    await el.updateComplete;
+    const panel = el.shadowRoot!.querySelector<HTMLElement>(".panel")!;
+    await waitUntil(() => panel.style.left === "180px", "popover resumes tracking after reconnect");
+
+    const hidden = oneEvent(el, "fluid-hide");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await hidden;
+    expect(el.open).to.be.false;
   });
 
   it("does not open when disabled", async () => {
@@ -131,9 +290,7 @@ describe("<fluid-popover>", () => {
 
     // Document listeners must be gone: these should not reopen/close anything.
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    document.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, composed: true })
-    );
+    document.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
     await aTimeout(20);
     expect(leaked).to.be.false;
   });

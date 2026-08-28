@@ -1,6 +1,6 @@
 import { FluidIcon } from "./fluid-icon.js";
 
-if (!customElements.get("fluid-icon")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-icon")) {
   customElements.define("fluid-icon", FluidIcon);
 }
 

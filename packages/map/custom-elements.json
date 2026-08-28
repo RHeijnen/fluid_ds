@@ -1,0 +1,656 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/map/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-map",
+          "declaration": {
+            "name": "FluidMap",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/map/fluid-map.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A themed Leaflet map. Renders an interactive tile map with optional markers,\ndriven by plain properties so it works from any framework.\n\nLeaflet needs its global stylesheet and a sized container, neither of which\nsurvive inside shadow DOM, so this component renders in LIGHT DOM (it\noverrides `createRenderRoot` to return itself). Leaflet's stylesheet is\nauto-loaded once from the CDN at runtime (a `<link>` appended to the document\nhead), so no bundler CSS handling is required. Consumers MUST have `leaflet`\ninstalled as a dependency. To self-host the CSS instead, add your own Leaflet\nstylesheet `<link>` (or one carrying `data-fluid-map-leaflet-css`) to the page\nbefore the component upgrades, and this auto-load is skipped.\n\nThe container is exposed as a labelled `role=\"region\"` so assistive tech can\nskip into and out of the interactive map. Provide a meaningful `label`.",
+          "name": "FluidMap",
+          "cssProperties": [
+            {
+              "description": "Map height. Falls back to 24rem.",
+              "name": "--fluid-map-height"
+            },
+            {
+              "description": "Corner radius of the viewport. Falls back to --fluid-radius-md.",
+              "name": "--fluid-map-radius"
+            },
+            {
+              "description": "Border around the viewport. Falls back to 1px solid --fluid-border-default.",
+              "name": "--fluid-map-border"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The map viewport container (the element Leaflet mounts into).",
+              "name": "base"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "center",
+              "type": {
+                "text": "[number, number]"
+              },
+              "default": "[51.505, -0.09]",
+              "description": "Map center as [latitude, longitude].",
+              "attribute": "center"
+            },
+            {
+              "kind": "field",
+              "name": "zoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "13",
+              "description": "Initial / current zoom level.",
+              "attribute": "zoom"
+            },
+            {
+              "kind": "field",
+              "name": "markers",
+              "type": {
+                "text": "FluidMapMarker[]"
+              },
+              "default": "[]",
+              "description": "Markers to place on the map. Each marker may carry a `label` (popup +\ntooltip), a semantic `tone` (coloured Fluid pin), or a fully custom `icon`\n(image or HTML / emoji). `icon` wins over `tone`; omit both for the default\nLeaflet pin.",
+              "attribute": "markers"
+            },
+            {
+              "kind": "field",
+              "name": "tileUrl",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\"",
+              "description": "Tile layer URL template. Defaults to OpenStreetMap. Empty disables tiles.",
+              "attribute": "tile-url"
+            },
+            {
+              "kind": "field",
+              "name": "attribution",
+              "type": {
+                "text": "string"
+              },
+              "default": "'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'",
+              "description": "Tile layer attribution (HTML allowed).",
+              "attribute": "attribution"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the map region.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "viewport",
+              "type": {
+                "text": "HTMLDivElement"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "map",
+              "type": {
+                "text": "Leaflet.Map | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "tileLayer",
+              "type": {
+                "text": "Leaflet.TileLayer | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "markerLayer",
+              "type": {
+                "text": "Leaflet.LayerGroup | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "renderedMarkers",
+              "type": {
+                "text": "Array<{ marker: Leaflet.Marker; source: FluidMapMarker }>"
+              },
+              "privacy": "private",
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "initializing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "resizeFrame",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "leaflet",
+              "type": {
+                "text": "LeafletRuntime | undefined"
+              },
+              "privacy": "private",
+              "static": true
+            },
+            {
+              "kind": "method",
+              "name": "loadLeaflet",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Promise<LeafletRuntime>"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "stylesInjected",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "static": true,
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "injectStyles",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "leafletCssLoaded",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "static": true,
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "loadLeafletCss",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "iconInstance",
+              "type": {
+                "text": "Leaflet.Icon | undefined"
+              },
+              "privacy": "private",
+              "static": true
+            },
+            {
+              "kind": "method",
+              "name": "markerIcon",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Leaflet.Icon"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "L",
+                  "type": {
+                    "text": "LeafletRuntime"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "TONE_TOKENS",
+              "type": {
+                "text": "Record<FluidMapMarkerTone, string>"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "{ info: \"var(--fluid-info-base, #0284c7)\", success: \"var(--fluid-success-base, #047857)\", warning: \"var(--fluid-warning-base, #f59e0b)\", danger: \"var(--fluid-danger-base, #dc2626)\", neutral: \"var(--fluid-text-secondary, #52525b)\" }"
+            },
+            {
+              "kind": "field",
+              "name": "toneIconCache",
+              "privacy": "private",
+              "static": true,
+              "default": "new Map<string, Leaflet.DivIcon>()"
+            },
+            {
+              "kind": "method",
+              "name": "tonedIcon",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Leaflet.DivIcon"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "L",
+                  "type": {
+                    "text": "LeafletRuntime"
+                  }
+                },
+                {
+                  "name": "tone",
+                  "type": {
+                    "text": "FluidMapMarkerTone"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "buildCustomIcon",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Leaflet.Icon | Leaflet.DivIcon"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "L",
+                  "type": {
+                    "text": "LeafletRuntime"
+                  }
+                },
+                {
+                  "name": "spec",
+                  "type": {
+                    "text": "FluidMapMarkerIcon"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "iconFor",
+              "privacy": "private",
+              "static": true,
+              "return": {
+                "type": {
+                  "text": "Leaflet.Icon | Leaflet.DivIcon"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "L",
+                  "type": {
+                    "text": "LeafletRuntime"
+                  }
+                },
+                {
+                  "name": "m",
+                  "type": {
+                    "text": "FluidMapMarker"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "initializeMap",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncMarkers",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "syncMarkerNames",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-marker-click",
+              "description": "A marker was clicked. `detail: { marker }`.\n *",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            },
+            {
+              "name": "fluid-move",
+              "description": "The view moved or zoomed. `detail: { center, zoom }`.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "center",
+              "type": {
+                "text": "[number, number]"
+              },
+              "default": "[51.505, -0.09]",
+              "description": "Map center as [latitude, longitude].",
+              "fieldName": "center"
+            },
+            {
+              "name": "zoom",
+              "type": {
+                "text": "number"
+              },
+              "default": "13",
+              "description": "Initial / current zoom level.",
+              "fieldName": "zoom"
+            },
+            {
+              "name": "markers",
+              "type": {
+                "text": "FluidMapMarker[]"
+              },
+              "default": "[]",
+              "description": "Markers to place on the map. Each marker may carry a `label` (popup +\ntooltip), a semantic `tone` (coloured Fluid pin), or a fully custom `icon`\n(image or HTML / emoji). `icon` wins over `tone`; omit both for the default\nLeaflet pin.",
+              "fieldName": "markers"
+            },
+            {
+              "name": "tile-url",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png\"",
+              "description": "Tile layer URL template. Defaults to OpenStreetMap. Empty disables tiles.",
+              "fieldName": "tileUrl"
+            },
+            {
+              "name": "attribution",
+              "type": {
+                "text": "string"
+              },
+              "default": "'&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors'",
+              "description": "Tile layer attribution (HTML allowed).",
+              "fieldName": "attribution"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Accessible name for the map region.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Framework-agnostic Leaflet map wrapper with markers.",
+          "usesTokens": [
+            {
+              "name": "--fluid-radius-md",
+              "description": "Viewport corner radius."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Viewport border color."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Focus ring color."
+            },
+            {
+              "name": "--fluid-info-base",
+              "description": "Info tone pin fill."
+            },
+            {
+              "name": "--fluid-success-base",
+              "description": "Success tone pin fill."
+            },
+            {
+              "name": "--fluid-warning-base",
+              "description": "Warning tone pin fill."
+            },
+            {
+              "name": "--fluid-danger-base",
+              "description": "Danger tone pin fill."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Neutral tone pin fill."
+            }
+          ],
+          "tagName": "fluid-map",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidMap",
+          "declaration": {
+            "name": "FluidMap",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/map/offline-story-fixture.ts",
+      "declarations": [
+        {
+          "kind": "function",
+          "name": "ensureOfflineMapStyles",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "description": "Storybook-only assets: real, locally served Leaflet CSS and inline SVG pins."
+        },
+        {
+          "kind": "variable",
+          "name": "offlineMapAttribution",
+          "type": {
+            "text": "string"
+          },
+          "default": "\"Deterministic local story map\""
+        },
+        {
+          "kind": "variable",
+          "name": "offlineMapMarkers",
+          "type": {
+            "text": "FluidMapMarker[]"
+          },
+          "default": "[ { lat: 51.505, lng: -0.09, label: \"Depot\", tone: \"info\" }, { lat: 51.51, lng: -0.1, label: \"Warehouse\", tone: \"success\" } ]"
+        },
+        {
+          "kind": "variable",
+          "name": "offlineMapTileUrl",
+          "description": "A seamless, deterministic tile used only by Storybook examples and visual tests."
+        },
+        {
+          "kind": "function",
+          "name": "withOfflineMapAssets",
+          "return": {
+            "type": {
+              "text": "FluidMapMarker[]"
+            }
+          },
+          "parameters": [
+            {
+              "name": "markers",
+              "type": {
+                "text": "FluidMapMarker[]"
+              }
+            }
+          ],
+          "description": "Keep each story's marker semantics while replacing only CDN-backed default icon assets."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "ensureOfflineMapStyles",
+          "declaration": {
+            "name": "ensureOfflineMapStyles",
+            "module": "src/components/map/offline-story-fixture.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "offlineMapAttribution",
+          "declaration": {
+            "name": "offlineMapAttribution",
+            "module": "src/components/map/offline-story-fixture.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "offlineMapMarkers",
+          "declaration": {
+            "name": "offlineMapMarkers",
+            "module": "src/components/map/offline-story-fixture.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "offlineMapTileUrl",
+          "declaration": {
+            "name": "offlineMapTileUrl",
+            "module": "src/components/map/offline-story-fixture.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "withOfflineMapAssets",
+          "declaration": {
+            "name": "withOfflineMapAssets",
+            "module": "src/components/map/offline-story-fixture.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidMap",
+          "declaration": {
+            "name": "FluidMap",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidMapMarker",
+          "declaration": {
+            "name": "FluidMapMarker",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidMapMarkerIcon",
+          "declaration": {
+            "name": "FluidMapMarkerIcon",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidMapMarkerTone",
+          "declaration": {
+            "name": "FluidMapMarkerTone",
+            "module": "src/components/map/fluid-map.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

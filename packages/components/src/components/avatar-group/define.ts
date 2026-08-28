@@ -1,6 +1,6 @@
 import { FluidAvatarGroup } from "./fluid-avatar-group.js";
 
-if (!customElements.get("fluid-avatar-group")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-avatar-group")) {
   customElements.define("fluid-avatar-group", FluidAvatarGroup);
 }
 

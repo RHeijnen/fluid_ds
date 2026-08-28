@@ -22,7 +22,12 @@ describe("applyBlueprint", () => {
       blueprint
     );
     expect(result.errors).to.deep.equal([]);
-    expect(result.rows[0]).to.deep.equal({ name: "Ada", age: 30, email: "ada@x.dev", status: "active" });
+    expect(result.rows[0]).to.deep.equal({
+      name: "Ada",
+      age: 30,
+      email: "ada@x.dev",
+      status: "active"
+    });
     expect(result.stats.kept).to.equal(1);
   });
 
@@ -36,6 +41,10 @@ describe("applyBlueprint", () => {
     expect(ageError?.row).to.equal(0);
     expect(ageError?.value).to.equal("oops");
     expect(ageError?.message).to.match(/not a number/);
+    expect(ageError?.diagnostic).to.deep.equal({
+      code: "invalidNumber",
+      parameters: { label: "age", value: "oops" }
+    });
   });
 
   it("still emits a row object even when a cell errors", () => {
@@ -45,7 +54,10 @@ describe("applyBlueprint", () => {
   });
 
   it("applies a default when the source cell is empty", () => {
-    const result = applyBlueprint(raw([{ name: "Ada", email: "ada@x.dev", status: "" }]), blueprint);
+    const result = applyBlueprint(
+      raw([{ name: "Ada", email: "ada@x.dev", status: "" }]),
+      blueprint
+    );
     expect(result.rows[0]?.status).to.equal("active");
   });
 
@@ -89,6 +101,38 @@ describe("applyBlueprint", () => {
     expect(result.stats.truncated).to.equal(1);
   });
 
+  it("does not attach discarded duplicate-row errors to the next kept row", () => {
+    const result = applyBlueprint(
+      raw([
+        { name: "Ada", age: "30", email: "a@x.dev" },
+        { name: "Duplicate", age: "invalid", email: "a@x.dev" },
+        { name: "Bo", age: "20", email: "b@x.dev" }
+      ]),
+      { ...blueprint, dedupeBy: "email" }
+    );
+    expect(result.rows).to.have.length(2);
+    expect(result.errors).to.deep.equal([]);
+    expect(result.stats.duplicates).to.equal(1);
+  });
+
+  it("counts duplicate rows before applying the row cap", () => {
+    const result = applyBlueprint(
+      raw([
+        { name: "Ada", email: "a@x.dev" },
+        { name: "Duplicate", email: "a@x.dev" },
+        { name: "Bo", email: "b@x.dev" }
+      ]),
+      { ...blueprint, dedupeBy: "email", maxRows: 1 }
+    );
+    expect(result.stats).to.deep.equal({
+      total: 3,
+      kept: 1,
+      duplicates: 1,
+      truncated: 1,
+      errorCount: 0
+    });
+  });
+
   it("runs transform then validate", () => {
     const bp: Blueprint = {
       fields: [
@@ -106,5 +150,113 @@ describe("applyBlueprint", () => {
 
     const badResult = applyBlueprint(raw([{ code: "ab" }]), bp);
     expect(badResult.errors[0]?.message).to.equal("must be 3 chars");
+  });
+
+  it("reports a throwing transform without losing the coerced value or later rows", () => {
+    const validated: unknown[] = [];
+    const result = applyBlueprint(raw([{ count: "2" }, { count: "3" }]), {
+      fields: [
+        {
+          key: "count",
+          label: "Item count",
+          type: "integer",
+          transform: (value) => {
+            if (value === 2) throw new Error("source rejected");
+            return Number(value) * 10;
+          },
+          validate: (value) => {
+            validated.push(value);
+            return true;
+          }
+        }
+      ]
+    });
+    expect(result.rows).to.deep.equal([{ count: 2 }, { count: 30 }]);
+    expect(validated).to.deep.equal([2, 30]);
+    expect(result.errors).to.deep.equal([
+      {
+        row: 0,
+        field: "count",
+        value: "2",
+        message: "Item count transform failed: source rejected",
+        diagnostic: {
+          code: "transformFailed",
+          parameters: { label: "Item count", reason: "source rejected" }
+        }
+      }
+    ]);
+    expect(result.stats).to.deep.equal({
+      total: 2,
+      kept: 2,
+      duplicates: 0,
+      truncated: 0,
+      errorCount: 1
+    });
+  });
+
+  it("normalizes non-Error transform throws into typed string diagnostics", () => {
+    const result = applyBlueprint(raw([{ value: "x" }]), {
+      fields: [
+        {
+          key: "value",
+          type: "string",
+          transform: () => {
+            throw "plain failure";
+          }
+        }
+      ]
+    });
+    expect(result.errors[0]?.message).to.equal("value transform failed: plain failure");
+    expect(result.errors[0]?.diagnostic).to.deep.equal({
+      code: "transformFailed",
+      parameters: { label: "value", reason: "plain failure" }
+    });
+  });
+
+  it("distinguishes parser-owned fallbacks from caller-owned validation messages", () => {
+    const result = applyBlueprint(raw([{ value: "x" }]), {
+      fields: [
+        { key: "missing", label: "Required field", type: "string", required: true },
+        { key: "value", label: "Custom field", type: "string", validate: () => "keep me verbatim" }
+      ]
+    });
+
+    expect(result.errors[0]?.diagnostic).to.deep.equal({
+      code: "unmappedRequired",
+      parameters: { label: "Required field" }
+    });
+    expect(result.errors[1]).to.include({ message: "keep me verbatim" });
+    expect(result.errors[1]?.diagnostic).to.deep.equal({
+      code: "customValidation",
+      parameters: { label: "Custom field" }
+    });
+  });
+
+  it("does not invoke transform or validation when coercion fails", () => {
+    let transformed = false;
+    let validated = false;
+    const result = applyBlueprint(raw([{ count: "not numeric" }]), {
+      fields: [
+        {
+          key: "count",
+          type: "integer",
+          transform: (value) => {
+            transformed = true;
+            return value;
+          },
+          validate: () => {
+            validated = true;
+            return true;
+          }
+        }
+      ]
+    });
+    expect(transformed).to.equal(false);
+    expect(validated).to.equal(false);
+    expect(result.rows).to.deep.equal([{ count: "not numeric" }]);
+    expect(result.errors).to.have.length(1);
+    expect(result.errors[0]).to.include({ row: 0, field: "count", value: "not numeric" });
+    expect(result.errors[0]?.message).to.match(/not a number/);
+    expect(result.stats.errorCount).to.equal(1);
   });
 });

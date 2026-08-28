@@ -39,6 +39,12 @@ export class FluidDivider extends FluidElement {
     :host([hidden]) {
       display: none;
     }
+
+    @media (forced-colors: active) {
+      :host {
+        background: CanvasText;
+      }
+    }
   `;
 
   /** Orientation. */

@@ -1,23 +1,20 @@
-import { playwrightLauncher } from "@web/test-runner-playwright";
+import {
+  fluidMochaFramework,
+  fluidPlaywrightLauncher
+} from "../../scripts/web-test-runner-lifecycle.mjs";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
-
-const ALL = ["chromium", "firefox", "webkit"];
-function resolveBrowsers() {
-  const raw = process.env.FLUID_BROWSERS?.trim().toLowerCase();
-  if (!raw || raw === "chromium") return ["chromium"];
-  if (raw === "all") return ALL;
-  const ok = raw.split(",").map((s) => s.trim()).filter((b) => ALL.includes(b));
-  return ok.length ? ok : ["chromium"];
-}
+import { fluidCoverage } from "../../scripts/web-test-runner-coverage.mjs";
+import { resolveTestBrowsers } from "../../scripts/resolve-test-browsers.mjs";
 
 /** @type {import("@web/test-runner").TestRunnerConfig} */
 export default {
   port: 8023,
   files: ["src/**/*.test.ts"],
   nodeResolve: true,
-  browsers: resolveBrowsers().map((product) => playwrightLauncher({ product })),
+  browsers: resolveTestBrowsers().map((product) => fluidPlaywrightLauncher({ product })),
   plugins: [esbuildPlugin({ ts: true, target: "es2022", tsconfig: "./tsconfig.json" })],
-  testFramework: { config: { ui: "bdd", timeout: "5000" } },
-  coverage: false,
-  testRunnerHtml: (tf) => `<!doctype html><html><head><meta charset="utf-8" /></head><body><script type="module" src="${tf}"></script></body></html>`
+  testFramework: fluidMochaFramework(),
+  ...fluidCoverage("kanban"),
+  testRunnerHtml: (tf) =>
+    `<!doctype html><html><head><meta charset="utf-8" /></head><body><script type="module" src="${tf}"></script></body></html>`
 };

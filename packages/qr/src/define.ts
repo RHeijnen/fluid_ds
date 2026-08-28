@@ -1,6 +1,6 @@
 import { FluidQrCode } from "./fluid-qr-code.js";
 
-if (!customElements.get("fluid-qr-code")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-qr-code")) {
   customElements.define("fluid-qr-code", FluidQrCode);
 }
 

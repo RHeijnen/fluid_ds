@@ -1,6 +1,6 @@
 import { FluidEventCalendar } from "./fluid-event-calendar.js";
 
-if (!customElements.get("fluid-event-calendar")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-event-calendar")) {
   customElements.define("fluid-event-calendar", FluidEventCalendar);
 }
 

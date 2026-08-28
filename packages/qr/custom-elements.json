@@ -1,0 +1,883 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-qr-code",
+          "declaration": {
+            "name": "FluidQrCode",
+            "module": "src/fluid-qr-code.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/fluid-qr-code.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Renders a QR code from a string as a crisp inline SVG, with optional logo\noverlay, reshaped modules and finder eyes, a gradient fill, and an artistic\n\"image behind the modules\" mode. Output scales without aliasing and prints\ncleanly.\n\nAccessibility: the SVG carries `role=\"img\"` and an accessible name. By\ndefault the name is derived from `value`; set `label` to describe the\ndestination in human terms (e.g. \"Open the Fluid docs\"). When a `logo` is\nembedded the logo is decorative (the QR still encodes the same `value`), so\nits description stays the host's responsibility via `label`, matching the\npre-existing name mechanism.",
+          "name": "FluidQrCode",
+          "cssProperties": [
+            {
+              "description": "Foreground (module) color.",
+              "name": "--fluid-qr-color"
+            },
+            {
+              "description": "Background color behind the code.",
+              "name": "--fluid-qr-bg"
+            },
+            {
+              "description": "Finder-eye color (defaults to the module color).",
+              "name": "--fluid-qr-eye-color"
+            },
+            {
+              "description": "Knockout plate color behind an embedded logo.",
+              "name": "--fluid-qr-logo-bg"
+            },
+            {
+              "description": "Gap between modules as a fraction of one module (0 to 0.4).",
+              "name": "--fluid-qr-gap"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The wrapping SVG.",
+              "name": "base"
+            },
+            {
+              "description": "Alias of base, the wrapping SVG.",
+              "name": "svg"
+            },
+            {
+              "description": "The background rect behind the code.",
+              "name": "background"
+            },
+            {
+              "description": "The group holding all non-eye data modules.",
+              "name": "modules"
+            },
+            {
+              "description": "An individual data module (rect/circle/path).",
+              "name": "module"
+            },
+            {
+              "description": "The group holding the three finder patterns.",
+              "name": "eyes"
+            },
+            {
+              "description": "A single finder pattern (outer ring + inner pupil group).",
+              "name": "eye"
+            },
+            {
+              "description": "The outer ring of a finder pattern.",
+              "name": "eye-frame"
+            },
+            {
+              "description": "The inner pupil of a finder pattern.",
+              "name": "eye-pupil"
+            },
+            {
+              "description": "The embedded logo group (knockout plate + image).",
+              "name": "logo"
+            },
+            {
+              "description": "The embedded logo image element.",
+              "name": "logo-image"
+            },
+            {
+              "description": "The full-bleed background image in artistic mode.",
+              "name": "image"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Data to encode.",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "160",
+              "description": "Pixel size of the rendered code.",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "ecLevel",
+              "type": {
+                "text": "EcLevel"
+              },
+              "default": "\"M\"",
+              "description": "Error correction level. Note: when `logo` is set (or `artistic` is on) this\nis forced to `H` internally so the covered modules still scan.",
+              "attribute": "ec-level"
+            },
+            {
+              "kind": "field",
+              "name": "fill",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Foreground (module) color. Falls back to the `--fluid-qr-color` token.",
+              "attribute": "fill"
+            },
+            {
+              "kind": "field",
+              "name": "background",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Background color behind the code. Falls back to the `--fluid-qr-bg` token.",
+              "attribute": "background"
+            },
+            {
+              "kind": "field",
+              "name": "margin",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "Module margin (the quiet zone, in modules).",
+              "attribute": "margin"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Human-readable accessible name for the code. When empty, the name is\nderived from `value`.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "moduleShape",
+              "type": {
+                "text": "ModuleShape"
+              },
+              "default": "\"square\"",
+              "description": "Shape of the data modules.",
+              "attribute": "module-shape"
+            },
+            {
+              "kind": "field",
+              "name": "eyeShape",
+              "type": {
+                "text": "EyeShape"
+              },
+              "default": "\"square\"",
+              "description": "Shape of the three finder eyes.",
+              "attribute": "eye-shape"
+            },
+            {
+              "kind": "field",
+              "name": "eyeColor",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Finder-eye color. Falls back to the `--fluid-qr-eye-color` token (then the module color).",
+              "attribute": "eye-color"
+            },
+            {
+              "kind": "field",
+              "name": "eyeColorTopLeft",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the top-left finder.",
+              "attribute": "eye-color-top-left"
+            },
+            {
+              "kind": "field",
+              "name": "eyeColorTopRight",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the top-right finder.",
+              "attribute": "eye-color-top-right"
+            },
+            {
+              "kind": "field",
+              "name": "eyeColorBottomLeft",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the bottom-left finder.",
+              "attribute": "eye-color-bottom-left"
+            },
+            {
+              "kind": "field",
+              "name": "gradientFrom",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional linear gradient start color for module fill. Both ends required to take effect.",
+              "attribute": "gradient-from"
+            },
+            {
+              "kind": "field",
+              "name": "gradientTo",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional linear gradient end color for module fill.",
+              "attribute": "gradient-to"
+            },
+            {
+              "kind": "field",
+              "name": "gradientAngle",
+              "type": {
+                "text": "number"
+              },
+              "default": "45",
+              "description": "Gradient angle in degrees (0 = left→right, 90 = top→bottom).",
+              "attribute": "gradient-angle"
+            },
+            {
+              "kind": "field",
+              "name": "logo",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Center logo image URL or data URI. Setting this forces `ec-level` to `H`.",
+              "attribute": "logo"
+            },
+            {
+              "kind": "field",
+              "name": "logoSize",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.22",
+              "description": "Logo size as a fraction of the code's module span (clamped to a safe max of 0.3).",
+              "attribute": "logo-size"
+            },
+            {
+              "kind": "field",
+              "name": "logoPadding",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "Extra knockout padding around the logo, as a fraction of one module.",
+              "attribute": "logo-padding"
+            },
+            {
+              "kind": "field",
+              "name": "logoBackground",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Knockout plate color behind the logo. Falls back to the `--fluid-qr-logo-bg` token.",
+              "attribute": "logo-background"
+            },
+            {
+              "kind": "field",
+              "name": "logoRadius",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Corner radius (in modules) of the logo knockout plate.",
+              "attribute": "logo-radius"
+            },
+            {
+              "kind": "field",
+              "name": "artistic",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Artistic mode: render `logo` as a full-bleed background image and draw the\ndata modules as semi-opaque dots on top, like a halftone overlay. Forces\n`ec-level` to `H` and keeps the finder eyes solid for scannability.\nScannability caveat: artistic codes are decorative-first; always test scan\nreliability with a real phone before shipping one in production.",
+              "attribute": "artistic"
+            },
+            {
+              "kind": "field",
+              "name": "artisticOpacity",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.85",
+              "description": "Opacity of the modules in artistic mode (0 to 1).",
+              "attribute": "artistic-opacity"
+            },
+            {
+              "kind": "field",
+              "name": "qrCache",
+              "type": {
+                "text": "{ value: string; level: EcLevel; result: QRCode | null } | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "effectiveEcLevel",
+              "type": {
+                "text": "EcLevel"
+              },
+              "privacy": "private",
+              "description": "The effective error-correction level after logo/artistic overrides.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "smoothing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "build",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "QRCode | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "eyeOrigins",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "EyeOrigin[]"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "The three finder-pattern origins for a code of `count` modules."
+            },
+            {
+              "kind": "method",
+              "name": "isInEye",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "r",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "c",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "True when (r, c) lies inside any of the three 7×7 finder patterns."
+            },
+            {
+              "kind": "method",
+              "name": "moduleColor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "resolvedEyeColor",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "corner",
+                  "type": {
+                    "text": "EyeOrigin[\"corner\"]"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "modulePaint",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "description": "Paint for the data modules: gradient ref when both ends are set, else flat color."
+            },
+            {
+              "kind": "method",
+              "name": "resolveGap",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "number"
+                }
+              },
+              "description": "Resolve the inter-module gap (fraction of one module) from the token, clamped to [0, 0.4]."
+            },
+            {
+              "kind": "method",
+              "name": "renderModule",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "x",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "paint",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "opacity",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "gap",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Render one data module at module coords (x, y) with the active shape."
+            },
+            {
+              "kind": "method",
+              "name": "renderEye",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "eye",
+                  "type": {
+                    "text": "EyeOrigin"
+                  }
+                }
+              ],
+              "description": "Render one finder eye (outer frame ring + inner pupil) at its origin."
+            },
+            {
+              "kind": "method",
+              "name": "renderGradientDef",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | null"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderLogo",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "total",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Render the center logo (knockout plate + image)."
+            },
+            {
+              "kind": "method",
+              "name": "logoKnockout",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "{ x0: number; y0: number; x1: number; y1: number } | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Module coords covered by the logo knockout, so we skip drawing them."
+            },
+            {
+              "kind": "method",
+              "name": "serializeSvg",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string | null"
+                }
+              },
+              "description": "Serialize the current shadow-DOM SVG to a standalone markup string."
+            },
+            {
+              "kind": "method",
+              "name": "toDataURL",
+              "return": {
+                "type": {
+                  "text": "Promise<string>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "scale",
+                  "default": "2"
+                }
+              ],
+              "description": "Rasterize the rendered SVG to a PNG data URL. Resolves to an empty-string\nfallback only if there is nothing to render. Note: when the SVG embeds a\ncross-origin `logo`/image without CORS headers, the canvas becomes tainted\nand export will reject; serve such images same-origin or with CORS."
+            },
+            {
+              "kind": "method",
+              "name": "download",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "filename",
+                  "default": "\"qr-code.png\""
+                }
+              ],
+              "description": "Rasterize and trigger a browser download of the PNG."
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Data to encode.",
+              "fieldName": "value"
+            },
+            {
+              "name": "size",
+              "type": {
+                "text": "number"
+              },
+              "default": "160",
+              "description": "Pixel size of the rendered code.",
+              "fieldName": "size"
+            },
+            {
+              "name": "ec-level",
+              "type": {
+                "text": "EcLevel"
+              },
+              "default": "\"M\"",
+              "description": "Error correction level. Note: when `logo` is set (or `artistic` is on) this\nis forced to `H` internally so the covered modules still scan.",
+              "fieldName": "ecLevel"
+            },
+            {
+              "name": "fill",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Foreground (module) color. Falls back to the `--fluid-qr-color` token.",
+              "fieldName": "fill"
+            },
+            {
+              "name": "background",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Background color behind the code. Falls back to the `--fluid-qr-bg` token.",
+              "fieldName": "background"
+            },
+            {
+              "name": "margin",
+              "type": {
+                "text": "number"
+              },
+              "default": "2",
+              "description": "Module margin (the quiet zone, in modules).",
+              "fieldName": "margin"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Human-readable accessible name for the code. When empty, the name is\nderived from `value`.",
+              "fieldName": "label"
+            },
+            {
+              "name": "module-shape",
+              "type": {
+                "text": "ModuleShape"
+              },
+              "default": "\"square\"",
+              "description": "Shape of the data modules.",
+              "fieldName": "moduleShape"
+            },
+            {
+              "name": "eye-shape",
+              "type": {
+                "text": "EyeShape"
+              },
+              "default": "\"square\"",
+              "description": "Shape of the three finder eyes.",
+              "fieldName": "eyeShape"
+            },
+            {
+              "name": "eye-color",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Finder-eye color. Falls back to the `--fluid-qr-eye-color` token (then the module color).",
+              "fieldName": "eyeColor"
+            },
+            {
+              "name": "eye-color-top-left",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the top-left finder.",
+              "fieldName": "eyeColorTopLeft"
+            },
+            {
+              "name": "eye-color-top-right",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the top-right finder.",
+              "fieldName": "eyeColorTopRight"
+            },
+            {
+              "name": "eye-color-bottom-left",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional per-eye color override for the bottom-left finder.",
+              "fieldName": "eyeColorBottomLeft"
+            },
+            {
+              "name": "gradient-from",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional linear gradient start color for module fill. Both ends required to take effect.",
+              "fieldName": "gradientFrom"
+            },
+            {
+              "name": "gradient-to",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Optional linear gradient end color for module fill.",
+              "fieldName": "gradientTo"
+            },
+            {
+              "name": "gradient-angle",
+              "type": {
+                "text": "number"
+              },
+              "default": "45",
+              "description": "Gradient angle in degrees (0 = left→right, 90 = top→bottom).",
+              "fieldName": "gradientAngle"
+            },
+            {
+              "name": "logo",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Center logo image URL or data URI. Setting this forces `ec-level` to `H`.",
+              "fieldName": "logo"
+            },
+            {
+              "name": "logo-size",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.22",
+              "description": "Logo size as a fraction of the code's module span (clamped to a safe max of 0.3).",
+              "fieldName": "logoSize"
+            },
+            {
+              "name": "logo-padding",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.5",
+              "description": "Extra knockout padding around the logo, as a fraction of one module.",
+              "fieldName": "logoPadding"
+            },
+            {
+              "name": "logo-background",
+              "type": {
+                "text": "string"
+              },
+              "default": "\"\"",
+              "description": "Knockout plate color behind the logo. Falls back to the `--fluid-qr-logo-bg` token.",
+              "fieldName": "logoBackground"
+            },
+            {
+              "name": "logo-radius",
+              "type": {
+                "text": "number"
+              },
+              "default": "1",
+              "description": "Corner radius (in modules) of the logo knockout plate.",
+              "fieldName": "logoRadius"
+            },
+            {
+              "name": "artistic",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Artistic mode: render `logo` as a full-bleed background image and draw the\ndata modules as semi-opaque dots on top, like a halftone overlay. Forces\n`ec-level` to `H` and keeps the finder eyes solid for scannability.\nScannability caveat: artistic codes are decorative-first; always test scan\nreliability with a real phone before shipping one in production.",
+              "fieldName": "artistic"
+            },
+            {
+              "name": "artistic-opacity",
+              "type": {
+                "text": "number"
+              },
+              "default": "0.85",
+              "description": "Opacity of the modules in artistic mode (0 to 1).",
+              "fieldName": "artisticOpacity"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Fancy, logo-embeddable QR code renderer.",
+          "usesTokens": [
+            {
+              "name": "--fluid-text-primary",
+              "description": "Default module / eye color."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Default background and logo-plate color."
+            }
+          ],
+          "tagName": "fluid-qr-code",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidQrCode",
+          "declaration": {
+            "name": "FluidQrCode",
+            "module": "src/fluid-qr-code.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidQrCode",
+          "declaration": {
+            "name": "FluidQrCode",
+            "module": "src/fluid-qr-code.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

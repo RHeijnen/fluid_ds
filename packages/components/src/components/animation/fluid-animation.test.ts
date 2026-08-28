@@ -3,6 +3,13 @@ import "./define.js";
 import type { FluidAnimation } from "./fluid-animation.js";
 
 describe("<fluid-animation>", () => {
+  it("passes an a11y audit with slotted content", async () => {
+    const el = await fixture<FluidAnimation>(html`
+      <fluid-animation><p>Animated announcement</p></fluid-animation>
+    `);
+    await expect(el).to.be.accessible();
+  });
+
   it("renders its slotted target", async () => {
     const el = await fixture<FluidAnimation>(html`
       <fluid-animation><div id="t">hi</div></fluid-animation>

@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-button>` triggers an action, submit a form, open a dialog, run a
 command. It wraps a native `<button>` inside shadow DOM, so it behaves like
 a real form button (`type="submit"` works, `disabled` blocks submission)
@@ -43,6 +42,7 @@ page can render it.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -54,6 +54,7 @@ page can render it.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/button";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -72,9 +73,11 @@ most-important action in a section, **secondary** for everything else,
   <fluid-button variant="ghost">Ghost</fluid-button>
 </Demo>
 
-<ConformanceCode code={`<fluid-button>Primary</fluid-button>
+<ConformanceCode
+  code={`<fluid-button>Primary</fluid-button>
 <fluid-button variant="secondary">Secondary</fluid-button>
-<fluid-button variant="ghost">Ghost</fluid-button>`} />
+<fluid-button variant="ghost">Ghost</fluid-button>`}
+/>
 
 ### Sizes
 
@@ -88,13 +91,15 @@ aligned.
   <fluid-button size="lg">Large</fluid-button>
 </Demo>
 
-<ConformanceCode code={`<fluid-button size="sm">Small</fluid-button>
+<ConformanceCode
+  code={`<fluid-button size="sm">Small</fluid-button>
 <fluid-button size="md">Medium</fluid-button>
-<fluid-button size="lg">Large</fluid-button>`} />
+<fluid-button size="lg">Large</fluid-button>`}
+/>
 
 ### Tones
 
-`variant` is the *treatment*; `tone` is the *intent*. They're
+`variant` is the _treatment_; `tone` is the _intent_. They're
 orthogonal, a danger action can be solid, outlined, or ghost. Tones are
 **theme-independent**: switching brand from Default to Midnight recolors
 `tone="brand"` buttons but leaves success / danger / warning / info
@@ -109,20 +114,21 @@ exactly where they were.
   <fluid-button tone="info">Info</fluid-button>
 </Demo>
 
-<ConformanceCode code={`<fluid-button tone="danger">Delete</fluid-button>
+<ConformanceCode
+  code={`<fluid-button tone="danger">Delete</fluid-button>
 <fluid-button variant="secondary" tone="success">Approve</fluid-button>
-<fluid-button variant="ghost" tone="warning">Reset</fluid-button>`} />
+<fluid-button variant="ghost" tone="warning">Reset</fluid-button>`}
+/>
 
 When `tone` is omitted, the default is variant-aware: primary defaults
 to **brand**, secondary and ghost default to **neutral**, so existing
 markup keeps its visual identity.
 
 <Aside type="tip">
-  Every tone's base + text pair is audited to meet
-  [WCAG 1.4.3 Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
-  at 4.5:1 for normal text. Warning uses dark text on amber for the
-  same reason Bootstrap and Material do, amber on white doesn't
-  reach 4.5:1.
+  Every tone's base + text pair is audited to meet [WCAG 1.4.3 Contrast
+  (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html) at 4.5:1 for normal
+  text. Warning uses dark text on amber for the same reason Bootstrap and Material do, amber on
+  white doesn't reach 4.5:1.
 </Aside>
 
 ### With an icon
@@ -151,6 +157,7 @@ unit.
 </fluid-button>
 
 <!-- icon-only, give it an aria-label so screen readers can name it -->
+
 <fluid-button variant="ghost" aria-label="More options">
   <fluid-icon name="ellipsis"></fluid-icon>
 </fluid-button>`} />
@@ -162,13 +169,19 @@ Inside a form, a disabled button won't submit either.
 
 <Demo>
   <fluid-button disabled>Primary</fluid-button>
-  <fluid-button variant="secondary" disabled>Secondary</fluid-button>
-  <fluid-button variant="ghost" disabled>Ghost</fluid-button>
+  <fluid-button variant="secondary" disabled>
+    Secondary
+  </fluid-button>
+  <fluid-button variant="ghost" disabled>
+    Ghost
+  </fluid-button>
 </Demo>
 
-<ConformanceCode code={`<fluid-button disabled>Primary</fluid-button>
+<ConformanceCode
+  code={`<fluid-button disabled>Primary</fluid-button>
 <fluid-button variant="secondary" disabled>Secondary</fluid-button>
-<fluid-button variant="ghost" disabled>Ghost</fluid-button>`} />
+<fluid-button variant="ghost" disabled>Ghost</fluid-button>`}
+/>
 
 ### Loading
 
@@ -180,8 +193,12 @@ visible label stays put, so the accessible name never changes.
 
 <Demo>
   <fluid-button loading>Saving…</fluid-button>
-  <fluid-button variant="secondary" loading>Loading</fluid-button>
-  <fluid-button tone="success" loading>Approving</fluid-button>
+  <fluid-button variant="secondary" loading>
+    Loading
+  </fluid-button>
+  <fluid-button tone="success" loading>
+    Approving
+  </fluid-button>
 </Demo>
 
 <ConformanceCode code={`<fluid-button loading>Saving…</fluid-button>`} />
@@ -197,9 +214,8 @@ try {
 ```
 
 <Aside type="tip">
-  The spinner honors `prefers-reduced-motion: reduce`, it stops spinning
-  for users who opt out of motion, while still signalling the busy state
-  via `aria-busy`.
+  The spinner honors `prefers-reduced-motion: reduce`, it stops spinning for users who opt out of
+  motion, while still signalling the busy state via `aria-busy`.
 </Aside>
 
 ### Toggle
@@ -251,7 +267,9 @@ which is exactly the right-hand half of a
 
 <Demo>
   <fluid-dropdown>
-    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Actions
+    </fluid-button>
     <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
     <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
     <fluid-dropdown-item type="separator"></fluid-dropdown-item>
@@ -259,11 +277,13 @@ which is exactly the right-hand half of a
   </fluid-dropdown>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropdown>
+<ConformanceCode
+  code={`<fluid-dropdown>
   <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
   <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
   <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
-</fluid-dropdown>`} />
+</fluid-dropdown>`}
+/>
 
 ## Listening for clicks
 
@@ -286,6 +306,7 @@ The tabs below show the same handler in each framework. Setup details
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="SaveButton.tsx"
@@ -306,6 +327,7 @@ The tabs below show the same handler in each framework. Setup details
       in React 18 or `onFluidClick` in React 19, see the
       [framework guide](/guides/frameworks/#react) for details.
     </Aside>
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="SaveButton.vue"
@@ -328,6 +350,7 @@ The tabs below show the same handler in each framework. Setup details
       Tell Vue that `fluid-*` tags are custom elements (one-time setup):
       `app.config.compilerOptions.isCustomElement = (tag) => tag.startsWith("fluid-")`.
     </Aside>
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="save-button.component.ts"
@@ -350,6 +373,7 @@ The tabs below show the same handler in each framework. Setup details
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="SaveButton.svelte"
@@ -365,6 +389,7 @@ The tabs below show the same handler in each framework. Setup details
       Save
     </fluid-button>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -411,22 +436,18 @@ form-data wiring across frameworks.
 ## As a link
 
 If the action is **navigation**, use a real `<a>` so right-click,
-middle-click, scroll restoration, and prefetch all keep working. Wrap a
-`<fluid-button>` for the look:
+middle-click, scroll restoration, and prefetch all keep working. Style the
+anchor directly; do not nest the button's native shadow-DOM control inside it:
 
 <Demo>
-  <a href="https://github.com/RHeijnen/fluid_ds" style="text-decoration:none;">
-    <fluid-button variant="secondary">
-      View on GitHub
-      <fluid-icon slot="suffix" name="external-link"></fluid-icon>
-    </fluid-button>
+  <a href="https://github.com/RHeijnen/fluid_ds" class="fluid-doc-link-button">
+    View on GitHub
+    <fluid-icon name="external-link"></fluid-icon>
   </a>
 </Demo>
 
 ```html
-<a href="/pricing" style="text-decoration:none;">
-  <fluid-button variant="secondary">View pricing</fluid-button>
-</a>
+<a href="/pricing" class="fluid-doc-link-button">View pricing</a>
 ```
 
 ## Theming
@@ -439,11 +460,11 @@ That fall-back chain is the override ladder, and it gives you three levels for
 free:
 
 1. **Brand**: override the main var (`--fluid-accent-base`,
-   `--fluid-radius-md`, …) and *every* component that reads it reflows.
-2. **Component**: override the `--fluid-button-*` token and *all* buttons
+   `--fluid-radius-md`, …) and _every_ component that reads it reflows.
+2. **Component**: override the `--fluid-button-*` token and _all_ buttons
    change, nothing else.
 3. **Instance**: set the `--fluid-button-*` token inline or on a
-   `[data-fluid-id]` and *one* button changes.
+   `[data-fluid-id]` and _one_ button changes.
 
 The **complete, authoritative list** of both layers lives in the
 [API tables below](#api): **CSS custom properties** is every
@@ -465,13 +486,13 @@ var those knobs fall back to. The two you'll reach for most are
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) (or the playground panel inside this
-  site) lets you tweak these tokens visually and exports the CSS above.
+  The [Theme builder](/playground/) (or the playground panel inside this site) lets you tweak these
+  tokens visually and exports the CSS above.
 </Aside>
 
 ### Beyond tokens: `::part()`
 
-Tokens cover the *intended* theming knobs. For anything else, a one-off
+Tokens cover the _intended_ theming knobs. For anything else, a one-off
 property we never tokenized, the inner element is exposed as
 [`part="base"`](#api) (the button also exposes `spinner` and `caret` parts),
 so you can reach it with the standard [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part)
@@ -495,7 +516,7 @@ Two notes that make per-corner specifically a non-issue:
 - `::part()` is the escape hatch for the long tail (a bespoke shadow, a gradient
   border, one decoupled corner). Tokens for the common cases **plus** `::part()`
   for the rest is what makes the system fully open without thousands of tokens:
-  so we deliberately *don't* split every shorthand into sub-tokens.
+  so we deliberately _don't_ split every shorthand into sub-tokens.
 
 ## When to use
 
@@ -504,12 +525,12 @@ Two notes that make per-corner specifically a non-issue:
 - Opening anything: dialog, drawer, popover, dropdown.
 - A toolbar control that's not navigation.
 
-### When *not* to use
+### When _not_ to use
 
 - **Navigation**: use a plain `<a>` (optionally wrapped in a button
   for visual treatment, as shown above).
 - A **settings-style on/off** that reads as a form value: use
-  `<fluid-switch>` or `<fluid-checkbox>`. (For an *in-place* binary action
+  `<fluid-switch>` or `<fluid-checkbox>`. (For an _in-place_ binary action
   like mute or bold, the [toggle button](#toggle) above is the right tool.)
 - A **destructive confirmation** by itself: pair with `<fluid-dialog>`
   so the user has a chance to cancel.
@@ -524,11 +545,11 @@ contract lives in the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Move focus in / out, like any focusable control. |
-| <kbd>Space</kbd> | Activate (fires on key-up, native button behavior). |
-| <kbd>Enter</kbd> | Activate (fires on key-down). |
+| Key                                              | Action                                              |
+| ------------------------------------------------ | --------------------------------------------------- |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Move focus in / out, like any focusable control.    |
+| <kbd>Space</kbd>                                 | Activate (fires on key-up, native button behavior). |
+| <kbd>Enter</kbd>                                 | Activate (fires on key-down).                       |
 
 The focus ring is `:focus-visible`, keyboard users see it, pointer users
 don't. Its width + offset read `--fluid-focus-ring-width` / `-offset`, so the
@@ -550,7 +571,7 @@ AAA toggle thickens it without touching the component.
 - **`disabled`** sets the inner button's native `disabled` (mirrored as
   `aria-disabled` on the host): blocks pointer + key activation and removes it
   from the tab order, the conventional choice for a plain action. If you need
-  a disabled control that *stays* focusable so SR users can reach and hear it,
+  a disabled control that _stays_ focusable so SR users can reach and hear it,
   use the `aria-disabled` pattern from the
   [Accessibility guide](/guides/accessibility/).
 - **`loading`** deliberately keeps the button focusable: `aria-busy="true"` +
@@ -575,16 +596,16 @@ AAA toggle thickens it without touching the component.
 
 The button ships **WCAG 2.2 Level AA** by default and scales to **AAA** on a
 switch. Flip the **Conformance** toggle at the top of this page, every example
-above resizes, *and the code snippets switch to show the
-`data-fluid-conformance="aaa"` wrapper that produces them*. It's not a mock-up:
+above resizes, _and the code snippets switch to show the
+`data-fluid-conformance="aaa"` wrapper that produces them_. It's not a mock-up:
 the toggle sets the real attribute on `<html>`, the same switch you'd throw
 app-wide. The button reads conformance tokens, so it scales with zero
 per-component branching:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ```html
 <!-- Opt the whole app (or one region) into AAA, once, on an ancestor. -->
@@ -595,10 +616,10 @@ per-component branching:
 ```
 
 <Aside type="note">
-  Text-contrast enhancement ([SC 1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced),
-  7:1) is a property of the brand color track, not these structural tokens:
-  the default palette targets the AA 4.5:1 floor. Target size and focus
-  appearance are the deltas a component itself owns, and the two this toggle
+  Text-contrast enhancement ([SC
+  1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced), 7:1) is a property of the
+  brand color track, not these structural tokens: the default palette targets the AA 4.5:1 floor.
+  Target size and focus appearance are the deltas a component itself owns, and the two this toggle
   demonstrates.
 </Aside>
 

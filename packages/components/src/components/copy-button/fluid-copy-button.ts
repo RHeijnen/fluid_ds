@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -159,7 +159,7 @@ export class FluidCopyButton extends FluidElement {
         part="base"
         class="button ${this.state === "copied" ? "copied" : ""} ${this.disabled ? "disabled" : ""}"
         type="button"
-        aria-label=${this.state === "copied" ? "Copied" : "Copy to clipboard"}
+        aria-label=${this.state === "copied" ? this.term("copied") : this.term("copyToClipboard")}
         ?disabled=${this.disabled}
         @click=${this.handleClick}
       >

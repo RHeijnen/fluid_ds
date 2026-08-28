@@ -1,11 +1,92 @@
 import { expect, fixture, html, oneEvent } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
 import type { FluidSplitPanel } from "./fluid-split-panel.js";
 
-const divider = (el: FluidSplitPanel) =>
-  el.shadowRoot!.querySelector<HTMLDivElement>(".divider")!;
+const divider = (el: FluidSplitPanel) => el.shadowRoot!.querySelector<HTMLDivElement>(".divider")!;
 
 describe("<fluid-split-panel>", () => {
+  describe("<fluid-split-panel> localized defaults", () => {
+    const readLabels = (control: FluidSplitPanel) => [
+      control.shadowRoot!.querySelector('[role="separator"]')!.getAttribute("aria-label")
+    ];
+    for (const [locale, expected] of [
+      ["nl", ["Paneelgrootte aanpassen"]],
+      ["de", ["Bereichsgröße ändern"]],
+      ["fr", ["Redimensionner les panneaux"]],
+      ["es", ["Cambiar el tamaño de los paneles"]],
+      ["ar", ["تغيير حجم اللوحات"]],
+      ["fr-CA", ["Redimensionner les panneaux"]]
+    ] as const) {
+      it(`updates owned labels in ${locale} without treating defaults as application overrides`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en"><fluid-split-panel></fluid-split-panel></div>
+        `);
+        const control = wrapper.querySelector<FluidSplitPanel>("fluid-split-panel")!;
+        await control.updateComplete;
+        expect(control.hasAttribute("label")).to.equal(false);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(readLabels(control)).to.deep.equal(expected);
+        expect(control.label).to.equal(expected[0]);
+        expect(control.hasAttribute("label")).to.equal(false);
+      });
+    }
+
+    it("refreshes defaults in a closed shadow context and after reconnect", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const context = document.createElement("section");
+      context.lang = "nl";
+      host.attachShadow({ mode: "closed" }).append(context);
+      const control = await fixture<FluidSplitPanel>(html`<fluid-split-panel></fluid-split-panel>`);
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Paneelgrootte aanpassen"]);
+      context.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Bereichsgröße ändern"]);
+      control.remove();
+      context.lang = "ar";
+      context.append(control);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["تغيير حجم اللوحات"]);
+    });
+
+    it("preserves explicit English and empty overrides, and restores defaults when overrides are removed", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="en"><fluid-split-panel></fluid-split-panel></div>
+      `);
+      const control = wrapper.querySelector<FluidSplitPanel>("fluid-split-panel")!;
+      control.label = "Resize panels";
+      wrapper.lang = "nl";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Resize panels"]);
+      control.setAttribute("label", "Resize panels");
+      wrapper.lang = "fr";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Resize panels"]);
+      control.removeAttribute("label");
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["Redimensionner les panneaux"]);
+      control.label = "";
+      wrapper.lang = "ar";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal([""]);
+      Reflect.set(control, "label", null);
+      await control.updateComplete;
+      expect(readLabels(control)).to.deep.equal(["تغيير حجم اللوحات"]);
+    });
+  });
+
   it("renders with defaults", async () => {
     const el = await fixture<FluidSplitPanel>(html`<fluid-split-panel></fluid-split-panel>`);
     expect(el.position).to.equal(50);
@@ -56,7 +137,11 @@ describe("<fluid-split-panel>", () => {
 
   it("clamps to min-position / max-position", async () => {
     const el = await fixture<FluidSplitPanel>(
-      html`<fluid-split-panel position="25" min-position="20" max-position="80"></fluid-split-panel>`
+      html`<fluid-split-panel
+        position="25"
+        min-position="20"
+        max-position="80"
+      ></fluid-split-panel>`
     );
     await el.updateComplete;
     // Hold ArrowLeft past the min; position should never drop below 20.

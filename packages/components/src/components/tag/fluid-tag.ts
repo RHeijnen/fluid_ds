@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -127,7 +127,7 @@ export class FluidTag extends FluidElement {
        */
       min-width: var(--fluid-target-min, 0px);
       min-height: var(--fluid-target-min, 0px);
-      margin-right: -0.25em;
+      margin-inline-end: -0.25em;
       cursor: pointer;
       border-radius: var(--fluid-radius-full);
       color: inherit;
@@ -171,7 +171,14 @@ export class FluidTag extends FluidElement {
    * Living in the shadow root, it cannot be corrected from the outside, so it
    * is exposed here.
    */
-  @property({ attribute: "remove-label" }) removeLabel = "Remove";
+  @property({ attribute: "remove-label" })
+  get removeLabel(): string {
+    return this.removeLabelOverride ?? this.term("remove");
+  }
+  set removeLabel(value: string | null) {
+    this.removeLabelOverride = value;
+  }
+  private removeLabelOverride: string | null = null;
 
   /** Disabled state, removal button can't be activated. */
   @property({ type: Boolean, reflect: true }) disabled = false;

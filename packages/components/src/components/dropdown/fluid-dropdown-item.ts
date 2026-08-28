@@ -143,20 +143,30 @@ export class FluidDropdownItem extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.setAttribute("role", this.type === "separator" ? "separator" : "menuitem");
+    this.syncSemantics();
     if (!this.id) this.id = `fluid-dropdown-item-${++counter}`;
   }
 
   protected override updated(changed: PropertyValues<this>): void {
-    if (changed.has("type")) {
-      this.setAttribute("role", this.type === "separator" ? "separator" : "menuitem");
+    if (changed.has("type") || changed.has("disabled") || changed.has("checked")) {
+      this.syncSemantics();
     }
-    if (changed.has("disabled")) {
-      this.setAttribute("aria-disabled", this.disabled ? "true" : "false");
-    }
-    if (changed.has("checked") && this.type === "checkbox") {
+  }
+
+  private syncSemantics(): void {
+    this.setAttribute(
+      "role",
+      this.type === "separator"
+        ? "separator"
+        : this.type === "checkbox"
+          ? "menuitemcheckbox"
+          : "menuitem"
+    );
+    if (this.type === "separator") this.removeAttribute("aria-disabled");
+    else this.setAttribute("aria-disabled", String(this.disabled));
+    if (this.type === "checkbox") {
       this.setAttribute("aria-checked", this.checked ? "true" : "false");
-    }
+    } else this.removeAttribute("aria-checked");
   }
 
   override render(): TemplateResult {

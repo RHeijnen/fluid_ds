@@ -1,5 +1,21 @@
 # @fluid-ds/parser
 
+## 0.4.0
+
+### Minor Changes
+
+- Add optional, typed `diagnostic` codes and parameters to parser-produced cell
+  errors, plus `ParserFileError` codes for invalid JSON syntax and shape. Existing
+  display messages remain available for compatibility.
+
+### Patch Changes
+
+- Localize the column-mapper and file-parser presentation, including structured
+  diagnostics, counts and RTL direction, while preserving caller labels, custom
+  validator messages, parsed values and event payloads.
+- Ignore stale or disconnected asynchronous file reads so an earlier request
+  cannot overwrite newer parser state.
+
 ## 0.1.6
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
-import { property, state } from "lit/decorators.js";
+import { property, state, query } from "lit/decorators.js";
 import { FluidFormAssociated } from "@fluid-ds/components/internal/form-associated";
 import { reducedMotion } from "@fluid-ds/components/internal/motion";
 import "@fluid-ds/components/define/calendar";
@@ -7,6 +7,7 @@ import "@fluid-ds/components/define/spinner";
 import "../time-slots/define.js";
 import {
   dayState,
+  generateSlots,
   fromISODate,
   toISODate,
   fromLocalISO,
@@ -60,6 +61,11 @@ function monthBounds(iso: string): { first: string; last: string; days: string[]
  * @fires fluid-change - A slot was committed. `detail: { value, start, end }`.
  */
 export class FluidScheduler extends FluidFormAssociated {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override formAssociated = true;
 
   static override styles = [
@@ -151,6 +157,9 @@ export class FluidScheduler extends FluidFormAssociated {
   /** The calendar's displayed month (any `YYYY-MM-DD` within it). */
   @state() private viewISO: string;
 
+  @query("fluid-calendar") private calendarEl?: HTMLElement;
+  @query("fluid-time-slots") private slotsEl?: HTMLElement;
+
   private defaultValue: string | null = null;
   private lastRange = "";
 
@@ -161,32 +170,101 @@ export class FluidScheduler extends FluidFormAssociated {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.defaultValue = this.value;
+    if (!this.hasUpdated) this.defaultValue = this.value;
     if (this.value) {
       this.selectedDate = this.value.slice(0, 10);
       this.viewISO = this.selectedDate;
       this.syncFormValue();
     }
     // Let the host fetch the initial month's bookings.
-    this.updateComplete.then(() => this.emitRangeChange());
+    this.updateComplete.then(() => { if (this.isConnected) this.emitRangeChange(); });
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has("value")) {
       this.syncFormValue();
-      if (this.value) this.selectedDate = this.value.slice(0, 10);
-      if (this.required && !this.value) this.setValidity({ valueMissing: true }, "Please choose an appointment.");
-      else this.setValidity({});
+      this.selectedDate = this.value ? this.value.slice(0, 10) : null;
+      if (this.selectedDate) this.viewISO = this.selectedDate;
     }
+    this.refreshValidity();
+  }
+
+  protected override updated(): void {
+    // A selected day renders the slot host in this update, changing the most
+    // useful correction target from the calendar to the slot list.
+    this.refreshValidity();
+    const focusHost = (this.slotsEl ?? this.calendarEl) as
+      | (HTMLElement & { updateComplete?: Promise<unknown> })
+      | undefined;
+    void focusHost?.updateComplete?.then(() => {
+      if (this.isConnected) this.refreshValidity();
+    });
+    if (this.isConnected) this.emitRangeChange();
+  }
+
+  protected override firstUpdated(): void {
+    this.refreshValidity();
+  }
+
+  private validityAnchor(): HTMLElement | undefined {
+    const selectedSlot = this.slotsEl?.shadowRoot?.querySelector<HTMLButtonElement>(
+      "button.slot.selected:not(:disabled)"
+    );
+    const selectableSlot = this.slotsEl?.shadowRoot?.querySelector<HTMLButtonElement>(
+      "button.slot[tabindex='0']:not(:disabled)"
+    );
+    const slotAnchor = selectedSlot ?? selectableSlot;
+    if (slotAnchor) return slotAnchor;
+    const calendarDay = this.calendarEl?.shadowRoot?.querySelector<HTMLButtonElement>(
+      "button.day[tabindex='0']:not(:disabled), button.day:not(:disabled)"
+    );
+    return calendarDay ?? this.calendarEl ?? undefined;
+  }
+
+  private refreshValidity(): void {
+    if (this.required && !this.value) {
+      this.setValidity(
+        { valueMissing: true },
+        this.term("chooseAppointmentRequired"),
+        this.validityAnchor()
+      );
+    } else if (this.value && !this.availableSlot(this.value)) {
+      this.setValidity(
+        { customError: true },
+        this.term("appointmentUnavailable"),
+        this.validityAnchor()
+      );
+    } else {
+      this.setValidity({}, undefined, this.validityAnchor());
+    }
+  }
+
+  private availableSlot(start: string): Slot | undefined {
+    const date = start.slice(0, 10);
+    if (!this.availability || date < this.minISO || (this.maxISO && date > this.maxISO)) return undefined;
+    return generateSlots(date, this.availability, this.bookings).find((slot) => slot.start === start && slot.state === "available");
   }
 
   override formResetCallback(): void {
     this.value = this.defaultValue;
     this.selectedDate = this.value ? this.value.slice(0, 10) : null;
+    this.syncFormValue();
   }
 
   override formDisabledCallback(disabled: boolean): void {
     this.disabled = disabled;
+  }
+
+  override formStateRestoreCallback(
+    state: string | File | FormData | null,
+    _mode: "restore" | "autocomplete",
+  ): void {
+    void _mode;
+    if (typeof state !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(state)) return;
+    this.value = state;
+    this.selectedDate = state.slice(0, 10);
+    this.viewISO = this.selectedDate;
+    this.syncFormValue();
   }
 
   /** Re-generate slots + day states (call after availability/bookings change out of band). */
@@ -230,6 +308,7 @@ export class FluidScheduler extends FluidFormAssociated {
   }
 
   private onViewChange = (e: Event): void => {
+    if (this.disabled) return;
     const view = (e as CustomEvent).detail?.view as string;
     if (view) {
       this.viewISO = view;
@@ -238,8 +317,9 @@ export class FluidScheduler extends FluidFormAssociated {
   };
 
   private onDateActivate = (e: Event): void => {
+    if (this.disabled || this.readonly || this.loading) return;
     const iso = (e as CustomEvent).detail?.iso as string;
-    if (!iso) return;
+    if (!iso || !fromISODate(iso) || iso < this.minISO || (this.maxISO && iso > this.maxISO)) return;
     this.selectedDate = iso;
     this.viewISO = iso;
     this.dispatchEvent(new CustomEvent("fluid-day-select", { detail: { date: iso }, bubbles: true, composed: true }));
@@ -247,13 +327,18 @@ export class FluidScheduler extends FluidFormAssociated {
 
   private onSlotChange = (e: Event): void => {
     e.stopPropagation();
+    if (this.disabled || this.readonly || this.loading) return;
     const slot = (e as CustomEvent).detail?.slot as Slot | undefined;
-    if (!slot) return;
-    this.value = slot.start;
-    const end = fromLocalISO(slot.end);
+    if (!slot || slot.start.slice(0, 10) !== this.selectedDate) return;
+    const available = this.availableSlot(slot.start);
+    if (!available) return;
+    this.value = available.start;
+    // Public change observers must see the committed value in FormData.
+    this.syncFormValue();
+    const end = fromLocalISO(available.end);
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
-        detail: { value: slot.start, start: slot.start, end: slot.end, timestamp: fromLocalISO(slot.start)?.getTime() ?? null, endTimestamp: end?.getTime() ?? null },
+        detail: { value: available.start, start: available.start, end: available.end, timestamp: fromLocalISO(available.start)?.getTime() ?? null, endTimestamp: end?.getTime() ?? null },
         bubbles: true,
         composed: true
       })
@@ -262,7 +347,7 @@ export class FluidScheduler extends FluidFormAssociated {
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="base">
+      <div part="base" class="base" ?inert=${this.disabled} aria-busy=${this.loading ? "true" : "false"}>
         <fluid-calendar
           part="calendar"
           .value=${this.selectedDate}
@@ -272,6 +357,7 @@ export class FluidScheduler extends FluidFormAssociated {
           week-start=${this.weekStart}
           locale=${this.locale ?? ""}
           .dayState=${this.dayStateMap}
+          ?inert=${this.readonly || this.loading}
           @fluid-date-activate=${this.onDateActivate}
           @fluid-view-change=${this.onViewChange}
         ></fluid-calendar>
@@ -288,13 +374,13 @@ export class FluidScheduler extends FluidFormAssociated {
                   time-format=${this.timeFormat}
                   size=${this.size}
                   locale=${this.locale ?? ""}
-                  ?disabled=${this.disabled || this.readonly}
+                  ?disabled=${this.disabled || this.readonly || this.loading}
                   @fluid-change=${this.onSlotChange}
                 ></fluid-time-slots>
               `
-            : html`<p part="prompt" class="prompt">Select a day to see available times.</p>`}
+            : html`<p part="prompt" class="prompt">${this.term("selectDayAvailableTimes")}</p>`}
           ${this.loading
-            ? html`<div class="overlay"><fluid-spinner label="Loading availability"></fluid-spinner></div>`
+            ? html`<div class="overlay"><fluid-spinner label=${this.term("loadingAvailability")}></fluid-spinner></div>`
             : ""}
         </div>
       </div>

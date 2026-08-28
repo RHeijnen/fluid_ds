@@ -1,6 +1,6 @@
 import { FluidTimePicker } from "./fluid-time-picker.js";
 
-if (!customElements.get("fluid-time-picker")) customElements.define("fluid-time-picker", FluidTimePicker);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-time-picker")) customElements.define("fluid-time-picker", FluidTimePicker);
 
 declare global {
   interface HTMLElementTagNameMap {

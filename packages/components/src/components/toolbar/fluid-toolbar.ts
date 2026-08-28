@@ -53,8 +53,7 @@ export class FluidToolbar extends FluidElement {
       gap: var(--fluid-toolbar-gap, var(--fluid-space-1));
       padding: var(--fluid-toolbar-padding, var(--fluid-space-2));
       background-color: var(--fluid-toolbar-bg, var(--fluid-surface-base));
-      box-shadow: inset 0 0 0 1px
-        var(--fluid-toolbar-border, var(--fluid-border-default));
+      box-shadow: inset 0 0 0 1px var(--fluid-toolbar-border, var(--fluid-border-default));
       border-radius: var(--fluid-toolbar-radius, var(--fluid-radius-md));
     }
 
@@ -79,6 +78,7 @@ export class FluidToolbar extends FluidElement {
    * defaults to `tabIndex` 0 unless we override it.
    */
   private controls: HTMLElement[] = [];
+  private controlObserver?: MutationObserver;
 
   /** The subset of {@link controls} that roving navigation can land on. */
   private get items(): HTMLElement[] {
@@ -106,27 +106,41 @@ export class FluidToolbar extends FluidElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener("keydown", this.handleKeydown);
-    this.addEventListener("focusin", this.handleFocusin);
+    this.listen(this, "keydown", this.handleKeydown);
+    this.listen(this, "focusin", this.handleFocusin);
+    if (typeof MutationObserver !== "undefined") {
+      this.controlObserver?.disconnect();
+      this.controlObserver = new MutationObserver(() => this.reconcileControls());
+      this.controlObserver.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["disabled", "aria-disabled"]
+      });
+    }
+    queueMicrotask(() => this.reconcileControls());
   }
 
   override disconnectedCallback(): void {
+    this.controlObserver?.disconnect();
     super.disconnectedCallback();
-    this.removeEventListener("keydown", this.handleKeydown);
-    this.removeEventListener("focusin", this.handleFocusin);
   }
 
   /** Collect the slotted controls and apply the initial roving tabindex. */
   private handleSlotChange = (): void => {
-    this.collectItems();
-    this.resetTabIndex();
+    this.reconcileControls();
   };
+
+  private reconcileControls(): void {
+    const previousTabStop = this.controls.find((control) => control.tabIndex === 0);
+    this.collectItems();
+    const preservedIndex = previousTabStop ? this.items.indexOf(previousTabStop) : -1;
+    this.resetTabIndex(preservedIndex >= 0 ? preservedIndex : 0);
+  }
 
   private collectItems(): void {
     const slot = this.base?.querySelector("slot");
-    const assigned = slot
-      ? (slot as HTMLSlotElement).assignedElements({ flatten: true })
-      : [];
+    const assigned = slot ? (slot as HTMLSlotElement).assignedElements({ flatten: true }) : [];
     const found: HTMLElement[] = [];
     for (const node of assigned) {
       if (!(node instanceof HTMLElement)) continue;
@@ -135,19 +149,13 @@ export class FluidToolbar extends FluidElement {
         continue;
       }
       // The focusable control may be nested inside a wrapper element.
-      const nested = node.querySelector<HTMLElement>(
-        FluidToolbar.FOCUSABLE_SELECTOR
-      );
-      if (nested) found.push(nested);
+      found.push(...node.querySelectorAll<HTMLElement>(FluidToolbar.FOCUSABLE_SELECTOR));
     }
     this.controls = found;
   }
 
   private isDisabled(el: HTMLElement): boolean {
-    return (
-      el.hasAttribute("disabled") ||
-      el.getAttribute("aria-disabled") === "true"
-    );
+    return el.hasAttribute("disabled") || el.getAttribute("aria-disabled") === "true";
   }
 
   /**
@@ -189,8 +197,8 @@ export class FluidToolbar extends FluidElement {
   private handleKeydown = (event: KeyboardEvent): void => {
     if (this.items.length === 0) return;
     const horizontal = this.orientation !== "vertical";
-    const next = horizontal ? "ArrowRight" : "ArrowDown";
-    const prev = horizontal ? "ArrowLeft" : "ArrowUp";
+    const next = horizontal ? (this.isRtl ? "ArrowLeft" : "ArrowRight") : "ArrowDown";
+    const prev = horizontal ? (this.isRtl ? "ArrowRight" : "ArrowLeft") : "ArrowUp";
 
     const current = this.activeIndex;
     const last = this.items.length - 1;

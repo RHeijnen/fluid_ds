@@ -106,13 +106,16 @@ export class FluidBadge extends FluidElement {
   /** Show only a colored dot, no content, smaller footprint. */
   @property({ type: Boolean, reflect: true }) dot = false;
 
+  /** Reactive mirror of the host name used by a dot-only status badge. */
+  @property({ attribute: "aria-label" }) private dotAccessibleLabel: string | null = null;
+
   override render(): TemplateResult {
     // A dot-only badge has no rendered text, so status would be conveyed by
     // color alone (WCAG 1.4.1) with no accessible name (4.1.2). Forward any
     // author-supplied aria-label from the host onto the base span and expose a
     // status role so the dot carries that name. A visible text label should
     // still accompany the dot where possible.
-    const dotLabel = this.dot ? this.getAttribute("aria-label") : null;
+    const dotLabel = this.dot ? this.dotAccessibleLabel : null;
     return html`
       <span
         part="base"

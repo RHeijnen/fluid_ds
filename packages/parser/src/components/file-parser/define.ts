@@ -1,6 +1,6 @@
 import { FluidFileParser } from "./fluid-file-parser.js";
 
-if (!customElements.get("fluid-file-parser")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-file-parser")) {
   customElements.define("fluid-file-parser", FluidFileParser);
 }
 

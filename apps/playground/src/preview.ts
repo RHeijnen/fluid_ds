@@ -2,6 +2,7 @@ import { LitElement, html, css, type TemplateResult } from "lit";
 import { customElement, query } from "lit/decorators.js";
 import { themeStore } from "./store.js";
 import { confetti } from "@fluid-ds/animations/effects";
+import type { FluidInfiniteTableCellContext } from "@fluid-ds/table";
 import "./preview-card.js";
 
 /**
@@ -294,7 +295,7 @@ export class ComponentPreview extends LitElement {
                 key: "terminal",
                 label: "Terminal",
                 width: "13rem",
-                renderCell: ({ row }) =>
+                renderCell: ({ row }: FluidInfiniteTableCellContext) =>
                   html`<strong>${row.terminal}</strong><br /><small>${row.serial}</small>`
               },
               { key: "site", label: "Site", width: "10rem" },
@@ -302,7 +303,7 @@ export class ComponentPreview extends LitElement {
                 key: "status",
                 label: "Status",
                 width: "7rem",
-                renderCell: ({ row }) =>
+                renderCell: ({ row }: FluidInfiniteTableCellContext) =>
                   html`<fluid-badge tone=${row.online ? "success" : "danger"}>
                     ${row.online ? "Online" : "Offline"}
                   </fluid-badge>`
@@ -353,6 +354,35 @@ export class ComponentPreview extends LitElement {
               { id: "done", title: "Done", cards: [{ id: "c4", title: "Kickoff" }] }
             ]}
           ></fluid-kanban>
+        </fluid-card>
+
+        <fluid-card>
+          <h3 slot="header">Node graph</h3>
+          <fluid-node-graph
+            style="height: 18rem"
+            label="Workflow preview"
+            .nodeTypes=${{
+              trigger: { label: "Trigger", input: false, removable: false },
+              task: {
+                label: "Task",
+                height: 116,
+                outputs: [
+                  { id: "success", label: "On success", tone: "success" },
+                  { id: "error", label: "On error", tone: "danger" }
+                ]
+              },
+              stop: { label: "Stop", outputs: [] }
+            }}
+            .nodes=${[
+              { id: "p1", type: "trigger", x: 24, y: 96, label: "Every night", summary: "Daily at 02:00" },
+              { id: "p2", type: "task", x: 304, y: 40, label: "Sync data", summary: "Pull latest records" },
+              { id: "p3", type: "stop", x: 584, y: 96, label: "Stop" }
+            ]}
+            .edges=${[
+              { id: "pe1", from: "p1", port: "next", to: "p2" },
+              { id: "pe2", from: "p2", port: "error", to: "p3" }
+            ]}
+          ></fluid-node-graph>
         </fluid-card>
 
         <fluid-card>
@@ -1103,6 +1133,12 @@ This is **markdown** with [links](https://example.com), \`inline code\`, and lis
         <preview-card tag="fluid-dropzone" label="Dropzone">
           <div style="width: 100%;">
           <fluid-dropzone multiple accept="image/*" label="Drag files here or click to browse"></fluid-dropzone>
+          </div>
+        </preview-card>
+
+        <preview-card tag="fluid-signature-pad" label="Signature pad">
+          <div style="width: 100%;">
+          <fluid-signature-pad aria-label="Signature"></fluid-signature-pad>
           </div>
         </preview-card>
 

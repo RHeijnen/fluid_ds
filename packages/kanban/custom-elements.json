@@ -1,0 +1,614 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/components/kanban/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-kanban",
+          "declaration": {
+            "name": "FluidKanban",
+            "module": "src/components/kanban/fluid-kanban.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/kanban/fluid-kanban.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A drag-and-drop kanban board. Pass an array of `columns`, each with a\n`title` and an ordered list of `cards`. Columns render side by side; each is\na labelled region containing a list (role=\"list\") of draggable cards\n(role=\"listitem\").\n\nCards move with native buttons, native HTML5 drag and drop, or keyboard pickup.\nThe buttons provide a single-pointer alternative to dragging. Press a\ncard and drop it onto another card or column. With the keyboard, focus a card\nand press Space to pick it up, then ArrowLeft / ArrowRight to move it along\nthe rendered column track (including RTL) and ArrowUp / ArrowDown to reorder\nwithin a column; press Space again to drop or Escape to cancel. Every move is\nannounced through a polite aria-live region.\n\nEither way the board updates its internal `columns` state and emits\n`fluid-move` with the card id, source column, target column, and target\nindex.",
+          "name": "FluidKanban",
+          "cssProperties": [
+            {
+              "description": "Gap between columns and between cards. Falls back to --fluid-space-md.",
+              "name": "--fluid-kanban-gap"
+            },
+            {
+              "description": "Corner radius of columns and cards. Falls back to --fluid-radius-md.",
+              "name": "--fluid-kanban-radius"
+            },
+            {
+              "description": "Column background. Falls back to --fluid-surface-muted.",
+              "name": "--fluid-kanban-column-bg"
+            },
+            {
+              "description": "Card background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-kanban-card-bg"
+            },
+            {
+              "description": "Text color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-kanban-fg"
+            },
+            {
+              "description": "Border color of columns and cards. Falls back to --fluid-border-default.",
+              "name": "--fluid-kanban-border"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The board: a horizontal track of columns.",
+              "name": "base"
+            },
+            {
+              "description": "A single column region.",
+              "name": "column"
+            },
+            {
+              "description": "A column's title bar.",
+              "name": "column-header"
+            },
+            {
+              "description": "The card list inside a column.",
+              "name": "list"
+            },
+            {
+              "description": "A single draggable card.",
+              "name": "card"
+            },
+            {
+              "description": "The card's non-drag move controls.",
+              "name": "move-controls"
+            },
+            {
+              "description": "A native move control.",
+              "name": "move-button"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "type": {
+                "text": "KanbanColumn[]"
+              },
+              "default": "[]",
+              "description": "The board data: an ordered list of columns, each with ordered cards.",
+              "attribute": "columns"
+            },
+            {
+              "kind": "field",
+              "name": "moveUpLabel",
+              "type": {
+                "text": "string"
+              },
+              "description": "Localizable accessible names for the non-drag controls. Card title is appended.",
+              "attribute": "move-up-label"
+            },
+            {
+              "kind": "field",
+              "name": "moveUpLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "moveDownLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "move-down-label"
+            },
+            {
+              "kind": "field",
+              "name": "moveDownLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "movePreviousLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "move-previous-label"
+            },
+            {
+              "kind": "field",
+              "name": "movePreviousLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "moveNextLabel",
+              "type": {
+                "text": "string"
+              },
+              "attribute": "move-next-label"
+            },
+            {
+              "kind": "field",
+              "name": "moveNextLabelOverride",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "grabbedId",
+              "type": {
+                "text": "string | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "The id of the card currently picked up via the keyboard, if any."
+            },
+            {
+              "kind": "field",
+              "name": "dragOverColumn",
+              "type": {
+                "text": "number | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Index of the column being hovered during a pointer drag, if any."
+            },
+            {
+              "kind": "field",
+              "name": "announcement",
+              "type": {
+                "text": "KanbanAnnouncement | null"
+              },
+              "privacy": "private",
+              "default": "null",
+              "description": "Semantic live-region state so a live locale change can re-render the current announcement."
+            },
+            {
+              "kind": "field",
+              "name": "pickupPosition",
+              "type": {
+                "text": "{ columnId: string; cardIndex: number } | null"
+              },
+              "privacy": "private",
+              "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "formatNumber",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "announcementText",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "findCard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "CardPosition | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "cardId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "moveCard",
+              "return": {
+                "type": {
+                  "text": "CardPosition | null"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "cardId",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "toColumn",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "toIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Move a card to a target column at a target index, update state, announce,\nand emit fluid-move. Returns the resulting position, or null if the card\nwas not found."
+            },
+            {
+              "kind": "method",
+              "name": "refocusCard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Promise<void>"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "cardId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onDragStart",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "cardId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onColumnDragOver",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "columnIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onColumnDrop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "DragEvent"
+                  }
+                },
+                {
+                  "name": "columnIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "beforeIndex",
+                  "optional": true,
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "onCardKeydown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "KeyboardEvent"
+                  }
+                },
+                {
+                  "name": "cardId",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderCard",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "card",
+                  "type": {
+                    "text": "KanbanCard"
+                  }
+                },
+                {
+                  "name": "columnIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "cardIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderColumn",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "column",
+                  "type": {
+                    "text": "KanbanColumn"
+                  }
+                },
+                {
+                  "name": "columnIndex",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            }
+          ],
+          "events": [
+            {
+              "name": "fluid-move",
+              "description": "A card moved. detail: { cardId, fromColumn, toColumn, index }.",
+              "type": {
+                "text": "CustomEvent<unknown>"
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "columns",
+              "type": {
+                "text": "KanbanColumn[]"
+              },
+              "default": "[]",
+              "description": "The board data: an ordered list of columns, each with ordered cards.",
+              "fieldName": "columns"
+            },
+            {
+              "name": "move-up-label",
+              "type": {
+                "text": "string"
+              },
+              "description": "Localizable accessible names for the non-drag controls. Card title is appended.",
+              "fieldName": "moveUpLabel"
+            },
+            {
+              "name": "move-down-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "moveDownLabel"
+            },
+            {
+              "name": "move-previous-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "movePreviousLabel"
+            },
+            {
+              "name": "move-next-label",
+              "type": {
+                "text": "string"
+              },
+              "fieldName": "moveNextLabel"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Accessible drag-and-drop kanban board.",
+          "usesTokens": [
+            {
+              "name": "--fluid-space-md",
+              "description": "Default gap."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Default corner radius."
+            },
+            {
+              "name": "--fluid-surface-muted",
+              "description": "Default column background."
+            },
+            {
+              "name": "--fluid-surface-base",
+              "description": "Default card background."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Default text color."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Card description color."
+            },
+            {
+              "name": "--fluid-border-default",
+              "description": "Default border color."
+            },
+            {
+              "name": "--fluid-accent-base",
+              "description": "Focus ring and pick-up highlight."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-focus-ring-offset",
+              "description": "Focus ring offset (scales with conformance)."
+            },
+            {
+              "name": "--fluid-target-min",
+              "description": "Minimum interactive target (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-font-family-sans",
+              "description": "Board typography."
+            },
+            {
+              "name": "--fluid-font-size-sm",
+              "description": "Column and card title size."
+            },
+            {
+              "name": "--fluid-font-size-xs",
+              "description": "Card description size."
+            }
+          ],
+          "tagName": "fluid-kanban",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidKanban",
+          "declaration": {
+            "name": "FluidKanban",
+            "module": "src/components/kanban/fluid-kanban.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidKanban",
+          "declaration": {
+            "name": "FluidKanban",
+            "module": "src/components/kanban/fluid-kanban.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "KanbanCard",
+          "declaration": {
+            "name": "KanbanCard",
+            "module": "src/components/kanban/fluid-kanban.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "KanbanColumn",
+          "declaration": {
+            "name": "KanbanColumn",
+            "module": "src/components/kanban/fluid-kanban.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

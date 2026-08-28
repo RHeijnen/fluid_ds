@@ -1,5 +1,14 @@
 # @fluid-ds/themes
 
+## 0.4.0
+
+### Patch Changes
+
+- Align the drop-in brand presets with the 0.4 token contract while retaining the existing
+  runtime-switchable, pure-CSS `data-fluid-brand` interface.
+- Updated dependencies
+  - @fluid-ds/tokens@0.4.0
+
 ## 0.0.3
 
 ### Patch Changes

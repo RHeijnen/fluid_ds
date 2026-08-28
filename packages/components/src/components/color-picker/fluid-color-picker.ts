@@ -2,6 +2,7 @@ import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import "../input/define.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import type { FluidInput } from "../input/fluid-input.js";
 
 const HEX_RE = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 
@@ -28,11 +29,17 @@ const HEX_RE = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
  * @cssproperty --fluid-color-picker-preset-size - Preset chip size (floored by --fluid-target-min). Falls back to 1.25rem.
  * @cssproperty --fluid-color-picker-radius - Swatch + preset corner radius. Falls back to --fluid-radius-sm.
  * @cssproperty --fluid-color-picker-font-family - Hex field font family. Falls back to --fluid-font-family-mono.
+ * @cssproperty --fluid-color-picker-field-border - Field border color. Defaults to the selected color.
+ * @cssproperty --fluid-color-picker-field-border-hover - Hovered field border color. Defaults to the selected color.
+ * @cssproperty --fluid-color-picker-field-border-focus - Focused field border color. Defaults to the selected color.
+ * @cssproperty --fluid-color-picker-field-focus-ring - Field focus-ring color. Defaults to the selected color.
+ * @cssproperty --fluid-color-picker-field-fallback-border - Field border used when the current value is not a valid hex color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-color-picker-focus-ring - Focus ring color for the swatch and presets. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-color-picker-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
  * @uses-token --fluid-focus-ring-color - Swatch + preset focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
+ * @uses-token --fluid-border-default - Field border fallback when the value is not a valid hex color.
  * @uses-token --fluid-target-min - Minimum preset hit-target size (24px AA / 44px AAA).
  * @uses-token --fluid-radius-sm - Swatch + preset corner radius.
  * @uses-token --fluid-font-family-mono - Hex field font family.
@@ -41,12 +48,27 @@ const HEX_RE = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
  * @fires fluid-change - Fired when the value is committed (blur / native picker close).
  */
 export class FluidColorPicker extends FluidFormAssociated {
+  static override shadowRootOptions: ShadowRootInit = {
+    ...FluidFormAssociated.shadowRootOptions,
+    delegatesFocus: true
+  };
+
   static override styles = css`
     :host {
       display: inline-flex;
       flex-direction: column;
       gap: var(--fluid-space-2);
       width: 100%;
+    }
+
+    /*
+     * The composed fluid-input is inline-flex. A block wrapper would create
+     * an inline formatting line box and reserve a few transparent pixels for
+     * the text baseline below the visible field. Flex removes that baseline
+     * gap so the host occupies exactly the nested input's rendered height.
+     */
+    [part="base"] {
+      display: flex;
     }
 
     /*
@@ -59,7 +81,6 @@ export class FluidColorPicker extends FluidFormAssociated {
       all: unset;
       display: block;
       width: var(--fluid-color-picker-swatch-size, 2.5rem);
-      height: 100%;
       align-self: stretch;
       background: var(--current);
       background-image:
@@ -148,7 +169,7 @@ export class FluidColorPicker extends FluidFormAssociated {
   `;
 
   @query("input.native") private nativeEl!: HTMLInputElement;
-  @query("fluid-input") private inputEl!: HTMLElement & { value: string };
+  @query("fluid-input") private inputEl!: FluidInput;
 
   /** Current value (hex, e.g. "#ff00aa"). */
   @property() override value = "#000000";
@@ -165,17 +186,23 @@ export class FluidColorPicker extends FluidFormAssociated {
   /** Required for form submission. */
   @property({ type: Boolean, reflect: true }) required = false;
 
+  /** Use the selected color for the field border and focus treatment. */
+  @property({ type: Boolean, attribute: "colorize-border", reflect: true }) colorizeBorder = false;
+
   /** Accessible label. */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private invalid = false;
+  private pendingHexChange = false;
 
   override formResetCallback(): void {
+    this.pendingHexChange = false;
     this.value = this.getAttribute("value") ?? "#000000";
     this.invalid = false;
   }
 
   override formDisabledCallback(disabled: boolean): void {
+    if (disabled) this.pendingHexChange = false;
     this.disabled = disabled;
   }
 
@@ -190,20 +217,33 @@ export class FluidColorPicker extends FluidFormAssociated {
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has("value") || changed.has("required")) {
       this.syncFormValue();
-      this.refreshValidity();
     }
+    this.refreshValidity();
+  }
+
+  protected override async firstUpdated(): Promise<void> {
+    // The nested input renders after its client-only parent. Native validation
+    // needs its actual text field, not the slotted swatch or hidden color input.
+    await this.inputEl.updateComplete;
+    if (this.isConnected) this.refreshValidity();
+  }
+
+  protected override updated(): void {
+    this.refreshValidity();
   }
 
   private refreshValidity(): void {
+    const anchor = this.inputEl?.shadowRoot?.querySelector<HTMLInputElement>("input") ?? undefined;
     const valid = !this.value || HEX_RE.test(this.value);
     if (!valid) {
-      this.setValidity({ patternMismatch: true }, "Enter a valid hex color (e.g. #ff00aa).");
+      this.setValidity({ patternMismatch: true }, this.term("invalidHexColor"), anchor);
       this.invalid = true;
     } else if (this.required && !this.value) {
-      this.setValidity({ valueMissing: true }, "Please choose a color.");
+      this.setValidity({ valueMissing: true }, this.term("chooseColorRequired"), anchor);
       this.invalid = false;
     } else {
-      this.setValidity({});
+      // Retain the anchor even while valid, for a later application custom error.
+      this.setValidity({}, undefined, anchor);
       this.invalid = false;
     }
   }
@@ -214,22 +254,36 @@ export class FluidColorPicker extends FluidFormAssociated {
   };
 
   private handleNativeInput = (e: Event) => {
+    if (this.disabled) return;
     this.value = (e.target as HTMLInputElement).value;
     this.emit("fluid-input");
   };
 
-  private handleNativeChange = () => this.emit("fluid-change");
+  private handleNativeChange = () => {
+    if (!this.disabled) this.emit("fluid-change");
+  };
 
   private handleHexInput = (e: CustomEvent) => {
+    e.stopPropagation();
+    if (this.disabled) return;
     const raw = String(e.detail.value).trim();
     const next = raw.startsWith("#") || !raw ? raw : `#${raw}`;
     this.value = next;
-    if (HEX_RE.test(this.value)) this.emit("fluid-input");
+    this.pendingHexChange = true;
+    this.emit("fluid-input");
   };
 
-  private handleHexBlur = () => this.emit("fluid-change");
+  private handleHexChange = (e: Event) => {
+    e.stopPropagation();
+    // Normalizing the displayed value can suppress native change in WebKit.
+    // Blur commits that edit too, while this flag prevents duplicate commits.
+    if (!this.pendingHexChange) return;
+    this.pendingHexChange = false;
+    if (!this.disabled) this.emit("fluid-change");
+  };
 
   private handlePresetClick = (hex: string) => {
+    if (this.disabled) return;
     this.value = hex;
     this.emit("fluid-input");
     this.emit("fluid-change");
@@ -247,22 +301,43 @@ export class FluidColorPicker extends FluidFormAssociated {
 
   override render(): TemplateResult {
     const validForNative = HEX_RE.test(this.value);
-    const ariaLabel = this.ariaLabel ?? "Color";
+    const nativeValue = validForNative
+      ? (this.value.length === 4
+          ? `#${[...this.value.slice(1)].map((digit) => digit.repeat(2)).join("")}`
+          : this.value
+        ).toLowerCase()
+      : "#000000";
+    const ariaLabel = this.ariaLabel ?? this.term("color");
+    const colorizedFieldStyles = this.colorizeBorder
+      ? `
+          --fluid-input-border: var(--fluid-color-picker-field-border, var(--current-field-color));
+          --fluid-input-border-hover: var(--fluid-color-picker-field-border-hover, var(--current-field-color));
+          --fluid-input-border-focus: var(--fluid-color-picker-field-border-focus, var(--current-field-color));
+          --fluid-input-focus-ring-color: var(--fluid-color-picker-field-focus-ring, var(--current-field-color));
+          --fluid-input-affix-border: var(--fluid-color-picker-field-border, var(--current-field-color));
+        `
+      : "";
     return html`
       <div
         part="base"
-        style="--current: ${validForNative ? this.value : "transparent"}; position: relative;"
+        style="--current: ${validForNative
+          ? this.value
+          : "transparent"}; --current-field-color: ${validForNative
+          ? this.value
+          : "var(--fluid-color-picker-field-fallback-border, var(--fluid-border-default))"}; position: relative;"
       >
         <fluid-input
           part="input"
+          style=${colorizedFieldStyles}
           .value=${this.value}
           ?disabled=${this.disabled}
           ?required=${this.required}
-          aria-label=${`${ariaLabel} hex`}
+          aria-label=${this.term("hexColor", ariaLabel)}
           spellcheck="false"
           autocomplete="off"
           @fluid-input=${this.handleHexInput}
-          @blur=${this.handleHexBlur}
+          @fluid-change=${this.handleHexChange}
+          @blur=${this.handleHexChange}
         >
           <button
             type="button"
@@ -270,7 +345,7 @@ export class FluidColorPicker extends FluidFormAssociated {
             class="swatch"
             slot="prefix"
             data-flush
-            aria-label=${`${ariaLabel}, open picker`}
+            aria-label=${this.term("openColorPicker", ariaLabel)}
             ?disabled=${this.disabled}
             @click=${this.openNative}
           ></button>
@@ -280,30 +355,37 @@ export class FluidColorPicker extends FluidFormAssociated {
           type="color"
           tabindex="-1"
           aria-hidden="true"
-          .value=${validForNative ? this.value : "#000000"}
+          ?disabled=${this.disabled}
+          .value=${nativeValue}
           @input=${this.handleNativeInput}
           @change=${this.handleNativeChange}
         />
-        ${this.palette.length
-          ? html`
-              <div part="palette" class="palette" role="listbox" aria-label="Color presets">
-                ${this.palette.map(
-                  (hex) => html`
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected=${this.value.toLowerCase() === hex.toLowerCase()}
-                      class="preset"
-                      style="background: ${hex};"
-                      title=${hex}
-                      @click=${() => this.handlePresetClick(hex)}
-                    ></button>
-                  `
-                )}
-              </div>
-            `
-          : ""}
       </div>
+      ${this.palette.length
+        ? html`
+            <div
+              part="palette"
+              class="palette"
+              role="listbox"
+              aria-label=${this.term("colorPresets")}
+            >
+              ${this.palette.map(
+                (hex) => html`
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected=${this.value.toLowerCase() === hex.toLowerCase()}
+                    class="preset"
+                    style="background: ${hex};"
+                    title=${hex}
+                    ?disabled=${this.disabled}
+                    @click=${() => this.handlePresetClick(hex)}
+                  ></button>
+                `
+              )}
+            </div>
+          `
+        : ""}
     `;
   }
 }

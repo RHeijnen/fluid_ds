@@ -1,6 +1,6 @@
 import { FluidFieldset } from "./fluid-fieldset.js";
 
-if (!customElements.get("fluid-fieldset")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-fieldset")) {
   customElements.define("fluid-fieldset", FluidFieldset);
 }
 

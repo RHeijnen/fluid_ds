@@ -81,6 +81,18 @@ type Story = StoryObj<Args>;
 
 export const Primary: Story = {};
 
+export const KeyboardFocus: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Deterministic visual fixture. The visual runner reaches the native shadow button with a real Tab key and verifies both target identity and `:focus-visible` before capture."
+      }
+    }
+  },
+  render: () => html`<fluid-button>Keyboard focus target</fluid-button>`
+};
+
 export const Secondary: Story = {
   args: { variant: "secondary" }
 };

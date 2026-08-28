@@ -1,13 +1,31 @@
-import { LitElement, html, svg, css, type TemplateResult } from "lit";
+import { html, svg, css, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
+import DOMPurify from "dompurify";
+import { FluidElement } from "@fluid-ds/components/internal/base-element";
+
+const sanitizeHtml = (value: string): string =>
+  String(DOMPurify.sanitize(value, { USE_PROFILES: { html: true } }));
+
+// TypeScript 5.8's DOM library predates this optional browser capability.
+// An intersection also remains compatible with newer libraries that declare it.
+type ComposedSelection = Selection & {
+  getComposedRanges?: (options?: { shadowRoots?: ShadowRoot[] }) => StaticRange[];
+};
 
 /** A formatting command exposed by the toolbar. */
 interface ToolbarCommand {
   /** The execCommand name (or "createLink" / "removeFormat"). */
   readonly cmd: string;
-  /** Accessible label for the button. */
-  readonly label: string;
+  /** Shared localization term for the button's accessible name. */
+  readonly term:
+    | "editorBold"
+    | "editorItalic"
+    | "editorUnderline"
+    | "editorBulletList"
+    | "editorNumberedList"
+    | "editorLink"
+    | "editorClearFormatting";
   /** Whether the button is a toggle (reflects aria-pressed). */
   readonly toggle: boolean;
   /** Inline SVG path data. */
@@ -15,19 +33,72 @@ interface ToolbarCommand {
 }
 
 const icon = (body: TemplateResult): TemplateResult => html`
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
     ${body}
   </svg>
 `;
 
 const COMMANDS: readonly ToolbarCommand[] = [
-  { cmd: "bold", label: "Bold", toggle: true, icon: icon(svg`<path d="M6 4h8a4 4 0 0 1 0 8H6z" /><path d="M6 12h9a4 4 0 0 1 0 8H6z" />`) },
-  { cmd: "italic", label: "Italic", toggle: true, icon: icon(svg`<line x1="19" y1="4" x2="10" y2="4" /><line x1="14" y1="20" x2="5" y2="20" /><line x1="15" y1="4" x2="9" y2="20" />`) },
-  { cmd: "underline", label: "Underline", toggle: true, icon: icon(svg`<path d="M6 4v6a6 6 0 0 0 12 0V4" /><line x1="4" y1="20" x2="20" y2="20" />`) },
-  { cmd: "insertUnorderedList", label: "Bullet list", toggle: true, icon: icon(svg`<line x1="9" y1="6" x2="20" y2="6" /><line x1="9" y1="12" x2="20" y2="12" /><line x1="9" y1="18" x2="20" y2="18" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" />`) },
-  { cmd: "insertOrderedList", label: "Numbered list", toggle: true, icon: icon(svg`<line x1="10" y1="6" x2="21" y2="6" /><line x1="10" y1="12" x2="21" y2="12" /><line x1="10" y1="18" x2="21" y2="18" /><path d="M4 6h1v4" /><path d="M4 10h2" /><path d="M6 18H4l2-3H4" />`) },
-  { cmd: "createLink", label: "Link", toggle: false, icon: icon(svg`<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />`) },
-  { cmd: "removeFormat", label: "Clear formatting", toggle: false, icon: icon(svg`<path d="M4 7V5h12v2" /><path d="M9 5v9" /><line x1="14" y1="14" x2="20" y2="20" /><line x1="20" y1="14" x2="14" y2="20" />`) }
+  {
+    cmd: "bold",
+    term: "editorBold",
+    toggle: true,
+    icon: icon(svg`<path d="M6 4h8a4 4 0 0 1 0 8H6z" /><path d="M6 12h9a4 4 0 0 1 0 8H6z" />`)
+  },
+  {
+    cmd: "italic",
+    term: "editorItalic",
+    toggle: true,
+    icon: icon(
+      svg`<line x1="19" y1="4" x2="10" y2="4" /><line x1="14" y1="20" x2="5" y2="20" /><line x1="15" y1="4" x2="9" y2="20" />`
+    )
+  },
+  {
+    cmd: "underline",
+    term: "editorUnderline",
+    toggle: true,
+    icon: icon(svg`<path d="M6 4v6a6 6 0 0 0 12 0V4" /><line x1="4" y1="20" x2="20" y2="20" />`)
+  },
+  {
+    cmd: "insertUnorderedList",
+    term: "editorBulletList",
+    toggle: true,
+    icon: icon(
+      svg`<line x1="9" y1="6" x2="20" y2="6" /><line x1="9" y1="12" x2="20" y2="12" /><line x1="9" y1="18" x2="20" y2="18" /><circle cx="4" cy="6" r="1" /><circle cx="4" cy="12" r="1" /><circle cx="4" cy="18" r="1" />`
+    )
+  },
+  {
+    cmd: "insertOrderedList",
+    term: "editorNumberedList",
+    toggle: true,
+    icon: icon(
+      svg`<line x1="10" y1="6" x2="21" y2="6" /><line x1="10" y1="12" x2="21" y2="12" /><line x1="10" y1="18" x2="21" y2="18" /><path d="M4 6h1v4" /><path d="M4 10h2" /><path d="M6 18H4l2-3H4" />`
+    )
+  },
+  {
+    cmd: "createLink",
+    term: "editorLink",
+    toggle: false,
+    icon: icon(
+      svg`<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />`
+    )
+  },
+  {
+    cmd: "removeFormat",
+    term: "editorClearFormatting",
+    toggle: false,
+    icon: icon(
+      svg`<path d="M4 7V5h12v2" /><path d="M9 5v9" /><line x1="14" y1="14" x2="20" y2="20" /><line x1="20" y1="14" x2="14" y2="20" />`
+    )
+  }
 ];
 
 /**
@@ -42,6 +113,8 @@ const COMMANDS: readonly ToolbarCommand[] = [
  * setting it replaces the editable content. Each input dispatches `fluid-change`
  * with the current HTML, and the toggle buttons reflect `aria-pressed` from
  * `document.queryCommandState` whenever the selection changes.
+ * Horizontal toolbar arrows follow its rendered direction: Right advances in
+ * LTR and Left advances in RTL. Vertical arrows retain command-order semantics.
  *
  * @summary Accessible contenteditable WYSIWYG with a formatting toolbar.
  *
@@ -73,7 +146,7 @@ const COMMANDS: readonly ToolbarCommand[] = [
  *
  * @fires fluid-change - The content changed. `detail: { value }` (current HTML).
  */
-export class FluidRichTextEditor extends LitElement {
+export class FluidRichTextEditor extends FluidElement {
   static override styles = css`
     :host {
       display: block;
@@ -109,7 +182,8 @@ export class FluidRichTextEditor extends LitElement {
       background: var(--fluid-editor-bg, var(--fluid-surface-base, #ffffff));
     }
     .button:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-editor-focus, var(--fluid-accent-base, #4f46e5));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-editor-focus, var(--fluid-accent-base, #4f46e5));
       outline-offset: var(--fluid-focus-ring-offset, 2px);
     }
     .button[aria-pressed="true"] {
@@ -130,7 +204,8 @@ export class FluidRichTextEditor extends LitElement {
       overflow-wrap: break-word;
     }
     .editable:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-editor-focus, var(--fluid-accent-base, #4f46e5));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-editor-focus, var(--fluid-accent-base, #4f46e5));
       outline-offset: calc(-1 * var(--fluid-focus-ring-width, 2px));
     }
     .editable:empty::before {
@@ -150,24 +225,40 @@ export class FluidRichTextEditor extends LitElement {
   }
   set value(html: string) {
     const old = this._value;
-    this._value = html;
-    if (this.editable && this.editable.innerHTML !== html) {
-      this.editable.innerHTML = html;
+    const safeHtml = sanitizeHtml(html);
+    this._value = safeHtml;
+    if (this.editable && this.editable.innerHTML !== safeHtml) {
+      // Live Ranges relocate when their nodes are removed. Such a range can
+      // still appear contained here but no longer represents the user's selection.
+      this.savedRange = null;
+      this.editable.innerHTML = safeHtml;
     }
     this.requestUpdate("value", old);
   }
   private _value = "";
 
   /** Accessible name for the editable region. */
-  @property({ type: String }) label = "Rich text editor";
+  @property({ type: String })
+  get label(): string {
+    return this.labelOverride ?? this.term("richTextEditor");
+  }
+  set label(value: string | null) {
+    this.labelOverride = value;
+  }
+  private labelOverride: string | null = null;
 
   /** Placeholder shown while the editor is empty. */
   @property({ type: String }) placeholder = "";
+
+  /** Keep the content selectable but prevent editing and toolbar commands. */
+  @property({ type: Boolean, reflect: true, attribute: "readonly" }) readOnly = false;
 
   @state() private active = 0;
   @state() private pressed: Record<string, boolean> = {};
 
   @query(".editable") private editable!: HTMLDivElement;
+  private savedRange: Range | null = null;
+  private savedBackward = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -177,6 +268,7 @@ export class FluidRichTextEditor extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener("selectionchange", this.onSelectionChange);
+    this.savedRange = null;
   }
 
   override firstUpdated(): void {
@@ -187,8 +279,37 @@ export class FluidRichTextEditor extends LitElement {
 
   private onSelectionChange = (): void => {
     if (!this.editable) return;
-    const sel = document.getSelection();
-    if (!sel || !sel.anchorNode || !this.editable.contains(sel.anchorNode)) return;
+    const sel: ComposedSelection | null = document.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    let range: AbstractRange | undefined;
+    if (typeof sel.getComposedRanges === "function") {
+      // The document Selection can retarget shadow endpoints to their hosts.
+      // Expose only our own and containing roots to recover the actual range.
+      const shadowRoots: ShadowRoot[] = [];
+      let root = this.editable.getRootNode();
+      while (root instanceof ShadowRoot) {
+        shadowRoots.push(root);
+        root = root.host.getRootNode();
+      }
+      [range] = sel.getComposedRanges({ shadowRoots });
+    } else {
+      range = sel.getRangeAt(0);
+    }
+    if (
+      !range ||
+      !this.editable.contains(range.startContainer) ||
+      !this.editable.contains(range.endContainer)
+    )
+      return;
+    const snapshot = document.createRange();
+    snapshot.setStart(range.startContainer, range.startOffset);
+    snapshot.setEnd(range.endContainer, range.endOffset);
+    this.savedRange = snapshot;
+    this.savedBackward =
+      sel.direction === "backward" ||
+      (!range.collapsed &&
+        sel.anchorNode === range.endContainer &&
+        sel.anchorOffset === range.endOffset);
     this.syncPressed();
   };
 
@@ -206,9 +327,19 @@ export class FluidRichTextEditor extends LitElement {
   }
 
   private exec(c: ToolbarCommand): void {
+    if (this.readOnly) return;
     this.editable.focus();
+    if (this.savedRange && this.editable.contains(this.savedRange.commonAncestorContainer)) {
+      const selection = document.getSelection();
+      selection?.setBaseAndExtent(
+        this.savedBackward ? this.savedRange.endContainer : this.savedRange.startContainer,
+        this.savedBackward ? this.savedRange.endOffset : this.savedRange.startOffset,
+        this.savedBackward ? this.savedRange.startContainer : this.savedRange.endContainer,
+        this.savedBackward ? this.savedRange.startOffset : this.savedRange.endOffset
+      );
+    }
     if (c.cmd === "createLink") {
-      const url = window.prompt("Link URL");
+      const url = window.prompt(this.term("editorLinkUrl"));
       if (url) document.execCommand("createLink", false, url);
     } else {
       document.execCommand(c.cmd, false);
@@ -218,7 +349,15 @@ export class FluidRichTextEditor extends LitElement {
   }
 
   private emitChange(): void {
-    this._value = this.editable.innerHTML;
+    const safeHtml = sanitizeHtml(this.editable.innerHTML);
+    if (safeHtml !== this.editable.innerHTML) {
+      this.savedRange = null;
+      this.editable.innerHTML = safeHtml;
+    }
+    // execCommand can synchronously dispatch input. A command/paste and its
+    // native input must not report the same content mutation twice.
+    if (safeHtml === this._value) return;
+    this._value = safeHtml;
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
         detail: { value: this._value },
@@ -229,15 +368,45 @@ export class FluidRichTextEditor extends LitElement {
   }
 
   private onInput(): void {
+    if (this.readOnly) {
+      if (this.editable.innerHTML !== this._value) {
+        this.savedRange = null;
+        this.editable.innerHTML = this._value;
+      }
+      return;
+    }
+    this.syncPressed();
+    this.emitChange();
+  }
+
+  private onPaste(event: ClipboardEvent): void {
+    if (this.readOnly) {
+      event.preventDefault();
+      return;
+    }
+    const htmlValue = event.clipboardData?.getData("text/html");
+    if (!htmlValue) return;
+    event.preventDefault();
+    document.execCommand("insertHTML", false, sanitizeHtml(htmlValue));
     this.emitChange();
   }
 
   private onToolbarKeydown(e: KeyboardEvent): void {
+    if (this.readOnly) return;
     const last = COMMANDS.length - 1;
     let next = this.active;
-    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    const rtl = getComputedStyle(e.currentTarget as Element).direction === "rtl";
+    if (
+      (e.key === "ArrowRight" && !rtl) ||
+      (e.key === "ArrowLeft" && rtl) ||
+      e.key === "ArrowDown"
+    ) {
       next = this.active >= last ? 0 : this.active + 1;
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    } else if (
+      (e.key === "ArrowLeft" && !rtl) ||
+      (e.key === "ArrowRight" && rtl) ||
+      e.key === "ArrowUp"
+    ) {
       next = this.active <= 0 ? last : this.active - 1;
     } else if (e.key === "Home") {
       next = 0;
@@ -250,14 +419,21 @@ export class FluidRichTextEditor extends LitElement {
     this.active = next;
     this.updateComplete.then(() => {
       const buttons = this.renderRoot.querySelectorAll<HTMLButtonElement>('[part="button"]');
-      buttons[next]?.focus();
+      if (this.isConnected && !this.readOnly) buttons[next]?.focus();
     });
   }
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="base">
-        <div part="toolbar" class="toolbar" role="toolbar" aria-orientation="horizontal" aria-label="Formatting" @keydown=${this.onToolbarKeydown}>
+      <div part="base" class="base" dir=${this.localize.dir}>
+        <div
+          part="toolbar"
+          class="toolbar"
+          role="toolbar"
+          aria-orientation="horizontal"
+          aria-label=${this.term("editorFormatting")}
+          @keydown=${this.onToolbarKeydown}
+        >
           ${COMMANDS.map((c, i) => {
             const pressed = c.toggle ? String(Boolean(this.pressed[c.cmd])) : undefined;
             return html`
@@ -265,9 +441,14 @@ export class FluidRichTextEditor extends LitElement {
                 part="button"
                 class="button"
                 type="button"
-                aria-label=${c.label}
+                aria-label=${this.term(c.term)}
                 aria-pressed=${ifDefined(pressed)}
                 tabindex=${i === this.active ? "0" : "-1"}
+                ?disabled=${this.readOnly}
+                @pointerdown=${(event: PointerEvent) => {
+                  this.onSelectionChange();
+                  event.preventDefault();
+                }}
                 @click=${() => this.exec(c)}
                 @focus=${() => {
                   this.active = i;
@@ -281,12 +462,16 @@ export class FluidRichTextEditor extends LitElement {
         <div
           part="editable"
           class="editable"
-          contenteditable="true"
+          contenteditable=${this.readOnly ? "false" : "true"}
+          tabindex="0"
           role="textbox"
           aria-multiline="true"
+          aria-readonly=${String(this.readOnly)}
           aria-label=${this.label}
           data-placeholder=${this.placeholder}
           @input=${this.onInput}
+          @paste=${this.onPaste}
+          @focusout=${this.onSelectionChange}
         ></div>
       </div>
     `;

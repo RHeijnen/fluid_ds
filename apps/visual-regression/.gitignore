@@ -3,6 +3,14 @@ test-results/
 playwright-report/
 playwright/.cache/
 
+# Raw Playwright stability captures stay local. Portable summaries retain exact
+# per-run hashes, platform attribution, lifecycle hashes, and flake-rate proof.
+candidate-evidence/stability/**/run-*/
+candidate-evidence/stability/**/runner.log
+candidate-evidence/**/report/
+candidate-evidence/**/test-results/
+candidate-evidence/**/results.json
+
 # Generated test specs are committed so CI doesn't depend on the
 # generator at install-time, but local devs can regenerate freely.
 # (no exclusion here: generated specs ARE tracked)

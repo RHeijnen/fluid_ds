@@ -1,0 +1,129 @@
+{
+  "status": "passed",
+  "framework": "Plain TypeScript/HTML",
+  "lane": "latest-compatible-packed-production-runtime",
+  "node": "v22.22.2",
+  "platform": "linux",
+  "packageManager": "pnpm@9.15.0",
+  "commandOutcomes": [
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72689,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 397
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72701,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 3457
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>/packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72713,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1286
+    },
+    {
+      "stage": "install",
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72725,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 2032
+    },
+    {
+      "stage": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72740,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1199
+    },
+    {
+      "stage": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 72765,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 1731
+    }
+  ],
+  "runtimeStatus": "passed",
+  "commands": [
+    "pnpm --filter @fluid-ds/framework-vanilla typecheck",
+    "pnpm --filter @fluid-ds/framework-vanilla build",
+    "node scripts/check-framework-vanilla-runtime.mjs"
+  ],
+  "limitations": [
+    "This fixture ships authored static light DOM and client JavaScript; it has no server renderer, DSD, or hydration contract.",
+    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
+    "Four representative core elements do not certify the full component catalog or framework integrations.",
+    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
+  ]
+}

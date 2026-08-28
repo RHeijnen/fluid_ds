@@ -8,7 +8,15 @@ import {
 } from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
-import type { FluidContextMenu } from "./fluid-context-menu.js";
+import type {
+  FluidContextMenu,
+  FluidContextMenuHideEvent,
+  FluidContextMenuShowEvent
+} from "../../index.js";
+
+// @ts-expect-error Context-menu lifecycle detail is exactly null.
+const invalidContextMenuEvent: FluidContextMenuShowEvent = new CustomEvent("fluid-show", { detail: 1 });
+void invalidContextMenuEvent;
 
 const sampleItems = [
   { label: "Cut", value: "cut" },
@@ -33,6 +41,57 @@ const rightClick = (target: HTMLElement) =>
   );
 
 describe("<fluid-context-menu>", () => {
+  it("emits exact null lifecycle payloads", async () => {
+    const el = await fixture<FluidContextMenu>(basic());
+    setTimeout(() => el.showAt(40, 40));
+    const shown = (await oneEvent(el, "fluid-show")) as FluidContextMenuShowEvent;
+    expect(shown.detail).to.equal(null);
+    setTimeout(() => el.hide());
+    const hidden = (await oneEvent(el, "fluid-hide")) as FluidContextMenuHideEvent;
+    expect(hidden.detail).to.equal(null);
+  });
+  it("does not emit a hide event before it has opened", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`<div></div>`);
+    const events: string[] = [];
+    wrapper.addEventListener("fluid-hide", () => events.push("hide"));
+    const focusedBefore = document.activeElement;
+    wrapper.innerHTML = '<fluid-context-menu><button slot="trigger">Target</button></fluid-context-menu>';
+    const el = wrapper.querySelector<FluidContextMenu>("fluid-context-menu")!;
+    await elementUpdated(el);
+    expect(events).to.deep.equal([]);
+    expect(document.activeElement).to.equal(focusedBefore);
+  });
+
+  it("cancels scheduled menu focus when closed before the next frame", async () => {
+    const el = await fixture<FluidContextMenu>(basic());
+    trigger(el).focus();
+    el.showAt(40, 40);
+    await el.updateComplete;
+    const menu = el.shadowRoot!.querySelector<HTMLElement>("fluid-menu")!;
+    let lateFocusCalls = 0;
+    menu.focus = () => { lateFocusCalls++; };
+    el.hide();
+    await el.updateComplete;
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    expect(lateFocusCalls).to.equal(0);
+    expect(document.activeElement).to.equal(trigger(el));
+  });
+
+  it("closes when focus leaves without pulling focus back to the trigger", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`<div>${basic()}<button id="after">After menu</button></div>`);
+    const el = wrapper.querySelector<FluidContextMenu>("fluid-context-menu")!;
+    const after = wrapper.querySelector<HTMLButtonElement>("#after")!;
+    trigger(el).focus();
+    el.showAt(40, 40);
+    await elementUpdated(el);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    after.focus();
+    await el.updateComplete;
+    expect(el.open).to.equal(false);
+    expect(document.activeElement).to.equal(after);
+    expect(trigger(el).getAttribute("aria-expanded")).to.equal("false");
+  });
+
   it("wires aria-haspopup=menu onto the trigger", async () => {
     const el = await fixture<FluidContextMenu>(basic());
     await elementUpdated(el);

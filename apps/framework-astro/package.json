@@ -1,0 +1,21 @@
+{
+  "name": "@fluid-ds/framework-astro",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Executable Astro consumer contract for Fluid.",
+  "scripts": {
+    "build": "astro build",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/tokens": "workspace:*",
+    "astro": "^6.4.6",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.7.2"
+  }
+}

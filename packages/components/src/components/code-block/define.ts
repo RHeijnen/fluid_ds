@@ -1,6 +1,6 @@
 import { FluidCodeBlock } from "./fluid-code-block.js";
 
-if (!customElements.get("fluid-code-block"))
+if (typeof customElements !== "undefined" && !customElements.get("fluid-code-block"))
   customElements.define("fluid-code-block", FluidCodeBlock);
 
 declare global {

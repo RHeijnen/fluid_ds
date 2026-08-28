@@ -7,6 +7,11 @@ import { FluidFormAssociated } from "../../internal/form-associated.js";
 import { reducedMotion } from "../../internal/motion.js";
 import "../tag/define.js";
 
+export interface FluidTagInputValueDetail {
+  value: string[];
+}
+export type FluidTagInputChangeEvent = CustomEvent<FluidTagInputValueDetail>;
+
 /**
  * A token / chip input. The user types a label and commits it (Enter or comma)
  * to add a chip; chips render as removable `<fluid-tag>` elements ahead of the
@@ -74,7 +79,7 @@ import "../tag/define.js";
  * @uses-token --fluid-duration-fast - Border / shadow transition duration.
  * @uses-token --fluid-easing-standard - Border / shadow transition easing.
  *
- * @fires fluid-change - Fired whenever the set of tokens changes (add or
+ * @fires {FluidTagInputChangeEvent} fluid-change - Fired whenever the set of tokens changes (add or
  *   remove). `event.detail.value` is the current array of tokens.
  */
 export class FluidTagInput extends FluidFormAssociated {
@@ -107,14 +112,11 @@ export class FluidTagInput extends FluidFormAssociated {
         width: 100%;
         box-sizing: border-box;
         padding: var(--fluid-tag-input-padding, var(--fluid-space-1));
-        min-height: max(
-          var(--fluid-field-height-md, 2.25rem),
-          var(--fluid-target-min, 0px)
-        );
+        min-height: max(var(--fluid-field-height-md, 2.25rem), var(--fluid-target-min, 0px));
         background: var(--fluid-tag-input-bg, var(--fluid-surface-base));
         color: var(--fluid-tag-input-fg, var(--fluid-text-primary));
-        border: var(--fluid-tag-input-border-width, var(--fluid-field-border-width))
-          solid var(--fluid-tag-input-border, var(--fluid-border-default));
+        border: var(--fluid-tag-input-border-width, var(--fluid-field-border-width)) solid
+          var(--fluid-tag-input-border, var(--fluid-border-default));
         border-radius: var(--fluid-tag-input-radius, var(--fluid-field-border-radius));
         box-shadow:
           inset 0 1px 0 0 rgb(0 0 0 / 0.02),
@@ -138,14 +140,8 @@ export class FluidTagInput extends FluidFormAssociated {
       .base.focused {
         border-color: var(--fluid-tag-input-border-focus, var(--fluid-accent-base));
         box-shadow:
-          0 0 0
-            var(--fluid-tag-input-focus-ring-width, var(--fluid-focus-ring-width))
-            color-mix(
-              in srgb,
-              var(--fluid-tag-input-focus-ring-color, var(--fluid-focus-ring-color))
-                35%,
-              transparent
-            ),
+          0 0 0 var(--fluid-tag-input-focus-ring-width, var(--fluid-focus-ring-width))
+            color-mix(in srgb, var(--fluid-focus-ring-color) 35%, transparent),
           inset 0 1px 0 0 rgb(0 0 0 / 0.02);
       }
 
@@ -190,7 +186,12 @@ export class FluidTagInput extends FluidFormAssociated {
   @property({
     converter: {
       fromAttribute: (v: string | null): string[] =>
-        v ? v.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        v
+          ? v
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
       toAttribute: (v: string[]): string => v.join(",")
     }
   })
@@ -215,6 +216,7 @@ export class FluidTagInput extends FluidFormAssociated {
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
   @state() private focused = false;
+  @state() private draft = "";
 
   /** True when the token cap has been reached. */
   private get atMax(): boolean {
@@ -234,7 +236,10 @@ export class FluidTagInput extends FluidFormAssociated {
   override formResetCallback(): void {
     const attr = this.getAttribute("value");
     this.value = attr
-      ? attr.split(",").map((s) => s.trim()).filter(Boolean)
+      ? attr
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
       : [];
   }
 
@@ -247,7 +252,10 @@ export class FluidTagInput extends FluidFormAssociated {
     _mode: "restore" | "autocomplete"
   ): void {
     if (typeof state === "string") {
-      this.value = state.split(",").map((s) => s.trim()).filter(Boolean);
+      this.value = state
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
     }
   }
 
@@ -283,7 +291,7 @@ export class FluidTagInput extends FluidFormAssociated {
 
   private emitChange(): void {
     this.dispatchEvent(
-      new CustomEvent("fluid-change", {
+      new CustomEvent<FluidTagInputValueDetail>("fluid-change", {
         detail: { value: this.value },
         bubbles: true,
         composed: true
@@ -298,7 +306,7 @@ export class FluidTagInput extends FluidFormAssociated {
       if (input.value.trim()) {
         event.preventDefault();
         if (this.addToken(input.value)) {
-          input.value = "";
+          this.draft = "";
         }
       } else if (event.key === ",") {
         // Swallow a lone comma so it never lands in the field.
@@ -374,11 +382,12 @@ export class FluidTagInput extends FluidFormAssociated {
         <input
           part="input"
           type="text"
-          .value=${live("")}
+          .value=${live(this.draft)}
           placeholder=${this.placeholder}
           ?disabled=${this.disabled || this.atMax}
           aria-label=${ifDefined(this.ariaLabel ?? undefined)}
           autocomplete="off"
+          @input=${(event: Event) => (this.draft = (event.target as HTMLInputElement).value)}
           @keydown=${this.handleKeydown}
         />
       </div>

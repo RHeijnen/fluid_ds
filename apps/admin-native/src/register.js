@@ -3,7 +3,7 @@
  *
  * There is NO build step here: each bare specifier below is resolved by the
  * `<script type="importmap">` in index.html to a jsDelivr URL (the published
- * `@fluid-ds/*@alpha` packages), and importing a `define.js` registers its
+ * `@fluid-ds/*@latest` packages), and importing a `define.js` registers its
  * custom element as a side effect. This is the real "consume from the CDN"
  * path an end user would write, the only Fluid-specific setup is the import
  * map itself.

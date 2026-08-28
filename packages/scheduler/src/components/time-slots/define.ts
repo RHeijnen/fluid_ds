@@ -1,6 +1,6 @@
 import { FluidTimeSlots } from "./fluid-time-slots.js";
 
-if (!customElements.get("fluid-time-slots")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-time-slots")) {
   customElements.define("fluid-time-slots", FluidTimeSlots);
 }
 

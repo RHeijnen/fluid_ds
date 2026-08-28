@@ -1,5 +1,11 @@
 import { expect, fixture, html, oneEvent, aTimeout } from "@open-wc/testing";
 import "./define.js";
+import "../../locales/nl.js";
+import "../../locales/de.js";
+import "../../locales/fr.js";
+import "../../locales/es.js";
+import "../../locales/ar.js";
+import type { FluidOption } from "./fluid-option.js";
 import type { FluidSelect } from "./fluid-select.js";
 
 const sampleOptions = html`
@@ -10,6 +16,167 @@ const sampleOptions = html`
 `;
 
 describe("<fluid-select>", () => {
+  describe("<fluid-select> localized validation", () => {
+    for (const [locale, message] of [
+      ["nl", "Kies een optie."],
+      ["de", "Bitte wählen Sie eine Option aus."],
+      ["fr", "Veuillez sélectionner une option."],
+      ["es", "Selecciona una opción."],
+      ["ar", "يرجى اختيار أحد الخيارات."],
+      ["fr-CA", "Veuillez sélectionner une option."]
+    ] as const) {
+      it(`refreshes current required validation in ${locale}`, async () => {
+        const wrapper = await fixture<HTMLDivElement>(html`
+          <div lang="en">
+            <fluid-select required aria-label="Application label"
+              ><fluid-option value="apple">Application option</fluid-option></fluid-select
+            >
+          </div>
+        `);
+        const control = wrapper.querySelector<FluidSelect>("fluid-select")!;
+        await control.updateComplete;
+        expect(control.validity.valueMissing).to.equal(true);
+        wrapper.lang = locale;
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        await control.updateComplete;
+        expect(control.validationMessage).to.equal(message);
+        expect(control.validity.valueMissing).to.equal(true);
+        expect(control.checkValidity()).to.equal(false);
+        expect(control.getAttribute("aria-label")).to.equal("Application label");
+      });
+    }
+
+    it("tracks dynamic required and preserves custom validity in a changing closed-shadow language context", async () => {
+      const host = await fixture<HTMLDivElement>(html`<div></div>`);
+      const root = host.attachShadow({ mode: "closed" });
+      const wrapper = document.createElement("section");
+      wrapper.lang = "nl";
+      const control = document.createElement("fluid-select") as FluidSelect;
+      control.setAttribute("aria-label", "Application label");
+
+      wrapper.append(control);
+      root.append(wrapper);
+      await control.updateComplete;
+      expect(control.checkValidity()).to.equal(true);
+      control.required = true;
+      await control.updateComplete;
+      expect(control.validity.valueMissing).to.equal(true);
+      expect(control.validationMessage).to.equal("Kies een optie.");
+      control.setCustomValidity("Application validation");
+      wrapper.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Application validation");
+      expect(control.validity.customError).to.equal(true);
+      control.setCustomValidity("");
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Option aus.");
+      expect(control.validity.customError).to.equal(false);
+      expect(control.validity.valueMissing).to.equal(true);
+      control.required = false;
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("");
+      expect(control.checkValidity()).to.equal(true);
+      expect(control.getAttribute("aria-label")).to.equal("Application label");
+    });
+
+    it("preserves a scoped language override and refreshes invalid text after reconnect", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="nl">
+          <fluid-select lang="fr" required aria-label="Application label"
+            ><fluid-option value="apple">Application option</fluid-option></fluid-select
+          >
+        </div>
+      `);
+      const control = wrapper.querySelector<FluidSelect>("fluid-select")!;
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Veuillez sélectionner une option.");
+      wrapper.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Veuillez sélectionner une option.");
+      control.removeAttribute("lang");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Option aus.");
+      control.remove();
+      wrapper.lang = "ar";
+      wrapper.append(control);
+      await control.updateComplete;
+      expect(control.validationMessage).to.equal("يرجى اختيار أحد الخيارات.");
+      expect(control.validity.valueMissing).to.equal(true);
+    });
+
+    it("keeps submitted data canonical and restores current-language validation after form reset", async () => {
+      const form = await fixture<HTMLFormElement>(html`
+        <form lang="nl">
+          <fluid-select name="control" required aria-label="Application label"
+            ><fluid-option value="apple">Application option</fluid-option></fluid-select
+          >
+        </form>
+      `);
+      const control = form.querySelector<FluidSelect>("fluid-select")!;
+      await control.updateComplete;
+      control.value = "apple";
+      await control.updateComplete;
+      expect(control.checkValidity()).to.equal(true);
+      expect(new FormData(form).get("control")).to.equal("apple");
+      form.lang = "de";
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await control.updateComplete;
+      form.reset();
+      await control.updateComplete;
+      expect(control.validity.valueMissing).to.equal(true);
+      expect(control.validationMessage).to.equal("Bitte wählen Sie eine Option aus.");
+    });
+  });
+
+  it("resolves the active slotted option through element reflection and clears it on close", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Fruit">${sampleOptions}</fluid-select>
+    `);
+    el.open = true;
+    await el.updateComplete;
+    const trigger = el.shadowRoot!.querySelector("button")! as HTMLButtonElement & {
+      ariaActiveDescendantElement: Element | null;
+    };
+    expect(trigger.ariaActiveDescendantElement).to.equal(el.querySelector("fluid-option"));
+    el.open = false;
+    await el.updateComplete;
+    expect(trigger.ariaActiveDescendantElement).to.equal(null);
+  });
+
+  it("opens at the first enabled option and does not activate disabled options on hover", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Fruit">
+        <fluid-option value="apple" disabled>Apple</fluid-option>
+        <fluid-option value="banana">Banana</fluid-option>
+      </fluid-select>
+    `);
+    el.open = true;
+    await el.updateComplete;
+    await aTimeout(0);
+    const [disabled, enabled] = el.querySelectorAll("fluid-option");
+    expect(enabled!.hasAttribute("active")).to.be.true;
+    disabled!.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, composed: true }));
+    await el.updateComplete;
+    expect(disabled!.hasAttribute("active")).to.be.false;
+    expect(enabled!.hasAttribute("active")).to.be.true;
+  });
+
+  it("has no active option when every option is disabled", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Fruit"
+        ><fluid-option disabled>Unavailable</fluid-option></fluid-select
+      >
+    `);
+    el.open = true;
+    await el.updateComplete;
+    await aTimeout(0);
+    expect(el.querySelector("fluid-option[active]")).to.equal(null);
+    expect(el.shadowRoot!.querySelector("button")!.hasAttribute("aria-activedescendant")).to.be
+      .false;
+  });
+
   it("renders closed by default", async () => {
     const el = await fixture<FluidSelect>(html`
       <fluid-select aria-label="Fruit">${sampleOptions}</fluid-select>
@@ -18,6 +185,56 @@ describe("<fluid-select>", () => {
     expect(el.shadowRoot!.querySelector(".trigger")!.getAttribute("aria-expanded")).to.equal(
       "false"
     );
+  });
+
+  it("associates an optional visible label and help text with the trigger", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select label="Country" help-text="Used for billing.">${sampleOptions}</fluid-select>
+    `);
+    const label = el.shadowRoot!.querySelector<HTMLLabelElement>('[part="label"]')!;
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    const help = el.shadowRoot!.querySelector<HTMLElement>('[part="help-text"]')!;
+    expect(label.htmlFor).to.equal("trigger");
+    expect(label.textContent?.trim()).to.equal("Country");
+    expect(trigger.getAttribute("aria-describedby")).to.equal(help.id);
+  });
+
+  it("keeps an untouched required select visually neutral until blur or validation", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select required aria-label="Country">${sampleOptions}</fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    expect(el.validity.valueMissing).to.equal(true);
+    expect(trigger.classList.contains("invalid")).to.equal(false);
+    expect(trigger.getAttribute("aria-invalid")).to.equal("false");
+
+    trigger.dispatchEvent(new Event("blur"));
+    await el.updateComplete;
+    expect(trigger.classList.contains("invalid")).to.equal(true);
+    expect(trigger.getAttribute("aria-invalid")).to.equal("true");
+  });
+
+  it("seeds and clears the active option in the popup's opening and closing update", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select value="banana" aria-label="Fruit">
+        <fluid-option value="apple">Apple</fluid-option>
+        <fluid-option value="banana">Banana</fluid-option>
+      </fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    el.open = true;
+    expect(await el.updateComplete).to.equal(true);
+    expect(trigger.ariaActiveDescendantElement).to.equal(el.querySelector('[value="banana"]'));
+    expect(trigger.getAttribute("aria-expanded")).to.equal("true");
+    el.open = false;
+    expect(await el.updateComplete).to.equal(true);
+    expect(trigger.ariaActiveDescendantElement).to.equal(null);
+    expect(trigger.getAttribute("aria-expanded")).to.equal("false");
+    el.value = "";
+    await el.updateComplete;
+    el.open = true;
+    expect(await el.updateComplete).to.equal(true);
+    expect(trigger.ariaActiveDescendantElement).to.equal(el.querySelector('[value="apple"]'));
   });
 
   it("shows the placeholder when nothing is selected", async () => {
@@ -54,7 +271,8 @@ describe("<fluid-select>", () => {
     const banana = el.querySelector<HTMLElement>('fluid-option[value="banana"]')!;
     setTimeout(() => banana.click());
     const event = (await oneEvent(el, "fluid-change")) as CustomEvent;
-    expect(event.detail.value).to.equal("banana");
+    expect(event.detail).to.deep.equal({ value: "banana" });
+    expect([event.bubbles, event.composed, event.cancelable]).to.deep.equal([true, true, false]);
     expect(el.value).to.equal("banana");
     expect(el.open).to.be.false;
   });
@@ -69,7 +287,11 @@ describe("<fluid-select>", () => {
     await el.updateComplete;
     expect(el.open).to.be.true;
     trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    const changed = oneEvent(el, "fluid-change");
     trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    const event = await changed;
+    expect(event.detail).to.deep.equal({ value: "banana" });
+    expect([event.bubbles, event.composed, event.cancelable]).to.deep.equal([true, true, false]);
     await el.updateComplete;
     expect(el.value).to.equal("banana");
   });
@@ -115,6 +337,25 @@ describe("<fluid-select>", () => {
     expect(active?.getAttribute("value")).to.equal("date");
   });
 
+  it("cycles repeated-character typeahead through matching enabled options", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="Fruit">
+        <fluid-option value="banana">Banana</fluid-option>
+        <fluid-option value="blackberry" disabled>Blackberry</fluid-option>
+        <fluid-option value="blueberry">Blueberry</fluid-option>
+      </fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    const [banana, , blueberry] = el.querySelectorAll<FluidOption>("fluid-option");
+    trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "b", bubbles: true }));
+    await el.updateComplete;
+    expect(banana!.active).to.equal(true);
+    trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "b", bubbles: true }));
+    await el.updateComplete;
+    expect(banana!.active).to.equal(false);
+    expect(blueberry!.active).to.equal(true);
+  });
+
   it("closes when clicking outside", async () => {
     const wrapper = await fixture<HTMLElement>(html`
       <div>
@@ -125,9 +366,9 @@ describe("<fluid-select>", () => {
     const el = wrapper.querySelector<FluidSelect>("fluid-select")!;
     el.open = true;
     await el.updateComplete;
-    wrapper.querySelector<HTMLElement>(".outside")!.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, composed: true })
-    );
+    wrapper
+      .querySelector<HTMLElement>(".outside")!
+      .dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }));
     await el.updateComplete;
     expect(el.open).to.be.false;
   });
@@ -140,6 +381,81 @@ describe("<fluid-select>", () => {
     `);
     const data = new FormData(form);
     expect(data.get("fruit")).to.equal("apple");
+  });
+
+  it("preserves validity and canonical data when reconnected to a new form owner", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div>
+        <form id="first">
+          <fluid-select name="fruit" value="apple" required aria-label="Fruit">
+            <fluid-option value="apple">Apple</fluid-option>
+            <fluid-option value="banana">Banana</fluid-option>
+          </fluid-select>
+        </form>
+        <form id="second"></form>
+      </div>
+    `);
+    const first = wrapper.querySelector<HTMLFormElement>("#first")!;
+    const second = wrapper.querySelector<HTMLFormElement>("#second")!;
+    const el = wrapper.querySelector<FluidSelect>("fluid-select")!;
+    el.setCustomValidity("Application validation");
+    el.remove();
+    el.name = "choice";
+    second.append(el);
+    await aTimeout(0);
+    await el.updateComplete;
+    expect(el.form).to.equal(second);
+    expect(new FormData(first).has("fruit")).to.equal(false);
+    expect(new FormData(second).get("choice")).to.equal("apple");
+    expect(el.validity.customError).to.equal(true);
+    expect(el.validationMessage).to.equal("Application validation");
+    el.setCustomValidity("");
+    expect(el.checkValidity()).to.equal(true);
+  });
+
+  it("preserves authored disabled state through disabled fieldset ownership", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fieldset>
+          <fluid-select disabled aria-label="Authored disabled">${sampleOptions}</fluid-select>
+          <fluid-select aria-label="Owner disabled only">${sampleOptions}</fluid-select>
+        </fieldset>
+      </form>
+    `);
+    const fieldset = form.querySelector("fieldset")!;
+    const [authored, enabled] = form.querySelectorAll<FluidSelect>("fluid-select");
+    fieldset.disabled = true;
+    await aTimeout(0);
+    expect(authored!.disabled).to.equal(true);
+    expect(enabled!.disabled).to.equal(true);
+    fieldset.disabled = false;
+    await aTimeout(0);
+    expect(authored!.disabled).to.equal(true);
+    expect(authored!.shadowRoot!.querySelector("button")!.disabled).to.equal(true);
+    expect(enabled!.disabled).to.equal(false);
+  });
+
+  it("silently falls back when the selected option is removed", async () => {
+    const form = await fixture<HTMLFormElement>(html`
+      <form>
+        <fluid-select name="fruit" value="banana" aria-label="Fruit">${sampleOptions}</fluid-select>
+      </form>
+    `);
+    const el = form.querySelector<FluidSelect>("fluid-select")!;
+    const changes: string[] = [];
+    el.addEventListener("fluid-change", (event) =>
+      changes.push((event as CustomEvent<{ value: string }>).detail.value)
+    );
+    await el.updateComplete;
+
+    el.querySelector('fluid-option[value="banana"]')!.remove();
+    await aTimeout(0);
+    await el.updateComplete;
+
+    expect(el.value).to.equal("apple");
+    expect(el.querySelector<FluidOption>('fluid-option[value="apple"]')!.selected).to.equal(true);
+    expect(new FormData(form).get("fruit")).to.equal("apple");
+    expect(changes).to.deep.equal([]);
   });
 
   it("reports invalid when required and empty", async () => {
@@ -170,6 +486,111 @@ describe("<fluid-select>", () => {
     expect(getComputedStyle(trigger).backgroundColor).to.equal("rgb(1, 2, 3)");
   });
 
+  it("isolates trigger sizing, typography, chevron and disabled styling", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select
+        size="sm"
+        disabled
+        aria-label="x"
+        style="
+          --fluid-select-height-sm: 44px;
+          --fluid-select-padding-x-sm: 17px;
+          --fluid-select-font-size-sm: 13px;
+          --fluid-select-gap: 11px;
+          --fluid-select-chevron-size: 18px;
+          --fluid-select-chevron-fg: rgb(1, 2, 3);
+          --fluid-select-disabled-bg: rgb(4, 5, 6);
+          --fluid-select-disabled-fg: rgb(7, 8, 9);
+          --fluid-select-disabled-opacity: 0.7;
+        "
+        >${sampleOptions}</fluid-select
+      >
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    const label = el.shadowRoot!.querySelector<HTMLElement>(".label")!;
+    const chevron = el.shadowRoot!.querySelector<HTMLElement>(".chevron")!;
+    const styles = getComputedStyle(trigger);
+    expect(trigger.getBoundingClientRect().height).to.be.closeTo(46, 0.5);
+    expect(getComputedStyle(label).paddingInlineStart).to.equal("17px");
+    expect(styles.fontSize).to.equal("13px");
+    expect(getComputedStyle(chevron).marginInlineEnd).to.equal("11px");
+    expect(styles.backgroundColor).to.equal("rgb(4, 5, 6)");
+    expect(styles.color).to.equal("rgb(7, 8, 9)");
+    expect(styles.opacity).to.equal("0.7");
+    expect(chevron.getBoundingClientRect().width).to.be.closeTo(18, 0.5);
+    expect(getComputedStyle(chevron).color).to.equal("rgb(1, 2, 3)");
+  });
+
+  it("renders text and icon prefix/suffix slots as full-height affixes", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select aria-label="x">
+        <fluid-icon slot="prefix" name="search" aria-hidden="true"></fluid-icon>
+        <span slot="suffix">per month</span>
+        ${sampleOptions}
+      </fluid-select>
+    `);
+    await el.updateComplete;
+
+    const trigger = el.shadowRoot!.querySelector<HTMLElement>(".trigger")!;
+    const prefix = el.shadowRoot!.querySelector<HTMLElement>(".prefix")!;
+    const suffix = el.shadowRoot!.querySelector<HTMLElement>(".suffix")!;
+    expect(prefix.hidden).to.equal(false);
+    expect(suffix.hidden).to.equal(false);
+    expect(prefix.getBoundingClientRect().height).to.be.closeTo(
+      trigger.getBoundingClientRect().height,
+      0.5
+    );
+    expect(suffix.getBoundingClientRect().height).to.be.closeTo(
+      trigger.getBoundingClientRect().height,
+      0.5
+    );
+  });
+
+  it("hides empty affix boxes and isolates their component tokens", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select
+        aria-label="x"
+        style="
+          --fluid-select-affix-bg: rgb(1, 2, 3);
+          --fluid-select-affix-fg: rgb(4, 5, 6);
+          --fluid-select-affix-border: rgb(7, 8, 9);
+        "
+      >
+        <span slot="prefix">€</span>
+        ${sampleOptions}
+      </fluid-select>
+    `);
+    await el.updateComplete;
+
+    const prefix = el.shadowRoot!.querySelector<HTMLElement>(".prefix")!;
+    const suffix = el.shadowRoot!.querySelector<HTMLElement>(".suffix")!;
+    const styles = getComputedStyle(prefix);
+    expect(prefix.hidden).to.equal(false);
+    expect(suffix.hidden).to.equal(true);
+    expect(styles.backgroundColor).to.equal("rgb(1, 2, 3)");
+    expect(styles.color).to.equal("rgb(4, 5, 6)");
+    expect(styles.borderInlineEndColor).to.equal("rgb(7, 8, 9)");
+  });
+
+  it("isolates listbox geometry", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select
+        aria-label="x"
+        style="
+          --fluid-select-listbox-radius: 13px;
+          --fluid-select-listbox-padding: 7px;
+          --fluid-select-listbox-max-height: 140px;
+        "
+        >${sampleOptions}</fluid-select
+      >
+    `);
+    const listbox = el.shadowRoot!.querySelector<HTMLElement>(".listbox")!;
+    const styles = getComputedStyle(listbox);
+    expect(styles.borderRadius).to.equal("13px");
+    expect(styles.paddingTop).to.equal("7px");
+    expect(styles.maxHeight).to.equal("140px");
+  });
+
   it("trigger min-height respects --fluid-target-min (AAA scaling)", async () => {
     const el = await fixture<FluidSelect>(html`
       <fluid-select size="sm" aria-label="x">${sampleOptions}</fluid-select>
@@ -178,6 +599,32 @@ describe("<fluid-select>", () => {
     await el.updateComplete;
     const trigger = el.shadowRoot!.querySelector<HTMLElement>(".trigger")!;
     expect(trigger.getBoundingClientRect().height).to.be.greaterThanOrEqual(60);
+  });
+
+  it("includes visible borders in its field height without a transparent host wrapper", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select
+        aria-label="x"
+        style="--fluid-field-height-md:36px; --fluid-field-border-width:1px; --fluid-target-min:24px;"
+      >
+        ${sampleOptions}
+      </fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLElement>(".trigger")!;
+
+    expect(trigger.getBoundingClientRect().height).to.be.closeTo(38, 0.1);
+    expect(el.getBoundingClientRect().height).to.be.closeTo(
+      trigger.getBoundingClientRect().height,
+      0.1
+    );
+
+    el.style.setProperty("--fluid-target-min", "44px");
+    await el.updateComplete;
+    expect(trigger.getBoundingClientRect().height).to.be.closeTo(46, 0.1);
+    expect(el.getBoundingClientRect().height).to.be.closeTo(
+      trigger.getBoundingClientRect().height,
+      0.1
+    );
   });
   it("places the listbox by where the trigger is on screen, not in the document", async () => {
     const holder = document.createElement("div");

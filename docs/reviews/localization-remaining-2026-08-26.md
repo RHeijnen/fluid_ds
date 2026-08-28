@@ -1,0 +1,222 @@
+# Remaining localization work, 2026-08-26
+
+## Current checkpoint
+
+The four formatter-context migrations and countdown/tour message work are
+**completed bounded slices**, not remaining tasks. The earlier rows and proposal
+below are preserved as historical discovery and explicitly marked where superseded.
+
+- Format-number, format-date, relative-time and format-bytes pass **136 tests per
+  engine**, 408 executions, with normal exits and stable source. Exact records:
+  `2026-08-26T14-34-16-207Z-formatter-context-chromium`,
+  `2026-08-26T14-34-34-395Z-formatter-context-firefox`, and
+  `2026-08-26T14-35-10-567Z-formatter-context-webkit`.
+- Countdown/tour messages and their reproduced timer/context fixes pass
+  **106 tests per engine**, 318 executions, with normal exits and stable source.
+  Exact records: `2026-08-26T15-02-58-395Z-countdown-tour-chromium`,
+  `2026-08-26T15-03-25-956Z-countdown-tour-firefox`, and
+  `2026-08-26T15-03-49-687Z-countdown-tour-webkit`.
+- Typed translation callback arguments are also implemented. The completion
+  addenda below retain the failure history, ownership rules and exact limits.
+
+Binary long-unit grammar, meter value descriptions, core calendar/date/time
+context and presets, file-size displays, expansion-package strings and
+native-ancestor SSR localization remain open. These targeted results are not
+an exhaustive localization inventory, RTL certification or fluent-speaker review.
+
+## Status and method
+
+The original report was a read-only source audit and implementation proposal, not a complete string inventory, new execution result, localization percentage, or production certification. Runtime and test files were frozen during that pass. Line references identify the inspected working-tree snapshot and may move. Later completion addenda and the current checkpoint above supersede the affected historical claims.
+
+The earlier `docs/reviews/localization-completeness-audit-2026-08-26.md` records the initial discovery across 155 catalog elements. Its forms and default-label rows are historical: subsequent migrations must not be counted again as missing implementation. This follow-up rechecked the remaining candidates in runtime source, inspected formatter and validation paths, and compared relevant existing tests. Search excluded generated output, dependency trees, stories and tests when identifying owned strings; tests were inspected separately for evidence boundaries. Searches are discovery aids, not proof of completeness. Dynamic messages, dependency UI, unusual error paths and assistive-technology output still need runtime review.
+
+Repository component-authoring and accessibility guidance informed the ownership and verification distinctions below. No files other than this review document were changed for this task; no browser tests, builds or installs were run.
+
+### Ownership categories
+
+- **Internal text:** library-rendered sentences, accessible names, status messages and built-in validation errors. These need locale-aware defaults and live updates.
+- **Configurable defaults:** an English property/message/slot fallback remains a localization gap even when the application can replace it. Preserve explicit overrides, including empty strings and values identical to the English default. An explicit empty name is not a claim of accessibility conformance.
+- **Application content:** titles, slots, dataset labels, filenames, imported values, captions, formatter output and custom validator responses. Do not translate or replace these automatically.
+- **Native/browser text:** native validation, media controls, file-picker chrome and prompt chrome. Library-authored text passed into those surfaces is still library-owned.
+- **Dependency UI:** default Leaflet or parser messages require an integration policy, not edits to dependency files or silent removal of attribution.
+- **Non-user text:** enum values, event names, canonical values, CSS, developer-only exceptions and logs are not translation candidates unless surfaced to users.
+
+## Completed work excluded from the remaining inventory
+
+Typed English terms, the five official dictionaries (`nl`, `de`, `fr`, `es`, `ar`), and diagnostic pseudo-locales already exist. The controller handles reactive DOM language/direction context across shadow hosts, regional fallback, registration and observer cleanup. Recent work migrated required/custom validation defaults and upload hints for the approved core forms, followed by sixteen default-label tags.
+
+At the original audit checkpoint, the latest bounded slice added ownership-aware host names for meter, progress-ring, skeleton and toast, and repaired existing helper consumers. This is not evidence that meter value descriptions or all component content are localized. Its browser results and teardown failures are recorded in the shared quality evidence; this document adds no execution credit.
+
+Dictionary parity only proves coverage of the typed registry, not that all component-owned text uses it. Machine-assisted translation prose still needs fluent-speaker review, especially grammar and terminology in Arabic.
+
+## Remaining core text and formatting
+
+Paths in this section begin with `packages/components/src/`. Rows marked historical
+retain the original finding; their stated formatter-context or countdown/tour
+scope was subsequently completed, as recorded above and in the addenda. Byte
+long-unit grammar remains open independently of its completed context migration.
+
+| Surface | Exact source | Remaining issue and ownership |
+| --- | --- | --- |
+| Number formatting (historical, context completed) | `components/format-number/fluid-format-number.ts:25`, `:76` | Original finding: an omitted `locale` used the browser/Intl default, not inherited Fluid language. Explicit currency, unit and precision options remain authoritative. |
+| Date formatting (historical, context completed) | `components/format-date/fluid-format-date.ts:31`, `:78` | Original finding: same locale divergence. Explicit timezone, hour cycle and detailed options were preserved; invalid dates render empty. |
+| Relative time (historical, context completed) | `components/relative-time/fluid-relative-time.ts:36`, `:98` | Original finding: same locale divergence. Locale-only changes now have regressions preserving the refresh schedule and input date. |
+| Byte formatting (context completed; long grammar open) | `components/format-bytes/fluid-format-bytes.ts:32`, `:58`, `:76`, `:85`, `:100` | Original context divergence is fixed. Binary long byte/bit names remain English and always plural. Standard IEC symbols are distinct from untranslated prose. |
+| Countdown (historical, messages/timer slice completed) | `components/countdown/fluid-countdown.ts:265`, `:275`, `:281`, `:290` | Original finding: completion, English unit plurals and the comma-joined remaining-time sentence needed migration. Complete messages now use typed terms and Intl grammar; visual ASCII digits were deliberately preserved. |
+| Tour (historical, message slice completed) | `components/tour/fluid-tour.ts:432`, `:563`, `:573`, `:586`, `:598` | Original finding: step announcement/counter and Skip/Back/Done/Next needed migration. These defaults now use typed terms. Step titles and bodies remain application content. |
+| Meter value text | `components/meter/fluid-meter.ts:250`, `:264`, `:273` | Good/fair/poor, raw default numerals and the value-of-maximum sentence remain English. The migrated host name is separate. `valueFormatter` output is application-owned. |
+| Date presets | `internal/date-utils.ts:151`, `:154`, `:159`, `:164`, `:169`, `:177` | Today, Yesterday, Last 7 days, Last 30 days, This month and Last month are static English defaults. Do not mutate the exported array or translate explicit caller presets by matching their text or IDs. |
+| Date-range prompt | `components/date-range-picker/fluid-date-range-picker.ts:705` | Internal Select a range fallback remains. The public preset default at `:264` needs an ownership-aware migration. |
+| Calendar/date display | `internal/date-utils.ts:111`, `:122`; `components/calendar/fluid-calendar.ts:388`, `:413`, `:425`, `:447`; `components/date-picker/fluid-date-picker.ts:256`; `components/date-range-picker/fluid-date-range-picker.ts:301` | Independent optional locale settings govern weekday/month/date labels; day numerals are raw. Labels can therefore be translated while dates use another language. Preserve caller date patterns and ISO form values. |
+| Time picker | `components/time-picker/fluid-time-picker.ts:45`, `:51` | Manual ASCII clock strings and AM/PM. Preserve canonical HH:MM values, explicit 12h/24h behavior, parsing and filtering while localizing display. |
+| File sizes | `components/file-input/fluid-file-input.ts:347`; `components/dropzone/fluid-dropzone.ts:512` | Decimal punctuation and unit assembly are manual. File-input uses 1024 thresholds with SI labels; correcting this requires a deliberate unit/compatibility decision. Filenames are application content. |
+
+Native validation is a separate boundary: `components/input/fluid-input.ts:436`, `components/number-input/fluid-number-input.ts:294`, and `components/textarea/fluid-textarea.ts:269` forward the native control's `validationMessage`. They are not additional hardcoded English literals. Their language behavior needs actual browser evidence before documentation promises nearest-lang validation. Do not replace browser validation policy as an incidental string cleanup.
+
+## Remaining expansion surfaces
+
+All paths are repository-relative. Multiple references in a row point to the same file unless another file is named.
+
+| Surface | Exact source | Remaining internal/default text and boundaries |
+| --- | --- | --- |
+| Animated image | `packages/media/src/components/animated-image/fluid-animated-image.ts:145` | Play/Pause animation. Image alt is application-owned. |
+| Audio | `packages/media/src/components/audio/fluid-audio.ts:105`, `:162`, `:177`, `:182` | Audio player, Play/Pause, Seek, Mute/Unmute; time display also needs a formatting decision. |
+| Video | `packages/media/src/components/video/fluid-video.ts:44` | Video default label. Native playback controls are browser-owned; captions and track labels are application content. |
+| Video playlist | `packages/media/src/components/video-playlist/fluid-video-playlist.ts:148`, `:155`, `:165` | Video, Playlist and Track N fallback. Explicit item titles remain unchanged. |
+| Lightbox | `packages/media/src/components/lightbox/fluid-lightbox.ts:185`, `:193`, `:206`, `:209`, `:215` | Image N, Image viewer, Previous/Next image, Close. Preserve explicit alt/title text. |
+| Zoomable frame | `packages/media/src/components/zoomable-frame/fluid-zoomable-frame.ts:117` | Seven configurable zoom/reset/pan defaults. Pan directions describe physical operations; do not reverse movement merely because text is RTL. |
+| Event calendar | `packages/calendar/src/components/event-calendar/fluid-event-calendar.ts:366`, `:375`, `:505`, `:514`, `:550`, `:557`, `:596` | Independent date locale, previous/next controls, event-count plurals and show-all sentence. Event titles remain application content. |
+| Scheduler | `packages/scheduler/src/components/scheduler/fluid-scheduler.ts:181`, `:182`, `:314`, `:316` | Required/unavailable validation, select-day prompt and loading label. The spinner receives `label="Loading availability"`, but spinner's supported naming API is `aria-label`/legacy `arialabel` (`packages/components/src/components/spinner/fluid-spinner.ts:75`). The intended specific loading name is not wired to that API. |
+| Time slots | `packages/scheduler/src/components/time-slots/fluid-time-slots.ts:211`, `:222`, `:273`, `:280`, `:311` | Date/time context, Time slots for date, no-openings/select-day prompts and unavailable suffix. |
+| Availability editor | `packages/scheduler/src/components/availability-editor/fluid-availability-editor.ts:193`, `:298`, `:300`, `:304`, `:308`, `:312`, `:319`, `:329`, `:344`, `:353`, `:362`, `:368`, `:376`, `:382`, `:388`, `:395`, `:396`, `:402` | Weekday context; slot/settings headings; open/close/indexed-window names; invalid range; closed-day and add/remove controls. Include visible and accessible labels in the migration. |
+| Rich-text editor | `packages/editor/src/components/rich-text-editor/fluid-rich-text-editor.ts:28`, `:167`, `:228`, `:297` | Seven default command names, editor/toolbar labels and Link URL prompt. Custom command labels, document content and placeholder remain application-owned; prompt chrome is browser-owned. |
+| Kanban | `packages/kanban/src/components/kanban/fluid-kanban.ts:198`, `:263`, `:329`, `:337`, `:352`, `:401`, `:458` | Move-button defaults, pickup/move/drop/cancel announcements and board/card naming. Card/column titles are data embedded in translated sentences. |
+| Node graph | `packages/node-graph/src/components/node-graph/fluid-node-graph.ts:75`, `:429`, `:1048` | Fifteen default message templates, graph label and role description. Preserve the existing partial `messages` override API and node/port names. |
+| Table | `packages/table/src/components/table/fluid-table.ts:246`, `:340`, `:380` | Locale-unspecified collation, select-all and indexed-row labels. Headers, cells and renderers are application content. |
+| Infinite table | `packages/table/src/components/infinite-table/fluid-infinite-table.ts:715`, `:717`, `:719`, `:1697`, `:1700`, `:1726`, `:1734`, `:1746`, `:1768`, `:1784`, `:1938`, `:1949`, `:1953` | Configurable resize/reorder/position templates, column dialog/actions, fragmented result-count sentences, empty/loading/end states. Preserve caller slots and overrides; localize count numbers as well as prose. |
+| Chart family | `packages/charts/src/components/chart/fluid-chart.ts:158`, `:319`, `:344` | Chart default, Total and locale-unspecified totals. Dataset labels remain caller content. A base-class change is not independent execution coverage for every subclass. |
+| Map | `packages/map/src/components/map/fluid-map.ts:179`, `:355` | Map default and Leaflet-created control names. Configure dependency integration options, not dependency source. Marker content and attribution remain intact. |
+| Markdown | `packages/markdown/src/fluid-markdown.ts:141` | Rendered load-failure sentence plus raw error detail. Markdown content is application-owned; dependency diagnostics need a separate display policy. |
+| QR code | `packages/qr/src/fluid-qr-code.ts:427`, `:434` | QR code for value and Empty QR code. The empty branch hardcodes its name rather than using the computed custom name. Encoded value remains application data. |
+
+No additional owned English candidate was confirmed for celebrate or sparkline in the earlier discovery. That is not certification of their accessibility or every runtime path.
+
+## Parser: structured validation before translation
+
+| Source | Remaining surface |
+| --- | --- |
+| `packages/parser/src/components/column-mapper/fluid-column-mapper.ts:173`, `:184` | Required, Select a column and not-mapped defaults. Field/source names remain data. |
+| `packages/parser/src/components/file-parser/fluid-file-parser.ts:185`, `:322`, `:334`, `:355`, `:424`, `:436`, `:442`, `:445`, `:451` | Upload default, count/plural summaries, preview/import/export/reset controls. Preserve filenames, imported values and custom messages. |
+| `packages/parser/src/core/coerce.ts:92`, `:100`, `:102`, `:104`, `:111`, `:113`, `:115`, `:117`, `:131`, `:137`, `:140`, `:142`, `:148`, `:158`, `:172`, `:180` | Required, length, pattern, number/integer/range, boolean, date, email, URL, enumeration and JSON failures. |
+| `packages/parser/src/core/apply-blueprint.ts:54`, `:80`, `:92` | Unmapped-required, transform-failure wrapper and invalid fallback. Caller validator strings remain application-owned. |
+| `packages/parser/src/core/parse-file.ts:82`, `:99` | JSON parse and structure errors that can become visible UI. Raw engine error detail is not consistently localizable. |
+
+Use stable error codes and typed parameters, preserving the public `message` contract and custom-validator responses. Translate built-in messages from structured data instead of parsing English sentences. Keep the headless parser independent of DOM/global locale state. A UI locale change must not silently change number/date coercion, canonical result values or CSV/JSON output.
+
+Required tests include every built-in error family, changing locale after errors already exist, keeping caller validation text, parameter interpolation with unusual field/raw values, count plural categories, local file ingestion/error/reset, and unchanged parsed/exported data.
+
+## Proposed next slice: four formatter contexts only
+
+**Historical proposal, subsequently implemented in the bounded scope documented
+in the formatter completion addendum.** The design and tests below preserve the
+original proposal, not an unstarted task or an assertion that its originally
+suggested file layout was used unchanged. Binary long-unit grammar and native
+ancestor SSR context were excluded and remain open.
+
+### Scope
+
+Limit runtime changes to `format-number`, `format-date`, `format-bytes`, `relative-time` and a small additive context resolver in `packages/components/src/internal/localization.ts`, with matching tests and documentation. Do not change all label-locale behavior, migrate expansion components, introduce a dependency, or add request-global SSR state.
+
+The existing `LocalizationController.locale` includes navigator language (`localization.ts:236`). Reusing it unchanged would not implement the proposed deterministic fallback. Add a formatter-specific resolver that reuses the existing DOM/shadow ancestry and observation machinery without changing the established label registry contract.
+
+### Precedence and compatibility
+
+1. An explicitly supplied non-null/undefined `locale` wins. Do not reinterpret an empty or malformed explicit string as absence, and do not silently replace it with inherited language.
+2. Without explicit locale, use the nearest declared `lang`, traversing DOM ancestors and shadow hosts using the existing language-inheritance rules. Do not follow assigned slots instead of light-DOM language ancestry. An explicit empty language declaration stops ancestry and resolves to the documented default, rather than adopting a more distant language.
+3. Without a usable declared language, use `en`, not the browser's ambient locale. This changes the documented omitted-locale behavior and must be described as an intentional default-policy change.
+4. Preserve valid regional and Unicode-extension tags, including numbering systems and calendars. Intl locale availability is not the translation dictionary's availability: an unregistered but Intl-supported locale must still format normally.
+5. Use an English final fallback for structurally valid but unsupported requested locales, for example an ordered Intl locale list. Do not let unsupported-language resolution silently return the ambient browser language. Invalid inherited language can fall back to English; invalid explicit values retain the existing component-specific error path below.
+
+Current error behavior to preserve and test before changing code:
+
+| Component | Current fallback |
+| --- | --- |
+| format-number | Intl construction/formatting failure returns `String(value)` (`fluid-format-number.ts:75`). |
+| format-date | Invalid date renders empty; Intl failure for a valid date returns `date.toISOString()` (`fluid-format-date.ts:62`, `:77`). |
+| relative-time | Invalid date renders empty; Intl failure for a valid date returns `date.toISOString()` (`fluid-relative-time.ts:92`, `:97`). |
+| format-bytes | Intl errors currently propagate; there is no catch in either SI or binary formatting (`fluid-format-bytes.ts:58`, `:100`). Preserving compatibility means explicitly testing that failure path, not pretending it is graceful. Any decision to introduce a fallback is a separately documented behavior change. |
+
+Preserve all existing formatter options, input properties, canonical values and timer cleanup. No synthetic `locale` or `lang` attributes should materialize from a library default, and no module-global current locale is permitted. No new dictionary terms are needed for context selection itself. Binary long unit translation/plural grammar is explicitly outside this first slice.
+
+### Tests first
+
+- Add regressions to the four existing `fluid-*.test.ts` files and `internal/localization.test.ts` before runtime edits. Current formatter tests cover selected explicit locales, not the full inherited-language contract.
+- Exercise `nl`, `de`, `fr`, `es`, `ar`, regional tags and a supported locale absent from the dictionary registry. Compare meaningful Intl parts/results while avoiding brittle assumptions about engine-specific whitespace.
+- Prove explicit locale overrides host and ancestor language; assignment equal to an existing default remains explicit; attribute removal/null reset restores inheritance. Empty/malformed explicit values follow the compatibility table.
+- Prove document, nested DOM and open/closed-shadow context changes, own-language overrides, empty-language boundaries and reconnect. With no declared language, English output must be independent of the browser's actual configured locale; do not fake CSS/browser behavior with a stub and call it a native test.
+- Preserve currency/unit/precision options, negative values, binary/decimal magnitude boundaries, SI versus IEC symbols, and malformed option handling. This slice does not certify binary long unit translations.
+- Date tests use fixed instants and explicit zones, including a daylight-saving boundary, plus hour-cycle and numbering/calendar extensions. Do not change parsing or canonical storage.
+- Relative-time tests control the reference instant, preserve `numeric` and `format`, and prove locale-only updates do not leak/restart timers. Keep disconnect/no-sync regressions.
+- Retain red evidence, then run all three engines serially with the unchanged lifecycle supervisor. Distinguish passed assertions from successful teardown. Run source and test typechecks, scoped lint, and the shared final verification after source freeze.
+
+### SSR boundary
+
+The server shim does not supply ordinary native ancestor context. Root recorded a failing baseline in `quality/evidence/2026-08-26T14-06-33-197Z-ssr-ancestor-locale-baseline`: explicit host language renders the expected five-language pagination labels, while a native ancestor language renders English. This remains an open server-rendering gap.
+
+The formatter slice can test import safety, explicit `locale`, explicit host `lang` where available to the renderer, and deterministic English without context. It must not promise native-ancestor SSR language inheritance, request-local dictionary mutation, or full locale hydration parity. Server context architecture and parser-aware native scope propagation are a separate decision. A custom Lit renderer alone has no public ordinary-element ancestor stack and does not close that gap.
+
+## Subsequent bounded slices
+
+This original follow-up list is retained with completed work marked; it is not a
+claim that every listed slice is still pending.
+
+1. **Whole core messages (partly completed):** countdown and tour are completed in the bounded scope of their addendum; meter value descriptions remain open. The original requested contracts were typed complete-message callbacks, localized numbers/duration/list grammar, preserved caller content, paused/completed locale changes, reconnect and unchanged events. The addendum states the actual plural-category coverage rather than claiming every proposed category was exercised.
+2. **Date/time displays and presets:** core calendar, date/range picker, time picker and built-in presets. Preserve public preset arrays, explicit labels/patterns, canonical form values and typed-input behavior. Add actual RTL keyboard/navigation coverage; do not assume locale selection implies correct direction behavior.
+3. **Binary units and file sizes:** establish unit semantics and localized long-unit grammar independently from byte values and filenames. Test fractional/negative/count-category cases and explicit display modes.
+4. **Media defaults:** migrate accessible/control defaults while retaining existing explicit label APIs and native playback boundaries. Use real local media for behavior tests.
+5. **Calendar and scheduler:** all affected labels, date context, count messages and required/unavailable validation. Fix the scheduler-to-spinner naming integration. Preserve custom validity, appointment values and availability data. Verify Arabic interaction behavior, not just strings.
+6. **Complex tools, separately:** table/infinite-table, editor, kanban and node graph. Preserve their override APIs, user data and movement semantics; use complete movement/count messages instead of sentence fragments.
+7. **Parser structured errors:** implement the code/parameter/display boundary above, then localized UI summaries and actions. Keep custom validator ownership explicit.
+8. **Remaining wrappers:** chart family, map controls, Markdown failure fallback and QR-code names, including the empty QR override case.
+9. **Product evidence:** representative five-language browser and SSR/hydration gates, concurrent request isolation, pseudo-locale overflow, RTL interaction/visual review, native/dependency boundaries and fluent-language review. No percentage or release label should be inferred from registry parity or this source inventory.
+
+Historical typing finding, now closed by the formatter/typed-arguments addendum:
+`LocalizationController.term` at the then-current `packages/components/src/internal/localization.ts:282` accepted `unknown[]`. Typed callback argument tuples and positive/negative compiler guards now enforce call-site shape. Key existence alone still does not prove translation grammar or inventory completeness.
+
+## Completion addendum: 2026-08-26, formatter context and typed arguments
+
+The formatter proposal and callback-typing observation above describe the earlier audit snapshot. The bounded four-formatter context slice is now implemented in `format-number`, `format-date`, `relative-time` and `format-bytes`, using `packages/components/src/internal/formatting-locale.ts`. Explicit locale overrides declared composed-tree language; missing context resolves to English. Existing malformed-explicit-locale behavior is preserved per component, and public locale properties support a `null` inheritance reset. Locale-only updates, shadow context and reconnect are covered without changing canonical values or binary unit grammar.
+
+The retained Chromium red run (`quality/evidence/2026-08-26T14-31-58-238Z-formatter-context-red`) had 64 passing and 72 failing tests. Following implementation, the same four-file suite passed 136 tests in each engine, with normal supervised teardown and source-stable evidence:
+
+- Chromium: `quality/evidence/2026-08-26T14-34-16-207Z-formatter-context-chromium`.
+- Firefox: `quality/evidence/2026-08-26T14-34-34-395Z-formatter-context-firefox`.
+- WebKit: `quality/evidence/2026-08-26T14-35-10-567Z-formatter-context-webkit`.
+
+Source and browser-test typechecks and scoped lint passed. These 408 executions are bounded formatter evidence, not certification of date-picker input, native-ancestor SSR inheritance, binary long units, RTL layouts or fluent translation quality. No shared `localization.test.ts` changes were needed for this slice; inherited-context regressions live in the four owned component test files.
+
+Separately, the main task added `FluidTranslationArguments<K>` and generic argument signatures to both `LocalizationController.term` and `FluidElement.term`, with positive and negative compile checks. The historical `unknown[]` public invocation gap above is therefore closed. Typed arguments validate callback shape, not translation grammar or the completeness of this inventory. Countdown and tour remain the next whole-message implementation slice at the time of this addendum.
+
+## Completion addendum: 2026-08-26, countdown and tour messages
+
+The following bounded slice now adds eight typed terms to English and the five official packs, with pseudo-pack derivation: `countdownComplete`, `countdownRemaining`, `tourStep`, `tourStepAnnouncement`, `skip`, `back`, `next`, and `done`. Duration and step-count arguments are already-localized display strings; callbacks own complete sentences and argument order. Countdown uses Intl unit/list grammar while retaining ASCII visual digits. Tour preserves application titles/body as plain text and translates a stored announcement snapshot without replaying focus or events. Official message translations remain machine-assisted drafts awaiting fluent review.
+
+Unlike the standalone four formatters, these complete messages align Intl formatting with the localization controller's effective locale, including document/browser fallback. Empty nearest-language behavior follows that existing controller policy; malformed Intl tags safely use English formatting. Tests explicitly exercise navigator fallback with a restored unit stub, not a claim about a natively configured browser language.
+
+Five controlled-clock countdown regressions additionally exposed and closed first-render reinitialization after the immediate tick, interval installation after immediate completion, active duration/target reconnect stalls, and restarting a manually paused autostart countdown on reconnect. Fixed durations pause while detached; valid targets use elapsed wall-clock time. An active reconnect retains the existing immediate-tick behavior, while an explicitly paused countdown stays paused. These are observable tick, completion and display assertions, not checks of a private timer identifier.
+
+Retained failure evidence:
+
+- `quality/evidence/2026-08-26T14-47-50-386Z-countdown-tour-red`: 35 passed, 56 failed; original missing-message baseline. The global source fingerprint changed during unrelated concurrent work.
+- `quality/evidence/2026-08-26T14-53-19-406Z-countdown-tour-context-timer-red`: 50 passed, seven failed countdown assertions; all 48 tour tests unexecuted after the 120-second browser-finish deadline. Source stable.
+- `quality/evidence/2026-08-26T14-55-52-438Z-tour-context-isolated-red`: zero executed tour tests and the same retained deadline failure. Source stable.
+- `quality/evidence/tour-import-diagnostic-2026-08-26/page-events.jsonl`: a DOM-object assertion failure caused the Mocha result serializer to throw on a circular `FluidButton.renderOptions.host`. The test driver now awaits nested button updates and expresses the same focus-identity assertion as a scalar boolean; no focus assertion was removed.
+- `quality/evidence/2026-08-26T15-01-52-766Z-countdown-tour-scalar-context-red`: all 106 tests executed, 103 passed and three failed. This isolated tour locale-context and paused-countdown reconnect behavior before the final corrections. Source stable.
+
+Final two-file matrix: 106 tests per engine (58 countdown, 48 tour), 318 executions total. All three source-stable runs exited normally through the lifecycle supervisor without retries or forced cleanup:
+
+- Chromium: `quality/evidence/2026-08-26T15-02-58-395Z-countdown-tour-chromium`.
+- Firefox: `quality/evidence/2026-08-26T15-03-25-956Z-countdown-tour-firefox`.
+- WebKit: `quality/evidence/2026-08-26T15-03-49-687Z-countdown-tour-webkit`.
+
+The two files contain 77 new tests and 29 preserved existing tests. Coverage includes five official languages, French regional fallback, Arabic numbering extensions and five nonzero Arabic unit-count categories; zero is completion, not a tested zero-unit plural. Scoped lint, source typecheck and the 108-file core browser-test typecheck pass. Shared integrated verification and documentation build remain the main task's responsibility after this source freeze. Meter value descriptions, date/time presets, binary units, expansion-package strings, native-ancestor SSR context, RTL interaction/layout and fluent/assistive-technology review remain open; these message tests do not certify them.

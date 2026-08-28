@@ -1,6 +1,6 @@
 import { FluidStat } from "./fluid-stat.js";
 
-if (!customElements.get("fluid-stat")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-stat")) {
   customElements.define("fluid-stat", FluidStat);
 }
 

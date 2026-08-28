@@ -1,0 +1,38 @@
+{
+  "name": "@fluid-ds/admin-next-packed-contract",
+  "version": "0.0.7",
+  "private": true,
+  "description": "Admin-portal demo built with Next.js (App Router) + the Fluid web components, showing the SSR-safe client registration pattern.",
+  "scripts": {
+    "dev": "next dev -p 5291",
+    "build": "next build",
+    "start": "next start -p 5291",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/charts": "file:../packs/fluid-ds-charts-0.4.0.tgz",
+    "@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
+    "@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
+    "@fluid-ds/react": "file:../packs/fluid-ds-react-0.4.0.tgz",
+    "@fluid-ds/themes": "file:../packs/fluid-ds-themes-0.4.0.tgz",
+    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz",
+    "lit": "^3.2.1",
+    "next": "^15.5.21",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "@fluid-ds/components@0.4.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
+      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz",
+      "@fluid-ds/charts@0.4.0>@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz"
+    }
+  }
+}

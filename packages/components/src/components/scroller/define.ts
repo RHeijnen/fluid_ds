@@ -1,6 +1,6 @@
 import { FluidScroller } from "./fluid-scroller.js";
 
-if (!customElements.get("fluid-scroller")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-scroller")) {
   customElements.define("fluid-scroller", FluidScroller);
 }
 

@@ -1,6 +1,6 @@
 import { FluidMeter } from "./fluid-meter.js";
 
-if (!customElements.get("fluid-meter")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-meter")) {
   customElements.define("fluid-meter", FluidMeter);
 }
 

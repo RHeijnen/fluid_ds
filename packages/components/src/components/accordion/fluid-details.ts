@@ -1,7 +1,7 @@
 import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 import { motionStyles, reducedMotion } from "../../internal/motion.js";
 
@@ -128,6 +128,8 @@ export class FluidDetails extends FluidElement {
 
   @query(".body") private bodyEl!: HTMLElement;
 
+  @query(".summary") private summaryEl!: HTMLButtonElement;
+
   /** Whether the details are expanded. */
   @property({ type: Boolean, reflect: true }) open = false;
 
@@ -136,6 +138,16 @@ export class FluidDetails extends FluidElement {
 
   private summaryId = `fluid-details-summary-${++counter}`;
   private bodyId = `fluid-details-body-${counter}`;
+  private restoreFocusAfterCollapse = false;
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (changed.get("open") === true && !this.open) {
+      const activeElement = this.ownerDocument.activeElement;
+      this.restoreFocusAfterCollapse = Boolean(
+        activeElement && activeElement !== this && this.contains(activeElement)
+      );
+    }
+  }
 
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("open")) {
@@ -154,6 +166,10 @@ export class FluidDetails extends FluidElement {
             composed: true
           })
         );
+      }
+      if (this.restoreFocusAfterCollapse) {
+        this.restoreFocusAfterCollapse = false;
+        this.summaryEl.focus();
       }
     }
   }

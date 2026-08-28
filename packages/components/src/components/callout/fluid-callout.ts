@@ -1,7 +1,7 @@
 import { html, css, type TemplateResult } from "lit";
 import { property } from "lit/decorators.js";
 import "../icon/define.js";
-import { registerIcon } from "@fluid-ds/icons";
+import { registerIcon } from "@fluid-ds/icons/registry";
 import { FluidElement } from "../../internal/base-element.js";
 
 registerIcon(
@@ -10,6 +10,7 @@ registerIcon(
 );
 
 export type FluidCalloutVariant = "neutral" | "info" | "success" | "warning" | "danger";
+export type FluidCalloutDismissEvent = CustomEvent<null>;
 
 /**
  * Inline message block calling attention to surrounding content, tips,
@@ -56,7 +57,7 @@ export type FluidCalloutVariant = "neutral" | "info" | "success" | "warning" | "
  * @uses-token --fluid-color-brand-500 - Info accent.
  * @uses-token --fluid-border-default - Outline.
  *
- * @fires fluid-dismiss - Fired when the dismiss button is clicked.
+ * @fires {FluidCalloutDismissEvent} fluid-dismiss - Fired when the dismiss button is clicked.
  */
 export class FluidCallout extends FluidElement {
   static override styles = css`
@@ -77,7 +78,7 @@ export class FluidCallout extends FluidElement {
       background-color: var(--fluid-callout-bg, var(--fluid-surface-muted));
       color: var(--fluid-callout-fg, var(--fluid-text-primary));
       border-radius: var(--fluid-callout-radius, var(--fluid-radius-md));
-      border-left: var(--fluid-callout-accent-width, 3px) solid
+      border-inline-start: var(--fluid-callout-accent-width, 3px) solid
         var(--fluid-callout-border, var(--fluid-border-default));
       font-family: var(--fluid-callout-font-family, var(--fluid-font-family-sans));
       font-size: var(--fluid-font-size-md);
@@ -144,7 +145,7 @@ export class FluidCallout extends FluidElement {
     .variant-info {
       background-color: var(--fluid-callout-info-bg, var(--fluid-color-brand-50));
       color: var(--fluid-callout-info-fg, var(--fluid-color-brand-900));
-      border-left-color: var(--fluid-callout-info-border, var(--fluid-color-brand-500));
+      border-inline-start-color: var(--fluid-callout-info-border, var(--fluid-color-brand-500));
     }
     .variant-info .icon-slot {
       color: var(--fluid-callout-info-border, var(--fluid-color-brand-600));
@@ -152,7 +153,7 @@ export class FluidCallout extends FluidElement {
     .variant-success {
       background-color: var(--fluid-callout-success-bg, var(--fluid-color-emerald-50));
       color: var(--fluid-callout-success-fg, var(--fluid-color-emerald-900));
-      border-left-color: var(--fluid-callout-success-border, var(--fluid-color-emerald-500));
+      border-inline-start-color: var(--fluid-callout-success-border, var(--fluid-color-emerald-500));
     }
     .variant-success .icon-slot {
       color: var(--fluid-callout-success-border, var(--fluid-color-emerald-700));
@@ -160,7 +161,7 @@ export class FluidCallout extends FluidElement {
     .variant-warning {
       background-color: var(--fluid-callout-warning-bg, var(--fluid-color-amber-50));
       color: var(--fluid-callout-warning-fg, var(--fluid-color-amber-900));
-      border-left-color: var(--fluid-callout-warning-border, var(--fluid-color-amber-500));
+      border-inline-start-color: var(--fluid-callout-warning-border, var(--fluid-color-amber-500));
     }
     .variant-warning .icon-slot {
       color: var(--fluid-callout-warning-border, var(--fluid-color-amber-700));
@@ -168,7 +169,7 @@ export class FluidCallout extends FluidElement {
     .variant-danger {
       background-color: var(--fluid-callout-danger-bg, var(--fluid-color-red-50));
       color: var(--fluid-callout-danger-fg, var(--fluid-color-red-900));
-      border-left-color: var(--fluid-callout-danger-border, var(--fluid-color-red-500));
+      border-inline-start-color: var(--fluid-callout-danger-border, var(--fluid-color-red-500));
     }
     .variant-danger .icon-slot {
       color: var(--fluid-callout-danger-border, var(--fluid-color-red-700));
@@ -183,7 +184,7 @@ export class FluidCallout extends FluidElement {
 
   private handleDismiss = () => {
     this.dispatchEvent(
-      new CustomEvent("fluid-dismiss", { bubbles: true, composed: true })
+      new CustomEvent<null>("fluid-dismiss", { detail: null, bubbles: true, composed: true })
     );
   };
 
@@ -225,7 +226,7 @@ export class FluidCallout extends FluidElement {
                 part="close"
                 class="close"
                 type="button"
-                aria-label="Dismiss"
+                aria-label=${this.term("dismiss")}
                 @click=${this.handleDismiss}
               >
                 <fluid-icon name="close"></fluid-icon>

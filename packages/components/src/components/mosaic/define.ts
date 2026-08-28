@@ -1,10 +1,10 @@
 import { FluidMosaic } from "./fluid-mosaic.js";
 import { FluidMosaicItem } from "./fluid-mosaic-item.js";
 
-if (!customElements.get("fluid-mosaic")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-mosaic")) {
   customElements.define("fluid-mosaic", FluidMosaic);
 }
-if (!customElements.get("fluid-mosaic-item")) {
+if (typeof customElements !== "undefined" && !customElements.get("fluid-mosaic-item")) {
   customElements.define("fluid-mosaic-item", FluidMosaicItem);
 }
 

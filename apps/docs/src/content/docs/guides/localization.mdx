@@ -1,0 +1,286 @@
+---
+title: "Localization and RTL"
+description: "Choose locale and direction, load Fluid dictionaries, preserve canonical values, and test bidirectional interfaces."
+---
+
+Fluid has three related but separate localization surfaces:
+
+- **Language context** selects registry-backed Fluid messages and the inherited locale for
+  Fluid formatters.
+- **Direction context** controls the `ltr` or `rtl` interaction and layout direction used by
+  direction-aware components.
+- **Application internationalization** owns product content, domain messages, and the locale
+  policy for the page as a whole.
+
+English is always registered as the fallback. Fluid also ships Dutch (`nl`), German (`de`),
+French (`fr`), Spanish (`es`), and Arabic (`ar`) dictionaries. Those official files cover the
+current typed translation dictionary, but dictionary-key parity does not mean every internal
+string in every core and expansion component has been migrated. The non-English wording is
+also pending fluent-speaker terminology and grammar review. Treat these locale packs as
+available for integration and testing, not as language-quality certification.
+
+## Load a Fluid dictionary
+
+Locale modules register themselves when imported. Load only the dictionaries your application
+offers, statically or through your application's normal dynamic-import boundary:
+
+```ts
+import "@fluid-ds/components/locales/nl";
+import "@fluid-ds/components/locales/de";
+import "@fluid-ds/components/locales/fr";
+import "@fluid-ds/components/locales/es";
+import "@fluid-ds/components/locales/ar";
+```
+
+Keep dynamic imports statically discoverable by the bundler:
+
+```ts
+const localeLoaders = {
+  nl: () => import("@fluid-ds/components/locales/nl"),
+  de: () => import("@fluid-ds/components/locales/de"),
+  fr: () => import("@fluid-ds/components/locales/fr"),
+  es: () => import("@fluid-ds/components/locales/es"),
+  ar: () => import("@fluid-ds/components/locales/ar")
+} as const;
+
+await localeLoaders[selectedLocale]();
+```
+
+Set a BCP 47 language tag on the document or the nearest relevant ancestor:
+
+```html
+<section lang="nl">
+  <fluid-date-picker label="Startdatum"></fluid-date-picker>
+</section>
+```
+
+Registry-backed messages select a language in this order:
+
+1. The component's own `lang`, then the nearest ancestor with `lang`, crossing shadow hosts.
+2. `document.documentElement.lang`.
+3. The browser language.
+4. English.
+
+A registered exact regional dictionary wins over its base dictionary. Otherwise, a regional
+tag such as `fr-CA` uses `fr` when it is registered, then English for missing terms. Locale
+normalization is intentionally small and is not a full BCP 47 validator, so validate
+application-provided locale identifiers before using them.
+
+### Change language at runtime
+
+Connected Fluid components observe changes to inherited `lang` and rerender registry-backed
+messages:
+
+```ts
+document.documentElement.lang = "de";
+```
+
+Nested open and closed shadow roots inherit language and explicit direction from their hosts.
+Changes remain reactive after disconnect and reconnect. Slotted components keep their
+light-DOM ancestor context rather than taking the language of a shadow wrapper around the
+slot, following
+[HTML language inheritance](https://html.spec.whatwg.org/multipage/dom.html#the-lang-and-xml:lang-attributes).
+
+Changing `lang` must not translate caller-provided text or change a component's submitted
+value. See [Translation ownership](#translation-ownership) for that boundary.
+
+## Set direction explicitly
+
+Language and writing direction are distinct. The Arabic dictionary declares `rtl`, so Fluid
+can derive an internal direction when there is no explicit override. Set `dir` on the
+document too so application layout, text, and native controls use the same direction:
+
+```html
+<html lang="ar" dir="rtl"></html>
+```
+
+The nearest explicit `dir="ltr"` or `dir="rtl"` wins over the dictionary direction. Fluid's
+localization controller does not infer content direction for `dir="auto"`; when it needs an
+interaction direction, it falls back to the selected dictionary. Use an explicit direction
+for controls whose keyboard or layout behavior matters.
+
+Use logical CSS properties in application styles:
+
+```css
+.actions {
+  margin-inline-start: auto;
+  padding-inline: var(--fluid-space-4);
+}
+```
+
+Direction-aware behavior is not the same as reversing everything. Previous/next navigation
+may follow writing direction, while media playback, brand marks, numeric values, and other
+physical or semantic symbols may not. Core calendar/date/time and expansion-package RTL
+keyboard and layout coverage is still being completed. Test the actual interaction rather
+than assuming that an Arabic dictionary or `dir="rtl"` makes every component RTL-ready.
+
+## Register an application dictionary or override
+
+`registerTranslation()` accepts partial dictionaries and merges repeated registrations for
+the same exact locale code. This is useful for an application-owned regional dictionary or a
+targeted override:
+
+```ts
+import { registerTranslation, type FluidTranslation } from "@fluid-ds/components";
+
+const belgianDutch = {
+  $code: "nl-BE",
+  dismiss: "Sluiten",
+  page: (page) => `Pagina ${page}`
+} satisfies FluidTranslation;
+
+registerTranslation(belgianDutch);
+```
+
+Omitted terms fall back to English in an exact regional dictionary. Use
+`FluidTranslationDictionary` when maintaining a complete dictionary so TypeScript reports a
+new required term:
+
+```ts
+import type { FluidTranslationDictionary } from "@fluid-ds/components";
+
+export const locale = {
+  $code: "en-XA",
+  $dir: "ltr"
+  // Every translation term is required here.
+} satisfies FluidTranslationDictionary;
+```
+
+`unregisterTranslation(code)` is intended for tests and hot reload; English cannot be
+removed. Dictionary registration is process-global. Register stable dictionaries during
+application startup, and do not register or unregister a different dictionary for each SSR
+request.
+
+Parameterized terms are checked at TypeScript call sites. `LocalizationController.term()`
+and the protected `FluidElement.term()` require the selected message's argument tuple:
+`term("page", 2)` is valid, while a string page number or a missing argument is not.
+`FluidTranslationArguments<K>` is exported for helpers that preserve that contract. Types do
+not validate untyped JavaScript or translation quality.
+
+An explicit component label or message override remains authoritative, including an
+intentional empty string when that API permits one. For example, `fluid-truncate` uses the
+registry's `showMore` and `showLess` terms by default, but explicit `more-label` and
+`less-label` values do not change with the locale. Remove the attribute or set its property
+to `null` to resume the translated default.
+
+## Format with `Intl`
+
+Fluid dictionaries and platform locale support are independent. A browser may support
+`Intl.NumberFormat("ja-JP")` even though Fluid does not ship a Japanese message dictionary.
+Conversely, loading a Fluid dictionary does not polyfill missing `Intl` locale data.
+
+`fluid-format-number`, `fluid-format-date`, `fluid-format-bytes`, and
+`fluid-relative-time` choose their formatting locale in this order:
+
+1. An explicit non-null `locale` property or attribute.
+2. The nearest declared `lang`, including through shadow hosts.
+3. English, including the fallback for an unsupported inherited locale.
+
+Remove `locale` or set its property to `null` to restore inheritance. An explicit empty or
+malformed `locale` preserves each formatter's documented error behavior: number falls back
+to its raw value, date and relative time to ISO text, and bytes propagates the formatting
+error. Invalid dates render empty.
+
+```html
+<fluid-format-date date="2026-08-25" locale="fr-FR"></fluid-format-date>
+<fluid-format-number
+  value="1499.95"
+  type="currency"
+  currency="EUR"
+  locale="de-DE"
+></fluid-format-number>
+<fluid-relative-time date="2026-08-24T12:00:00Z" locale="es"></fluid-relative-time>
+```
+
+Locale changes update connected formatters without replacing their source values,
+timezone/precision options, or relative-time refresh schedule. Keep canonical values
+locale-neutral: date inputs and events use their documented ISO values, and parsed/exported
+data and form payloads must not switch to localized numerals or labels. Calendar,
+date-picker, date-range-picker, and time-picker extend the same rule: presentation is
+localized while canonical ISO dates and 24-hour time values stay stable.
+
+## Server rendering and request isolation
+
+`renderFluid()` and `renderFluidToString()` inherit `lang` and `dir` from ordinary native
+HTML ancestors as well as from Fluid hosts. The renderer follows the HTML parser's resulting
+tree, including optional end tags and table foster parenting, and binds the derived context
+to each rendered element. Interleaved asynchronous renders keep locale context isolated;
+explicit attributes on a Fluid host still win.
+
+```ts
+import { html } from "lit";
+import { renderFluidToString } from "@fluid-ds/components/ssr";
+
+const markup = await renderFluidToString(html`
+  <main lang="ar" dir="rtl">
+    <fluid-format-number value="1499.95"></fluid-format-number>
+  </main>
+`);
+```
+
+The parser-derived element context is request-local, but the registered dictionary map is
+process-global. Load stable dictionaries before serving traffic; do not mutate the registry
+as a request-specific locale mechanism. Keep server and browser dictionaries aligned so
+hydration sees the same terms. The [SSR guide](/guides/ssr/) documents the full render and
+hydration contract.
+
+## Validation and plural messages
+
+Many core controls use registry-backed built-in required messages and update them after a
+language change, including while invalid. An application message set through
+`setCustomValidity()` remains application-owned and must take precedence; clearing it
+restores the component's current built-in message. The guarded 155-element and 12-surface
+inventory has no confirmed machine-actionable Fluid-owned string migration remaining.
+
+Native browser validation text is a separate boundary. Some controls surface the inner
+native control's `validationMessage`, whose wording can follow browser or operating-system
+language rather than the nearest Fluid `lang`. Fluid does not claim to translate that text.
+For application counts, use `Intl.PluralRules` or a message-formatting system rather than
+concatenating a localized number with a noun.
+
+## Diagnostic pseudo-locales
+
+Fluid ships two generated diagnostic dictionaries:
+
+```ts
+import "@fluid-ds/components/locales/en-xa"; // expanded, accented LTR text
+import "@fluid-ds/components/locales/ar-xb"; // bidi-mirrored RTL text
+```
+
+`en-XA` expands every registered English term to expose clipping and hardcoded strings.
+`ar-XB` wraps those terms in a right-to-left override and declares RTL to expose physical
+layout assumptions. They only transform terms that use the Fluid registry; unchanged text
+may be application content, native/browser text, dependency-owned UI, or canonical developer
+text. A pseudo-locale screenshot is diagnostic evidence, not fluent Arabic review or RTL
+product approval.
+
+## Translation ownership
+
+Use the ownership boundary before deciding whether text should change with `lang`:
+
+| Surface                                                                                                                | Owner and expected behavior                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Fluid internal labels, accessible names, status, validation defaults, and announcements                                | Registry-backed defaults react to language changes; the guarded catalog audit reports no confirmed remaining owned-string migration. |
+| Application labels, filenames, titles, option text, dataset labels, imported documents, and custom validation messages | The application translates or preserves them. Fluid must not translate them by matching English text.                                |
+| Canonical form values, ISO dates/times, parser output, exports, and event payloads                                     | Remain stable and locale-neutral unless a public API explicitly says otherwise. Formatting changes presentation only.                |
+| Native controls and browser validation UI                                                                              | Browser/operating-system owned. Verify actual target environments; Fluid cannot promise the text follows component `lang`.           |
+| Third-party editor, chart, map, media, or other dependency UI                                                          | Dependency or application owned unless a Fluid adapter explicitly supplies a localized label. Audit that dependency separately.      |
+
+## Release testing and human gates
+
+Automated tests should cover:
+
+- every available official dictionary plus an exact regional and base fallback;
+- live language changes, reconnects, nested/shadow contexts, and explicit overrides;
+- localized visible text, accessible names, status messages, errors, and plural boundaries;
+- fixed date, time, timezone, currency, numbering-system, and invalid-input cases;
+- both pseudo-locales, including overflow and hardcoded-string review;
+- actual Arabic RTL keyboard, focus, popup placement, and logical-layout workflows;
+- SSR/hydration with native ancestors and concurrent requests while canonical values remain
+  unchanged.
+
+Automation does not close the language or accessibility review. Before calling an official
+locale stable, require fluent-speaker review of terminology, grammar, plural categories, and
+sentence order. Also retain manual assistive-technology review and visual RTL approval as
+human gates. Passing dictionary parity, pseudo-locale, browser, or SSR checks alone is not a
+production-readiness sign-off.

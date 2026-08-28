@@ -1,0 +1,26 @@
+{
+  "name": "@fluid-ds/framework-vanilla-packed-contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Executable plain TypeScript and HTML consumer contract for Fluid.",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
+    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^7.1.3"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "@fluid-ds/components@0.4.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
+      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz"
+    }
+  }
+}

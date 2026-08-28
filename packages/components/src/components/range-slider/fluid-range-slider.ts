@@ -2,6 +2,7 @@ import { html, css, type PropertyValues, type TemplateResult } from "lit";
 import { property, query, state } from "lit/decorators.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { FluidFormAssociated } from "../../internal/form-associated.js";
+import { FormDisabledController } from "../../internal/form-disabled.js";
 import { reducedMotion } from "../../internal/motion.js";
 
 type Thumb = "min" | "max";
@@ -27,6 +28,7 @@ type Thumb = "min" | "max";
  * @csspart thumb - Either thumb (both thumbs share this part).
  * @csspart thumb-min - The minimum thumb.
  * @csspart thumb-max - The maximum thumb.
+ * @csspart value - The optional visible min/max value readout.
  *
  * Every styled property reads a component-scoped `--fluid-range-slider-*` token
  * that falls back to a main semantic var (the override ladder).
@@ -37,12 +39,20 @@ type Thumb = "min" | "max";
  * @cssproperty --fluid-range-slider-thumb-radius - Corner radius of the thumbs and the selected-range fill (they share it so the fill caps match the handles). Falls back to 3px.
  * @cssproperty --fluid-range-slider-track-size - Track thickness. Falls back to 8px.
  * @cssproperty --fluid-range-slider-radius - Track corner radius. Falls back to --fluid-radius-full.
+ * @cssproperty --fluid-range-slider-gap - Gap between the track and visible value readout. Falls back to --fluid-space-3.
+ * @cssproperty --fluid-range-slider-font-family - Value readout font family. Falls back to --fluid-font-family-sans.
+ * @cssproperty --fluid-range-slider-value-font-size - Value readout font size. Falls back to --fluid-font-size-sm.
+ * @cssproperty --fluid-range-slider-value-fg - Value readout text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-range-slider-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-range-slider-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
  * @uses-token --fluid-accent-base - Default fill + thumb color.
  * @uses-token --fluid-color-neutral-200 - Unfilled track color.
  * @uses-token --fluid-radius-full - Track corner radius.
+ * @uses-token --fluid-space-3 - Gap between the track and visible value readout.
+ * @uses-token --fluid-font-family-sans - Value readout font family.
+ * @uses-token --fluid-font-size-sm - Value readout font size.
+ * @uses-token --fluid-text-secondary - Value readout text color.
  * @uses-token --fluid-gradient-glossy - Thumb sheen.
  * @uses-token --fluid-focus-ring-color - Keyboard focus ring.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
@@ -54,6 +64,7 @@ type Thumb = "min" | "max";
  * @fires fluid-change - Fires when the user commits a change (release / keyup) with detail { min, max }.
  */
 export class FluidRangeSlider extends FluidFormAssociated {
+  private readonly formDisabled = new FormDisabledController(this);
   static override formAssociated = true;
 
   static override styles = [
@@ -64,9 +75,17 @@ export class FluidRangeSlider extends FluidFormAssociated {
         width: 100%;
       }
 
+      .layout {
+        display: flex;
+        align-items: center;
+        gap: var(--fluid-range-slider-gap, var(--fluid-space-3));
+        width: 100%;
+      }
+
       .base {
         position: relative;
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 0;
         /*
          * SC 2.5.8 Target Size. The visible rail is thin, so the row reads
          * --fluid-target-min as a floor: the full-height row is the pointer
@@ -166,6 +185,16 @@ export class FluidRangeSlider extends FluidFormAssociated {
             var(--fluid-range-slider-focus-ring, var(--fluid-focus-ring-color)),
           0 2px 4px rgb(0 0 0 / 0.15);
       }
+
+      .value {
+        flex: 0 0 auto;
+        color: var(--fluid-range-slider-value-fg, var(--fluid-text-secondary));
+        font-family: var(--fluid-range-slider-font-family, var(--fluid-font-family-sans));
+        font-size: var(--fluid-range-slider-value-font-size, var(--fluid-font-size-sm));
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+      }
     `
   ];
 
@@ -196,6 +225,9 @@ export class FluidRangeSlider extends FluidFormAssociated {
   /** Disabled state. */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
+  /** Show the current minimum and maximum values beside the track. */
+  @property({ type: Boolean, attribute: "show-value" }) showValue = false;
+
   /** Format function for aria-valuetext on both thumbs. */
   @property({ attribute: false }) valueFormatter?: (value: number) => string;
 
@@ -212,6 +244,14 @@ export class FluidRangeSlider extends FluidFormAssociated {
     this.syncFormValue();
   }
 
+  override disconnectedCallback(): void {
+    // Pointer capture is released by the platform when the control leaves the
+    // document. Clear the matching visual/interaction state as well so a
+    // reconnected slider cannot resume an interrupted drag.
+    this.dragging = null;
+    super.disconnectedCallback();
+  }
+
   override formResetCallback(): void {
     const attrMin = this.getAttribute("value-min");
     const attrMax = this.getAttribute("value-max");
@@ -220,7 +260,11 @@ export class FluidRangeSlider extends FluidFormAssociated {
   }
 
   override formDisabledCallback(disabled: boolean): void {
-    this.disabled = disabled;
+    this.formDisabled.preserve(
+      disabled,
+      () => this.disabled,
+      (value) => (this.disabled = value)
+    );
   }
 
   override formStateRestoreCallback(state: string | File | FormData | null): void {
@@ -240,30 +284,28 @@ export class FluidRangeSlider extends FluidFormAssociated {
       changed.has("valueMin") ||
       changed.has("valueMax") ||
       changed.has("min") ||
-      changed.has("max")
+      changed.has("max") ||
+      changed.has("step")
     ) {
-      this.clamp();
+      // Preserve authored initial values for compatibility. Once mounted,
+      // later value/bounds/step mutations are normalized as one atomic state.
+      if (this.hasUpdated) this.clamp();
       this.value = `${this.valueMin},${this.valueMax}`;
       this.syncFormValue();
     }
   }
 
-  /**
-   * Normalize the two thumbs so the minimum never sits above the maximum. We
-   * deliberately do NOT force the values into [min, max] here: the submitted
-   * form value mirrors the configured value-min / value-max as-is (matching
-   * fluid-slider, which serializes the raw value and leaves range clamping to
-   * interaction and rendering). Keyboard / pointer moves clamp into range via
-   * setThumb(), and the visible fill / thumb positions are clamped to 0-100%
-   * in percentOf()/render(), so an out-of-range configured value stays visually
-   * sane without rewriting what the consumer asked to submit.
-   */
+  /** Normalize both thumbs to current bounds/step and preserve their order. */
   private clamp(): void {
-    if (this.valueMin > this.valueMax) {
-      const lo = Math.min(this.valueMin, this.valueMax);
-      const hi = Math.max(this.valueMin, this.valueMax);
-      this.valueMin = lo;
-      this.valueMax = hi;
+    const first = this.snap(this.valueMin);
+    const second = this.snap(this.valueMax);
+    this.valueMin = Math.min(first, second);
+    this.valueMax = Math.max(first, second);
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    if (changed.has("disabled") && this.disabled) {
+      (this.shadowRoot?.activeElement as HTMLElement | null)?.blur();
     }
   }
 
@@ -374,7 +416,7 @@ export class FluidRangeSlider extends FluidFormAssociated {
     const value = thumb === "min" ? this.valueMin : this.valueMax;
     const ariaMin = thumb === "min" ? this.min : this.valueMin;
     const ariaMax = thumb === "min" ? this.valueMax : this.max;
-    const label = thumb === "min" ? "Minimum" : "Maximum";
+    const label = this.term(thumb === "min" ? "minimum" : "maximum");
     const valueText = this.valueFormatter ? this.valueFormatter(value) : undefined;
     return html`
       <button
@@ -402,11 +444,18 @@ export class FluidRangeSlider extends FluidFormAssociated {
   override render(): TemplateResult {
     const lo = Math.max(0, Math.min(100, this.percentOf(this.valueMin)));
     const hi = Math.max(0, Math.min(100, this.percentOf(this.valueMax)));
+    const minText = this.valueFormatter ? this.valueFormatter(this.valueMin) : this.valueMin;
+    const maxText = this.valueFormatter ? this.valueFormatter(this.valueMax) : this.valueMax;
     return html`
-      <div part="base" class="base ${this.disabled ? "disabled" : ""}">
-        <div part="track" class="track"></div>
-        <div part="fill" class="fill" style="left: ${lo}%; right: ${100 - hi}%"></div>
-        ${this.renderThumb("min")} ${this.renderThumb("max")}
+      <div class="layout">
+        <div part="base" class="base ${this.disabled ? "disabled" : ""}">
+          <div part="track" class="track"></div>
+          <div part="fill" class="fill" style="left: ${lo}%; right: ${100 - hi}%"></div>
+          ${this.renderThumb("min")} ${this.renderThumb("max")}
+        </div>
+        ${this.showValue
+          ? html`<output part="value" class="value">${minText} – ${maxText}</output>`
+          : ""}
       </div>
     `;
   }
