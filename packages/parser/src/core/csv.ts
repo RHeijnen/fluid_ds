@@ -102,7 +102,10 @@ export function parseDelimited(text: string, delimiter: string): string[][] {
  * candidate on how consistently it splits rows into the same column count.
  */
 export function sniffDelimiter(text: string): Delimiter {
-  const sample = text.split(/\r\n|\n|\r/).filter((l) => l.length > 0).slice(0, 10);
+  const sample = text
+    .split(/\r\n|\n|\r/)
+    .filter((l) => l.length > 0)
+    .slice(0, 10);
   if (sample.length === 0) return ",";
 
   const candidates: Delimiter[] = [",", ";", "\t"];

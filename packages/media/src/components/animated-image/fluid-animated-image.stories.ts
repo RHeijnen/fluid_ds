@@ -2,13 +2,12 @@ import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
 
-const SRC =
-  "https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif";
+const SRC = "https://upload.wikimedia.org/wikipedia/commons/2/2c/Rotating_earth_%28large%29.gif";
 
 const meta: Meta = {
   title: "Media/Animated Image",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () =>
     html`<fluid-animated-image
       src=${SRC}

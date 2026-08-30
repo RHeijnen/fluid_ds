@@ -70,7 +70,7 @@ let counter = 0;
  * @fires fluid-open - Fired when the dial opens.
  * @fires fluid-close - Fired when the dial closes.
  * @cssproperty --fluid-speed-dial-shadow-lg - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidSpeedDial extends FluidElement {
   static override styles = [
     reducedMotion,
@@ -260,8 +260,7 @@ export class FluidSpeedDial extends FluidElement {
   /** Get all slotted action elements (skipping disabled ones is done per-call). */
   private getActions(): HTMLElement[] {
     return Array.from(this.children).filter(
-      (el): el is HTMLElement =>
-        el instanceof HTMLElement && el.slot !== "trigger-icon"
+      (el): el is HTMLElement => el instanceof HTMLElement && el.slot !== "trigger-icon"
     );
   }
 

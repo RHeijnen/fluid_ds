@@ -31,12 +31,13 @@ content).
     ```ts
     import "@fluid-ds/components/define/mutation-observer";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  A behavior wrapper, it renders no UI (`display: contents`) and reads no
-  design tokens, so no `@fluid-ds/tokens` stylesheet is required.
+  A behavior wrapper, it renders no UI (`display: contents`) and reads no design tokens, so no
+  `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -45,15 +46,15 @@ content).
 
 ```html
 <fluid-mutation-observer child-list>
-  <ul id="list">…</ul>
+  <ul id="list">
+    …
+  </ul>
 </fluid-mutation-observer>
 
 <script type="module">
-  document
-    .querySelector("fluid-mutation-observer")
-    .addEventListener("fluid-mutation", (e) => {
-      console.log("records:", e.detail.records);
-    });
+  document.querySelector("fluid-mutation-observer").addEventListener("fluid-mutation", (e) => {
+    console.log("records:", e.detail.records);
+  });
 </script>
 ```
 

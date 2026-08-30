@@ -10,7 +10,7 @@ type Args = Pick<FluidResult, "status" | "title" | "subtitle">;
 const meta: Meta<Args> = {
   title: "Components/Feedback/Result",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     status: {
       control: "inline-radio",
@@ -25,11 +25,7 @@ const meta: Meta<Args> = {
     subtitle: "Your order is confirmed. A receipt has been emailed to you."
   },
   render: (args) => html`
-    <fluid-result
-      status=${args.status}
-      title=${args.title}
-      subtitle=${args.subtitle}
-    >
+    <fluid-result status=${args.status} title=${args.title} subtitle=${args.subtitle}>
       <fluid-button slot="actions" variant="primary">View order</fluid-button>
       <fluid-button slot="actions" variant="secondary">Back home</fluid-button>
     </fluid-result>
@@ -113,6 +109,5 @@ export const CustomIcon: Story = {
 };
 
 export const TitleOnly: Story = {
-  render: () =>
-    html`<fluid-result status="info" title="Loading complete"></fluid-result>`
+  render: () => html`<fluid-result status="info" title="Loading complete"></fluid-result>`
 };

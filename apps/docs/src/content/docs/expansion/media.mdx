@@ -8,6 +8,14 @@ auto-advance, GIF/APNG with play/pause control, and pan-and-zoom frames.
 Expansion pack.
 
 import { Aside } from "@astrojs/starlight/components";
+import MediaDemo from "../../../components/MediaDemo.astro";
+
+Two of the components are live below, with no media files shipped: the audio
+player plays a chime synthesized right in your browser, and the zoomable frame
+pans and zooms an inline illustration. The video players need real video
+sources, so they are shown in code only.
+
+<MediaDemo />
 
 <Aside type="note">
   Looking for `<fluid-animation>`? It's a general motion primitive, not a media
@@ -33,14 +41,14 @@ import "@fluid-ds/media/define/lightbox";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
-| `<fluid-video>` | Themed video surface with browser-native playback controls. |
-| `<fluid-video-playlist>` | Playlist-driven video player with auto-advance. |
-| `<fluid-animated-image>` | GIF / APNG / animated WebP with play/pause control (canvas-snapshot trick). |
-| `<fluid-zoomable-frame>` | Pan + zoom container with wheel, drag, and native zoom/pan buttons. |
-| `<fluid-audio>` | Themed audio player: custom play/pause, seek slider with time, mute. |
-| `<fluid-lightbox>` | Thumbnail gallery that opens images in a modal lightbox (top-layer `<dialog>`, prev/next, Escape). |
+| Tag                      | Use                                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------------------- |
+| `<fluid-video>`          | Themed video surface with browser-native playback controls.                                        |
+| `<fluid-video-playlist>` | Playlist-driven video player with auto-advance.                                                    |
+| `<fluid-animated-image>` | GIF / APNG / animated WebP with play/pause control (canvas-snapshot trick).                        |
+| `<fluid-zoomable-frame>` | Pan + zoom container with wheel, drag, and native zoom/pan buttons.                                |
+| `<fluid-audio>`          | Themed audio player: custom play/pause, seek slider with time, mute.                               |
+| `<fluid-lightbox>`       | Thumbnail gallery that opens images in a modal lightbox (top-layer `<dialog>`, prev/next, Escape). |
 
 ## Use
 
@@ -50,7 +58,7 @@ import "@fluid-ds/media/define/lightbox";
 <fluid-animated-image src="/cat.gif"></fluid-animated-image>
 
 <fluid-zoomable-frame>
-  <img src="/diagram.svg" alt="…">
+  <img src="/diagram.svg" alt="…" />
 </fluid-zoomable-frame>
 
 <fluid-audio src="/track.mp3" label="Episode 12"></fluid-audio>
@@ -74,7 +82,7 @@ array, not an HTML attribute), so set it from script after the element upgrades:
   playlist.entries = [
     { src: "/intro.mp4", title: "Intro" },
     { src: "/chapter-1.mp4", title: "Chapter 1" },
-    { src: "/chapter-2.mp4", title: "Chapter 2" },
+    { src: "/chapter-2.mp4", title: "Chapter 2" }
   ];
 </script>
 ```

@@ -10,7 +10,7 @@ const meta: Meta<Args> = {
   title: "Components/Content/Avatar",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },

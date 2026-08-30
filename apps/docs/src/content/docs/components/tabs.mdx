@@ -12,14 +12,29 @@ import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/com
 is the body shown when its matching tab is selected. Together they implement the
 WAI-ARIA tab pattern with full keyboard support and a themable rail.
 
+Every tab strip on this page is live. Click through one, then put focus on a tab
+and try <kbd>←</kbd> / <kbd>→</kbd>, <kbd>Home</kbd>, and <kbd>End</kbd>.
+
 <Demo>
   <fluid-tabs style="width: 100%;">
-    <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
-    <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
-    <fluid-tab slot="nav" panel="api">API</fluid-tab>
-    <fluid-tab-panel name="overview"><p>The overview tab is selected by default, first in document order.</p></fluid-tab-panel>
-    <fluid-tab-panel name="usage"><p>How to use this thing.</p></fluid-tab-panel>
-    <fluid-tab-panel name="api"><p>The complete API.</p></fluid-tab-panel>
+    <fluid-tab slot="nav" panel="overview">
+      Overview
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="usage">
+      Usage
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="api">
+      API
+    </fluid-tab>
+    <fluid-tab-panel name="overview">
+      <p>The overview tab is selected by default, first in document order.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="usage">
+      <p>How to use this thing.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="api">
+      <p>The complete API.</p>
+    </fluid-tab-panel>
   </fluid-tabs>
 </Demo>
 
@@ -35,6 +50,7 @@ WAI-ARIA tab pattern with full keyboard support and a themable rail.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tabs/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +62,7 @@ WAI-ARIA tab pattern with full keyboard support and a themable rail.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tabs"; // registers tabs + tab + tab-panel
     ```
+
   </TabItem>
 </Tabs>
 
@@ -54,30 +71,145 @@ WAI-ARIA tab pattern with full keyboard support and a themable rail.
 ### Basic
 
 The `panel` attribute on a tab points to the matching `name` on a panel. Names
-only need to be unique within one `<fluid-tabs>` instance.
+only need to be unique within one `<fluid-tabs>` instance. With no `value` set,
+the first tab in document order is selected.
 
 <Demo>
   <fluid-tabs style="width: 100%;">
-    <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
-    <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
-    <fluid-tab slot="nav" panel="api">API</fluid-tab>
-    <fluid-tab-panel name="overview"><p>Overview content.</p></fluid-tab-panel>
-    <fluid-tab-panel name="usage"><p>Usage content.</p></fluid-tab-panel>
-    <fluid-tab-panel name="api"><p>API content.</p></fluid-tab-panel>
+    <fluid-tab slot="nav" panel="overview">
+      Overview
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="usage">
+      Usage
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="api">
+      API
+    </fluid-tab>
+    <fluid-tab-panel name="overview">
+      <p>Overview content.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="usage">
+      <p>Usage content.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="api">
+      <p>API content.</p>
+    </fluid-tab-panel>
   </fluid-tabs>
 </Demo>
 
-<ConformanceCode code={`<fluid-tabs>
+<ConformanceCode
+  code={`<fluid-tabs>
   <fluid-tab slot="nav" panel="overview">Overview</fluid-tab>
   <fluid-tab slot="nav" panel="usage">Usage</fluid-tab>
   <fluid-tab-panel name="overview">…</fluid-tab-panel>
   <fluid-tab-panel name="usage">…</fluid-tab-panel>
-</fluid-tabs>`} />
+</fluid-tabs>`}
+/>
+
+### Setting the active panel
+
+`value` is the name of the active panel, and it's readable and writable at any
+time. Set it in markup to open on a panel other than the first, or assign it
+later to drive the strip from elsewhere on the page. Both buttons below move the
+live strip:
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); width:100%;">
+    <div style="display:flex; gap: var(--fluid-space-2);">
+      <fluid-button
+        size="sm"
+        variant="secondary"
+        onclick="document.getElementById('tabs-controlled').value = 'shipping';"
+      >
+        Jump to Shipping
+      </fluid-button>
+      <fluid-button
+        size="sm"
+        variant="secondary"
+        onclick="document.getElementById('tabs-controlled').value = 'returns';"
+      >
+        Jump to Returns
+      </fluid-button>
+    </div>
+    <fluid-tabs id="tabs-controlled" value="shipping" style="width: 100%;">
+      <fluid-tab slot="nav" panel="details">
+        Details
+      </fluid-tab>
+      <fluid-tab slot="nav" panel="shipping">
+        Shipping
+      </fluid-tab>
+      <fluid-tab slot="nav" panel="returns">
+        Returns
+      </fluid-tab>
+      <fluid-tab-panel name="details">
+        <p>Opened on Shipping, not Details, because `value` said so.</p>
+      </fluid-tab-panel>
+      <fluid-tab-panel name="shipping">
+        <p>Free over 50. Two to four business days.</p>
+      </fluid-tab-panel>
+      <fluid-tab-panel name="returns">
+        <p>Thirty days, unopened, receipt required.</p>
+      </fluid-tab-panel>
+    </fluid-tabs>
+  </div>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-tabs value="shipping">
+  <fluid-tab slot="nav" panel="details">Details</fluid-tab>
+  <fluid-tab slot="nav" panel="shipping">Shipping</fluid-tab>
+  <fluid-tab-panel name="details">…</fluid-tab-panel>
+  <fluid-tab-panel name="shipping">…</fluid-tab-panel>
+</fluid-tabs>`}
+/>
+
+```js
+const tabs = document.querySelector("fluid-tabs");
+tabs.value = "returns"; // switches the panel and moves the underline
+console.log(tabs.value); // -> "returns"
+```
+
+<Aside type="note">
+  Setting `value` from your code counts as an interaction, so it fires `fluid-change` just like a
+  click does. The initial selection on mount does not, which keeps an uncontrolled strip from
+  emitting an event nobody asked for.
+</Aside>
 
 ### Disabled tab
 
-A disabled tab can't be selected by click or keyboard, but stays in the reading
-order so its label is still announced.
+A disabled tab can't be selected by click or keyboard, and arrow keys skip past
+it, but it stays in the reading order so its label is still announced. Try it:
+pressing <kbd>→</kbd> from "Usage" lands on "Changelog", not on the disabled
+"Advanced".
+
+<Demo>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="d-overview">
+      Overview
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="d-usage">
+      Usage
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="d-advanced" disabled>
+      Advanced
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="d-changelog">
+      Changelog
+    </fluid-tab>
+    <fluid-tab-panel name="d-overview">
+      <p>Overview content.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="d-usage">
+      <p>Usage content. Press the right arrow from here.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="d-advanced">
+      <p>You should not be able to reach this panel.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="d-changelog">
+      <p>Changelog content.</p>
+    </fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
 
 <ConformanceCode code={`<fluid-tab slot="nav" panel="advanced" disabled>Advanced</fluid-tab>`} />
 
@@ -85,10 +217,203 @@ order so its label is still announced.
 
 By default, arrow-key navigation **changes the panel immediately** as focus
 moves (`activation="auto"`). For panels that are expensive to render, use
-`manual`, focus moves, but the user presses <kbd>Enter</kbd> / <kbd>Space</kbd>
-to activate.
+`manual`: focus still moves with the arrows, but the panel doesn't change until
+the user commits with <kbd>Enter</kbd> or with the <kbd>Space</kbd> key.
+
+Both strips below are live. Focus the first tab of each and hold <kbd>→</kbd>:
+the top one swaps panels on every keypress, the bottom one waits for you to
+commit.
+
+<Demo title='activation="auto" (the default)'>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="auto-1">
+      First
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="auto-2">
+      Second
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="auto-3">
+      Third
+    </fluid-tab>
+    <fluid-tab-panel name="auto-1">
+      <p>Panel one. Arrow away and this changes at once.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="auto-2">
+      <p>Panel two, reached by focus alone.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="auto-3">
+      <p>Panel three, same story.</p>
+    </fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
+
+<Demo title='activation="manual"'>
+  <fluid-tabs activation="manual" style="width: 100%;">
+    <fluid-tab slot="nav" panel="manual-1">
+      First
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="manual-2">
+      Second
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="manual-3">
+      Third
+    </fluid-tab>
+    <fluid-tab-panel name="manual-1">
+      <p>Panel one. Arrow away and this stays put.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="manual-2">
+      <p>Panel two, reached only after Enter or Space.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="manual-3">
+      <p>Panel three, same story.</p>
+    </fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
 
 <ConformanceCode code={`<fluid-tabs activation="manual">…</fluid-tabs>`} />
+
+### Labels with icons and counts
+
+A tab's label is an ordinary slot, so it takes markup, not just text. Wrap the
+pieces in one inline-flex span to control the spacing, since the tab itself
+doesn't add a gap between slotted children.
+
+<Demo>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="inbox">
+      <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+        <fluid-icon name="bell"></fluid-icon>
+        Inbox
+        <fluid-badge variant="danger">3</fluid-badge>
+      </span>
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="sent">
+      <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+        <fluid-icon name="share"></fluid-icon>
+        Sent
+      </span>
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="archive">
+      <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+        <fluid-icon name="trash-2"></fluid-icon>
+        Archive
+      </span>
+    </fluid-tab>
+    <fluid-tab-panel name="inbox">
+      <p>Three unread messages.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="sent">
+      <p>Everything you've sent this month.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="archive">
+      <p>Nothing archived yet.</p>
+    </fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-tab slot="nav" panel="inbox">
+  <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+    <fluid-icon name="bell"></fluid-icon>
+    Inbox
+    <fluid-badge variant="danger">3</fluid-badge>
+  </span>
+</fluid-tab>`}
+/>
+
+<Aside type="note">
+  The count inside the label becomes part of the tab's accessible name, so this one announces as
+  "Inbox 3". That's usually what you want. If the number would read as nonsense out loud, put it in
+  the panel instead and leave the tab a plain word.
+</Aside>
+
+### Many tabs
+
+The tab strip scrolls horizontally when the labels don't fit, and the sliding
+underline stays glued to the selected tab as the strip scrolls. Shift-scroll the
+strip below, or move focus into it and hit the <kbd>End</kbd> key: the last tab
+scrolls itself into view.
+
+<Demo>
+  <fluid-tabs style="width: 100%;">
+    <fluid-tab slot="nav" panel="m-jan">
+      January
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-feb">
+      February
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-mar">
+      March
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-apr">
+      April
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-may">
+      May
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-jun">
+      June
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-jul">
+      July
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-aug">
+      August
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-sep">
+      September
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-oct">
+      October
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-nov">
+      November
+    </fluid-tab>
+    <fluid-tab slot="nav" panel="m-dec">
+      December
+    </fluid-tab>
+    <fluid-tab-panel name="m-jan">
+      <p>January figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-feb">
+      <p>February figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-mar">
+      <p>March figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-apr">
+      <p>April figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-may">
+      <p>May figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-jun">
+      <p>June figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-jul">
+      <p>July figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-aug">
+      <p>August figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-sep">
+      <p>September figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-oct">
+      <p>October figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-nov">
+      <p>November figures.</p>
+    </fluid-tab-panel>
+    <fluid-tab-panel name="m-dec">
+      <p>December figures.</p>
+    </fluid-tab-panel>
+  </fluid-tabs>
+</Demo>
+
+A dozen tabs is already a sign the content wants a different shape. Past that,
+reach for a [nav list](/components/nav-list/) or real routing rather than a
+strip nobody can see the end of.
 
 ## Listening for changes
 
@@ -106,6 +431,7 @@ in `detail` when the selection changes.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Panels.tsx"
@@ -129,6 +455,7 @@ in `detail` when the selection changes.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Panels.vue"
@@ -144,6 +471,7 @@ in `detail` when the selection changes.
       </fluid-tabs>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="panels.component.ts"
@@ -167,6 +495,7 @@ in `detail` when the selection changes.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Panels.svelte"
@@ -182,20 +511,9 @@ in `detail` when the selection changes.
       <fluid-tab-panel name="a">…</fluid-tab-panel>
     </fluid-tabs>
     ```
+
   </TabItem>
 </Tabs>
-
-## When to use
-
-- Switching between **related** views of the same content (cuts of a dataset,
-  sections of a settings page).
-
-### When *not* to use
-
-- **Conceptually separate pages**: use real navigation links + routing; tabs
-  aren't a router.
-- **A small set of mutually-exclusive options that set a value**: use
-  [`<fluid-segmented-control>`](/components/segmented-control/).
 
 ## Theming
 
@@ -206,36 +524,56 @@ indicator-width / focus). The **complete list** is in the [API tables
 below](#api).
 
 ```css title="brand.css"
+/* Every tab strip under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-tabs-nav-border: var(--fluid-border-default);
   --fluid-tab-fg: var(--fluid-text-secondary);
   --fluid-tab-selected-fg: var(--fluid-accent-base);
 }
+
+/* One strip with a chunkier underline. */
+[data-fluid-id="settings-tabs"] {
+  --fluid-tab-indicator-width: 4px;
+}
 ```
 
 <Aside type="tip">
-  Select a `fluid-tab` in the [Theme builder](/playground/) to tweak the rail,
-  selected color, and focus tokens visually.
+  Select a `fluid-tab` in the [Theme builder](/playground/) to tweak the rail, selected color, and
+  focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
 
-The container exposes [`part="base"`](#api), `part="nav"`, and `part="panels"`.
-Reach them with
+The container exposes [`part="base"`](#api), `part="nav"`, `part="panels"`, and
+`part="indicator"` (the sliding underline). Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
-not covered by a token.
+not covered by a token:
 
-## API
+```css
+/* Center a short tab strip instead of left-aligning it. */
+fluid-tabs.centered::part(nav) {
+  justify-content: center;
+}
+```
 
-<ComponentApi tag="fluid-tabs" />
+## When to use
 
-### `<fluid-tab>`
+- Switching between **related** views of the same content (cuts of a dataset,
+  sections of a settings page).
+- A handful of peer sections where the user will bounce between them, and where
+  losing the others from view costs nothing.
 
-<ComponentApi tag="fluid-tab" />
+### When _not_ to use
 
-### `<fluid-tab-panel>`
-
-<ComponentApi tag="fluid-tab-panel" />
+- **Conceptually separate pages**: use real navigation links + routing; tabs
+  aren't a router.
+- **A small set of mutually-exclusive options that set a value**: use
+  [`<fluid-segmented-control>`](/components/segmented-control/).
+- **Content the user needs to compare or read straight through**: stack it, or
+  use [`<fluid-accordion>`](/components/accordion/) so more than one section can
+  be open at once.
+- **Steps in a sequence**: use [`<fluid-steps>`](/components/steps/); tabs imply
+  the sections are peers in any order.
 
 ## Accessibility
 
@@ -244,11 +582,11 @@ Implements the WAI-ARIA Tabs pattern. The cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Move into the tab list, then into the selected panel. |
-| <kbd>←</kbd> / <kbd>→</kbd> | Move focus between tabs (wraps). |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last tab. |
+| Key                                 | Action                                                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------- |
+| <kbd>Tab</kbd>                      | Move into the tab list, then into the selected panel.                        |
+| <kbd>←</kbd> / <kbd>→</kbd>         | Move focus between tabs (wraps).                                             |
+| <kbd>Home</kbd> / <kbd>End</kbd>    | Jump to the first / last tab.                                                |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused tab (only in `manual` mode; `auto` activates on focus). |
 
 One tab is a tab stop (roving tabindex), so <kbd>Tab</kbd> doesn't walk every tab.
@@ -263,6 +601,10 @@ skipped. Arrow keys within panel inputs retain their normal editing behavior.
   `aria-selected` + `aria-controls`; `<fluid-tab-panel>` is `role="tabpanel"`
   with `aria-labelledby` back to its tab
   ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
+- The tab's accessible name is its whole label, icons and counts included, so
+  keep the label short and meaningful on its own.
+- A disabled tab reflects `aria-disabled="true"` rather than being removed, so
+  it is still announced and its label still explains why the section exists.
 
 ### Motion & target size
 
@@ -275,10 +617,22 @@ skipped. Arrow keys within panel inputs retain their normal editing behavior.
 Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
 `[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+
+## API
+
+<ComponentApi tag="fluid-tabs" />
+
+### `<fluid-tab>`
+
+<ComponentApi tag="fluid-tab" />
+
+### `<fluid-tab-panel>`
+
+<ComponentApi tag="fluid-tab-panel" />
 
 ## Related
 
@@ -292,6 +646,11 @@ Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
     title="Accordion"
     href="/components/accordion/"
     description="Stacked collapsible sections instead of a tab strip."
+  />
+  <LinkCard
+    title="Steps"
+    href="/components/steps/"
+    description="An ordered sequence rather than peer sections."
   />
   <LinkCard
     title="Card"

@@ -20,7 +20,9 @@ export class DesignInspector extends LitElement {
     :host {
       display: block;
       position: relative;
-      transition: padding 180ms ease, background 180ms ease;
+      transition:
+        padding 180ms ease,
+        background 180ms ease;
     }
 
     /* When design mode is armed, give the whole preview an unmistakable
@@ -65,8 +67,13 @@ export class DesignInspector extends LitElement {
 
     /* Hover preview, dashed, lower z-index than the anchored selection. */
     .overlay.hover {
-      border: 2px dashed var(--fluid-accent-base);
-      opacity: 0.65;
+      /*
+       * The border is muted through its own colour rather than an opacity on
+       * the overlay: opacity applies to the whole subtree, so it would fade
+       * the tag label with it and take the label text below its contrast
+       * floor. Only the outline should read as provisional.
+       */
+      border: 2px dashed color-mix(in srgb, var(--fluid-accent-base) 65%, transparent);
       z-index: 99;
     }
 
@@ -82,6 +89,9 @@ export class DesignInspector extends LitElement {
       position: absolute;
       top: -1.5rem;
       left: -2px;
+      /* Never eat the pointer: the label overhangs whatever sits above the
+         element, and the inspector needs that area to stay hoverable. */
+      pointer-events: none;
       background: var(--fluid-accent-base);
       color: var(--fluid-accent-text);
       font-family: var(--fluid-font-family-mono);
@@ -91,6 +101,22 @@ export class DesignInspector extends LitElement {
       white-space: nowrap;
       font-weight: var(--fluid-font-weight-semibold);
     }
+
+    /*
+     * Sits above the element by default. For anything against the top of the
+     * scroll container that would be clipped, so the label drops inside and
+     * flips its rounded corners to match.
+     */
+    .label.inside {
+      top: 0;
+      border-radius: 0 0 var(--fluid-radius-sm) var(--fluid-radius-sm);
+    }
+
+    /*
+     * The hover tag keeps the full accent background. Tinting it to read
+     * "quieter" put 9.6px semibold text at 4.18:1, under the 4.5:1 floor;
+     * the dashed border already distinguishes a hover from a selection.
+     */
 
     :host([design-mode]) ::slotted(*) {
       cursor: crosshair;
@@ -253,7 +279,11 @@ export class DesignInspector extends LitElement {
                 width: ${this.hoverRect.width}px;
                 height: ${this.hoverRect.height}px;
               "
-            ></div>
+            >
+              <span class="label hover ${this.hoverRect.top < 24 ? "inside" : ""}">
+                ${this.hoveredTag}
+              </span>
+            </div>
           `
         : ""}
       ${inDesign && this.state.selectedTag && this.anchoredRect
@@ -267,7 +297,9 @@ export class DesignInspector extends LitElement {
                 height: ${this.anchoredRect.height}px;
               "
             >
-              <span class="label">${this.state.selectedTag}</span>
+              <span class="label ${this.anchoredRect.top < 24 ? "inside" : ""}">
+                ${this.state.selectedTag}
+              </span>
             </div>
           `
         : ""}

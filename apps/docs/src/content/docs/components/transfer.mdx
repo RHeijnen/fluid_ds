@@ -35,6 +35,7 @@ target ids as a comma-joined string.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/transfer/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +47,7 @@ target ids as a comma-joined string.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/transfer";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -61,16 +63,18 @@ target side). Both accept a JSON-string attribute or a JS array property.
     source-label="Available"
     target-label="Selected"
     items='[{"id":"a","label":"Apple"},{"id":"b","label":"Banana"},{"id":"c","label":"Cherry"}]'
-    value='[]'
+    value="[]"
   ></fluid-transfer>
 </Demo>
 
-<ConformanceCode code={`<fluid-transfer
+<ConformanceCode
+  code={`<fluid-transfer
   name="picks"
   source-label="Available"
   target-label="Selected"
   items='[{"id":"a","label":"Apple"},{"id":"b","label":"Banana"},{"id":"c","label":"Cherry"}]'
-></fluid-transfer>`} />
+></fluid-transfer>`}
+/>
 
 ### Pre-filled target
 
@@ -85,12 +89,14 @@ Ids in `value` render on the target side; everything else stays in the source.
   ></fluid-transfer>
 </Demo>
 
-<ConformanceCode code={`<fluid-transfer
+<ConformanceCode
+  code={`<fluid-transfer
   source-label="All permissions"
   target-label="Granted"
   items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"},{"id":"delete","label":"Delete"}]'
   value='["read"]'
-></fluid-transfer>`} />
+></fluid-transfer>`}
+/>
 
 ### Disabled items
 
@@ -102,13 +108,15 @@ whichever side it sits.
     source-label="Available"
     target-label="Selected"
     items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"},{"id":"qwik","label":"Qwik","disabled":true}]'
-    value='[]'
+    value="[]"
   ></fluid-transfer>
 </Demo>
 
-<ConformanceCode code={`<fluid-transfer
+<ConformanceCode
+  code={`<fluid-transfer
   items='[{"id":"react","label":"React"},{"id":"qwik","label":"Qwik","disabled":true}]'
-></fluid-transfer>`} />
+></fluid-transfer>`}
+/>
 
 ### Disabled control
 
@@ -122,8 +130,10 @@ whichever side it sits.
   ></fluid-transfer>
 </Demo>
 
-<ConformanceCode code={`<fluid-transfer disabled value='["react"]'
-  items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"}]'></fluid-transfer>`} />
+<ConformanceCode
+  code={`<fluid-transfer disabled value='["react"]'
+  items='[{"id":"react","label":"React"},{"id":"vue","label":"Vue"}]'></fluid-transfer>`}
+/>
 
 ## Listening for fluid-change
 
@@ -141,6 +151,7 @@ whichever side it sits.
       t.addEventListener("fluid-change", (e) => console.log(e.detail.value));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Picker.tsx"
@@ -161,6 +172,7 @@ whichever side it sits.
       return <fluid-transfer ref={ref} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Picker.vue"
@@ -178,6 +190,7 @@ whichever side it sits.
       />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="picker.component.ts"
@@ -197,6 +210,7 @@ whichever side it sits.
       onChange(e: any) { console.log(e.detail.value); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Picker.svelte"
@@ -211,6 +225,7 @@ whichever side it sits.
       on:fluid-change={(e) => (value = e.detail.value)}
     />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -220,9 +235,7 @@ whichever side it sits.
 ids as a comma-joined string (e.g. `picks=read,write`).
 
 <Demo>
-  <form
-    onsubmit="event.preventDefault(); this.querySelector('output').textContent = new FormData(this).get('roles') || '(none)';"
-  >
+  <form onsubmit="event.preventDefault(); this.querySelector('output').textContent = new FormData(this).get('roles') || '(none)';">
     <fluid-transfer
       name="roles"
       source-label="Available"
@@ -231,16 +244,23 @@ ids as a comma-joined string (e.g. `picks=read,write`).
       value='["read"]'
     ></fluid-transfer>
     <div style="margin-top: var(--fluid-space-3); display:flex; gap: var(--fluid-space-2); align-items:center;">
-      <fluid-button type="submit" size="sm">Submit</fluid-button>
-      <span>Submitted: <output>—</output></span>
+      <fluid-button type="submit" size="sm">
+        Submit
+      </fluid-button>
+      <span>
+        Submitted: <output>—</output>
+      </span>
     </div>
   </form>
 </Demo>
 
 ```html
 <form>
-  <fluid-transfer name="roles" value='["read"]'
-    items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"}]'></fluid-transfer>
+  <fluid-transfer
+    name="roles"
+    value='["read"]'
+    items='[{"id":"read","label":"Read"},{"id":"write","label":"Write"}]'
+  ></fluid-transfer>
   <button type="submit">Submit</button>
 </form>
 ```
@@ -280,9 +300,7 @@ sub-elements. Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for any CSS a
 token doesn't cover.
 
-<Aside type="tip">
-  Retheme it live in the [Theme builder](/playground/).
-</Aside>
+<Aside type="tip">Retheme it live in the [Theme builder](/playground/).</Aside>
 
 ## When to use
 
@@ -291,7 +309,7 @@ token doesn't cover.
 - The list is long enough that a row of checkboxes would be unwieldy and seeing
   "chosen" vs "available" side by side helps.
 
-### When *not* to use
+### When _not_ to use
 
 - A small fixed set of independent options: reach for a checkbox group or
   [`<fluid-switch>`](/components/switch/).
@@ -311,13 +329,13 @@ explicit `aria-label`s. Each listbox manages an active option with
 
 Tab moves between the two listboxes and the move buttons. Once a listbox has focus:
 
-| Key | Action |
-| --- | --- |
-| Arrow Down / Up | Move the active option within the list |
-| Home / End | Move the active option to the first / last item |
-| Space | Toggle selection on the active option |
-| Shift + Arrow | Extend the selection range from the anchor |
-| Enter | Move the selected items to the other list |
+| Key             | Action                                          |
+| --------------- | ----------------------------------------------- |
+| Arrow Down / Up | Move the active option within the list          |
+| Home / End      | Move the active option to the first / last item |
+| Space           | Toggle selection on the active option           |
+| Shift + Arrow   | Extend the selection range from the anchor      |
+| Enter           | Move the selected items to the other list       |
 
 The move buttons activate with Enter / Space (native `<button>`). The focused
 listbox shows a `:focus-visible` ring, and the active option carries an inset ring,
@@ -350,10 +368,10 @@ The only motion is a hover background fade, which collapses under
 `data-fluid-conformance="aaa"` on any ancestor (the docs header toggle is live, and
 the snippets above switch with it):
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+| Token                      | AA   | AAA      | Criterion      |
+| -------------------------- | ---- | -------- | -------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → 2.5.5  |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → 2.4.13 |
 
 ## API
 
@@ -362,9 +380,29 @@ the snippets above switch with it):
 ## Related
 
 <CardGrid>
-  <LinkCard title="Tag input" href="/components/tag-input/" description="Free-form token entry instead of a fixed catalog." />
-  <LinkCard title="Select" href="/components/select/" description="Pick one option from a dropdown." />
-  <LinkCard title="Switch" href="/components/switch/" description="Toggle a small set of independent options." />
-  <LinkCard title="Forms guide" href="/guides/forms/" description="How form-associated controls submit." />
-  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+  <LinkCard
+    title="Tag input"
+    href="/components/tag-input/"
+    description="Free-form token entry instead of a fixed catalog."
+  />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick one option from a dropdown."
+  />
+  <LinkCard
+    title="Switch"
+    href="/components/switch/"
+    description="Toggle a small set of independent options."
+  />
+  <LinkCard
+    title="Forms guide"
+    href="/guides/forms/"
+    description="How form-associated controls submit."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Use Fluid in React, Vue, Angular, Svelte."
+  />
 </CardGrid>

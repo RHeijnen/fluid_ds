@@ -9,7 +9,7 @@ const POSTER =
 const meta: Meta = {
   title: "Media/Video",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () =>
     html`<fluid-video
       src=${SRC}

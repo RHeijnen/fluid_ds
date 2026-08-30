@@ -8,12 +8,12 @@ land with regression tests.
 
 ## What the audit found
 
-| Category | Count |
-| --- | --- |
-| Confirmed bugs | 54 |
-| Test gaps | 55 |
-| Doc gaps | 21 |
-| Future improvements | 17 |
+| Category            | Count |
+| ------------------- | ----- |
+| Confirmed bugs      | 54    |
+| Test gaps           | 55    |
+| Doc gaps            | 21    |
+| Future improvements | 17    |
 
 Bug breakdown by kind: correctness (14), a11y (7), phantom-token (7), lifecycle-leak (6), reduced-motion (3), spurious-event (2), target-size (2), tokenization (1), a11y-focus (1), focus-visible (1), wrong-jsdoc (1), dead-condition (1), default-override (1), duplicate-part (1), a11y-name-mismatch (1), theming-token (1), a11y-aria-activedescendant (1), lifecycle (1), convention (1), xss-unsanitized-html (1).
 
@@ -72,7 +72,7 @@ Several features are simply non-functional due to invalid CSS selectors, dead ev
 - [high] fluid-format-bytes: base=binary divides by 1024 but labels output KB/MB instead of KiB/MiB (fluid-format-bytes.ts:41)
 - [high] fluid-split-panel: keyboard resize never fires fluid-reposition though drag path and docs promise it (fluid-split-panel.ts:133)
 - [medium] fluid-file-input: focus() override targets non-focusable element; handleClick/handleKey are dead code (fluid-file-input.ts:255)
-- [low] fluid-empty-state: non-functional .actions:not(:has(*))::slotted(*) selector (fluid-empty-state.ts:75)
+- [low] fluid-empty-state: non-functional .actions:not(:has(_))::slotted(_) selector (fluid-empty-state.ts:75)
 - [low] fluid-form: Enter-to-submit guard checks input.type !== 'textarea' which is always true (fluid-form.ts:219)
 - [low] fluid-otp: shrinking length does not truncate value, leaving hidden chars in submission (fluid-otp.ts:264)
 - [medium] animations/controller: hover/click triggers bind the def once and ignore data-fluid-animation changes (controller.ts:213)
@@ -82,7 +82,7 @@ Several features are simply non-functional due to invalid CSS selectors, dead ev
 @fluid-ds/markdown injects marked() output via .innerHTML with no sanitization. This is a direct XSS sink: any consumer rendering user-authored or third-party markdown ships a script-injection vector. It is the only security finding and stands alone at the top of the priority list independent of effort. The package also has zero tests, so the fix must land with a regression suite proving script payloads are neutralized.
 
 - [high] fluid-markdown: sanitize marked output (DOMPurify or marked sanitize hook) before innerHTML injection (fluid-markdown.ts:132)
-- Add a sanitization regression test covering <script>, on* handlers, javascript: URLs, and <img onerror>
+- Add a sanitization regression test covering <script>, on\* handlers, javascript: URLs, and <img onerror>
 - Document the sanitization guarantee (and any escape hatch) on the markdown docs page
 
 ### P1 · Accessibility: focus visibility, names, roles & target size _(effort: L)_
@@ -114,7 +114,7 @@ prefers-reduced-motion is honored inconsistently. Autoplaying/looping animations
 
 ### P1 · Testing infrastructure & missing coverage _(effort: L)_
 
-Whole packages and many behavior components ship with no test file at all (charts has zero tests anywhere; markdown, scroller, split-panel, carousel, code-block, comparison, include, the format-* trio, and the standalone observer wrappers all lack tests; media and animations controller/registry are largely untested). Two distinct gaps compound the lifecycle theme: there is almost no regression coverage proving observers/timers/listeners are torn down on disconnect, and almost none proving events are NOT emitted on mount. Without these, the P0 leak fixes and the spurious-event fixes will silently regress. Prioritize disconnect-cleanup and spurious-event regression tests alongside their fixes; backfill bare missing-test-file gaps as a sustained P2 effort.
+Whole packages and many behavior components ship with no test file at all (charts has zero tests anywhere; markdown, scroller, split-panel, carousel, code-block, comparison, include, the format-\* trio, and the standalone observer wrappers all lack tests; media and animations controller/registry are largely untested). Two distinct gaps compound the lifecycle theme: there is almost no regression coverage proving observers/timers/listeners are torn down on disconnect, and almost none proving events are NOT emitted on mount. Without these, the P0 leak fixes and the spurious-event fixes will silently regress. Prioritize disconnect-cleanup and spurious-event regression tests alongside their fixes; backfill bare missing-test-file gaps as a sustained P2 effort.
 
 - [high] @fluid-ds/charts: stand up a test file/harness (zero tests exist) (charts/src/index.ts:1)
 - [medium] add missing test files: carousel, code-block, comparison, include, intersection-observer, mutation-observer, resize-observer, relative-time, scroller, split-panel, format-bytes/-date/-number, markdown, media video/video-playlist/zoomable-frame
@@ -151,9 +151,9 @@ The audit names this seven times and it is the structural root of the entire P0 
 
 ### P1 · NET-NEW: build-time phantom-token & annotation validator _(effort: M)_
 
-At least nine phantom-token findings and several @uses-token/@cssproperty mismatches exist because nothing checks that a referenced --fluid-* custom property actually exists in tokens.ts, or that JSDoc token annotations match the CSS the component reads. The repo already has a check:coverage gate (scripts/check-component-coverage.mjs) wired into pnpm verify, so there is a proven pattern to extend. A validator makes this entire bug class non-recurring instead of re-auditing by hand.
+At least nine phantom-token findings and several @uses-token/@cssproperty mismatches exist because nothing checks that a referenced --fluid-\* custom property actually exists in tokens.ts, or that JSDoc token annotations match the CSS the component reads. The repo already has a check:coverage gate (scripts/check-component-coverage.mjs) wired into pnpm verify, so there is a proven pattern to extend. A validator makes this entire bug class non-recurring instead of re-auditing by hand.
 
-- Add scripts/check-tokens.mjs: parse tokens.ts into the set of real --fluid-* names, scan component CSS + stories + mdx for var(--fluid-*) references, fail on any name not in the set (allowing documented component-scoped tokens)
+- Add scripts/check-tokens.mjs: parse tokens.ts into the set of real --fluid-_ names, scan component CSS + stories + mdx for var(--fluid-_) references, fail on any name not in the set (allowing documented component-scoped tokens)
 - Cross-check @uses-token / @cssproperty JSDoc against the custom properties actually read in each component's CSS and flag drift (covers chart 200-900, comparison, option, tag, grid, map, zoomable-frame)
 - Seed an allowlist from the real token names so --fluid-font-line-height-normal passes and --fluid-line-height-normal fails
 - Wire it into pnpm verify alongside check:coverage so CI blocks new phantom tokens
@@ -164,7 +164,7 @@ Reduced-motion compliance is applied ad hoc: some components honor --fluid-motio
 
 - Provide a shared motion helper/mixin (a reducedMotion getter + a standard @media (prefers-reduced-motion: reduce) css fragment) that components compose instead of re-deriving
 - Standardize on the --fluid-motion scalar already used by popconfirm; document it as the single opt-out in the component-authoring skill
-- Add a lint/static check that flags @keyframes / animation / transition declarations in a fluid-* component that are not paired with a reduced-motion guard or the --fluid-motion scalar
+- Add a lint/static check that flags @keyframes / animation / transition declarations in a fluid-\* component that are not paired with a reduced-motion guard or the --fluid-motion scalar
 - Backfill the offenders identified in the reduced-motion theme as the first consumers
 
 ### P2 · NET-NEW: deprecated-ARIA & APG-pattern conformance audit _(effort: M)_
@@ -186,8 +186,8 @@ patterns from coming back:
    `disconnectSignal` `AbortSignal`, all run/aborted in the base
    `disconnectedCallback`. Opt-in and additive (a non-adopting component behaves
    like a plain `LitElement`). See `packages/components/src/internal/base-element.ts`
-   + its test. Removes the leak class at the root: a component no longer has to
-   remember to mirror every side effect in teardown.
+   - its test. Removes the leak class at the root: a component no longer has to
+     remember to mirror every side effect in teardown.
 2. **✅ DONE, build-time phantom-token validator.** `pnpm check:tokens`
    (`scripts/check-tokens.mjs`, wired into `pnpm verify`) fails the build on any
    `var(--fluid-*)` / `getPropertyValue` reference that does not resolve to a real
@@ -198,7 +198,7 @@ patterns from coming back:
    component under a stubbed `prefers-reduced-motion: reduce` and asserts no infinite
    animation or autoplay timer is running, wired into the coverage gate. (Still TODO.)
 4. **✅ DONE, a first-render event guard.** `FluidElement.changedAfterFirstRender(
-   changed, key)` returns true only on a genuine value change, not at mount, so
+changed, key)` returns true only on a genuine value change, not at mount, so
    components emit `fluid-change`/`fluid-toggle`/`fluid-hide` only on real
    transitions. The audit's six spurious-mount-event bugs were fixed individually;
    new/migrated components should use this helper. (Incremental migration of the
@@ -251,7 +251,7 @@ patterns from coming back:
 - **fluid-details** (spurious-event): fluid-toggle fires once on initial mount for every details (even closed ones) `packages/components/src/components/accordion/fluid-details.ts:146`
 - **fluid-dropzone** (phantom-token): Phantom CSS token --fluid-line-height-normal (real token is --fluid-font-line-height-normal) `packages/components/src/components/dropzone/fluid-dropzone.ts:172`
 - **fluid-dropzone** (lifecycle-leak): createObjectURL thumbnail can leak: revoked only on img load, never on disconnect `packages/components/src/components/dropzone/fluid-dropzone.ts:472`
-- **fluid-empty-state** (correctness): Non-functional CSS selector: .actions:not(:has(*))::slotted(*) `packages/components/src/components/empty-state/fluid-empty-state.ts:75`
+- **fluid-empty-state** (correctness): Non-functional CSS selector: .actions:not(:has(_))::slotted(_) `packages/components/src/components/empty-state/fluid-empty-state.ts:75`
 - **fluid-file-input** (correctness): focus() override targets a non-focusable element; handleClick/handleKey are dead code `packages/components/src/components/file-input/fluid-file-input.ts:255`
 - **fluid-form** (dead-condition): Enter-to-submit guard checks input.type !== "textarea", which is always true `packages/components/src/components/form/fluid-form.ts:219`
 - **fluid-format-bytes** (wrong-jsdoc): JSDoc on the `unit` property describes the `base` property `packages/components/src/components/format-bytes/fluid-format-bytes.ts:25`

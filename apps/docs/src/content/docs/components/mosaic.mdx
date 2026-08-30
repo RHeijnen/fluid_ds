@@ -16,13 +16,41 @@ spans.
 
 <Demo>
   <fluid-mosaic cols="4" row-height="5rem" gap="0.75rem" style="width:100%;">
-    <fluid-mosaic-item size="large"><div style="height:100%;display:grid;place-items:center;background:var(--fluid-accent-base);color:var(--fluid-accent-text);border-radius:var(--fluid-radius-md);">large</div></fluid-mosaic-item>
-    <fluid-mosaic-item size="wide"><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">wide</div></fluid-mosaic-item>
-    <fluid-mosaic-item><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">1×1</div></fluid-mosaic-item>
-    <fluid-mosaic-item><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">1×1</div></fluid-mosaic-item>
-    <fluid-mosaic-item size="tall"><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">tall</div></fluid-mosaic-item>
-    <fluid-mosaic-item><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">1×1</div></fluid-mosaic-item>
-    <fluid-mosaic-item size="wide"><div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">wide</div></fluid-mosaic-item>
+    <fluid-mosaic-item size="large">
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-accent-base);color:var(--fluid-accent-text);border-radius:var(--fluid-radius-md);">
+        large
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item size="wide">
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        wide
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item>
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        1×1
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item>
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        1×1
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item size="tall">
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        tall
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item>
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        1×1
+      </div>
+    </fluid-mosaic-item>
+    <fluid-mosaic-item size="wide">
+      <div style="height:100%;display:grid;place-items:center;background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);">
+        wide
+      </div>
+    </fluid-mosaic-item>
   </fluid-mosaic>
 </Demo>
 
@@ -38,6 +66,7 @@ spans.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/mosaic/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -49,6 +78,7 @@ spans.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/mosaic"; // registers mosaic + mosaic-item
     ```
+
   </TabItem>
 </Tabs>
 
@@ -96,7 +126,7 @@ Drop `cols` for an auto-filling track that reflows with the container, set
 - **Dashboards & galleries** where tiles have deliberately different weights.
 - **Marketing bento grids**: a feature highlight beside smaller stat tiles.
 
-### When *not* to use
+### When _not_ to use
 
 - **Uniform cells** that should all match: use
   [`<fluid-grid>`](/components/grid/).

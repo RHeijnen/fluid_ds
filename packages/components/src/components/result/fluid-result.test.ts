@@ -5,11 +5,7 @@ import type { FluidResult } from "./fluid-result.js";
 describe("<fluid-result>", () => {
   it("renders the title and subtitle", async () => {
     const el = await fixture<FluidResult>(
-      html`<fluid-result
-        status="success"
-        title="Done"
-        subtitle="It worked"
-      ></fluid-result>`
+      html`<fluid-result status="success" title="Done" subtitle="It worked"></fluid-result>`
     );
     const root = el.shadowRoot!;
     expect(root.querySelector(".title")?.textContent?.trim()).to.equal("Done");
@@ -30,9 +26,7 @@ describe("<fluid-result>", () => {
       const el = await fixture<FluidResult>(
         html`<fluid-result status=${status} title="x"></fluid-result>`
       );
-      expect(el.shadowRoot!.querySelector(".base")?.getAttribute("role")).to.equal(
-        "status"
-      );
+      expect(el.shadowRoot!.querySelector(".base")?.getAttribute("role")).to.equal("status");
     }
   });
 
@@ -41,9 +35,7 @@ describe("<fluid-result>", () => {
       const el = await fixture<FluidResult>(
         html`<fluid-result status=${status} title="x"></fluid-result>`
       );
-      expect(el.shadowRoot!.querySelector(".base")?.getAttribute("role")).to.equal(
-        "alert"
-      );
+      expect(el.shadowRoot!.querySelector(".base")?.getAttribute("role")).to.equal("alert");
     }
   });
 
@@ -55,9 +47,7 @@ describe("<fluid-result>", () => {
   });
 
   it("omits the title element when title is empty", async () => {
-    const el = await fixture<FluidResult>(
-      html`<fluid-result status="info"></fluid-result>`
-    );
+    const el = await fixture<FluidResult>(html`<fluid-result status="info"></fluid-result>`);
     expect(el.shadowRoot!.querySelector(".title")).to.be.null;
   });
 
@@ -70,9 +60,7 @@ describe("<fluid-result>", () => {
     );
     await elementUpdated(el);
     const defaultSlot = el.shadowRoot!.querySelector<HTMLSlotElement>("slot:not([name])")!;
-    const actionsSlot = el.shadowRoot!.querySelector<HTMLSlotElement>(
-      'slot[name="actions"]'
-    )!;
+    const actionsSlot = el.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="actions"]')!;
     expect(defaultSlot.assignedElements().length).to.equal(1);
     expect(actionsSlot.assignedElements().length).to.equal(1);
   });

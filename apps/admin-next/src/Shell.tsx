@@ -58,6 +58,9 @@ export function Shell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
+        <a className="sidebar-back" href="../">
+          &larr; All demos
+        </a>
         <div className="sidebar-foot muted">Next.js · App Router</div>
       </aside>
 

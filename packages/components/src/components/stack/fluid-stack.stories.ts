@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Layout/Stack",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -29,9 +29,7 @@ const box = (label: string) => html`
 /** Vertical stack, even rhythm down a column. */
 export const Vertical: Story = {
   render: () => html`
-    <fluid-stack style="max-width: 16rem;">
-      ${box("One")}${box("Two")}${box("Three")}
-    </fluid-stack>
+    <fluid-stack style="max-width: 16rem;"> ${box("One")}${box("Two")}${box("Three")} </fluid-stack>
   `
 };
 

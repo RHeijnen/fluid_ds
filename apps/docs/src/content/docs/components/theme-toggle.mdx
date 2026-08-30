@@ -31,6 +31,7 @@ when nothing is stored. Each flip emits **`fluid-theme-change`**.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/theme-toggle/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +43,7 @@ when nothing is stored. Each flip emits **`fluid-theme-change`**.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/theme-toggle";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -96,6 +98,7 @@ theme, a server preference) when the scheme flips.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Header.tsx"
@@ -114,6 +117,7 @@ theme, a server preference) when the scheme flips.
       return <fluid-theme-toggle ref={ref} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Header.vue"
@@ -128,6 +132,7 @@ theme, a server preference) when the scheme flips.
       <fluid-theme-toggle @fluid-theme-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="header.component.ts"
@@ -146,6 +151,7 @@ theme, a server preference) when the scheme flips.
       onChange(e: CustomEvent) { console.log("theme", e.detail.theme); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Header.svelte"
@@ -158,6 +164,7 @@ theme, a server preference) when the scheme flips.
 
     <fluid-theme-toggle on:fluid-theme-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 

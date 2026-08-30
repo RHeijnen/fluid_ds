@@ -1,29 +1,40 @@
 ---
 title: "Card"
-description: "A surface with header, body, and footer slots. Variants for elevation and outline."
+description: "A surface with header, body, and footer slots. Three variants: elevated, outlined, and filled."
 ---
 
 import Demo from "../../../components/Demo.astro";
 import ComponentApi from "../../../components/ComponentApi.astro";
-import { Tabs, TabItem, CardGrid, LinkCard } from "@astrojs/starlight/components";
+import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-`<fluid-card>` groups related content into a visual block, header, body,
+`<fluid-card>` groups related content into a visual block: header, body,
 optional footer. It's the workhorse surface for dashboards, settings panels,
-and anything that benefits from a clear bounding box. Two visual variants
-(`default` and `outline`) plus a `compact` size let it slot into dense lists
-without overpowering the layout.
+and anything that benefits from a clear bounding box. Three variants
+(`elevated`, `outlined`, `filled`) cover shadowed, bordered, and tinted
+surfaces, and any slot you leave empty collapses instead of leaving a gap.
 
 <Demo>
   <fluid-card style="max-width: 22rem;">
-    <h3 slot="header" style="margin: 0;">Hello, world</h3>
+    <h3 slot="header" style="margin: 0;">
+      Hello, world
+    </h3>
     <p style="margin: 0;">
-      Cards keep your content visually grouped. The header and footer slots are
-      optional, leave them out for a body-only block.
+      Cards keep your content visually grouped. The header and footer slots are optional, leave them
+      out for a body-only block.
     </p>
+    <div slot="footer" style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end;">
+      <fluid-button variant="ghost" size="sm">
+        Dismiss
+      </fluid-button>
+      <fluid-button size="sm">Got it</fluid-button>
+    </div>
   </fluid-card>
 </Demo>
 
 ## Install
+
+The card registers `<fluid-card>`. Most real cards put buttons in the footer, so
+you'll usually want `<fluid-button>` alongside it.
 
 <Tabs syncKey="install">
   <TabItem label="CDN">
@@ -35,6 +46,7 @@ without overpowering the layout.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,95 +58,328 @@ without overpowering the layout.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/card";
     ```
+
   </TabItem>
 </Tabs>
 
 ## Examples
 
-### Default
+### Variants
+
+`variant` swaps how the surface separates itself from the page. **elevated**
+(the default) casts a shadow, **outlined** trades the shadow for a one-pixel
+border, and **filled** drops both in favour of a tinted background. All three
+are shown live below, so you can compare them in the current theme (flip the
+site's dark mode to see how each one holds up).
+
+<Demo>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: var(--fluid-space-4); width:100%;">
+    <fluid-card variant="elevated">
+      <h3 slot="header" style="margin: 0; font-size: 1rem;">
+        elevated
+      </h3>
+      <p style="margin: 0;">The default. A shadow lifts it off the page.</p>
+    </fluid-card>
+    <fluid-card variant="outlined">
+      <h3 slot="header" style="margin: 0; font-size: 1rem;">
+        outlined
+      </h3>
+      <p style="margin: 0;">A hairline border instead of a shadow.</p>
+    </fluid-card>
+    <fluid-card variant="filled">
+      <h3 slot="header" style="margin: 0; font-size: 1rem;">
+        filled
+      </h3>
+      <p style="margin: 0;">A tinted surface, no border, no shadow.</p>
+    </fluid-card>
+  </div>
+</Demo>
+
+```html
+<fluid-card variant="elevated">…</fluid-card>
+<fluid-card variant="outlined">…</fluid-card>
+<fluid-card variant="filled">…</fluid-card>
+```
+
+Use **outlined** when cards are nested inside another surface, where a second
+shadow reads as clutter, and **filled** for a quiet block that shouldn't compete
+with the content around it.
+
+### Body only
+
+Leave the `header` and `footer` slots out and those sections collapse
+completely, no empty padding, no stray separator lines.
 
 <Demo>
   <fluid-card style="max-width: 22rem;">
-    <h3 slot="header" style="margin: 0;">Hello, world</h3>
-    <p style="margin: 0;">
-      Cards keep your content visually grouped. The header and footer slots are
-      optional, leave them out for a body-only block.
-    </p>
+    Just a body. The header and footer areas collapse when nothing is slotted into them.
   </fluid-card>
 </Demo>
 
+```html
+<fluid-card> Just a body. </fluid-card>
+```
+
 ### With a footer
+
+The `footer` slot gets its own tinted band and a separator above it, which makes
+it the natural home for the card's actions. Both buttons below are live:
 
 <Demo>
   <fluid-card style="max-width: 22rem;">
-    <h3 slot="header" style="margin: 0;">Delete project</h3>
-    <p style="margin: 0;">
-      This permanently removes the project and its history. There's no undo.
-    </p>
-    <div slot="footer" style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end;">
-      <fluid-button variant="ghost">Cancel</fluid-button>
-      <fluid-button>Delete</fluid-button>
+    <h3 slot="header" style="margin: 0;">
+      Delete project
+    </h3>
+    <p style="margin: 0;">This permanently removes the project and its history. There's no undo.</p>
+    <div
+      slot="footer"
+      style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end; align-items: center;"
+    >
+      <output
+        id="card-footer-result"
+        style="margin-right:auto; font-size:0.875rem; color: var(--fluid-text-secondary);"
+      ></output>
+      <fluid-button
+        variant="ghost"
+        onclick="document.getElementById('card-footer-result').textContent = 'Cancelled.';"
+      >
+        Cancel
+      </fluid-button>
+      <fluid-button
+        tone="danger"
+        onclick="document.getElementById('card-footer-result').textContent = 'Deleted.';"
+      >
+        Delete
+      </fluid-button>
     </div>
   </fluid-card>
 </Demo>
 
-### Outline variant
+```html
+<fluid-card>
+  <h3 slot="header">Delete project</h3>
+  <p>This permanently removes the project and its history. There's no undo.</p>
+  <div slot="footer">
+    <fluid-button variant="ghost">Cancel</fluid-button>
+    <fluid-button tone="danger">Delete</fluid-button>
+  </div>
+</fluid-card>
+```
 
-The `outline` variant drops the shadow in favour of a one-pixel border, use
-it when cards are nested or when an extra shadow would feel heavy.
+<Aside type="note">
+  A card is **not** a modal. If the choice must be answered before the user can
+  continue, put the same header/body/footer content in a
+  [`<fluid-dialog>`](/components/dialog/), which adds the focus trap and the
+  backdrop.
+</Aside>
+
+### Header actions
+
+The header is a plain slot, so it takes a whole layout, not just a title. A
+title on the left and an overflow menu on the right is the common one. Open the
+menu below: it's a real [`<fluid-dropdown>`](/components/dropdown/) rendered in
+the top layer, so the card's `overflow: hidden` never clips it.
 
 <Demo>
-  <fluid-card variant="outline" style="max-width: 22rem;">
-    <h3 slot="header" style="margin: 0;">No shadow</h3>
-    <p style="margin: 0;">
-      The outline variant suits inset surfaces, settings rows, list items.
-    </p>
+  <fluid-card variant="outlined" style="max-width: 22rem;">
+    <div
+      slot="header"
+      style="display:flex; align-items:center; justify-content:space-between; gap: var(--fluid-space-2);"
+    >
+      <h3 style="margin: 0; font-size: 1rem;">Weekly report</h3>
+      <fluid-dropdown placement="bottom-end">
+        <fluid-button slot="trigger" variant="ghost" size="sm" aria-label="Report actions">
+          <fluid-icon name="ellipsis"></fluid-icon>
+        </fluid-button>
+        <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+        <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
+        <fluid-dropdown-item type="separator"></fluid-dropdown-item>
+        <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+      </fluid-dropdown>
+    </div>
+    <p style="margin: 0;">Sessions are up 12% week over week. Conversion held steady at 3.4%.</p>
   </fluid-card>
 </Demo>
 
-## When to use
+```html
+<fluid-card variant="outlined">
+  <div slot="header" style="display:flex; align-items:center; justify-content:space-between;">
+    <h3>Weekly report</h3>
+    <fluid-dropdown placement="bottom-end">
+      <fluid-button slot="trigger" variant="ghost" size="sm" aria-label="Report actions">
+        <fluid-icon name="ellipsis"></fluid-icon>
+      </fluid-button>
+      <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+      <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
+    </fluid-dropdown>
+  </div>
+  <p>Sessions are up 12% week over week.</p>
+</fluid-card>
+```
 
-- Grouping multiple related controls or pieces of content.
-- Modal-style or dialog-style blocks that aren't truly modal (use
-  [`<fluid-dialog>`](/components/dialog/) for actual modals).
-- List items where each row needs its own header/footer rhythm.
+### As a form panel
 
-If you only need a thin separator without grouping, reach for
-[`<fluid-divider>`](/components/divider/).
+Settings panels are the other everyday shape: fields in the body, the submit
+action in the footer. The form below is live, fill it in and submit to see the
+values the card's `<form>` collects.
+
+<Demo>
+  <form
+    style="max-width: 24rem; width: 100%;"
+    onsubmit="event.preventDefault(); const d = new FormData(this); this.querySelector('output').textContent = 'Saved: ' + (d.get('display-name') || '(empty)') + ', digest ' + (d.get('digest') ? 'on' : 'off');"
+  >
+    <fluid-card variant="outlined">
+      <h3 slot="header" style="margin: 0; font-size: 1rem;">
+        Profile
+      </h3>
+      <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
+        <fluid-input
+          name="display-name"
+          label="Display name"
+          help-text="Shown next to everything you publish."
+          placeholder="Ada Lovelace"
+        ></fluid-input>
+        <fluid-switch name="digest" value="yes">
+          Send me the weekly digest
+        </fluid-switch>
+      </div>
+      <div
+        slot="footer"
+        style="display:flex; gap: var(--fluid-space-2); align-items:center; justify-content:flex-end;"
+      >
+        <output style="margin-right:auto; font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
+        <fluid-button type="submit" size="sm">
+          Save
+        </fluid-button>
+      </div>
+    </fluid-card>
+  </form>
+</Demo>
+
+```html
+<form>
+  <fluid-card variant="outlined">
+    <h3 slot="header">Profile</h3>
+    <fluid-input name="display-name" label="Display name"></fluid-input>
+    <fluid-switch name="digest" value="yes">Send me the weekly digest</fluid-switch>
+    <div slot="footer">
+      <fluid-button type="submit">Save</fluid-button>
+    </div>
+  </fluid-card>
+</form>
+```
+
+<Aside type="tip">
+  Keep the `<form>` **outside** the card, as above. The card is a styling
+  surface, not a form owner, and wrapping it keeps every field in the same form
+  scope. See the [Forms guide](/guides/forms/) for validation and submission
+  wiring.
+</Aside>
 
 ## Theming
 
 Every styled property reads a **component-scoped `--fluid-card-*` token that
-falls back to a main semantic var** (the override ladder), so a brand can
-retune the card without touching the surface track everywhere else. The
-**complete list** is in the [API table below](#api).
+falls back to a main semantic var** (the override ladder), so a brand can retune
+the card without touching the surface track everywhere else:
+
+1. **Brand**: override the main var (`--fluid-surface-base`,
+   `--fluid-border-default`, …) and every component reflows.
+2. **Component**: override the `--fluid-card-*` token and all cards change.
+3. **Instance**: set the same token on one `[data-fluid-id]` and one card
+   changes.
+
+The **complete list** of both layers is in the [API table below](#api). The
+three you'll reach for most are `--fluid-card-bg`, `--fluid-card-border`, and
+`--fluid-card-padding` (which sets the padding of the header, body, and footer
+together).
 
 ```css title="brand.css"
+/* Every card under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-card-bg: var(--fluid-surface-base);
   --fluid-card-border: var(--fluid-border-default);
   --fluid-card-padding: 1.5rem;
 }
+
+/* One denser card in a tight sidebar. */
+[data-fluid-id="sidebar-card"] {
+  --fluid-card-padding: 0.75rem;
+}
 ```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a card and tweak these tokens visually, then
+  exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The card exposes [`part="base"`](#api) plus `part="header"`, `part="body"`, and
 `part="footer"`. Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
-not covered by a token, e.g. a sticky header inside a scrolling card.
+not covered by a token:
+
+```css
+/* A scrolling card body with a header that stays put. */
+fluid-card.scrollable::part(body) {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+```
+
+## When to use
+
+- Grouping multiple related controls or pieces of content behind one boundary.
+- Dashboard tiles, settings panels, and list rows that need their own
+  header/footer rhythm.
+- A non-blocking block that _looks_ like a dialog but shouldn't interrupt.
+
+### When _not_ to use
+
+- **A blocking decision**: use [`<fluid-dialog>`](/components/dialog/), which
+  adds the focus trap, backdrop, and Escape-to-close.
+- **A status message in the flow of the page**: use
+  [`<fluid-callout>`](/components/callout/), which carries the tone and icon.
+- **Only a separation line**: use [`<fluid-divider>`](/components/divider/); a
+  card is overkill when nothing needs grouping.
+- **A whole clickable tile**: a card is a passive surface. Put a real
+  [`<fluid-button>`](/components/button/) or anchor inside it rather than
+  attaching a click handler to the card itself.
+
+## Accessibility
+
+The card is a passive grouping surface with no implicit ARIA role, so it adds
+nothing to the accessibility tree and takes no focus. The cross-component
+contract is in the [Accessibility guide](/guides/accessibility/); the notes
+below are card-specific.
+
+### Headings
+
+Put a real heading element (`<h2>`, `<h3>`, …) in the `header` slot, at the
+level the surrounding page calls for, so the document outline stays coherent
+([SC 1.3.1 Info and Relationships](https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships)).
+A bold `<div>` looks the same and tells assistive technology nothing.
+
+### Interactive cards
+
+If the whole card is meant to be clickable, don't put the handler on the card.
+Wrap the card's title in a real link or button so there is one focusable,
+nameable target, and let the rest of the card stay decorative
+([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)). A
+click handler on a `<div>`-like host has no role, no keyboard activation, and no
+accessible name.
+
+### Focus and clipping
+
+The card sets `overflow: hidden` to keep its rounded corners, which would clip
+an ordinary absolutely-positioned popup. Fluid's overlays
+([dropdown](/components/dropdown/), [tooltip](/components/tooltip/),
+[dialog](/components/dialog/)) render in the top layer, so a focused menu inside
+a card is never cut off.
 
 ## API
 
 <ComponentApi tag="fluid-card" />
-
-## Accessibility
-
-- The card is a passive grouping surface: no implicit ARIA role. If your
-  card is interactive (e.g. an entire card is clickable), wrap it in a
-  `<button>` or anchor and set a meaningful `aria-label`.
-- Use a proper heading element (`<h2>`, `<h3>`, etc.) inside the header
-  slot so the page's heading outline stays coherent.
 
 ## Related
 
@@ -143,6 +388,11 @@ not covered by a token, e.g. a sticky header inside a scrolling card.
     title="Dialog"
     href="/components/dialog/"
     description="A truly modal surface, focus trap, backdrop, Escape to close."
+  />
+  <LinkCard
+    title="Callout"
+    href="/components/callout/"
+    description="A tinted, status-flavored block for in-flow messages."
   />
   <LinkCard
     title="Stack"
@@ -155,8 +405,8 @@ not covered by a token, e.g. a sticky header inside a scrolling card.
     description="A thin separator when grouping into a card is overkill."
   />
   <LinkCard
-    title="Callout"
-    href="/components/callout/"
-    description="A tinted, status-flavored block for in-flow messages."
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup and custom-element hints per framework."
   />
 </CardGrid>

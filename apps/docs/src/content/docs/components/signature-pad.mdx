@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-signature-pad>` captures a signature as ink, not as a picture: strokes
 are recorded as point sequences and replayed, so the pad resizes losslessly,
 undoes one stroke at a time, and exports a crisp PNG at the device's real
@@ -31,6 +30,7 @@ stroke velocity where it does not. Form-associated.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/signature-pad/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +42,7 @@ stroke velocity where it does not. Form-associated.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/signature-pad";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -56,7 +57,9 @@ stroke and Clear wipes everything.
   <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
 </Demo>
 
-<ConformanceCode code={`<fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>`} />
+<ConformanceCode
+  code={`<fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>`}
+/>
 
 ### Placeholder and labels
 
@@ -75,14 +78,16 @@ usable.
   ></fluid-signature-pad>
 </Demo>
 
-<ConformanceCode code={`<fluid-signature-pad
+<ConformanceCode
+  code={`<fluid-signature-pad
   placeholder="Hier tekenen"
   clear-label="Wissen"
   undo-label="Ongedaan maken"
   upload-label="Uploaden"
   fit-label="Passend"
   aria-label="Handtekening"
-></fluid-signature-pad>`} />
+></fluid-signature-pad>`}
+/>
 
 ### Disabled
 
@@ -102,8 +107,8 @@ pull the corner grip to scale, Fit to return to the centred contain-fit.
 
 ```ts
 const pad = document.querySelector("fluid-signature-pad");
-await pad.placeImage(file);   // a File / Blob, or an image URL
-pad.refit();                  // back to the centred contain-fit
+await pad.placeImage(file); // a File / Blob, or an image URL
+pad.refit(); // back to the centred contain-fit
 ```
 
 ### Undo, clear, export
@@ -114,9 +119,9 @@ pad is empty).
 
 ```ts
 const pad = document.querySelector("fluid-signature-pad");
-pad.undo();                   // most recent stroke first, placed image last
+pad.undo(); // most recent stroke first, placed image last
 pad.clear();
-const png = pad.toDataURL();  // "data:image/png;base64,…" or undefined
+const png = pad.toDataURL(); // "data:image/png;base64,…" or undefined
 ```
 
 ## Listening for fluid-change
@@ -137,6 +142,7 @@ any ink remains; `detail.strokes` is the stroke count.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="SignatureField.tsx"
@@ -155,6 +161,7 @@ any ink remains; `detail.strokes` is the stroke count.
       return <fluid-signature-pad ref={ref} aria-label="Signature" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="SignatureField.vue"
@@ -167,6 +174,7 @@ any ink remains; `detail.strokes` is the stroke count.
       <fluid-signature-pad aria-label="Signature" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="signature-field.component.ts"
@@ -185,6 +193,7 @@ any ink remains; `detail.strokes` is the stroke count.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="SignatureField.svelte"
@@ -197,6 +206,7 @@ any ink remains; `detail.strokes` is the stroke count.
 
     <fluid-signature-pad aria-label="Signature" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -210,15 +220,19 @@ while nothing has been drawn, and a form reset clears the ink.
     <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
     <div style="display:flex; gap: var(--fluid-space-2);">
       <fluid-button type="submit">Save</fluid-button>
-      <fluid-button type="reset" variant="ghost">Reset</fluid-button>
+      <fluid-button type="reset" variant="ghost">
+        Reset
+      </fluid-button>
     </div>
   </form>
 </Demo>
 
-<ConformanceCode code={`<form>
+<ConformanceCode
+  code={`<form>
   <fluid-signature-pad name="signature" aria-label="Signature"></fluid-signature-pad>
   <fluid-button type="submit">Save</fluid-button>
-</form>`} />
+</form>`}
+/>
 
 See the [Forms guide](/guides/forms/) for validation and submission patterns.
 
@@ -245,8 +259,8 @@ maximum width; the **complete list** is in the [API table below](#api).
 ```
 
 <Aside type="tip">
-  Select a `fluid-signature-pad` in the [Theme builder](/playground/) to tweak
-  the ink, surface, border, and guideline tokens visually.
+  Select a `fluid-signature-pad` in the [Theme builder](/playground/) to tweak the ink, surface,
+  border, and guideline tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -264,14 +278,14 @@ action row.
 - Anywhere a **drawn mark** is the required artifact and you need it back as an
   image (the pad exports PNG at device resolution).
 
-### When *not* to use
+### When _not_ to use
 
 - **Typed legal consent**: a [`<fluid-checkbox>`](/components/checkbox/) next to
   the terms is simpler and often legally equivalent.
 - **Collecting signature files as documents**: use
   [`<fluid-dropzone>`](/components/dropzone/) or
   [`<fluid-file-input>`](/components/file-input/); the pad's upload path is for
-  placing an image *into* the composite ink.
+  placing an image _into_ the composite ink.
 - **Free-form sketching or annotation**: the pad is tuned for signatures
   (baseline guide, velocity-based width), not for a general drawing canvas.
 
@@ -285,10 +299,10 @@ with visible labels. The cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Moves focus to the canvas, then through the visible action buttons. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused action button (Undo, Clear, Upload, Fit). |
+| Key                                 | Action                                                              |
+| ----------------------------------- | ------------------------------------------------------------------- |
+| <kbd>Tab</kbd>                      | Moves focus to the canvas, then through the visible action buttons. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activates the focused action button (Undo, Clear, Upload, Fit).     |
 
 Drawing itself is inherently a pointer gesture. The **Upload** path is the
 pointer-free equivalent: a keyboard user can pick a prepared signature image
@@ -327,10 +341,10 @@ labels, so localized `clear-label` / `undo-label` / `upload-label` /
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 The target floor applies through the member buttons (see the
 [button page](/components/button/) for the full table); the canvas focus ring

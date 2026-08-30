@@ -4,9 +4,7 @@ import type { FluidHero } from "./fluid-hero.js";
 
 describe("<fluid-hero>", () => {
   it("renders the heading from the default slot", async () => {
-    const el = await fixture<FluidHero>(html`
-      <fluid-hero><h1>Welcome</h1></fluid-hero>
-    `);
+    const el = await fixture<FluidHero>(html` <fluid-hero><h1>Welcome</h1></fluid-hero> `);
     const slot = el.shadowRoot!.querySelector("slot:not([name])") as HTMLSlotElement;
     expect(slot.assignedElements()[0]?.textContent).to.contain("Welcome");
   });

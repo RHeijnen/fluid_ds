@@ -55,7 +55,11 @@ export function startOfDay(date: Date): Date {
 
 export function isSameDay(a: Date | null, b: Date | null): boolean {
   if (!a || !b) return false;
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 /** Whole-day comparison: <0 if a before b, 0 same day, >0 after. */
@@ -89,7 +93,11 @@ export function clampDate(date: Date, min: Date | null, max: Date | null): Date 
  * The 42-cell (6×7) grid for a month, including leading/trailing days of the
  * adjacent months so every row is full. `weekStartsOn` defaults to Monday (1).
  */
-export function getMonthGrid(year: number, month: number, weekStartsOn: Weekday = 1): CalendarDay[] {
+export function getMonthGrid(
+  year: number,
+  month: number,
+  weekStartsOn: Weekday = 1
+): CalendarDay[] {
   const firstOfMonth = new Date(year, month, 1);
   const lead = (firstOfMonth.getDay() - weekStartsOn + 7) % 7;
   const today = startOfDay(new Date());
@@ -110,7 +118,9 @@ export function getMonthGrid(year: number, month: number, weekStartsOn: Weekday 
 export function weekdayNames(locale: string | undefined, weekStartsOn: Weekday = 1): string[] {
   const fmt = new Intl.DateTimeFormat(locale || undefined, { weekday: "short" });
   // 2024-01-07 is a Sunday; offset to the requested first day.
-  return Array.from({ length: 7 }, (_, i) => fmt.format(new Date(2024, 0, 7 + ((weekStartsOn + i) % 7))));
+  return Array.from({ length: 7 }, (_, i) =>
+    fmt.format(new Date(2024, 0, 7 + ((weekStartsOn + i) % 7)))
+  );
 }
 
 /** Format a date for display in the input / header. */
@@ -148,11 +158,18 @@ export interface RangePreset {
  * entirely. Each returns date-only bounds; the picker decides how to serialize.
  */
 export const defaultRangePresets: RangePreset[] = [
-  { id: "today", label: "Today", getRange: (now = new Date()) => ({ start: startOfDay(now), end: startOfDay(now) }) },
+  {
+    id: "today",
+    label: "Today",
+    getRange: (now = new Date()) => ({ start: startOfDay(now), end: startOfDay(now) })
+  },
   {
     id: "yesterday",
     label: "Yesterday",
-    getRange: (now = new Date()) => ({ start: addDays(startOfDay(now), -1), end: addDays(startOfDay(now), -1) })
+    getRange: (now = new Date()) => ({
+      start: addDays(startOfDay(now), -1),
+      end: addDays(startOfDay(now), -1)
+    })
   },
   {
     id: "last7",
@@ -183,7 +200,11 @@ export const defaultRangePresets: RangePreset[] = [
 ];
 
 /** Match a concrete range back to a preset id (for the active highlight). */
-export function matchPreset(range: DayRange, presets: RangePreset[], now = new Date()): string | null {
+export function matchPreset(
+  range: DayRange,
+  presets: RangePreset[],
+  now = new Date()
+): string | null {
   for (const p of presets) {
     const r = p.getRange(now);
     if (isSameDay(r.start, range.start) && isSameDay(r.end, range.end)) return p.id;

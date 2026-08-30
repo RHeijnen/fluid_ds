@@ -9,8 +9,7 @@ type Internals = {
   parsedThreshold(): number | number[];
 };
 
-const peek = (el: FluidIntersectionObserver): Internals =>
-  el as unknown as Internals;
+const peek = (el: FluidIntersectionObserver): Internals => el as unknown as Internals;
 
 describe("<fluid-intersection-observer>", () => {
   it("passes an a11y audit without changing slotted semantics", async () => {
@@ -92,12 +91,8 @@ describe("<fluid-intersection-observer>", () => {
       await el.updateComplete;
       expect(captured).to.be.a("function");
 
-      const entries = [
-        { isIntersecting: true } as IntersectionObserverEntry
-      ];
-      setTimeout(() =>
-        captured!(entries, {} as IntersectionObserver)
-      );
+      const entries = [{ isIntersecting: true } as IntersectionObserverEntry];
+      setTimeout(() => captured!(entries, {} as IntersectionObserver));
 
       const ev = await oneEvent(el, "fluid-intersect");
       expect(ev).to.exist;
@@ -143,7 +138,9 @@ describe("<fluid-intersection-observer>", () => {
 
   it("parses a comma-separated threshold list", async () => {
     const el = await fixture<FluidIntersectionObserver>(html`
-      <fluid-intersection-observer threshold="0, 0.25, 1"><div>hi</div></fluid-intersection-observer>
+      <fluid-intersection-observer threshold="0, 0.25, 1"
+        ><div>hi</div></fluid-intersection-observer
+      >
     `);
     await el.updateComplete;
     expect(peek(el).parsedThreshold()).to.deep.equal([0, 0.25, 1]);

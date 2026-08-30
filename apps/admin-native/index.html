@@ -9,12 +9,27 @@
     <!-- Design tokens, straight from the CDN. Always base first, then the
          scheme sheets (they key off [data-fluid-theme] on <html>, which the
          topbar toggle flips). -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css"
+    />
     <!-- Brand presets. Inert until the topbar sets data-fluid-brand on <html>. -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@latest/src/midnight.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@latest/src/corporate.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@latest/src/midnight.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/themes@latest/src/corporate.css"
+    />
     <link rel="stylesheet" href="./src/styles.css" />
 
     <!--
@@ -31,14 +46,15 @@
       {
         "imports": {
           "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
-          "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
-          "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/",
-          "@fluid-ds/charts/":     "https://cdn.jsdelivr.net/npm/@fluid-ds/charts@latest/dist/components/",
+          "@fluid-ds/icons": "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
+          "@fluid-ds/icons/": "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/",
+          "@fluid-ds/charts/": "https://cdn.jsdelivr.net/npm/@fluid-ds/charts@latest/dist/components/",
 
-          "lit":              "https://esm.run/lit",
-          "lit/":             "https://esm.run/lit/",
-          "chart.js":         "https://esm.run/chart.js",
-          "chart.js/auto":    "https://esm.run/chart.js/auto"
+          "lit": "https://esm.run/lit",
+          "lit/": "https://esm.run/lit/",
+          "chart.js": "https://esm.run/chart.js",
+          "chart.js/auto": "https://esm.run/chart.js/auto",
+          "@floating-ui/dom": "https://esm.run/@floating-ui/dom"
         }
       }
     </script>

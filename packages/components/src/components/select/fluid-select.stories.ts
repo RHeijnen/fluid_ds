@@ -15,7 +15,7 @@ const meta: Meta<Args> = {
   title: "Components/Forms/Select",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     value: { control: "text" },

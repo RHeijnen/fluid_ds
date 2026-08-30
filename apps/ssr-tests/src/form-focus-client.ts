@@ -260,7 +260,9 @@ async function start(): Promise<void> {
       tag === "fluid-date-range-picker" ||
       tag === "fluid-scheduler"
     ) {
-      const calendars = [...(field.shadowRoot?.querySelectorAll<UpdatingHost>("fluid-calendar") ?? [])];
+      const calendars = [
+        ...(field.shadowRoot?.querySelectorAll<UpdatingHost>("fluid-calendar") ?? [])
+      ];
       const expected = tag === "fluid-date-range-picker" ? 2 : 1;
       if (calendars.length !== expected || calendars.some((calendar) => !calendar.updateComplete))
         throw new Error(`${tag} calendars did not upgrade`);

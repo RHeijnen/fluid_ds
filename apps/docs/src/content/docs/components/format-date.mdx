@@ -34,12 +34,13 @@ both mapping straight onto the platform API.
     ```ts
     import "@fluid-ds/components/define/format-date";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  Renders plain inline text and reads no design tokens beyond the inherited
-  text color, so no `@fluid-ds/tokens` stylesheet is required.
+  Renders plain inline text and reads no design tokens beyond the inherited text color, so no
+  `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -47,9 +48,12 @@ both mapping straight onto the platform API.
 ### Date styles
 
 <Demo>
-  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="short"></fluid-format-date><br/>
-  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="medium"></fluid-format-date><br/>
-  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="long"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="short"></fluid-format-date>
+  <br />
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="medium"></fluid-format-date>
+  <br />
+  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="long"></fluid-format-date>
+  <br />
   <fluid-format-date date="2026-05-29T14:30:00Z" date-style="full"></fluid-format-date>
 </Demo>
 
@@ -61,7 +65,11 @@ both mapping straight onto the platform API.
 ### Date + time
 
 <Demo>
-  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="medium" time-style="short"></fluid-format-date>
+  <fluid-format-date
+    date="2026-05-29T14:30:00Z"
+    date-style="medium"
+    time-style="short"
+  ></fluid-format-date>
 </Demo>
 
 ```html
@@ -112,7 +120,11 @@ inheritance. Regional and supported numbering/calendar extensions are preserved.
 
 ```html
 <div lang="fr">
-  <fluid-format-date date="2026-05-29T14:30:00Z" date-style="long" time-zone="UTC"></fluid-format-date>
+  <fluid-format-date
+    date="2026-05-29T14:30:00Z"
+    date-style="long"
+    time-zone="UTC"
+  ></fluid-format-date>
 </div>
 ```
 
@@ -122,14 +134,15 @@ for a valid date. Specify `time-zone` when output must not depend on the runtime
 timezone.
 
 <Aside type="note">
-  Native ancestor language inheritance during SSR remains unverified and is not
-  provided by this formatter change. Pass an explicit `locale` for predictable
-  server output; without available context the server uses English. This does
-  not promise full locale hydration parity or request-scoped translation state.
+  Native ancestor language inheritance during SSR remains unverified and is not provided by this
+  formatter change. Pass an explicit `locale` for predictable server output; without available
+  context the server uses English. This does not promise full locale hydration parity or
+  request-scoped translation state.
 </Aside>
 
 <Demo>
-  <fluid-format-date date="2026-05-29" date-style="full" locale="fr-FR"></fluid-format-date><br/>
+  <fluid-format-date date="2026-05-29" date-style="full" locale="fr-FR"></fluid-format-date>
+  <br />
   <fluid-format-date date="2026-05-29" date-style="full" locale="ja-JP"></fluid-format-date>
 </Demo>
 

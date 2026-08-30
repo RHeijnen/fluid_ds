@@ -1,0 +1,197 @@
+---
+/**
+ * Live generator for the QR expansion page: a fluid-input bound to a
+ * fluid-qr-code that re-renders on every keystroke, plus controls for the
+ * real styling API (module shape, eye shape, error correction, size, and
+ * a gradient fill), and the component's own PNG export.
+ *
+ * No looping animation here, so there is nothing to pause: the code only
+ * changes when the visitor changes it.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="qr-demo" data-qr-demo>
+    <div class="qr-controls">
+      <fluid-input
+        size="sm"
+        label="Content"
+        value="https://fluid-web.dev"
+        data-qr-value></fluid-input>
+      <div class="qr-row">
+        <div class="qr-field">
+          <span class="qr-field-label" aria-hidden="true">Modules</span>
+          <fluid-select size="sm" value="rounded" aria-label="Module shape" data-qr-modules>
+            <fluid-option value="square">Square</fluid-option>
+            <fluid-option value="dots">Dots</fluid-option>
+            <fluid-option value="rounded">Rounded</fluid-option>
+          </fluid-select>
+        </div>
+        <div class="qr-field">
+          <span class="qr-field-label" aria-hidden="true">Eyes</span>
+          <fluid-select size="sm" value="rounded" aria-label="Eye shape" data-qr-eyes>
+            <fluid-option value="square">Square</fluid-option>
+            <fluid-option value="rounded">Rounded</fluid-option>
+            <fluid-option value="circle">Circle</fluid-option>
+          </fluid-select>
+        </div>
+      </div>
+      <div class="qr-row">
+        <div class="qr-field">
+          <span class="qr-field-label" aria-hidden="true">Fill</span>
+          <fluid-select size="sm" value="theme" aria-label="Module fill" data-qr-fill>
+            <fluid-option value="theme">Theme color</fluid-option>
+            <fluid-option value="gradient">Gradient</fluid-option>
+          </fluid-select>
+        </div>
+        <div class="qr-field">
+          <span class="qr-field-label" aria-hidden="true">Error correction</span>
+          <fluid-select size="sm" value="M" aria-label="Error correction level" data-qr-ec>
+            <fluid-option value="L">L (7%)</fluid-option>
+            <fluid-option value="M">M (15%)</fluid-option>
+            <fluid-option value="Q">Q (25%)</fluid-option>
+            <fluid-option value="H">H (30%)</fluid-option>
+          </fluid-select>
+        </div>
+        <div class="qr-field">
+          <span class="qr-field-label" aria-hidden="true">Size</span>
+          <fluid-select size="sm" value="220" aria-label="Rendered size" data-qr-size>
+            <fluid-option value="160">160 px</fluid-option>
+            <fluid-option value="220">220 px</fluid-option>
+            <fluid-option value="280">280 px</fluid-option>
+          </fluid-select>
+        </div>
+      </div>
+      <div class="qr-actions">
+        <fluid-button size="sm" variant="secondary" data-qr-download>Download PNG</fluid-button>
+        <span class="qr-hint">Rendered as inline SVG, exported through <code>download()</code>.</span>
+      </div>
+    </div>
+    <div class="qr-stage">
+      <fluid-qr-code
+        value="https://fluid-web.dev"
+        size="220"
+        module-shape="rounded"
+        eye-shape="rounded"
+        label="QR code encoding the demo content above"></fluid-qr-code>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .qr-demo {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    .qr-demo {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .qr-stage {
+      justify-self: center;
+    }
+  }
+  .qr-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-inline-size: 0;
+  }
+  .qr-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .qr-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1 1 8rem;
+    min-inline-size: 8rem;
+  }
+  .qr-field-label {
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+  }
+  .qr-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .qr-hint {
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+  }
+  .qr-stage {
+    padding: 1rem;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 10px);
+    background: var(--fluid-surface-base);
+  }
+</style>
+
+<script>
+  import "@fluid-ds/qr/define";
+
+  interface QrEl extends HTMLElement {
+    value: string;
+    label: string;
+    download: (filename?: string) => Promise<void>;
+  }
+
+  const GRADIENT_FROM = "#4f46e5";
+  const GRADIENT_TO = "#db2777";
+
+  function setup(root: HTMLElement): void {
+    const qr = root.querySelector<QrEl>("fluid-qr-code");
+    if (!qr) return;
+
+    const on = (
+      selector: string,
+      event: string,
+      handler: (value: string) => void
+    ): void => {
+      root
+        .querySelector(selector)
+        ?.addEventListener(event, (e) =>
+          handler(String((e as CustomEvent<{ value: string }>).detail.value))
+        );
+    };
+
+    on("[data-qr-value]", "fluid-input", (value) => {
+      qr.value = value;
+    });
+    on("[data-qr-modules]", "fluid-change", (value) => {
+      qr.setAttribute("module-shape", value);
+    });
+    on("[data-qr-eyes]", "fluid-change", (value) => {
+      qr.setAttribute("eye-shape", value);
+    });
+    on("[data-qr-ec]", "fluid-change", (value) => {
+      qr.setAttribute("ec-level", value);
+    });
+    on("[data-qr-size]", "fluid-change", (value) => {
+      qr.setAttribute("size", value);
+    });
+    on("[data-qr-fill]", "fluid-change", (value) => {
+      if (value === "gradient") {
+        qr.setAttribute("gradient-from", GRADIENT_FROM);
+        qr.setAttribute("gradient-to", GRADIENT_TO);
+      } else {
+        qr.removeAttribute("gradient-from");
+        qr.removeAttribute("gradient-to");
+      }
+    });
+
+    root.querySelector("[data-qr-download]")?.addEventListener("click", () => {
+      void qr.download("fluid-qr.png");
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-qr-demo]")) setup(root);
+</script>

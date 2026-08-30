@@ -314,7 +314,8 @@ export class FluidFileParser extends FluidElement {
     this.dropzoneEl?.clear?.();
     if (restoreIntakeFocus) {
       void this.updateComplete.then(() => {
-        if (this.isConnected) this.dropzoneEl?.shadowRoot?.querySelector<HTMLElement>('[role="button"]')?.focus();
+        if (this.isConnected)
+          this.dropzoneEl?.shadowRoot?.querySelector<HTMLElement>('[role="button"]')?.focus();
       });
     }
   }
@@ -360,7 +361,9 @@ export class FluidFileParser extends FluidElement {
     return this.localizedDiagnostic(diagnostic);
   }
 
-  private localizedDiagnostic(diagnostic: Exclude<ParserDiagnostic, { code: "customValidation" }>): string {
+  private localizedDiagnostic(
+    diagnostic: Exclude<ParserDiagnostic, { code: "customValidation" }>
+  ): string {
     switch (diagnostic.code) {
       case "required":
         return this.term("parserFieldRequired", diagnostic.parameters.label);
@@ -465,10 +468,7 @@ export class FluidFileParser extends FluidElement {
     );
 
     return html`
-      <div
-        part="summary"
-        class="summary"
-      >
+      <div part="summary" class="summary">
         <fluid-callout variant=${hasErrors ? "danger" : "success"}>
           <span slot="header">
             ${hasErrors
@@ -571,7 +571,6 @@ export class FluidFileParser extends FluidElement {
               </div>
             `
           : nothing}
-
         ${loaded && this.result
           ? html`
               ${!this.hideMapping

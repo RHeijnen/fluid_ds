@@ -8,12 +8,11 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-date-picker>` is a form-associated text field that opens a
 [`<fluid-calendar>`](/components/calendar/) inside a `role="dialog"` popover. You
 can type a date or pick it from the grid; either way the form value is always a
 timezone-safe ISO `YYYY-MM-DD` string. The `format` attribute controls only the
-*visible* text, never the value, so locale and presentation never corrupt what you
+_visible_ text, never the value, so locale and presentation never corrupt what you
 store.
 
 <Demo>
@@ -32,6 +31,7 @@ store.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/date-picker/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +43,7 @@ store.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/date-picker"; // registers date-picker + calendar
     ```
+
   </TabItem>
 </Tabs>
 
@@ -78,13 +79,18 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-date-picker label="Start date" help-text="Your subscription begins on this day."></fluid-date-picker>
+  <fluid-date-picker
+    label="Start date"
+    help-text="Your subscription begins on this day."
+  ></fluid-date-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-picker
+<ConformanceCode
+  code={`<fluid-date-picker
   label="Start date"
   help-text="Your subscription begins on this day."
-></fluid-date-picker>`} />
+></fluid-date-picker>`}
+/>
 
 ### Display format
 
@@ -100,9 +106,11 @@ changes only the text the field shows; the value and form submission stay ISO.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-picker value="2026-06-15" format="short"></fluid-date-picker>
+<ConformanceCode
+  code={`<fluid-date-picker value="2026-06-15" format="short"></fluid-date-picker>
 <fluid-date-picker value="2026-06-15" format="long"></fluid-date-picker>
-<fluid-date-picker value="2026-06-15" format="iso"></fluid-date-picker>`} />
+<fluid-date-picker value="2026-06-15" format="iso"></fluid-date-picker>`}
+/>
 
 ### Min and max
 
@@ -110,10 +118,52 @@ changes only the text the field shows; the value and form submission stay ISO.
 the grid and rejected when typed.
 
 <Demo>
-  <fluid-date-picker value="2026-06-15" min="2026-06-08" max="2026-06-24" aria-label="Date"></fluid-date-picker>
+  <fluid-date-picker
+    value="2026-06-15"
+    min="2026-06-08"
+    max="2026-06-24"
+    aria-label="Date"
+  ></fluid-date-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-picker value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-date-picker>`} />
+<ConformanceCode
+  code={`<fluid-date-picker value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-date-picker>`}
+/>
+
+### Opening behaviour
+
+Clicking the field opens the date list and selects the current value, so the
+text and the trigger button do the same thing and one click is enough to type a
+replacement. Keyboard users open with <kbd>ArrowDown</kbd>.
+
+Opening is deliberately tied to the click rather than to focus: focus also
+arrives from form validation, from an overlay above the field closing, and from
+any programmatic `.focus()`, none of which mean "show me the options".
+
+Both halves are opt-out. `no-auto-open` keeps the click from opening the
+date list, and `no-select-on-focus` keeps focus from selecting the value.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-date-picker value="2026-06-15" aria-label="Opens on click"></fluid-date-picker>
+    <fluid-date-picker
+      value="2026-06-15"
+      no-auto-open
+      aria-label="Never opens on click"
+    ></fluid-date-picker>
+    <fluid-date-picker
+      value="2026-06-15"
+      no-select-on-focus
+      aria-label="Opens without selecting"
+    ></fluid-date-picker>
+  </div>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-date-picker value="2026-06-15"></fluid-date-picker>
+<fluid-date-picker value="2026-06-15" no-auto-open></fluid-date-picker>
+<fluid-date-picker value="2026-06-15" no-select-on-focus></fluid-date-picker>`}
+/>
 
 ### Sizes
 
@@ -127,9 +177,11 @@ the grid and rejected when typed.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-picker size="sm" value="2026-06-15"></fluid-date-picker>
+<ConformanceCode
+  code={`<fluid-date-picker size="sm" value="2026-06-15"></fluid-date-picker>
 <fluid-date-picker size="md" value="2026-06-15"></fluid-date-picker>
-<fluid-date-picker size="lg" value="2026-06-15"></fluid-date-picker>`} />
+<fluid-date-picker size="lg" value="2026-06-15"></fluid-date-picker>`}
+/>
 
 ### Disabled
 
@@ -143,9 +195,10 @@ the grid and rejected when typed.
 
 The picker fires **`fluid-change`** with `{ value, date, timestamp }` in `detail`
 when the committed date changes (a grid pick, or a valid typed entry on
-<kbd>Enter</kbd> / blur). `value` is the ISO string, `date` is a `Date`, and
-`timestamp` is the epoch milliseconds, so you can read whatever shape you need. It
-also fires `fluid-open` / `fluid-close` around the popover.
+
+<kbd>Enter</kbd> / blur). `value` is the ISO string, `date` is a `Date`, and `timestamp` is the
+epoch milliseconds, so you can read whatever shape you need. It also fires `fluid-open` /
+`fluid-close` around the popover.
 
 <Tabs syncKey="framework">
   <TabItem label="HTML">
@@ -158,6 +211,7 @@ also fires `fluid-open` / `fluid-close` around the popover.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="DueDate.tsx"
@@ -176,6 +230,7 @@ also fires `fluid-open` / `fluid-close` around the popover.
       return <fluid-date-picker ref={ref} aria-label="Due date" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="DueDate.vue"
@@ -188,6 +243,7 @@ also fires `fluid-open` / `fluid-close` around the popover.
       <fluid-date-picker aria-label="Due date" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="due-date.component.ts"
@@ -208,6 +264,7 @@ also fires `fluid-open` / `fluid-close` around the popover.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="DueDate.svelte"
@@ -220,6 +277,7 @@ also fires `fluid-open` / `fluid-close` around the popover.
 
     <fluid-date-picker aria-label="Due date" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -234,7 +292,12 @@ blocks submission until a date is chosen. The submitted value is always ISO
     style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'due=' + (new FormData(this).get('due') ?? '(none)');"
   >
-    <fluid-date-picker name="due" required placeholder="Due date" aria-label="Due date"></fluid-date-picker>
+    <fluid-date-picker
+      name="due"
+      required
+      placeholder="Due date"
+      aria-label="Due date"
+    ></fluid-date-picker>
     <fluid-button type="submit">Save</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -272,8 +335,8 @@ layers lives in the [API tables below](#api).
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) lets you tweak the field, popover, and inner
-  calendar tokens visually and exports the CSS above.
+  The [Theme builder](/playground/) lets you tweak the field, popover, and inner calendar tokens
+  visually and exports the CSS above.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -296,7 +359,7 @@ fluid-date-picker::part(dialog) {
 - Anywhere you need both **typed entry and a visual grid** with one accessible
   control that submits a clean ISO value.
 
-### When *not* to use
+### When _not_ to use
 
 - A **start/end span**: use
   [`<fluid-date-range-picker>`](/components/date-range-picker/).
@@ -315,12 +378,12 @@ picker-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| _type a date_ | Enter an ISO or locale date in the field; <kbd>Enter</kbd> commits it (or reverts if invalid). |
-| <kbd>↓</kbd> | Open the calendar and move focus into the grid. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | (in the grid) select the focused day and close. |
-| <kbd>Escape</kbd> | Close the popover and return focus to the field. |
+| Key                                 | Action                                                                                         |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------- |
+| _type a date_                       | Enter an ISO or locale date in the field; <kbd>Enter</kbd> commits it (or reverts if invalid). |
+| <kbd>↓</kbd>                        | Open the calendar and move focus into the grid.                                                |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | (in the grid) select the focused day and close.                                                |
+| <kbd>Escape</kbd>                   | Close the popover and return focus to the field.                                               |
 
 Inside the grid, the full calendar keyboard contract applies (arrows ±1 day/week,
 Home/End, PageUp/PageDown ±month, Shift+PageUp/Down ±year). The field's focus ring
@@ -354,10 +417,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA** and the trigge
 target grows, the day targets grow, and the focus ring thickens. The toggle sets
 the real `data-fluid-conformance` attribute on `<html>`:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

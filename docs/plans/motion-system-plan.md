@@ -8,17 +8,18 @@ vocabulary can't live in an optional pack; `<fluid-animation>` joins core beside
 the observer utilities. Tree-shaking keeps it free for non-users.
 
 ## Conventions (apply throughout)
+
 - **Override ladder for motion too:** components read `--fluid-<comp>-<role>`
   with a fallback to a shared motion token, e.g.
   `animation-duration: var(--fluid-dialog-enter-duration, var(--fluid-duration-normal))`.
 - **Animations are swappable AND opt-out-able** (core design requirement). The
-  animation *name* is itself a token, not hardwired:
+  animation _name_ is itself a token, not hardwired:
   `animation-name: var(--fluid-dialog-enter-animation, fluid-scale-in)`. Four
   layers of control, all declarative (no JS):
   1. **Default**: each component ships a tasteful enter/exit.
   2. **Swap preset**: set `--fluid-<comp>-enter-animation: fluid-slide-in-up`
      (or any shipped preset) at brand / component / instance scope. Works because
-     the full preset set is adopted into *every* component's shadow root, so the
+     the full preset set is adopted into _every_ component's shadow root, so the
      name resolves there.
   3. **None**: `--fluid-<comp>-enter-animation: none`, or the global inherited
      scalar `--fluid-motion: 0` (custom props pierce shadow DOM, so it works at
@@ -45,7 +46,9 @@ the observer utilities. Tree-shaking keeps it free for non-users.
 ---
 
 ## Phase 0: Extract `fluid-animation` from media → core
+
 Media must be purely media (video, video-playlist, animated-image, zoomable-frame).
+
 1. Move `packages/media/src/components/animation/` →
    `packages/components/src/components/animation/`; re-base it on `FluidElement`.
 2. Remove it from `@fluid-ds/media` (delete folder, update `src/index.ts`).
@@ -59,6 +62,7 @@ Media must be purely media (video, video-playlist, animated-image, zoomable-fram
 6. Regenerate CEM; `pnpm verify` + `pnpm docs:build` green.
 
 ## Phase 1: Motion foundation (tokens + shared module)
+
 1. **Tokens** (`@fluid-ds/tokens`, theme-independent): add easings
    `--fluid-easing-decelerate` (enter), `--fluid-easing-accelerate` (exit),
    `--fluid-easing-emphasized`; keep `standard`. Add `--fluid-duration-slower`
@@ -70,8 +74,10 @@ Media must be purely media (video, video-playlist, animated-image, zoomable-fram
 3. Document the set + the per-component motion-token names.
 
 ## Phase 2: Apply standard motion to overlays & disclosure (one per turn)
+
 Each: enter + exit, component motion tokens w/ fallback, reduced-motion guard,
 story state, docs note, browser-verify.
+
 - [ ] **dialog**: scale+fade enter / fade-down exit + backdrop fade; ADD reduced-motion.
 - [ ] **drawer**: slide-in from edge (per `placement`) + backdrop; real keyframes; reduced-motion.
 - [ ] **toast**: slide+fade in (per placement), fade out; reduced-motion. (currently none)
@@ -83,6 +89,7 @@ story state, docs note, browser-verify.
 - [ ] **tabs**: sliding active indicator under the active tab.
 
 ## Phase 3: Consistency sweep
+
 - [ ] Add `prefers-reduced-motion` guards to every animating component missing one
       (audit: callout, carousel, color-picker, copy-button, dialog, drawer,
       file-input, input, number-input, popover, rating, scroller, select,
@@ -90,6 +97,7 @@ story state, docs note, browser-verify.
 - [ ] Normalize hardcoded durations/easings to the motion tokens.
 
 ## Phase 4: Docs, features, verification
+
 - [ ] Rewrite the **Animations guide** (`/guides/animations`): the motion system,
       tokens, standard keyframes, reduced-motion contract, `<fluid-animation>`.
 - [ ] `components/animation.mdx` to full standard parity.
@@ -98,10 +106,11 @@ story state, docs note, browser-verify.
       toast/segmented/tabs incl. `prefers-reduced-motion` emulation.
 
 ## Status: COMPLETE
+
 - **Phase 0 ✅**: `fluid-animation` moved to core; media is purely media. (`1344895`)
 - **Phase 1 ✅**: motion tokens + `internal/motion.ts`. (`d8ea0ca`)
 - **Phase 2 ✅**: dialog, drawer, toast, popover, tooltip, accordion enter/exit
-  + tabs & segmented-control sliding indicators; dropdown already animated. (`db37b87`)
+  - tabs & segmented-control sliding indicators; dropdown already animated. (`db37b87`)
 - **Phase 3 ✅**: carousel autoplay now respects reduced-motion; principled
   scope recorded (auto-motion guarded; color/user-driven transitions don't need
   the guard). (`fix(carousel)`)
@@ -111,11 +120,12 @@ story state, docs note, browser-verify.
 The configuration wizard (`configuration-wizard-plan.md`) is the next effort.
 
 ### P2 application recipe (per component)
+
 1. `static styles = [motionStyles, reducedMotion, css\`…\`]`.
 2. Animate the relevant part on open/close:
    `animation: var(--fluid-<c>-enter-animation, fluid-scale-in)
-     calc(var(--fluid-<c>-enter-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-     var(--fluid-<c>-enter-easing, var(--fluid-easing-decelerate)) both;`
+calc(var(--fluid-<c>-enter-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
+var(--fluid-<c>-enter-easing, var(--fluid-easing-decelerate)) both;`
    (exit variant on close, using `accelerate`).
 3. Annotate the new `--fluid-<c>-enter/exit-animation` tokens with `@cssproperty`.
 4. Add a story state if useful; browser-verify open/close + reduced-motion emulation.

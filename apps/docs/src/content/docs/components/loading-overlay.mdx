@@ -17,7 +17,9 @@ via a polite `role="status"` region.
   <fluid-loading-overlay active label="Loading account…">
     <div style="width: 320px; padding: 20px; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); background: var(--fluid-surface-base); color: var(--fluid-text-primary);">
       <h3 style="margin: 0 0 8px;">Account summary</h3>
-      <p style="margin: 0; color: var(--fluid-text-secondary);">Your balance and recent activity load here.</p>
+      <p style="margin: 0; color: var(--fluid-text-secondary);">
+        Your balance and recent activity load here.
+      </p>
     </div>
   </fluid-loading-overlay>
 </Demo>
@@ -34,6 +36,7 @@ via a polite `role="status"` region.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/loading-overlay/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -45,6 +48,7 @@ via a polite `role="status"` region.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/loading-overlay";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -110,6 +114,7 @@ Set `active` before the work starts and clear it when the promise settles.
       }
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Panel.tsx"
@@ -133,6 +138,7 @@ Set `active` before the work starts and clear it when the promise settles.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Panel.vue"
@@ -156,6 +162,7 @@ Set `active` before the work starts and clear it when the promise settles.
       </fluid-loading-overlay>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="panel.component.ts"
@@ -181,6 +188,7 @@ Set `active` before the work starts and clear it when the promise settles.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Panel.svelte"
@@ -198,6 +206,7 @@ Set `active` before the work starts and clear it when the promise settles.
       <form on:submit|preventDefault={save}>…</form>
     </fluid-loading-overlay>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -264,7 +273,19 @@ retune `--fluid-loading-overlay-scrim` and `--fluid-loading-overlay-fg`.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Spinner" href="/components/spinner/" description="The indeterminate loader the overlay renders." />
-  <LinkCard title="Skeleton" href="/components/skeleton/" description="Placeholder shapes for first-load content." />
-  <LinkCard title="Dialog" href="/components/dialog/" description="Block the whole page instead of a region." />
+  <LinkCard
+    title="Spinner"
+    href="/components/spinner/"
+    description="The indeterminate loader the overlay renders."
+  />
+  <LinkCard
+    title="Skeleton"
+    href="/components/skeleton/"
+    description="Placeholder shapes for first-load content."
+  />
+  <LinkCard
+    title="Dialog"
+    href="/components/dialog/"
+    description="Block the whole page instead of a region."
+  />
 </CardGrid>

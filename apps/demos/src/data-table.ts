@@ -63,16 +63,75 @@ function makeRng(seed: number): () => number {
 const pick = <T>(list: readonly T[], r: number): T =>
   list[Math.floor(r * list.length) % list.length]!;
 
-const FIRST = ["Iris", "Marco", "Aisha", "Oliver", "Soraya", "Henrik", "Yuki", "Daria", "Lena", "Tom", "Priya", "Jonas", "Mei", "Carlos", "Amara", "Finn", "Noor", "Pavel", "Sofia", "Ethan"] as const;
-const LAST = ["Chen", "Diaz", "Khan", "Pratt", "Lopes", "Berg", "Tanaka", "Ivanov", "Visser", "Novak", "Sharma", "Meyer", "Lindqvist", "Okafor", "Costa", "Moreau", "Haddad", "Kowalski", "Nilsen", "Baker"] as const;
+const FIRST = [
+  "Iris",
+  "Marco",
+  "Aisha",
+  "Oliver",
+  "Soraya",
+  "Henrik",
+  "Yuki",
+  "Daria",
+  "Lena",
+  "Tom",
+  "Priya",
+  "Jonas",
+  "Mei",
+  "Carlos",
+  "Amara",
+  "Finn",
+  "Noor",
+  "Pavel",
+  "Sofia",
+  "Ethan"
+] as const;
+const LAST = [
+  "Chen",
+  "Diaz",
+  "Khan",
+  "Pratt",
+  "Lopes",
+  "Berg",
+  "Tanaka",
+  "Ivanov",
+  "Visser",
+  "Novak",
+  "Sharma",
+  "Meyer",
+  "Lindqvist",
+  "Okafor",
+  "Costa",
+  "Moreau",
+  "Haddad",
+  "Kowalski",
+  "Nilsen",
+  "Baker"
+] as const;
 const CITIES: readonly (readonly [string, string])[] = [
-  ["Amsterdam", "Netherlands"], ["Rotterdam", "Netherlands"], ["Berlin", "Germany"],
-  ["Hamburg", "Germany"], ["Paris", "France"], ["Lyon", "France"],
-  ["Madrid", "Spain"], ["Milan", "Italy"], ["Copenhagen", "Denmark"],
-  ["Oslo", "Norway"], ["Vienna", "Austria"], ["Dublin", "Ireland"]
+  ["Amsterdam", "Netherlands"],
+  ["Rotterdam", "Netherlands"],
+  ["Berlin", "Germany"],
+  ["Hamburg", "Germany"],
+  ["Paris", "France"],
+  ["Lyon", "France"],
+  ["Madrid", "Spain"],
+  ["Milan", "Italy"],
+  ["Copenhagen", "Denmark"],
+  ["Oslo", "Norway"],
+  ["Vienna", "Austria"],
+  ["Dublin", "Ireland"]
 ];
 // Weighted: most orders in a healthy shop are paid.
-const STATUSES: readonly OrderStatus[] = ["Paid", "Paid", "Paid", "Paid", "Pending", "Pending", "Refunded", "Failed"];
+const STATUSES: readonly OrderStatus[] = [
+  "Paid",
+  "Paid",
+  "Paid",
+  "Paid",
+  "Pending",
+  "Pending",
+  "Refunded",
+  "Failed"
+];
 const CHANNELS = ["Web", "Mobile", "Marketplace", "POS"] as const;
 const PAYMENTS = ["Card", "iDEAL", "PayPal", "Invoice", "Gift card"] as const;
 const COURIERS = ["PostNL", "DHL", "UPS", "DPD", "GLS"] as const;
@@ -99,9 +158,7 @@ function generateOrders(count: number): Order[] {
       region: { city, country },
       courier: pick(COURIERS, rand()),
       tracking: `3S${String(Math.floor(rand() * 1e9)).padStart(9, "0")}NL`,
-      placed: new Date(start + Math.floor(rand() * 600) * 86_400_000)
-        .toISOString()
-        .slice(0, 10)
+      placed: new Date(start + Math.floor(rand() * 600) * 86_400_000).toISOString().slice(0, 10)
     };
   });
 }
@@ -109,7 +166,11 @@ function generateOrders(count: number): Order[] {
 const ALL_ORDERS = generateOrders(TOTAL_ORDERS);
 
 const money = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" });
-const shortDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" });
+const shortDate = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric"
+});
 
 const statusVariant: Record<OrderStatus, string> = {
   Paid: "success",
@@ -137,7 +198,9 @@ const columns: FluidInfiniteTableColumn<Order>[] = [
     renderCell: ({ row }) => html`
       <div style="display: grid; line-height: 1.35;">
         <span style="font-weight: 600;">${row.customer.name}</span>
-        <span style="color: var(--fluid-text-secondary); font-size: 0.8125rem;">${row.customer.email}</span>
+        <span style="color: var(--fluid-text-secondary); font-size: 0.8125rem;"
+          >${row.customer.email}</span
+        >
       </div>
     `
   },
@@ -155,7 +218,8 @@ const columns: FluidInfiniteTableColumn<Order>[] = [
     width: "8rem",
     align: "end",
     sortable: true,
-    renderCell: ({ row }) => html`<span style="font-variant-numeric: tabular-nums;">${money.format(row.amount)}</span>`
+    renderCell: ({ row }) =>
+      html`<span style="font-variant-numeric: tabular-nums;">${money.format(row.amount)}</span>`
   },
   {
     key: "items",
@@ -240,7 +304,12 @@ main.innerHTML = `
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
     ${[
       ["Orders", TOTAL_ORDERS.toLocaleString(), "users", "var(--fluid-text-secondary)"],
-      ["Paid revenue", money.format(Math.round(revenue)), "circle-check", "var(--fluid-color-success, #16a34a)"],
+      [
+        "Paid revenue",
+        money.format(Math.round(revenue)),
+        "circle-check",
+        "var(--fluid-color-success, #16a34a)"
+      ],
       ["Pending", pendingCount.toLocaleString(), "bell", "var(--fluid-color-warning, #d97706)"],
       ["Refunded", refundedCount.toLocaleString(), "circle-x", "var(--fluid-color-info, #2563eb)"]
     ]
@@ -329,8 +398,7 @@ main.innerHTML = `
 
 // Wire interactions
 
-const $ = <T extends Element>(sel: string): T | null =>
-  document.querySelector<T>(sel);
+const $ = <T extends Element>(sel: string): T | null => document.querySelector<T>(sel);
 
 const table = $<FluidInfiniteTable>("#orders-table")!;
 const toaster = $<HTMLElement & { toast: (o: { message: string; variant: string }) => void }>(

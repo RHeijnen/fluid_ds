@@ -4,11 +4,16 @@ const port = Number(process.env.SSR_TEST_PORT ?? 4178);
 const baseURL = process.env.SSR_TEST_BASE_URL ?? `http://127.0.0.1:${port}`;
 const supported = ["chromium", "firefox", "webkit"] as const;
 const selection = process.env.FLUID_BROWSERS ?? "chromium";
-const requested = selection === "all" ? [...supported] : selection.split(",").map((name) => name.trim());
-if (requested.some((name) => !supported.includes(name as typeof supported[number]))) {
+const requested =
+  selection === "all" ? [...supported] : selection.split(",").map((name) => name.trim());
+if (requested.some((name) => !supported.includes(name as (typeof supported)[number]))) {
   throw new Error(`Unsupported FLUID_BROWSERS: ${selection}`);
 }
-const profiles = { chromium: "Desktop Chrome", firefox: "Desktop Firefox", webkit: "Desktop Safari" } as const;
+const profiles = {
+  chromium: "Desktop Chrome",
+  firefox: "Desktop Firefox",
+  webkit: "Desktop Safari"
+} as const;
 
 export default defineConfig({
   testDir: "./tests",
@@ -27,9 +32,12 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure"
   },
-  projects: supported.filter((name) => requested.includes(name)).map((name) => ({
-    name, use: { ...devices[profiles[name]] }
-  })),
+  projects: supported
+    .filter((name) => requested.includes(name))
+    .map((name) => ({
+      name,
+      use: { ...devices[profiles[name]] }
+    })),
   webServer: process.env.SSR_TEST_BASE_URL
     ? undefined
     : {

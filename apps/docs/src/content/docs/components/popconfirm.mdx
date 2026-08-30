@@ -16,7 +16,9 @@ confirmations.
 
 <Demo>
   <fluid-popconfirm message="Delete this item? This cannot be undone." confirm-text="Delete">
-    <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" tone="danger">
+      Delete
+    </fluid-button>
   </fluid-popconfirm>
 </Demo>
 
@@ -32,6 +34,7 @@ confirmations.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/popconfirm/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +46,7 @@ confirmations.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/popconfirm";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -55,7 +59,9 @@ fires `fluid-confirm` when the user proceeds.
 
 <Demo>
   <fluid-popconfirm message="Delete this item? This cannot be undone." confirm-text="Delete">
-    <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" tone="danger">
+      Delete
+    </fluid-button>
   </fluid-popconfirm>
 </Demo>
 
@@ -73,13 +79,19 @@ theme-independent.
 
 <Demo>
   <fluid-popconfirm tone="danger" message="Delete this file?" confirm-text="Delete">
-    <fluid-button slot="trigger" variant="secondary" tone="danger">Danger</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" tone="danger">
+      Danger
+    </fluid-button>
   </fluid-popconfirm>
   <fluid-popconfirm tone="warning" message="Discard unsaved changes?" confirm-text="Discard">
-    <fluid-button slot="trigger" variant="secondary" tone="warning">Warning</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" tone="warning">
+      Warning
+    </fluid-button>
   </fluid-popconfirm>
   <fluid-popconfirm tone="brand" message="Publish this draft now?" confirm-text="Publish">
-    <fluid-button slot="trigger" variant="secondary">Brand</fluid-button>
+    <fluid-button slot="trigger" variant="secondary">
+      Brand
+    </fluid-button>
   </fluid-popconfirm>
 </Demo>
 
@@ -92,7 +104,9 @@ theme-independent.
     confirm-text="Sign out everywhere"
     cancel-text="Stay signed in"
   >
-    <fluid-button slot="trigger" variant="secondary">Sign out</fluid-button>
+    <fluid-button slot="trigger" variant="secondary">
+      Sign out
+    </fluid-button>
   </fluid-popconfirm>
 </Demo>
 
@@ -126,6 +140,7 @@ the Cancel button, an outside click, or Escape.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Row.tsx"
@@ -141,6 +156,7 @@ the Cancel button, an outside click, or Escape.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Row.vue"
@@ -157,6 +173,7 @@ the Cancel button, an outside click, or Escape.
       </fluid-popconfirm>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="row.component.ts"
@@ -178,6 +195,7 @@ the Cancel button, an outside click, or Escape.
       remove() { /* run the destructive action */ }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Row.svelte"
@@ -191,6 +209,7 @@ the Cancel button, an outside click, or Escape.
       <fluid-button slot="trigger" variant="secondary" tone="danger">Delete</fluid-button>
     </fluid-popconfirm>
     ```
+
   </TabItem>
 </Tabs>
 

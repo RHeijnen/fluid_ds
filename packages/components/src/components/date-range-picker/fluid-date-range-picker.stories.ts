@@ -20,12 +20,14 @@ type Args = Pick<
   | "readonly"
   | "typeable"
   | "noPresets"
+  | "noAutoOpen"
+  | "noSelectOnFocus"
 >;
 
 const meta: Meta<Args> = {
   title: "Components/Forms/Date Range Picker",
   component: "fluid-date-range-picker",
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     start: { control: "text" },
     end: { control: "text" },
@@ -38,7 +40,9 @@ const meta: Meta<Args> = {
     required: { control: "boolean" },
     readonly: { control: "boolean" },
     typeable: { control: "boolean" },
-    noPresets: { control: "boolean" }
+    noPresets: { control: "boolean" },
+    noAutoOpen: { control: "boolean" },
+    noSelectOnFocus: { control: "boolean" }
   },
   args: {
     start: "2026-06-08",
@@ -52,7 +56,9 @@ const meta: Meta<Args> = {
     required: false,
     readonly: false,
     typeable: false,
-    noPresets: false
+    noPresets: false,
+    noAutoOpen: false,
+    noSelectOnFocus: false
   },
   render: (args) => renderRange(args)
 };
@@ -187,6 +193,8 @@ function renderRange(args: Args) {
       ?readonly=${args.readonly}
       ?typeable=${args.typeable}
       ?no-presets=${args.noPresets}
+      ?no-auto-open=${args.noAutoOpen}
+      ?no-select-on-focus=${args.noSelectOnFocus}
     ></fluid-date-range-picker>
   `;
 }

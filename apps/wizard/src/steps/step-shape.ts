@@ -46,12 +46,23 @@ export class WizardStepShape extends WizardStep {
 
       <div class="field">
         <label for="round">Corner roundness, ${this.roundness.toFixed(2)}×</label>
-        <fluid-slider id="round" min="0" max="1.6" step="0.1" value=${this.roundness} @fluid-change=${this.onRoundness}></fluid-slider>
+        <fluid-slider
+          id="round"
+          min="0"
+          max="1.6"
+          step="0.1"
+          value=${this.roundness}
+          @fluid-change=${this.onRoundness}
+        ></fluid-slider>
       </div>
 
       <div class="field">
         <label>Spacing density</label>
-        <fluid-segmented-control value=${this.density} aria-label="Density" @fluid-change=${this.onDensity}>
+        <fluid-segmented-control
+          value=${this.density}
+          aria-label="Density"
+          @fluid-change=${this.onDensity}
+        >
           <fluid-segment value="compact">Compact</fluid-segment>
           <fluid-segment value="cozy">Cozy</fluid-segment>
           <fluid-segment value="comfortable">Comfortable</fluid-segment>

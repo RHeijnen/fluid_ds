@@ -45,9 +45,7 @@ describe("<fluid-timeline>", () => {
       </fluid-timeline>
     `);
     await elementUpdated(el);
-    const items = Array.from(
-      el.querySelectorAll("fluid-timeline-item")
-    ) as FluidTimelineItem[];
+    const items = Array.from(el.querySelectorAll("fluid-timeline-item")) as FluidTimelineItem[];
     expect(items[0]!.last).to.be.false;
     expect(items[1]!.last).to.be.false;
     expect(items[2]!.last).to.be.true;
@@ -61,9 +59,7 @@ describe("<fluid-timeline>", () => {
       </fluid-timeline>
     `);
     await elementUpdated(el);
-    const items = Array.from(
-      el.querySelectorAll("fluid-timeline-item")
-    ) as FluidTimelineItem[];
+    const items = Array.from(el.querySelectorAll("fluid-timeline-item")) as FluidTimelineItem[];
     await elementUpdated(items[1]!);
     const lastLine = items[1]!.shadowRoot!.querySelector<HTMLElement>(".line")!;
     expect(getComputedStyle(lastLine).display).to.equal("none");
@@ -182,5 +178,23 @@ describe("<fluid-timeline-item>", () => {
     await elementUpdated(timeline);
     await aTimeout(20);
     await expect(timeline).to.be.accessible();
+  });
+
+  /* Regression: the item's default slot used to sit directly in the .content
+     flex column, so every slotted node blockified into its own flex row and
+     inline links each rendered on their own line. */
+  it("item body with inline links flows as one paragraph", async () => {
+    const el = await fixture<HTMLElement>(html`
+      <fluid-timeline aria-label="History" style="width: 30rem">
+        <fluid-timeline-item>
+          See the <a href="#notes">release notes</a> and the <a href="#log">changelog</a>.
+        </fluid-timeline-item>
+      </fluid-timeline>
+    `);
+    await aTimeout(20);
+    const [first, second] = Array.from(el.querySelectorAll("a"));
+    expect(getComputedStyle(first!).display).to.equal("inline");
+    expect(getComputedStyle(second!).display).to.equal("inline");
+    expect(first!.getBoundingClientRect().top).to.equal(second!.getBoundingClientRect().top);
   });
 });

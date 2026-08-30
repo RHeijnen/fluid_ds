@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Forms/Calendar",
   component: "fluid-calendar",
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     min: { control: "text" },

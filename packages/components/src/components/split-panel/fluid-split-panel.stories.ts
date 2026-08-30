@@ -5,16 +5,14 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Layout/Split panel",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
 type Story = StoryObj;
 
 const block = (label: string) => html`
-  <div
-    style="padding: var(--fluid-space-4); height: 100%; background: var(--fluid-surface-muted);"
-  >
+  <div style="padding: var(--fluid-space-4); height: 100%; background: var(--fluid-surface-muted);">
     ${label}
   </div>
 `;

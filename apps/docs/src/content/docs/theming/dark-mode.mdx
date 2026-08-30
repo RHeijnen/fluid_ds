@@ -58,7 +58,10 @@ panel, light and dark:
 </Demo>
 
 <Demo title='Same markup under data-fluid-theme="dark"'>
-  <div data-fluid-theme="dark" style="background:var(--fluid-surface-base); color:var(--fluid-text-primary); border:1px solid var(--fluid-border-default); border-radius:12px; padding:1.25rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+  <div
+    data-fluid-theme="dark"
+    style="background:var(--fluid-surface-base); color:var(--fluid-text-primary); border:1px solid var(--fluid-border-default); border-radius:12px; padding:1.25rem; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;"
+  >
     <fluid-button>Primary</fluid-button>
     <fluid-button variant="secondary">Secondary</fluid-button>
     <fluid-badge>Badge</fluid-badge>
@@ -75,10 +78,14 @@ you only want part of the UI dark.
 Two independent axes you can combine freely:
 
 - `data-fluid-theme` = **light / dark** (the surface + text scheme).
-- `data-fluid-brand` = **which accent palette** (Default / Midnight / Corporate / your own).
+- `data-fluid-brand` = **which accent palette** (one of the six
+  [presets](/theming/brand/): Default, Midnight, Corporate, Titanium, Glass,
+  Orchid, or your own).
 
 So "Midnight brand in dark mode" is just both attributes set. They never fight,
-one picks the canvas, the other picks the accent.
+one picks the canvas, the other picks the accent. Every shipped preset
+re-derives its accent under `data-fluid-theme="dark"`, and Glass inverts its
+frost and wash, so the pairings hold in both schemes.
 
 ## Where to go next
 

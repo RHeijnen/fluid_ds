@@ -13,8 +13,12 @@ stand-alone unit and can be `removable`, firing **`fluid-remove`** when the user
 clicks the ×.
 
 <Demo>
-  <fluid-tag removable variant="info">React</fluid-tag>
-  <fluid-tag removable variant="info">TypeScript</fluid-tag>
+  <fluid-tag removable variant="info">
+    React
+  </fluid-tag>
+  <fluid-tag removable variant="info">
+    TypeScript
+  </fluid-tag>
   <fluid-tag variant="success">Verified</fluid-tag>
 </Demo>
 
@@ -30,6 +34,7 @@ clicks the ×.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tag/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +46,7 @@ clicks the ×.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tag";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -75,9 +81,15 @@ click, the host doesn't remove itself, so you decide whether to delete
 it from the DOM, hide it, or revert.
 
 <Demo>
-  <fluid-tag removable variant="info">React</fluid-tag>
-  <fluid-tag removable variant="info">TypeScript</fluid-tag>
-  <fluid-tag removable variant="info">Lit</fluid-tag>
+  <fluid-tag removable variant="info">
+    React
+  </fluid-tag>
+  <fluid-tag removable variant="info">
+    TypeScript
+  </fluid-tag>
+  <fluid-tag removable variant="info">
+    Lit
+  </fluid-tag>
 </Demo>
 
 ```html
@@ -113,6 +125,7 @@ A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
       document.getElementById("t").addEventListener("fluid-remove", (e) => e.target.remove());
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Filters.tsx"
@@ -129,6 +142,7 @@ A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
       ));
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Filters.vue"
@@ -143,6 +157,7 @@ A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
         @fluid-remove="tags = tags.filter((x) => x !== t)">{{ t }}</fluid-tag>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="filters.component.ts"
@@ -162,6 +177,7 @@ A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
       remove(t: string) { this.tags = this.tags.filter((x) => x !== t); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Filters.svelte"
@@ -174,6 +190,7 @@ A `removable` tag fires **`fluid-remove`** when its × is clicked. The host does
       <fluid-tag removable on:fluid-remove={() => (tags = tags.filter((x) => x !== t))}>{t}</fluid-tag>
     {/each}
     ```
+
   </TabItem>
 </Tabs>
 

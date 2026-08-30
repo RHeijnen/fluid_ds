@@ -24,8 +24,12 @@ warning announce assertively (`role="alert"`).
     title="Payment successful"
     subtitle="Your order is confirmed. A receipt has been emailed to you."
   >
-    <fluid-button slot="actions" variant="primary">View order</fluid-button>
-    <fluid-button slot="actions" variant="secondary">Back home</fluid-button>
+    <fluid-button slot="actions" variant="primary">
+      View order
+    </fluid-button>
+    <fluid-button slot="actions" variant="secondary">
+      Back home
+    </fluid-button>
   </fluid-result>
 </Demo>
 
@@ -41,6 +45,7 @@ warning announce assertively (`role="alert"`).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/result/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -52,6 +57,7 @@ warning announce assertively (`role="alert"`).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/result";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -62,14 +68,23 @@ warning announce assertively (`role="alert"`).
 Each `status` sets the default icon, its color, and the live-region role.
 
 <Demo>
-  <fluid-result status="error" title="Submission failed" subtitle="We couldn't process your request. Please try again.">
-    <fluid-button slot="actions" variant="primary">Retry</fluid-button>
+  <fluid-result
+    status="error"
+    title="Submission failed"
+    subtitle="We couldn't process your request. Please try again."
+  >
+    <fluid-button slot="actions" variant="primary">
+      Retry
+    </fluid-button>
   </fluid-result>
 </Demo>
 
 ```html
-<fluid-result status="error" title="Submission failed"
-  subtitle="We couldn't process your request. Please try again.">
+<fluid-result
+  status="error"
+  title="Submission failed"
+  subtitle="We couldn't process your request. Please try again."
+>
   <fluid-button slot="actions" variant="primary">Retry</fluid-button>
 </fluid-result>
 ```
@@ -77,22 +92,37 @@ Each `status` sets the default icon, its color, and the live-region role.
 ### Info and warning
 
 <Demo>
-  <fluid-result status="warning" title="Subscription expiring" subtitle="Your plan ends in 3 days. Renew now to avoid losing access.">
-    <fluid-button slot="actions" variant="primary">Renew plan</fluid-button>
+  <fluid-result
+    status="warning"
+    title="Subscription expiring"
+    subtitle="Your plan ends in 3 days. Renew now to avoid losing access."
+  >
+    <fluid-button slot="actions" variant="primary">
+      Renew plan
+    </fluid-button>
   </fluid-result>
 </Demo>
 
 ### Page not found
 
 <Demo>
-  <fluid-result status="404" title="Page not found" subtitle="The page you're looking for doesn't exist or has moved.">
-    <fluid-button slot="actions" variant="primary">Go home</fluid-button>
+  <fluid-result
+    status="404"
+    title="Page not found"
+    subtitle="The page you're looking for doesn't exist or has moved."
+  >
+    <fluid-button slot="actions" variant="primary">
+      Go home
+    </fluid-button>
   </fluid-result>
 </Demo>
 
 ```html
-<fluid-result status="404" title="Page not found"
-  subtitle="The page you're looking for doesn't exist or has moved.">
+<fluid-result
+  status="404"
+  title="Page not found"
+  subtitle="The page you're looking for doesn't exist or has moved."
+>
   <fluid-button slot="actions" variant="primary">Go home</fluid-button>
 </fluid-result>
 ```
@@ -146,6 +176,7 @@ default slot.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue
@@ -160,6 +191,7 @@ default slot.
       </fluid-result>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts
@@ -179,6 +211,7 @@ default slot.
     })
     export class Confirmation {}
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte
@@ -191,6 +224,7 @@ default slot.
       <fluid-button slot="actions" variant="primary">View order</fluid-button>
     </fluid-result>
     ```
+
   </TabItem>
 </Tabs>
 

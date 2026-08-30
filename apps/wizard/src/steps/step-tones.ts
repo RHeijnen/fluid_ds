@@ -37,7 +37,10 @@ export class WizardStepTones extends WizardStep {
     "success / danger / warning / info are theme-independent across brands, a delete button stays red everywhere. Most teams keep the defaults.";
 
   @state() private values: Record<Tone, string> = Object.fromEntries(
-    TONES.map((t) => [t, themeStore.get(`--fluid-${t}-base`) ?? semanticDefault(`--fluid-${t}-base`)])
+    TONES.map((t) => [
+      t,
+      themeStore.get(`--fluid-${t}-base`) ?? semanticDefault(`--fluid-${t}-base`)
+    ])
   ) as Record<Tone, string>;
 
   private onPick(tone: Tone, e: Event): void {

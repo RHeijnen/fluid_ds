@@ -2,18 +2,9 @@ import type { Meta, StoryObj } from "@storybook/web-components";
 
 import {
   confetti,
-  fireworks,
-  emojiBurst,
-  emojiRain,
-  emojiFountain,
-  bubbles,
-  snow,
-  sparkles,
-  streamers,
-  pulse,
-  stars,
-  hearts,
-  pride,
+  EFFECT_CATALOG,
+  EFFECT_ORIGIN_PRESETS,
+  EFFECTS,
   type EffectHandle
 } from "./index.js";
 import "../define/celebrate.js";
@@ -27,7 +18,7 @@ const meta: Meta = {
   title: "Animations/Effects",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" },
+    status: { type: "stable" },
     docs: {
       description: {
         component:
@@ -47,25 +38,18 @@ interface ButtonSpec {
   ambient?: boolean;
 }
 
-const oneShot: ButtonSpec[] = [
-  { label: "🎉 Confetti", fire: (o) => confetti({ origin: o }) },
-  { label: "🎆 Confetti cannons", fire: () => confetti({ cannons: true }) },
-  { label: "🎇 Fireworks", fire: () => fireworks() },
-  { label: "😄 Emoji burst", fire: (o) => emojiBurst({ origin: o }) },
-  { label: "🎀 Streamers", fire: (o) => streamers({ origin: o }) },
-  { label: "💥 Pulse", fire: (o) => pulse({ origin: o }) },
-  { label: "⭐ Stars", fire: (o) => stars({ origin: o }) },
-  { label: "❤️ Hearts", fire: (o) => hearts({ origin: o }) },
-  { label: "🏳️‍🌈 Pride", fire: () => pride() }
-];
+const effects: ButtonSpec[] = EFFECT_CATALOG.filter(
+  (effect): boolean => !("hidden" in effect && effect.hidden)
+).map((effect) => ({
+  label: `${effect.emoji} ${effect.label}`,
+  fire: (origin) => EFFECTS[effect.name](effect.origin ? { origin } : undefined),
+  ambient: effect.kind === "ambient"
+}));
 
-const ambient: ButtonSpec[] = [
-  { label: "❄️ Snow", fire: () => snow(), ambient: true },
-  { label: "🌧️ Emoji rain", fire: () => emojiRain(), ambient: true },
-  { label: "⛲ Emoji fountain", fire: (o) => emojiFountain({ origin: o }), ambient: true },
-  { label: "🫧 Bubbles", fire: () => bubbles(), ambient: true },
-  { label: "✨ Sparkles", fire: (o) => sparkles({ origin: o }), ambient: true }
-];
+effects.splice(1, 0, {
+  label: "🎉 Bottom-corner confetti",
+  fire: () => confetti({ sources: EFFECT_ORIGIN_PRESETS["bottom-corners"] })
+});
 
 function makeButton(spec: ButtonSpec): HTMLButtonElement {
   const btn = document.createElement("button");
@@ -77,16 +61,20 @@ function makeButton(spec: ButtonSpec): HTMLButtonElement {
   let handle: EffectHandle | undefined;
   btn.addEventListener("click", () => {
     if (spec.ambient && handle) {
-      handle.stop();
+      handle.fizzle();
       handle = undefined;
-      btn.dataset["running"] = "";
+      delete btn.dataset["running"];
       return;
     }
     handle = spec.fire(btn);
     if (spec.ambient) {
       btn.dataset["running"] = "1";
-      void handle.finished.then(() => {
-        handle = undefined;
+      const current = handle;
+      void current.finished.then(() => {
+        if (handle === current) {
+          handle = undefined;
+          delete btn.dataset["running"];
+        }
       });
     }
   });
@@ -95,9 +83,8 @@ function makeButton(spec: ButtonSpec): HTMLButtonElement {
 
 function gallery(): HTMLElement {
   const wrap = document.createElement("div");
-  wrap.style.cssText =
-    "display:flex;flex-wrap:wrap;gap:.75rem;max-width:48rem;font:inherit;";
-  for (const spec of [...oneShot, ...ambient]) wrap.appendChild(makeButton(spec));
+  wrap.style.cssText = "display:flex;flex-wrap:wrap;gap:.75rem;max-width:48rem;font:inherit;";
+  for (const spec of effects) wrap.appendChild(makeButton(spec));
   return wrap;
 }
 

@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-rating>` is the row-of-stars rating control, interactive by default,
 switchable to read-only for displaying averages. Half-stars, custom symbols
 (hearts, thumbs, anything you slot in), full keyboard support, and form
@@ -30,6 +29,7 @@ participation.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/rating/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +41,7 @@ participation.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/rating";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -81,7 +82,7 @@ is enough.
 <Demo>
   <fluid-rating value="3" aria-label="Hearts">
     <svg slot="symbol" viewBox="0 0 24 24" fill="currentColor" style="width: 100%; height: 100%;">
-      <path d="M12 21s-7-4.5-9.5-9C.4 8.3 2 4 5.5 4 7.7 4 9.7 5.3 12 7.7 14.3 5.3 16.3 4 18.5 4 22 4 23.6 8.3 21.5 12 19 16.5 12 21 12 21z"/>
+      <path d="M12 21s-7-4.5-9.5-9C.4 8.3 2 4 5.5 4 7.7 4 9.7 5.3 12 7.7 14.3 5.3 16.3 4 18.5 4 22 4 23.6 8.3 21.5 12 19 16.5 12 21 12 21z" />
     </svg>
   </fluid-rating>
 </Demo>
@@ -116,6 +117,7 @@ commits a new score.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="ScoreInput.tsx"
@@ -134,6 +136,7 @@ commits a new score.
       return <fluid-rating ref={ref} aria-label="Rate this" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="ScoreInput.vue"
@@ -146,6 +149,7 @@ commits a new score.
       <fluid-rating aria-label="Rate this" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="score-input.component.ts"
@@ -164,6 +168,7 @@ commits a new score.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="ScoreInput.svelte"
@@ -176,6 +181,7 @@ commits a new score.
 
     <fluid-rating aria-label="Rate this" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -195,7 +201,7 @@ Rating is form-associated: it submits `name=<value>`.
 - Capturing a satisfaction or quality score (1–5 stars is the canonical case).
 - Displaying an average rating elsewhere on the page (`readonly`).
 
-### When *not* to use
+### When _not_ to use
 
 - **Exact precision** (a percentage, not a 1–5 score): use
   [`<fluid-slider>`](/components/slider/).
@@ -215,8 +221,8 @@ token that falls back to a main semantic var** (the override ladder). The
 ```
 
 <Aside type="tip">
-  Select a `fluid-rating` in the [Theme builder](/playground/) to tweak the
-  active / inactive colors, symbol size, and focus tokens visually.
+  Select a `fluid-rating` in the [Theme builder](/playground/) to tweak the active / inactive
+  colors, symbol size, and focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -233,11 +239,11 @@ cross-component contract is in the [Accessibility guide](/guides/accessibility/)
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>→</kbd> / <kbd>↑</kbd> | Increase by `precision`. |
-| <kbd>←</kbd> / <kbd>↓</kbd> | Decrease by `precision`. |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to 0 / `max`. |
+| Key                              | Action                   |
+| -------------------------------- | ------------------------ |
+| <kbd>→</kbd> / <kbd>↑</kbd>      | Increase by `precision`. |
+| <kbd>←</kbd> / <kbd>↓</kbd>      | Decrease by `precision`. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to 0 / `max`.       |
 
 The focus ring renders around the row and reads `--fluid-focus-ring-width`.
 
@@ -265,10 +271,10 @@ input, so an average display can't be edited.
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

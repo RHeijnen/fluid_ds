@@ -65,7 +65,7 @@ registerIcon(
  * @fires fluid-menu-toggle - Dispatched when the built-in hamburger button is
  *   pressed. `event.detail.expanded` carries the new intended expanded state
  *   (the negation of the current `expanded` value). Bubbles and is composed.
-*/
+ */
 export class FluidAppBar extends FluidElement {
   static override styles = css`
     :host {
@@ -146,10 +146,7 @@ export class FluidAppBar extends FluidElement {
     }
 
     .menu-button:hover {
-      background-color: var(
-        --fluid-app-bar-button-hover-bg,
-        var(--fluid-surface-muted)
-      );
+      background-color: var(--fluid-app-bar-button-hover-bg, var(--fluid-surface-muted));
     }
 
     .menu-button:focus-visible {

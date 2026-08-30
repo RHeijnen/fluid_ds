@@ -56,7 +56,11 @@ Renders `logo` full-bleed behind semi-opaque dotted modules. Forces `ec-level`
 to `H`. Decorative-first: scan-test on a real phone before shipping.
 
 ```html
-<fluid-qr-code value="https://example.com" artistic logo="/photo.jpg"></fluid-qr-code>
+<fluid-qr-code
+  value="https://example.com"
+  artistic
+  logo="/photo.jpg"
+></fluid-qr-code>
 ```
 
 ## Export
@@ -64,32 +68,32 @@ to `H`. Decorative-first: scan-test on a real phone before shipping.
 ```ts
 const el = document.querySelector("fluid-qr-code");
 const dataUrl = await el.toDataURL(); // PNG data URL
-await el.download("my-qr.png");        // browser download
+await el.download("my-qr.png"); // browser download
 ```
 
 ## Props
 
-| Prop | Default | Description |
-| --- | --- | --- |
-| `value` | `""` | The data to encode |
-| `size` | `160` | Pixel size of the rendered code |
-| `ec-level` | `"M"` | Error correction: `L`, `M`, `Q`, `H` (forced to `H` with `logo`/`artistic`) |
-| `fill` | token | Module color (falls back to `--fluid-qr-color`) |
-| `background` | token | Background color (falls back to `--fluid-qr-bg`) |
-| `margin` | `2` | Quiet-zone margin, in modules |
-| `label` | `""` | Accessible name; derived from `value` when empty |
-| `module-shape` | `"square"` | `square`, `dots`, `rounded` |
-| `eye-shape` | `"square"` | `square`, `rounded`, `circle` |
-| `eye-color` | token | Finder-eye color (falls back to `--fluid-qr-eye-color`) |
-| `eye-color-top-left` / `-top-right` / `-bottom-left` | `""` | Per-eye color override |
-| `gradient-from` / `gradient-to` / `gradient-angle` | `""` / `""` / `45` | Linear gradient module fill |
-| `logo` | `""` | Center logo URL / data URI (forces `ec-level=H`) |
-| `logo-size` | `0.22` | Logo fraction of the code (clamped to `0.3`) |
-| `logo-padding` | `0.5` | Knockout padding, in modules |
-| `logo-background` | token | Knockout plate color (falls back to `--fluid-qr-logo-bg`) |
-| `logo-radius` | `1` | Knockout plate corner radius, in modules |
-| `artistic` | `false` | Full-bleed background image behind dotted modules |
-| `artistic-opacity` | `0.85` | Module opacity in artistic mode |
+| Prop                                                 | Default            | Description                                                                 |
+| ---------------------------------------------------- | ------------------ | --------------------------------------------------------------------------- |
+| `value`                                              | `""`               | The data to encode                                                          |
+| `size`                                               | `160`              | Pixel size of the rendered code                                             |
+| `ec-level`                                           | `"M"`              | Error correction: `L`, `M`, `Q`, `H` (forced to `H` with `logo`/`artistic`) |
+| `fill`                                               | token              | Module color (falls back to `--fluid-qr-color`)                             |
+| `background`                                         | token              | Background color (falls back to `--fluid-qr-bg`)                            |
+| `margin`                                             | `2`                | Quiet-zone margin, in modules                                               |
+| `label`                                              | `""`               | Accessible name; derived from `value` when empty                            |
+| `module-shape`                                       | `"square"`         | `square`, `dots`, `rounded`                                                 |
+| `eye-shape`                                          | `"square"`         | `square`, `rounded`, `circle`                                               |
+| `eye-color`                                          | token              | Finder-eye color (falls back to `--fluid-qr-eye-color`)                     |
+| `eye-color-top-left` / `-top-right` / `-bottom-left` | `""`               | Per-eye color override                                                      |
+| `gradient-from` / `gradient-to` / `gradient-angle`   | `""` / `""` / `45` | Linear gradient module fill                                                 |
+| `logo`                                               | `""`               | Center logo URL / data URI (forces `ec-level=H`)                            |
+| `logo-size`                                          | `0.22`             | Logo fraction of the code (clamped to `0.3`)                                |
+| `logo-padding`                                       | `0.5`              | Knockout padding, in modules                                                |
+| `logo-background`                                    | token              | Knockout plate color (falls back to `--fluid-qr-logo-bg`)                   |
+| `logo-radius`                                        | `1`                | Knockout plate corner radius, in modules                                    |
+| `artistic`                                           | `false`            | Full-bleed background image behind dotted modules                           |
+| `artistic-opacity`                                   | `0.85`             | Module opacity in artistic mode                                             |
 
 ## Theming
 

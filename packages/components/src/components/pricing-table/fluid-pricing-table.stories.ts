@@ -12,7 +12,7 @@ type Args = Pick<
 const meta: Meta<Args> = {
   title: "Components/Content/Pricing table",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     name: { control: "text" },
     price: { control: "text" },

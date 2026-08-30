@@ -12,7 +12,7 @@ const targetStyle =
 const meta: Meta = {
   title: "Components/Navigation/Context menu",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-context-menu
       aria-label="Item actions"
@@ -25,9 +25,7 @@ const meta: Meta = {
       ]}
       @fluid-select=${logSelect}
     >
-      <div slot="trigger" tabindex="0" style=${targetStyle}>
-        Right-click here (or Shift+F10)
-      </div>
+      <div slot="trigger" tabindex="0" style=${targetStyle}>Right-click here (or Shift+F10)</div>
     </fluid-context-menu>
   `
 };
@@ -89,11 +87,7 @@ export const CustomMenuSlot: Story = {
 
 export const Disabled: Story = {
   render: () => html`
-    <fluid-context-menu
-      disabled
-      aria-label="Disabled"
-      .items=${[{ label: "Copy", value: "copy" }]}
-    >
+    <fluid-context-menu disabled aria-label="Disabled" .items=${[{ label: "Copy", value: "copy" }]}>
       <div slot="trigger" tabindex="0" style=${targetStyle}>
         Right-click falls through (disabled)
       </div>

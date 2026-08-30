@@ -18,7 +18,7 @@ import "../sparkline/define.js";
  */
 const meta: Meta = {
   title: "Charts/Gallery",
-  parameters: { status: { type: "beta" } }
+  parameters: { status: { type: "stable" } }
 };
 export default meta;
 

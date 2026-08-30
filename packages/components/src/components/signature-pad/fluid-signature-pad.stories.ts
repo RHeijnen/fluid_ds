@@ -24,7 +24,7 @@ const meta: Meta<Args> = {
   title: "Components/Forms/Signature pad",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     placeholder: { control: "text", description: "Invitation shown while the pad is empty." },
@@ -90,20 +90,37 @@ export const PlacedImage: Story = {
       await pad.placeImage(SAMPLE_SIGNATURE);
       await pad.updateComplete;
       storyAssert(pad.signed, "Signature was not signed after placing image");
-      storyAssert(/^data:image\/png;base64,/.test(pad.toDataURL() ?? ""), "Signature did not export a PNG");
-      storyAssert(changes.length === 1 && changes[0]?.signed === true && changes[0]?.strokes === 0, "Image placement must emit exactly one signed change");
-      const clearHost = [...pad.shadowRoot!.querySelectorAll("fluid-button")].find((button) => button.textContent?.trim() === pad.clearLabel);
+      storyAssert(
+        /^data:image\/png;base64,/.test(pad.toDataURL() ?? ""),
+        "Signature did not export a PNG"
+      );
+      storyAssert(
+        changes.length === 1 && changes[0]?.signed === true && changes[0]?.strokes === 0,
+        "Image placement must emit exactly one signed change"
+      );
+      const clearHost = [...pad.shadowRoot!.querySelectorAll("fluid-button")].find(
+        (button) => button.textContent?.trim() === pad.clearLabel
+      );
       const clear = clearHost?.shadowRoot?.querySelector("button");
       if (!clear || clear.disabled) throw new Error("Signature Clear control is unavailable");
       // A DOM activation contract; trusted pointer drawing is covered separately.
       clear.click();
       await pad.updateComplete;
-      storyAssert(!pad.signed && pad.toDataURL() === undefined, "Clear did not remove the signature");
-      storyAssert(changes.length === 2 && changes[1]?.signed === false && changes[1]?.strokes === 0, "Clear must emit exactly one empty change");
+      storyAssert(
+        !pad.signed && pad.toDataURL() === undefined,
+        "Clear did not remove the signature"
+      );
+      storyAssert(
+        changes.length === 2 && changes[1]?.signed === false && changes[1]?.strokes === 0,
+        "Clear must emit exactly one empty change"
+      );
       // Preserve the prepared-image story's final visual state after exercising Clear.
       await pad.placeImage(SAMPLE_SIGNATURE);
       await pad.updateComplete;
-      storyAssert(pad.signed && changes.length === 3, "Signature could not be placed again after Clear");
+      storyAssert(
+        pad.signed && changes.length === 3,
+        "Signature could not be placed again after Clear"
+      );
     } finally {
       pad.removeEventListener("fluid-change", onChange);
     }

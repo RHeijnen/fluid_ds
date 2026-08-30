@@ -63,10 +63,7 @@ export class FluidDescriptionItem extends FluidElement {
 
     .term {
       font-size: var(--fluid-description-item-term-font-size, var(--fluid-font-size-sm));
-      font-weight: var(
-        --fluid-description-item-term-font-weight,
-        var(--fluid-font-weight-medium)
-      );
+      font-weight: var(--fluid-description-item-term-font-weight, var(--fluid-font-weight-medium));
       color: var(--fluid-description-item-term-fg, var(--fluid-text-secondary));
       margin: 0;
     }

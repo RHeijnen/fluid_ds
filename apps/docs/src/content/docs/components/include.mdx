@@ -31,12 +31,13 @@ Scripts in the fetched markup are **not** executed unless you opt in with
     ```ts
     import "@fluid-ds/components/define/include";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  A behavior wrapper, it injects whatever markup it fetched and reads no design
-  tokens of its own, so no `@fluid-ds/tokens` stylesheet is required.
+  A behavior wrapper, it injects whatever markup it fetched and reads no design tokens of its own,
+  so no `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -61,17 +62,14 @@ for a skeleton, an error message, or sane default content.
 ### Executing scripts
 
 ```html
-<fluid-include
-  src="/partials/widget.html"
-  allow-scripts
-></fluid-include>
+<fluid-include src="/partials/widget.html" allow-scripts></fluid-include>
 ```
 
 ### Listening for load / error
 
 ```ts
 const el = document.querySelector("fluid-include");
-el.addEventListener("fluid-load",  (e) => console.log("loaded", e.detail.src));
+el.addEventListener("fluid-load", (e) => console.log("loaded", e.detail.src));
 el.addEventListener("fluid-error", (e) => console.log("failed", e.detail.src));
 ```
 

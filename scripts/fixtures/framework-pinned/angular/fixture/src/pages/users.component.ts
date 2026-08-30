@@ -70,9 +70,7 @@ type DialogEl = HTMLElement & { open: boolean };
 
     <fluid-dialog #dialog label="Add user">
       <div class="form-grid">
-        <label>
-          Name <fluid-input #nameInput placeholder="Jane Doe"></fluid-input>
-        </label>
+        <label> Name <fluid-input #nameInput placeholder="Jane Doe"></fluid-input> </label>
         <label>
           Email <fluid-input #emailInput type="email" placeholder="jane@fluid.dev"></fluid-input>
         </label>

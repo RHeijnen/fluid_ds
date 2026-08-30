@@ -112,7 +112,11 @@ export function fromISODate(iso: string): Date | null {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
   if (!m) return null;
   const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  if (d.getFullYear() !== Number(m[1]) || d.getMonth() !== Number(m[2]) - 1 || d.getDate() !== Number(m[3])) {
+  if (
+    d.getFullYear() !== Number(m[1]) ||
+    d.getMonth() !== Number(m[2]) - 1 ||
+    d.getDate() !== Number(m[3])
+  ) {
     return null;
   }
   return d;
@@ -122,7 +126,13 @@ export function fromISODate(iso: string): Date | null {
 function dateAtMinutes(iso: string, minutes: number): Date | null {
   const base = fromISODate(iso);
   if (!base) return null;
-  return new Date(base.getFullYear(), base.getMonth(), base.getDate(), Math.floor(minutes / 60), minutes % 60);
+  return new Date(
+    base.getFullYear(),
+    base.getMonth(),
+    base.getDate(),
+    Math.floor(minutes / 60),
+    minutes % 60
+  );
 }
 
 /** Local `Date` → `YYYY-MM-DDTHH:MM` (no zone, wall-clock). */
@@ -134,7 +144,13 @@ export function toLocalISO(date: Date): string {
 export function fromLocalISO(iso: string): Date | null {
   const m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(iso.trim());
   if (!m) return null;
-  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4] ?? 0), Number(m[5] ?? 0));
+  return new Date(
+    Number(m[1]),
+    Number(m[2]) - 1,
+    Number(m[3]),
+    Number(m[4] ?? 0),
+    Number(m[5] ?? 0)
+  );
 }
 
 /**
@@ -153,7 +169,13 @@ export function windowsForDate(iso: string, availability: Availability): TimeWin
 }
 
 /** Does a booking (extended by buffer) overlap the half-open slot interval? */
-function bookingOverlaps(slotStart: Date, slotEnd: Date, booking: Booking, slotMinutes: number, buffer: number): boolean {
+function bookingOverlaps(
+  slotStart: Date,
+  slotEnd: Date,
+  booking: Booking,
+  slotMinutes: number,
+  buffer: number
+): boolean {
   const bStart = fromLocalISO(booking.start);
   if (!bStart) return false;
   const bEndRaw = booking.end ? fromLocalISO(booking.end) : null;
@@ -166,13 +188,28 @@ function bookingOverlaps(slotStart: Date, slotEnd: Date, booking: Booking, slotM
  * Generate every slot for one day, marking each available / full / past /
  * blocked. `now` is injected for testability (the component passes `new Date()`).
  */
-export function generateSlots(iso: string, availability: Availability, bookings: Booking[] = [], now: Date = new Date()): Slot[] {
+export function generateSlots(
+  iso: string,
+  availability: Availability,
+  bookings: Booking[] = [],
+  now: Date = new Date()
+): Slot[] {
   const { slotMinutes } = availability;
-  const step = availability.stepMinutes && availability.stepMinutes > 0 ? availability.stepMinutes : slotMinutes;
+  const step =
+    availability.stepMinutes && availability.stepMinutes > 0
+      ? availability.stepMinutes
+      : slotMinutes;
   // Reject malformed increments before entering the loop. Zero/negative or
   // sub-minute steps can otherwise loop forever or create unbounded output.
-  if (!Number.isInteger(slotMinutes) || slotMinutes < 1 || slotMinutes > 1440 ||
-      !Number.isInteger(step) || step < 1 || step > 1440) return [];
+  if (
+    !Number.isInteger(slotMinutes) ||
+    slotMinutes < 1 ||
+    slotMinutes > 1440 ||
+    !Number.isInteger(step) ||
+    step < 1 ||
+    step > 1440
+  )
+    return [];
   const buffer = availability.bufferMinutes ?? 0;
   const capacity = availability.capacity && availability.capacity > 0 ? availability.capacity : 1;
   const noticeCutoff = now.getTime() + (availability.minNoticeMinutes ?? 0) * 60_000;
@@ -190,7 +227,9 @@ export function generateSlots(iso: string, availability: Availability, bookings:
       const start = dateAtMinutes(iso, m);
       const end = dateAtMinutes(iso, m + slotMinutes);
       if (!start || !end) continue;
-      const booked = bookings.filter((b) => bookingOverlaps(start, end, b, slotMinutes, buffer)).length;
+      const booked = bookings.filter((b) =>
+        bookingOverlaps(start, end, b, slotMinutes, buffer)
+      ).length;
       const remaining = Math.max(0, capacity - booked);
 
       let state: SlotState;
@@ -215,7 +254,12 @@ export function generateSlots(iso: string, availability: Availability, bookings:
  * - `full`: open, but every slot is fully booked.
  * - `unavailable`: open, but every slot is in the past / outside the booking horizon.
  */
-export function dayState(iso: string, availability: Availability, bookings: Booking[] = [], now: Date = new Date()): DayState {
+export function dayState(
+  iso: string,
+  availability: Availability,
+  bookings: Booking[] = [],
+  now: Date = new Date()
+): DayState {
   if (windowsForDate(iso, availability).length === 0) return "closed";
   const slots = generateSlots(iso, availability, bookings, now);
   if (slots.length === 0) return "closed";

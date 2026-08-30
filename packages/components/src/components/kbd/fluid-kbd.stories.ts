@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Content/Kbd",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`<fluid-kbd>Ctrl</fluid-kbd>`
 };
 

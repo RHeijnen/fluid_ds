@@ -5,6 +5,7 @@ description: "Menu dropdown, WAI-ARIA menu pattern with arrow nav, type-ahead, a
 
 import Demo from "../../../components/Demo.astro";
 import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 `<fluid-dropdown>` is the menu pattern, a trigger that opens a list of actions.
@@ -14,9 +15,14 @@ panel shares its surface with [`<fluid-select>`](/components/select/) and
 [`<fluid-typeahead>`](/components/typeahead/), so every popover menu reads as one
 family.
 
+Every menu on this page is live. Open one and try the arrow keys, <kbd>Home</kbd>
+/ <kbd>End</kbd>, typing a letter to jump, and <kbd>Escape</kbd> to close.
+
 <Demo>
   <fluid-dropdown>
-    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Actions
+    </fluid-button>
     <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
     <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
     <fluid-dropdown-item type="separator"></fluid-dropdown-item>
@@ -25,6 +31,10 @@ family.
 </Demo>
 
 ## Install
+
+The dropdown registers `<fluid-dropdown>` and `<fluid-dropdown-item>` together.
+The trigger is any element you slot in; it's almost always a
+`<fluid-button>`, so load that too.
 
 <Tabs syncKey="install">
   <TabItem label="CDN">
@@ -35,7 +45,11 @@ family.
     <script type="module"
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dropdown/define.js">
     </script>
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js">
+    </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,7 +60,9 @@ family.
     import "@fluid-ds/tokens/base.css";
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/dropdown"; // registers dropdown + dropdown-item
+    import "@fluid-ds/components/define/button";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -55,11 +71,15 @@ family.
 ### Basic menu
 
 Give the trigger a [`caret`](/components/button/#dropdown-trigger) so it
-renders the built-in chevron and rotates while the menu is open.
+renders the built-in chevron and rotates while the menu is open. A
+`type="separator"` item draws a rule and is skipped by both the pointer and the
+keyboard.
 
 <Demo>
   <fluid-dropdown>
-    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Actions
+    </fluid-button>
     <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
     <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
     <fluid-dropdown-item type="separator"></fluid-dropdown-item>
@@ -67,70 +87,234 @@ renders the built-in chevron and rotates while the menu is open.
   </fluid-dropdown>
 </Demo>
 
-```html
-<fluid-dropdown>
+<ConformanceCode
+  code={`<fluid-dropdown>
   <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
   <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
   <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
   <fluid-dropdown-item type="separator"></fluid-dropdown-item>
   <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
-</fluid-dropdown>
-```
+</fluid-dropdown>`}
+/>
 
 For a primary action fused to a caret menu, see the
 [split button](/components/button-group/#split-button).
 
-### Listening for selection
+### Icons and shortcut hints
 
-Each item fires `fluid-select` when activated; the event bubbles to the
-dropdown so you can listen once at the top.
+Each item has a `prefix` and a `suffix` slot. Put a
+[`<fluid-icon>`](/components/icon/) in the prefix and a shortcut hint in the
+suffix; the label takes the space between them, so every suffix lands flush on
+the right edge of the menu.
 
-```ts
-const menu = document.querySelector("fluid-dropdown");
-menu.addEventListener("fluid-select", (e) => {
-  console.log("picked", e.detail.item.textContent);
-});
-```
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      File
+    </fluid-button>
+    <fluid-dropdown-item value="new">
+      <fluid-icon slot="prefix" name="plus"></fluid-icon>
+      New
+      <span slot="suffix">⌘N</span>
+    </fluid-dropdown-item>
+    <fluid-dropdown-item value="duplicate">
+      <fluid-icon slot="prefix" name="copy"></fluid-icon>
+      Duplicate
+      <span slot="suffix">⌘D</span>
+    </fluid-dropdown-item>
+    <fluid-dropdown-item value="save">
+      <fluid-icon slot="prefix" name="save"></fluid-icon>
+      Save
+      <span slot="suffix">⌘S</span>
+    </fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dropdown>
+  <fluid-button slot="trigger" variant="secondary" caret>File</fluid-button>
+  <fluid-dropdown-item value="new">
+    <fluid-icon slot="prefix" name="plus"></fluid-icon>
+    New
+    <span slot="suffix">⌘N</span>
+  </fluid-dropdown-item>
+  <fluid-dropdown-item value="save">
+    <fluid-icon slot="prefix" name="save"></fluid-icon>
+    Save
+    <span slot="suffix">⌘S</span>
+  </fluid-dropdown-item>
+</fluid-dropdown>`}
+/>
+
+Give every item in one menu an icon, or none of them: the prefix slot is not a
+fixed-width column, so a half-iconed menu leaves its labels out of line.
+
+<Aside type="note">
+  The shortcut hint is decorative text, not a live binding. Register the real
+  key handler yourself (or with [`<fluid-hotkey>`](/components/hotkey/)) so the
+  hint and the behavior can't drift apart.
+</Aside>
 
 ### Checkbox items
 
-`type="checkbox"` items toggle without closing the menu, handy for
-filters and quick settings.
+`type="checkbox"` items toggle **without closing the menu**, so a reader can
+flip several in a row. Open the menu below and click a couple: the check marks
+persist, and the menu only closes on a click outside, on <kbd>Tab</kbd>, or on
+the <kbd>Escape</kbd> key. A checkbox item's check mark occupies the prefix
+position, so it can't also carry a prefix icon.
 
-```html
-<fluid-dropdown>
-  <fluid-button slot="trigger">View</fluid-button>
-  <fluid-dropdown-item type="checkbox" checked>Show grid</fluid-dropdown-item>
-  <fluid-dropdown-item type="checkbox">Show rulers</fluid-dropdown-item>
-</fluid-dropdown>
-```
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      View options
+    </fluid-button>
+    <fluid-dropdown-item type="checkbox" value="grid" checked>
+      Show grid
+    </fluid-dropdown-item>
+    <fluid-dropdown-item type="checkbox" value="ruler">
+      Show rulers
+    </fluid-dropdown-item>
+    <fluid-dropdown-item type="checkbox" value="snap" checked>
+      Snap to grid
+    </fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dropdown>
+  <fluid-button slot="trigger" variant="secondary" caret>View options</fluid-button>
+  <fluid-dropdown-item type="checkbox" value="grid" checked>Show grid</fluid-dropdown-item>
+  <fluid-dropdown-item type="checkbox" value="ruler">Show rulers</fluid-dropdown-item>
+  <fluid-dropdown-item type="checkbox" value="snap" checked>Snap to grid</fluid-dropdown-item>
+</fluid-dropdown>`}
+/>
+
+A checkbox item still fires `fluid-select` on every toggle, with the item's new
+`checked` value already applied. Read it off `event.detail.item.checked`.
+
+### Disabled items and a disabled menu
+
+`disabled` on an item greys it out and takes it out of the arrow-key and
+type-ahead order, so it can never be activated. `disabled` on the dropdown
+itself stops the trigger opening anything at all. Both are live below: the first
+menu opens with one dead entry, the second doesn't open.
+
+<Demo>
+  <fluid-dropdown>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Export
+    </fluid-button>
+    <fluid-dropdown-item value="csv">Export as CSV</fluid-dropdown-item>
+    <fluid-dropdown-item value="pdf" disabled>
+      Export as PDF (Pro only)
+    </fluid-dropdown-item>
+    <fluid-dropdown-item value="json">Export as JSON</fluid-dropdown-item>
+  </fluid-dropdown>
+  <fluid-dropdown disabled>
+    <fluid-button slot="trigger" variant="secondary" caret disabled>
+      No actions
+    </fluid-button>
+    <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dropdown-item value="pdf" disabled>Export as PDF (Pro only)</fluid-dropdown-item>
+
+<!-- The whole menu off: disable the dropdown and its trigger together. -->
+
+<fluid-dropdown disabled>
+  <fluid-button slot="trigger" variant="secondary" caret disabled>No actions</fluid-button>
+  <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
+</fluid-dropdown>`}
+/>
 
 ### Placement
 
-The menu uses floating-ui under the hood. Set `placement` to control
-where it opens:
+The menu is positioned by Fluid's own engine and rendered in the top layer, so
+it is never clipped by an ancestor's `overflow` or `transform`. Set `placement`
+to pick the preferred side; it auto-flips when there isn't room. `distance`
+(in px) tunes the gap between trigger and menu. Open each of these to see where
+they land:
 
-```html
-<fluid-dropdown placement="top-start">…</fluid-dropdown>
+<Demo>
+  <fluid-dropdown placement="bottom-start">
+    <fluid-button slot="trigger" variant="secondary" caret>
+      bottom-start
+    </fluid-button>
+    <fluid-dropdown-item value="a">First</fluid-dropdown-item>
+    <fluid-dropdown-item value="b">Second</fluid-dropdown-item>
+  </fluid-dropdown>
+  <fluid-dropdown placement="bottom-end">
+    <fluid-button slot="trigger" variant="secondary" caret>
+      bottom-end
+    </fluid-button>
+    <fluid-dropdown-item value="a">First</fluid-dropdown-item>
+    <fluid-dropdown-item value="b">Second</fluid-dropdown-item>
+  </fluid-dropdown>
+  <fluid-dropdown placement="top">
+    <fluid-button slot="trigger" variant="secondary" caret>
+      top
+    </fluid-button>
+    <fluid-dropdown-item value="a">First</fluid-dropdown-item>
+    <fluid-dropdown-item value="b">Second</fluid-dropdown-item>
+  </fluid-dropdown>
+  <fluid-dropdown placement="right-start" distance="12">
+    <fluid-button slot="trigger" variant="secondary" caret>
+      right-start, distance 12
+    </fluid-button>
+    <fluid-dropdown-item value="a">First</fluid-dropdown-item>
+    <fluid-dropdown-item value="b">Second</fluid-dropdown-item>
+  </fluid-dropdown>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dropdown placement="top-start">…</fluid-dropdown>
+<fluid-dropdown placement="bottom-end" distance="12">…</fluid-dropdown>`}
+/>
+
+Standard placements are `top` `right` `bottom` `left`, each optionally suffixed
+with `-start` or `-end`. The default is `bottom-start`.
+
+### Opening it yourself
+
+`open` reflects the menu state and is writable, so you can open a menu from
+somewhere else on the page (a toolbar shortcut, a "what can I do here?" hint).
+The trigger still has to be present, that's what the menu anchors to. Both
+buttons below drive the same live menu:
+
+<Demo>
+  <fluid-dropdown id="dropdown-controlled" placement="bottom-start">
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Anchored trigger
+    </fluid-button>
+    <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
+    <fluid-dropdown-item value="archive">Archive</fluid-dropdown-item>
+  </fluid-dropdown>
+  <fluid-button onclick="document.getElementById('dropdown-controlled').open = true;">
+    Open it
+  </fluid-button>
+  <fluid-button
+    variant="ghost"
+    onclick="document.getElementById('dropdown-controlled').open = false;"
+  >
+    Close it
+  </fluid-button>
+</Demo>
+
+```ts
+const menu = document.querySelector("fluid-dropdown");
+menu.open = true; // open from anywhere
+menu.open = false; // and close it again
 ```
-
-Standard placements: `top` `top-start` `top-end` `bottom` `bottom-start`
-(default) `bottom-end` `left` `right` etc. The dropdown auto-flips when
-it would overflow the viewport.
-
-## When to use
-
-- A button that reveals a small list of actions.
-- Quick settings / view toggles.
-
-Reach for [`<fluid-select>`](/components/select/) when you're picking
-**one of a list** as a form value. Use [`<fluid-popover>`](/components/popover/)
-when the panel contains arbitrary content, not just a list of items.
 
 ## Listening for changes
 
 `<fluid-dropdown>` fires **`fluid-select`** with `{ value, item }` in `detail`
-when an item is chosen.
+when an item is chosen, by pointer or by keyboard. The event bubbles from the
+dropdown, so one listener on a toolbar covers every menu inside it. The
+dropdown also fires `fluid-show` and `fluid-hide` when the panel opens and
+closes.
 
 <Tabs syncKey="framework">
   <TabItem label="HTML">
@@ -143,6 +327,7 @@ when an item is chosen.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Menu.tsx"
@@ -166,6 +351,7 @@ when an item is chosen.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Menu.vue"
@@ -181,6 +367,7 @@ when an item is chosen.
       </fluid-dropdown>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="menu.component.ts"
@@ -204,6 +391,7 @@ when an item is chosen.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Menu.svelte"
@@ -219,38 +407,80 @@ when an item is chosen.
       <fluid-dropdown-item value="edit">Edit</fluid-dropdown-item>
     </fluid-dropdown>
     ```
+
   </TabItem>
 </Tabs>
+
+### Reading a checkbox item
+
+`detail.item` is the element itself, so a checkbox item tells you its new state
+directly. Branch on `detail.item.type` when one menu mixes both kinds:
+
+```js
+menu.addEventListener("fluid-select", (e) => {
+  const { value, item } = e.detail;
+  if (item.type === "checkbox") console.log(value, "->", item.checked);
+  else console.log("ran action", value);
+});
+```
 
 ## Theming
 
 Every styled property reads a **component-scoped token that falls back to a main
 semantic var** (the override ladder): the menu exposes `--fluid-dropdown-*` and
 each item exposes `--fluid-dropdown-item-*`. The menu shares the
-select / typeahead listbox surface. The **complete list** is in the
-[API tables below](#api).
+select / typeahead listbox surface, so overriding the panel here keeps all three
+in step. The **complete list** is in the [API tables below](#api).
 
 ```css title="brand.css"
+/* Every menu under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-dropdown-bg: var(--fluid-surface-base);
   --fluid-dropdown-border: var(--fluid-border-default);
   --fluid-dropdown-item-active-accent: var(--fluid-accent-base);
 }
+
+/* One menu with squared-off corners. */
+[data-fluid-id="row-actions"] {
+  --fluid-dropdown-radius: 4px;
+}
 ```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a dropdown and tweak the panel and item tokens
+  visually, then exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The container exposes [`part="base"`](#api) and `part="menu"`. Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
-not covered by a token.
+not covered by a token:
 
-## API
+```css
+/* A wider panel for long labels, no new token needed. */
+fluid-dropdown.wide::part(menu) {
+  min-width: 18rem;
+}
+```
 
-<ComponentApi tag="fluid-dropdown" />
+## When to use
 
-### `<fluid-dropdown-item>`
+- A button that reveals a small list of **actions**.
+- Quick settings and view toggles (the checkbox items above).
+- The overflow menu on a card header or a table row.
 
-<ComponentApi tag="fluid-dropdown-item" />
+### When _not_ to use
+
+- **Picking a value** for a form: use [`<fluid-select>`](/components/select/),
+  which is form-associated and submits with the form.
+- **Arbitrary panel content** (fields, prose, a mini form): use
+  [`<fluid-popover>`](/components/popover/); a menu should only hold items.
+- **A right-click menu**: use
+  [`<fluid-context-menu>`](/components/context-menu/).
+- **A long, searchable list**: use
+  [`<fluid-typeahead>`](/components/typeahead/) or
+  [`<fluid-command-palette>`](/components/command-palette/).
 
 ## Accessibility
 
@@ -259,13 +489,13 @@ Implements the WAI-ARIA Menu pattern. The cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Move the active item. |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last item. |
-| _type a letter_ | Jump to the next item starting with it. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the item. |
-| <kbd>Escape</kbd> | Close the menu (focus returns to the trigger). |
+| Key                                                | Action                                              |
+| -------------------------------------------------- | --------------------------------------------------- |
+| <kbd>↑</kbd> / <kbd>↓</kbd>                        | Move the active item.                               |
+| <kbd>Home</kbd> / <kbd>End</kbd>                   | Jump to the first / last item.                      |
+| _type a letter_                                    | Jump to the next item starting with it.             |
+| <kbd>Enter</kbd> / <kbd>Space</kbd>                | Activate the item.                                  |
+| <kbd>Escape</kbd>                                  | Close the menu (focus returns to the trigger).      |
 | <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Close and move forward / backward from the trigger. |
 
 Opening the menu keeps DOM focus on the menu panel and marks the first enabled
@@ -279,6 +509,9 @@ outside-pointer dismissal allow focus to move to the next intended control.
   `aria-expanded`. The menu renders in the **top layer**, so it's never clipped.
 - Checkbox items expose `aria-checked`; ordinary items and separators do not.
   Disabled items cannot activate, and separators are not selectable.
+- An icon-only trigger has no text to name it, so give it an `aria-label`
+  ("Row actions", "Report actions"), the same rule as an
+  [icon-only button](/components/button/#names).
 - The panel uses `ariaActiveDescendantElement` to reference the active slotted
   item across the shadow boundary. This targets current browsers with ARIA
   element reflection; older engines without that API are outside this contract.
@@ -295,12 +528,21 @@ outside-pointer dismissal allow focus to move to the next intended control.
 ### AA vs AAA
 
 Targets **WCAG 2.2 AA**; manual assistive-technology review remains required.
-An ancestor `[data-fluid-conformance="aaa"]` lifts:
+The **Conformance** toggle at the top of this page (or an ancestor
+`[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+
+## API
+
+<ComponentApi tag="fluid-dropdown" />
+
+### `<fluid-dropdown-item>`
+
+<ComponentApi tag="fluid-dropdown-item" />
 
 ## Related
 
@@ -319,6 +561,11 @@ An ancestor `[data-fluid-conformance="aaa"]` lifts:
     title="Popover"
     href="/components/popover/"
     description="Arbitrary content instead of a list of actions."
+  />
+  <LinkCard
+    title="Context menu"
+    href="/components/context-menu/"
+    description="The same menu surface, opened by right-click."
   />
   <LinkCard
     title="Framework integrations"

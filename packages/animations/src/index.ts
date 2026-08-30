@@ -11,7 +11,7 @@
  *
  * Side-effect entries (not re-exported here, but available):
  *   - `@fluid-ds/animations/define/controller`: boots the controller
- *   - `@fluid-ds/animations/register-defaults`: registers the 12 defaults
+ *   - `@fluid-ds/animations/register-defaults`: registers the 18 defaults
  *   - `@fluid-ds/animations/animations/<name>`: register one at a time
  */
 

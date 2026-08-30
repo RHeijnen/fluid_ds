@@ -10,13 +10,22 @@ const meta: Meta<Args> = {
   title: "Components/Feedback/Tooltip",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     content: { control: "text" },
     placement: {
       control: "select",
-      options: ["top", "bottom", "left", "right", "top-start", "top-end", "bottom-start", "bottom-end"]
+      options: [
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-start",
+        "top-end",
+        "bottom-start",
+        "bottom-end"
+      ]
     },
     open: { control: "boolean" },
     disabled: { control: "boolean" }

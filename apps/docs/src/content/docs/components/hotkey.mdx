@@ -41,12 +41,13 @@ Ctrl elsewhere, so a single binding works on every platform.
     ```ts
     import "@fluid-ds/components/define/hotkey";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  A behavior wrapper, it renders no UI (`display: none`) and reads no design
-  tokens, so no `@fluid-ds/tokens` stylesheet is required.
+  A behavior wrapper, it renders no UI (`display: none`) and reads no design tokens, so no
+  `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -66,6 +67,7 @@ A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="App.tsx"
@@ -78,6 +80,7 @@ A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="App.vue"
@@ -89,6 +92,7 @@ A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
       <fluid-hotkey keys="mod+k" prevent-default @fluid-hotkey="paletteOpen = true" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="app.component.ts"
@@ -103,6 +107,7 @@ A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
     })
     export class App { open() { /* ... */ } }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="App.svelte"
@@ -112,6 +117,7 @@ A chord is `+`-joined. Use `mod` for the platform-appropriate primary modifier.
 
     <fluid-hotkey keys="mod+k" prevent-default on:fluid-hotkey={() => (open = true)} />
     ```
+
   </TabItem>
 </Tabs>
 

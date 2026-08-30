@@ -24,7 +24,11 @@ export default function DashboardPage() {
       <div className="grid-2">
         <fluid-card className="chart-card">
           <h3 slot="header">Signups · last 6 months</h3>
-          <FluidChart kind="line" data={signups} options={{ plugins: { legend: { display: false } } }} />
+          <FluidChart
+            kind="line"
+            data={signups}
+            options={{ plugins: { legend: { display: false } } }}
+          />
         </fluid-card>
         <fluid-card className="chart-card">
           <h3 slot="header">Plan mix</h3>

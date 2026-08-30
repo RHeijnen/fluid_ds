@@ -197,9 +197,7 @@ export const Playground: Story = {
               <fluid-icon name="star" style="--fluid-icon-size: 1.5rem;"></fluid-icon>
               <div>
                 <strong>${args.name}</strong>
-                <div
-                  style="color: var(--fluid-text-secondary); font-size:0.85rem;"
-                >
+                <div style="color: var(--fluid-text-secondary); font-size:0.85rem;">
                   trigger: ${args.trigger}
                 </div>
               </div>
@@ -243,7 +241,9 @@ function single(name: string): Story {
       }
     },
     render: () => html`
-      <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 28rem;">
+      <div
+        style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 28rem;"
+      >
         <fluid-card
           variant="outline"
           style="cursor:pointer; user-select:none;"
@@ -278,8 +278,7 @@ function replay(el: HTMLElement): void {
 
 function buildSnippet(args: Args): string {
   const attrs: string[] = [`data-fluid-animation="${args.name}"`];
-  if (args.trigger !== "mount")
-    attrs.push(`data-fluid-animation-trigger="${args.trigger}"`);
+  if (args.trigger !== "mount") attrs.push(`data-fluid-animation-trigger="${args.trigger}"`);
   if (args.duration && args.duration !== 600)
     attrs.push(`data-fluid-animation-duration="${args.duration}"`);
   if (args.delay) attrs.push(`data-fluid-animation-delay="${args.delay}"`);

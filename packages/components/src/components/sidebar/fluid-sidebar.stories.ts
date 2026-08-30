@@ -23,7 +23,7 @@ const navContent = html`
 const meta: Meta<Args> = {
   title: "Components/Navigation/Sidebar",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     open: { control: "boolean" },
     collapsible: { control: "boolean" },
@@ -33,7 +33,9 @@ const meta: Meta<Args> = {
   },
   args: { open: true, collapsible: false, overlay: false },
   render: (args) => html`
-    <div style="block-size: 360px; display:flex; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;">
+    <div
+      style="block-size: 360px; display:flex; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;"
+    >
       <fluid-sidebar
         aria-label="Primary navigation"
         ?open=${args.open}
@@ -58,15 +60,16 @@ export const Default: Story = {};
 
 export const Collapsible: Story = {
   render: () => html`
-    <div style="block-size: 360px; display:flex; gap: var(--fluid-space-4); align-items:flex-start;">
+    <div
+      style="block-size: 360px; display:flex; gap: var(--fluid-space-4); align-items:flex-start;"
+    >
       <fluid-sidebar id="sb-collapsible" collapsible aria-label="Primary navigation">
         <strong slot="header">Fluid</strong>
         ${navContent}
       </fluid-sidebar>
       <button
         type="button"
-        @click=${() =>
-          (document.getElementById("sb-collapsible") as FluidSidebar)?.toggle()}
+        @click=${() => (document.getElementById("sb-collapsible") as FluidSidebar)?.toggle()}
       >
         Toggle rail
       </button>
@@ -80,17 +83,23 @@ export const Mini: Story = {
 
 export const Overlay: Story = {
   render: () => html`
-    <div style="position:relative; block-size: 360px; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;">
+    <div
+      style="position:relative; block-size: 360px; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;"
+    >
       <div style="padding: var(--fluid-space-5);">
         <button
           type="button"
-          @click=${() =>
-            (document.getElementById("sb-overlay") as FluidSidebar)?.show()}
+          @click=${() => (document.getElementById("sb-overlay") as FluidSidebar)?.show()}
         >
           Open navigation
         </button>
       </div>
-      <fluid-sidebar id="sb-overlay" overlay aria-label="Primary navigation" style="position:absolute;">
+      <fluid-sidebar
+        id="sb-overlay"
+        overlay
+        aria-label="Primary navigation"
+        style="position:absolute;"
+      >
         <strong slot="header">Fluid</strong>
         ${navContent}
         <small slot="footer">v1.0.0</small>

@@ -12,7 +12,7 @@ type Args = Pick<FluidFieldset, "legend" | "description" | "error" | "disabled">
 const meta: Meta<Args> = {
   title: "Components/Forms/Fieldset",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     legend: { control: "text" },
     description: { control: "text" },

@@ -141,7 +141,12 @@ describe("availability engine", () => {
 
     it("keeps group slots available until capacity runs out", () => {
       const a = avail({ capacity: 3 });
-      const slots = generateSlots(DAY, a, [{ start: "2026-06-15T09:00" }, { start: "2026-06-15T09:00" }], past);
+      const slots = generateSlots(
+        DAY,
+        a,
+        [{ start: "2026-06-15T09:00" }, { start: "2026-06-15T09:00" }],
+        past
+      );
       const nine = slots.find((s) => s.start === "2026-06-15T09:00")!;
       expect(nine.remaining).to.equal(1);
       expect(nine.state).to.equal("available");
@@ -149,14 +154,26 @@ describe("availability engine", () => {
 
     it("applies a buffer after a booking to neighbouring slots", () => {
       const a = avail({ bufferMinutes: 30 });
-      const slots = generateSlots(DAY, a, [{ start: "2026-06-15T09:00", end: "2026-06-15T09:30" }], past);
+      const slots = generateSlots(
+        DAY,
+        a,
+        [{ start: "2026-06-15T09:00", end: "2026-06-15T09:30" }],
+        past
+      );
       // 09:00 booked; 30-min buffer pushes the block to 10:00, so 09:30 is full, 10:00 free
       expect(slots.find((s) => s.start === "2026-06-15T09:30")!.state).to.equal("full");
       expect(slots.find((s) => s.start === "2026-06-15T10:00")!.state).to.equal("available");
     });
 
     it("sorts slots from out-of-order windows chronologically", () => {
-      const a = avail({ weekly: { [WD]: [{ start: "13:00", end: "14:00" }, { start: "09:00", end: "10:00" }] } });
+      const a = avail({
+        weekly: {
+          [WD]: [
+            { start: "13:00", end: "14:00" },
+            { start: "09:00", end: "10:00" }
+          ]
+        }
+      });
       const slots = generateSlots(DAY, a, [], past);
       const first = slots[0];
       const last = slots.at(-1);
@@ -183,9 +200,9 @@ describe("availability engine", () => {
     });
 
     it("is full when every slot is booked out", () => {
-      const bookings = [
-        "09:00", "09:30", "10:00", "10:30", "11:00", "11:30"
-      ].map((t) => ({ start: `2026-06-15T${t}` }));
+      const bookings = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"].map((t) => ({
+        start: `2026-06-15T${t}`
+      }));
       expect(dayState(DAY, avail(), bookings, past)).to.equal("full");
     });
 

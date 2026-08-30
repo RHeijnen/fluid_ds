@@ -15,7 +15,9 @@ covered with `object-fit` so it fills cleanly instead of letterboxing.
 <Demo>
   <div style="max-width: 320px;">
     <fluid-aspect-ratio ratio="16/9">
-      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">16 / 9</div>
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">
+        16 / 9
+      </div>
     </fluid-aspect-ratio>
   </div>
 </Demo>
@@ -32,6 +34,7 @@ covered with `object-fit` so it fills cleanly instead of letterboxing.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/aspect-ratio/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +46,7 @@ covered with `object-fit` so it fills cleanly instead of letterboxing.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/aspect-ratio";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -56,9 +60,21 @@ are fine too.
 
 <Demo>
   <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: var(--fluid-space-3); max-width: 640px;">
-    <fluid-aspect-ratio ratio="1/1"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">1 / 1</div></fluid-aspect-ratio>
-    <fluid-aspect-ratio ratio="4/3"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">4 / 3</div></fluid-aspect-ratio>
-    <fluid-aspect-ratio ratio="16/9"><div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">16 / 9</div></fluid-aspect-ratio>
+    <fluid-aspect-ratio ratio="1/1">
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">
+        1 / 1
+      </div>
+    </fluid-aspect-ratio>
+    <fluid-aspect-ratio ratio="4/3">
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">
+        4 / 3
+      </div>
+    </fluid-aspect-ratio>
+    <fluid-aspect-ratio ratio="16/9">
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">
+        16 / 9
+      </div>
+    </fluid-aspect-ratio>
   </div>
 </Demo>
 
@@ -76,7 +92,10 @@ so it fills the box edge to edge without distortion or bars.
 <Demo>
   <div style="max-width: 320px;">
     <fluid-aspect-ratio ratio="16/9">
-      <img src="https://picsum.photos/seed/fluid/800/300" alt="Landscape sample covered to fill a 16:9 box" />
+      <img
+        src="https://picsum.photos/seed/fluid/800/300"
+        alt="Landscape sample covered to fill a 16:9 box"
+      />
     </fluid-aspect-ratio>
   </div>
 </Demo>
@@ -94,7 +113,9 @@ Ratios smaller than 1 produce a taller-than-wide box.
 <Demo>
   <div style="max-width: 200px;">
     <fluid-aspect-ratio ratio="3/4">
-      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">3 / 4</div>
+      <div style="display:flex; align-items:center; justify-content:center; background: var(--fluid-surface-muted); color: var(--fluid-text-secondary);">
+        3 / 4
+      </div>
     </fluid-aspect-ratio>
   </div>
 </Demo>
@@ -111,7 +132,7 @@ Ratios smaller than 1 produce a taller-than-wide box.
 - Embedding an `<iframe>` (a video player, a map) that must keep its proportions
   as the column resizes.
 
-### When *not* to use
+### When _not_ to use
 
 - For an image whose intrinsic dimensions should drive its size, set
   `width`/`height` (or the modern `aspect-ratio` CSS) on the image directly,

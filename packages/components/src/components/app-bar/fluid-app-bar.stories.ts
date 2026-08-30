@@ -3,15 +3,12 @@ import { html } from "lit";
 import "./define.js";
 import type { FluidAppBar } from "./fluid-app-bar.js";
 
-type Args = Pick<
-  FluidAppBar,
-  "sticky" | "elevated" | "menuButton" | "expanded" | "menuLabel"
->;
+type Args = Pick<FluidAppBar, "sticky" | "elevated" | "menuButton" | "expanded" | "menuLabel">;
 
 const meta: Meta<Args> = {
   title: "Components/Navigation/App bar",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     sticky: { control: "boolean" },
     elevated: { control: "boolean" },

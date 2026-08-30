@@ -75,10 +75,7 @@ async function openScheduler(page: Page, mode: string) {
 }
 
 async function selectFutureDay(field: Locator) {
-  const day = field
-    .locator("fluid-calendar")
-    .locator("button.day:not(:disabled)")
-    .last();
+  const day = field.locator("fluid-calendar").locator("button.day:not(:disabled)").last();
   await day.click();
   await expect(field.locator("fluid-time-slots")).toBeVisible();
   return field.locator("fluid-time-slots button.slot:not(:disabled)").first();
@@ -157,7 +154,9 @@ for (const mode of ["client", "dsd"] as const) {
       );
       await page.locator("#native-form").evaluate((form) => (form as HTMLFormElement).reset());
       expect(
-        await page.locator("#native-form").evaluate((form) => [...new FormData(form as HTMLFormElement)])
+        await page
+          .locator("#native-form")
+          .evaluate((form) => [...new FormData(form as HTMLFormElement)])
       ).toEqual([]);
       await expect(field.locator('[part="prompt"]')).toContainText("Select a day");
       await page.evaluate(() => window.formFocusFixture.assertServerNodes());
@@ -202,9 +201,9 @@ for (const mode of ["client", "dsd"] as const) {
         scheduler.bookings = [];
         scheduler.formStateRestoreCallback("2035-06-18T10:00", "restore");
       });
-      await expect.poll(() => field.evaluate((host) => (host as SchedulerHost).value)).toBe(
-        "2035-06-18T10:00"
-      );
+      await expect
+        .poll(() => field.evaluate((host) => (host as SchedulerHost).value))
+        .toBe("2035-06-18T10:00");
       await field.evaluate((host) => {
         const parent = host.parentNode!;
         host.remove();

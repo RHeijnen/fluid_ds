@@ -7,7 +7,7 @@ const meta: Meta = {
   title: "Components/Forms/Time picker",
   component: "fluid-time-picker",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     format: { control: "inline-radio", options: ["12h", "24h"] },
@@ -17,7 +17,8 @@ const meta: Meta = {
     step: { control: "number" },
     required: { control: "boolean" },
     disabled: { control: "boolean" },
-    openOnInputClick: { control: "boolean" }
+    noAutoOpen: { control: "boolean" },
+    noSelectOnFocus: { control: "boolean" }
   }
 };
 export default meta;
@@ -31,7 +32,8 @@ export const Default: Story = {
     step: 15,
     required: false,
     disabled: false,
-    openOnInputClick: true
+    noAutoOpen: false,
+    noSelectOnFocus: false
   },
   render: (a) =>
     html`<fluid-time-picker
@@ -41,7 +43,8 @@ export const Default: Story = {
       step=${a.step}
       ?required=${a.required}
       ?disabled=${a.disabled}
-      ?open-on-input-click=${a.openOnInputClick}
+      ?no-auto-open=${a.noAutoOpen}
+      ?no-select-on-focus=${a.noSelectOnFocus}
       min=${a.min ?? "00:00"}
       max=${a.max ?? "23:59"}
     ></fluid-time-picker>`
@@ -76,7 +79,6 @@ export const Steps: Story = {
               min="09:00"
               max="12:00"
               .step=${step}
-              open-on-input-click
             ></fluid-time-picker>
           </div>
         `

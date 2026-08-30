@@ -31,6 +31,7 @@ form-associated: it hands you the `File` objects so you own the upload.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dropzone/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +43,7 @@ form-associated: it hands you the `File` objects so you own the upload.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/dropzone";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -55,7 +57,9 @@ The default accepts one file. Dropping or picking a second replaces the first.
   <fluid-dropzone label="Drop a file or click to browse"></fluid-dropzone>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropzone label="Drop a file or click to browse"></fluid-dropzone>`} />
+<ConformanceCode
+  code={`<fluid-dropzone label="Drop a file or click to browse"></fluid-dropzone>`}
+/>
 
 ### Multiple files
 
@@ -65,7 +69,9 @@ Set `multiple` to accept and stack more than one file.
   <fluid-dropzone multiple label="Drop one or more files"></fluid-dropzone>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropzone multiple label="Drop one or more files"></fluid-dropzone>`} />
+<ConformanceCode
+  code={`<fluid-dropzone multiple label="Drop one or more files"></fluid-dropzone>`}
+/>
 
 ### Restrict the type
 
@@ -78,7 +84,9 @@ thumbnail.
   <fluid-dropzone accept="image/*" multiple label="Drop images here"></fluid-dropzone>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropzone accept="image/*" multiple label="Drop images here"></fluid-dropzone>`} />
+<ConformanceCode
+  code={`<fluid-dropzone accept="image/*" multiple label="Drop images here"></fluid-dropzone>`}
+/>
 
 ### Limit the size
 
@@ -89,7 +97,9 @@ thumbnail.
   <fluid-dropzone max-size="1048576" label="Up to 1 MB per file"></fluid-dropzone>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropzone max-size="1048576" label="Up to 1 MB per file"></fluid-dropzone>`} />
+<ConformanceCode
+  code={`<fluid-dropzone max-size="1048576" label="Up to 1 MB per file"></fluid-dropzone>`}
+/>
 
 ### Disabled
 
@@ -105,7 +115,8 @@ Slot your own content to replace the default prompt text.
 
 <Demo>
   <fluid-dropzone multiple accept="image/*">
-    <strong>Upload your photos</strong><br />
+    <strong>Upload your photos</strong>
+    <br />
     PNG or JPG, drag and drop or click
   </fluid-dropzone>
 </Demo>
@@ -139,6 +150,7 @@ current array of `File` objects. It fires **`fluid-reject`** with
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Uploader.tsx"
@@ -157,6 +169,7 @@ current array of `File` objects. It fires **`fluid-reject`** with
       return <fluid-dropzone ref={ref} multiple accept="image/*" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Uploader.vue"
@@ -174,6 +187,7 @@ current array of `File` objects. It fires **`fluid-reject`** with
       />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="uploader.component.ts"
@@ -193,6 +207,7 @@ current array of `File` objects. It fires **`fluid-reject`** with
       files: File[] = [];
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Uploader.svelte"
@@ -207,6 +222,7 @@ current array of `File` objects. It fires **`fluid-reject`** with
       on:fluid-change={(e) => (files = e.detail.files)}
     />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -250,7 +266,7 @@ not covered by a token.
 - Attaching one or more documents to a form or message.
 - Bulk import (CSV, images) where drag-and-drop is faster than a file picker.
 
-### When *not* to use
+### When _not_ to use
 
 - For a single inline file field with no preview, a native
   [`<fluid-input>`](/components/input/) of `type="file"` (or the platform input)
@@ -267,10 +283,10 @@ native `<input type="file">` that does the actual picking. See the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| `Tab` | Move focus to the drop region, then to each file's remove button. |
-| `Enter` / `Space` | Open the native file dialog. |
+| Key               | Action                                                            |
+| ----------------- | ----------------------------------------------------------------- |
+| `Tab`             | Move focus to the drop region, then to each file's remove button. |
+| `Enter` / `Space` | Open the native file dialog.                                      |
 
 The drop region and remove buttons show a `:focus-visible` ring that reads the
 focus-ring tokens. After a file is removed, focus returns to the drop region so
@@ -302,10 +318,10 @@ The component ships WCAG 2.2 AA by default and scales to AAA via
 snippets switch with it). It reads the conformance tokens rather than
 hard-coding sizes:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+| Token                      | AA   | AAA      | Criterion      |
+| -------------------------- | ---- | -------- | -------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → 2.5.5  |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → 2.4.13 |
 
 ## API
 
@@ -314,8 +330,20 @@ hard-coding sizes:
 ## Related
 
 <CardGrid>
-  <LinkCard title="Input" href="/components/input/" description="Single-line text field, including type=file." />
-  <LinkCard title="Tag input" href="/components/tag-input/" description="Capture free-text tokens as chips." />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="Single-line text field, including type=file."
+  />
+  <LinkCard
+    title="Tag input"
+    href="/components/tag-input/"
+    description="Capture free-text tokens as chips."
+  />
   <LinkCard title="Avatar" href="/components/avatar/" description="Render the uploaded image." />
-  <LinkCard title="Frameworks" href="/guides/frameworks/" description="Use Fluid with React, Vue, Angular, Svelte." />
+  <LinkCard
+    title="Frameworks"
+    href="/guides/frameworks/"
+    description="Use Fluid with React, Vue, Angular, Svelte."
+  />
 </CardGrid>

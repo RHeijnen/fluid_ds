@@ -6,7 +6,7 @@ const meta: Meta = {
   title: "Components/Content/CodeBlock",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   }
 };
 
@@ -34,12 +34,9 @@ export const TypeScript: Story = {
 };
 
 export const WithFilename: Story = {
-  render: () =>
-    html`<fluid-code-block filename="theme.css" code=${CSS_SAMPLE}></fluid-code-block>`
+  render: () => html`<fluid-code-block filename="theme.css" code=${CSS_SAMPLE}></fluid-code-block>`
 };
 
 export const NoCopy: Story = {
-  render: () => html`
-    <fluid-code-block no-copy code="quick and quiet code"></fluid-code-block>
-  `
+  render: () => html` <fluid-code-block no-copy code="quick and quiet code"></fluid-code-block> `
 };

@@ -6,7 +6,7 @@ import "../icon/define.js";
 const meta: Meta = {
   title: "Components/Navigation/Menu",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-menu aria-label="Actions" @fluid-select=${logSelect}>
       <fluid-menu-item value="new">New file</fluid-menu-item>

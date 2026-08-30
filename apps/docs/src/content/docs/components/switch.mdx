@@ -8,9 +8,8 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-switch>` is a binary on/off control, like a checkbox, but with
-**immediate-effect** semantics: flipping a switch should *do something now*, not
+**immediate-effect** semantics: flipping a switch should _do something now_, not
 wait for a Save button. It wraps a native `role="switch"` checkbox, is
 **form-associated** (submits / validates like a native checkbox), and meets the
 WCAG 2.2 guarantees (focus ring, target size, name from the label).
@@ -31,6 +30,7 @@ WCAG 2.2 guarantees (focus ring, target size, name from the label).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/switch/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +42,7 @@ WCAG 2.2 guarantees (focus ring, target size, name from the label).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/switch";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,13 +58,17 @@ sets the initial state; `disabled` dims + removes it from the tab order.
     <fluid-switch>Notifications</fluid-switch>
     <fluid-switch checked>Two-factor auth</fluid-switch>
     <fluid-switch disabled>Unavailable</fluid-switch>
-    <fluid-switch checked disabled>Locked on</fluid-switch>
+    <fluid-switch checked disabled>
+      Locked on
+    </fluid-switch>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-switch>Notifications</fluid-switch>
+<ConformanceCode
+  code={`<fluid-switch>Notifications</fluid-switch>
 <fluid-switch checked>Two-factor auth</fluid-switch>
-<fluid-switch disabled>Unavailable</fluid-switch>`} />
+<fluid-switch disabled>Unavailable</fluid-switch>`}
+/>
 
 ### Without a visible label
 
@@ -92,6 +97,7 @@ whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="NotifyToggle.tsx"
@@ -110,6 +116,7 @@ whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
       return <fluid-switch ref={ref}>Notifications</fluid-switch>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="NotifyToggle.vue"
@@ -122,6 +129,7 @@ whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
       <fluid-switch @fluid-change="onChange">Notifications</fluid-switch>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="notify-toggle.component.ts"
@@ -142,6 +150,7 @@ whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="NotifyToggle.svelte"
@@ -154,6 +163,7 @@ whenever the user toggles it (click, <kbd>Space</kbd>, <kbd>Enter</kbd>).
 
     <fluid-switch on:fluid-change={onChange}>Notifications</fluid-switch>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -167,7 +177,9 @@ when off it's omitted entirely, matching native checkbox semantics.
     style="display:flex; gap:0.75rem; align-items:center;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'marketing=' + (new FormData(this).get('marketing') ?? '(off)');"
   >
-    <fluid-switch name="marketing" value="yes" checked>Marketing emails</fluid-switch>
+    <fluid-switch name="marketing" value="yes" checked>
+      Marketing emails
+    </fluid-switch>
     <fluid-button type="submit">Save</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -195,8 +207,8 @@ work like the rest of the system; the **complete list** is in the
 ```
 
 <Aside type="tip">
-  Select a switch in the [Theme builder](/playground/) to tweak the track,
-  thumb, and focus tokens visually.
+  Select a switch in the [Theme builder](/playground/) to tweak the track, thumb, and focus tokens
+  visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -207,16 +219,20 @@ The label is [`part="base"`](#api); the track and thumb are `part="track"` /
 not covered by a token:
 
 ```css
-fluid-switch::part(track) { width: 3rem; }
-fluid-switch::part(thumb) { box-shadow: none; }
+fluid-switch::part(track) {
+  width: 3rem;
+}
+fluid-switch::part(thumb) {
+  box-shadow: none;
+}
 ```
 
 ## When to use
 
 - **Immediate-effect settings**: Wi-Fi, dark mode, notifications. The toggle
-  *is* the action; there's no Save step.
+  _is_ the action; there's no Save step.
 
-### When *not* to use
+### When _not_ to use
 
 - **Applies on submit / part of a form choice**: use a
   [`<fluid-checkbox>`](/components/checkbox/) ("remember this, apply on save").
@@ -233,10 +249,10 @@ below are switch-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Move focus to/from the switch. |
-| <kbd>Space</kbd> | Toggle on/off. |
+| Key              | Action                                     |
+| ---------------- | ------------------------------------------ |
+| <kbd>Tab</kbd>   | Move focus to/from the switch.             |
+| <kbd>Space</kbd> | Toggle on/off.                             |
 | <kbd>Enter</kbd> | Toggle on/off (matches form expectations). |
 
 The focus ring renders around the track and reads `--fluid-focus-ring-width`.
@@ -259,7 +275,7 @@ The accessible name comes from the default slot (the visible label). A
 - The thumb-slide + track transition honor `prefers-reduced-motion`.
 - The visible track is small (20px tall), so the **clickable `<label>`** carries
   the target floor: ≥ **24×24** (AA) and **44×44** (AAA) via `--fluid-target-min`
-, the graphic stays the same size, the hit area grows.
+  , the graphic stays the same size, the hit area grows.
 
 ### AA vs AAA
 
@@ -267,10 +283,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
 The switch reads both conformance tokens (target size matters most for a small
 control like this):
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

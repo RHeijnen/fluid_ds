@@ -22,7 +22,13 @@ export const INITIAL_USERS: User[] = [
   { id: 2, name: "Grace Hopper", email: "grace@fluid.dev", role: "Admin", status: "active" },
   { id: 3, name: "Alan Turing", email: "alan@fluid.dev", role: "Editor", status: "invited" },
   { id: 4, name: "Katherine Johnson", email: "kat@fluid.dev", role: "Editor", status: "active" },
-  { id: 5, name: "Margaret Hamilton", email: "maggie@fluid.dev", role: "Viewer", status: "suspended" },
+  {
+    id: 5,
+    name: "Margaret Hamilton",
+    email: "maggie@fluid.dev",
+    role: "Viewer",
+    status: "suspended"
+  },
   { id: 6, name: "Linus Torvalds", email: "linus@fluid.dev", role: "Admin", status: "active" }
 ];
 

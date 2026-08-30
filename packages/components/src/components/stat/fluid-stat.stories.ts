@@ -7,12 +7,18 @@ type Args = { label: string; value: string; change: string; trend: "up" | "down"
 const meta: Meta<Args> = {
   title: "Components/Content/Stat",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     trend: { control: "inline-radio", options: ["up", "down", "neutral"] }
   },
   args: { label: "Revenue", value: "$48.2k", change: "+12%", trend: "up" },
-  render: (a) => html`<fluid-stat label=${a.label} value=${a.value} change=${a.change} trend=${a.trend}></fluid-stat>`
+  render: (a) =>
+    html`<fluid-stat
+      label=${a.label}
+      value=${a.value}
+      change=${a.change}
+      trend=${a.trend}
+    ></fluid-stat>`
 };
 
 export default meta;

@@ -405,9 +405,7 @@ describe("<fluid-masked-input>", () => {
     const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
     const inputStyle = getComputedStyle(input);
     expect(inputStyle.fontSize).to.equal("18px");
-    expect(inputStyle.getPropertyValue("--fluid-masked-input-line-height").trim()).to.equal(
-      "20px"
-    );
+    expect(inputStyle.getPropertyValue("--fluid-masked-input-line-height").trim()).to.equal("20px");
     expect(inputStyle.paddingInlineStart).to.equal("17px");
     expect(base.getBoundingClientRect().height).to.be.closeTo(50, 1.5);
     expect(

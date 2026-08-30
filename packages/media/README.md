@@ -24,13 +24,13 @@ import "@fluid-ds/media/define/animation";
 
 ## Components
 
-| Tag | Use case |
-| --- | --- |
-| `<fluid-video>` | Themed wrapper around native `<video>` |
-| `<fluid-video-playlist>` | Playlist-driven video player with auto-advance |
+| Tag                      | Use case                                                                   |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `<fluid-video>`          | Themed wrapper around native `<video>`                                     |
+| `<fluid-video-playlist>` | Playlist-driven video player with auto-advance                             |
 | `<fluid-animated-image>` | GIF / APNG / animated-WebP with play/pause control (canvas-snapshot trick) |
-| `<fluid-zoomable-frame>` | Pan + zoom container for images, iframes, SVG (scroll wheel + drag pan) |
-| `<fluid-animation>` | Declarative wrapper around the Web Animations API |
+| `<fluid-zoomable-frame>` | Pan + zoom container for images, iframes, SVG (scroll wheel + drag pan)    |
+| `<fluid-animation>`      | Declarative wrapper around the Web Animations API                          |
 
 Each component reads from the same `--fluid-*` semantic tokens as the rest
 of the system, so themes flow through without extra work.

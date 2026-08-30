@@ -138,7 +138,9 @@ export class FluidFold extends FluidElement {
          on unfold. */
       .body:not([hidden]) {
         animation: var(--fluid-fold-enter-animation, fluid-slide-in-down)
-          calc(var(--fluid-fold-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1))
+          calc(
+            var(--fluid-fold-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1)
+          )
           var(--fluid-easing-decelerate) both;
       }
 

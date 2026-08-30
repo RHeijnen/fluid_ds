@@ -22,14 +22,14 @@ type Trend = "up" | "down" | "neutral";
  * @cssproperty --fluid-stat-bg - Background. Falls back to transparent.
  * @cssproperty --fluid-stat-fg - Value text. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-stat-label-fg - Label text. Falls back to --fluid-text-secondary.
- * @cssproperty --fluid-stat-up-fg - Upward trend color. Falls back to --fluid-success-text.
- * @cssproperty --fluid-stat-down-fg - Downward trend color. Falls back to --fluid-danger-text.
+ * @cssproperty --fluid-stat-up-fg - Upward trend color. Falls back to --fluid-success-base.
+ * @cssproperty --fluid-stat-down-fg - Downward trend color. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-stat-radius - Corner radius. Falls back to --fluid-radius-lg.
  *
  * @uses-token --fluid-text-primary - Value text.
  * @uses-token --fluid-text-secondary - Label + neutral change text.
- * @uses-token --fluid-success-text - Upward trend.
- * @uses-token --fluid-danger-text - Downward trend.
+ * @uses-token --fluid-success-base - Upward trend.
+ * @uses-token --fluid-danger-base - Downward trend.
  */
 export class FluidStat extends FluidElement {
   static override styles = css`
@@ -69,9 +69,18 @@ export class FluidStat extends FluidElement {
       font-weight: 600;
       color: var(--fluid-stat-label-fg, var(--fluid-text-secondary));
     }
-    .change[data-trend="up"] { color: var(--fluid-stat-up-fg, var(--fluid-success-text)); }
-    .change[data-trend="down"] { color: var(--fluid-stat-down-fg, var(--fluid-danger-text)); }
-    ::slotted([slot="icon"]) { width: 1.25rem; height: 1.25rem; }
+    /* -base, not -text: the *-text tokens are text-ON-a-status-fill (white),
+       which rendered the trend invisible on a light card surface. */
+    .change[data-trend="up"] {
+      color: var(--fluid-stat-up-fg, var(--fluid-success-base));
+    }
+    .change[data-trend="down"] {
+      color: var(--fluid-stat-down-fg, var(--fluid-danger-base));
+    }
+    ::slotted([slot="icon"]) {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   `;
 
   /** The metric label. */

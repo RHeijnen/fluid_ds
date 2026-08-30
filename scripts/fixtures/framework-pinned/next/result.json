@@ -8,11 +8,7 @@
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70647,
@@ -26,11 +22,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70659,
@@ -44,11 +36,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70671,
@@ -62,11 +50,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70683,
@@ -80,11 +64,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70695,
@@ -98,11 +78,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 70707,
@@ -116,12 +92,7 @@
     },
     {
       "stage": "install",
-      "args": [
-        "install",
-        "--no-frozen-lockfile",
-        "--ignore-scripts",
-        "--strict-peer-dependencies"
-      ],
+      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
       "status": "passed",
       "reason": null,
       "pid": 70719,
@@ -135,10 +106,7 @@
     },
     {
       "stage": "typecheck",
-      "args": [
-        "run",
-        "typecheck"
-      ],
+      "args": ["run", "typecheck"],
       "status": "passed",
       "reason": null,
       "pid": 70734,
@@ -152,10 +120,7 @@
     },
     {
       "stage": "build",
-      "args": [
-        "run",
-        "build"
-      ],
+      "args": ["run", "build"],
       "status": "passed",
       "reason": null,
       "pid": 70759,

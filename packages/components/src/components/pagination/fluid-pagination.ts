@@ -93,6 +93,15 @@ export class FluidPagination extends FluidElement {
       list-style: none;
     }
 
+    /* Each li must be a flex container, not a block: a block li gives its
+       inline-flex button a text line box, and the icon-only edge buttons
+       (shorter than that line box) get BASELINE-aligned inside it, riding
+       visibly higher than the number buttons. Flex collapses the li to the
+       button box so the list's align-items: center actually centers. */
+    .list > li {
+      display: flex;
+    }
+
     .button {
       all: unset;
       box-sizing: border-box;
@@ -110,6 +119,10 @@ export class FluidPagination extends FluidElement {
       padding: 0 var(--fluid-space-2);
       border-radius: var(--fluid-pagination-radius, var(--fluid-radius-md));
       font: inherit;
+      /* After the font shorthand (which would reset it): control geometry
+         must not inherit the ambient page line-height, or number buttons
+         grow a taller text box than the icon-only edge buttons. */
+      line-height: var(--fluid-font-line-height-tight, 1.2);
       cursor: pointer;
       user-select: none;
       background-color: var(--fluid-pagination-bg, transparent);

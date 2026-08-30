@@ -38,7 +38,11 @@ const demoLayout = (extra: TemplateResult | string = "") => html`
       style="flex:1; padding:0.5rem 0.75rem; border:1px solid var(--fluid-border-default); border-radius:0.5rem;"
     />
     <button id="tour-new" style="padding:0.5rem 1rem;">New project</button>
-    <button id="tour-profile" aria-label="Account" style="width:2.5rem; height:2.5rem; border-radius:999px;">
+    <button
+      id="tour-profile"
+      aria-label="Account"
+      style="width:2.5rem; height:2.5rem; border-radius:999px;"
+    >
       RH
     </button>
   </div>
@@ -48,7 +52,7 @@ const demoLayout = (extra: TemplateResult | string = "") => html`
 const meta: Meta = {
   title: "Components/Feedback/Tour",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;

@@ -53,7 +53,7 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:ssr": "pnpm test:ssr-node && node scripts/check-ssr.mjs",
     "test:ssr-node": "node --test scripts/ssr-cold-imports.test.mjs scripts/ssr-entry-inventory.test.mjs && node --experimental-test-coverage --test-coverage-include=packages/components/dist/ssr.js --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 --test scripts/ssr-renderer.test.mjs",
-    "verify": "pnpm typecheck && pnpm lint && pnpm check:coverage && pnpm check:quality && pnpm check:cem && pnpm test:release-gates && pnpm test:package-artifacts && pnpm test:framework:isolation && pnpm test:framework:guards && pnpm test:browser-selection && pnpm test:browser-command-ownership && pnpm test:browser-policy && pnpm test:browser-lifecycle && pnpm test:coverage-inventory && pnpm check:tokens && pnpm test:matrix && pnpm build && pnpm check:ssr && pnpm check:docs",
+    "verify": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:coverage && pnpm check:quality && pnpm check:cem && pnpm test:release-gates && pnpm test:package-artifacts && pnpm test:framework:isolation && pnpm test:framework:guards && pnpm test:browser-selection && pnpm test:browser-command-ownership && pnpm test:browser-policy && pnpm test:browser-lifecycle && pnpm test:coverage-inventory && pnpm check:tokens && pnpm test:matrix && pnpm build && pnpm check:ssr && pnpm check:docs",
     "publish:dry": "node scripts/dry-run-publish.mjs",
     "check:packages": "node scripts/check-package-artifacts.mjs",
     "test:packed": "pnpm test:package-artifacts && pnpm build && node scripts/check-package-artifacts.mjs --install",

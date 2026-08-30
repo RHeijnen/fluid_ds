@@ -46,7 +46,7 @@ registerIcon(
  *
  * @fires fluid-slide-change - Fired when the active slide changes; detail = { index }.
  * @cssproperty --fluid-carousel-shadow-sm - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidCarousel extends FluidElement {
   static override styles = css`
     :host {
@@ -126,7 +126,9 @@ export class FluidCarousel extends FluidElement {
       height: 0.5rem;
       border-radius: 50%;
       background: var(--fluid-carousel-dot-bg, var(--fluid-border-default));
-      transition: background 120ms ease, transform 120ms ease;
+      transition:
+        background 120ms ease,
+        transform 120ms ease;
     }
     .dot[aria-current="true"]::before {
       background: var(--fluid-carousel-dot-active-bg, var(--fluid-accent-base));
@@ -282,10 +284,12 @@ export class FluidCarousel extends FluidElement {
   private onKeyDown = (e: KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
       e.preventDefault();
-      if (this.isRtl) this.next(); else this.previous();
+      if (this.isRtl) this.next();
+      else this.previous();
     } else if (e.key === "ArrowRight") {
       e.preventDefault();
-      if (this.isRtl) this.previous(); else this.next();
+      if (this.isRtl) this.previous();
+      else this.next();
     } else if (e.key === "Home") {
       e.preventDefault();
       this.goTo(0);

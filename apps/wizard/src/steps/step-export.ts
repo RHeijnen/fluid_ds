@@ -108,7 +108,10 @@ export class WizardStepExport extends WizardStep {
 
       <div class="block">
         <h3>fluid-custom-brand.css</h3>
-        <fluid-code-block filename="fluid-custom-brand.css" code=${this.brandCss()}></fluid-code-block>
+        <fluid-code-block
+          filename="fluid-custom-brand.css"
+          code=${this.brandCss()}
+        ></fluid-code-block>
         <div class="actions" style="margin-top:0.75rem;">
           <fluid-button @click=${this.download}>
             <fluid-icon slot="prefix" name="download"></fluid-icon>

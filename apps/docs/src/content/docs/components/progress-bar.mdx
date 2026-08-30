@@ -13,7 +13,9 @@ on `show-value` for the trailing "42%" readout. Omit `value` (or set
 `indeterminate`) for the looping animation when the duration is unknown.
 
 <Demo>
-  <fluid-progress-bar value="60" show-value style="width: 100%;">Uploading…</fluid-progress-bar>
+  <fluid-progress-bar value="60" show-value style="width: 100%;">
+    Uploading…
+  </fluid-progress-bar>
 </Demo>
 
 ## Install
@@ -28,6 +30,7 @@ on `show-value` for the trailing "42%" readout. Omit `value` (or set
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/progress-bar/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -39,6 +42,7 @@ on `show-value` for the trailing "42%" readout. Omit `value` (or set
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/progress-bar";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,7 +61,9 @@ on `show-value` for the trailing "42%" readout. Omit `value` (or set
 ### With a label and readout
 
 <Demo>
-  <fluid-progress-bar value="42" show-value style="width: 100%;">Uploading…</fluid-progress-bar>
+  <fluid-progress-bar value="42" show-value style="width: 100%;">
+    Uploading…
+  </fluid-progress-bar>
 </Demo>
 
 ```html
@@ -67,7 +73,9 @@ on `show-value` for the trailing "42%" readout. Omit `value` (or set
 ### Indeterminate
 
 <Demo>
-  <fluid-progress-bar indeterminate style="width: 100%;">Working…</fluid-progress-bar>
+  <fluid-progress-bar indeterminate style="width: 100%;">
+    Working…
+  </fluid-progress-bar>
 </Demo>
 
 ```html
@@ -80,7 +88,7 @@ Pass a function as the `valueFormatter` property (not an attribute).
 
 ```ts
 const bar = document.querySelector("fluid-progress-bar");
-bar.valueFormatter = (v) => `${Math.round(v / 100 * 250)} of 250`;
+bar.valueFormatter = (v) => `${Math.round((v / 100) * 250)} of 250`;
 bar.value = 40;
 ```
 

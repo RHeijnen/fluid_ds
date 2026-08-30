@@ -19,7 +19,8 @@ try {
     const chunks = [];
     const complete = new Promise((resolve) => {
       recorder.ondataavailable = (event) => chunks.push(event.data);
-      recorder.onstop = async () => resolve(Array.from(new Uint8Array(await new Blob(chunks).arrayBuffer())));
+      recorder.onstop = async () =>
+        resolve(Array.from(new Uint8Array(await new Blob(chunks).arrayBuffer())));
     });
     recorder.start();
     for (let frame = 0; frame < 20; frame++) {

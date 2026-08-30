@@ -41,6 +41,76 @@ describe("<fluid-chart>", () => {
     expect(el.instance!.data.datasets[0]!.data).to.deep.equal([3, 7, 5]);
   });
 
+  it("insets radial charts by default so the ring is not flush to the canvas", async () => {
+    const el = await fixture<FluidChart>(
+      html`<fluid-chart type="doughnut" .data=${sampleData}></fluid-chart>`
+    );
+    /* Without an inset a doughnut fits its ring to the canvas edges (verified:
+       outerRadius == canvas half-height), which reads as cramped in a card. */
+    expect(el.instance!.options.layout!.padding).to.equal(10);
+
+    const bar = await fixture<FluidChart>(
+      html`<fluid-chart type="bar" .data=${sampleData}></fluid-chart>`
+    );
+    // Cartesian charts space their plot with axes, so they default to no inset.
+    expect(bar.instance!.options.layout!.padding).to.equal(0);
+  });
+
+  it("lets --fluid-chart-padding override the drawing-area inset", async () => {
+    const el = await fixture<FluidChart>(
+      html`<fluid-chart
+        type="doughnut"
+        style="--fluid-chart-padding: 24"
+        .data=${sampleData}
+      ></fluid-chart>`
+    );
+    expect(el.instance!.options.layout!.padding).to.equal(24);
+  });
+
+  it("draws no doughnut ring shadow by default, and one when the token is set", async () => {
+    /*
+     * The shadow is drawn on the canvas and spills past the plot area, so on by
+     * default it gets clipped by the tight edge and looks broken. It is now
+     * opt-in via --fluid-chart-doughnut-shadow. Spy on the 2D context's
+     * shadowColor to see whether the arc-decor plugin sets an opaque shadow
+     * during a redraw.
+     */
+    const spyShadow = (chart: FluidChart) => {
+      const ctx = chart.shadowRoot!.querySelector("canvas")!.getContext("2d")!;
+      const applied: string[] = [];
+      const proto = Object.getOwnPropertyDescriptor(
+        CanvasRenderingContext2D.prototype,
+        "shadowColor"
+      )!;
+      Object.defineProperty(ctx, "shadowColor", {
+        configurable: true,
+        get() {
+          return proto.get!.call(this);
+        },
+        set(value: string) {
+          if (value && value !== "rgba(0, 0, 0, 0)") applied.push(value);
+          proto.set!.call(this, value);
+        }
+      });
+      chart.instance!.draw();
+      return applied;
+    };
+
+    const plain = await fixture<FluidChart>(
+      html`<fluid-chart type="doughnut" .data=${sampleData}></fluid-chart>`
+    );
+    expect(spyShadow(plain), "no shadow by default").to.have.lengthOf(0);
+
+    const shadowed = await fixture<FluidChart>(
+      html`<fluid-chart
+        type="doughnut"
+        style="--fluid-chart-doughnut-shadow: rgba(2, 6, 23, 0.2)"
+        .data=${sampleData}
+      ></fluid-chart>`
+    );
+    expect(spyShadow(shadowed).length, "shadow drawn when the token is set").to.be.greaterThan(0);
+  });
+
   it("respects custom legend callbacks and explicit legend suppression", async () => {
     let called = 0;
     const el = await fixture<FluidChart>(
@@ -210,6 +280,63 @@ describe("<fluid-chart>", () => {
     // A live Chart.js instance exposes a canvas and an update() method.
     expect(el.instance!.canvas).to.be.instanceOf(HTMLCanvasElement);
     expect(typeof el.instance!.update).to.equal("function");
+  });
+
+  it("refresh() repaints in place so ancestor token changes reach the canvas", async () => {
+    const el = await fixture<FluidChart>(html`<fluid-chart .data=${sampleData}></fluid-chart>`);
+    const before = el.instance as Chart;
+    expect(before).to.not.equal(null);
+
+    /* A canvas reads its colors once, at draw time. Theming that writes custom
+       properties onto an ancestor mutates no attribute the chart can observe,
+       so refresh() is the only way the repaint happens; a broken one leaves the
+       old instance in place and the chart keeps its stale palette until a full
+       page reload. */
+    el.refresh();
+    await aTimeout(0);
+
+    const after = el.instance as Chart;
+    expect(after, "refresh must leave a live instance behind").to.not.equal(null);
+    expect(after).to.not.equal(before);
+    expect(before.canvas, "the superseded instance must be destroyed").to.equal(null);
+  });
+
+  it("rounds only the outer edges of a stacked bar column", async () => {
+    const stacked = {
+      labels: ["Q1", "Q2"],
+      datasets: [
+        { label: "A", data: [1, 2] },
+        { label: "B", data: [3, 4] },
+        { label: "C", data: [5, 6] }
+      ]
+    };
+    const el = await fixture<FluidChart>(html`
+      <fluid-chart
+        type="bar"
+        .data=${stacked}
+        .options=${{ scales: { x: { stacked: true }, y: { stacked: true } } }}
+      ></fluid-chart>
+    `);
+    const chart = el.instance as Chart;
+    const radius = (chart.data.datasets[0] as { borderRadius?: unknown }).borderRadius;
+    expect(typeof radius, "stacked bars need a scriptable borderRadius").to.equal("function");
+
+    const cornersFor = (datasetIndex: number) =>
+      (radius as (c: object) => Record<string, number>)({ chart, datasetIndex, dataIndex: 0 });
+
+    /* Rounding every segment would put caps in the middle of the column. Only
+       the bottom of the first segment and the top of the last are rounded, so
+       the stack reads as one bar. */
+    const bottom = cornersFor(0);
+    const middle = cornersFor(1);
+    const top = cornersFor(2);
+
+    expect(bottom.bottomLeft).to.be.greaterThan(0);
+    expect(bottom.topLeft).to.equal(0);
+    expect(middle.topLeft).to.equal(0);
+    expect(middle.bottomLeft).to.equal(0);
+    expect(top.topLeft).to.be.greaterThan(0);
+    expect(top.bottomLeft).to.equal(0);
   });
 
   it("destroys the Chart.js instance on disconnect", async () => {
@@ -453,6 +580,27 @@ describe("<fluid-sparkline>", () => {
     const chart = Chart.getChart(canvas);
     expect(chart, "a chart should control the canvas").to.not.equal(undefined);
     expect(chart!.data.datasets[0]!.data).to.deep.equal([1, 4, 2, 8, 5]);
+  });
+
+  it("refresh() repaints without reusing an occupied canvas", async () => {
+    const el = await fixture<FluidSparkline>(
+      html`<fluid-sparkline .values=${[1, 4, 2, 8, 5]}></fluid-sparkline>`
+    );
+    const canvas = el.shadowRoot!.querySelector("canvas") as HTMLCanvasElement;
+    const before = Chart.getChart(canvas);
+    expect(before).to.not.equal(undefined);
+
+    /* Chart.js throws "Canvas is already in use" when a second instance is
+       constructed on a canvas it still owns, so refresh() has to destroy the
+       previous one first. When this threw, the sparkline aborted the theme
+       repaint loop for every chart after it in DOM order. */
+    expect(() => el.refresh()).to.not.throw();
+    await aTimeout(0);
+
+    const after = Chart.getChart(canvas);
+    expect(after, "refresh must leave a live chart on the canvas").to.not.equal(undefined);
+    expect(after).to.not.equal(before);
+    expect(after!.data.datasets[0]!.data).to.deep.equal([1, 4, 2, 8, 5]);
   });
 
   it("tears down on disconnect (no leaked Chart.js instance)", async () => {

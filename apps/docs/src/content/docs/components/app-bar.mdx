@@ -17,8 +17,12 @@ open a drawer without wiring your own control.
 <Demo>
   <fluid-app-bar elevated menu-button>
     <strong slot="start">Acme</strong>
-    <a href="#" style="color: inherit;">Dashboard</a>
-    <a href="#" style="color: inherit;">Projects</a>
+    <a href="#" style="color: inherit;">
+      Dashboard
+    </a>
+    <a href="#" style="color: inherit;">
+      Projects
+    </a>
     <span slot="end">Sign in</span>
   </fluid-app-bar>
 </Demo>
@@ -35,6 +39,7 @@ open a drawer without wiring your own control.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/app-bar/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +51,7 @@ open a drawer without wiring your own control.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/app-bar";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -60,8 +66,12 @@ right edge.
 <Demo>
   <fluid-app-bar>
     <strong slot="start">Acme</strong>
-    <a href="#" style="color: inherit;">Home</a>
-    <a href="#" style="color: inherit;">Docs</a>
+    <a href="#" style="color: inherit;">
+      Home
+    </a>
+    <a href="#" style="color: inherit;">
+      Docs
+    </a>
     <span slot="end">Sign in</span>
   </fluid-app-bar>
 </Demo>
@@ -82,8 +92,12 @@ Add `elevated` for a drop shadow that lifts the bar off the content below.
 <Demo>
   <fluid-app-bar elevated>
     <strong slot="start">Acme</strong>
-    <a href="#" style="color: inherit;">Home</a>
-    <a href="#" style="color: inherit;">Docs</a>
+    <a href="#" style="color: inherit;">
+      Home
+    </a>
+    <a href="#" style="color: inherit;">
+      Docs
+    </a>
     <span slot="end">Sign in</span>
   </fluid-app-bar>
 </Demo>
@@ -111,7 +125,9 @@ button's `aria-expanded` stays correct.
 <Demo>
   <fluid-app-bar elevated menu-button>
     <strong slot="start">Acme</strong>
-    <a href="#" style="color: inherit;">Dashboard</a>
+    <a href="#" style="color: inherit;">
+      Dashboard
+    </a>
     <span slot="end">Profile</span>
   </fluid-app-bar>
 </Demo>
@@ -145,6 +161,7 @@ The built-in button does not open anything itself: it announces intent. Wire
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Shell.tsx"
@@ -161,6 +178,7 @@ The built-in button does not open anything itself: it announces intent. Wire
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Shell.vue"
@@ -177,6 +195,7 @@ The built-in button does not open anything itself: it announces intent. Wire
       </fluid-app-bar>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="shell.component.ts"
@@ -195,6 +214,7 @@ The built-in button does not open anything itself: it announces intent. Wire
     })
     export class Shell { open = false; }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Shell.svelte"
@@ -208,6 +228,7 @@ The built-in button does not open anything itself: it announces intent. Wire
       <strong slot="start">Acme</strong>
     </fluid-app-bar>
     ```
+
   </TabItem>
 </Tabs>
 

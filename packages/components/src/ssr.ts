@@ -28,10 +28,12 @@ function attributes(element: ParsedElement): LocaleContext {
 
 /** Resolve the HTML parser's actual insertion ancestry, including implied closes and foster parenting. */
 function localizationContextFromPrefix(prefix: string): LocaleContext {
-  const document = parse(`${prefix}<fluid-ssr-context-marker ${markerAttribute}></fluid-ssr-context-marker>`);
+  const document = parse(
+    `${prefix}<fluid-ssr-context-marker ${markerAttribute}></fluid-ssr-context-marker>`
+  );
   let result: LocaleContext = {};
   const visit = (node: ParsedNode, inherited: LocaleContext): void => {
-    const element = "attrs" in node ? node as ParsedElement : undefined;
+    const element = "attrs" in node ? (node as ParsedElement) : undefined;
     const own = element ? attributes(element) : {};
     const context = { ...inherited, ...own };
     if (element?.attrs.some(({ name }) => name === markerAttribute)) result = context;
@@ -52,10 +54,9 @@ function observeRender(result: RenderResult, context: { prefix: string }): Rende
         context.prefix += chunk;
         yield chunk;
       } else {
-        yield chunk.then((nested) => observeRender(
-          typeof nested === "string" ? [nested] as RenderResult : nested,
-          context
-        ));
+        yield chunk.then((nested) =>
+          observeRender(typeof nested === "string" ? ([nested] as RenderResult) : nested, context)
+        );
       }
     }
   }
@@ -68,10 +69,7 @@ function observeRender(result: RenderResult, context: { prefix: string }): Rende
  * Consume chunks in order and await promise chunks before continuing. Use
  * `renderFluidToString` when a complete HTML string is more convenient.
  */
-export function renderFluid(
-  value: unknown,
-  renderInfo: Partial<RenderInfo> = {}
-): RenderResult {
+export function renderFluid(value: unknown, renderInfo: Partial<RenderInfo> = {}): RenderResult {
   const request = { prefix: "" };
   class ContextualFluidRenderer extends LitElementRenderer {
     static override matchesClass(ctor: typeof HTMLElement, tagName = ""): boolean {

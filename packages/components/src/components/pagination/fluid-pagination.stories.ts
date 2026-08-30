@@ -11,7 +11,7 @@ type Args = Pick<
 const meta: Meta<Args> = {
   title: "Components/Navigation/Pagination",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     total: { control: "number" },
     totalPages: { control: "number" },
@@ -64,9 +64,7 @@ export const WiderWindow: Story = {
 
 /** Derive the page count from an item total and a page size. */
 export const FromItemTotal: Story = {
-  render: () => html`
-    <fluid-pagination total="195" page-size="20" page="3"></fluid-pagination>
-  `
+  render: () => html` <fluid-pagination total="195" page-size="20" page="3"></fluid-pagination> `
 };
 
 /** All states side by side. */

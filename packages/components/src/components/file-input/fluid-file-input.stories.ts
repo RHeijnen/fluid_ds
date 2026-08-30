@@ -10,7 +10,7 @@ type Args = Pick<FluidFileInput, "accept" | "multiple" | "disabled" | "required"
 const meta: Meta<Args> = {
   title: "Components/Forms/FileInput",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     accept: { control: "text" },
     multiple: { control: "boolean" },

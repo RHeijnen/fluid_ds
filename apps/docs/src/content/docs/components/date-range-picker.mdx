@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-date-range-picker>` is a form-associated field that opens a popover with a
 preset column, two side-by-side [`<fluid-calendar>`](/components/calendar/) grids,
 and Apply / Cancel. `start` and `end` are timezone-safe ISO `YYYY-MM-DD` strings;
@@ -16,7 +15,11 @@ the submitted form value is the ISO interval `start/end`. Common ranges (last 7
 days, this month, and so on) are offered as presets by default.
 
 <Demo>
-  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+  <fluid-date-range-picker
+    start="2026-06-08"
+    end="2026-06-19"
+    aria-label="Date range"
+  ></fluid-date-range-picker>
 </Demo>
 
 ## Install
@@ -31,6 +34,7 @@ days, this month, and so on) are offered as presets by default.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/date-range-picker/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +46,7 @@ days, this month, and so on) are offered as presets by default.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/date-range-picker"; // registers range picker + calendar
     ```
+
   </TabItem>
 </Tabs>
 
@@ -54,10 +59,16 @@ grids, pick a start then an end (either order: the picker sorts them), and press
 **Apply**.
 
 <Demo>
-  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+  <fluid-date-range-picker
+    start="2026-06-08"
+    end="2026-06-19"
+    aria-label="Date range"
+  ></fluid-date-range-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-range-picker name="stay" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`} />
+<ConformanceCode
+  code={`<fluid-date-range-picker name="stay" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`}
+/>
 
 ### Presets
 
@@ -66,7 +77,11 @@ one matching the current selection. Customize the list via the `.presets` proper
 (an array of `{ id, label, getRange }`).
 
 <Demo>
-  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" aria-label="Date range"></fluid-date-range-picker>
+  <fluid-date-range-picker
+    start="2026-06-08"
+    end="2026-06-19"
+    aria-label="Date range"
+  ></fluid-date-range-picker>
 </Demo>
 
 ```js
@@ -91,20 +106,76 @@ picker.presets = [
 Add `no-presets` to drop the column and show just the two grids.
 
 <Demo>
-  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-presets aria-label="Date range"></fluid-date-range-picker>
+  <fluid-date-range-picker
+    start="2026-06-08"
+    end="2026-06-19"
+    no-presets
+    aria-label="Date range"
+  ></fluid-date-range-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-presets></fluid-date-range-picker>`} />
+<ConformanceCode
+  code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-presets></fluid-date-range-picker>`}
+/>
 
 ### Min and max
 
 `min` and `max` (ISO) bound both grids; out-of-range days are disabled.
 
 <Demo>
-  <fluid-date-range-picker start="2026-06-08" end="2026-06-19" min="2026-06-01" max="2026-06-30" aria-label="Date range"></fluid-date-range-picker>
+  <fluid-date-range-picker
+    start="2026-06-08"
+    end="2026-06-19"
+    min="2026-06-01"
+    max="2026-06-30"
+    aria-label="Date range"
+  ></fluid-date-range-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" min="2026-06-01" max="2026-06-30"></fluid-date-range-picker>`} />
+<ConformanceCode
+  code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19" min="2026-06-01" max="2026-06-30"></fluid-date-range-picker>`}
+/>
+
+### Opening behaviour
+
+Clicking the field opens the calendar and selects the current range, so the text
+and the trigger button do the same thing and one click is enough to type a
+replacement. Keyboard users open with <kbd>ArrowDown</kbd>.
+
+Opening is deliberately tied to the click rather than to focus: focus also
+arrives from form validation, from an overlay above the field closing, and from
+any programmatic `.focus()`, none of which mean "show me the calendar".
+
+Both halves are opt-out. `no-auto-open` keeps the click from opening the
+calendar, and `no-select-on-focus` keeps focus from selecting the range.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:24rem;">
+    <fluid-date-range-picker
+      start="2026-06-08"
+      end="2026-06-19"
+      aria-label="Opens on click"
+    ></fluid-date-range-picker>
+    <fluid-date-range-picker
+      start="2026-06-08"
+      end="2026-06-19"
+      no-auto-open
+      aria-label="Never opens on click"
+    ></fluid-date-range-picker>
+    <fluid-date-range-picker
+      start="2026-06-08"
+      end="2026-06-19"
+      no-select-on-focus
+      aria-label="Opens without selecting"
+    ></fluid-date-range-picker>
+  </div>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-date-range-picker start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>
+<fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-auto-open></fluid-date-range-picker>
+<fluid-date-range-picker start="2026-06-08" end="2026-06-19" no-select-on-focus></fluid-date-range-picker>`}
+/>
 
 ### Sizes
 
@@ -112,14 +183,31 @@ Add `no-presets` to drop the column and show just the two grids.
 
 <Demo>
   <div style="display:flex; flex-direction:column; gap:0.75rem;">
-    <fluid-date-range-picker size="sm" start="2026-06-08" end="2026-06-19" aria-label="Small"></fluid-date-range-picker>
-    <fluid-date-range-picker size="md" start="2026-06-08" end="2026-06-19" aria-label="Medium"></fluid-date-range-picker>
-    <fluid-date-range-picker size="lg" start="2026-06-08" end="2026-06-19" aria-label="Large"></fluid-date-range-picker>
+    <fluid-date-range-picker
+      size="sm"
+      start="2026-06-08"
+      end="2026-06-19"
+      aria-label="Small"
+    ></fluid-date-range-picker>
+    <fluid-date-range-picker
+      size="md"
+      start="2026-06-08"
+      end="2026-06-19"
+      aria-label="Medium"
+    ></fluid-date-range-picker>
+    <fluid-date-range-picker
+      size="lg"
+      start="2026-06-08"
+      end="2026-06-19"
+      aria-label="Large"
+    ></fluid-date-range-picker>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-date-range-picker size="sm" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>
-<fluid-date-range-picker size="lg" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`} />
+<ConformanceCode
+  code={`<fluid-date-range-picker size="sm" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>
+<fluid-date-range-picker size="lg" start="2026-06-08" end="2026-06-19"></fluid-date-range-picker>`}
+/>
 
 ## Listening for changes
 
@@ -139,6 +227,7 @@ popover.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="StayRange.tsx"
@@ -159,6 +248,7 @@ popover.
       return <fluid-date-range-picker ref={ref} aria-label="Stay" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="StayRange.vue"
@@ -171,6 +261,7 @@ popover.
       <fluid-date-range-picker aria-label="Stay" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="stay-range.component.ts"
@@ -191,6 +282,7 @@ popover.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="StayRange.svelte"
@@ -203,6 +295,7 @@ popover.
 
     <fluid-date-range-picker aria-label="Stay" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -216,7 +309,12 @@ The picker is form-associated: it submits `name=<start/end>`, the ISO interval, 
     style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'stay=' + (new FormData(this).get('stay') ?? '(none)');"
   >
-    <fluid-date-range-picker name="stay" required placeholder="Stay dates" aria-label="Stay dates"></fluid-date-range-picker>
+    <fluid-date-range-picker
+      name="stay"
+      required
+      placeholder="Stay dates"
+      aria-label="Stay dates"
+    ></fluid-date-range-picker>
     <fluid-button type="submit">Book</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -252,8 +350,8 @@ matches your inputs, while the two grids read the
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) lets you tweak the field, popover, preset, and
-  inner calendar tokens visually and exports the CSS above.
+  The [Theme builder](/playground/) lets you tweak the field, popover, preset, and inner calendar
+  tokens visually and exports the CSS above.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -276,7 +374,7 @@ fluid-date-range-picker::part(presets) {
 - Anywhere users pick from **common ranges** often: the preset column saves them
   two grid clicks.
 
-### When *not* to use
+### When _not_ to use
 
 - A **single date**: use [`<fluid-date-picker>`](/components/date-picker/).
 - An **always-visible month** with no field: use
@@ -293,13 +391,13 @@ contract is in the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>↓</kbd> | Open the popover from the field. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | (in a grid) set the focused day as the start, then the end. |
-| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Move focus ±1 day / ±1 week within a grid. |
-| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Move the focused grid ±1 month (Shift = ±1 year). |
-| <kbd>Escape</kbd> | Close the popover (discarding the in-progress selection) and return focus to the field. |
+| Key                                                 | Action                                                                                  |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| <kbd>↓</kbd>                                        | Open the popover from the field.                                                        |
+| <kbd>Enter</kbd> / <kbd>Space</kbd>                 | (in a grid) set the focused day as the start, then the end.                             |
+| <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd> | Move focus ±1 day / ±1 week within a grid.                                              |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd>             | Move the focused grid ±1 month (Shift = ±1 year).                                       |
+| <kbd>Escape</kbd>                                   | Close the popover (discarding the in-progress selection) and return focus to the field. |
 
 Each preset is a focusable button; activating one fills the start/end and
 highlights the match. The field's focus ring is `:focus-within` and reads
@@ -335,10 +433,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA** and the trigge
 presets, day targets, and focus ring all scale up. The toggle sets the real
 `data-fluid-conformance` attribute on `<html>`:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

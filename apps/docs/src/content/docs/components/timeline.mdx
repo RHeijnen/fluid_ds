@@ -42,6 +42,7 @@ presentational and semantic: the items form a list, so the timeline exposes
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/timeline/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -53,6 +54,7 @@ presentational and semantic: the items form a list, so the timeline exposes
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/timeline";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -159,9 +161,15 @@ The `time` slot is optional. Omit it for a plain step list.
 
 <Demo>
   <fluid-timeline aria-label="Setup steps">
-    <fluid-timeline-item><strong>Clone the repository</strong></fluid-timeline-item>
-    <fluid-timeline-item><strong>Install dependencies</strong></fluid-timeline-item>
-    <fluid-timeline-item><strong>Run the build</strong></fluid-timeline-item>
+    <fluid-timeline-item>
+      <strong>Clone the repository</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item>
+      <strong>Install dependencies</strong>
+    </fluid-timeline-item>
+    <fluid-timeline-item>
+      <strong>Run the build</strong>
+    </fluid-timeline-item>
   </fluid-timeline>
 </Demo>
 

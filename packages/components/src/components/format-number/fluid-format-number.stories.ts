@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Number",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -17,10 +17,7 @@ export const Decimal: Story = {
       <li><fluid-format-number value="1234567.89"></fluid-format-number></li>
       <li><fluid-format-number value="1234567.89" no-grouping></fluid-format-number></li>
       <li>
-        <fluid-format-number
-          value="3.14159"
-          maximum-fraction-digits="3"
-        ></fluid-format-number>
+        <fluid-format-number value="3.14159" maximum-fraction-digits="3"></fluid-format-number>
       </li>
     </ul>
   `
@@ -29,8 +26,17 @@ export const Decimal: Story = {
 export const Currency: Story = {
   render: () => html`
     <ul style="line-height: 1.8;">
-      <li><fluid-format-number value="1234.5" type="currency" currency="USD"></fluid-format-number></li>
-      <li><fluid-format-number value="1234.5" type="currency" currency="EUR" locale="de-DE"></fluid-format-number></li>
+      <li>
+        <fluid-format-number value="1234.5" type="currency" currency="USD"></fluid-format-number>
+      </li>
+      <li>
+        <fluid-format-number
+          value="1234.5"
+          type="currency"
+          currency="EUR"
+          locale="de-DE"
+        ></fluid-format-number>
+      </li>
       <li>
         <fluid-format-number
           value="1234.5"
@@ -61,9 +67,16 @@ export const Percent: Story = {
 export const Unit: Story = {
   render: () => html`
     <ul style="line-height: 1.8;">
-      <li><fluid-format-number value="85" type="unit" unit="kilometer-per-hour"></fluid-format-number></li>
       <li>
-        <fluid-format-number value="2.5" type="unit" unit="liter" unit-display="long"></fluid-format-number>
+        <fluid-format-number value="85" type="unit" unit="kilometer-per-hour"></fluid-format-number>
+      </li>
+      <li>
+        <fluid-format-number
+          value="2.5"
+          type="unit"
+          unit="liter"
+          unit-display="long"
+        ></fluid-format-number>
       </li>
     </ul>
   `

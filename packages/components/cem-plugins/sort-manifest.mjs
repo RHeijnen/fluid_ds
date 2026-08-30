@@ -28,7 +28,9 @@ export function sortManifestPlugin() {
 
       for (const mod of cem.modules) {
         if (Array.isArray(mod.exports)) {
-          mod.exports.sort((a, b) => cmp(a.kind ?? "", b.kind ?? "") || cmp(a.name ?? "", b.name ?? ""));
+          mod.exports.sort(
+            (a, b) => cmp(a.kind ?? "", b.kind ?? "") || cmp(a.name ?? "", b.name ?? "")
+          );
         }
         if (Array.isArray(mod.declarations)) {
           mod.declarations.sort((a, b) => cmp(a.name ?? "", b.name ?? ""));

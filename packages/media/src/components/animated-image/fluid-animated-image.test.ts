@@ -3,8 +3,7 @@ import "./define.js";
 import type { FluidAnimatedImage } from "./fluid-animated-image.js";
 
 // A 1x1 transparent GIF data URL loads synchronously and reliably in the test runner.
-const SRC =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+const SRC = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 describe("<fluid-animated-image>", () => {
   it("passes an a11y audit with alternative text and playback control", async () => {

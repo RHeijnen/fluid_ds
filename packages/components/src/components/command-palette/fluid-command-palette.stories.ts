@@ -29,7 +29,7 @@ const flatItems: FluidCommandItem[] = [
 const meta: Meta<Args> = {
   title: "Components/Navigation/Command palette",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     open: { control: "boolean" },
     placeholder: { control: "text" },
@@ -108,8 +108,7 @@ export const WithTrigger: Story = {
   render: (args) => html`
     <fluid-button
       @click=${(e: Event) => {
-        const palette = (e.currentTarget as HTMLElement)
-          .nextElementSibling as FluidCommandPalette;
+        const palette = (e.currentTarget as HTMLElement).nextElementSibling as FluidCommandPalette;
         palette.show();
       }}
       >Open command palette (⌘K)</fluid-button

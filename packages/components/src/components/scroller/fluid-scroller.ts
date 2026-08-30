@@ -61,8 +61,7 @@ export class FluidScroller extends FluidElement {
       position: absolute;
       pointer-events: none;
       opacity: 0;
-      transition: opacity
-        calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
+      transition: opacity calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
       background: linear-gradient(
         var(--_dir),
         var(--fluid-scroller-fade-color, var(--fluid-surface-base)),
@@ -166,14 +165,17 @@ export class FluidScroller extends FluidElement {
       this.resizeObserver.observe(child);
     }
     this.updateFades();
-  }
+  };
 
   private updateFades = () => {
     if (!this.container) return;
     if (this.orientation === "horizontal") {
       const max = Math.max(0, this.container.scrollWidth - this.container.clientWidth);
       const rtl = getComputedStyle(this.container).direction === "rtl";
-      const offset = Math.min(max, Math.max(0, rtl ? -this.container.scrollLeft : this.container.scrollLeft));
+      const offset = Math.min(
+        max,
+        Math.max(0, rtl ? -this.container.scrollLeft : this.container.scrollLeft)
+      );
       this.showStart = offset > 1;
       this.showEnd = offset < max - 1;
     } else {

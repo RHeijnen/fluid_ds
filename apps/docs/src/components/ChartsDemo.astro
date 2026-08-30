@@ -1,0 +1,320 @@
+---
+/**
+ * Live hero demo for the charts expansion page: a compact analytics
+ * dashboard driven by a simulated metrics feed. The area chart streams a
+ * new point every tick, the doughnut re-balances now and then, and the
+ * sparkline stat tiles track the same feed. Everything is painted by the
+ * real chart components, themed from the page's Fluid tokens.
+ *
+ * The stream honours prefers-reduced-motion (paints one static frame
+ * instead) and pauses while the demo is scrolled out of view.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="ch-demo" data-charts-demo>
+    <div class="ch-hud">
+      <fluid-button size="sm" variant="secondary" data-ch-toggle>Pause</fluid-button>
+      <span class="ch-status" data-ch-status></span>
+    </div>
+    <div class="ch-grid">
+      <div class="ch-card ch-wide">
+        <p class="ch-title">Requests per minute</p>
+        <fluid-line-chart class="ch-line" label="Simulated requests per minute for two regions">
+          <span slot="fallback">Simulated request rates for two regions, streamed live for demonstration.</span>
+        </fluid-line-chart>
+      </div>
+      <div class="ch-card">
+        <p class="ch-title">Traffic sources</p>
+        <fluid-doughnut-chart class="ch-donut" label="Simulated traffic share by source">
+          <span slot="fallback">Simulated traffic share across direct, search, referral and social sources.</span>
+        </fluid-doughnut-chart>
+      </div>
+    </div>
+    <div class="ch-stats">
+      <div class="ch-stat">
+        <span class="ch-stat-label">Sessions</span>
+        <span class="ch-stat-value" data-ch-stat="sessions"></span>
+        <fluid-sparkline class="ch-spark" data-ch-spark="sessions"></fluid-sparkline>
+      </div>
+      <div class="ch-stat">
+        <span class="ch-stat-label">Conversion</span>
+        <span class="ch-stat-value" data-ch-stat="conversion"></span>
+        <fluid-sparkline class="ch-spark" data-ch-spark="conversion"></fluid-sparkline>
+      </div>
+      <div class="ch-stat">
+        <span class="ch-stat-label">P95 latency</span>
+        <span class="ch-stat-value" data-ch-stat="latency"></span>
+        <fluid-sparkline class="ch-spark" data-ch-spark="latency"></fluid-sparkline>
+      </div>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .ch-demo {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .ch-hud {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ch-status {
+    margin-inline-start: auto;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .ch-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .ch-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .ch-card {
+    padding: 0.85rem 1rem 1rem;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 10px);
+    background: var(--fluid-surface-base);
+    min-inline-size: 0;
+  }
+  .ch-title {
+    margin: 0 0 0.5rem;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--fluid-text-primary);
+  }
+  .ch-line {
+    --fluid-chart-height: 230px;
+  }
+  .ch-donut {
+    --fluid-chart-height: 230px;
+  }
+  .ch-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .ch-stats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .ch-stat {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 0.5rem;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 10px);
+    background: var(--fluid-surface-base);
+  }
+  .ch-stat-label {
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+  }
+  .ch-stat-value {
+    grid-row: 2;
+    font-size: var(--fluid-font-size-lg, 1.15rem);
+    font-weight: 700;
+    color: var(--fluid-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .ch-spark {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    inline-size: 5.5rem;
+    --fluid-sparkline-height: 2.2rem;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/charts/define/line-chart";
+  import "@fluid-ds/charts/define/doughnut-chart";
+  import "@fluid-ds/charts/define/sparkline";
+
+  interface ChartData {
+    labels: (string | number)[];
+    datasets: Record<string, unknown>[];
+  }
+
+  interface ChartEl extends HTMLElement {
+    data: ChartData;
+    options: Record<string, unknown>;
+  }
+
+  interface SparklineEl extends HTMLElement {
+    values: number[];
+  }
+
+  const WINDOW = 24;
+  const TICK_MS = 1400;
+  const DONUT_EVERY = 4;
+
+  /** Deterministic PRNG so the feed looks the same on every load. */
+  function mulberry32(seed: number): () => number {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /** One simulated metrics feed shared by every widget in the dashboard. */
+  interface Feed {
+    minute: number;
+    labels: string[];
+    eu: number[];
+    us: number[];
+    sessions: number[];
+    conversion: number[];
+    latency: number[];
+    donut: number[];
+  }
+
+  function makeFeed(): { feed: Feed; tick: () => void } {
+    const rand = mulberry32(20260830);
+    const feed: Feed = {
+      minute: 0,
+      labels: [],
+      eu: [],
+      us: [],
+      sessions: [],
+      conversion: [],
+      latency: [],
+      donut: [420, 310, 180, 120]
+    };
+    const tick = () => {
+      const t = feed.minute;
+      const clock = `${String((9 + Math.floor(t / 60)) % 24).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+      feed.labels.push(clock);
+      feed.eu.push(Math.round(340 + Math.sin(t / 3.1) * 90 + rand() * 70));
+      feed.us.push(Math.round(240 + Math.cos(t / 4.3) * 70 + rand() * 60));
+      feed.sessions.push(Math.round(1900 + Math.sin(t / 5) * 260 + rand() * 180));
+      feed.conversion.push(Math.round((3.1 + Math.sin(t / 7) * 0.5 + rand() * 0.4) * 10) / 10);
+      feed.latency.push(Math.round(180 + Math.cos(t / 6) * 40 + rand() * 55));
+      for (const key of ["labels", "eu", "us", "sessions", "conversion", "latency"] as const) {
+        const series = feed[key] as unknown[];
+        if (series.length > WINDOW) series.shift();
+      }
+      if (t % DONUT_EVERY === 0) {
+        feed.donut = feed.donut.map((v) => Math.max(60, Math.round(v + (rand() - 0.5) * 60)));
+      }
+      feed.minute += 1;
+    };
+    return { feed, tick };
+  }
+
+  function setup(root: HTMLElement): void {
+    const line = root.querySelector<ChartEl>("fluid-line-chart");
+    const donut = root.querySelector<ChartEl>("fluid-doughnut-chart");
+    const status = root.querySelector<HTMLElement>("[data-ch-status]");
+    const toggle = root.querySelector<HTMLElement>("[data-ch-toggle]");
+    if (!line || !donut || !status || !toggle) return;
+
+    const spark = (name: string) => root.querySelector<SparklineEl>(`[data-ch-spark="${name}"]`);
+    const stat = (name: string) => root.querySelector<HTMLElement>(`[data-ch-stat="${name}"]`);
+
+    const { feed, tick } = makeFeed();
+    /* Pre-fill the rolling window so the first paint is a full chart. */
+    for (let i = 0; i < WINDOW; i += 1) tick();
+
+    const paint = () => {
+      line.data = {
+        labels: [...feed.labels],
+        datasets: [
+          { label: "EU west", data: [...feed.eu], fill: true },
+          { label: "US east", data: [...feed.us], fill: true }
+        ]
+      };
+      donut.data = {
+        labels: ["Direct", "Search", "Referral", "Social"],
+        datasets: [{ data: [...feed.donut] }]
+      };
+      const sessions = feed.sessions[feed.sessions.length - 1] ?? 0;
+      const conversion = feed.conversion[feed.conversion.length - 1] ?? 0;
+      const latency = feed.latency[feed.latency.length - 1] ?? 0;
+      const sessionsEl = stat("sessions");
+      const conversionEl = stat("conversion");
+      const latencyEl = stat("latency");
+      if (sessionsEl) sessionsEl.textContent = sessions.toLocaleString("en-US");
+      if (conversionEl) conversionEl.textContent = `${conversion.toFixed(1)}%`;
+      if (latencyEl) latencyEl.textContent = `${latency} ms`;
+      const sessionsSpark = spark("sessions");
+      if (sessionsSpark) sessionsSpark.values = [...feed.sessions];
+      const conversionSpark = spark("conversion");
+      if (conversionSpark) conversionSpark.values = [...feed.conversion];
+      const latencySpark = spark("latency");
+      if (latencySpark) latencySpark.values = [...feed.latency];
+    };
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer: ReturnType<typeof setInterval> | undefined;
+    let visible = false;
+    let paused = false;
+
+    const stop = () => {
+      if (timer !== undefined) clearInterval(timer);
+      timer = undefined;
+    };
+
+    const syncState = () => {
+      if (reduceMotion.matches) {
+        stop();
+        status.textContent = "Static preview (reduced motion)";
+        toggle.setAttribute("disabled", "");
+        return;
+      }
+      toggle.removeAttribute("disabled");
+      if (visible && !paused) {
+        if (timer === undefined) {
+          timer = setInterval(() => {
+            tick();
+            paint();
+            status.textContent = `Streaming, minute ${feed.minute}`;
+          }, TICK_MS);
+        }
+        status.textContent = `Streaming, minute ${feed.minute}`;
+      } else {
+        stop();
+        status.textContent = paused ? "Paused" : "Waiting to scroll into view";
+      }
+    };
+
+    /* First frame: always painted, even under reduced motion. */
+    paint();
+    syncState();
+
+    /* Only stream while the demo is actually on screen. */
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) visible = entry.isIntersecting;
+        syncState();
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(root);
+
+    reduceMotion.addEventListener("change", syncState);
+
+    toggle.addEventListener("click", () => {
+      paused = !paused;
+      toggle.textContent = paused ? "Resume" : "Pause";
+      syncState();
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-charts-demo]")) setup(root);
+</script>

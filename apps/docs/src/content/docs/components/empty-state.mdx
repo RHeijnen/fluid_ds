@@ -15,7 +15,9 @@ buttons, centered in a column.
   <fluid-empty-state heading="No projects yet">
     <fluid-icon slot="media" name="folder"></fluid-icon>
     Create your first project to get started.
-    <fluid-button slot="actions" variant="primary">New project</fluid-button>
+    <fluid-button slot="actions" variant="primary">
+      New project
+    </fluid-button>
   </fluid-empty-state>
 </Demo>
 
@@ -24,16 +26,13 @@ buttons, centered in a column.
 <Tabs syncKey="install">
   <TabItem label="CDN">
     ```html
-    <script type="module"
-      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/empty-state/define.js">
-    </script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/empty-state/define.js"
+    ></script>
     ```
   </TabItem>
-  <TabItem label="npm">
-    ```ts
-    import "@fluid-ds/components/define/empty-state";
-    ```
-  </TabItem>
+  <TabItem label="npm">```ts import "@fluid-ds/components/define/empty-state"; ```</TabItem>
 </Tabs>
 
 ## Slots

@@ -7,8 +7,7 @@ const content = html`
   <div slot="after">After</div>
 `;
 
-const handleOf = (el: FluidComparison) =>
-  el.shadowRoot!.querySelector<HTMLDivElement>(".handle")!;
+const handleOf = (el: FluidComparison) => el.shadowRoot!.querySelector<HTMLDivElement>(".handle")!;
 
 const press = (el: FluidComparison, key: string, init: KeyboardEventInit = {}) =>
   handleOf(el).dispatchEvent(
@@ -17,12 +16,16 @@ const press = (el: FluidComparison, key: string, init: KeyboardEventInit = {}) =
 
 describe("<fluid-comparison>", () => {
   it("renders with the default position", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     expect(el.position).to.equal(50);
   });
 
   it("fires fluid-position-change on ArrowRight and moves 1%", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     setTimeout(() => press(el, "ArrowRight"));
     const event = (await oneEvent(el, "fluid-position-change")) as CustomEvent;
     expect(event.detail.position).to.equal(51);
@@ -30,7 +33,9 @@ describe("<fluid-comparison>", () => {
   });
 
   it("ArrowLeft moves 1% and Shift moves 10%", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     press(el, "ArrowLeft");
     await el.updateComplete;
     expect(el.position).to.equal(49);
@@ -45,7 +50,9 @@ describe("<fluid-comparison>", () => {
   });
 
   it("Home and End snap to 0 and 100", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     press(el, "Home");
     await el.updateComplete;
     expect(el.position).to.equal(0);
@@ -84,14 +91,18 @@ describe("<fluid-comparison>", () => {
   });
 
   it("reflects the position to the attribute", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     press(el, "End");
     await el.updateComplete;
     expect(el.getAttribute("position")).to.equal("100");
   });
 
   it("keeps aria-valuenow in sync with the position", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     const handle = handleOf(el);
     expect(handle.getAttribute("aria-valuenow")).to.equal("50");
 
@@ -101,7 +112,9 @@ describe("<fluid-comparison>", () => {
   });
 
   it("passes a11y audit", async () => {
-    const el = await fixture<FluidComparison>(html`<fluid-comparison>${content}</fluid-comparison>`);
+    const el = await fixture<FluidComparison>(
+      html`<fluid-comparison>${content}</fluid-comparison>`
+    );
     await expect(el).to.be.accessible();
   });
 });

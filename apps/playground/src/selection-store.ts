@@ -30,20 +30,6 @@ function hasInlineTokenOverrides(el: HTMLElement | null): boolean {
 }
 
 /**
- * Generate a friendly default id from a tag name + per-tag ordinal that's
- * tracked across the session, so the second isolated button becomes
- * `button-2`, the third `button-3`, etc. The user can rename later via
- * the sidebar; this is just a sensible first label.
- */
-const ordinals = new Map<string, number>();
-export function generateFluidId(tag: string | null): string {
-  const stem = (tag ?? "el").replace(/^fluid-/, "") || "el";
-  const next = (ordinals.get(stem) ?? 0) + 1;
-  ordinals.set(stem, next);
-  return `${stem}-${next}`;
-}
-
-/**
  * Tiny store for the playground's mode + currently-selected component.
  * Kept separate from the theme store so token-state and selection-state can
  * be subscribed to independently.

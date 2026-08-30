@@ -26,13 +26,28 @@ and `<link>` tags from [jsDelivr](https://www.jsdelivr.com/).
     <title>Hello, Fluid</title>
 
     <!-- 1. Design tokens, CSS custom properties -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css"
+    />
 
     <!-- 2. Default icons + the components you use (each registers one tag) -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js"></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"
+    ></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"
+    ></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/card/define.js"
+    ></script>
   </head>
   <body>
     <!-- 3. Use the tags like any other HTML element -->
@@ -56,9 +71,8 @@ just works.
 </Aside>
 
 <Aside type="note" title="Stable channel">
-  Fluid is published to npm under the `latest` dist-tag. The examples use
-  `@latest` for convenience; pin an exact version for repeatable production
-  deployments.
+  Fluid is published to npm under the `latest` dist-tag. The examples use `@latest` for convenience;
+  pin an exact version for repeatable production deployments.
 </Aside>
 
 ### Import maps
@@ -71,8 +85,8 @@ in the rest of your page:
   {
     "imports": {
       "@fluid-ds/components/": "https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/",
-      "@fluid-ds/icons":       "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
-      "@fluid-ds/icons/":      "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/"
+      "@fluid-ds/icons": "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/index.js",
+      "@fluid-ds/icons/": "https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/"
     }
   }
 </script>
@@ -96,7 +110,10 @@ pin to a specific version so a release doesn't change behaviour under you:
 
 ```html
 <!-- pinned -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@1.2.3/dist/components/button/define.js"></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.3.8/dist/components/button/define.js"
+></script>
 
 <!-- the rest of the URL stays identical -->
 ```
@@ -111,19 +128,13 @@ similar, install the packages from npm.
 
 <Tabs syncKey="pkg">
   <TabItem label="pnpm">
-    ```bash
-    pnpm add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
-    ```
+    ```bash pnpm add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons ```
   </TabItem>
   <TabItem label="npm">
-    ```bash
-    npm install @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
-    ```
+    ```bash npm install @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons ```
   </TabItem>
   <TabItem label="yarn">
-    ```bash
-    yarn add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
-    ```
+    ```bash yarn add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons ```
   </TabItem>
 </Tabs>
 
@@ -159,7 +170,8 @@ handling, types, SSR). The short version:
 - **Vue 3**: works as `<fluid-button @fluid-click="..." />`. Add
   `compilerOptions.isCustomElement` to skip the unknown-tag warning.
 - **Angular**: `CUSTOM_ELEMENTS_SCHEMA` in your module, then use the
-  tags directly.
+  tags directly. Add `@fluid-ds/angular` if you want `ngModel` /
+  `formControlName` to bind to the form controls.
 
 Full per-framework guide: **[Framework integrations](/guides/frameworks/)**.
 

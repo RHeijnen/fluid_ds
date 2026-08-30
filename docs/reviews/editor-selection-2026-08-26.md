@@ -46,23 +46,23 @@ state. `setBaseAndExtent()` restores the saved anchor/focus ordering.
 All entries below are retained under `quality/evidence/`. No assertion failure
 was hidden by increasing runner deadlines or lowering coverage requirements.
 
-| Evidence directory suffix | Result and interpretation |
-| --- | --- |
-| `15-28-46-510Z-editor-behavior-coverage-chromium` | 33 pass, 1 fail: stale range after replacing value. |
-| `15-30-02-490Z-editor-selection-fix-chromium` | 35 pass using the earlier DOM Range fixtures. This did not establish native cross-engine selection behavior. |
-| `15-30-21-926Z-editor-selection-fix-firefox` | 34 pass, 1 fail: synthetic HTML paste setup. |
-| `15-31-36-525Z-editor-selection-fix-webkit` | 26 pass, 9 fail: old selection/caret fixture assumptions. |
-| `15-35-34-430Z-editor-native-driver-stale-range-red` | 33 pass, 2 fail: native capture failed before the setter mutation could prove causality. Not counted as successful setter-mutation proof. |
-| `15-36-14-355Z-editor-native-selection-diagnostic` | 33 pass, 2 fail: selected text was Beta, but document range endpoints were outside the editor. |
-| `15-40-40-896Z-editor-composed-stale-range-mutation-red` | After composed capture was fixed, removing only the setter's range-clear lines caused exactly the stale-value test to fail: 39 pass, 1 fail. The clear was restored. |
-| `15-41-03-374Z-editor-composed-selection-firefox` | 39 pass, 1 fail: paste fixture still lacked a usable HTML payload. |
-| `15-42-03-807Z-editor-firefox-paste-diagnostic` | Before dispatch, the constructed event's HTML payload was empty. Native selected text was correct; the no-HTML delegation branch was behaving correctly. |
-| `15-42-38-385Z-editor-firefox-explicit-paste-payload` | 40 pass after supplying and asserting the handler fixture's DataTransfer payload explicitly. No paste runtime change. |
-| `15-43-18-394Z-editor-final-native-chromium-coverage` | 39 pass, 1 fail after strengthening the legacy control to select Gamma instead of reusing Beta. Focusout overwrote the controlled capture; setup was corrected. |
-| `15-44-32-422Z-editor-final-native-webkit` | 39 pass, 1 fail in that controlled legacy branch: focus could empty the native selection. The unit fixture now explicitly controls rangeCount and verifies exactly one API read. |
-| `15-45-36-214Z-editor-final-explicit-legacy-webkit` | 40 pass, including the strengthened legacy control. |
-| `15-47-03-030Z-editor-backward-selection-red` | 40 pass, 1 fail: backward became forward after canceling Link. |
-| `15-47-52-014Z-editor-selection-direction-and-rewrites-red` | 40 pass, 3 fail: direction plus both sanitizer/read-only DOM replacement paths. |
+| Evidence directory suffix                                   | Result and interpretation                                                                                                                                                        |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `15-28-46-510Z-editor-behavior-coverage-chromium`           | 33 pass, 1 fail: stale range after replacing value.                                                                                                                              |
+| `15-30-02-490Z-editor-selection-fix-chromium`               | 35 pass using the earlier DOM Range fixtures. This did not establish native cross-engine selection behavior.                                                                     |
+| `15-30-21-926Z-editor-selection-fix-firefox`                | 34 pass, 1 fail: synthetic HTML paste setup.                                                                                                                                     |
+| `15-31-36-525Z-editor-selection-fix-webkit`                 | 26 pass, 9 fail: old selection/caret fixture assumptions.                                                                                                                        |
+| `15-35-34-430Z-editor-native-driver-stale-range-red`        | 33 pass, 2 fail: native capture failed before the setter mutation could prove causality. Not counted as successful setter-mutation proof.                                        |
+| `15-36-14-355Z-editor-native-selection-diagnostic`          | 33 pass, 2 fail: selected text was Beta, but document range endpoints were outside the editor.                                                                                   |
+| `15-40-40-896Z-editor-composed-stale-range-mutation-red`    | After composed capture was fixed, removing only the setter's range-clear lines caused exactly the stale-value test to fail: 39 pass, 1 fail. The clear was restored.             |
+| `15-41-03-374Z-editor-composed-selection-firefox`           | 39 pass, 1 fail: paste fixture still lacked a usable HTML payload.                                                                                                               |
+| `15-42-03-807Z-editor-firefox-paste-diagnostic`             | Before dispatch, the constructed event's HTML payload was empty. Native selected text was correct; the no-HTML delegation branch was behaving correctly.                         |
+| `15-42-38-385Z-editor-firefox-explicit-paste-payload`       | 40 pass after supplying and asserting the handler fixture's DataTransfer payload explicitly. No paste runtime change.                                                            |
+| `15-43-18-394Z-editor-final-native-chromium-coverage`       | 39 pass, 1 fail after strengthening the legacy control to select Gamma instead of reusing Beta. Focusout overwrote the controlled capture; setup was corrected.                  |
+| `15-44-32-422Z-editor-final-native-webkit`                  | 39 pass, 1 fail in that controlled legacy branch: focus could empty the native selection. The unit fixture now explicitly controls rangeCount and verifies exactly one API read. |
+| `15-45-36-214Z-editor-final-explicit-legacy-webkit`         | 40 pass, including the strengthened legacy control.                                                                                                                              |
+| `15-47-03-030Z-editor-backward-selection-red`               | 40 pass, 1 fail: backward became forward after canceling Link.                                                                                                                   |
+| `15-47-52-014Z-editor-selection-direction-and-rewrites-red` | 40 pass, 3 fail: direction plus both sanitizer/read-only DOM replacement paths.                                                                                                  |
 
 Each suffix above has the prefix `2026-08-26T`. Additional intermediate passing
 runs remain beside these records; they are historical checkpoints, not extra
@@ -70,11 +70,11 @@ unique test coverage.
 
 ## Final targeted results
 
-| Engine | Cases | Evidence directory | Process result |
-| --- | --- | --- | --- |
-| Chromium | 43/43 | `2026-08-26T15-48-51-648Z-editor-direction-rewrite-chromium-coverage` | Normal exit 0; source-stable during run. |
-| Firefox | 43/43 | `2026-08-26T15-49-15-099Z-editor-direction-rewrite-firefox` | Normal exit 0; global source hash changed because the root agent updated `quality/defects.md`. Editor source/tests were frozen. Do not label this run globally source-stable. |
-| WebKit | 43/43 | `2026-08-26T15-49-45-106Z-editor-direction-rewrite-webkit` | Normal exit 0; source-stable during run. |
+| Engine   | Cases | Evidence directory                                                    | Process result                                                                                                                                                                |
+| -------- | ----- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chromium | 43/43 | `2026-08-26T15-48-51-648Z-editor-direction-rewrite-chromium-coverage` | Normal exit 0; source-stable during run.                                                                                                                                      |
+| Firefox  | 43/43 | `2026-08-26T15-49-15-099Z-editor-direction-rewrite-firefox`           | Normal exit 0; global source hash changed because the root agent updated `quality/defects.md`. Editor source/tests were frozen. Do not label this run globally source-stable. |
+| WebKit   | 43/43 | `2026-08-26T15-49-45-106Z-editor-direction-rewrite-webkit`            | Normal exit 0; source-stable during run.                                                                                                                                      |
 
 This is 129 executed cases, not 129 different tests. Each browser ran in a
 separate supervised process with concurrency 1 and port 8017. Lifecycle records

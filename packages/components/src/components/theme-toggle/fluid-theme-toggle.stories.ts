@@ -8,17 +8,14 @@ type Args = Pick<FluidThemeToggle, "theme" | "brands">;
 const meta: Meta<Args> = {
   title: "Components/Utilities/Theme toggle",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     theme: { control: "inline-radio", options: ["light", "dark"] },
     brands: { control: "object" }
   },
   args: { theme: "light", brands: [] },
   render: (args) => html`
-    <fluid-theme-toggle
-      theme=${args.theme}
-      .brands=${args.brands}
-    ></fluid-theme-toggle>
+    <fluid-theme-toggle theme=${args.theme} .brands=${args.brands}></fluid-theme-toggle>
   `
 };
 

@@ -45,7 +45,7 @@ const COUNTRIES: TypeaheadOption[] = [
 const meta: Meta<Args> = {
   title: "Components/Forms/Typeahead",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },

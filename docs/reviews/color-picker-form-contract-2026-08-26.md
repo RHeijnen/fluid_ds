@@ -31,16 +31,16 @@ that specification alone, is the evidence that this implementation works.
 Artifacts are retained under `quality/evidence/`; full traces, screenshots and
 reports for failed browser runs are also under `quality/evidence/color-picker-2026-08-26/`.
 
-| Record | Result and scope |
-| --- | --- |
-| `2026-08-26T18-01-30-776Z-color-focus-before-fix` | Six failing required-submit focus contracts: two render modes in three engines. |
-| `2026-08-26T18-03-07-196Z-color-events-disabled-before-fix` | Four failing Chromium contracts: duplicate event payloads and enabled native color input while disabled. |
-| `2026-08-26T18-04-46-605Z-color-focus-after-fix` | Intermediate result: 14 pass, four fail. Retains the shorthand-color warning and missing WebKit commit event. |
-| `2026-08-26T18-06-24-476Z-color-focus-final` | 18/18 pass across Chromium, Firefox and WebKit, zero retries, normal exit and unchanged source. |
-| `2026-08-26T18-07-07-540Z-color-picker-unit-regressions` | Invocation failure before tests: pnpm shorthand rejected `--files`. No execution credit. |
-| `2026-08-26T18-07-17-869Z-color-picker-unit-regressions-run` | Correct explicit `run test` invocation: 29 cases per engine, 87 passing executions. Normal worker/server/browser shutdown, zero remaining sockets or observed processes, no forced cleanup. |
-| `2026-08-26T18-07-40-609Z-color-picker-integrated-ssr` | Full browser SSR gate: 114/114 pass, zero retries, normal exit and unchanged source. |
-| `2026-08-26T18-11-13-968Z-color-picker-full-verify` | Full workspace verification passes in 587.853 seconds: 6,897 unit executions across 42 package/engine runs, 18 package builds, 1,903 cold imports, 155 renders and 24,224 local documentation links. Normal exit and unchanged source. |
+| Record                                                       | Result and scope                                                                                                                                                                                                                       |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `2026-08-26T18-01-30-776Z-color-focus-before-fix`            | Six failing required-submit focus contracts: two render modes in three engines.                                                                                                                                                        |
+| `2026-08-26T18-03-07-196Z-color-events-disabled-before-fix`  | Four failing Chromium contracts: duplicate event payloads and enabled native color input while disabled.                                                                                                                               |
+| `2026-08-26T18-04-46-605Z-color-focus-after-fix`             | Intermediate result: 14 pass, four fail. Retains the shorthand-color warning and missing WebKit commit event.                                                                                                                          |
+| `2026-08-26T18-06-24-476Z-color-focus-final`                 | 18/18 pass across Chromium, Firefox and WebKit, zero retries, normal exit and unchanged source.                                                                                                                                        |
+| `2026-08-26T18-07-07-540Z-color-picker-unit-regressions`     | Invocation failure before tests: pnpm shorthand rejected `--files`. No execution credit.                                                                                                                                               |
+| `2026-08-26T18-07-17-869Z-color-picker-unit-regressions-run` | Correct explicit `run test` invocation: 29 cases per engine, 87 passing executions. Normal worker/server/browser shutdown, zero remaining sockets or observed processes, no forced cleanup.                                            |
+| `2026-08-26T18-07-40-609Z-color-picker-integrated-ssr`       | Full browser SSR gate: 114/114 pass, zero retries, normal exit and unchanged source.                                                                                                                                                   |
+| `2026-08-26T18-11-13-968Z-color-picker-full-verify`          | Full workspace verification passes in 587.853 seconds: 6,897 unit executions across 42 package/engine runs, 18 package builds, 1,903 cold imports, 155 renders and 24,224 local documentation links. Normal exit and unchanged source. |
 
 The final focused browser and unit records use source
 `3616a4b39b314a2b50d64b746a69f94aa8680a2cd074c32dca1dd29fa77a1cde`.

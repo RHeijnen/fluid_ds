@@ -118,9 +118,10 @@ export class FluidCopyButton extends FluidElement {
   private resolveText(): string {
     if (this.value) return this.value;
     if (this.from) {
-      const target = this.getRootNode() instanceof Document
-        ? (this.getRootNode() as Document).getElementById(this.from)
-        : document.getElementById(this.from);
+      const target =
+        this.getRootNode() instanceof Document
+          ? (this.getRootNode() as Document).getElementById(this.from)
+          : document.getElementById(this.from);
       if (target) return target.textContent ?? "";
     }
     return this.textContent ?? "";

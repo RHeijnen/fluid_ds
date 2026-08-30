@@ -1,7 +1,8 @@
 import { FluidToast } from "./fluid-toast.js";
 import { FluidToastItem } from "./fluid-toast-item.js";
 
-if (typeof customElements !== "undefined" && !customElements.get("fluid-toast")) customElements.define("fluid-toast", FluidToast);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-toast"))
+  customElements.define("fluid-toast", FluidToast);
 if (typeof customElements !== "undefined" && !customElements.get("fluid-toast-item"))
   customElements.define("fluid-toast-item", FluidToastItem);
 

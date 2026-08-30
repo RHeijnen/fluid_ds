@@ -18,7 +18,9 @@ element, so the focus trap, Escape-to-close, and backdrop come from the platform
     <span slot="label">Filters</span>
     <p>Filter controls go here.</p>
     <div slot="footer">
-      <fluid-button variant="ghost" onclick="document.querySelector('#hero-drawer').hide()">Cancel</fluid-button>
+      <fluid-button variant="ghost" onclick="document.querySelector('#hero-drawer').hide()">
+        Cancel
+      </fluid-button>
       <fluid-button onclick="document.querySelector('#hero-drawer').hide()">Apply</fluid-button>
     </div>
   </fluid-drawer>
@@ -36,6 +38,7 @@ element, so the focus trap, Escape-to-close, and backdrop come from the platform
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/drawer/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +50,7 @@ element, so the focus trap, Escape-to-close, and backdrop come from the platform
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/drawer";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -55,14 +59,14 @@ element, so the focus trap, Escape-to-close, and backdrop come from the platform
 ### Side drawer (end)
 
 <Demo>
-  <fluid-button onclick="document.querySelector('#demo-drawer').show()">
-    Open filters
-  </fluid-button>
+  <fluid-button onclick="document.querySelector('#demo-drawer').show()">Open filters</fluid-button>
   <fluid-drawer id="demo-drawer" placement="end">
     <span slot="label">Filters</span>
     <p>Filter controls go here.</p>
     <div slot="footer">
-      <fluid-button variant="ghost" onclick="document.querySelector('#demo-drawer').hide()">Cancel</fluid-button>
+      <fluid-button variant="ghost" onclick="document.querySelector('#demo-drawer').hide()">
+        Cancel
+      </fluid-button>
       <fluid-button onclick="document.querySelector('#demo-drawer').hide()">Apply</fluid-button>
     </div>
   </fluid-drawer>
@@ -71,10 +75,14 @@ element, so the focus trap, Escape-to-close, and backdrop come from the platform
 ### Placement
 
 ```html
-<fluid-drawer placement="start">…</fluid-drawer>   <!-- slides from left -->
-<fluid-drawer placement="end">…</fluid-drawer>     <!-- slides from right (default) -->
-<fluid-drawer placement="top">…</fluid-drawer>     <!-- slides down -->
-<fluid-drawer placement="bottom">…</fluid-drawer>  <!-- slides up -->
+<fluid-drawer placement="start">…</fluid-drawer>
+<!-- slides from left -->
+<fluid-drawer placement="end">…</fluid-drawer>
+<!-- slides from right (default) -->
+<fluid-drawer placement="top">…</fluid-drawer>
+<!-- slides down -->
+<fluid-drawer placement="bottom">…</fluid-drawer>
+<!-- slides up -->
 ```
 
 ### Programmatic control
@@ -113,6 +121,7 @@ for small contextual surfaces anchored to a trigger.
       d.show();
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Filters.tsx"
@@ -130,6 +139,7 @@ for small contextual surfaces anchored to a trigger.
       return <fluid-drawer ref={ref} placement="end"><span slot="label">Filters</span>…</fluid-drawer>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Filters.vue"
@@ -141,6 +151,7 @@ for small contextual surfaces anchored to a trigger.
       <fluid-drawer placement="end" @fluid-hide="() => {}"><span slot="label">Filters</span>…</fluid-drawer>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="filters.component.ts"
@@ -157,6 +168,7 @@ for small contextual surfaces anchored to a trigger.
       onHide() {}
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Filters.svelte"
@@ -166,6 +178,7 @@ for small contextual surfaces anchored to a trigger.
 
     <fluid-drawer placement="end" on:fluid-hide={() => {}}><span slot="label">Filters</span>…</fluid-drawer>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -205,8 +218,8 @@ semantics. The cross-component contract is in the
 
 - `showModal()` provides the focus trap; focus is restored to the trigger on
   close ([SC 2.4.3](https://www.w3.org/WAI/WCAG22/Understanding/focus-order)).
-- <kbd>Escape</kbd> closes the drawer (handled natively); it renders in the
-  **top layer**, so it's never clipped.
+- <kbd>Escape</kbd> closes the drawer (handled natively); it renders in the **top layer**, so it's
+  never clipped.
 
 ### Names & roles
 
@@ -225,10 +238,10 @@ semantics. The cross-component contract is in the
 
 Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

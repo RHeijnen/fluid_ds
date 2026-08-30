@@ -6,7 +6,7 @@ const meta: Meta = {
   title: "Components/Navigation/Accordion",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   render: () => html`
     <fluid-accordion>

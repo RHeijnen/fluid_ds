@@ -184,7 +184,7 @@ declare global {
 The `HTMLElementTagNameMap` augmentation is what makes
 `document.querySelector("fluid-tagline")` return the right type in TypeScript.
 Library components expose this file as a `/define/*` entry point so consumers
-import *behavior*, not just types, importing `define` is what actually
+import _behavior_, not just types, importing `define` is what actually
 registers the tag (see [What are web components?](/concepts/web-components/#the-registry)).
 
 The file layout for a Fluid component:
@@ -198,10 +198,9 @@ packages/components/src/components/<name>/
 ```
 
 <Aside>
-  A library-grade component isn't "done" until it also has a Storybook story, a
-  docs page, a playground card, and tests (including an accessibility audit):
-  `pnpm verify` fails the build otherwise. The `component-authoring` skill in
-  the repo is the full checklist.
+  A library-grade component isn't "done" until it also has a Storybook story, a docs page, a
+  playground card, and tests (including an accessibility audit): `pnpm verify` fails the build
+  otherwise. The `component-authoring` skill in the repo is the full checklist.
 </Aside>
 
 ## Extending an existing component: no fork needed
@@ -223,6 +222,7 @@ component, reach for the two doors shadow DOM leaves open, **tokens** and
       --fluid-card-padding: 1.5rem;
     }
     ```
+
   </TabItem>
   <TabItem label="::part()">
     Reach internals the tokens don't cover:
@@ -237,6 +237,7 @@ component, reach for the two doors shadow DOM leaves open, **tokens** and
       top: 0;
     }
     ```
+
   </TabItem>
 </Tabs>
 

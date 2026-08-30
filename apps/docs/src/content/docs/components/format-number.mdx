@@ -33,12 +33,13 @@ support (thousand separators, decimal commas, currency symbols).
     ```ts
     import "@fluid-ds/components/define/format-number";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  Renders plain inline text and reads no design tokens beyond the inherited
-  text color, so no `@fluid-ds/tokens` stylesheet is required.
+  Renders plain inline text and reads no design tokens beyond the inherited text color, so no
+  `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -46,7 +47,8 @@ support (thousand separators, decimal commas, currency symbols).
 ### Decimal
 
 <Demo>
-  <fluid-format-number value="1234567.89"></fluid-format-number><br/>
+  <fluid-format-number value="1234567.89"></fluid-format-number>
+  <br />
   <fluid-format-number value="1234567.89" maximum-fraction-digits="0"></fluid-format-number>
 </Demo>
 
@@ -61,8 +63,15 @@ support (thousand separators, decimal commas, currency symbols).
 `currency-display` for code / name / symbol variants.
 
 <Demo>
-  <fluid-format-number value="1499.99" type="currency" currency="USD"></fluid-format-number><br/>
-  <fluid-format-number value="1499.99" type="currency" currency="EUR" locale="de-DE"></fluid-format-number><br/>
+  <fluid-format-number value="1499.99" type="currency" currency="USD"></fluid-format-number>
+  <br />
+  <fluid-format-number
+    value="1499.99"
+    type="currency"
+    currency="EUR"
+    locale="de-DE"
+  ></fluid-format-number>
+  <br />
   <fluid-format-number value="1499.99" type="currency" currency="JPY"></fluid-format-number>
 </Demo>
 
@@ -75,8 +84,13 @@ support (thousand separators, decimal commas, currency symbols).
 The value is the **fraction**, not a percentage, pass `0.42` for "42%".
 
 <Demo>
-  <fluid-format-number value="0.42" type="percent"></fluid-format-number><br/>
-  <fluid-format-number value="0.4275" type="percent" maximum-fraction-digits="2"></fluid-format-number>
+  <fluid-format-number value="0.42" type="percent"></fluid-format-number>
+  <br />
+  <fluid-format-number
+    value="0.4275"
+    type="percent"
+    maximum-fraction-digits="2"
+  ></fluid-format-number>
 </Demo>
 
 ```html
@@ -86,8 +100,14 @@ The value is the **fraction**, not a percentage, pass `0.42` for "42%".
 ### Unit
 
 <Demo>
-  <fluid-format-number value="65" type="unit" unit="mile-per-hour"></fluid-format-number><br/>
-  <fluid-format-number value="2.5" type="unit" unit="kilogram" unit-display="long"></fluid-format-number>
+  <fluid-format-number value="65" type="unit" unit="mile-per-hour"></fluid-format-number>
+  <br />
+  <fluid-format-number
+    value="2.5"
+    type="unit"
+    unit="kilogram"
+    unit-display="long"
+  ></fluid-format-number>
 </Demo>
 
 ```html
@@ -117,15 +137,17 @@ Malformed explicit locales, including an empty string, and invalid formatting
 options preserve the existing fallback to the plain numeric value.
 
 <Aside type="note">
-  Native ancestor language inheritance during SSR remains unverified and is not
-  provided by this formatter change. Pass an explicit `locale` for predictable
-  server output; without available context the server uses English. This does
-  not promise full locale hydration parity or request-scoped translation state.
+  Native ancestor language inheritance during SSR remains unverified and is not provided by this
+  formatter change. Pass an explicit `locale` for predictable server output; without available
+  context the server uses English. This does not promise full locale hydration parity or
+  request-scoped translation state.
 </Aside>
 
 <Demo>
-  <fluid-format-number value="1234567.89" locale="fr-FR"></fluid-format-number><br/>
-  <fluid-format-number value="1234567.89" locale="de-DE"></fluid-format-number><br/>
+  <fluid-format-number value="1234567.89" locale="fr-FR"></fluid-format-number>
+  <br />
+  <fluid-format-number value="1234567.89" locale="de-DE"></fluid-format-number>
+  <br />
   <fluid-format-number value="1234567.89" locale="hi-IN"></fluid-format-number>
 </Demo>
 

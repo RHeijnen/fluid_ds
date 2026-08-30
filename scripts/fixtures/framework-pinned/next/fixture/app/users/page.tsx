@@ -2,12 +2,7 @@
 import { useMemo, useRef, useState } from "react";
 import { INITIAL_USERS, ROLES, STATUS_TONE, type User } from "../../src/data";
 import { toast, useFluidEvent } from "../../src/lib";
-import type {
-  FluidDialog,
-  FluidInput,
-  FluidSelect,
-  FluidTypeahead
-} from "@fluid-ds/components";
+import type { FluidDialog, FluidInput, FluidSelect, FluidTypeahead } from "@fluid-ds/components";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>(INITIAL_USERS);

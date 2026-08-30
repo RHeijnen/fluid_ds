@@ -6,9 +6,7 @@ Themable Markdown rendering web component for
 
 ```html
 <fluid-markdown>
-  ### Hello
-
-  This is **markdown** with [links](https://example.com).
+  ### Hello This is **markdown** with [links](https://example.com).
 </fluid-markdown>
 ```
 

@@ -47,8 +47,12 @@ export class FluidKbd extends FluidElement {
       border-bottom-width: 2px;
       border-radius: var(--fluid-kbd-radius, var(--fluid-radius-sm, 4px));
     }
-    :host([size="sm"]) kbd { font-size: 0.6875rem; }
-    :host([size="lg"]) kbd { font-size: var(--fluid-font-size-sm, 0.875rem); }
+    :host([size="sm"]) kbd {
+      font-size: 0.6875rem;
+    }
+    :host([size="lg"]) kbd {
+      font-size: var(--fluid-font-size-sm, 0.875rem);
+    }
   `;
 
   /** Key size. */

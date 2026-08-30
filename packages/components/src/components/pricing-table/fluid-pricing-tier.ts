@@ -46,7 +46,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-accent-text - Featured foreground.
  * @uses-token --fluid-radius-lg - Corner radius.
  * @cssproperty --fluid-pricing-tier-shadow-lg - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidPricingTier extends FluidElement {
   static override styles = css`
     :host {
@@ -216,9 +216,7 @@ export class FluidPricingTier extends FluidElement {
           ${this.price
             ? html`<p part="price" class="price">
                 <span part="amount" class="amount">${this.price}</span>
-                ${this.period
-                  ? html`<span part="period" class="period">${this.period}</span>`
-                  : ""}
+                ${this.period ? html`<span part="period" class="period">${this.period}</span>` : ""}
               </p>`
             : ""}
         </div>

@@ -20,13 +20,13 @@ the reviewer re-fetch the verbatim text from
 Every "text on surface" combination authorised by the semantic-token system
 MUST meet:
 
-| Text classification | Min contrast | Definition |
-|---|---|---|
-| Normal text | 4.5:1 | Less than 18pt (~24 px), or less than 14pt (~18.66 px) bold |
-| Large text | 3:1 | At least 18pt / 24 px, or 14pt / 18.66 px bold |
-| Incidental | exempt | Inactive UI, pure decoration, not visible, part of a picture with significant other content |
-| Logotypes | exempt | Text that is part of a logo or brand name |
-| Disabled | exempt | Per SC 1.4.3, controls that are inactive |
+| Text classification | Min contrast | Definition                                                                                  |
+| ------------------- | ------------ | ------------------------------------------------------------------------------------------- |
+| Normal text         | 4.5:1        | Less than 18pt (~24 px), or less than 14pt (~18.66 px) bold                                 |
+| Large text          | 3:1          | At least 18pt / 24 px, or 14pt / 18.66 px bold                                              |
+| Incidental          | exempt       | Inactive UI, pure decoration, not visible, part of a picture with significant other content |
+| Logotypes           | exempt       | Text that is part of a logo or brand name                                                   |
+| Disabled            | exempt       | Per SC 1.4.3, controls that are inactive                                                    |
 
 Disabled-control text is exempt but should still be distinguishable from
 enabled text, otherwise users cannot tell what is interactive (perception
@@ -121,12 +121,12 @@ Don't:
 
 Verbatim: content must remain functional when a user applies all four:
 
-| Property | User-applied value |
-|---|---|
-| `line-height` | at least 1.5× the font size |
-| spacing following paragraphs | at least 2× the font size |
-| `letter-spacing` | at least 0.12× the font size |
-| `word-spacing` | at least 0.16× the font size |
+| Property                     | User-applied value           |
+| ---------------------------- | ---------------------------- |
+| `line-height`                | at least 1.5× the font size  |
+| spacing following paragraphs | at least 2× the font size    |
+| `letter-spacing`             | at least 0.12× the font size |
+| `word-spacing`               | at least 0.16× the font size |
 
 Token-system implications:
 
@@ -168,13 +168,13 @@ Token-system implications:
 
 Every pointer target ≥ 24×24 CSS px, with these documented exceptions:
 
-| Exception | Meaning |
-|---|---|
-| Spacing | A 24-CSS-px-diameter circle centred on the target does not intersect any other target's bounding box (or its own 24-px circle). |
-| Equivalent | Another target on the same page achieves the same function and meets 24×24. |
-| Inline | The target is in a sentence or block of text. |
-| User-agent | Size is determined by the UA and not modified by the author. |
-| Essential | A particular presentation is essential or legally required. |
+| Exception  | Meaning                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Spacing    | A 24-CSS-px-diameter circle centred on the target does not intersect any other target's bounding box (or its own 24-px circle). |
+| Equivalent | Another target on the same page achieves the same function and meets 24×24.                                                     |
+| Inline     | The target is in a sentence or block of text.                                                                                   |
+| User-agent | Size is determined by the UA and not modified by the author.                                                                    |
+| Essential  | A particular presentation is essential or legally required.                                                                     |
 
 Token-system implications:
 
@@ -285,11 +285,11 @@ surface, not on the variable component fill.
 
 Recommended dimensions:
 
-| Token | Minimum | Rationale |
-|---|---|---|
-| `--fluid-focus-ring-width` | ≥ 2 CSS px | <2 px disappears on high-DPI displays and at high zoom. |
-| `--fluid-focus-ring-offset` | ≥ 2 CSS px | Keeps the ring visible against busy component borders. |
-| `--fluid-focus-ring-color` | passes 3:1 vs every documented surface | Validated by the token script. |
+| Token                       | Minimum                                | Rationale                                               |
+| --------------------------- | -------------------------------------- | ------------------------------------------------------- |
+| `--fluid-focus-ring-width`  | ≥ 2 CSS px                             | <2 px disappears on high-DPI displays and at high zoom. |
+| `--fluid-focus-ring-offset` | ≥ 2 CSS px                             | Keeps the ring visible against busy component borders.  |
+| `--fluid-focus-ring-color`  | passes 3:1 vs every documented surface | Validated by the token script.                          |
 
 AAA SCs 2.4.12 Focus Not Obscured (Enhanced) and 2.4.13 Focus Appearance
 are informative for an AA-target system, but 2.4.13's geometric
@@ -327,13 +327,12 @@ const contrast = (a, b) => {
   return (L1 + 0.05) / (L2 + 0.05);
 };
 
-const min = (p) =>
-  p.kind === "text" ? (p.large ? 3 : 4.5) : 3; // non-text + focus-ring
+const min = (p) => (p.kind === "text" ? (p.large ? 3 : 4.5) : 3); // non-text + focus-ring
 
 const rows = PAIRS.map((p) => ({
   ...p,
   ratio: +contrast(manifest.resolve(p.fg), manifest.resolve(p.bg)).toFixed(2),
-  required: min(p),
+  required: min(p)
 })).map((r) => ({ ...r, pass: r.ratio >= r.required }));
 
 console.table(rows);

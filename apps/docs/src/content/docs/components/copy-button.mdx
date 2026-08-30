@@ -37,6 +37,7 @@ already.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/copy-button/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -48,6 +49,7 @@ already.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/copy-button";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -66,7 +68,12 @@ already.
 ### Copy from an element
 
 <Demo>
-  <code id="demo-token" style="font-family: var(--fluid-font-family-mono); padding: 4px 8px; background: var(--fluid-surface-muted); border-radius: 4px;">sk-1234-abcd-ef</code>
+  <code
+    id="demo-token"
+    style="font-family: var(--fluid-font-family-mono); padding: 4px 8px; background: var(--fluid-surface-muted); border-radius: 4px;"
+  >
+    sk-1234-abcd-ef
+  </code>
   <fluid-copy-button from="demo-token" aria-label="Copy token"></fluid-copy-button>
 </Demo>
 
@@ -121,6 +128,7 @@ The button fires **`fluid-copy`** after every attempt, with `event.detail.succes
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="CopyEmail.tsx"
@@ -138,6 +146,7 @@ The button fires **`fluid-copy`** after every attempt, with `event.detail.succes
       return <fluid-copy-button ref={ref} value="hello@example.com" aria-label="Copy email" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="CopyEmail.vue"
@@ -150,6 +159,7 @@ The button fires **`fluid-copy`** after every attempt, with `event.detail.succes
       <fluid-copy-button value="hello@example.com" aria-label="Copy email" @fluid-copy="onCopy" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="copy-email.component.ts"
@@ -166,6 +176,7 @@ The button fires **`fluid-copy`** after every attempt, with `event.detail.succes
       onCopy(e: any) { console.log(e.detail.success); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="CopyEmail.svelte"
@@ -176,6 +187,7 @@ The button fires **`fluid-copy`** after every attempt, with `event.detail.succes
 
     <fluid-copy-button value="hello@example.com" aria-label="Copy email" on:fluid-copy={onCopy} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -224,8 +236,8 @@ not covered by a token.
 Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts the
 focus indicator:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
+| Token                      | AA  | AAA     | Criterion                                                                                       |
+| -------------------------- | --- | ------- | ----------------------------------------------------------------------------------------------- |
 | `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
 
 ## Related

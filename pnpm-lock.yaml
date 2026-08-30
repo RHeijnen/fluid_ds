@@ -126,6 +126,9 @@ importers:
       '@angular/router':
         specifier: ^20.3.27
         version: 20.3.27(@angular/common@20.3.27(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.27(@angular/common@20.3.27(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      '@fluid-ds/angular':
+        specifier: workspace:*
+        version: link:../../packages/angular
       '@fluid-ds/charts':
         specifier: workspace:*
         version: link:../../packages/charts
@@ -303,9 +306,18 @@ importers:
       '@fluid-ds/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@fluid-ds/kanban':
+        specifier: workspace:*
+        version: link:../../packages/kanban
       '@fluid-ds/markdown':
         specifier: workspace:*
         version: link:../../packages/markdown
+      '@fluid-ds/qr':
+        specifier: workspace:*
+        version: link:../../packages/qr
+      '@fluid-ds/scheduler':
+        specifier: workspace:*
+        version: link:../../packages/scheduler
       '@fluid-ds/table':
         specifier: workspace:*
         version: link:../../packages/table
@@ -337,12 +349,51 @@ importers:
       '@astrojs/starlight':
         specifier: ^0.40.0
         version: 0.40.0(astro@6.4.8(@types/node@24.12.4)(rollup@4.60.4)(sass@1.90.0)(tsx@4.22.3)(yaml@2.9.0))(typescript@5.9.3)
+      '@fluid-ds/animations':
+        specifier: workspace:*
+        version: link:../../packages/animations
+      '@fluid-ds/calendar':
+        specifier: workspace:*
+        version: link:../../packages/calendar
+      '@fluid-ds/charts':
+        specifier: workspace:*
+        version: link:../../packages/charts
       '@fluid-ds/components':
         specifier: workspace:*
         version: link:../../packages/components
+      '@fluid-ds/editor':
+        specifier: workspace:*
+        version: link:../../packages/editor
       '@fluid-ds/icons':
         specifier: workspace:*
         version: link:../../packages/icons
+      '@fluid-ds/kanban':
+        specifier: workspace:*
+        version: link:../../packages/kanban
+      '@fluid-ds/map':
+        specifier: workspace:*
+        version: link:../../packages/map
+      '@fluid-ds/markdown':
+        specifier: workspace:*
+        version: link:../../packages/markdown
+      '@fluid-ds/media':
+        specifier: workspace:*
+        version: link:../../packages/media
+      '@fluid-ds/node-graph':
+        specifier: workspace:*
+        version: link:../../packages/node-graph
+      '@fluid-ds/parser':
+        specifier: workspace:*
+        version: link:../../packages/parser
+      '@fluid-ds/qr':
+        specifier: workspace:*
+        version: link:../../packages/qr
+      '@fluid-ds/scheduler':
+        specifier: workspace:*
+        version: link:../../packages/scheduler
+      '@fluid-ds/table':
+        specifier: workspace:*
+        version: link:../../packages/table
       '@fluid-ds/themes':
         specifier: workspace:*
         version: link:../../packages/themes
@@ -483,6 +534,9 @@ importers:
       '@fluid-ds/qr':
         specifier: workspace:*
         version: link:../../packages/qr
+      '@fluid-ds/table':
+        specifier: workspace:*
+        version: link:../../packages/table
       '@fluid-ds/themes':
         specifier: workspace:*
         version: link:../../packages/themes
@@ -717,6 +771,30 @@ importers:
         specifier: ^6.4.3
         version: 6.4.3(@types/node@22.19.19)(sass@1.90.0)(tsx@4.22.3)(yaml@2.9.0)
 
+  packages/angular:
+    devDependencies:
+      '@angular/compiler':
+        specifier: ^20.3.27
+        version: 20.3.27
+      '@angular/compiler-cli':
+        specifier: ^20.3.27
+        version: 20.3.27(@angular/compiler@20.3.27)(typescript@5.8.3)
+      '@angular/core':
+        specifier: ^20.3.27
+        version: 20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/forms':
+        specifier: ^20.3.27
+        version: 20.3.27(@angular/common@20.3.27(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.27(@angular/common@20.3.27(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.27(@angular/compiler@20.3.27)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      rxjs:
+        specifier: ^7.8.0
+        version: 7.8.2
+      tslib:
+        specifier: ^2.8.0
+        version: 2.8.1
+      typescript:
+        specifier: ~5.8.3
+        version: 5.8.3
+
   packages/animations:
     devDependencies:
       '@open-wc/testing':
@@ -740,6 +818,9 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+      vite:
+        specifier: ^6.4.3
+        version: 6.4.3(@types/node@24.12.4)(sass@1.90.0)(tsx@4.22.3)(yaml@2.9.0)
 
   packages/calendar:
     dependencies:
@@ -9709,7 +9790,7 @@ packages:
         optional: true
 
   xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz:
-    resolution: {integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA==, tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz}
+    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz, integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA==}
     version: 0.20.3
     engines: {node: '>=0.8'}
     hasBin: true
@@ -10038,7 +10119,7 @@ snapshots:
       chokidar: 4.0.3
       convert-source-map: 1.9.0
       reflect-metadata: 0.2.2
-      semver: 7.8.1
+      semver: 7.8.5
       tslib: 2.8.1
       yargs: 18.0.0
     optionalDependencies:
@@ -19615,8 +19696,7 @@ snapshots:
 
   ws@8.21.0: {}
 
-  xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz:
-    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz, integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA==}
+  xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz: {}
 
   xml@1.0.1: {}
 

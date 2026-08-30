@@ -9,7 +9,7 @@ const meta: Meta<Args> = {
   title: "Components/Content/Badge",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     variant: {

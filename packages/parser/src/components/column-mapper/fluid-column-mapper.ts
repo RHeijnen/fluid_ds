@@ -133,14 +133,21 @@ export class FluidColumnMapper extends FluidElement {
         this.mapping = autoMap(this.columns, this.blueprint);
       }
     }
-    if ((changed.has("columns") || changed.has("blueprint") || changed.has("mapping")) &&
-      (this.columns.length > 0 || Object.keys(this.mapping).length > 0)) {
+    if (
+      (changed.has("columns") || changed.has("blueprint") || changed.has("mapping")) &&
+      (this.columns.length > 0 || Object.keys(this.mapping).length > 0)
+    ) {
       // A removed source column must not remain silently selected in the data
       // while the native select displays its empty option.
-      this.mapping = Object.fromEntries(this.blueprint.fields.map((field) => {
-        const source = this.mapping[field.key];
-        return [field.key, typeof source === "string" && this.columns.includes(source) ? source : null];
-      }));
+      this.mapping = Object.fromEntries(
+        this.blueprint.fields.map((field) => {
+          const source = this.mapping[field.key];
+          return [
+            field.key,
+            typeof source === "string" && this.columns.includes(source) ? source : null
+          ];
+        })
+      );
     }
   }
 

@@ -19,16 +19,19 @@ type-ahead. Selecting an entry fires **`fluid-select`** and closes the menu.
     aria-label="Item actions"
     items='[{"label":"Cut","value":"cut"},{"label":"Copy","value":"copy"},{"label":"Paste","value":"paste","disabled":true},{"divider":true,"label":"","value":""},{"label":"Delete","value":"delete"}]'
   >
-    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+    <div
+      slot="trigger"
+      tabindex="0"
+      style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;"
+    >
       Right-click here (or Shift+F10)
     </div>
   </fluid-context-menu>
 </Demo>
 
 <Aside type="note">
-  The `items` array is passed as a JSON string on the `items` attribute in these
-  docs demos. In a framework, set the `items` **property** to a real array
-  instead.
+  The `items` array is passed as a JSON string on the `items` attribute in these docs demos. In a
+  framework, set the `items` **property** to a real array instead.
 </Aside>
 
 ## Install
@@ -43,6 +46,7 @@ type-ahead. Selecting an entry fires **`fluid-select`** and closes the menu.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/context-menu/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -57,6 +61,7 @@ type-ahead. Selecting an entry fires **`fluid-select`** and closes the menu.
 
     Registering `context-menu` also registers the [`menu`](/components/menu/)
     family it composes with.
+
   </TabItem>
 </Tabs>
 
@@ -73,7 +78,11 @@ component renders the menu for you. Set `disabled` to grey out an entry, and
     aria-label="File actions"
     items='[{"label":"New file","value":"new"},{"label":"Rename","value":"rename"},{"label":"Duplicate","value":"duplicate"},{"divider":true,"label":"","value":""},{"label":"Move to trash","value":"trash"}]'
   >
-    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+    <div
+      slot="trigger"
+      tabindex="0"
+      style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;"
+    >
       document.txt
     </div>
   </fluid-context-menu>
@@ -101,7 +110,11 @@ For full control (icons, group labels, nested structure) slot your own
 
 <Demo>
   <fluid-context-menu aria-label="Account">
-    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+    <div
+      slot="trigger"
+      tabindex="0"
+      style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;"
+    >
       Avatar
     </div>
     <fluid-menu slot="menu" aria-label="Account">
@@ -130,9 +143,12 @@ For full control (icons, group labels, nested structure) slot your own
 Set `disabled` so a right-click falls through to the browser's own menu.
 
 <Demo>
-  <fluid-context-menu disabled aria-label="Disabled"
-    items='[{"label":"Copy","value":"copy"}]'>
-    <div slot="trigger" tabindex="0" style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;">
+  <fluid-context-menu disabled aria-label="Disabled" items='[{"label":"Copy","value":"copy"}]'>
+    <div
+      slot="trigger"
+      tabindex="0"
+      style="display:grid;place-items:center;width:18rem;height:8rem;border:1px dashed var(--fluid-border-default);border-radius:var(--fluid-radius-md);color:var(--fluid-text-secondary);cursor:context-menu;user-select:none;"
+    >
       Right-click falls through (disabled)
     </div>
   </fluid-context-menu>
@@ -157,6 +173,7 @@ trigger.
       cm.addEventListener("fluid-select", (e) => console.log(e.detail.value));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="FileRow.tsx"
@@ -177,6 +194,7 @@ trigger.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="FileRow.vue"
@@ -192,6 +210,7 @@ trigger.
       </fluid-context-menu>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="file-row.component.ts"
@@ -214,6 +233,7 @@ trigger.
       onSelect(e: CustomEvent<{ value: string }>) { console.log(e.detail.value); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="FileRow.svelte"
@@ -227,6 +247,7 @@ trigger.
       <div slot="trigger" tabindex="0">Target</div>
     </fluid-context-menu>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -235,7 +256,7 @@ trigger.
 - Per-row or per-item actions on a file list, canvas, table row, or card.
 - A secondary action surface you reach by right-clicking an object.
 
-### When *not* to use
+### When _not_ to use
 
 - A button that toggles a menu on click: reach for
   [`<fluid-menu>`](/components/menu/) inside a [`<fluid-popover>`](/components/popover/),
@@ -260,9 +281,7 @@ list** is in the [API table below](#api).
 }
 ```
 
-<Aside type="tip">
-  Try retheming it live in the [Theme builder](/playground/).
-</Aside>
+<Aside type="tip">Try retheming it live in the [Theme builder](/playground/).</Aside>
 
 ### Beyond tokens: `::part()`
 
@@ -284,15 +303,15 @@ children and a roving tabindex. See the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
+| Key                             | Action                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------- |
 | `Shift` + `F10` / `ContextMenu` | Open the menu (keyboard equivalent of right-click) while the trigger is focused |
-| `ArrowDown` / `ArrowUp` | Move between items (wrapping), skipping disabled |
-| `Home` / `End` | Jump to the first / last item |
-| `Enter` / `Space` | Activate the focused item, then close |
-| printable character | Type-ahead to the next matching item |
-| `Escape` | Close the menu and return focus to the trigger |
-| `Tab` / `Shift` + `Tab` | Leave the menu in document order and close it without pulling focus back |
+| `ArrowDown` / `ArrowUp`         | Move between items (wrapping), skipping disabled                                |
+| `Home` / `End`                  | Jump to the first / last item                                                   |
+| `Enter` / `Space`               | Activate the focused item, then close                                           |
+| printable character             | Type-ahead to the next matching item                                            |
+| `Escape`                        | Close the menu and return focus to the trigger                                  |
+| `Tab` / `Shift` + `Tab`         | Leave the menu in document order and close it without pulling focus back        |
 
 Focus moves into the menu on open. Selection and Escape restore the trigger;
 moving focus outside preserves the new destination and closes the menu. The
@@ -324,17 +343,33 @@ The component ships WCAG 2.2 AA by default and scales to AAA via
 `data-fluid-conformance="aaa"` on any ancestor. The conformance tokens flow
 through the menu rows:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+| Token                      | AA   | AAA      | Criterion      |
+| -------------------------- | ---- | -------- | -------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → 2.5.5  |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → 2.4.13 |
 
 ## Related
 
 <CardGrid>
-  <LinkCard title="Menu" href="/components/menu/" description="The list surface this composes with." />
-  <LinkCard title="Popover" href="/components/popover/" description="Click-anchored floating panel." />
+  <LinkCard
+    title="Menu"
+    href="/components/menu/"
+    description="The list surface this composes with."
+  />
+  <LinkCard
+    title="Popover"
+    href="/components/popover/"
+    description="Click-anchored floating panel."
+  />
   <LinkCard title="Dialog" href="/components/dialog/" description="Modal for a focused choice." />
-  <LinkCard title="Accessibility guide" href="/guides/accessibility/" description="The cross-component a11y contract." />
-  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Use Fluid in React, Vue, Angular, Svelte."
+  />
 </CardGrid>

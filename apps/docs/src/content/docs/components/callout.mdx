@@ -31,6 +31,7 @@ attention to this." Four variants signal severity: `info` (default), `success`,
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/callout/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +43,7 @@ attention to this." Four variants signal severity: `info` (default), `success`,
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/callout";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -72,8 +74,7 @@ attention to this." Four variants signal severity: `info` (default), `success`,
 
 <Demo>
   <fluid-callout variant="danger" style="width: 100%;">
-    <span slot="header">Error</span>
-    A failure or destructive consequence the user should understand.
+    <span slot="header">Error</span>A failure or destructive consequence the user should understand.
   </fluid-callout>
 </Demo>
 
@@ -138,6 +139,7 @@ it's clicked, remove the callout (or persist the dismissal) in the handler.
       c.addEventListener("fluid-dismiss", () => c.remove());
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Notice.tsx"
@@ -155,6 +157,7 @@ it's clicked, remove the callout (or persist the dismissal) in the handler.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Notice.vue"
@@ -168,6 +171,7 @@ it's clicked, remove the callout (or persist the dismissal) in the handler.
       <fluid-callout v-if="open" variant="info" dismissible @fluid-dismiss="open = false">…</fluid-callout>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="notice.component.ts"
@@ -184,6 +188,7 @@ it's clicked, remove the callout (or persist the dismissal) in the handler.
       open = true;
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Notice.svelte"
@@ -196,6 +201,7 @@ it's clicked, remove the callout (or persist the dismissal) in the handler.
       <fluid-callout variant="info" dismissible on:fluid-dismiss={() => (open = false)}>…</fluid-callout>
     {/if}
     ```
+
   </TabItem>
 </Tabs>
 
@@ -250,10 +256,10 @@ callout-specific.
 
 Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 
@@ -268,11 +274,7 @@ Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
     href="/components/dialog/"
     description="When the message must block until acknowledged."
   />
-  <LinkCard
-    title="Badge"
-    href="/components/badge/"
-    description="A compact inline status marker."
-  />
+  <LinkCard title="Badge" href="/components/badge/" description="A compact inline status marker." />
   <LinkCard
     title="Accessibility guide"
     href="/guides/accessibility/"

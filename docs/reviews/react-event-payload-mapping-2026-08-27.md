@@ -4,11 +4,11 @@
 
 The initial audit found one narrow source contract that could be completed without inference. Follow-up batches added anchor-nav, eight core-form contracts, and eight overlay/navigation lifecycle contracts. The current source-derived canonical inventory has 166 events: 38 have a named, exported event alias plus verified dispatch evidence, and 128 remain `CustomEvent<unknown>`.
 
-| State | Before | After |
-| --- | ---: | ---: |
-| Verified typed event contracts | 21 | 38 |
-| Honest `CustomEvent<unknown>` contracts | 145 | 128 |
-| Total events | 166 | 166 |
+| State                                   | Before | After |
+| --------------------------------------- | -----: | ----: |
+| Verified typed event contracts          |     21 |    38 |
+| Honest `CustomEvent<unknown>` contracts |    145 |   128 |
+| Total events                            |    166 |   166 |
 
 Seventeen events have now been promoted across the implementation tranches. Changing the remaining denominator safely requires separate product-source contract work.
 
@@ -29,15 +29,15 @@ Canonical analysis now proves one literal dispatch, the exact detail alias, the 
 
 The core-forms batch adds these exact contracts without changing any dispatched object:
 
-| Component | Events | Exact detail shape |
-| --- | --- | --- |
-| `fluid-file-input` | `fluid-change` | `{ files: File[]; value: string }` |
-| `fluid-dropzone` | `fluid-change` | `{ files: File[] }` |
-| `fluid-dropzone` | `fluid-reject` | `{ files: File[]; reason: "type" \| "size" }` |
-| `fluid-form` | `fluid-submit` | `{ values: { [name: string]: string \| string[] } }` |
-| `fluid-form` | `fluid-invalid` | `{ invalid: HTMLElement }` |
-| `fluid-rating` | `fluid-change` | `{ value: number }` |
-| `fluid-otp` | `fluid-input`, `fluid-complete` | `{ value: string }` |
+| Component          | Events                          | Exact detail shape                                   |
+| ------------------ | ------------------------------- | ---------------------------------------------------- |
+| `fluid-file-input` | `fluid-change`                  | `{ files: File[]; value: string }`                   |
+| `fluid-dropzone`   | `fluid-change`                  | `{ files: File[] }`                                  |
+| `fluid-dropzone`   | `fluid-reject`                  | `{ files: File[]; reason: "type" \| "size" }`        |
+| `fluid-form`       | `fluid-submit`                  | `{ values: { [name: string]: string \| string[] } }` |
+| `fluid-form`       | `fluid-invalid`                 | `{ invalid: HTMLElement }`                           |
+| `fluid-rating`     | `fluid-change`                  | `{ value: number }`                                  |
+| `fluid-otp`        | `fluid-input`, `fluid-complete` | `{ value: string }`                                  |
 
 The CEM validator's closed platform-type allowlist now recognizes `File` and `HTMLElement`; arbitrary external or application types still fail closed. Events with omitted detail, dynamic names, application-generic data, or ambiguous payloads remain unknown.
 

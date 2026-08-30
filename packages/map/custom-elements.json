@@ -216,6 +216,17 @@
             },
             {
               "kind": "field",
+              "name": "LEAFLET_CSS_HREF",
+              "type": {
+                "text": "string"
+              },
+              "privacy": "private",
+              "static": true,
+              "readonly": true,
+              "default": "\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\""
+            },
+            {
+              "kind": "field",
               "name": "leafletCssLoaded",
               "type": {
                 "text": "boolean"
@@ -234,6 +245,17 @@
                   "text": "void"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "loadLeafletCssIntoRoot",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "The map renders into LIGHT DOM, so when this element is used inside\nanother component's shadow root that light DOM *is* the shadow root, and\nthe document-level Leaflet stylesheet cannot reach it: tiles lose their\npositioning and the container loses `overflow: hidden`, so the map spills\nout of its box. Mirror the stylesheet into the containing root as well."
             },
             {
               "kind": "field",

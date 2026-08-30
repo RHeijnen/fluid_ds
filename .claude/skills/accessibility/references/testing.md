@@ -21,21 +21,21 @@ rendered element. This is the per-component gate.
 Rule families that matter for a design-system component test (full list at
 <https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md>):
 
-| Rule ID | What it checks | Maps to SC |
-|---|---|---|
-| `color-contrast` | Text vs background ratio | 1.4.3 |
-| `button-name` | `<button>` has an accessible name | 4.1.2 |
-| `link-name` | `<a>` has an accessible name | 2.4.4, 4.1.2 |
-| `image-alt` / `role-img-alt` | `<img>` and `role="img"` have alt text | 1.1.1 |
-| `label` | Form controls have programmatic labels | 1.3.1, 4.1.2 |
-| `aria-valid-attr` / `aria-valid-attr-value` | ARIA attribute names and values are valid | 4.1.2 |
-| `aria-required-attr` | Required ARIA attributes for the role are present | 4.1.2 |
-| `aria-allowed-attr` | ARIA attributes are valid on that role | 4.1.2 |
-| `aria-roles` | Role values exist in the ARIA spec | 4.1.2 |
-| `aria-required-children` / `aria-required-parent` | Composite-widget structure (e.g. `listbox` > `option`) | 1.3.1 |
-| `focus-order-semantics` | Focusable elements have a role conveyable to AT | 1.3.1, 4.1.2 |
-| `frame-title` | `<iframe>` has a title (rare in our components) | 4.1.2 |
-| `duplicate-id-aria` | IDs referenced by ARIA are unique | 4.1.2 |
+| Rule ID                                           | What it checks                                         | Maps to SC   |
+| ------------------------------------------------- | ------------------------------------------------------ | ------------ |
+| `color-contrast`                                  | Text vs background ratio                               | 1.4.3        |
+| `button-name`                                     | `<button>` has an accessible name                      | 4.1.2        |
+| `link-name`                                       | `<a>` has an accessible name                           | 2.4.4, 4.1.2 |
+| `image-alt` / `role-img-alt`                      | `<img>` and `role="img"` have alt text                 | 1.1.1        |
+| `label`                                           | Form controls have programmatic labels                 | 1.3.1, 4.1.2 |
+| `aria-valid-attr` / `aria-valid-attr-value`       | ARIA attribute names and values are valid              | 4.1.2        |
+| `aria-required-attr`                              | Required ARIA attributes for the role are present      | 4.1.2        |
+| `aria-allowed-attr`                               | ARIA attributes are valid on that role                 | 4.1.2        |
+| `aria-roles`                                      | Role values exist in the ARIA spec                     | 4.1.2        |
+| `aria-required-children` / `aria-required-parent` | Composite-widget structure (e.g. `listbox` > `option`) | 1.3.1        |
+| `focus-order-semantics`                           | Focusable elements have a role conveyable to AT        | 1.3.1, 4.1.2 |
+| `frame-title`                                     | `<iframe>` has a title (rare in our components)        | 4.1.2        |
+| `duplicate-id-aria`                               | IDs referenced by ARIA are unique                      | 4.1.2        |
 
 Shadow DOM caveat: axe walks shadow roots when invoked through
 `@open-wc/testing` because it receives the host element directly. It will report
@@ -49,9 +49,7 @@ import { fixture, html, expect } from "@open-wc/testing";
 import "../define.js";
 
 it("is accessible in its default state", async () => {
-  const el = await fixture(html`
-    <fluid-button>Save changes</fluid-button>
-  `);
+  const el = await fixture(html` <fluid-button>Save changes</fluid-button> `);
   await expect(el).to.be.accessible();
 });
 
@@ -61,7 +59,7 @@ it("is accessible while disabled", async () => {
   `);
   // color-contrast is exempt for disabled controls per 1.4.3.
   await expect(el).to.be.accessible({
-    ignoredRules: ["color-contrast"],
+    ignoredRules: ["color-contrast"]
   });
 });
 ```
@@ -146,13 +144,13 @@ A keyboard sweep, performed with the mouse pushed away from the keyboard.
 The matrix below is the minimum sweep per release. For a PR that touches a
 single component, the primary pair on each OS is enough.
 
-| Combo | Role |
-|---|---|
-| NVDA + Firefox (Windows) | Primary desktop |
-| JAWS + Chrome (Windows) | Secondary desktop |
-| VoiceOver + Safari (macOS) | Primary desktop |
-| TalkBack + Chrome (Android) | Mobile smoke |
-| VoiceOver + Safari (iOS) | Mobile smoke |
+| Combo                       | Role              |
+| --------------------------- | ----------------- |
+| NVDA + Firefox (Windows)    | Primary desktop   |
+| JAWS + Chrome (Windows)     | Secondary desktop |
+| VoiceOver + Safari (macOS)  | Primary desktop   |
+| TalkBack + Chrome (Android) | Mobile smoke      |
+| VoiceOver + Safari (iOS)    | Mobile smoke      |
 
 What to verify per component:
 

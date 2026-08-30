@@ -1,7 +1,9 @@
 /** Push a toast onto the app's <fluid-toast> stack (imperative method). */
 export function toast(message: string, variant = "success"): void {
   const el = document.getElementById("app-toast") as
-    | (HTMLElement & { toast?: (o: { message: string; variant: string; duration: number }) => void })
+    | (HTMLElement & {
+        toast?: (o: { message: string; variant: string; duration: number }) => void;
+      })
     | null;
   el?.toast?.({ message, variant, duration: 3500 });
 }

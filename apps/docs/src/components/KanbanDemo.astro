@@ -1,0 +1,132 @@
+---
+/**
+ * Live demo for the kanban expansion page: a small three-column sprint board
+ * the reader can rearrange by pointer drag, by each card's native move
+ * buttons, or by keyboard pickup (Space, arrows, Space again). Every move is
+ * the pack's real fluid-move event, mirrored in the readout above the board.
+ * The demo is entirely user-driven: nothing auto-plays, so there is no motion
+ * to pause or reduce.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="kb-demo" data-kb-demo>
+    <div class="kb-hud">
+      <fluid-button size="sm" variant="secondary" data-kb-reset>Reset board</fluid-button>
+      <span class="kb-status" data-kb-status>No moves yet</span>
+    </div>
+    <fluid-kanban class="kb-board"></fluid-kanban>
+  </div>
+</Demo>
+
+<style>
+  .kb-demo {
+    inline-size: 100%;
+  }
+  .kb-hud {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-end: 0.6rem;
+  }
+  .kb-status {
+    margin-inline-start: auto;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+  .kb-board {
+    display: block;
+    inline-size: 100%;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/kanban/define/kanban";
+
+  interface DemoCard {
+    id: string;
+    title: string;
+    description?: string;
+  }
+
+  interface DemoColumn {
+    id: string;
+    title: string;
+    cards: DemoCard[];
+  }
+
+  interface KanbanEl extends HTMLElement {
+    columns: DemoColumn[];
+  }
+
+  interface MoveDetail {
+    cardId: string;
+    fromColumn: string;
+    toColumn: string;
+    index: number;
+  }
+
+  /* Fresh board data per call, so "Reset board" always restores the original
+     sprint regardless of what the reader dragged around. */
+  const sprintBoard = (): DemoColumn[] => [
+    {
+      id: "todo",
+      title: "To do",
+      cards: [
+        { id: "empty-states", title: "Design empty states", description: "Tables, search, inbox" },
+        { id: "release-notes", title: "Write release notes" },
+        { id: "chip-focus", title: "Fix focus ring on chips", description: "Clipped at 200% zoom" }
+      ]
+    },
+    {
+      id: "doing",
+      title: "In progress",
+      cards: [
+        { id: "token-cleanup", title: "Token pipeline cleanup", description: "Waiting on review" },
+        { id: "contrast-pass", title: "Dark-mode contrast pass" }
+      ]
+    },
+    {
+      id: "done",
+      title: "Done",
+      cards: [{ id: "board-demo", title: "Embed the board demo" }]
+    }
+  ];
+
+  function setup(root: HTMLElement): void {
+    const board = root.querySelector<KanbanEl>("fluid-kanban");
+    const status = root.querySelector<HTMLElement>("[data-kb-status]");
+    if (!board || !status) return;
+
+    const data = sprintBoard();
+    board.columns = data;
+
+    /* Ids are stable across moves, so a static lookup covers the readout. */
+    const cardTitles = new Map<string, string>();
+    const columnTitles = new Map<string, string>();
+    for (const column of data) {
+      columnTitles.set(column.id, column.title);
+      for (const card of column.cards) cardTitles.set(card.id, card.title);
+    }
+
+    let moves = 0;
+    board.addEventListener("fluid-move", (event) => {
+      const detail = (event as CustomEvent<MoveDetail>).detail;
+      moves += 1;
+      const card = cardTitles.get(detail.cardId) ?? detail.cardId;
+      const column = columnTitles.get(detail.toColumn) ?? detail.toColumn;
+      status.textContent = `Move ${moves}: "${card}" to ${column}, position ${detail.index + 1}`;
+    });
+
+    root.querySelector("[data-kb-reset]")?.addEventListener("click", () => {
+      board.columns = sprintBoard();
+      moves = 0;
+      status.textContent = "Board reset";
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-kb-demo]")) setup(root);
+</script>

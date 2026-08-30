@@ -3,11 +3,19 @@ title: "@fluid-ds/calendar"
 description: "An accessible month view that displays events."
 ---
 
+import CalendarPackDemo from "../../../components/CalendarPackDemo.astro";
+
 The calendar expansion pack for Fluid. `<fluid-event-calendar>` lays out a
 six-week month grid and drops your events onto the days they fall on, with a
 "+N more" indicator when a day overflows. It is the read-oriented calendar: a
 distinct concern from the booking scheduler, which is about picking a slot.
 Expansion pack.
+
+The calendar below is live, loaded with a team's release cycle: step through
+the months, click an event chip or a day, and the readout above mirrors the
+pack's real events. Day 12 overflows into a "+1 more" indicator.
+
+<CalendarPackDemo />
 
 ## Install
 
@@ -23,8 +31,8 @@ import "@fluid-ds/calendar/define/event-calendar";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
+| Tag                      | Use                                                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | `<fluid-event-calendar>` | A month grid that displays events as tone-coded chips, with month navigation and day / event click events. |
 
 ## Use
@@ -56,21 +64,21 @@ signal: the chip always renders its title text.
 
 ### Properties
 
-| Property / attribute | Type | Default | Description |
-| --- | --- | --- | --- |
-| `month` | `string` | current month | Visible month as `"YYYY-MM"`. |
-| `events` | `CalendarEvent[]` | `[]` | Events to display. Array property or JSON-string attribute. |
-| `week-start` | `number` (0-6) | `1` (Monday) | First day of the week, `0` Sunday through `6` Saturday. |
-| `locale` | `string` | browser locale | BCP-47 locale for month and weekday names. Internal action text is not yet connected to shared locale bundles. |
-| `max-per-day` | `number` | `3` | Chips shown per day before collapsing into `+N more`. |
+| Property / attribute | Type              | Default        | Description                                                                                                    |
+| -------------------- | ----------------- | -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `month`              | `string`          | current month  | Visible month as `"YYYY-MM"`.                                                                                  |
+| `events`             | `CalendarEvent[]` | `[]`           | Events to display. Array property or JSON-string attribute.                                                    |
+| `week-start`         | `number` (0-6)    | `1` (Monday)   | First day of the week, `0` Sunday through `6` Saturday.                                                        |
+| `locale`             | `string`          | browser locale | BCP-47 locale for month and weekday names. Internal action text is not yet connected to shared locale bundles. |
+| `max-per-day`        | `number`          | `3`            | Chips shown per day before collapsing into `+N more`.                                                          |
 
 ### Events
 
-| Event | Detail | When |
-| --- | --- | --- |
-| `fluid-month-change` | `{ month: "YYYY-MM" }` | Previous / Next pressed, or PageUp / PageDown in the grid. |
-| `fluid-day-click` | `{ date: "YYYY-MM-DD" }` | A day cell (or its "+N more") is activated. |
-| `fluid-event-click` | `{ id, event }` | An event chip is activated. |
+| Event                | Detail                   | When                                                       |
+| -------------------- | ------------------------ | ---------------------------------------------------------- |
+| `fluid-month-change` | `{ month: "YYYY-MM" }`   | Previous / Next pressed, or PageUp / PageDown in the grid. |
+| `fluid-day-click`    | `{ date: "YYYY-MM-DD" }` | A day cell (or its "+N more") is activated.                |
+| `fluid-event-click`  | `{ id, event }`          | An event chip is activated.                                |
 
 ## Accessibility
 
@@ -89,7 +97,7 @@ For a day containing event chips, F2 focuses the first chip. Arrow keys move
 between that day's chips and its overflow button. Enter or Space activates the
 focused button without also firing a day activation. Escape or F2 restores
 day-grid navigation; Tab leaves the grid. These in-cell controls follow the
-[APG grid navigation conventions](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteractionsettingfocusandnavigatinginsidecells).
+[APG grid navigation conventions](https://www.w3.org/WAI/ARIA/apg/patterns/grid/#keyboardinteraction-settingfocusandnavigatinginsidecells).
 
 PageUp and PageDown preserve the day number where it exists in the destination
 month, otherwise choosing its final day. If the `month` property changes while

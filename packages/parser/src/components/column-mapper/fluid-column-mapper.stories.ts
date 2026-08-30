@@ -5,8 +5,20 @@ import type { Blueprint } from "../../core/types.js";
 
 const blueprint: Blueprint = {
   fields: [
-    { key: "firstName", label: "First name", type: "string", required: true, aliases: ["fname", "given"] },
-    { key: "lastName", label: "Last name", type: "string", required: true, aliases: ["lname", "surname"] },
+    {
+      key: "firstName",
+      label: "First name",
+      type: "string",
+      required: true,
+      aliases: ["fname", "given"]
+    },
+    {
+      key: "lastName",
+      label: "Last name",
+      type: "string",
+      required: true,
+      aliases: ["lname", "surname"]
+    },
     { key: "email", label: "Email", type: "email", required: true },
     { key: "company", label: "Company", type: "string" }
   ]

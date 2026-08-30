@@ -26,11 +26,23 @@ no other step.
     <meta charset="utf-8" />
     <title>My first Fluid button</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css"
+    />
 
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"
+    ></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"
+    ></script>
   </head>
   <body>
     <fluid-button id="save">Save changes</fluid-button>
@@ -69,6 +81,7 @@ code can stay component-aware without sniffing the inner element.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React 19">
     ```tsx
@@ -80,6 +93,7 @@ code can stay component-aware without sniffing the inner element.
     React 19 supports custom elements and custom events natively. For
     `fluid-click`, use a `ref` + `addEventListener` instead, React's
     `on*` prop names only synthesise standard DOM event names.
+
   </TabItem>
   <TabItem label="Vue 3">
     ```html
@@ -89,6 +103,7 @@ code can stay component-aware without sniffing the inner element.
     Add `compilerOptions.isCustomElement: tag => tag.startsWith('fluid-')`
     to your Vue config so the compiler treats unknown tags as elements,
     not components.
+
   </TabItem>
   <TabItem label="Angular">
     ```html
@@ -96,6 +111,7 @@ code can stay component-aware without sniffing the inner element.
     ```
 
     Add `CUSTOM_ELEMENTS_SCHEMA` to your module's `schemas` array.
+
   </TabItem>
 </Tabs>
 
@@ -143,7 +159,10 @@ Adding the next component is the same shape: one more `<script>` tag (or
 one more `define` import), and you can use the element.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js"></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js"
+></script>
 
 <fluid-input placeholder="Search…" aria-label="Search">
   <fluid-icon slot="prefix" name="search"></fluid-icon>
@@ -157,9 +176,8 @@ one more `define` import), and you can use the element.
 </Demo>
 
 <Aside type="tip" title="Too many script tags?">
-  Once your import list grows, switch to an
-  [import map](/getting-started/installation/#import-maps), same CDN,
-  cleaner bare imports.
+  Once your import list grows, switch to an [import
+  map](/getting-started/installation/#import-maps), same CDN, cleaner bare imports.
 </Aside>
 
 ## Where to next?

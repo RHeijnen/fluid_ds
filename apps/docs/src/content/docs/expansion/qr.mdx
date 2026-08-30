@@ -3,6 +3,8 @@ title: "@fluid-ds/qr"
 description: "Fancy, logo-embeddable QR codes rendered as crisp inline SVG, with shaped modules, styled finder eyes, gradients, an artistic image mode, and PNG export."
 ---
 
+import QrDemo from "../../../components/QrDemo.astro";
+
 `<fluid-qr-code>` renders a QR code as inline SVG, so it scales without
 aliasing and prints cleanly. It now goes well beyond plain black squares:
 embed a center logo, reshape the modules and the three finder eyes, paint a
@@ -10,6 +12,16 @@ gradient, drop the whole code over a background image (artistic mode), and
 export to PNG. Backed by
 [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator).
 Expansion pack.
+
+Try it live: type anything into the field below and the code re-renders on
+every keystroke. The other controls drive the real styling API (module and eye
+shapes, error correction, size, a gradient fill), and the download button uses
+the component's own PNG export.
+
+<QrDemo />
+
+See it running: the [QR studio demo](/demos/qr/) lets you design a code live,
+shapes, eyes, colors and a center logo, and export the result.
 
 ## Install
 
@@ -133,38 +145,38 @@ tainted and export rejects; serve the image same-origin or with CORS enabled.
 
 ## Props
 
-| Prop | Default | Description |
-| --- | --- | --- |
-| `value` | `""` | The data to encode |
-| `size` | `160` | Pixel size of the rendered code |
-| `ec-level` | `"M"` | Error correction: `L`, `M`, `Q`, `H`. Forced to `H` when `logo` is set or `artistic` is on |
-| `fill` | token | Module color (falls back to `--fluid-qr-color`) |
-| `background` | token | Background color (falls back to `--fluid-qr-bg`) |
-| `margin` | `2` | Quiet-zone margin, in modules |
-| `label` | `""` | Accessible name; derived from `value` when empty |
-| `module-shape` | `"square"` | `square`, `dots`, or `rounded` |
-| `eye-shape` | `"square"` | `square`, `rounded`, or `circle` |
-| `eye-color` | token | Finder-eye color (falls back to `--fluid-qr-eye-color`, then the module color) |
-| `eye-color-top-left` | `""` | Per-eye color override |
-| `eye-color-top-right` | `""` | Per-eye color override |
-| `eye-color-bottom-left` | `""` | Per-eye color override |
-| `gradient-from` | `""` | Gradient start color (both ends required) |
-| `gradient-to` | `""` | Gradient end color |
-| `gradient-angle` | `45` | Gradient angle, degrees |
-| `logo` | `""` | Center logo URL / data URI (forces `ec-level=H`) |
-| `logo-size` | `0.22` | Logo size as a fraction of the code (clamped to `0.3`) |
-| `logo-padding` | `0.5` | Knockout padding around the logo, in modules |
-| `logo-background` | token | Knockout plate color (falls back to `--fluid-qr-logo-bg`) |
-| `logo-radius` | `1` | Knockout plate corner radius, in modules |
-| `artistic` | `false` | Render `logo` as a full-bleed background behind dotted modules |
-| `artistic-opacity` | `0.85` | Module opacity in artistic mode |
+| Prop                    | Default    | Description                                                                                |
+| ----------------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| `value`                 | `""`       | The data to encode                                                                         |
+| `size`                  | `160`      | Pixel size of the rendered code                                                            |
+| `ec-level`              | `"M"`      | Error correction: `L`, `M`, `Q`, `H`. Forced to `H` when `logo` is set or `artistic` is on |
+| `fill`                  | token      | Module color (falls back to `--fluid-qr-color`)                                            |
+| `background`            | token      | Background color (falls back to `--fluid-qr-bg`)                                           |
+| `margin`                | `2`        | Quiet-zone margin, in modules                                                              |
+| `label`                 | `""`       | Accessible name; derived from `value` when empty                                           |
+| `module-shape`          | `"square"` | `square`, `dots`, or `rounded`                                                             |
+| `eye-shape`             | `"square"` | `square`, `rounded`, or `circle`                                                           |
+| `eye-color`             | token      | Finder-eye color (falls back to `--fluid-qr-eye-color`, then the module color)             |
+| `eye-color-top-left`    | `""`       | Per-eye color override                                                                     |
+| `eye-color-top-right`   | `""`       | Per-eye color override                                                                     |
+| `eye-color-bottom-left` | `""`       | Per-eye color override                                                                     |
+| `gradient-from`         | `""`       | Gradient start color (both ends required)                                                  |
+| `gradient-to`           | `""`       | Gradient end color                                                                         |
+| `gradient-angle`        | `45`       | Gradient angle, degrees                                                                    |
+| `logo`                  | `""`       | Center logo URL / data URI (forces `ec-level=H`)                                           |
+| `logo-size`             | `0.22`     | Logo size as a fraction of the code (clamped to `0.3`)                                     |
+| `logo-padding`          | `0.5`      | Knockout padding around the logo, in modules                                               |
+| `logo-background`       | token      | Knockout plate color (falls back to `--fluid-qr-logo-bg`)                                  |
+| `logo-radius`           | `1`        | Knockout plate corner radius, in modules                                                   |
+| `artistic`              | `false`    | Render `logo` as a full-bleed background behind dotted modules                             |
+| `artistic-opacity`      | `0.85`     | Module opacity in artistic mode                                                            |
 
 ### Methods
 
-| Method | Returns | Description |
-| --- | --- | --- |
-| `toDataURL(scale?)` | `Promise<string>` | PNG data URL of the rendered code |
-| `download(filename?)` | `Promise<void>` | Rasterize and download a PNG |
+| Method                | Returns           | Description                       |
+| --------------------- | ----------------- | --------------------------------- |
+| `toDataURL(scale?)`   | `Promise<string>` | PNG data URL of the rendered code |
+| `download(filename?)` | `Promise<void>`   | Rasterize and download a PNG      |
 
 ## CSS parts and tokens
 
@@ -172,13 +184,13 @@ Every painted role reads a component-scoped token that falls back to a Fluid
 semantic variable, so you can retheme one instance, every QR, or the whole
 brand:
 
-| Token | Falls back to | Role |
-| --- | --- | --- |
-| `--fluid-qr-color` | `--fluid-text-primary` | Module color |
-| `--fluid-qr-bg` | `--fluid-surface-base` | Background |
-| `--fluid-qr-eye-color` | the module color | Finder-eye color |
-| `--fluid-qr-logo-bg` | `--fluid-surface-base` | Logo knockout plate |
-| `--fluid-qr-gap` | `0` (`0.1` for dots) | Inter-module gap, fraction of a module (0 to 0.4) |
+| Token                  | Falls back to          | Role                                              |
+| ---------------------- | ---------------------- | ------------------------------------------------- |
+| `--fluid-qr-color`     | `--fluid-text-primary` | Module color                                      |
+| `--fluid-qr-bg`        | `--fluid-surface-base` | Background                                        |
+| `--fluid-qr-eye-color` | the module color       | Finder-eye color                                  |
+| `--fluid-qr-logo-bg`   | `--fluid-surface-base` | Logo knockout plate                               |
+| `--fluid-qr-gap`       | `0` (`0.1` for dots)   | Inter-module gap, fraction of a module (0 to 0.4) |
 
 Exposed `::part()`s: `base` / `svg`, `background`, `modules`, `module`, `eyes`,
 `eye`, `eye-frame`, `eye-pupil`, `logo`, `logo-image`, `image`.

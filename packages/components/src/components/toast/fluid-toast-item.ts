@@ -74,130 +74,145 @@ export class FluidToastItem extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: block;
-    }
-
-    .base {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--fluid-space-3);
-      min-width: 16rem;
-      max-width: 24rem;
-      padding: var(--fluid-space-3) var(--fluid-space-4);
-      background: var(--fluid-toast-item-bg, var(--fluid-surface-base));
-      color: var(--fluid-toast-item-fg, var(--fluid-text-primary));
-      border: var(--fluid-toast-item-border-width, 1px) solid
-        var(--fluid-toast-item-border, var(--fluid-border-default));
-      border-inline-start: var(--fluid-toast-item-accent-width, 3px) solid
-        var(--fluid-toast-item-accent, var(--fluid-toast-item-border, var(--fluid-border-default)));
-      border-radius: var(--fluid-toast-item-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-toast-item-shadow, var(--fluid-shadow-lg));
-      font-family: var(--fluid-toast-item-font-family, var(--fluid-font-family-sans));
-      font-size: var(--fluid-font-size-md);
-      pointer-events: auto;
-      animation: toast-in
-        calc(var(--fluid-toast-item-enter-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-        var(--fluid-easing-decelerate);
-    }
-
-    @keyframes toast-in {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
+      :host {
+        display: block;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+
+      .base {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--fluid-space-3);
+        min-width: 16rem;
+        max-width: 24rem;
+        padding: var(--fluid-space-3) var(--fluid-space-4);
+        background: var(--fluid-toast-item-bg, var(--fluid-surface-base));
+        color: var(--fluid-toast-item-fg, var(--fluid-text-primary));
+        border: var(--fluid-toast-item-border-width, 1px) solid
+          var(--fluid-toast-item-border, var(--fluid-border-default));
+        border-inline-start: var(--fluid-toast-item-accent-width, 3px) solid
+          var(
+            --fluid-toast-item-accent,
+            var(--fluid-toast-item-border, var(--fluid-border-default))
+          );
+        border-radius: var(--fluid-toast-item-radius, var(--fluid-radius-md));
+        box-shadow: var(--fluid-toast-item-shadow, var(--fluid-shadow-lg));
+        font-family: var(--fluid-toast-item-font-family, var(--fluid-font-family-sans));
+        font-size: var(--fluid-font-size-md);
+        pointer-events: auto;
+        animation: toast-in
+          calc(
+            var(--fluid-toast-item-enter-duration, var(--fluid-duration-normal)) *
+              var(--fluid-motion, 1)
+          )
+          var(--fluid-easing-decelerate);
       }
-    }
 
-    :host([dismissing]) .base {
-      animation: toast-out
-        calc(var(--fluid-toast-item-exit-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1))
-        var(--fluid-easing-accelerate) forwards;
-    }
-
-    @keyframes toast-out {
-      to {
-        opacity: 0;
-        transform: translateX(20px);
+      @keyframes toast-in {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-    }
 
-    .icon-slot {
-      flex-shrink: 0;
-      display: inline-flex;
-      width: 1.25rem;
-      height: 1.25rem;
-      align-items: center;
-      justify-content: center;
-      color: var(--fluid-toast-item-icon-fg, var(--fluid-text-secondary));
-    }
+      :host([dismissing]) .base {
+        animation: toast-out
+          calc(
+            var(--fluid-toast-item-exit-duration, var(--fluid-duration-fast)) *
+              var(--fluid-motion, 1)
+          )
+          var(--fluid-easing-accelerate) forwards;
+      }
 
-    .body {
-      flex: 1 1 auto;
-      min-width: 0;
-      line-height: var(--fluid-font-line-height-normal);
-    }
+      @keyframes toast-out {
+        to {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+      }
 
-    /*
+      .icon-slot {
+        flex-shrink: 0;
+        display: inline-flex;
+        width: 1.25rem;
+        height: 1.25rem;
+        align-items: center;
+        justify-content: center;
+        color: var(--fluid-toast-item-icon-fg, var(--fluid-text-secondary));
+      }
+
+      .body {
+        flex: 1 1 auto;
+        min-width: 0;
+        line-height: var(--fluid-font-line-height-normal);
+      }
+
+      /*
      * SC 2.5.8 Target Size. The close button floors its box to
      * --fluid-target-min (24px AA / 44px AAA) without resizing the glyph.
      */
-    .close {
-      all: unset;
-      cursor: pointer;
-      box-sizing: border-box;
-      width: max(1.5rem, var(--fluid-target-min, 0px));
-      height: max(1.5rem, var(--fluid-target-min, 0px));
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--fluid-radius-sm);
-      color: var(--fluid-toast-item-close-fg, var(--fluid-text-secondary));
-      flex-shrink: 0;
-      opacity: 0.6;
-      transition: opacity var(--fluid-duration-fast) var(--fluid-easing-standard);
-    }
-    .close:hover,
-    .close:focus-visible {
-      opacity: 1;
-      background: var(--fluid-toast-item-close-hover-bg, var(--fluid-surface-muted));
-      color: var(--fluid-toast-item-close-hover-fg, var(--fluid-text-primary));
-    }
-    .close:focus-visible {
-      outline: var(--fluid-toast-item-focus-ring-width, var(--fluid-focus-ring-width)) solid
-        var(--fluid-toast-item-focus-ring, var(--fluid-focus-ring-color));
-      outline-offset: 1px;
-    }
+      .close {
+        all: unset;
+        cursor: pointer;
+        box-sizing: border-box;
+        width: max(1.5rem, var(--fluid-target-min, 0px));
+        height: max(1.5rem, var(--fluid-target-min, 0px));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--fluid-radius-sm);
+        color: var(--fluid-toast-item-close-fg, var(--fluid-text-secondary));
+        flex-shrink: 0;
+        opacity: 0.6;
+        transition: opacity var(--fluid-duration-fast) var(--fluid-easing-standard);
+      }
+      .close:hover,
+      .close:focus-visible {
+        opacity: 1;
+        background: var(--fluid-toast-item-close-hover-bg, var(--fluid-surface-muted));
+        color: var(--fluid-toast-item-close-hover-fg, var(--fluid-text-primary));
+      }
+      .close:focus-visible {
+        outline: var(--fluid-toast-item-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-toast-item-focus-ring, var(--fluid-focus-ring-color));
+        outline-offset: 1px;
+      }
 
-    /* Variant accents on the left border + icon, theme-independent tones. */
-    :host([variant="info"]) .base {
-      border-inline-start-color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
-    }
-    :host([variant="info"]) .icon-slot {
-      color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
-    }
-    :host([variant="success"]) .base {
-      border-inline-start-color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
-    }
-    :host([variant="success"]) .icon-slot {
-      color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
-    }
-    :host([variant="warning"]) .base {
-      border-inline-start-color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
-    }
-    :host([variant="warning"]) .icon-slot {
-      color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
-    }
-    :host([variant="danger"]) .base {
-      border-inline-start-color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
-    }
-    :host([variant="danger"]) .icon-slot {
-      color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
-    }
-  `
+      /* Variant accents on the left border + icon, theme-independent tones. */
+      :host([variant="info"]) .base {
+        border-inline-start-color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
+      }
+      :host([variant="info"]) .icon-slot {
+        color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
+      }
+      :host([variant="success"]) .base {
+        border-inline-start-color: var(
+          --fluid-toast-item-success-accent,
+          var(--fluid-success-base)
+        );
+      }
+      :host([variant="success"]) .icon-slot {
+        color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
+      }
+      :host([variant="warning"]) .base {
+        border-inline-start-color: var(
+          --fluid-toast-item-warning-accent,
+          var(--fluid-warning-base)
+        );
+      }
+      :host([variant="warning"]) .icon-slot {
+        color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
+      }
+      :host([variant="danger"]) .base {
+        border-inline-start-color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
+      }
+      :host([variant="danger"]) .icon-slot {
+        color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
+      }
+    `
   ];
 
   /** Visual variant, drives accent + default icon. */

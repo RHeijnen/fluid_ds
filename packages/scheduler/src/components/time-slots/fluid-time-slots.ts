@@ -82,7 +82,10 @@ export class FluidTimeSlots extends FluidElement {
       }
       .list {
         display: grid;
-        grid-template-columns: repeat(var(--fluid-time-slots-columns, auto-fill), minmax(var(--fluid-time-slots-min, 5rem), 1fr));
+        grid-template-columns: repeat(
+          var(--fluid-time-slots-columns, auto-fill),
+          minmax(var(--fluid-time-slots-min, 5rem), 1fr)
+        );
         gap: var(--fluid-time-slots-gap, 0.5rem);
       }
       .slot {
@@ -99,11 +102,18 @@ export class FluidTimeSlots extends FluidElement {
         font: inherit;
         font-variant-numeric: tabular-nums;
         cursor: pointer;
-        transition: background-color calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease,
+        transition:
+          background-color calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease,
           border-color calc(var(--fluid-duration-fast, 120ms) * var(--fluid-motion, 1)) ease;
       }
-      :host([size="sm"]) .slot { min-height: max(1.9rem, var(--fluid-target-min, 0px)); font-size: 0.8125rem; }
-      :host([size="lg"]) .slot { min-height: max(2.75rem, var(--fluid-target-min, 0px)); font-size: 1rem; }
+      :host([size="sm"]) .slot {
+        min-height: max(1.9rem, var(--fluid-target-min, 0px));
+        font-size: 0.8125rem;
+      }
+      :host([size="lg"]) .slot {
+        min-height: max(2.75rem, var(--fluid-target-min, 0px));
+        font-size: 1rem;
+      }
       .slot:hover:not(:disabled):not(.selected) {
         background: var(--fluid-time-slots-hover-bg, var(--fluid-surface-muted));
         border-color: var(--fluid-accent-base);
@@ -120,7 +130,8 @@ export class FluidTimeSlots extends FluidElement {
         text-decoration: line-through;
       }
       .slot:focus-visible {
-        outline: var(--fluid-time-slots-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid var(--fluid-accent-base);
+        outline: var(--fluid-time-slots-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
+          var(--fluid-accent-base);
         outline-offset: 2px;
       }
       .empty {
@@ -182,9 +193,10 @@ export class FluidTimeSlots extends FluidElement {
   @queryAll(".slot") private slotEls!: NodeListOf<HTMLButtonElement>;
 
   override focus(options?: FocusOptions): void {
-    const target = Array.from(this.slotEls ?? []).find(
-      (slot) => slot.classList.contains("selected") && !slot.disabled
-    ) ?? Array.from(this.slotEls ?? []).find((slot) => slot.tabIndex === 0 && !slot.disabled);
+    const target =
+      Array.from(this.slotEls ?? []).find(
+        (slot) => slot.classList.contains("selected") && !slot.disabled
+      ) ?? Array.from(this.slotEls ?? []).find((slot) => slot.tabIndex === 0 && !slot.disabled);
     if (target) target.focus(options);
     else super.focus(options);
   }
@@ -192,7 +204,8 @@ export class FluidTimeSlots extends FluidElement {
   /** The slots to render: explicit `slots`, else generated from date + availability. */
   private get resolved(): Slot[] {
     if (this.slots) return this.slots;
-    if (this.date && this.availability) return generateSlots(this.date, this.availability, this.bookings);
+    if (this.date && this.availability)
+      return generateSlots(this.date, this.availability, this.bookings);
     return [];
   }
 
@@ -201,7 +214,13 @@ export class FluidTimeSlots extends FluidElement {
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
-    if (changed.has("value") || changed.has("slots") || changed.has("availability") || changed.has("date") || changed.has("bookings")) {
+    if (
+      changed.has("value") ||
+      changed.has("slots") ||
+      changed.has("availability") ||
+      changed.has("date") ||
+      changed.has("bookings")
+    ) {
       this.activeIndex = this.initialActiveIndex();
     }
   }
@@ -232,14 +251,22 @@ export class FluidTimeSlots extends FluidElement {
     if (!this.date) return "";
     const d = fromISODate(this.date);
     if (!d) return "";
-    return new Intl.DateTimeFormat(this.locale || undefined, { weekday: "long", month: "long", day: "numeric" }).format(d);
+    return new Intl.DateTimeFormat(this.locale || undefined, {
+      weekday: "long",
+      month: "long",
+      day: "numeric"
+    }).format(d);
   }
 
   private select(slot: Slot): void {
     if (this.disabled || !this.isSelectable(slot)) return;
     this.value = slot.start;
     this.dispatchEvent(
-      new CustomEvent("fluid-change", { detail: { value: slot.start, slot }, bubbles: true, composed: true })
+      new CustomEvent("fluid-change", {
+        detail: { value: slot.start, slot },
+        bubbles: true,
+        composed: true
+      })
     );
   }
 
@@ -256,7 +283,8 @@ export class FluidTimeSlots extends FluidElement {
         break;
       case "ArrowUp":
       case "ArrowLeft":
-        nextPos = pos < 0 ? selectable.length - 1 : (pos - 1 + selectable.length) % selectable.length;
+        nextPos =
+          pos < 0 ? selectable.length - 1 : (pos - 1 + selectable.length) % selectable.length;
         break;
       case "Home":
         nextPos = 0;
@@ -290,8 +318,12 @@ export class FluidTimeSlots extends FluidElement {
       const closed = !!this.date && !!this.availability;
       return html`
         <div part="base">
-          ${this.date && !this.noHeading ? html`<p class="heading" part="heading">${this.headingText()}</p>` : ""}
-          <p class="empty" part="empty" role="status">${closed ? this.term("noOpeningsOnDay") : this.term("selectDayToSeeOpenings")}</p>
+          ${this.date && !this.noHeading
+            ? html`<p class="heading" part="heading">${this.headingText()}</p>`
+            : ""}
+          <p class="empty" part="empty" role="status">
+            ${closed ? this.term("noOpeningsOnDay") : this.term("selectDayToSeeOpenings")}
+          </p>
         </div>
       `;
     }
@@ -300,7 +332,9 @@ export class FluidTimeSlots extends FluidElement {
 
     return html`
       <div part="base">
-        ${this.date && !this.noHeading ? html`<p class="heading" part="heading">${this.headingText()}</p>` : ""}
+        ${this.date && !this.noHeading
+          ? html`<p class="heading" part="heading">${this.headingText()}</p>`
+          : ""}
         <div
           part="list"
           class="list"

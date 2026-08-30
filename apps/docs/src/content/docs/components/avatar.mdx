@@ -33,6 +33,7 @@ bottom-right corner.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/avatar/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -44,6 +45,7 @@ bottom-right corner.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/avatar";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -73,8 +75,7 @@ automatically. Or pass `initials` directly.
 </Demo>
 
 ```html
-<fluid-avatar label="Ada Lovelace"></fluid-avatar>
-<fluid-avatar initials="AL"></fluid-avatar>
+<fluid-avatar label="Ada Lovelace"></fluid-avatar> <fluid-avatar initials="AL"></fluid-avatar>
 ```
 
 ### Icon fallback
@@ -123,7 +124,9 @@ Drop a [`<fluid-badge>`](/components/badge/) (or anything small) into the
     <fluid-badge slot="badge" variant="success" dot></fluid-badge>
   </fluid-avatar>
   <fluid-avatar label="Grace Hopper">
-    <fluid-badge slot="badge" variant="danger">3</fluid-badge>
+    <fluid-badge slot="badge" variant="danger">
+      3
+    </fluid-badge>
   </fluid-avatar>
 </Demo>
 

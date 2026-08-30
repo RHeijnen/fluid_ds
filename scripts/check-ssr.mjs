@@ -8,7 +8,7 @@
  * published element so a new component cannot silently skip the SSR contract.
  */
 import { readdir, readFile } from "node:fs/promises";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { coldImportAll } from "./ssr-cold-imports.mjs";
 import { assertRenderCatalog, inventoryWorkspaceEntries } from "./ssr-entry-inventory.mjs";
@@ -63,10 +63,20 @@ assertRenderCatalog(publishedTags, catalog.components);
 
 const packageDirs = await readdir(packagesDir, { withFileTypes: true });
 const imports = [];
+const coldImportExempt = new Set();
 for (const entry of packageDirs) {
   if (!entry.isDirectory()) continue;
   const dir = join(packagesDir, entry.name);
   const manifest = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+  // The Angular integration ships Angular partial-compilation output, which by
+  // contract is linked by the consumer's Angular build and cannot execute in
+  // bare Node (importing @angular/common at module scope demands the linker or
+  // the JIT compiler). Its server story is Angular SSR, not plain-Node import,
+  // so the cold-import gate does not apply to it.
+  if (manifest.fluidIntegration === "angular") {
+    coldImportExempt.add(dir);
+    continue;
+  }
   if (manifest.main?.endsWith(".js")) imports.push(join(dir, manifest.main));
   const dist = join(dir, "dist");
   try {
@@ -94,7 +104,11 @@ const coldEntries = [
 ];
 const publishedEntries = await inventoryWorkspaceEntries(packagesDir);
 for (const file of publishedEntries.flatMap((entry) => entry.javascript))
-  if (!coldEntries.includes(file)) coldEntries.push(file);
+  if (
+    !coldEntries.includes(file) &&
+    ![...coldImportExempt].some((dir) => file.startsWith(`${dir}${sep}`))
+  )
+    coldEntries.push(file);
 console.log("Published built-JavaScript cold-import inventory:");
 for (const entry of publishedEntries) {
   console.log(`  ${entry.package}: ${entry.javascript.length} distinct JS targets`);

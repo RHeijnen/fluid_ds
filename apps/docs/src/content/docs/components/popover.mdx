@@ -30,6 +30,7 @@ floating-ui, so it auto-flips when it would overflow the viewport.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/popover/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +42,7 @@ floating-ui, so it auto-flips when it would overflow the viewport.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/popover";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,9 +59,7 @@ positioning primitive without the open/close state machine, reach for
   <fluid-popover>
     <fluid-button slot="trigger">Open popover</fluid-button>
     <p style="margin: 0;">Any content goes here.</p>
-    <p style="margin: var(--fluid-space-2) 0 0;">
-      Click outside or press Escape to dismiss.
-    </p>
+    <p style="margin: var(--fluid-space-2) 0 0;">Click outside or press Escape to dismiss.</p>
   </fluid-popover>
 </Demo>
 
@@ -121,6 +121,7 @@ imperative `show()` / `hide()` / `toggle()`.
       p.addEventListener("fluid-hide", () => console.log("closed"));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Settings.tsx"
@@ -138,6 +139,7 @@ imperative `show()` / `hide()` / `toggle()`.
       return <fluid-popover ref={ref}><button slot="trigger">Open</button>…</fluid-popover>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Settings.vue"
@@ -151,6 +153,7 @@ imperative `show()` / `hide()` / `toggle()`.
       </fluid-popover>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="settings.component.ts"
@@ -167,6 +170,7 @@ imperative `show()` / `hide()` / `toggle()`.
       onShow() {}
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Settings.svelte"
@@ -178,6 +182,7 @@ imperative `show()` / `hide()` / `toggle()`.
       <button slot="trigger">Open</button>…
     </fluid-popover>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -185,7 +190,7 @@ imperative `show()` / `hide()` / `toggle()`.
 
 - Contextual options or controls attached to a specific element.
 
-### When *not* to use
+### When _not_ to use
 
 - **A list of actions**: use [`<fluid-dropdown>`](/components/dropdown/).
 - **Text-only help**: use [`<fluid-tooltip>`](/components/tooltip/) (hover-

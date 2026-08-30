@@ -41,6 +41,7 @@ const NAV: NavItem[] = [
             </a>
           }
         </nav>
+        <a class="sidebar-back" href="../">&larr; All demos</a>
         <div class="sidebar-foot muted">Angular 20 · standalone</div>
       </aside>
 
@@ -65,7 +66,12 @@ const NAV: NavItem[] = [
               <fluid-option value="corporate">Corporate</fluid-option>
             </fluid-select>
             <fluid-tooltip content="Toggle light / dark">
-              <fluid-button variant="ghost" size="sm" aria-label="Toggle theme" (click)="toggleTheme()">
+              <fluid-button
+                variant="ghost"
+                size="sm"
+                aria-label="Toggle theme"
+                (click)="toggleTheme()"
+              >
                 <fluid-icon name="sun-moon"></fluid-icon>
               </fluid-button>
             </fluid-tooltip>

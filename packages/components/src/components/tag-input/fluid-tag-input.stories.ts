@@ -13,7 +13,7 @@ type Args = Pick<FluidTagInput, "name" | "placeholder" | "disabled" | "max" | "a
 const meta: Meta<Args> = {
   title: "Components/Forms/Tag input",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     name: { control: "text" },
     placeholder: { control: "text" },

@@ -9,7 +9,7 @@ type Args = Pick<FluidField, "label" | "description" | "error" | "required" | "f
 const meta: Meta<Args> = {
   title: "Components/Forms/Field",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     label: { control: "text" },
     description: { control: "text" },

@@ -8,11 +8,7 @@
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 71260,
@@ -26,11 +22,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 71272,
@@ -44,11 +36,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 71284,
@@ -62,12 +50,7 @@
     },
     {
       "stage": "install",
-      "args": [
-        "install",
-        "--no-frozen-lockfile",
-        "--ignore-scripts",
-        "--strict-peer-dependencies"
-      ],
+      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
       "status": "passed",
       "reason": null,
       "pid": 71296,
@@ -81,10 +64,7 @@
     },
     {
       "stage": "typecheck",
-      "args": [
-        "run",
-        "typecheck"
-      ],
+      "args": ["run", "typecheck"],
       "status": "passed",
       "reason": null,
       "pid": 71311,
@@ -98,10 +78,7 @@
     },
     {
       "stage": "build",
-      "args": [
-        "run",
-        "build"
-      ],
+      "args": ["run", "build"],
       "status": "passed",
       "reason": null,
       "pid": 71371,

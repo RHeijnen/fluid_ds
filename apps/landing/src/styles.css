@@ -139,11 +139,18 @@ nav.primary a:focus-visible,
 /* ------------------------------------------------------------------ */
 /* Hero */
 
+/* Two columns: the claim and its numbers on the left, the components that back
+   them up on the right. Collapses to one column (copy first) under 60rem. */
 .hero {
-  max-width: 56rem;
-  margin: 4rem auto 5rem;
-  text-align: center;
+  max-width: 76rem;
+  margin: 3.5rem auto 5rem;
   padding: 0 1.25rem;
+  display: grid;
+  /* The right track is exactly the stage width so the absolutely placed
+     collage is never squeezed. The copy takes whatever is left. */
+  grid-template-columns: minmax(0, 1fr) 30rem;
+  gap: 3rem;
+  align-items: center;
 }
 .hero h1 {
   font-size: clamp(2.25rem, 5vw, 3.75rem);
@@ -152,22 +159,986 @@ nav.primary a:focus-visible,
   margin: 1.25rem 0 1rem;
 }
 .hero h1 .accent {
-  background: linear-gradient(135deg, var(--fluid-accent-base, #6366f1), #22d3ee);
+  /* Ends at cyan-700, not cyan-400: every stop keeps >= 3:1 on white, the
+     large-text AA floor, so no part of the wordmark washes out. */
+  background: linear-gradient(135deg, var(--fluid-accent-base, #2563eb), #0e7490);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.hero-name-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-mark {
+  inline-size: clamp(2.5rem, 5vw, 3.5rem);
+  block-size: clamp(2.5rem, 5vw, 3.5rem);
+  flex: none;
+  border-radius: 22.9%;
+  box-shadow: 0 10px 24px -10px rgb(37 99 235 / 45%);
+}
+.hero-name {
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  line-height: 1;
+  /* The gradient clips to the glyphs; a hair of bottom padding keeps
+     descender-free capitals from shaving the "d". */
+  padding-block-end: 0.05em;
+}
+.hero-tagline {
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.1;
+  font-weight: 700;
+}
 .hero p.lead {
   color: var(--fluid-text-secondary);
-  font-size: 1.15rem;
-  max-width: 38rem;
-  margin: 0 auto 2rem;
+  font-size: 1.1rem;
+  max-width: 34rem;
+  margin: 0 0 1.75rem;
 }
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+/* One-liner install command with a real copy button, width hugs content. */
+.hero-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block-start: 1.25rem;
+  padding: 0.45rem 0.5rem 0.45rem 0.9rem;
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md, 0.5rem);
+  background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
+}
+.hero-install code {
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.85rem;
+  color: var(--fluid-text-primary);
+  white-space: nowrap;
+}
+
+/* Hero stat trio: components and tests, straight from the verification
+   inventory. `dt` is the label so the value reads as its description. */
+.hero-stats {
+  display: grid;
+  /* Three across when there is room, then 2, then 1. Matches `.stat-band`. */
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 2rem;
+  padding-block: 1.25rem;
+  border-block: 1px solid var(--fluid-border-default);
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+/* A short accent tick above each value gives the row hierarchy without
+   turning the stats into cards. */
+.hero-stat::before {
+  content: "";
+  inline-size: 1.5rem;
+  block-size: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--fluid-accent-base, #2563eb), #22d3ee);
+  margin-block-end: 0.5rem;
+}
+.hero-stat-label {
+  order: 2;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.hero-stat-value {
+  order: 1;
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.hero-stat-note {
+  order: 3;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--fluid-text-secondary);
+}
+
+/* ---------------------------------------------------------------- */
+/* Hero stage: a scattered collage of real components                 */
+
+/* Registered token types so the stage's theme cycling interpolates instead of
+   snapping. Registration is global but behavior-neutral: every one of these is
+   a semantic/primitive token that base.css and light/dark.css always declare,
+   so the registered initial value never wins. Component knobs (for example
+   --fluid-card-padding) must NOT be registered: they are undeclared by design,
+   and a registered initial value would replace every inline var() fallback
+   across the site. */
+@property --fluid-accent-base {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2563eb;
+}
+@property --fluid-accent-hover {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1d4ed8;
+}
+@property --fluid-accent-active {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1e40af;
+}
+@property --fluid-color-brand-50 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eff6ff;
+}
+@property --fluid-color-brand-200 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #bfdbfe;
+}
+@property --fluid-color-brand-800 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1e40af;
+}
+/* @property initial values must be computationally independent, so px, not rem. */
+@property --fluid-radius-sm {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 4px;
+}
+@property --fluid-radius-md {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 8px;
+}
+@property --fluid-radius-lg {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 12px;
+}
+@property --fluid-radius-xl {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 16px;
+}
+@property --fluid-field-border-radius {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 8px;
+}
+/* Spacing steps the collage's buttons (and friends) read for their inner
+   padding: sm buttons use space-1 block / space-3 inline. */
+@property --fluid-space-1 {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 4px;
+}
+@property --fluid-space-3 {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 12px;
+}
+
+/* The stage is a fixed 34rem x 33rem canvas and every piece is placed on it
+   absolutely, which is what gives the hand-scattered look. The hero grid
+   reserves exactly 34rem for this column so the canvas is never squeezed;
+   below the two-column breakpoint the stage releases every position and the
+   pieces fall into a plain wrapped row instead. */
+.hero-stage {
+  position: relative;
+  inline-size: 30rem;
+  /* Room for the roomiest padding step plus float slack. */
+  block-size: 21rem;
+  /* A framed canvas, so the space around the pieces reads as an intentional
+     surface rather than a gap. The frame's fill, border and radius are themed
+     by the cycler too, so it restyles along with what sits inside it. */
+  border: 1px solid var(--fluid-color-brand-200, var(--fluid-border-default));
+  border-radius: var(--fluid-radius-xl, 1.5rem);
+  background: var(--fluid-surface-subtle);
+  /* The cycler writes token overrides onto this element's inline style, so
+     only the collage re-themes. Colours and radii interpolate here; card
+     padding is discrete (an unregistered knob) and is tweened on the card
+     parts instead. */
+  transition-property:
+    --fluid-accent-base, --fluid-accent-hover, --fluid-accent-active, --fluid-color-brand-50,
+    --fluid-color-brand-200, --fluid-color-brand-800, --fluid-radius-sm, --fluid-radius-md,
+    --fluid-radius-lg, --fluid-radius-xl, --fluid-field-border-radius, background-color,
+    border-color, border-radius;
+  transition-duration: 1100ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* The colour wash the frosted cards sit over. Painted behind the pieces and
+   faded in only for the glass step, so entering and leaving glass stays smooth
+   (opacity interpolates where a gradient cannot). */
+.hero-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* Vivid on purpose: the frost only reads as glass when there is saturated
+     colour behind it to blur. The panels stay light enough (55-60% white) that
+     dark text keeps its contrast over every stop. */
+  background:
+    radial-gradient(70% 70% at 16% 18%, #8b5cf6, transparent 60%),
+    radial-gradient(70% 70% at 84% 24%, #06b6d4, transparent 58%),
+    radial-gradient(80% 80% at 58% 96%, #f43f5e, transparent 60%),
+    linear-gradient(135deg, #c7d2fe, #a5f3fc);
+  opacity: 0;
+  transition: opacity 1100ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-stage[data-fluid-brand="glass"]::before {
+  opacity: 1;
+}
+/* The real Glass preset paints its wash straight onto the branded element,
+   which cannot crossfade (gradients do not interpolate). Keep the stage's own
+   surface and let the ::before wash above carry the fade instead; the frost
+   on the pieces still comes from the real theme's part selectors. */
+.hero-stage[data-fluid-brand="glass"] {
+  background: var(--fluid-surface-subtle);
+}
+
+/* A small live-theming label in the corner. Decorative marketing, hidden on
+   narrow screens by the media query at the foot of this file. */
+.hero-stage-tag {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 1rem;
+  inset-inline-start: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fluid-text-secondary);
+  background: var(--fluid-surface-base);
+  border: 1px solid var(--fluid-border-default);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+  transition:
+    background-color 1100ms ease,
+    color 1100ms ease,
+    border-color 1100ms ease;
+}
+.hero-stage-tag fluid-icon {
+  color: var(--fluid-accent-base);
+  font-size: 0.85rem;
+}
+
+/* Each piece is placed individually, scattered rather than stacked. */
+.hero-stage .pin {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  /* Idle drift. Each piece has its own duration and a negative delay below,
+     so the two curves never line up. */
+  animation: hero-pin-float calc(var(--hero-float-dur, 6s) * 1.6) ease-in-out
+    var(--hero-float-delay, 0s) infinite;
+}
+/* Pause the drift under the cursor so clicks and focus have a still target. */
+.hero-stage .pin:hover {
+  animation-play-state: paused;
+}
+@keyframes hero-pin-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Card padding is discrete at the token, so the visible padding is tweened on
+   the card's inner parts. Contained to the card: nothing else depends on its
+   size now, so this no longer reflows the collage the way the old flow layout
+   did. */
+.hero-stage fluid-card::part(header),
+.hero-stage fluid-card::part(body),
+.hero-stage fluid-card::part(footer) {
+  transition: padding 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Frosted surfaces: translucent and blurred over the wash. blur(0) in the base
+   state so the blur interpolates in and out rather than snapping. */
+.hero-stage fluid-card::part(base),
+.hero-stage fluid-input::part(base) {
+  backdrop-filter: blur(0);
+  transition:
+    background-color 1100ms ease,
+    border-color 1100ms ease,
+    backdrop-filter 1100ms ease;
+}
+/* The pieces' frost comes from the REAL Glass preset now (its part selectors
+   match under the stage's data-fluid-brand). Only the stage's own label chip
+   is landing chrome, so it carries its frost here. */
+.hero-stage[data-fluid-brand="glass"] .hero-stage-tag {
+  background-color: rgb(255 255 255 / 60%);
+  border-color: rgb(255 255 255 / 70%);
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage,
+  .hero-stage::before,
+  .hero-stage-tag,
+  .hero-stage fluid-card::part(base),
+  .hero-stage fluid-input::part(base),
+  .hero-stage fluid-card::part(header),
+  .hero-stage fluid-card::part(body),
+  .hero-stage fluid-card::part(footer) {
+    transition: none;
+  }
+  .hero-stage .pin {
+    animation: none;
+  }
+}
+/* Cards on the stage float above the page rather than sitting in it. */
+.hero-stage fluid-card {
+  --fluid-card-shadow: 0 12px 32px -12px rgb(0 0 0 / 22%);
+}
+
+/* Scattered placement inside the frame. Distinct float durations plus negative
+   delays start each piece mid-cycle at a different phase. */
+.pin-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  inline-size: 14rem;
+  inset-block-start: 1rem;
+  inset-inline-start: 14.5rem;
+  --hero-float-dur: 6.4s;
+  --hero-float-delay: -3.3s;
+}
+.pin-search fluid-input {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+.pin-profile {
+  inline-size: 16rem;
+  inset-block-start: 6.75rem;
+  inset-inline-start: 3.5rem;
+  --hero-float-dur: 8.2s;
+  --hero-float-delay: -0.7s;
+}
+/* The description item stacks term over detail by default. Its flex container
+   is the inner `base` part, not the host, so the row layout has to go through
+   ::part rather than a host rule. */
+.pin-profile fluid-description-item::part(base) {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Small pieces of composition inside the collage cards. */
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block-end: 0.75rem;
+}
+.profile-eyebrow {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fluid-text-secondary);
+}
+.profile-name {
+  font-size: 1.05rem;
+}
+.profile-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-block-start: 0.85rem;
+}
+/* ------------------------------------------------------------------ */
+/* Demo portal: a framed application built from live components        */
+
+.portal-section {
+  max-width: 72rem;
+}
+.portal-frame {
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  overflow: hidden;
+  box-shadow: 0 24px 48px -24px rgb(0 0 0 / 25%);
+  background: var(--fluid-surface-base);
+  /* Re-anchor the base text colour at this scope. The page sets `color:
+     var(--fluid-text-primary)` higher up, where the token is substituted to the
+     light value and then inherited into here as a fixed computed colour, so a
+     dark toggle on this frame would leave inherited text (like the untinted
+     .portal-title) black-on-black. Re-declaring it re-substitutes the token
+     where the dark value is in effect. */
+  color: var(--fluid-text-primary);
+  /* Re-anchor the font too, so a brand that swaps the sans family (Titanium)
+     reaches the demo's hand-rolled chrome text, not only the Fluid components
+     that set their own font-family. */
+  font-family: var(--fluid-font-family-sans);
+}
+/* Browser-window chrome: three dots, purely decorative. */
+.portal-chrome {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem;
+  border-block-end: 1px solid var(--fluid-border-default);
+  background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
+}
+.portal-chrome span {
+  inline-size: 0.65rem;
+  block-size: 0.65rem;
+  border-radius: 50%;
+  background: var(--fluid-border-strong, var(--fluid-border-default));
+  opacity: 0.55;
+}
+.portal {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  /* Canvas-gray content so the white cards float, PrimeNG style. */
+  background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
+}
+/* Compact icon-only rail, PrimeNG style: a floating card detached from the
+   frame edges, nav icons on top, settings + user at the bottom. Labels live
+   in tooltips + aria-labels. */
+.portal-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.25rem 0 1.25rem 1.25rem;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--fluid-border-default);
+  border-radius: 0.9rem;
+  background: var(--fluid-surface-base);
+}
+/* Squared-off icon buttons like the reference; the filled one is current. */
+.portal-rail fluid-button,
+.portal-rail-foot fluid-button {
+  --fluid-button-radius: 0.65rem;
+}
+.portal-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.5rem;
+  font-size: 0.95rem;
+}
+.portal-mark {
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  flex: none;
+  border-radius: 22.9%;
+}
+.portal-rail,
+.portal-rail-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.portal-rail-foot {
+  margin-block-start: auto;
+}
+.portal-main {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+/* PrimeNG-style menubar inside the app-bar's nav region: plain links for
+   leaf destinations, fluid-dropdowns for sections with submenus. */
+.portal-menubar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.portal-menubar > a {
+  text-decoration: none;
+  color: var(--fluid-text-secondary);
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--fluid-radius-md, 0.375rem);
+}
+.portal-menubar > a:hover {
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+}
+.portal-menubar > a[aria-current="page"] {
+  color: var(--fluid-accent-base);
+  font-weight: 600;
+}
+/* The two dropdown triggers are fluid-buttons, not plain <a> links, so they
+   carried the button's own smaller type and taller box. Match them to the
+   anchor items: same font size, weight, colour and padding, so the whole
+   menubar reads as one row of equal nav items. The ghost variant keeps its own
+   transparent fill and hover. */
+.portal-menubar fluid-button::part(base) {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--fluid-text-secondary);
+  padding: 0.35rem 0.75rem;
+  min-block-size: 0;
+  gap: 0.3rem;
+}
+.portal-bar-end {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.portal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+/* KPI cards: small label + icon chip, large value, change badge. */
+.kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+}
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  border-radius: 0.65rem;
+  /* A translucent accent wash, not the fixed near-white brand-50: it reads as a
+     soft tint over a light card and a subtle dark tint in dark mode, and tracks
+     whatever brand accent is active instead of pinning to blue. */
+  background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
+  color: var(--fluid-accent-base);
+}
+.kpi-value {
+  display: block;
+  margin-block: 0.3rem 0.55rem;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.kpi-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+/* Controls row: range picker left, download + dates right. */
+.portal-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.portal-controls-end {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+/* Donut breakdown list (replaces the chart's default legend). */
+.portal-mix {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+}
+.portal-mix li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mix-dot {
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border-radius: 50%;
+  flex: none;
+}
+.mix-val {
+  margin-inline-start: auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/*
+ * The demo's own chrome under the glass brand.
+ *
+ * The shipped glass brand frosts every Fluid component, but the portal is also
+ * built from landing-local elements (the frame, the icon rail, the KPI chips,
+ * the browser-chrome bar) that the brand cannot reach. Give them the same
+ * treatment so the whole surface reads as one material. A real app applying
+ * the glass brand to a container it owns would not need this: it exists only
+ * because the demo mixes Fluid components with hand-rolled chrome.
+ */
+.portal-frame[data-fluid-brand="glass"] .portal {
+  /* Transparent so the frame's colour wash shows through the main area. */
+  background: transparent;
+}
+/*
+ * The page header on glass.
+ *
+ * A bare title floating on the wash next to frosted cards reads as unfinished:
+ * on glass the standard is a frosted "toolbar" strip for the header, the way
+ * Windows Acrylic and macOS materials treat a window's title bar. Housing the
+ * title (and its search) in a frosted panel makes the header part of the same
+ * material as everything below it.
+ */
+/* Layout only. The frost itself comes from the theme's .fluid-glass-panel
+   helper (added to these elements in markup), so glass lives in one place. */
+.portal-frame[data-fluid-brand="glass"] .portal-head {
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--fluid-radius-lg);
+}
+
+/* The active rail item is a primary button (solid accent). A solid fill reads
+   as "stuck on" against the frosted rail, so under glass it becomes a frosted
+   highlight with an accent icon instead: still clearly the active item, but the
+   same material as everything around it. Uses the button's own tokens rather
+   than overriding its parts. */
+.portal-frame[data-fluid-brand="glass"] .portal-rail fluid-button[variant="primary"] {
+  --fluid-button-bg: var(--glass-frost);
+  --fluid-button-hover-bg: var(--glass-frost-strong);
+  --fluid-button-fg: var(--fluid-accent-base);
+}
+.portal-frame[data-fluid-brand="glass"] .portal-rail fluid-button[variant="primary"]::part(base) {
+  backdrop-filter: var(--glass-blur);
+}
+
+/* The demo theme switcher: a small toolbar above the portal frame. Each choice
+   flips data-fluid-brand on the frame, so only the demo re-themes. */
+.portal-theme-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block-end: 1rem;
+}
+.portal-theme-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fluid-text-secondary);
+}
+.portal-theme-label fluid-icon {
+  color: var(--fluid-accent-base);
+}
+.portal-theme-hint {
+  font-size: 0.78rem;
+  color: var(--fluid-text-secondary);
+}
+.portal-theme-hint code {
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.72rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--fluid-radius-sm);
+  background: var(--fluid-surface-muted);
+}
+/* The light/dark toggle sits at the far end of the same toolbar. margin auto
+   pushes it right of the brand switcher; it drops below on narrow widths where
+   the row wraps. */
+.portal-appearance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-inline-start: auto;
+}
+/* The Measurements switch sits after Appearance. Flex + center so the switch
+   and its text label line up on one baseline (a plain <label> would leave the
+   text riding high against the switch). */
+.portal-measure {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+/*
+ * Live token measurements overlay (PrimeNG-designer style).
+ *
+ * The stage is the positioning context for the frame; the overlay is a sibling
+ * of the frame (not a child), so the frame's `overflow: hidden` does not clip
+ * the pills that overhang its edges. The overlay never eats pointer events.
+ */
+.portal-stage {
+  position: relative;
+}
+.portal-annotation-probe {
+  position: absolute;
+  inline-size: 0;
+  block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.portal-annotations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 3;
+}
+.portal-stage.annotations-off .portal-annotations {
+  display: none;
+}
+/* The SVG draws the geometry (radius circles, padding + font calipers) in the
+   stage's own pixel space; overflow visible so a circle or cap near an edge is
+   not clipped. */
+.portal-measure-svg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+}
+.mm-radius {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 2;
+}
+.mm-padding {
+  stroke: #f43f5e;
+  stroke-width: 2;
+}
+.mm-font {
+  stroke: #10b981;
+  stroke-width: 2;
+}
+.mm-primary {
+  stroke: #7c3aed;
+  stroke-width: 2;
+}
+.mm-surface {
+  stroke: #d97706;
+  stroke-width: 2;
+}
+/* Dashed leader from a value chip to the geometry it measures, plus the
+   anchor dot at the measured point. Thinner and softer than the geometry so
+   the marks stay the loudest ink. */
+.mm-lead {
+  stroke-width: 1.25;
+  stroke-dasharray: 4 4;
+  opacity: 0.55;
+}
+.mm-dot {
+  stroke: none;
+}
+.mm-dot.mm-radius {
+  fill: #2563eb;
+}
+.mm-dot.mm-padding {
+  fill: #f43f5e;
+}
+.mm-dot.mm-font {
+  fill: #10b981;
+}
+.mm-dot.mm-primary {
+  fill: #7c3aed;
+}
+.mm-dot.mm-surface {
+  fill: #d97706;
+}
+/* Value labels float over the SVG, centred on the point they are handed. */
+.portal-measure-labels {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.mm-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid;
+  box-shadow: 0 2px 10px rgb(15 23 42 / 16%);
+}
+/* Callout alignment: chips grow away from the frame edge they sit against. */
+.mm-label.mm-align-end {
+  transform: translate(-100%, -50%);
+}
+.mm-label.mm-align-start {
+  transform: translate(0, -50%);
+}
+.mm-l-radius {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+.mm-l-primary {
+  background: #ede9fe;
+  color: #6d28d9;
+  border-color: #c4b5fd;
+}
+.mm-l-padding {
+  background: #ffe4e6;
+  color: #be123c;
+  border-color: #fda4af;
+}
+.mm-l-font {
+  background: #d1fae5;
+  color: #047857;
+  border-color: #6ee7b7;
+}
+.mm-l-surface {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+@media (max-width: 720px) {
+  /* The pills crowd a narrow portal; hide them there rather than overlap the UI. */
+  .portal-annotations {
+    display: none;
+  }
+}
+/* The frame animates its re-theme so a switch reads as a smooth transition
+   rather than a hard cut. Paint-only tokens interpolate; nothing here reflows. */
+.portal-frame,
+.portal-frame fluid-card::part(base),
+.portal-frame fluid-input::part(base) {
+  transition:
+    background-color 500ms ease,
+    border-color 500ms ease,
+    backdrop-filter 500ms ease;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.15fr;
+  /* Two KPIs and the revenue line share the left two columns; the traffic
+     card spans both rows on the right, its donut reading as the top and its
+     breakdown list as the bottom. */
+  grid-template-areas:
+    "balance netflow traffic"
+    "revenue revenue traffic";
+  gap: 1.25rem;
+  align-items: stretch;
+}
+.kpi-balance {
+  grid-area: balance;
+}
+.kpi-netflow {
+  grid-area: netflow;
+}
+.portal-chart-card {
+  grid-area: revenue;
+}
+.portal-donut-card {
+  grid-area: traffic;
+}
+/* Fill the tall traffic card: let its body grow and pin the footer to the
+   bottom, so the card reads as full instead of floating with an empty base. */
+/* Fill the tall traffic card: the base spans the full card height and the body
+   grows inside it, so the footer (margin-top:auto) reaches the very bottom and
+   the card sits flush with the revenue card beside it. */
+.portal-donut-card::part(base) {
+  block-size: 100%;
+}
+.portal-donut-card::part(body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.portal-traffic-foot {
+  margin-block-start: auto;
+  padding-block-start: 0.85rem;
+  border-block-start: 1px solid var(--fluid-border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.portal-traffic-note {
+  font-size: 0.78rem;
+  color: var(--fluid-text-secondary);
+}
+/* Page-title block + range tools above the stats. */
+.portal-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.portal-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fluid-text-secondary);
+}
+.portal-title {
+  margin: 0.15rem 0 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+.portal-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--fluid-text-secondary);
+}
+.portal-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.portal-table-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+}
+.portal-grid .card-h {
+  margin-block-end: 0.6rem;
+}
+
+/* Narrow: the sidebar folds away and the content grid stacks. */
+@media (max-width: 56rem) {
+  .portal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .portal-side {
+    display: none;
+  }
+  .portal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "balance netflow"
+      "revenue revenue"
+      "traffic traffic";
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -202,84 +1173,6 @@ section.row > p.subhead {
 }
 
 /* ------------------------------------------------------------------ */
-/* Before/after panes inside <fluid-comparison>.
- *
- * The "before" pane wraps its content in `.fluid-comparison-before-isolate`
- * which strips the Fluid variables so the content renders with raw
- * browser defaults, same DOM, no styling. The "after" pane uses Fluid
- * components normally. The visual difference is the entire point.
- */
-.compare-pane {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  padding: 2.25rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  overflow: hidden;
-}
-.compare-pane.before {
-  background: #f8fafc;
-  color: #1f2937;
-  font-family: "Times New Roman", Times, serif;
-}
-.compare-pane.before label {
-  display: block;
-  margin-bottom: 0.25rem;
-}
-.compare-pane.before input,
-.compare-pane.before button {
-  font-family: inherit;
-  font-size: inherit;
-}
-.compare-pane.before .label-rough {
-  font-weight: bold;
-  font-style: italic;
-}
-.compare-pane.after {
-  background: var(--fluid-surface-base);
-  color: var(--fluid-text-primary);
-}
-.compare-pane.after fluid-input,
-.compare-pane.after fluid-button {
-  /* Components manage their own width; spread these to full-width inside the pane. */
-  width: 100%;
-}
-/* The switch is a labeled inline control: it should hug its label, not stretch
-   to the full pane (a full-width switch made its label sit far right). */
-.compare-pane.after fluid-switch {
-  align-self: start;
-}
-
-.compare-tag-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-}
-
-.compare-pane .pane-label {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.compare-pane.before .pane-label {
-  background: #cbd5e1;
-  color: #1e293b;
-}
-.compare-pane.after .pane-label {
-  background: var(--fluid-accent-base);
-  color: white;
-}
-
-/* ------------------------------------------------------------------ */
 /* Footer */
 
 footer.site-footer {
@@ -304,6 +1197,10 @@ footer.site-footer a {
   }
   nav.primary {
     width: 100%;
+    /* Without this the flex item's `min-width: auto` floors it at its
+       min-content width, so `overflow-x` never engages and the whole
+       document scrolls sideways instead of just this row. */
+    min-width: 0;
     overflow-x: auto;
     padding-block-end: 0.25rem;
   }
@@ -313,37 +1210,59 @@ footer.site-footer a {
 }
 
 /* ------------------------------------------------------------------ */
-/* Hero extras: badges + the live theme switcher                       */
+/* Hero extras: badges. The live theme switcher lives in the nav.     */
 
 .hero-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: center;
 }
-.theme-switch {
-  margin: 2.5rem auto 0;
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem 1rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--fluid-border-default);
-  border-radius: var(--fluid-radius-lg, 0.75rem);
-  background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
-}
-.theme-switch-label {
+/* Nav theme switcher: brand select + dark toggle, separated from the
+   page links by a hairline so it reads as a control, not a destination. */
+.nav-theme {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-weight: 600;
-  font-size: 0.9rem;
+  gap: 0.35rem;
+  margin-inline-start: 0.35rem;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 1px solid var(--fluid-border-default);
 }
-.theme-switch-note {
-  margin: 0.75rem auto 0;
-  color: var(--fluid-text-secondary);
-  font-size: 0.9rem;
+@media (max-width: 700px) {
+  .nav-theme {
+    display: none;
+  }
+}
+
+/* One column below 72rem: copy first, then the collage. The stage stops being
+   a fixed canvas; its two columns sit side by side in normal flow and wrap
+   under each other when even that is too wide. */
+@media (max-width: 72rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+    max-width: 44rem;
+  }
+  .hero-stage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 2rem;
+    inline-size: auto;
+    block-size: auto;
+    /* Drop the framed-canvas chrome on narrow screens: the frame and its
+       caption are decorative, and the two pieces read fine on their own. */
+    border: 0;
+    background: none;
+    padding: 0;
+  }
+  .hero-stage::before,
+  .hero-stage-tag {
+    display: none;
+  }
+  .hero-stage .pin {
+    position: static;
+    inset: auto;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -418,7 +1337,9 @@ footer.site-footer a {
 
 .chart-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  /* minmax(0, …) lets the columns shrink below the charts' intrinsic canvas
+     width, otherwise the doughnut card overflows the viewport around 1000px. */
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: 1.25rem;
 }
 .card-h {
@@ -429,6 +1350,385 @@ footer.site-footer a {
   .chart-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion / animation demo */
+
+/* A full-bleed band so the animation moment reads as its own section, not just
+   another centred row. Body has no padding, so a non-.row section spans the
+   viewport; the inner wrapper re-centres the content to the row width. */
+.motion-band {
+  margin: 0 0 4.5rem;
+  padding: 3.5rem 1.25rem 4rem;
+  background:
+    radial-gradient(
+      120% 130% at 50% 0%,
+      color-mix(in srgb, var(--fluid-accent-base) 12%, transparent),
+      transparent 60%
+    ),
+    var(--fluid-surface-subtle);
+  border-block: 1px solid var(--fluid-border-default);
+}
+.motion-band-inner {
+  max-width: 64rem;
+  margin: 0 auto;
+}
+.motion-eyebrow {
+  display: block;
+  text-align: center;
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--fluid-accent-base);
+  margin-block-end: 0.5rem;
+}
+.motion-band h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  text-align: center;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.motion-band .subhead {
+  text-align: center;
+  color: var(--fluid-text-secondary);
+  max-width: 44rem;
+  margin: 0 auto 2rem;
+}
+.motion-cta {
+  text-align: center;
+  margin-block-start: 1.75rem;
+}
+
+.motion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.motion-copy {
+  margin: 0 0 0.9rem;
+  color: var(--fluid-text-secondary);
+  font-size: 0.95rem;
+}
+.motion-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-block-end: 1rem;
+}
+.motion-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: 3.25rem;
+  margin-block-end: 1rem;
+}
+.motion-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--fluid-radius-full, 999px);
+  background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
+  color: var(--fluid-accent-base);
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.motion-code {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--fluid-radius-md, 0.5rem);
+  background: var(--fluid-surface-muted);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* Standalone animations page (/animations.html) */
+
+/* Token-painted so the header's brand + dark toggle actually reskins the whole
+   page (the shared body rule stays token-free for the always-light main page). */
+.anim-page {
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+}
+.anim-brand-picker {
+  inline-size: 8.5rem;
+}
+.anim-hero {
+  max-width: 52rem;
+  margin: 3.5rem auto 4rem;
+  padding: 0 1.25rem;
+  text-align: center;
+}
+.anim-hero-title {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0.25rem 0 1rem;
+}
+.anim-hero-lead {
+  color: var(--fluid-text-secondary);
+  font-size: 1.05rem;
+  max-width: 42rem;
+  margin: 0 auto 1.75rem;
+}
+.anim-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+}
+.anim-install {
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--fluid-radius-md, 0.5rem);
+  background: var(--fluid-surface-muted);
+  border: 1px solid var(--fluid-border-default);
+}
+.anim-effects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin-block-end: 1.5rem;
+}
+.anim-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.1rem 0.75rem;
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  border: 1px solid var(--fluid-border-default);
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform var(--fluid-duration-fast, 120ms) ease,
+    border-color var(--fluid-duration-fast, 120ms) ease,
+    background var(--fluid-duration-fast, 120ms) ease;
+}
+.anim-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--fluid-accent-base);
+}
+.anim-tile:focus-visible {
+  outline: var(--fluid-focus-ring-width, 2px) solid
+    var(--fluid-focus-ring-color, var(--fluid-accent-base));
+  outline-offset: 2px;
+}
+.anim-tile-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.anim-tile-kind {
+  color: var(--fluid-text-secondary);
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.anim-tile[aria-pressed="true"] {
+  border-color: var(--fluid-accent-base);
+  background: color-mix(in srgb, var(--fluid-accent-base) 12%, var(--fluid-surface-base));
+}
+.anim-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-block-end: 1.5rem;
+}
+.anim-chip {
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--fluid-radius-full, 999px);
+  border: 1px solid var(--fluid-border-default);
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.anim-chip:hover {
+  border-color: var(--fluid-accent-base);
+  color: var(--fluid-accent-base);
+}
+.anim-chip:focus-visible {
+  outline: var(--fluid-focus-ring-width, 2px) solid
+    var(--fluid-focus-ring-color, var(--fluid-accent-base));
+  outline-offset: 2px;
+}
+.anim-install-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.anim-foot-note {
+  text-align: center;
+  color: var(--fluid-text-secondary);
+  font-size: 0.9rem;
+  margin-block-start: 1.5rem;
+}
+.anim-footer {
+  text-align: center;
+  padding: 3rem 1.25rem 4rem;
+  border-block-start: 1px solid var(--fluid-border-default);
+  background: var(--fluid-surface-subtle);
+}
+.anim-footer .brand {
+  display: inline-flex;
+  margin: 0 auto 0.5rem;
+}
+.anim-footer-links {
+  color: var(--fluid-text-secondary);
+  margin: 0.25rem 0;
+}
+.anim-footer-fine {
+  color: var(--fluid-text-secondary);
+  font-size: 0.82rem;
+  margin: 0.5rem 0 0;
+}
+.anim-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1rem 1.5rem;
+  padding: 1.1rem 1.25rem;
+  margin-block-end: 1.5rem;
+  border: 1px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  background: var(--fluid-surface-subtle);
+}
+.anim-control-heading {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid var(--fluid-border-default);
+}
+.anim-control-heading strong {
+  font-size: 1rem;
+}
+.anim-control-heading span {
+  color: var(--fluid-text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.anim-control-heading .anim-effect-description {
+  margin-inline-start: auto;
+  font-size: 0.82rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.anim-control-fields {
+  display: contents;
+}
+.anim-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.anim-control[hidden] {
+  display: none;
+}
+[data-multi-origin][hidden] {
+  display: none;
+}
+.anim-control-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--fluid-text-secondary);
+}
+/* The switch is shorter than the select and sliders. Keep its label on top like
+   every other control, then drop the toggle into a slot the same height as the
+   select so the toggle's center lines up with the dropdown beside it, instead of
+   floating up toward the labels. This does not depend on the grid row height, so
+   it holds at any viewport width. */
+.anim-control--switch .anim-switch-slot {
+  display: flex;
+  align-items: center;
+  min-block-size: 38px;
+}
+.anim-control-label b {
+  color: var(--fluid-accent-base);
+  font-variant-numeric: tabular-nums;
+}
+#effect-fire {
+  align-self: end;
+  justify-self: start;
+  inline-size: max-content;
+  max-inline-size: 100%;
+  block-size: fit-content;
+}
+.anim-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 9rem;
+  margin-block-end: 1.5rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--fluid-border-default);
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  background: var(--fluid-surface-subtle);
+  overflow: hidden;
+}
+.anim-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: var(--fluid-radius-lg, 0.75rem);
+  border: 1px solid var(--fluid-accent-base);
+  background: var(--fluid-surface-base);
+  color: var(--fluid-text-primary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  box-shadow: var(--fluid-shadow-md);
+}
+.anim-preview-emoji {
+  color: var(--fluid-accent-base);
+  font-size: 1.35rem;
+}
+.anim-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: -0.5rem 0 1rem;
+}
+.anim-preview-timing {
+  color: var(--fluid-text-secondary);
+  font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
+  font-size: 0.78rem;
+}
+.anim-chip[aria-pressed="true"] {
+  border-color: var(--fluid-accent-base);
+  background: color-mix(in srgb, var(--fluid-accent-base) 14%, var(--fluid-surface-base));
+  color: var(--fluid-accent-base);
+}
+.anim-origin-demo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-block-start: 1rem;
+  color: var(--fluid-text-secondary);
+  font-size: 0.9rem;
 }
 
 /* ------------------------------------------------------------------ */
@@ -572,6 +1872,10 @@ footer.site-footer a {
 .cta-row .cta-inner {
   text-align: center;
   padding: 1.5rem 1rem;
+}
+/* .hero-actions is left-aligned for the hero; the closing card centers it. */
+.cta-row .hero-actions {
+  justify-content: center;
 }
 .footer-links {
   display: flex;

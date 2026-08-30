@@ -1,11 +1,4 @@
-import {
-  expect,
-  fixture,
-  html,
-  oneEvent,
-  elementUpdated,
-  aTimeout
-} from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, elementUpdated, aTimeout } from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
 import type {
@@ -15,7 +8,9 @@ import type {
 } from "../../index.js";
 
 // @ts-expect-error Context-menu lifecycle detail is exactly null.
-const invalidContextMenuEvent: FluidContextMenuShowEvent = new CustomEvent("fluid-show", { detail: 1 });
+const invalidContextMenuEvent: FluidContextMenuShowEvent = new CustomEvent("fluid-show", {
+  detail: 1
+});
 void invalidContextMenuEvent;
 
 const sampleItems = [
@@ -55,7 +50,8 @@ describe("<fluid-context-menu>", () => {
     const events: string[] = [];
     wrapper.addEventListener("fluid-hide", () => events.push("hide"));
     const focusedBefore = document.activeElement;
-    wrapper.innerHTML = '<fluid-context-menu><button slot="trigger">Target</button></fluid-context-menu>';
+    wrapper.innerHTML =
+      '<fluid-context-menu><button slot="trigger">Target</button></fluid-context-menu>';
     const el = wrapper.querySelector<FluidContextMenu>("fluid-context-menu")!;
     await elementUpdated(el);
     expect(events).to.deep.equal([]);
@@ -69,7 +65,9 @@ describe("<fluid-context-menu>", () => {
     await el.updateComplete;
     const menu = el.shadowRoot!.querySelector<HTMLElement>("fluid-menu")!;
     let lateFocusCalls = 0;
-    menu.focus = () => { lateFocusCalls++; };
+    menu.focus = () => {
+      lateFocusCalls++;
+    };
     el.hide();
     await el.updateComplete;
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -78,7 +76,9 @@ describe("<fluid-context-menu>", () => {
   });
 
   it("closes when focus leaves without pulling focus back to the trigger", async () => {
-    const wrapper = await fixture<HTMLDivElement>(html`<div>${basic()}<button id="after">After menu</button></div>`);
+    const wrapper = await fixture<HTMLDivElement>(
+      html`<div>${basic()}<button id="after">After menu</button></div>`
+    );
     const el = wrapper.querySelector<FluidContextMenu>("fluid-context-menu")!;
     const after = wrapper.querySelector<HTMLButtonElement>("#after")!;
     trigger(el).focus();
@@ -175,9 +175,7 @@ describe("<fluid-context-menu>", () => {
   it("the ContextMenu key on the trigger opens the menu", async () => {
     const el = await fixture<FluidContextMenu>(basic());
     await elementUpdated(el);
-    trigger(el).dispatchEvent(
-      new KeyboardEvent("keydown", { key: "ContextMenu", bubbles: true })
-    );
+    trigger(el).dispatchEvent(new KeyboardEvent("keydown", { key: "ContextMenu", bubbles: true }));
     await elementUpdated(el);
     expect(el.open).to.be.true;
   });

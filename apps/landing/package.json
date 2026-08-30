@@ -20,6 +20,7 @@
     "@fluid-ds/tokens": "workspace:*",
     "lit": "^3.2.1",
     "@fluid-ds/qr": "workspace:*",
+    "@fluid-ds/table": "workspace:*",
     "@fluid-ds/animations": "workspace:*",
     "@fluid-ds/parser": "workspace:*"
   },

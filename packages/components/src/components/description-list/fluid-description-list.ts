@@ -70,10 +70,7 @@ export class FluidDescriptionList extends FluidElement {
       display: grid;
       grid-template-columns: repeat(
         var(--_dl-columns, 2),
-        minmax(
-          min(100%, var(--fluid-description-list-min-column, 16rem)),
-          1fr
-        )
+        minmax(min(100%, var(--fluid-description-list-min-column, 16rem)), 1fr)
       );
       column-gap: var(--fluid-description-list-column-gap, var(--fluid-space-6));
       row-gap: var(--fluid-description-list-gap, var(--fluid-space-3));
@@ -86,8 +83,7 @@ export class FluidDescriptionList extends FluidElement {
      * row rule.
      */
     :host([divider]) ::slotted(fluid-description-item:not(:first-child)) {
-      border-top: 1px solid
-        var(--fluid-description-list-divider-color, var(--fluid-border-default));
+      border-top: 1px solid var(--fluid-description-list-divider-color, var(--fluid-border-default));
       padding-top: var(--fluid-description-list-gap, var(--fluid-space-3));
     }
   `;
@@ -125,11 +121,7 @@ export class FluidDescriptionList extends FluidElement {
     this.syncItems();
   }
 
-  override attributeChangedCallback(
-    name: string,
-    old: string | null,
-    value: string | null
-  ): void {
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
     // Ignore the attribute change we trigger ourselves when mirroring `columns`,
     // so writing the attribute never parses back into (and clobbers) the property.
     if (name === "columns" && this.syncingColumnsAttr) return;
@@ -161,9 +153,7 @@ export class FluidDescriptionList extends FluidElement {
   }
 
   private getItems(): FluidDescriptionItem[] {
-    return Array.from(
-      this.querySelectorAll("fluid-description-item")
-    ) as FluidDescriptionItem[];
+    return Array.from(this.querySelectorAll("fluid-description-item")) as FluidDescriptionItem[];
   }
 
   /**

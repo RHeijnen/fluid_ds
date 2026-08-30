@@ -16,10 +16,14 @@ const meta: Meta = {
   title: "Scheduler/Time slots",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   render: () => html`
-    <fluid-time-slots date="2026-06-15" .slots=${SLOTS} style="max-width: 24rem;"></fluid-time-slots>
+    <fluid-time-slots
+      date="2026-06-15"
+      .slots=${SLOTS}
+      style="max-width: 24rem;"
+    ></fluid-time-slots>
   `
 };
 
@@ -30,13 +34,23 @@ export const Default: Story = {};
 
 export const WithSelection: Story = {
   render: () => html`
-    <fluid-time-slots date="2026-06-15" .slots=${SLOTS} value="2026-06-15T09:30" style="max-width: 24rem;"></fluid-time-slots>
+    <fluid-time-slots
+      date="2026-06-15"
+      .slots=${SLOTS}
+      value="2026-06-15T09:30"
+      style="max-width: 24rem;"
+    ></fluid-time-slots>
   `
 };
 
 export const TwelveHour: Story = {
   render: () => html`
-    <fluid-time-slots date="2026-06-15" .slots=${SLOTS} time-format="12h" style="max-width: 24rem;"></fluid-time-slots>
+    <fluid-time-slots
+      date="2026-06-15"
+      .slots=${SLOTS}
+      time-format="12h"
+      style="max-width: 24rem;"
+    ></fluid-time-slots>
   `
 };
 
@@ -55,7 +69,12 @@ export const GeneratedFromAvailability: Story = {
     <fluid-time-slots
       date="2030-01-07"
       .availability=${{
-        weekly: { 1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "16:00" }] },
+        weekly: {
+          1: [
+            { start: "09:00", end: "12:00" },
+            { start: "13:00", end: "16:00" }
+          ]
+        },
         slotMinutes: 30
       }}
       style="max-width: 24rem;"

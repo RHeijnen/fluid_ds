@@ -22,7 +22,7 @@ const meta: Meta = {
   title: "Expansion/Markdown",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     value: { control: "text" },

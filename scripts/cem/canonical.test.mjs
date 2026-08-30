@@ -194,7 +194,13 @@ test("repository analysis resolves all 155 actual registrations and leaves paylo
   });
   assert.equal(anchorNav["x-fluid-event-contract"].detailType, "FluidAnchorNavActiveChangeDetail");
   for (const [tag, eventName, eventType, detailType, dispatches] of [
-    ["fluid-file-input", "fluid-change", "FluidFileInputChangeEvent", "FluidFileInputChangeDetail", 2],
+    [
+      "fluid-file-input",
+      "fluid-change",
+      "FluidFileInputChangeEvent",
+      "FluidFileInputChangeDetail",
+      2
+    ],
     ["fluid-dropzone", "fluid-change", "FluidDropzoneChangeEvent", "FluidDropzoneChangeDetail", 2],
     ["fluid-dropzone", "fluid-reject", "FluidDropzoneRejectEvent", "FluidDropzoneRejectDetail", 1],
     ["fluid-form", "fluid-invalid", "FluidFormInvalidEvent", "FluidFormInvalidDetail", 1],

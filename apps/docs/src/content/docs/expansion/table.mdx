@@ -3,6 +3,8 @@ title: "@fluid-ds/table"
 description: "Accessible tables for static and asynchronously loaded operational data."
 ---
 
+import TableDemo from "../../../components/TableDemo.astro";
+
 The table expansion pack provides two deliberately separate components.
 `<fluid-table>` renders a compact semantic
 `<table>` with a `<caption>`, `<th scope="col">` headers, and a data-driven
@@ -11,6 +13,17 @@ checkboxes, fully themable through `--fluid-table-*` tokens, and works in any
 framework. `<fluid-infinite-table>` handles large asynchronously loaded
 datasets with rich cell templates, sticky projected filters and headers,
 windowed rows, column configuration, and an infinite-load event.
+
+The table below is live over 500 generated deployment records: scroll it and
+only a small window of rows ever exists in the DOM (the readout underneath
+counts them), click a header to sort, open the Columns dialog, and keep
+scrolling to trigger the infinite-load sentinel.
+
+<TableDemo />
+
+See it running: the [data table demo](/demos/data-table/) puts
+`<fluid-infinite-table>` on a large dataset with windowed rows, infinite
+loading, sorting, filters, a column manager and a persisted layout.
 
 ## Install
 
@@ -27,9 +40,9 @@ import "@fluid-ds/table/define/infinite-table";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
-| `<fluid-table>` | Accessible data table: column-driven, sortable headers, optional row selection, themable. |
+| Tag                      | Use                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `<fluid-table>`          | Accessible data table: column-driven, sortable headers, optional row selection, themable.                                 |
 | `<fluid-infinite-table>` | Template-driven operational table: infinite loading, row windowing, sticky filters and headers, and configurable columns. |
 
 ## Use
@@ -215,93 +228,93 @@ of `configurable`, only the button is gated.
 
 ### Infinite table properties
 
-| Property | Type | Default | Notes |
-| --- | --- | --- | --- |
-| `columns` | `FluidInfiniteTableColumn[]` | `[]` | Supports nested `path`, width, visibility, sorting, and header/cell renderers. |
-| `rows` | `Record<string, unknown>[]` | `[]` | Currently loaded records. |
-| `total` | `number` | `0` | Total matching records reported by the data source. |
-| `available-total` | `number` | `0` | Optional unfiltered total shown after the matching count. |
-| `loading` | `boolean` | `false` | Announces the loading state. |
-| `has-more` | `boolean` | `false` | Enables the infinite-load sentinel. |
-| `virtual` | `boolean` | `true` | Windows loaded rows to bound DOM size. |
-| `row-height` | `number` | `64` | Fixed row height used by the windowing calculation. |
-| `overscan` | `number` | `6` | Extra rows rendered above and below the viewport. |
-| `scroll-mode` | `"document" \| "container"` | `"document"` | Uses page scrolling or a constrained component viewport. |
-| `configurable` | `boolean` | `false` | Exposes the column visibility and ordering dialog. |
-| `clickable` | `boolean` | `false` | Makes rows keyboard-focusable and emits row activation from Enter or Space. |
-| `layout` | `FluidInfiniteTableLayoutItem[]` | `[]` | Restores a previously saved layout. |
-| `reorderable-columns` | `boolean` | `false` | Columns can be dragged, or moved from the keyboard, into another order. |
-| `resizable-columns` | `boolean` | `false` | Column widths can be dragged, auto-fitted, or stepped from the keyboard. |
-| `column-scroll` | `boolean` | `false` | Opt-in horizontal column scrollbar between header and rows (see above). |
-| `row-key` | `string` | `"id"` | Row field used as the stable row identity. |
-| `error` | `string` | `""` | Error message; when set, the error state (or the `error` slot) is shown. |
-| `resize-column-label` | `string` | `"Resize {column}"` | Accessible name for a resize grip. |
-| `reorder-column-label` | `string` | `"Reorder {column}"` | Accessible name for a reorder handle. |
-| `column-position-label` | `string` | `"{column}, column {position} of {count}"` | Announcement while a column is moved. |
+| Property                | Type                             | Default                                    | Notes                                                                          |
+| ----------------------- | -------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------ |
+| `columns`               | `FluidInfiniteTableColumn[]`     | `[]`                                       | Supports nested `path`, width, visibility, sorting, and header/cell renderers. |
+| `rows`                  | `Record<string, unknown>[]`      | `[]`                                       | Currently loaded records.                                                      |
+| `total`                 | `number`                         | `0`                                        | Total matching records reported by the data source.                            |
+| `available-total`       | `number`                         | `0`                                        | Optional unfiltered total shown after the matching count.                      |
+| `loading`               | `boolean`                        | `false`                                    | Announces the loading state.                                                   |
+| `has-more`              | `boolean`                        | `false`                                    | Enables the infinite-load sentinel.                                            |
+| `virtual`               | `boolean`                        | `true`                                     | Windows loaded rows to bound DOM size.                                         |
+| `row-height`            | `number`                         | `64`                                       | Fixed row height used by the windowing calculation.                            |
+| `overscan`              | `number`                         | `6`                                        | Extra rows rendered above and below the viewport.                              |
+| `scroll-mode`           | `"document" \| "container"`      | `"document"`                               | Uses page scrolling or a constrained component viewport.                       |
+| `configurable`          | `boolean`                        | `false`                                    | Exposes the column visibility and ordering dialog.                             |
+| `clickable`             | `boolean`                        | `false`                                    | Makes rows keyboard-focusable and emits row activation from Enter or Space.    |
+| `layout`                | `FluidInfiniteTableLayoutItem[]` | `[]`                                       | Restores a previously saved layout.                                            |
+| `reorderable-columns`   | `boolean`                        | `false`                                    | Columns can be dragged, or moved from the keyboard, into another order.        |
+| `resizable-columns`     | `boolean`                        | `false`                                    | Column widths can be dragged, auto-fitted, or stepped from the keyboard.       |
+| `column-scroll`         | `boolean`                        | `false`                                    | Opt-in horizontal column scrollbar between header and rows (see above).        |
+| `row-key`               | `string`                         | `"id"`                                     | Row field used as the stable row identity.                                     |
+| `error`                 | `string`                         | `""`                                       | Error message; when set, the error state (or the `error` slot) is shown.       |
+| `resize-column-label`   | `string`                         | `"Resize {column}"`                        | Accessible name for a resize grip.                                             |
+| `reorder-column-label`  | `string`                         | `"Reorder {column}"`                       | Accessible name for a reorder handle.                                          |
+| `column-position-label` | `string`                         | `"{column}, column {position} of {count}"` | Announcement while a column is moved.                                          |
 
 ### Infinite table methods
 
-| Method | Purpose |
-| --- | --- |
+| Method                | Purpose                                                                                                                                                          |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `openColumnManager()` | Opens the column configuration dialog. Public so a host that hides the built-in button (`configurable=false`) can reach the dialog from its own toolbar control. |
 
 ### Infinite table slots
 
-| Slot | Content |
-| --- | --- |
-| `filters` | Application-owned filter controls rendered above the header. |
-| `toolbar-actions` | Host controls placed at the end of the toolbar, after the row count and the built-in Columns button. |
-| `toolbar-secondary` | Full-width second toolbar line; removed from layout when empty. |
-| `empty` | Empty-result content. |
-| `error` | Error content, shown when `error` is set. |
+| Slot                | Content                                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| `filters`           | Application-owned filter controls rendered above the header.                                         |
+| `toolbar-actions`   | Host controls placed at the end of the toolbar, after the row count and the built-in Columns button. |
+| `toolbar-secondary` | Full-width second toolbar line; removed from layout when empty.                                      |
+| `empty`             | Empty-result content.                                                                                |
+| `error`             | Error content, shown when `error` is set.                                                            |
 
 ### Infinite table events
 
-| Event | Detail | When |
-| --- | --- | --- |
-| `fluid-load-more` | `{ offset }` | The load sentinel approaches the viewport. |
-| `fluid-sort` | `{ key, dir }` | A sortable header is activated. |
-| `fluid-column-layout-change` | `{ layout }` | Column visibility, order, or width changes; complete and ready to persist. |
-| `fluid-row-click` | `{ row, rowIndex, originalEvent }` | A non-interactive row area is activated. |
+| Event                        | Detail                             | When                                                                       |
+| ---------------------------- | ---------------------------------- | -------------------------------------------------------------------------- |
+| `fluid-load-more`            | `{ offset }`                       | The load sentinel approaches the viewport.                                 |
+| `fluid-sort`                 | `{ key, dir }`                     | A sortable header is activated.                                            |
+| `fluid-column-layout-change` | `{ layout }`                       | Column visibility, order, or width changes; complete and ready to persist. |
+| `fluid-row-click`            | `{ row, rowIndex, originalEvent }` | A non-interactive row area is activated.                                   |
 
 ### Infinite table theming
 
 Each styled property reads a `--fluid-infinite-table-*` token that falls back
 to a Fluid semantic variable:
 
-| Token | Purpose |
-| --- | --- |
-| `--fluid-infinite-table-bg` | Table background. |
-| `--fluid-infinite-table-fg` | Table foreground. |
-| `--fluid-infinite-table-border` | Border color. |
-| `--fluid-infinite-table-header-bg` | Sticky header background. |
-| `--fluid-infinite-table-toolbar-bg` | Sticky toolbar background. |
-| `--fluid-infinite-table-row-hover-bg` | Hovered row background. |
-| `--fluid-infinite-table-radius` | Outer radius. |
-| `--fluid-infinite-table-cell-padding` | Cell padding. |
-| `--fluid-infinite-table-height` | Container-scroll height. |
-| `--fluid-infinite-table-sticky-offset` | Offset below app chrome. |
-| `--fluid-infinite-table-grip-color` | Resting color of a resize grip and a reorder handle. |
-| `--fluid-infinite-table-grip-active-color` | Color of a grip being hovered, focused, or dragged. |
+| Token                                      | Purpose                                              |
+| ------------------------------------------ | ---------------------------------------------------- |
+| `--fluid-infinite-table-bg`                | Table background.                                    |
+| `--fluid-infinite-table-fg`                | Table foreground.                                    |
+| `--fluid-infinite-table-border`            | Border color.                                        |
+| `--fluid-infinite-table-header-bg`         | Sticky header background.                            |
+| `--fluid-infinite-table-toolbar-bg`        | Sticky toolbar background.                           |
+| `--fluid-infinite-table-row-hover-bg`      | Hovered row background.                              |
+| `--fluid-infinite-table-radius`            | Outer radius.                                        |
+| `--fluid-infinite-table-cell-padding`      | Cell padding.                                        |
+| `--fluid-infinite-table-height`            | Container-scroll height.                             |
+| `--fluid-infinite-table-sticky-offset`     | Offset below app chrome.                             |
+| `--fluid-infinite-table-grip-color`        | Resting color of a resize grip and a reorder handle. |
+| `--fluid-infinite-table-grip-active-color` | Color of a grip being hovered, focused, or dragged.  |
 
 ## API
 
 ### Properties
 
-| Property | Type | Default | Notes |
-| --- | --- | --- | --- |
-| `columns` | `{ key, label, sortable?, align? }[]` | `[]` | Column definitions. `align` is `"start" \| "center" \| "end"`. |
-| `rows` | `Record<string, unknown>[]` | `[]` | Row data keyed by `column.key`. |
-| `selectable` | `boolean` | `false` | Adds a leading select-all + per-row checkbox column. |
-| `sort` | `{ key, dir: "asc" \| "desc" } \| null` | `null` | Current sort. Set it to control sorting, or let the headers drive it. |
-| `caption` | `string` | `""` | Table caption text. |
-| `hide-caption` | `boolean` | `false` | Keep the caption for screen readers but hide it visually. |
+| Property       | Type                                    | Default | Notes                                                                 |
+| -------------- | --------------------------------------- | ------- | --------------------------------------------------------------------- |
+| `columns`      | `{ key, label, sortable?, align? }[]`   | `[]`    | Column definitions. `align` is `"start" \| "center" \| "end"`.        |
+| `rows`         | `Record<string, unknown>[]`             | `[]`    | Row data keyed by `column.key`.                                       |
+| `selectable`   | `boolean`                               | `false` | Adds a leading select-all + per-row checkbox column.                  |
+| `sort`         | `{ key, dir: "asc" \| "desc" } \| null` | `null`  | Current sort. Set it to control sorting, or let the headers drive it. |
+| `caption`      | `string`                                | `""`    | Table caption text.                                                   |
+| `hide-caption` | `boolean`                               | `false` | Keep the caption for screen readers but hide it visually.             |
 
 ### Events
 
-| Event | Detail | When |
-| --- | --- | --- |
-| `fluid-sort` | `{ key, dir }` | A sortable header was toggled. |
+| Event                    | Detail                   | When                           |
+| ------------------------ | ------------------------ | ------------------------------ |
+| `fluid-sort`             | `{ key, dir }`           | A sortable header was toggled. |
 | `fluid-selection-change` | `{ selected: string[] }` | The selected row keys changed. |
 
 ### Parts
@@ -315,18 +328,18 @@ Each styled property reads a component token that falls back to a Fluid
 semantic variable, so brand themes flow through automatically and you can
 override one table, all tables, or a single instance:
 
-| Token | Falls back to |
-| --- | --- |
-| `--fluid-table-bg` | `--fluid-surface-base` |
-| `--fluid-table-fg` | `--fluid-text-primary` |
-| `--fluid-table-header-bg` | `--fluid-surface-muted` |
-| `--fluid-table-header-fg` | `--fluid-text-primary` |
-| `--fluid-table-border` | `--fluid-border-default` |
-| `--fluid-table-row-hover-bg` | `--fluid-surface-muted` |
-| `--fluid-table-selected-bg` | a tint of `--fluid-accent-base` |
-| `--fluid-table-zebra-bg` | `transparent` (zebra off) |
-| `--fluid-table-radius` | `--fluid-radius-md` |
-| `--fluid-table-cell-padding` | `0.625rem 0.75rem` |
+| Token                        | Falls back to                   |
+| ---------------------------- | ------------------------------- |
+| `--fluid-table-bg`           | `--fluid-surface-base`          |
+| `--fluid-table-fg`           | `--fluid-text-primary`          |
+| `--fluid-table-header-bg`    | `--fluid-surface-muted`         |
+| `--fluid-table-header-fg`    | `--fluid-text-primary`          |
+| `--fluid-table-border`       | `--fluid-border-default`        |
+| `--fluid-table-row-hover-bg` | `--fluid-surface-muted`         |
+| `--fluid-table-selected-bg`  | a tint of `--fluid-accent-base` |
+| `--fluid-table-zebra-bg`     | `transparent` (zebra off)       |
+| `--fluid-table-radius`       | `--fluid-radius-md`             |
+| `--fluid-table-cell-padding` | `0.625rem 0.75rem`              |
 
 Turn on zebra striping by setting `--fluid-table-zebra-bg`.
 

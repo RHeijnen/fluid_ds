@@ -16,9 +16,7 @@ const board: KanbanColumn[] = [
   {
     id: "doing",
     title: "In progress",
-    cards: [
-      { id: "c4", title: "Build the board", description: "Drag and drop plus keyboard." }
-    ]
+    cards: [{ id: "c4", title: "Build the board", description: "Drag and drop plus keyboard." }]
   },
   {
     id: "done",
@@ -30,10 +28,8 @@ const board: KanbanColumn[] = [
 const meta: Meta = {
   title: "Kanban/Board",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
-  render: (args) => html`
-    <fluid-kanban .columns=${args["columns"]}></fluid-kanban>
-  `,
+  parameters: { status: { type: "stable" } },
+  render: (args) => html` <fluid-kanban .columns=${args["columns"]}></fluid-kanban> `,
   args: { columns: board }
 };
 

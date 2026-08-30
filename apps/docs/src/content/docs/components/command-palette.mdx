@@ -31,7 +31,10 @@ and restores focus to whatever opened it.
 </script>
 ```
 
-<Aside type="tip">Try it live in [Storybook](https://fluid-web.dev): the palette opens in a focus-trapped modal with full keyboard control.</Aside>
+<Aside type="tip">
+  Try it live in [Storybook](https://fluid-web.dev): the palette opens in a focus-trapped modal with
+  full keyboard control.
+</Aside>
 
 ## Install
 
@@ -45,6 +48,7 @@ and restores focus to whatever opened it.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/command-palette/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -56,6 +60,7 @@ and restores focus to whatever opened it.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/command-palette";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -128,6 +133,7 @@ The palette is presentational: it does not run anything itself. Listen for
       cp.addEventListener("fluid-select", (e) => run(e.detail.id));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Launcher.tsx"
@@ -147,6 +153,7 @@ The palette is presentational: it does not run anything itself. Listen for
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Launcher.vue"
@@ -162,6 +169,7 @@ The palette is presentational: it does not run anything itself. Listen for
       />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="launcher.component.ts"
@@ -181,6 +189,7 @@ The palette is presentational: it does not run anything itself. Listen for
       run(id: string) { /* … */ }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Launcher.svelte"
@@ -191,6 +200,7 @@ The palette is presentational: it does not run anything itself. Listen for
 
     <fluid-command-palette {items} on:fluid-select={(e) => run(e.detail.id)} />
     ```
+
   </TabItem>
 </Tabs>
 

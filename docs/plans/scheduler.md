@@ -29,10 +29,10 @@ consumers will not need it, so it stays out of the core bundle. It depends on
 
 ## Components
 
-| Element | Role |
-| --- | --- |
-| `fluid-scheduler` | Headline visitor picker: calendar + time-slot panel, form-associated. |
-| `fluid-time-slots` | Standalone slot list for a single day (the right pane, usable on its own). |
+| Element                     | Role                                                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `fluid-scheduler`           | Headline visitor picker: calendar + time-slot panel, form-associated.                                      |
+| `fluid-time-slots`          | Standalone slot list for a single day (the right pane, usable on its own).                                 |
 | `fluid-availability-editor` | Owner-facing weekly-hours + exceptions editor that emits an `Availability` config (in scope this release). |
 
 Plus an internal pure-logic module `src/internal/availability.ts`, the booking
@@ -41,29 +41,39 @@ analog of the components package's `date-utils.ts` (no DOM, fully unit-tested).
 ## Data model (the contract)
 
 ```ts
-type Time = `${number}:${number}`;        // "09:00", 24h local wall-clock
-interface TimeWindow { start: Time; end: Time; }
+type Time = `${number}:${number}`; // "09:00", 24h local wall-clock
+interface TimeWindow {
+  start: Time;
+  end: Time;
+}
 
 interface Availability {
   // Recurring weekly open windows, keyed by weekday 0..6 (0 = Sunday).
   weekly: Partial<Record<0 | 1 | 2 | 3 | 4 | 5 | 6, TimeWindow[]>>;
   // Date-specific overrides: holidays (closed) or special hours.
-  exceptions?: Array<{ date: string; closed?: boolean; windows?: TimeWindow[] }>;
-  slotMinutes: number;        // appointment length, e.g. 30
-  stepMinutes?: number;       // gap between slot starts (default = slotMinutes)
-  bufferMinutes?: number;     // padding reserved after each appointment
-  capacity?: number;          // bookings allowed per slot (default 1; >1 = group)
-  minNoticeMinutes?: number;  // cannot book sooner than now + this
-  maxAdvanceDays?: number;    // cannot book further out than this
-  timeZone?: string;          // IANA tz; default = viewer's local zone
+  exceptions?: Array<{
+    date: string;
+    closed?: boolean;
+    windows?: TimeWindow[];
+  }>;
+  slotMinutes: number; // appointment length, e.g. 30
+  stepMinutes?: number; // gap between slot starts (default = slotMinutes)
+  bufferMinutes?: number; // padding reserved after each appointment
+  capacity?: number; // bookings allowed per slot (default 1; >1 = group)
+  minNoticeMinutes?: number; // cannot book sooner than now + this
+  maxAdvanceDays?: number; // cannot book further out than this
+  timeZone?: string; // IANA tz; default = viewer's local zone
 }
 
-interface Booking { start: string; end?: string; }   // ISO datetime, already taken
+interface Booking {
+  start: string;
+  end?: string;
+} // ISO datetime, already taken
 
 interface Slot {
-  start: string;              // ISO datetime
+  start: string; // ISO datetime
   end: string;
-  remaining: number;          // capacity - booked
+  remaining: number; // capacity - booked
   state: "available" | "full" | "past" | "blocked";
 }
 ```
@@ -85,6 +95,7 @@ All timezone-safe and local-first, the same discipline as `date-utils.ts`.
 ## `fluid-scheduler` API
 
 Props:
+
 - `availability` (object property, or JSON string attribute) the config above.
 - `bookings` (array) known taken slots to subtract.
 - `value` (ISO datetime) the selected slot; the form value (`override` + `name`).
@@ -95,6 +106,7 @@ Props:
   `FluidFormAssociated`).
 
 Events:
+
 - `fluid-range-change {start, end}` fires when the visible month changes, so the
   consumer can **lazily fetch only that range's bookings** and feed them back.
   This is the "update with new data every time x happens" hook.
@@ -102,6 +114,7 @@ Events:
 - `fluid-change {value, start, end}` a slot was committed (the form value).
 
 Methods:
+
 - `refresh()` re-runs slot generation (poll on an interval, or after a
   websocket / SSE message says availability changed).
 
@@ -136,6 +149,7 @@ consistency. New tokens annotated `@cssproperty`, semantic deps `@uses-token`.
 ## Reactive data (the "every time x happens" requirement)
 
 Two complementary mechanisms:
+
 1. **Push**: assign `.bookings` / `.availability` and the component re-renders.
 2. **Pull**: `fluid-range-change` fires on month nav so you fetch only the
    visible window; `refresh()` re-generates after any external change (interval
@@ -161,7 +175,7 @@ its own for a "today's openings" widget.
   demo). Tests + a11y.
 - **P5** docs pages + stories + playground cards + a **vet-clinic demo** (owner
   editor wired to the visitor picker) + FEATURES + changeset, then `pnpm verify`
-  + `pnpm docs:build` green + browser-verify.
+  - `pnpm docs:build` green + browser-verify.
 
 Decisions locked (with the user): extension package; **both** the visitor picker
 and the owner editor ship this release; full slot model (capacity, buffers,

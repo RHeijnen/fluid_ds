@@ -6,7 +6,7 @@ import "../button/define.js";
 const meta: Meta = {
   title: "Components/Forms/Date Picker",
   component: "fluid-date-picker",
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     format: { control: "select", options: ["short", "medium", "long", "numeric", "iso"] },
@@ -14,7 +14,8 @@ const meta: Meta = {
     min: { control: "text" },
     max: { control: "text" },
     disabled: { control: "boolean" },
-    openOnInputClick: { control: "boolean" }
+    noAutoOpen: { control: "boolean" },
+    noSelectOnFocus: { control: "boolean" }
   }
 };
 export default meta;
@@ -26,7 +27,8 @@ export const Default: Story = {
     format: "medium",
     size: "md",
     disabled: false,
-    openOnInputClick: true
+    noAutoOpen: false,
+    noSelectOnFocus: false
   },
   render: (a) =>
     html`<fluid-date-picker
@@ -34,7 +36,8 @@ export const Default: Story = {
       format=${a.format}
       size=${a.size}
       ?disabled=${a.disabled}
-      ?open-on-input-click=${a.openOnInputClick}
+      ?no-auto-open=${a.noAutoOpen}
+      ?no-select-on-focus=${a.noSelectOnFocus}
       min=${a.min ?? ""}
       max=${a.max ?? ""}
     ></fluid-date-picker>`

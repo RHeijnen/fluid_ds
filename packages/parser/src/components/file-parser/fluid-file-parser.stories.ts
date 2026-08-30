@@ -5,7 +5,13 @@ import type { Blueprint } from "../../core/types.js";
 
 const blueprint: Blueprint = {
   fields: [
-    { key: "name", label: "Full name", type: "string", required: true, aliases: ["name", "full name"] },
+    {
+      key: "name",
+      label: "Full name",
+      type: "string",
+      required: true,
+      aliases: ["name", "full name"]
+    },
     { key: "email", label: "Email", type: "email", required: true, aliases: ["e-mail", "mail"] },
     { key: "age", label: "Age", type: "integer", min: 0, max: 120 },
     {
@@ -36,8 +42,8 @@ const meta: Meta = {
     ></fluid-file-parser>
     <p style="color: var(--fluid-text-secondary); font-size: 0.875rem; max-width: 48rem;">
       Drop a CSV, JSON, or Excel file. Try one with columns like
-      <code>name, email, age, role, joined, active</code> in any order or casing,
-      the auto-mapper will line them up. Bad cells are highlighted in the preview.
+      <code>name, email, age, role, joined, active</code> in any order or casing, the auto-mapper
+      will line them up. Bad cells are highlighted in the preview.
     </p>
   `
 };
@@ -64,7 +70,13 @@ export const PreCleaned: Story = {
     <fluid-file-parser
       .blueprint=${{
         fields: [
-          { key: "sku", label: "SKU", type: "string", required: true, pattern: "^[A-Z]{3}-\\d{4}$" },
+          {
+            key: "sku",
+            label: "SKU",
+            type: "string",
+            required: true,
+            pattern: "^[A-Z]{3}-\\d{4}$"
+          },
           { key: "price", label: "Price", type: "number", required: true, min: 0 },
           { key: "stock", label: "In stock", type: "integer", min: 0, default: 0 }
         ]

@@ -36,6 +36,7 @@ by default and fires **`fluid-load`** / **`fluid-error`**.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/image/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +48,7 @@ by default and fires **`fluid-load`** / **`fluid-error`**.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/image";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -82,8 +84,20 @@ Combined with a `width`, this is the no-layout-shift recipe.
 to show the whole image.
 
 <Demo>
-  <fluid-image src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80" alt="Cover fit" width="200" height="200" fit="cover"></fluid-image>
-  <fluid-image src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80" alt="Contain fit" width="200" height="200" fit="contain"></fluid-image>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="Cover fit"
+    width="200"
+    height="200"
+    fit="cover"
+  ></fluid-image>
+  <fluid-image
+    src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80"
+    alt="Contain fit"
+    width="200"
+    height="200"
+    fit="contain"
+  ></fluid-image>
 </Demo>
 
 ```html
@@ -156,6 +170,7 @@ A `fluid-image` fires **`fluid-load`** when the image decodes and
       el.addEventListener("fluid-error", () => console.log("failed"));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Hero.tsx"
@@ -174,6 +189,7 @@ A `fluid-image` fires **`fluid-load`** when the image decodes and
       return <fluid-image ref={ref} src="/hero.jpg" alt="Hero" aspect-ratio="16/9" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Hero.vue"
@@ -191,6 +207,7 @@ A `fluid-image` fires **`fluid-load`** when the image decodes and
       />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="hero.component.ts"
@@ -210,6 +227,7 @@ A `fluid-image` fires **`fluid-load`** when the image decodes and
       onError() { console.warn("image failed"); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Hero.svelte"
@@ -224,6 +242,7 @@ A `fluid-image` fires **`fluid-load`** when the image decodes and
       on:fluid-error={() => console.warn("image failed")}
     />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -285,6 +304,14 @@ any text overlaid on the image (`fluid-image` does not overlay text itself).
 ## Related
 
 <CardGrid>
-  <LinkCard title="Avatar" href="/components/avatar/" description="Circular image for a person or entity, with initials fallback." />
-  <LinkCard title="Card" href="/components/card/" description="Surface that often frames a media image." />
+  <LinkCard
+    title="Avatar"
+    href="/components/avatar/"
+    description="Circular image for a person or entity, with initials fallback."
+  />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="Surface that often frames a media image."
+  />
 </CardGrid>

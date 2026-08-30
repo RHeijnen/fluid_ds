@@ -7,26 +7,26 @@ import "../badge/define.js";
 const meta: Meta = {
   title: "Components/Layout/Hero",
   component: "fluid-hero",
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   tags: ["autodocs"],
   argTypes: {
     align: {
       control: { type: "inline-radio" },
       options: ["start", "center"],
-      description: "Horizontal alignment of the content column.",
+      description: "Horizontal alignment of the content column."
     },
     mediaPosition: {
       control: { type: "inline-radio" },
       options: ["end", "start", "background"],
-      description: "Where the media sits relative to the content.",
+      description: "Where the media sits relative to the content."
     },
     size: {
       control: { type: "inline-radio" },
       options: ["sm", "md", "lg"],
-      description: "Overall scale (heading size + padding feel).",
-    },
+      description: "Overall scale (heading size + padding feel)."
+    }
   },
-  args: { align: "start", mediaPosition: "end", size: "md" },
+  args: { align: "start", mediaPosition: "end", size: "md" }
 };
 export default meta;
 
@@ -54,7 +54,7 @@ export const Default: Story = {
       </div>
       <div slot="media">${media}</div>
     </fluid-hero>
-  `,
+  `
 };
 
 export const Centered: Story = {
@@ -72,7 +72,7 @@ export const Centered: Story = {
       </div>
       <div slot="media">${media}</div>
     </fluid-hero>
-  `,
+  `
 };
 
 export const TextOnly: Story = {
@@ -85,7 +85,7 @@ export const TextOnly: Story = {
         <fluid-button variant="ghost">Secondary</fluid-button>
       </div>
     </fluid-hero>
-  `,
+  `
 };
 
 export const MediaStart: Story = {
@@ -98,5 +98,5 @@ export const MediaStart: Story = {
       <div slot="actions"><fluid-button variant="primary">Try it</fluid-button></div>
       <div slot="media">${media}</div>
     </fluid-hero>
-  `,
+  `
 };

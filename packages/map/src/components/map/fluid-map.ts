@@ -220,6 +220,7 @@ export class FluidMap extends FluidElement {
   // otherwise have to handle) and works in web-test-runner, Vite, and Storybook.
   // Consumers may self-host by adding their own Leaflet `<link>` (or one marked
   // with `data-fluid-map-leaflet-css`) before this component upgrades.
+  private static readonly LEAFLET_CSS_HREF = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
   private static leafletCssLoaded = false;
   private static loadLeafletCss(): void {
     if (FluidMap.leafletCssLoaded || typeof document === "undefined") return;
@@ -230,9 +231,28 @@ export class FluidMap extends FluidElement {
     if (existing) return;
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    link.href = FluidMap.LEAFLET_CSS_HREF;
     link.setAttribute("data-fluid-map-leaflet-css", "");
     document.head.appendChild(link);
+  }
+
+  /**
+   * The map renders into LIGHT DOM, so when this element is used inside
+   * another component's shadow root that light DOM *is* the shadow root, and
+   * the document-level Leaflet stylesheet cannot reach it: tiles lose their
+   * positioning and the container loses `overflow: hidden`, so the map spills
+   * out of its box. Mirror the stylesheet into the containing root as well.
+   */
+  private loadLeafletCssIntoRoot(): void {
+    const root = this.getRootNode();
+    if (!(root instanceof ShadowRoot)) return;
+    const selector = "link[data-fluid-map-leaflet-css]";
+    if (root.querySelector(selector)) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = FluidMap.LEAFLET_CSS_HREF;
+    link.setAttribute("data-fluid-map-leaflet-css", "");
+    root.appendChild(link);
   }
 
   // Leaflet's `Icon.Default` resolves its PNG URLs by detecting where the
@@ -357,6 +377,7 @@ export class FluidMap extends FluidElement {
     if (!this.isConnected || this.map) return;
 
     FluidMap.loadLeafletCss();
+    this.loadLeafletCssIntoRoot();
     this.map = L.map(this.viewport, {
       center: this.center,
       zoom: this.zoom,
@@ -389,6 +410,27 @@ export class FluidMap extends FluidElement {
     // Leaflet measures the container on creation; ensure it picks up the
     // settled layout once the element is in the DOM and sized.
     this.resizeFrame = requestAnimationFrame(() => this.map?.invalidateSize());
+
+    /*
+     * A one-shot measurement is not enough. A map created inside a hidden
+     * container (an inactive tab panel, a collapsed accordion, a drawer that
+     * has not opened yet) measures zero, and Leaflet keeps rendering tiles for
+     * that zero-sized viewport once the container is finally shown. Re-measure
+     * whenever the viewport's box actually changes.
+     */
+    if (typeof ResizeObserver !== "undefined") {
+      let last = "";
+      const observer = new ResizeObserver((entries) => {
+        const box = entries[0]?.contentRect;
+        if (!box || box.width === 0 || box.height === 0) return;
+        const size = `${Math.round(box.width)}x${Math.round(box.height)}`;
+        if (size === last) return;
+        last = size;
+        this.map?.invalidateSize();
+      });
+      observer.observe(this.viewport);
+      this.registerCleanup(() => observer.disconnect());
+    }
   }
 
   override updated(changed: Map<string, unknown>): void {

@@ -25,9 +25,7 @@ describe("<fluid-scroller>", () => {
   });
 
   it("hides the native scrollbar with no-scrollbar", async () => {
-    const el = await fixture<FluidScroller>(
-      html`<fluid-scroller no-scrollbar></fluid-scroller>`
-    );
+    const el = await fixture<FluidScroller>(html`<fluid-scroller no-scrollbar></fluid-scroller>`);
     await el.updateComplete;
     expect(el.noScrollbar).to.equal(true);
     expect(container(el).style.scrollbarWidth).to.equal("none");
@@ -65,7 +63,9 @@ describe("<fluid-scroller>", () => {
       constructor() {
         instances.push(this);
       }
-      observe() { this.disconnected = false; }
+      observe() {
+        this.disconnected = false;
+      }
       unobserve() {}
       disconnect() {
         this.disconnected = true;
@@ -102,24 +102,34 @@ describe("<fluid-scroller>", () => {
 
   it("updates fades when slotted content resizes, including after reconnect", async () => {
     const wrapper = await fixture<HTMLDivElement>(html`
-      <div><fluid-scroller style="width:100px"><div style="width:50px">Content</div></fluid-scroller></div>
+      <div>
+        <fluid-scroller style="width:100px"><div style="width:50px">Content</div></fluid-scroller>
+      </div>
     `);
     const el = wrapper.querySelector<FluidScroller>("fluid-scroller")!;
     const content = el.querySelector<HTMLElement>("div")!;
     await el.updateComplete;
     expect(fade(el, "end").hasAttribute("data-visible")).to.equal(false);
     content.style.width = "500px";
-    await waitUntil(() => fade(el, "end").hasAttribute("data-visible"), "content resize updates overflow");
+    await waitUntil(
+      () => fade(el, "end").hasAttribute("data-visible"),
+      "content resize updates overflow"
+    );
     el.remove();
     wrapper.append(el);
     await el.updateComplete;
     content.style.width = "50px";
-    await waitUntil(() => !fade(el, "end").hasAttribute("data-visible"), "reconnected observer updates overflow");
+    await waitUntil(
+      () => !fade(el, "end").hasAttribute("data-visible"),
+      "reconnected observer updates overflow"
+    );
   });
 
   it("tracks logical start and end fades in RTL", async () => {
     const el = await fixture<FluidScroller>(html`
-      <fluid-scroller dir="rtl" style="width:100px"><div style="width:500px">Content</div></fluid-scroller>
+      <fluid-scroller dir="rtl" style="width:100px"
+        ><div style="width:500px">Content</div></fluid-scroller
+      >
     `);
     await el.updateComplete;
     const c = container(el);
@@ -132,7 +142,9 @@ describe("<fluid-scroller>", () => {
     expect(c.scrollLeft).to.equal(-400);
     expect(fade(el, "start").hasAttribute("data-visible")).to.equal(true);
     expect(fade(el, "end").hasAttribute("data-visible")).to.equal(false);
-    expect(fade(el, "start").getBoundingClientRect().right).to.equal(el.getBoundingClientRect().right);
+    expect(fade(el, "start").getBoundingClientRect().right).to.equal(
+      el.getBoundingClientRect().right
+    );
   });
 
   it("passes an accessibility audit", async () => {

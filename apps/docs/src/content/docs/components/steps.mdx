@@ -34,6 +34,7 @@ changing one number. A stepper is a progress indicator, not a button group.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/steps/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -45,6 +46,7 @@ changing one number. A stepper is a progress indicator, not a button group.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/steps"; // registers steps + step
     ```
+
   </TabItem>
 </Tabs>
 
@@ -65,12 +67,14 @@ complete, the rest upcoming. The complete step shows a check; the rest show thei
   </fluid-steps>
 </Demo>
 
-<ConformanceCode code={`<fluid-steps current="2" aria-label="Order">
+<ConformanceCode
+  code={`<fluid-steps current="2" aria-label="Order">
   <fluid-step>Cart</fluid-step>
   <fluid-step>Address</fluid-step>
   <fluid-step>Payment</fluid-step>
   <fluid-step>Confirm</fluid-step>
-</fluid-steps>`} />
+</fluid-steps>`}
+/>
 
 ### Vertical
 
@@ -85,11 +89,13 @@ for a sidebar or a tall wizard.
   </fluid-steps>
 </Demo>
 
-<ConformanceCode code={`<fluid-steps current="1" orientation="vertical" aria-label="Setup">
+<ConformanceCode
+  code={`<fluid-steps current="1" orientation="vertical" aria-label="Setup">
   <fluid-step description="Create your workspace">Workspace</fluid-step>
   <fluid-step description="Invite your team">Team</fluid-step>
   <fluid-step description="Connect a data source">Integrations</fluid-step>
-</fluid-steps>`} />
+</fluid-steps>`}
+/>
 
 ### Clickable
 
@@ -106,11 +112,13 @@ step.
   </fluid-steps>
 </Demo>
 
-<ConformanceCode code={`<fluid-steps current="2" clickable aria-label="Editable wizard">
+<ConformanceCode
+  code={`<fluid-steps current="2" clickable aria-label="Editable wizard">
   <fluid-step>Plan</fluid-step>
   <fluid-step>Build</fluid-step>
   <fluid-step>Ship</fluid-step>
-</fluid-steps>`} />
+</fluid-steps>`}
+/>
 
 ### Chip variant
 
@@ -121,7 +129,13 @@ complete step shows the check badge. Descriptions are hidden in this variant to
 keep the chips compact.
 
 <Demo>
-  <fluid-steps current="2" variant="chip" clickable aria-label="Wizard progress" style="width: 100%;">
+  <fluid-steps
+    current="2"
+    variant="chip"
+    clickable
+    aria-label="Wizard progress"
+    style="width: 100%;"
+  >
     <fluid-step>Theme</fluid-step>
     <fluid-step>Color</fluid-step>
     <fluid-step>Font</fluid-step>
@@ -130,13 +144,15 @@ keep the chips compact.
   </fluid-steps>
 </Demo>
 
-<ConformanceCode code={`<fluid-steps current="2" variant="chip" clickable aria-label="Wizard progress">
+<ConformanceCode
+  code={`<fluid-steps current="2" variant="chip" clickable aria-label="Wizard progress">
   <fluid-step>Theme</fluid-step>
   <fluid-step>Color</fluid-step>
   <fluid-step>Font</fluid-step>
   <fluid-step>Shape</fluid-step>
   <fluid-step>Review</fluid-step>
-</fluid-steps>`} />
+</fluid-steps>`}
+/>
 
 ### Descriptions
 
@@ -164,6 +180,7 @@ validate or block a jump first).
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Wizard.tsx"
@@ -189,6 +206,7 @@ validate or block a jump first).
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Wizard.vue"
@@ -207,6 +225,7 @@ validate or block a jump first).
       </fluid-steps>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="wizard.component.ts"
@@ -233,6 +252,7 @@ validate or block a jump first).
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Wizard.svelte"
@@ -250,6 +270,7 @@ validate or block a jump first).
       <fluid-step>Ship</fluid-step>
     </fluid-steps>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -258,7 +279,7 @@ validate or block a jump first).
 - Communicating **progress through a known, ordered sequence**: a checkout, an
   onboarding wizard, a multi-page form.
 
-### When *not* to use
+### When _not_ to use
 
 - **Switching between peer views** of the same content: use
   [`<fluid-tabs>`](/components/tabs/).
@@ -285,8 +306,8 @@ completed segments. The **complete list** is in the [API tables below](#api).
 ```
 
 <Aside type="tip">
-  Select a `fluid-step` in the [Theme builder](/playground/) to tweak the
-  indicator colors, connector, and focus tokens visually.
+  Select a `fluid-step` in the [Theme builder](/playground/) to tweak the indicator colors,
+  connector, and focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -339,9 +360,9 @@ Calling a clickable step's `focus()` delegates to its native button. Activation
 requests a change through `fluid-step-change`; the consumer remains responsible
 for updating the parent's `current` index.
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Move to the next clickable step (clickable mode only). |
+| Key                                 | Action                                                 |
+| ----------------------------------- | ------------------------------------------------------ |
+| <kbd>Tab</kbd>                      | Move to the next clickable step (clickable mode only). |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Activate the focused step → fires `fluid-step-change`. |
 
 ### Motion & target size
@@ -355,10 +376,10 @@ Targets **WCAG 2.2 AA**, with manual assistive-technology review still required.
 The header **Conformance** toggle (or an ancestor
 `[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

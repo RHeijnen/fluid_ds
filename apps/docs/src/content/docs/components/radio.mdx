@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-radio>` is one option; `<fluid-radio-group>` is the container that holds
 the set and manages selection, keyboard navigation, and form participation.
 Always wrap radios in a group, a radio on its own has no concept of its set.
@@ -35,6 +34,7 @@ nav) and is form-associated.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/radio/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +46,7 @@ nav) and is form-associated.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/radio"; // registers radio + radio-group
     ```
+
   </TabItem>
 </Tabs>
 
@@ -63,11 +64,13 @@ nav) and is form-associated.
   </fluid-radio-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-radio-group name="size" value="medium">
+<ConformanceCode
+  code={`<fluid-radio-group name="size" value="medium">
   <fluid-radio value="small">Small</fluid-radio>
   <fluid-radio value="medium">Medium</fluid-radio>
   <fluid-radio value="large">Large</fluid-radio>
-</fluid-radio-group>`} />
+</fluid-radio-group>`}
+/>
 
 ### With a group label
 
@@ -82,11 +85,13 @@ The `label` slot renders above the options and is wired via `aria-labelledby`.
   </fluid-radio-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-radio-group value="email">
+<ConformanceCode
+  code={`<fluid-radio-group value="email">
   <span slot="label">How should we contact you?</span>
   <fluid-radio value="email">Email</fluid-radio>
   <fluid-radio value="sms">SMS</fluid-radio>
-</fluid-radio-group>`} />
+</fluid-radio-group>`}
+/>
 
 ### Horizontal layout
 
@@ -98,10 +103,12 @@ The `label` slot renders above the options and is wired via `aria-labelledby`.
   </fluid-radio-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-radio-group orientation="horizontal" value="yes">
+<ConformanceCode
+  code={`<fluid-radio-group orientation="horizontal" value="yes">
   <fluid-radio value="yes">Yes</fluid-radio>
   <fluid-radio value="no">No</fluid-radio>
-</fluid-radio-group>`} />
+</fluid-radio-group>`}
+/>
 
 ## Listening for changes
 
@@ -119,6 +126,7 @@ selection changes.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="PlanPicker.tsx"
@@ -142,6 +150,7 @@ selection changes.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="PlanPicker.vue"
@@ -157,6 +166,7 @@ selection changes.
       </fluid-radio-group>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="plan-picker.component.ts"
@@ -180,6 +190,7 @@ selection changes.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="PlanPicker.svelte"
@@ -195,6 +206,7 @@ selection changes.
       <fluid-radio value="pro">Pro</fluid-radio>
     </fluid-radio-group>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -247,8 +259,8 @@ checked color is the brand accent. The group exposes
 ```
 
 <Aside type="tip">
-  Select a radio in the [Theme builder](/playground/) to tweak the circle, dot,
-  and focus tokens visually.
+  Select a radio in the [Theme builder](/playground/) to tweak the circle, dot, and focus tokens
+  visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -261,7 +273,7 @@ for CSS not covered by a token.
 
 - **One-of-many** selection where all options should be visible at once.
 
-### When *not* to use
+### When _not_ to use
 
 - A **long list** (> ~7): use [`<fluid-select>`](/components/select/) (denser)
   or [`<fluid-typeahead>`](/components/typeahead/) (filterable).
@@ -276,13 +288,13 @@ contract is in the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Enter/leave the group (roving tabindex, only the selected option is a tab stop). |
-| <kbd>↑</kbd> / <kbd>←</kbd> | Select + focus the previous option. |
-| <kbd>↓</kbd> / <kbd>→</kbd> | Select + focus the next option. |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Select the first / last option. |
-| <kbd>Space</kbd> | Select the focused option. |
+| Key                              | Action                                                                           |
+| -------------------------------- | -------------------------------------------------------------------------------- |
+| <kbd>Tab</kbd>                   | Enter/leave the group (roving tabindex, only the selected option is a tab stop). |
+| <kbd>↑</kbd> / <kbd>←</kbd>      | Select + focus the previous option.                                              |
+| <kbd>↓</kbd> / <kbd>→</kbd>      | Select + focus the next option.                                                  |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Select the first / last option.                                                  |
+| <kbd>Space</kbd>                 | Select the focused option.                                                       |
 
 The focus ring renders around the circle and reads `--fluid-focus-ring-width`.
 
@@ -307,10 +319,10 @@ submits the selected value.
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

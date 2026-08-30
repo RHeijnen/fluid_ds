@@ -16,7 +16,11 @@ form-associated: its submitted value is the comma-joined string, while the
 array on every add or remove.
 
 <Demo>
-  <fluid-tag-input aria-label="Tags" value="react,typescript,lit" placeholder="Add a tag…"></fluid-tag-input>
+  <fluid-tag-input
+    aria-label="Tags"
+    value="react,typescript,lit"
+    placeholder="Add a tag…"
+  ></fluid-tag-input>
 </Demo>
 
 ## Install
@@ -31,6 +35,7 @@ array on every add or remove.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tag-input/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +47,7 @@ array on every add or remove.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tag-input";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -66,7 +72,12 @@ Set `max` to cap the number of tokens. Once the cap is reached the text field is
 disabled, so no further tokens can be added.
 
 <Demo>
-  <fluid-tag-input aria-label="Up to three" value="one,two" max="3" placeholder="Up to 3 tags"></fluid-tag-input>
+  <fluid-tag-input
+    aria-label="Up to three"
+    value="one,two"
+    max="3"
+    placeholder="Up to 3 tags"
+  ></fluid-tag-input>
 </Demo>
 
 ```html
@@ -79,7 +90,11 @@ By default a token already present is rejected. Set `allow-duplicates` to permit
 repeats.
 
 <Demo>
-  <fluid-tag-input aria-label="Duplicates allowed" value="react,react" allow-duplicates></fluid-tag-input>
+  <fluid-tag-input
+    aria-label="Duplicates allowed"
+    value="react,react"
+    allow-duplicates
+  ></fluid-tag-input>
 </Demo>
 
 ```html
@@ -112,6 +127,7 @@ or remove). `event.detail.value` is the current array of tokens.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="TagField.tsx"
@@ -130,6 +146,7 @@ or remove). `event.detail.value` is the current array of tokens.
       return <fluid-tag-input ref={ref} aria-label="Tags" value={tags.join(",")} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="TagField.vue"
@@ -147,6 +164,7 @@ or remove). `event.detail.value` is the current array of tokens.
       />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="tag-field.component.ts"
@@ -166,6 +184,7 @@ or remove). `event.detail.value` is the current array of tokens.
       tags = ["react", "lit"];
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="TagField.svelte"
@@ -180,6 +199,7 @@ or remove). `event.detail.value` is the current array of tokens.
       on:fluid-change={(e) => (tags = e.detail.value)}
     />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -259,5 +279,9 @@ per-component change.
 <CardGrid>
   <LinkCard title="Tag" href="/components/tag/" description="The chip rendered for each token." />
   <LinkCard title="Input" href="/components/input/" description="Single-line text field." />
-  <LinkCard title="Select" href="/components/select/" description="Pick from a fixed list of options." />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick from a fixed list of options."
+  />
 </CardGrid>

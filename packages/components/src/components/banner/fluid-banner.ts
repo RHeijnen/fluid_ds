@@ -136,8 +136,8 @@ export class FluidBanner extends FluidElement {
         background: rgb(0 0 0 / 0.08);
       }
       .dismiss:focus-visible {
-        outline: var(--fluid-banner-focus-ring-width, var(--fluid-focus-ring-width, 2px))
-          solid var(--fluid-banner-focus-ring, var(--fluid-focus-ring-color));
+        outline: var(--fluid-banner-focus-ring-width, var(--fluid-focus-ring-width, 2px)) solid
+          var(--fluid-banner-focus-ring, var(--fluid-focus-ring-color));
         outline-offset: 1px;
       }
       .dismiss fluid-icon {
@@ -183,7 +183,10 @@ export class FluidBanner extends FluidElement {
    */
   @property()
   get label(): string {
-    return this.labelOverride ?? this.term(this.variant === "danger" || this.variant === "warning" ? "alert" : "notification");
+    return (
+      this.labelOverride ??
+      this.term(this.variant === "danger" || this.variant === "warning" ? "alert" : "notification")
+    );
   }
   set label(value: string | null) {
     this.labelOverride = value;
@@ -214,12 +217,7 @@ export class FluidBanner extends FluidElement {
     const label = this.label;
 
     return html`
-      <div
-        part="base"
-        class="base variant-${this.variant}"
-        role=${role}
-        aria-label=${label}
-      >
+      <div part="base" class="base variant-${this.variant}" role=${role} aria-label=${label}>
         <div part="content" class="content">
           <slot></slot>
         </div>

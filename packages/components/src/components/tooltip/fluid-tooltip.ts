@@ -68,10 +68,21 @@ export class FluidTooltip extends FluidElement {
       }
 
       .popover {
-        /* Fixed, like every other Fluid overlay: viewport coordinates make the
-         positioning math exact and immune to clipping/transformed ancestors;
-         autoUpdate keeps it glued to the anchor while scrolling. */
+        /*
+         * Rendered in the top layer via popover="manual" (see render), which is
+         * what actually makes it immune to transformed, filtered or contained
+         * ancestors: a plain position:fixed anchors to the nearest ancestor
+         * that has transform / filter / backdrop-filter / contain, not the
+         * viewport, so a tooltip inside a frosted card would land in the wrong
+         * place. The top layer escapes all of that. These resets undo the UA
+         * popover box (centred by inset:0 + margin:auto, plus a default border)
+         * so floating-ui's own coordinates win; autoUpdate keeps it glued to
+         * the anchor while scrolling.
+         */
         position: fixed;
+        inset: auto;
+        margin: 0;
+        border: 0;
         top: 0;
         left: 0;
         z-index: 1000;
@@ -267,6 +278,12 @@ export class FluidTooltip extends FluidElement {
     if (this.visible) this.visible = false;
     this.cleanupPosition?.();
     this.cleanupPosition = undefined;
+    const popover = this.popoverEl as HTMLElement & { hidePopover?: () => void };
+    try {
+      popover?.hidePopover?.();
+    } catch {
+      /* not shown, ignore */
+    }
     this.dispatchEvent(
       new CustomEvent<null>("fluid-hide", { detail: null, bubbles: true, composed: true })
     );
@@ -274,6 +291,14 @@ export class FluidTooltip extends FluidElement {
 
   private startPositioning(): void {
     if (!this.anchor || !this.popoverEl || !this.presented) return;
+    // Promote to the top layer before measuring: a hidden popover has no box,
+    // and this is also what lifts it out of any transformed/filtered ancestor.
+    const popover = this.popoverEl as HTMLElement & { showPopover?: () => void };
+    try {
+      popover.showPopover?.();
+    } catch {
+      /* already shown or unsupported, ignore */
+    }
     this.cleanupPosition?.();
     this.cleanupPosition = autoUpdate(this.anchor, this.popoverEl, () => void this.reposition());
     void this.reposition();
@@ -295,6 +320,7 @@ export class FluidTooltip extends FluidElement {
       <div
         id=${this.tooltipId}
         part="popover"
+        popover="manual"
         class="popover ${this.open || this.visible ? "visible" : ""}"
         role="tooltip"
         aria-hidden=${this.open || this.visible ? "false" : "true"}

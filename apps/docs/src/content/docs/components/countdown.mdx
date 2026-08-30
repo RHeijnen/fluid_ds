@@ -30,6 +30,7 @@ at zero.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/countdown/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +42,7 @@ at zero.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/countdown";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -156,6 +158,7 @@ the remaining time reaches zero.
       c.addEventListener("fluid-complete", () => console.log("done"));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Sale.tsx"
@@ -173,6 +176,7 @@ the remaining time reaches zero.
       return <fluid-countdown ref={ref} seconds={60} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Sale.vue"
@@ -185,6 +189,7 @@ the remaining time reaches zero.
       <fluid-countdown :seconds="60" @fluid-complete="onComplete" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="sale.component.ts"
@@ -201,6 +206,7 @@ the remaining time reaches zero.
       done() { console.log("done"); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Sale.svelte"
@@ -211,6 +217,7 @@ the remaining time reaches zero.
 
     <fluid-countdown seconds={60} on:fluid-complete={done} />
     ```
+
   </TabItem>
 </Tabs>
 

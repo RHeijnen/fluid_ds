@@ -3,17 +3,14 @@ import { html } from "lit";
 import "./define.js";
 import type { FluidMeter } from "./fluid-meter.js";
 
-type Args = Pick<
-  FluidMeter,
-  "value" | "min" | "max" | "low" | "high" | "optimum" | "showValue"
-> & {
+type Args = Pick<FluidMeter, "value" | "min" | "max" | "low" | "high" | "optimum" | "showValue"> & {
   label: string;
 };
 
 const meta: Meta<Args> = {
   title: "Components/Feedback/Meter",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: { type: "range", min: 0, max: 100, step: 1 } },
     min: { control: "number" },

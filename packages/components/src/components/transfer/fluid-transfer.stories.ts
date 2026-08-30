@@ -3,10 +3,10 @@ import { html } from "lit";
 import "./define.js";
 import type { FluidTransfer, FluidTransferItem } from "./fluid-transfer.js";
 
-type Args = Pick<
-  FluidTransfer,
-  "sourceLabel" | "targetLabel" | "disabled"
-> & { items: FluidTransferItem[]; value: string[] };
+type Args = Pick<FluidTransfer, "sourceLabel" | "targetLabel" | "disabled"> & {
+  items: FluidTransferItem[];
+  value: string[];
+};
 
 const sampleItems: FluidTransferItem[] = [
   { id: "react", label: "React" },
@@ -20,7 +20,7 @@ const sampleItems: FluidTransferItem[] = [
 const meta: Meta<Args> = {
   title: "Components/Forms/Transfer",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     sourceLabel: { control: "text" },
     targetLabel: { control: "text" },

@@ -6,7 +6,7 @@ const meta: Meta = {
   title: "Components/Navigation/SegmentedControl",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   render: () => html`
     <fluid-segmented-control value="light" aria-label="Theme">

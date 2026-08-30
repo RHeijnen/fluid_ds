@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Layout/Grid",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -29,8 +29,7 @@ const cell = (label: string) => html`
   </div>
 `;
 
-const cells = (n: number) =>
-  Array.from({ length: n }, (_, i) => cell(`Item ${i + 1}`));
+const cells = (n: number) => Array.from({ length: n }, (_, i) => cell(`Item ${i + 1}`));
 
 /** Intrinsic mode, auto-fills as many columns as fit (resize to see). */
 export const Intrinsic: Story = {
@@ -44,8 +43,7 @@ export const FixedColumns: Story = {
 
 /** Responsive: 1 column on phones, 2 at md, 4 at lg. */
 export const Responsive: Story = {
-  render: () =>
-    html`<fluid-grid cols="1" cols-md="2" cols-lg="4">${cells(8)}</fluid-grid>`
+  render: () => html`<fluid-grid cols="1" cols-md="2" cols-lg="4">${cells(8)}</fluid-grid>`
 };
 
 /** Spanning cells with <fluid-col>. */

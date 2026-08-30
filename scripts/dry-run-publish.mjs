@@ -17,6 +17,7 @@ const execFile = promisify(execFileCallback);
 const here = dirname(fileURLToPath(import.meta.url));
 export const repositoryRoot = dirname(here);
 export const expectedPackageNames = Object.freeze([
+  "@fluid-ds/angular",
   "@fluid-ds/animations",
   "@fluid-ds/calendar",
   "@fluid-ds/charts",

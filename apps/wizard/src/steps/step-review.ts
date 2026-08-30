@@ -31,7 +31,8 @@ export class WizardStepReview extends WizardStep {
   ];
 
   protected stepTitle = "Review your setup";
-  protected stepLede = "Here's everything you chose. The live preview shows it in action, tweak any step or continue to export.";
+  protected stepLede =
+    "Here's everything you chose. The live preview shows it in action, tweak any step or continue to export.";
 
   @state() private config: WizardState["config"] = wizardStore.get().config;
   private unsubscribe?: () => void;

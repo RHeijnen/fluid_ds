@@ -128,9 +128,7 @@ async function main() {
   try {
     await stat(websiteDir);
   } catch {
-    console.error(
-      `× ${websiteDir} doesn't exist, run \`pnpm build:website\` first.`
-    );
+    console.error(`× ${websiteDir} doesn't exist, run \`pnpm build:website\` first.`);
     process.exit(1);
   }
 

@@ -30,6 +30,7 @@ enclosing `<form>` under `name`. It fires **`fluid-input`** on every change and
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/otp/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +42,7 @@ enclosing `<form>` under `name`. It fires **`fluid-input`** on every change and
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/otp";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -115,6 +117,7 @@ when the last box fills. Both carry the concatenated code on
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="VerifyCode.tsx"
@@ -132,6 +135,7 @@ when the last box fills. Both carry the concatenated code on
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="VerifyCode.vue"
@@ -144,6 +148,7 @@ when the last box fills. Both carry the concatenated code on
       <fluid-otp :length="6" @fluid-complete="onComplete" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="verify-code.component.ts"
@@ -160,6 +165,7 @@ when the last box fills. Both carry the concatenated code on
       verify(e: CustomEvent) { /* e.detail.value */ }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="VerifyCode.svelte"
@@ -170,6 +176,7 @@ when the last box fills. Both carry the concatenated code on
 
     <fluid-otp length="6" on:fluid-complete={onComplete} />
     ```
+
   </TabItem>
 </Tabs>
 

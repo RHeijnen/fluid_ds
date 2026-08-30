@@ -8,11 +8,10 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-time-picker>` is a form-associated text field that opens a
 `role="listbox"` of time options in a popover. You can type to filter or pick
 from the list; either way the form value is always a canonical 24-hour
-`"HH:MM"` string. The `format` attribute controls only the *visible* text
+`"HH:MM"` string. The `format` attribute controls only the _visible_ text
 ("12h" shows `1:30 PM`, "24h" shows `13:30`), never the value, so presentation
 never corrupts what you store.
 
@@ -32,6 +31,7 @@ never corrupts what you store.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/time-picker/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +43,7 @@ never corrupts what you store.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/time-picker";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -78,13 +79,18 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-time-picker label="Pickup time" help-text="We deliver between 09:00 and 17:00."></fluid-time-picker>
+  <fluid-time-picker
+    label="Pickup time"
+    help-text="We deliver between 09:00 and 17:00."
+  ></fluid-time-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-time-picker
+<ConformanceCode
+  code={`<fluid-time-picker
   label="Pickup time"
   help-text="We deliver between 09:00 and 17:00."
-></fluid-time-picker>`} />
+></fluid-time-picker>`}
+/>
 
 ### Display format
 
@@ -98,8 +104,10 @@ and options show; the value and form submission stay canonical 24h `HH:MM`.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-time-picker value="13:30" format="24h"></fluid-time-picker>
-<fluid-time-picker value="13:30" format="12h"></fluid-time-picker>`} />
+<ConformanceCode
+  code={`<fluid-time-picker value="13:30" format="24h"></fluid-time-picker>
+<fluid-time-picker value="13:30" format="12h"></fluid-time-picker>`}
+/>
 
 ### Step
 
@@ -113,8 +121,10 @@ and options show; the value and form submission stay canonical 24h `HH:MM`.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-time-picker value="09:00" step="60"></fluid-time-picker>
-<fluid-time-picker value="09:05" step="5"></fluid-time-picker>`} />
+<ConformanceCode
+  code={`<fluid-time-picker value="09:00" step="60"></fluid-time-picker>
+<fluid-time-picker value="09:05" step="5"></fluid-time-picker>`}
+/>
 
 ### Min and max
 
@@ -122,10 +132,53 @@ and options show; the value and form submission stay canonical 24h `HH:MM`.
 range appear as options.
 
 <Demo>
-  <fluid-time-picker value="10:00" min="09:00" max="17:00" step="30" aria-label="Time"></fluid-time-picker>
+  <fluid-time-picker
+    value="10:00"
+    min="09:00"
+    max="17:00"
+    step="30"
+    aria-label="Time"
+  ></fluid-time-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-time-picker value="10:00" min="09:00" max="17:00" step="30"></fluid-time-picker>`} />
+<ConformanceCode
+  code={`<fluid-time-picker value="10:00" min="09:00" max="17:00" step="30"></fluid-time-picker>`}
+/>
+
+### Opening behaviour
+
+Clicking the field opens the time list and selects the current value, so the
+text and the trigger button do the same thing and one click is enough to type a
+replacement. Keyboard users open with <kbd>ArrowDown</kbd>.
+
+Opening is deliberately tied to the click rather than to focus: focus also
+arrives from form validation, from an overlay above the field closing, and from
+any programmatic `.focus()`, none of which mean "show me the options".
+
+Both halves are opt-out. `no-auto-open` keeps the click from opening the
+time list, and `no-select-on-focus` keeps focus from selecting the value.
+
+<Demo>
+  <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
+    <fluid-time-picker value="09:30" aria-label="Opens on click"></fluid-time-picker>
+    <fluid-time-picker
+      value="09:30"
+      no-auto-open
+      aria-label="Never opens on click"
+    ></fluid-time-picker>
+    <fluid-time-picker
+      value="09:30"
+      no-select-on-focus
+      aria-label="Opens without selecting"
+    ></fluid-time-picker>
+  </div>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-time-picker value="09:30"></fluid-time-picker>
+<fluid-time-picker value="09:30" no-auto-open></fluid-time-picker>
+<fluid-time-picker value="09:30" no-select-on-focus></fluid-time-picker>`}
+/>
 
 ### Sizes
 
@@ -139,9 +192,11 @@ range appear as options.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-time-picker size="sm" value="09:30"></fluid-time-picker>
+<ConformanceCode
+  code={`<fluid-time-picker size="sm" value="09:30"></fluid-time-picker>
 <fluid-time-picker size="md" value="09:30"></fluid-time-picker>
-<fluid-time-picker size="lg" value="09:30"></fluid-time-picker>`} />
+<fluid-time-picker size="lg" value="09:30"></fluid-time-picker>`}
+/>
 
 ### Disabled
 
@@ -169,6 +224,7 @@ It also fires `fluid-open` / `fluid-close` around the popover.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="StartTime.tsx"
@@ -187,6 +243,7 @@ It also fires `fluid-open` / `fluid-close` around the popover.
       return <fluid-time-picker ref={ref} aria-label="Start time" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="StartTime.vue"
@@ -199,6 +256,7 @@ It also fires `fluid-open` / `fluid-close` around the popover.
       <fluid-time-picker aria-label="Start time" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="start-time.component.ts"
@@ -219,6 +277,7 @@ It also fires `fluid-open` / `fluid-close` around the popover.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="StartTime.svelte"
@@ -231,6 +290,7 @@ It also fires `fluid-open` / `fluid-close` around the popover.
 
     <fluid-time-picker aria-label="Start time" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -245,7 +305,12 @@ canonical 24h `HH:MM`, independent of the `format` shown.
     style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'start=' + (new FormData(this).get('start') ?? '(none)');"
   >
-    <fluid-time-picker name="start" required placeholder="Start time" aria-label="Start time"></fluid-time-picker>
+    <fluid-time-picker
+      name="start"
+      required
+      placeholder="Start time"
+      aria-label="Start time"
+    ></fluid-time-picker>
     <fluid-button type="submit">Save</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -279,8 +344,8 @@ authoritative list** lives in the [API table below](#api).
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) lets you tweak the field, listbox, and
-  option tokens visually and exports the CSS above.
+  The [Theme builder](/playground/) lets you tweak the field, listbox, and option tokens visually
+  and exports the CSS above.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -303,7 +368,7 @@ fluid-time-picker::part(listbox) {
 - Anywhere you need both **typed entry and a pickable list** with one
   accessible control that submits a clean 24h value.
 
-### When *not* to use
+### When _not_ to use
 
 - A **calendar date**: use [`<fluid-date-picker>`](/components/date-picker/).
 - **Free text** that isn't a time: use [`<fluid-input>`](/components/input/).
@@ -319,13 +384,13 @@ notes below are picker-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| _type a time_ | Filter the list; <kbd>Enter</kbd> commits the active option (or a typed match). |
-| <kbd>↓</kbd> / <kbd>↑</kbd> | Open the list and move the active option. |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last option. |
-| <kbd>Enter</kbd> | Commit the active option and close. |
-| <kbd>Escape</kbd> | Close the popover without changing the value. |
+| Key                              | Action                                                                          |
+| -------------------------------- | ------------------------------------------------------------------------------- |
+| _type a time_                    | Filter the list; <kbd>Enter</kbd> commits the active option (or a typed match). |
+| <kbd>↓</kbd> / <kbd>↑</kbd>      | Open the list and move the active option.                                       |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last option.                                                |
+| <kbd>Enter</kbd>                 | Commit the active option and close.                                             |
+| <kbd>Escape</kbd>                | Close the popover without changing the value.                                   |
 
 The field's focus ring is `:focus-within` and reads
 `--fluid-time-picker-focus-ring-width` (falling back to
@@ -358,10 +423,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA** and the
 trigger target grows, the option targets grow, and the focus ring thickens. The
 toggle sets the real `data-fluid-conformance` attribute on `<html>`:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

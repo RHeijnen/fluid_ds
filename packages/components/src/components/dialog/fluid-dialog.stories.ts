@@ -6,7 +6,7 @@ import "../button/define.js";
 const meta: Meta = {
   title: "Components/Feedback/Dialog",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;

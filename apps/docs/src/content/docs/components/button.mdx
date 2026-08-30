@@ -485,6 +485,26 @@ var those knobs fall back to. The two you'll reach for most are
 }
 ```
 
+### Sizing beyond `size`
+
+The `size` attribute picks a preset; the padding knobs re-tune the geometry of
+whatever preset is active. `--fluid-button-padding-block` and
+`--fluid-button-padding-inline` apply to every size, and
+`--fluid-button-padding-inline-icon` covers the side a prefix/suffix icon sits
+on (and both sides of icon-only buttons), which stays one step tighter than the
+label side by default:
+
+```css
+/* Every button in this section becomes roomier, regardless of its size. */
+.marketing-hero {
+  --fluid-button-padding-block: 0.5rem;
+  --fluid-button-padding-inline: 1.5rem;
+}
+```
+
+Heights still respect the minimum hit-target (`--fluid-target-min`), so
+shrinking the padding never produces an inaccessibly small control.
+
 <Aside type="tip">
   The [Theme builder](/playground/) (or the playground panel inside this site) lets you tweak these
   tokens visually and exports the CSS above.

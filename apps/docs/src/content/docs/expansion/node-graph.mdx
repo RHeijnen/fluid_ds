@@ -3,10 +3,20 @@ title: "@fluid-ds/node-graph"
 description: "An accessible node graph editor web component with typed ports and Bezier edges."
 ---
 
+import NodeGraphDemo from "../../../components/NodeGraphDemo.astro";
+
 A node graph editor for Fluid: draggable nodes with typed connection ports,
 joined by Bezier edges, with pan, zoom, fit-to-view, and keyboard controls for
 node movement, selection and connection editing. Expansion pack. Applications
 must provide a keyboard-operated add-node action if they offer a drag palette.
+
+The editor below is live: drag the nodes around, draw a connection from an
+output port, or focus the canvas and use the keyboard (documented in full
+[further down](#keyboard)). The pulsing badges and marching-ants edges are a
+simulated run painted through `runStates` / `traversedEdges`, exactly the
+mechanism [Showing a run](#showing-a-run) describes.
+
+<NodeGraphDemo />
 
 The graph knows nothing about what a node means. A `nodeTypes` registry
 supplies each type's label, accent, height and port topology, and a
@@ -29,8 +39,8 @@ import "@fluid-ds/node-graph/define/node-graph";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
+| Tag                  | Use                                                                                                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<fluid-node-graph>` | An editable canvas of typed nodes and connections. Nodes move by pointer drag or arrow keys; connections are drawn from output ports by drag or keyboard; every mutation emits an event. |
 
 ## Use
@@ -89,14 +99,14 @@ Port topology belongs to the type, not the node: every node of a type has the
 same connection points, which keeps a serialized graph replayable against a
 changed catalog.
 
-| Key | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label` | `string` | the type key | Human label, used in default rendering and accessible names. |
-| `accent` | `string` | accent token | CSS color for the node's leading edge. |
-| `height` | `number` | `92` | Node height in world pixels. |
-| `input` | `boolean` | `true` | Whether nodes of this type accept incoming connections. |
-| `outputs` | `NodeGraphPort[]` | one `next` port | Output ports, top to bottom: `{ id, label?, tone? }`. Tones: `neutral`, `accent`, `success`, `danger`, `warning`, `info`. |
-| `removable` | `boolean` | `true` | Whether nodes of this type can be deleted. |
+| Key         | Type              | Default         | Description                                                                                                               |
+| ----------- | ----------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `label`     | `string`          | the type key    | Human label, used in default rendering and accessible names.                                                              |
+| `accent`    | `string`          | accent token    | CSS color for the node's leading edge.                                                                                    |
+| `height`    | `number`          | `92`            | Node height in world pixels.                                                                                              |
+| `input`     | `boolean`         | `true`          | Whether nodes of this type accept incoming connections.                                                                   |
+| `outputs`   | `NodeGraphPort[]` | one `next` port | Output ports, top to bottom: `{ id, label?, tone? }`. Tones: `neutral`, `accent`, `success`, `danger`, `warning`, `info`. |
+| `removable` | `boolean`         | `true`          | Whether nodes of this type can be deleted.                                                                                |
 
 ### Adding nodes
 
@@ -118,61 +128,61 @@ animation is disabled under reduced motion.
 
 ### Properties
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `nodes` | – | `NodeGraphNode[]` | `[]` | The nodes: `{ id, type, x, y, label?, summary? }` in world pixels. |
-| `edges` | – | `NodeGraphEdge[]` | `[]` | The connections: `{ id, from, port, to }`. |
-| `nodeTypes` | – | `Record<string, NodeGraphNodeType>` | `{}` | The type registry (see above). |
-| `renderNode` | – | `(node) => unknown` | – | Optional renderer for a node's body. |
-| `runStates` | – | `Record<string, NodeGraphRunState>` | `{}` | Traversal paint state per node. |
-| `traversedEdges` | – | `string[]` | `[]` | Edges painted with the traversed style. |
-| `messages` | – | `Partial<NodeGraphMessages>` | `{}` | Overrides for the announcement strings (localization). |
-| `label` | `label` | `string` | `"Node graph"` | Accessible name of the editor. |
-| `grid` | `grid` | `number` | `8` | Snap step in world pixels; `0` disables snapping. |
-| `nodeWidth` | `node-width` | `number` | `230` | Shared node width in world pixels. |
-| `minZoom` / `maxZoom` | `min-zoom` / `max-zoom` | `number` | `0.4` / `2` | Zoom clamp. |
-| `readonly` | `readonly` | `boolean` | `false` | Blocks every mutation; pan, zoom and selection stay live. |
-| `dropFormat` | `drop-format` | `string` | `"text/fluid-node-graph"` | The dataTransfer type accepted on drop. |
+| Property              | Attribute               | Type                                | Default                   | Description                                                        |
+| --------------------- | ----------------------- | ----------------------------------- | ------------------------- | ------------------------------------------------------------------ |
+| `nodes`               | –                       | `NodeGraphNode[]`                   | `[]`                      | The nodes: `{ id, type, x, y, label?, summary? }` in world pixels. |
+| `edges`               | –                       | `NodeGraphEdge[]`                   | `[]`                      | The connections: `{ id, from, port, to }`.                         |
+| `nodeTypes`           | –                       | `Record<string, NodeGraphNodeType>` | `{}`                      | The type registry (see above).                                     |
+| `renderNode`          | –                       | `(node) => unknown`                 | –                         | Optional renderer for a node's body.                               |
+| `runStates`           | –                       | `Record<string, NodeGraphRunState>` | `{}`                      | Traversal paint state per node.                                    |
+| `traversedEdges`      | –                       | `string[]`                          | `[]`                      | Edges painted with the traversed style.                            |
+| `messages`            | –                       | `Partial<NodeGraphMessages>`        | `{}`                      | Overrides for the announcement strings (localization).             |
+| `label`               | `label`                 | `string`                            | `"Node graph"`            | Accessible name of the editor.                                     |
+| `grid`                | `grid`                  | `number`                            | `8`                       | Snap step in world pixels; `0` disables snapping.                  |
+| `nodeWidth`           | `node-width`            | `number`                            | `230`                     | Shared node width in world pixels.                                 |
+| `minZoom` / `maxZoom` | `min-zoom` / `max-zoom` | `number`                            | `0.4` / `2`               | Zoom clamp.                                                        |
+| `readonly`            | `readonly`              | `boolean`                           | `false`                   | Blocks every mutation; pan, zoom and selection stay live.          |
+| `dropFormat`          | `drop-format`           | `string`                            | `"text/fluid-node-graph"` | The dataTransfer type accepted on drop.                            |
 
 ### Methods
 
-| Method | Description |
-| --- | --- |
+| Method                         | Description                                                                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `connectNodes(from, port, to)` | Create an edge through the same guards the gestures use (no self-links, duplicates, unknown ports, or targets without input). Returns the edge or `null`. |
-| `fitView()` | Fit every node into view. |
-| `resetViewport()` | Reset pan and zoom. |
-| `zoomBy(factor)` | Zoom around the canvas center, clamped to the range. |
-| `centerOn(nodeId)` | Center the viewport on a node. |
+| `fitView()`                    | Fit every node into view.                                                                                                                                 |
+| `resetViewport()`              | Reset pan and zoom.                                                                                                                                       |
+| `zoomBy(factor)`               | Zoom around the canvas center, clamped to the range.                                                                                                      |
+| `centerOn(nodeId)`             | Center the viewport on a node.                                                                                                                            |
 
 ### Events
 
 All events bubble and are composed.
 
-| Event | Detail | Fired when |
-| --- | --- | --- |
-| `fluid-node-move` | `{ id, x, y }` | A node settles after a drag, or moves by keyboard. |
-| `fluid-node-remove` | `{ id }` | A node (and its edges) is removed. |
-| `fluid-connect` | `{ id, from, port, to }` | An edge is created by drag, keyboard, or `connectNodes`. |
-| `fluid-edge-remove` | `{ id, from, port, to }` | An edge is removed. |
-| `fluid-selection-change` | `{ nodeId, edgeId }` | The selection changes (either or both `null`). |
-| `fluid-viewport-change` | `{ x, y, zoom }` | Pan or zoom settles. |
-| `fluid-node-drop` | `{ data, x, y }` | A matching drag is dropped, in world coordinates. |
+| Event                    | Detail                   | Fired when                                               |
+| ------------------------ | ------------------------ | -------------------------------------------------------- |
+| `fluid-node-move`        | `{ id, x, y }`           | A node settles after a drag, or moves by keyboard.       |
+| `fluid-node-remove`      | `{ id }`                 | A node (and its edges) is removed.                       |
+| `fluid-connect`          | `{ id, from, port, to }` | An edge is created by drag, keyboard, or `connectNodes`. |
+| `fluid-edge-remove`      | `{ id, from, port, to }` | An edge is removed.                                      |
+| `fluid-selection-change` | `{ nodeId, edgeId }`     | The selection changes (either or both `null`).           |
+| `fluid-viewport-change`  | `{ x, y, zoom }`         | Pan or zoom settles.                                     |
+| `fluid-node-drop`        | `{ data, x, y }`         | A matching drag is dropped, in world coordinates.        |
 
 ## Keyboard
 
 The keyboard path is a first-class peer of the pointer gestures, not a
 fallback.
 
-| Focus | Key | Action |
-| --- | --- | --- |
-| Canvas | `Arrow keys` | Pan. |
-| Canvas | `+` / `-` | Zoom in / out. |
-| Canvas | `Home` | Fit the graph into view. |
-| Node | `Arrow keys` | Nudge by one grid step (`Shift` for four). |
-| Node | `Enter` / `Space` | Select the node. |
-| Node | `Delete` | Remove the node and its connections. |
+| Focus       | Key               | Action                                                                                                                                                                  |
+| ----------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Canvas      | `Arrow keys`      | Pan.                                                                                                                                                                    |
+| Canvas      | `+` / `-`         | Zoom in / out.                                                                                                                                                          |
+| Canvas      | `Home`            | Fit the graph into view.                                                                                                                                                |
+| Node        | `Arrow keys`      | Nudge by one grid step (`Shift` for four).                                                                                                                              |
+| Node        | `Enter` / `Space` | Select the node.                                                                                                                                                        |
+| Node        | `Delete`          | Remove the node and its connections.                                                                                                                                    |
 | Output port | `Enter` / `Space` | Start a connection; then arrows cycle valid targets (previewed on the canvas), `Enter` connects, `Escape` cancels. `Tab` cancels and continues normal focus navigation. |
-| Input port | `Enter` / `Space` | Select the newest incoming connection, so `Delete` can remove it. |
+| Input port  | `Enter` / `Space` | Select the newest incoming connection, so `Delete` can remove it.                                                                                                       |
 
 Nodes live in a `list` with focusable `listitem` children; ports are real
 buttons whose targets meet the minimum size (scaling to 44px under AAA

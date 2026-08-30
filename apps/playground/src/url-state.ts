@@ -1,5 +1,5 @@
 import { themeStore } from "./store.js";
-import { elementOverridesStore } from "./element-overrides-store.js";
+import { componentOverridesStore } from "./component-overrides-store.js";
 
 /**
  * Serializes both override stores into the URL hash so themes are shareable
@@ -12,7 +12,7 @@ import { elementOverridesStore } from "./element-overrides-store.js";
  */
 
 const THEME_KEY = "theme";
-const ELEMENTS_KEY = "elements";
+const COMPONENTS_KEY = "components";
 
 function encode(obj: unknown): string {
   const json = JSON.stringify(obj);
@@ -47,8 +47,8 @@ function writeHashValues(
   const params = new URLSearchParams(window.location.hash.slice(1));
   if (Object.keys(theme).length === 0) params.delete(THEME_KEY);
   else params.set(THEME_KEY, encode(theme));
-  if (Object.keys(elements).length === 0) params.delete(ELEMENTS_KEY);
-  else params.set(ELEMENTS_KEY, encode(elements));
+  if (Object.keys(elements).length === 0) params.delete(COMPONENTS_KEY);
+  else params.set(COMPONENTS_KEY, encode(elements));
   const newHash = params.toString();
   // Replace state so we don't pollute history with every keystroke.
   history.replaceState(null, "", newHash ? `#${newHash}` : window.location.pathname);
@@ -88,8 +88,8 @@ export function syncUrlState(): void {
   // reference each other.
   const theme = readHashValue<Record<string, unknown>>(THEME_KEY);
   if (theme) themeStore.replace(sanitizeFlat(theme));
-  const elements = readHashValue<Record<string, unknown>>(ELEMENTS_KEY);
-  if (elements) elementOverridesStore.replace(sanitizeNested(elements));
+  const elements = readHashValue<Record<string, unknown>>(COMPONENTS_KEY);
+  if (elements) componentOverridesStore.replace(sanitizeNested(elements));
 
   // Batch hash writes: every store change schedules a single rAF write so
   // burst edits (e.g. dragging a slider) don't thrash the URL bar.
@@ -99,16 +99,16 @@ export function syncUrlState(): void {
     queued = true;
     requestAnimationFrame(() => {
       queued = false;
-      writeHashValues(themeStore.diff(), elementOverridesStore.current);
+      writeHashValues(themeStore.diff(), componentOverridesStore.current);
     });
   };
   themeStore.subscribe(queueWrite);
-  elementOverridesStore.subscribe(queueWrite);
+  componentOverridesStore.subscribe(queueWrite);
 
   window.addEventListener("hashchange", () => {
     const t = readHashValue<Record<string, unknown>>(THEME_KEY);
     themeStore.replace(t ? sanitizeFlat(t) : {});
-    const e = readHashValue<Record<string, unknown>>(ELEMENTS_KEY);
-    elementOverridesStore.replace(e ? sanitizeNested(e) : {});
+    const e = readHashValue<Record<string, unknown>>(COMPONENTS_KEY);
+    componentOverridesStore.replace(e ? sanitizeNested(e) : {});
   });
 }

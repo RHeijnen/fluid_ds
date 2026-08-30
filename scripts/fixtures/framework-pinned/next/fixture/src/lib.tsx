@@ -48,7 +48,9 @@ export function useFluidEvent<T extends HTMLElement = HTMLElement>(
 /** Push a toast onto the app's <fluid-toast> stack. */
 export function toast(message: string, variant = "success") {
   const el = document.getElementById("app-toast") as
-    | (HTMLElement & { toast?: (o: { message: string; variant: string; duration: number }) => void })
+    | (HTMLElement & {
+        toast?: (o: { message: string; variant: string; duration: number }) => void;
+      })
     | null;
   el?.toast?.({ message, variant, duration: 3500 });
 }
@@ -72,9 +74,9 @@ export function FluidChart({
   const lineRef = useRef<FluidLineChart>(null);
   const doughnutRef = useRef<FluidDoughnutChart>(null);
   useEffect(() => {
-    const el = (kind === "doughnut" ? doughnutRef.current : lineRef.current) as
-      | ChartProperties
-      | null;
+    const el = (
+      kind === "doughnut" ? doughnutRef.current : lineRef.current
+    ) as ChartProperties | null;
     if (!el) return;
     el.data = data;
     if (options) el.options = options;

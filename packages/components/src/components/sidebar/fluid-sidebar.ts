@@ -62,123 +62,127 @@ export class FluidSidebar extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: block;
-      box-sizing: border-box;
-    }
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
 
-    :host([hidden]) {
-      display: none;
-    }
+      :host([hidden]) {
+        display: none;
+      }
 
-    .base {
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      block-size: 100%;
-      inline-size: var(--fluid-sidebar-width, 16rem);
-      overflow: hidden;
-      background: var(--fluid-sidebar-bg, var(--fluid-surface-base));
-      color: var(--fluid-sidebar-fg, var(--fluid-text-primary));
-      border-inline-end: var(--fluid-sidebar-border-width, 1px) solid
-        var(--fluid-sidebar-border, var(--fluid-border-default));
-      font-family: var(--fluid-sidebar-font-family, var(--fluid-font-family-sans));
-      transition: inline-size
-        calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-        var(--fluid-sidebar-easing, var(--fluid-easing-emphasized));
-    }
-
-    /* Collapsible: closed collapses to the mini rail. */
-    :host([collapsible]:not([open])) .base {
-      inline-size: var(--fluid-sidebar-mini-width, 4rem);
-    }
-
-    /* Not collapsible: closed hides the sidebar entirely (inline mode). */
-    :host(:not([collapsible]):not([open]):not([overlay])) .base {
-      inline-size: 0;
-      border-inline-end-width: 0;
-    }
-
-    .header {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      gap: var(--fluid-space-2);
-      padding: var(--fluid-space-3);
-      min-block-size: 0;
-    }
-    .header.empty {
-      display: none;
-    }
-
-    .content {
-      flex: 1 1 auto;
-      min-block-size: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: var(--fluid-space-2);
-    }
-
-    .footer {
-      flex: 0 0 auto;
-      padding: var(--fluid-space-3);
-      border-block-start: var(--fluid-sidebar-border-width, 1px) solid
-        var(--fluid-sidebar-border, var(--fluid-border-default));
-    }
-    .footer.empty {
-      display: none;
-    }
-
-    /* Overlay mode: float the aside above the page over a backdrop. */
-    :host([overlay]) {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      pointer-events: none;
-    }
-    :host([overlay]:not([open])) {
-      visibility: hidden;
-    }
-
-    .backdrop {
-      position: absolute;
-      inset: 0;
-      background: var(--fluid-sidebar-backdrop, rgb(0 0 0 / 0.4));
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity
-        calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-        var(--fluid-easing-standard);
-    }
-
-    :host([overlay]) .base {
-      position: absolute;
-      inset-block: 0;
-      inset-inline-start: 0;
-      block-size: 100%;
-      box-shadow: var(--fluid-sidebar-shadow, var(--fluid-shadow-lg));
-      pointer-events: auto;
-      transform: translateX(-100%);
-      transition:
-        transform
+      .base {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        block-size: 100%;
+        inline-size: var(--fluid-sidebar-width, 16rem);
+        overflow: hidden;
+        background: var(--fluid-sidebar-bg, var(--fluid-surface-base));
+        color: var(--fluid-sidebar-fg, var(--fluid-text-primary));
+        border-inline-end: var(--fluid-sidebar-border-width, 1px) solid
+          var(--fluid-sidebar-border, var(--fluid-border-default));
+        font-family: var(--fluid-sidebar-font-family, var(--fluid-font-family-sans));
+        transition: inline-size
           calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
-          var(--fluid-sidebar-easing, var(--fluid-easing-emphasized)),
-        visibility 0s
-          calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1));
-    }
+          var(--fluid-sidebar-easing, var(--fluid-easing-emphasized));
+      }
 
-    :host([overlay][open]) {
-      pointer-events: auto;
-    }
-    :host([overlay][open]) .backdrop {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    :host([overlay][open]) .base {
-      transform: none;
-      transition-delay: 0s;
-    }
-  `
+      /* Collapsible: closed collapses to the mini rail. */
+      :host([collapsible]:not([open])) .base {
+        inline-size: var(--fluid-sidebar-mini-width, 4rem);
+      }
+
+      /* Not collapsible: closed hides the sidebar entirely (inline mode). */
+      :host(:not([collapsible]):not([open]):not([overlay])) .base {
+        inline-size: 0;
+        border-inline-end-width: 0;
+      }
+
+      .header {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: var(--fluid-space-2);
+        padding: var(--fluid-space-3);
+        min-block-size: 0;
+      }
+      .header.empty {
+        display: none;
+      }
+
+      .content {
+        flex: 1 1 auto;
+        min-block-size: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: var(--fluid-space-2);
+      }
+
+      .footer {
+        flex: 0 0 auto;
+        padding: var(--fluid-space-3);
+        border-block-start: var(--fluid-sidebar-border-width, 1px) solid
+          var(--fluid-sidebar-border, var(--fluid-border-default));
+      }
+      .footer.empty {
+        display: none;
+      }
+
+      /* Overlay mode: float the aside above the page over a backdrop. */
+      :host([overlay]) {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      :host([overlay]:not([open])) {
+        visibility: hidden;
+      }
+
+      .backdrop {
+        position: absolute;
+        inset: 0;
+        background: var(--fluid-sidebar-backdrop, rgb(0 0 0 / 0.4));
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity
+          calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
+          var(--fluid-easing-standard);
+      }
+
+      :host([overlay]) .base {
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: 0;
+        block-size: 100%;
+        box-shadow: var(--fluid-sidebar-shadow, var(--fluid-shadow-lg));
+        pointer-events: auto;
+        transform: translateX(-100%);
+        transition:
+          transform
+            calc(
+              var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1)
+            )
+            var(--fluid-sidebar-easing, var(--fluid-easing-emphasized)),
+          visibility 0s
+            calc(
+              var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1)
+            );
+      }
+
+      :host([overlay][open]) {
+        pointer-events: auto;
+      }
+      :host([overlay][open]) .backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      :host([overlay][open]) .base {
+        transform: none;
+        transition-delay: 0s;
+      }
+    `
   ];
 
   @query(".base") private baseEl!: HTMLElement;
@@ -242,9 +246,7 @@ export class FluidSidebar extends FluidElement {
 
   protected override firstUpdated(): void {
     for (const slotName of ["header", "footer"]) {
-      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>(
-        `slot[name="${slotName}"]`
-      );
+      const slot = this.shadowRoot?.querySelector<HTMLSlotElement>(`slot[name="${slotName}"]`);
       const parent = slot?.parentElement;
       if (!slot || !parent) continue;
       const update = () => {
@@ -273,8 +275,7 @@ export class FluidSidebar extends FluidElement {
   }
 
   private captureFocus(): void {
-    this.previouslyFocused =
-      (this.getRootNode() as Document).activeElement as HTMLElement | null;
+    this.previouslyFocused = (this.getRootNode() as Document).activeElement as HTMLElement | null;
     requestAnimationFrame(() => {
       const first = this.firstFocusable();
       if (first) first.focus();
@@ -306,7 +307,9 @@ export class FluidSidebar extends FluidElement {
     return result.filter((el) => {
       if (el === active) return true;
       const style = getComputedStyle(el);
-      return el.getClientRects().length > 0 && style.display !== "none" && style.visibility !== "hidden";
+      return (
+        el.getClientRects().length > 0 && style.display !== "none" && style.visibility !== "hidden"
+      );
     });
   }
 
@@ -342,8 +345,12 @@ export class FluidSidebar extends FluidElement {
       const active = this.deepestActiveElement();
       const index = items.findIndex((item) => item === active);
       const next = e.shiftKey
-        ? index <= 0 ? last : items[index - 1]
-        : index < 0 || index === items.length - 1 ? first : items[index + 1];
+        ? index <= 0
+          ? last
+          : items[index - 1]
+        : index < 0 || index === items.length - 1
+          ? first
+          : items[index + 1];
       e.preventDefault();
       next?.focus();
     }
@@ -356,11 +363,7 @@ export class FluidSidebar extends FluidElement {
   override render(): TemplateResult {
     return html`
       ${this.overlay
-        ? html`<div
-            part="backdrop"
-            class="backdrop"
-            @click=${this.handleBackdropClick}
-          ></div>`
+        ? html`<div part="backdrop" class="backdrop" @click=${this.handleBackdropClick}></div>`
         : ""}
       <aside
         part="base"

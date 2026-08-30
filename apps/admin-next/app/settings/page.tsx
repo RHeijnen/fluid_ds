@@ -50,7 +50,9 @@ export default function SettingsPage() {
           </div>
         </div>
         <div slot="footer" className="dialog-actions">
-          <fluid-button onClick={() => toast("Settings saved.", "success")}>Save changes</fluid-button>
+          <fluid-button onClick={() => toast("Settings saved.", "success")}>
+            Save changes
+          </fluid-button>
         </div>
       </fluid-card>
     </>

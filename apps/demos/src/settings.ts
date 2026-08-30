@@ -130,7 +130,7 @@ main.innerHTML = `
             <fluid-textarea
               rows="5"
               aria-label="Bio"
-              value="Building design systems and tinkering with web components."
+              value="Building stuff"
             ></fluid-textarea>
           </label>
 
@@ -186,7 +186,8 @@ main.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 0.5rem; height: 16rem; padding: 0.5rem; align-items: stretch; justify-content: end;">
               ${Array.from(
                 { length: 12 },
-                (_, i) => `<fluid-skeleton style="width: 100%; height: ${20 + (i * 5) % 60}%;"></fluid-skeleton>`
+                (_, i) =>
+                  `<fluid-skeleton style="width: 100%; height: ${20 + ((i * 5) % 60)}%;"></fluid-skeleton>`
               ).join("")}
             </div>
           </div>
@@ -266,8 +267,7 @@ main.innerHTML = `
 
 // Wire interactions.
 
-const $ = <T extends Element>(sel: string): T | null =>
-  document.querySelector<T>(sel);
+const $ = <T extends Element>(sel: string): T | null => document.querySelector<T>(sel);
 
 const toaster = $<HTMLElement & { toast: (o: { message: string; variant: string }) => void }>(
   "#toaster"
@@ -281,9 +281,14 @@ const toaster = $<HTMLElement & { toast: (o: { message: string; variant: string 
  */
 function validateForm(): boolean {
   const fields = Array.from(
-    document.querySelectorAll<HTMLElement & { validity?: ValidityState; validationMessage?: string; focus?: () => void; reportValidity?: () => boolean }>(
-      "fluid-input, fluid-textarea, fluid-select"
-    )
+    document.querySelectorAll<
+      HTMLElement & {
+        validity?: ValidityState;
+        validationMessage?: string;
+        focus?: () => void;
+        reportValidity?: () => boolean;
+      }
+    >("fluid-input, fluid-textarea, fluid-select")
   );
   for (const field of fields) {
     const v = field.validity;
@@ -319,9 +324,9 @@ const deleteDialog = $<HTMLElement & { show: () => void; hide: () => void }>("#d
 $<HTMLElement>("#delete-btn")?.addEventListener("click", () => deleteDialog?.show());
 $<HTMLElement>("#cancel-delete")?.addEventListener("click", () => deleteDialog?.hide());
 
-const confirmInput = $<HTMLElement & { value?: string; addEventListener: typeof window.addEventListener }>(
-  "#delete-confirm-input"
-);
+const confirmInput = $<
+  HTMLElement & { value?: string; addEventListener: typeof window.addEventListener }
+>("#delete-confirm-input");
 const confirmBtn = $<HTMLElement>("#confirm-delete");
 confirmInput?.addEventListener("fluid-input", () => {
   if (confirmInput.value === "DELETE") confirmBtn?.removeAttribute("disabled");
@@ -378,20 +383,7 @@ async function loadBillingData(): Promise<void> {
     };
     if (!chart) return;
     chart.data = {
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ],
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       datasets: [
         {
           label: "Spend",

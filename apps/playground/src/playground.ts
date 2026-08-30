@@ -1,10 +1,12 @@
 import { LitElement, html, css, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { themeStore } from "./store.js";
+import { componentOverridesStore } from "./component-overrides-store.js";
 import { selectionStore, type Mode } from "./selection-store.js";
 import { syncUrlState } from "./url-state.js";
 import "./token-form.js";
 import "./preview.js";
+import "./builder-demo.js";
 import "./export-panel.js";
 import "./inspector.js";
 
@@ -103,6 +105,42 @@ export class FluidPlayground extends LitElement {
       min-width: 0;
     }
 
+    /*
+     * The walkthrough sits over the preview, the way the scheduler's demo sits
+     * over its canvas: the thing being explained stays visible behind it, and
+     * the first click anywhere goes to dismissing it rather than to a control
+     * the reader has not been told about yet.
+     */
+    section {
+      position: relative;
+    }
+    .demo-veil {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      /* Start, not centre: the preview is many viewports tall, so centring in
+         the veil would park the panel somewhere far below the fold. */
+      justify-items: center;
+      align-items: start;
+      padding: var(--fluid-space-4);
+      background: color-mix(in srgb, var(--fluid-surface-base) 82%, transparent);
+      backdrop-filter: blur(2px);
+      cursor: pointer;
+    }
+    .demo-panel {
+      /* Sticky so it stays in view while the veil spans the whole preview. */
+      position: sticky;
+      inset-block-start: 12vh;
+      width: min(30rem, 100%);
+      padding: var(--fluid-space-4);
+      border: 1px solid var(--fluid-border-default);
+      border-radius: var(--fluid-radius-lg);
+      background: var(--fluid-surface-base);
+      box-shadow: var(--fluid-shadow-lg);
+      cursor: auto;
+    }
+
     .section-label {
       margin: 0 0 var(--fluid-space-3) 0;
       font-size: var(--fluid-font-size-sm);
@@ -124,6 +162,9 @@ export class FluidPlayground extends LitElement {
      * "armed" state. Big and obvious so designers see it immediately
      * and know what's about to change when they click.
      */
+    .base-select {
+      inline-size: 8.5rem;
+    }
     .design-toggle {
       all: unset;
       cursor: pointer;
@@ -181,17 +222,40 @@ export class FluidPlayground extends LitElement {
   `;
 
   @state() private colorScheme: ColorScheme = "light";
-  @state() private changeCount = 0;
+  /**
+   * Brand-wide overrides plus per-element ones. Both are user changes, and a
+   * Reset that only knew about the theme store sat disabled while an isolated
+   * element was visibly overridden, with no way to undo it.
+   */
+  @state() private themeChangeCount = 0;
+  @state() private elementChangeCount = 0;
+
+  private get changeCount(): number {
+    return this.themeChangeCount + this.elementChangeCount;
+  }
+  @state() private baseTheme = "default";
   @state() private mode: Mode = "interaction";
+  @state() private demoDismissed = false;
+  @state() private demoRequested = false;
 
   private unsubscribeTheme?: () => void;
+  private unsubscribeElements?: () => void;
   private unsubscribeSelection?: () => void;
+  /**
+   * Demo fluid-theme-toggle components inside the preview flip the document's
+   * data-fluid-theme out-of-band; this observer keeps the shell's scheme
+   * control and the preview's semantic re-declarations honest.
+   */
+  private schemeObserver?: MutationObserver;
 
   override connectedCallback(): void {
     super.connectedCallback();
     syncUrlState();
     this.unsubscribeTheme = themeStore.subscribe((overrides) => {
-      this.changeCount = Object.keys(overrides).length;
+      this.themeChangeCount = Object.keys(overrides).length;
+    });
+    this.unsubscribeElements = componentOverridesStore.subscribe(() => {
+      this.elementChangeCount = componentOverridesStore.valueCount();
     });
     this.unsubscribeSelection = selectionStore.subscribe((s) => {
       this.mode = s.mode;
@@ -199,12 +263,25 @@ export class FluidPlayground extends LitElement {
     });
     this.applyColorScheme();
     this.applyDesignMode();
+    this.schemeObserver = new MutationObserver(() => {
+      const attr = document.documentElement.getAttribute("data-fluid-theme");
+      if ((attr === "light" || attr === "dark") && attr !== this.colorScheme) {
+        this.colorScheme = attr;
+        themeStore.setScheme(attr);
+      }
+    });
+    this.schemeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-fluid-theme"]
+    });
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.unsubscribeTheme?.();
+    this.unsubscribeElements?.();
     this.unsubscribeSelection?.();
+    this.schemeObserver?.disconnect();
   }
 
   private toggleDesignMode = () => {
@@ -224,6 +301,7 @@ export class FluidPlayground extends LitElement {
 
   private applyColorScheme(): void {
     document.documentElement.setAttribute("data-fluid-theme", this.colorScheme);
+    themeStore.setScheme(this.colorScheme);
   }
 
   private handleSchemeChange = (e: CustomEvent) => {
@@ -231,8 +309,109 @@ export class FluidPlayground extends LitElement {
     this.applyColorScheme();
   };
 
+  /** The brand presets offered as a starting point, in the same order as the demos. */
+  private static readonly BASE_THEMES = ["default", "glass", "titanium", "midnight", "corporate"];
+
+  private handleBaseChange = (e: CustomEvent) => {
+    this.loadBaseTheme(String(e.detail.value));
+  };
+
+  /**
+   * Load a brand preset as an editable starting point.
+   *
+   * The preset is a shipped @fluid-ds/themes brand, i.e. a set of token
+   * overrides. Rather than duplicate its values here, they are read back from a
+   * hidden probe carrying the brand attribute, then written into the theme
+   * store as the current overrides. From there every token is editable and the
+   * export is the user's own theme built on that base. `themeStore.replace`
+   * drops anything equal to the default, so only the preset's real differences
+   * land. "default" clears back to the base tokens.
+   *
+   * Glass loads its palette this way like any other; its frosted surface
+   * treatment is structural CSS, not tokens, so it is best seen in the portal
+   * or hero demos rather than here.
+   */
+  private loadBaseTheme(brand: string): void {
+    this.baseTheme = brand;
+    if (brand === "default") {
+      themeStore.reset();
+      return;
+    }
+    const probe = document.createElement("div");
+    probe.setAttribute("data-fluid-brand", brand);
+    probe.style.display = "none";
+    document.body.appendChild(probe);
+    const styles = getComputedStyle(probe);
+    const keys = [
+      ...[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((n) => `--fluid-color-brand-${n}`),
+      "--fluid-radius-sm",
+      "--fluid-radius-md",
+      "--fluid-radius-lg",
+      "--fluid-radius-xl"
+    ];
+    const overrides: Record<string, string> = {};
+    for (const key of keys) {
+      const value = styles.getPropertyValue(key).trim();
+      if (value) overrides[key] = value;
+    }
+    /*
+     * The accent semantics are var() references, which getPropertyValue returns
+     * unresolved, so they would not land as usable overrides. Resolve each to a
+     * concrete colour by borrowing the probe's `color` property, which forces
+     * the engine to substitute the reference against the brand ramp. Captured
+     * as a snapshot: the accent will not re-derive if the user later edits the
+     * ramp, which is the expected behaviour for a starting point.
+     */
+    const resolveColor = (token: string): string => {
+      probe.style.setProperty("color", `var(${token})`);
+      const resolved = getComputedStyle(probe).color;
+      probe.style.removeProperty("color");
+      return resolved && resolved !== "rgba(0, 0, 0, 0)" ? resolved : "";
+    };
+    for (const token of [
+      "--fluid-accent-base",
+      "--fluid-accent-hover",
+      "--fluid-accent-active",
+      "--fluid-focus-ring-color"
+    ]) {
+      const value = resolveColor(token);
+      if (value) overrides[token] = value;
+    }
+    document.body.removeChild(probe);
+    themeStore.replace(overrides);
+  }
+
+  /**
+   * Whether the walkthrough is on the preview right now.
+   *
+   * Unasked while the page is still untouched, and on request after that.
+   * Dismissing it is remembered for the session so it does not reappear every
+   * time the preview re-renders while someone is reading it.
+   */
+  private showDemo(): boolean {
+    if (this.demoRequested) return true;
+    if (this.demoDismissed) return false;
+    return this.mode !== "design" && this.changeCount === 0;
+  }
+
+  /** Any click on the preview puts the walkthrough away and gets out of the way. */
+  private dismissDemo = (): void => {
+    this.demoRequested = false;
+    this.demoDismissed = true;
+  };
+
   private handleReset = () => {
     themeStore.reset();
+    this.baseTheme = "default";
+    // The preview renders these as a stylesheet it rebuilds from the store,
+    // so clearing the store is enough to un-paint them.
+    componentOverridesStore.reset();
+    /*
+     * Leave isolate mode too. The component-scoped overrides were just
+     * cleared, so a panel still claiming to be scoped to that component
+     * would misrepresent what the next edit does.
+     */
+    selectionStore.setIsolate(false);
   };
 
   override render(): TemplateResult {
@@ -275,6 +454,19 @@ export class FluidPlayground extends LitElement {
             <span class="pulse"></span>
             <span>${this.mode === "design" ? "Design Mode · ON" : "Design Mode"}</span>
           </button>
+          <fluid-select
+            class="base-select"
+            .value=${this.baseTheme}
+            aria-label="Base theme"
+            @fluid-change=${this.handleBaseChange}
+          >
+            ${FluidPlayground.BASE_THEMES.map(
+              (name) =>
+                html`<fluid-option value=${name}
+                  >${name[0]!.toUpperCase() + name.slice(1)}</fluid-option
+                >`
+            )}
+          </fluid-select>
           <fluid-segmented-control
             .value=${this.colorScheme}
             aria-label="Color scheme"
@@ -306,6 +498,13 @@ export class FluidPlayground extends LitElement {
           <design-inspector>
             <component-preview></component-preview>
           </design-inspector>
+          ${this.showDemo()
+            ? html`<div class="demo-veil" @click=${this.dismissDemo}>
+                <div class="demo-panel">
+                  <builder-demo></builder-demo>
+                </div>
+              </div>`
+            : ""}
         </section>
       </main>
       <!--

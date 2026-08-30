@@ -150,7 +150,7 @@ async function finishUpdates(host: FluidHydrationOwner): Promise<void> {
 export function captureFluidFormState(root: FluidHydrationRoot = document): () => Promise<void> {
   const controls: StatefulControl[] = [];
   collectControls(root, controls);
-  const ownerDocument = root.nodeType === 9 ? root as Document : root.ownerDocument;
+  const ownerDocument = root.nodeType === 9 ? (root as Document) : root.ownerDocument;
   const active = ownerDocument ? deepActiveElement(ownerDocument) : null;
   const states: ControlState[] = controls.map((control) => ({
     control,
@@ -178,8 +178,12 @@ export function captureFluidFormState(root: FluidHydrationRoot = document): () =
 
   let restoration: Promise<void> | undefined;
   const restore = async () => {
-    const owners = new Set(states.filter(({ control }) => control.isConnected)
-      .map(({ control }) => fluidOwner(control)).filter((host) => host !== undefined));
+    const owners = new Set(
+      states
+        .filter(({ control }) => control.isConnected)
+        .map(({ control }) => fluidOwner(control))
+        .filter((host) => host !== undefined)
+    );
     // First adopt the unchanged server template, then apply the captured edits.
     await Promise.all([...owners].map(finishUpdates));
     const ownerStates = new Map<FluidHydrationOwner, ControlState[]>();
@@ -203,13 +207,18 @@ export function captureFluidFormState(root: FluidHydrationRoot = document): () =
       } else if (host?.localName === "fluid-color-picker") {
         const raw = state.value.trim();
         (host as ColorPickerOwner).value = raw.startsWith("#") || !raw ? raw : `#${raw}`;
-      } else if (["fluid-date-picker", "fluid-date-range-picker", "fluid-time-picker"].includes(host.localName)) {
+      } else if (
+        ["fluid-date-picker", "fluid-date-range-picker", "fluid-time-picker"].includes(
+          host.localName
+        )
+      ) {
         (host as DraftOwner).typed = state.value;
       } else if (host?.localName === "fluid-otp") {
         const otp = host as OtpOwner;
         const combined = captured.map(({ value }) => value).join("");
-        otp.value = (otp.type === "number" ? combined.replace(/[^0-9]/g, "") : combined.replace(/\s/g, ""))
-          .slice(0, otp.length);
+        otp.value = (
+          otp.type === "number" ? combined.replace(/[^0-9]/g, "") : combined.replace(/\s/g, "")
+        ).slice(0, otp.length);
       } else if (host?.localName === "fluid-tag-input") {
         (host as TagInputOwner).draft = state.value;
       }
@@ -248,5 +257,5 @@ export function captureFluidFormState(root: FluidHydrationRoot = document): () =
     }
   };
   // Repeated calls must not overwrite edits made after hydration.
-  return () => restoration ??= restore();
+  return () => (restoration ??= restore());
 }

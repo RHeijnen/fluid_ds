@@ -16,14 +16,13 @@ that also works on its own; the accordion is the orchestration layer on top.
 <Demo>
   <fluid-accordion style="width: 100%;">
     <fluid-details>
-      <span slot="summary">What is Fluid?</span>
-      A framework-agnostic web-component design system, standard custom elements
-      that work in any framework, or none.
+      <span slot="summary">What is Fluid?</span>A framework-agnostic web-component design system,
+      standard custom elements that work in any framework, or none.
     </fluid-details>
     <fluid-details>
       <span slot="summary">Which browsers are supported?</span>
-      Anything with custom elements + constructable stylesheets, every evergreen
-      browser shipped in the last few years.
+      Anything with custom elements + constructable stylesheets, every evergreen browser shipped in
+      the last few years.
     </fluid-details>
     <fluid-details>
       <span slot="summary">Is it tree-shakable?</span>
@@ -44,6 +43,7 @@ that also works on its own; the accordion is the orchestration layer on top.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/accordion/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -55,6 +55,7 @@ that also works on its own; the accordion is the orchestration layer on top.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/accordion"; // registers accordion + details
     ```
+
   </TabItem>
 </Tabs>
 
@@ -65,8 +66,7 @@ that also works on its own; the accordion is the orchestration layer on top.
 <Demo>
   <fluid-accordion style="width: 100%;">
     <fluid-details>
-      <span slot="summary">What is Fluid?</span>
-      A framework-agnostic web-component design system.
+      <span slot="summary">What is Fluid?</span>A framework-agnostic web-component design system.
     </fluid-details>
     <fluid-details>
       <span slot="summary">Which browsers are supported?</span>
@@ -75,7 +75,8 @@ that also works on its own; the accordion is the orchestration layer on top.
   </fluid-accordion>
 </Demo>
 
-<ConformanceCode code={`<fluid-accordion>
+<ConformanceCode
+  code={`<fluid-accordion>
   <fluid-details>
     <span slot="summary">What is Fluid?</span>
     A framework-agnostic web-component design system…
@@ -84,7 +85,8 @@ that also works on its own; the accordion is the orchestration layer on top.
     <span slot="summary">Which browsers are supported?</span>
     Every evergreen browser…
   </fluid-details>
-</fluid-accordion>`} />
+</fluid-accordion>`}
+/>
 
 ### Single-open mode
 
@@ -92,16 +94,24 @@ that also works on its own; the accordion is the orchestration layer on top.
 
 <Demo>
   <fluid-accordion single style="width: 100%;">
-    <fluid-details open><span slot="summary">First section</span>Open by default.</fluid-details>
-    <fluid-details><span slot="summary">Second section</span>Opening this closes the first.</fluid-details>
-    <fluid-details><span slot="summary">Third section</span>Same goes for this one.</fluid-details>
+    <fluid-details open>
+      <span slot="summary">First section</span>Open by default.
+    </fluid-details>
+    <fluid-details>
+      <span slot="summary">Second section</span>Opening this closes the first.
+    </fluid-details>
+    <fluid-details>
+      <span slot="summary">Third section</span>Same goes for this one.
+    </fluid-details>
   </fluid-accordion>
 </Demo>
 
-<ConformanceCode code={`<fluid-accordion single>
+<ConformanceCode
+  code={`<fluid-accordion single>
   <fluid-details open>…</fluid-details>
   <fluid-details>…</fluid-details>
-</fluid-accordion>`} />
+</fluid-accordion>`}
+/>
 
 ### Standalone disclosure
 
@@ -114,10 +124,12 @@ that also works on its own; the accordion is the orchestration layer on top.
   </fluid-details>
 </Demo>
 
-<ConformanceCode code={`<fluid-details>
+<ConformanceCode
+  code={`<fluid-details>
   <span slot="summary">Show details</span>
   One-off expandable section.
-</fluid-details>`} />
+</fluid-details>`}
+/>
 
 ## Listening for changes
 
@@ -135,6 +147,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Faq.tsx"
@@ -157,6 +170,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Faq.vue"
@@ -171,6 +185,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
       </fluid-accordion>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="faq.component.ts"
@@ -193,6 +208,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Faq.svelte"
@@ -207,6 +223,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
       <fluid-details><span slot="summary">Q</span>A</fluid-details>
     </fluid-accordion>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -215,7 +232,7 @@ it expands or collapses; the event bubbles, so you can listen on the accordion.
 - A list where most items are collapsed and the user expands one (FAQ,
   changelog, settings groups).
 
-### When *not* to use
+### When _not_ to use
 
 - **Peer sections the user flips between**: use
   [`<fluid-tabs>`](/components/tabs/).
@@ -237,8 +254,8 @@ below](#api).
 ```
 
 <Aside type="tip">
-  Select a `fluid-details` in the [Theme builder](/playground/) to tweak the
-  separator, summary, and focus tokens visually.
+  Select a `fluid-details` in the [Theme builder](/playground/) to tweak the separator, summary, and
+  focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -266,8 +283,8 @@ the [Accessibility guide](/guides/accessibility/).
 - Each summary is a real `<button>` with `aria-expanded` + `aria-controls`; the
   body is `role="region"` with `aria-labelledby` back to the summary
   ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
-- <kbd>Enter</kbd> / <kbd>Space</kbd> toggle the focused summary; disabled
-  disclosures ignore pointer + keyboard.
+- <kbd>Enter</kbd> / <kbd>Space</kbd> toggle the focused summary; disabled disclosures ignore
+  pointer + keyboard.
 
 ### Motion & target size
 
@@ -280,10 +297,10 @@ the [Accessibility guide](/guides/accessibility/).
 Ships **WCAG 2.2 AA**; the header **Conformance** toggle (or an ancestor
 `[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

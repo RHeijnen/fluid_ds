@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Hotkey",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     keys: { control: "text", description: "Shortcut, e.g. mod+k, shift+?, or the sequence g h." },
     target: {
@@ -37,9 +37,7 @@ export const Default: Story = {
         ?when-input=${args.whenInput}
         @fluid-hotkey=${log}
       ></fluid-hotkey>
-      <p>
-        Press <kbd>${args.keys}</kbd> anywhere on the page.
-      </p>
+      <p>Press <kbd>${args.keys}</kbd> anywhere on the page.</p>
       <p data-out style="font-family: monospace;">No match yet.</p>
     </div>
   `
@@ -49,10 +47,7 @@ export const Sequence: Story = {
   render: () => html`
     <div>
       <fluid-hotkey keys="g h" @fluid-hotkey=${log}></fluid-hotkey>
-      <p>
-        Press <kbd>g</kbd> then <kbd>h</kbd> in quick succession (a Gmail-style
-        sequence).
-      </p>
+      <p>Press <kbd>g</kbd> then <kbd>h</kbd> in quick succession (a Gmail-style sequence).</p>
       <p data-out style="font-family: monospace;">No match yet.</p>
     </div>
   `
@@ -64,8 +59,8 @@ export const ShiftQuestionMark: Story = {
     <div>
       <fluid-hotkey keys="shift+?" prevent-default @fluid-hotkey=${log}></fluid-hotkey>
       <p>
-        Press <kbd>?</kbd> to open a help overlay, the classic keyboard-shortcut
-        cheat sheet trigger.
+        Press <kbd>?</kbd> to open a help overlay, the classic keyboard-shortcut cheat sheet
+        trigger.
       </p>
       <p data-out style="font-family: monospace;">No match yet.</p>
     </div>
@@ -78,8 +73,8 @@ export const WhenInput: Story = {
     <div>
       <fluid-hotkey keys="mod+s" prevent-default when-input @fluid-hotkey=${log}></fluid-hotkey>
       <p>
-        With <code>when-input</code>, <kbd>mod+s</kbd> fires even while the text
-        field below has focus.
+        With <code>when-input</code>, <kbd>mod+s</kbd> fires even while the text field below has
+        focus.
       </p>
       <input type="text" placeholder="Focus me, then press mod+s" />
       <p data-out style="font-family: monospace;">No match yet.</p>

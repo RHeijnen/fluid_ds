@@ -9,12 +9,18 @@ external editor library, themable through the same `--fluid-*` tokens as the
 rest of the system. Expansion pack.
 
 import { Aside } from "@astrojs/starlight/components";
+import EditorDemo from "../../../components/EditorDemo.astro";
+
+The editor below is live and preloaded with content: select some text, use the
+toolbar (or the arrow keys inside it), and watch the sanitized HTML value
+update underneath.
+
+<EditorDemo />
 
 <Aside type="note">
-  Formatting uses the deprecated `document.execCommand` API. The current browser
-  unit suite exercises Chromium, Firefox and WebKit. These targeted checks do
-  not establish complete editing or assistive-technology compatibility.
-  DOMPurify is used to sanitize HTML.
+  Formatting uses the deprecated `document.execCommand` API. The current browser unit suite
+  exercises Chromium, Firefox and WebKit. These targeted checks do not establish complete editing or
+  assistive-technology compatibility. DOMPurify is used to sanitize HTML.
 </Aside>
 
 ## Install
@@ -31,8 +37,8 @@ import "@fluid-ds/editor/define/rich-text-editor";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
+| Tag                        | Use                                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------------------- |
 | `<fluid-rich-text-editor>` | Accessible contenteditable WYSIWYG with a Bold / Italic / Underline / list / link / clear toolbar. |
 
 ## Use
@@ -65,17 +71,17 @@ the editor's HTML:
 
 ### Properties
 
-| Property | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `string` | `""` | The editor content as an HTML string. Reading it returns the live HTML; setting it replaces the editable content. |
-| `label` | `string` | `"Rich text editor"` | Accessible name for the editable textbox. |
-| `placeholder` | `string` | `""` | Hint shown while the editor is empty. |
-| `readOnly` / `readonly` | `boolean` | `false` | Keep the textbox selectable and focusable but prevent editing and disable formatting controls. Programmatic `value` assignment remains available. |
+| Property                | Type      | Default              | Description                                                                                                                                       |
+| ----------------------- | --------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`                 | `string`  | `""`                 | The editor content as an HTML string. Reading it returns the live HTML; setting it replaces the editable content.                                 |
+| `label`                 | `string`  | `"Rich text editor"` | Accessible name for the editable textbox.                                                                                                         |
+| `placeholder`           | `string`  | `""`                 | Hint shown while the editor is empty.                                                                                                             |
+| `readOnly` / `readonly` | `boolean` | `false`              | Keep the textbox selectable and focusable but prevent editing and disable formatting controls. Programmatic `value` assignment remains available. |
 
 ### Events
 
-| Event | Detail | Description |
-| --- | --- | --- |
+| Event          | Detail              | Description                                                                                                                                                      |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fluid-change` | `{ value: string }` | Fires once per content mutation with sanitized HTML. A formatting command and its native input do not emit duplicates. Programmatic assignment does not emit it. |
 
 ### Toolbar
@@ -116,23 +122,23 @@ case counts. Manual assistive-technology review remains outstanding.
 
 ### CSS parts
 
-| Part | Description |
-| --- | --- |
-| `base` | The editor root (toolbar plus editable region). |
-| `toolbar` | The formatting toolbar. |
-| `button` | A toolbar button. |
-| `editable` | The contenteditable textbox. |
+| Part       | Description                                     |
+| ---------- | ----------------------------------------------- |
+| `base`     | The editor root (toolbar plus editable region). |
+| `toolbar`  | The formatting toolbar.                         |
+| `button`   | A toolbar button.                               |
+| `editable` | The contenteditable textbox.                    |
 
 ### CSS custom properties
 
-| Property | Falls back to | Description |
-| --- | --- | --- |
-| `--fluid-editor-bg` | `--fluid-surface-base` | Editable region background. |
-| `--fluid-editor-fg` | `--fluid-text-primary` | Text color. |
-| `--fluid-editor-border` | `--fluid-border-default` | Border color. |
-| `--fluid-editor-toolbar-bg` | `--fluid-surface-muted` | Toolbar background. |
-| `--fluid-editor-radius` | `--fluid-radius-md` | Corner radius. |
-| `--fluid-editor-focus` | `--fluid-accent-base` | Focus ring and active toggle color. |
+| Property                    | Falls back to            | Description                         |
+| --------------------------- | ------------------------ | ----------------------------------- |
+| `--fluid-editor-bg`         | `--fluid-surface-base`   | Editable region background.         |
+| `--fluid-editor-fg`         | `--fluid-text-primary`   | Text color.                         |
+| `--fluid-editor-border`     | `--fluid-border-default` | Border color.                       |
+| `--fluid-editor-toolbar-bg` | `--fluid-surface-muted`  | Toolbar background.                 |
+| `--fluid-editor-radius`     | `--fluid-radius-md`      | Corner radius.                      |
+| `--fluid-editor-focus`      | `--fluid-accent-base`    | Focus ring and active toggle color. |
 
 ## Theming
 

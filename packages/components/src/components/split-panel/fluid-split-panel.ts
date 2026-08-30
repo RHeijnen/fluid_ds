@@ -31,7 +31,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-split-panel-border-default - Component override for the corresponding semantic token.
  * @cssproperty --fluid-split-panel-border-strong - Component override for the corresponding semantic token.
  * @cssproperty --fluid-split-panel-focus-ring-color - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidSplitPanel extends FluidElement {
   static override styles = css`
     :host {
@@ -149,7 +149,8 @@ export class FluidSplitPanel extends FluidElement {
   private onPointerUp = (e: PointerEvent) => {
     if (!this.dragging) return;
     this.dragging = false;
-    if (this.divider.hasPointerCapture(e.pointerId)) this.divider.releasePointerCapture(e.pointerId);
+    if (this.divider.hasPointerCapture(e.pointerId))
+      this.divider.releasePointerCapture(e.pointerId);
     this.divider.removeAttribute("data-dragging");
   };
 

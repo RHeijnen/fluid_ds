@@ -89,101 +89,101 @@ export class FluidPopconfirm extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: contents;
-    }
+      :host {
+        display: contents;
+      }
 
-    .panel {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
-      box-sizing: border-box;
-      max-width: var(--fluid-popconfirm-width, 18rem);
-      display: flex;
-      flex-direction: column;
-      gap: var(--fluid-popconfirm-gap, var(--fluid-space-3));
-      padding: var(--fluid-popconfirm-padding, var(--fluid-space-4));
-      background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
-      border: var(--fluid-popconfirm-border-width, 1px) solid
-        var(--fluid-popconfirm-border, var(--fluid-border-default));
-      border-radius: var(--fluid-popconfirm-radius, var(--fluid-radius-md));
-      box-shadow: var(--fluid-popconfirm-shadow, var(--fluid-shadow-lg));
-      font-family: var(--fluid-popconfirm-font-family, var(--fluid-font-family-sans));
-      color: var(--fluid-popconfirm-fg, var(--fluid-text-primary));
-      opacity: 0;
-      visibility: hidden;
-      transform: scale(0.97);
-      transform-origin: top left;
-      transition:
-        opacity calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
-          var(--fluid-easing-standard),
-        transform calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
-          var(--fluid-easing-standard),
-        visibility 0s calc(var(--fluid-duration-fast) * var(--fluid-motion, 1));
-    }
+      .panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+        max-width: var(--fluid-popconfirm-width, 18rem);
+        display: flex;
+        flex-direction: column;
+        gap: var(--fluid-popconfirm-gap, var(--fluid-space-3));
+        padding: var(--fluid-popconfirm-padding, var(--fluid-space-4));
+        background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
+        border: var(--fluid-popconfirm-border-width, 1px) solid
+          var(--fluid-popconfirm-border, var(--fluid-border-default));
+        border-radius: var(--fluid-popconfirm-radius, var(--fluid-radius-md));
+        box-shadow: var(--fluid-popconfirm-shadow, var(--fluid-shadow-lg));
+        font-family: var(--fluid-popconfirm-font-family, var(--fluid-font-family-sans));
+        color: var(--fluid-popconfirm-fg, var(--fluid-text-primary));
+        opacity: 0;
+        visibility: hidden;
+        transform: scale(0.97);
+        transform-origin: top left;
+        transition:
+          opacity calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
+            var(--fluid-easing-standard),
+          transform calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
+            var(--fluid-easing-standard),
+          visibility 0s calc(var(--fluid-duration-fast) * var(--fluid-motion, 1));
+      }
 
-    :host([open]) .panel {
-      opacity: 1;
-      visibility: visible;
-      transform: scale(1);
-      transition-delay: 0s;
-    }
+      :host([open]) .panel {
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1);
+        transition-delay: 0s;
+      }
 
-    .arrow {
-      position: absolute;
-      width: 0.625rem;
-      height: 0.625rem;
-      background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
-      border: var(--fluid-popconfirm-border-width, 1px) solid
-        var(--fluid-popconfirm-border, var(--fluid-border-default));
-      transform: rotate(45deg);
-      z-index: -1;
-    }
+      .arrow {
+        position: absolute;
+        width: 0.625rem;
+        height: 0.625rem;
+        background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
+        border: var(--fluid-popconfirm-border-width, 1px) solid
+          var(--fluid-popconfirm-border, var(--fluid-border-default));
+        transform: rotate(45deg);
+        z-index: -1;
+      }
 
-    .body {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--fluid-space-2);
-    }
+      .body {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--fluid-space-2);
+      }
 
-    .icon {
-      flex: 0 0 auto;
-      display: inline-flex;
-      width: 1.125rem;
-      height: 1.125rem;
-      margin-top: 0.0625rem;
-      color: var(--fluid-popconfirm-icon-color, var(--fluid-text-secondary));
-    }
+      .icon {
+        flex: 0 0 auto;
+        display: inline-flex;
+        width: 1.125rem;
+        height: 1.125rem;
+        margin-top: 0.0625rem;
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-text-secondary));
+      }
 
-    :host([tone="danger"]) .icon {
-      color: var(--fluid-popconfirm-icon-color, var(--fluid-danger-base));
-    }
-    :host([tone="warning"]) .icon {
-      color: var(--fluid-popconfirm-icon-color, var(--fluid-warning-base));
-    }
-    :host([tone="brand"]) .icon {
-      color: var(--fluid-popconfirm-icon-color, var(--fluid-accent-base));
-    }
+      :host([tone="danger"]) .icon {
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-danger-base));
+      }
+      :host([tone="warning"]) .icon {
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-warning-base));
+      }
+      :host([tone="brand"]) .icon {
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-accent-base));
+      }
 
-    .icon svg {
-      width: 100%;
-      height: 100%;
-    }
+      .icon svg {
+        width: 100%;
+        height: 100%;
+      }
 
-    .message {
-      margin: 0;
-      font-size: var(--fluid-popconfirm-font-size, var(--fluid-font-size-sm));
-      line-height: var(--fluid-font-line-height-normal, 1.5);
-      color: inherit;
-    }
+      .message {
+        margin: 0;
+        font-size: var(--fluid-popconfirm-font-size, var(--fluid-font-size-sm));
+        line-height: var(--fluid-font-line-height-normal, 1.5);
+        color: inherit;
+      }
 
-    .actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--fluid-space-2);
-    }
-  `
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--fluid-space-2);
+      }
+    `
   ];
 
   @query(".panel") private panelEl!: HTMLElement;
@@ -327,20 +327,16 @@ export class FluidPopconfirm extends FluidElement {
 
   private async reposition(): Promise<void> {
     if (!this.trigger || !this.panelEl) return;
-    const { x, y, placement, middlewareData } = await computePosition(
-      this.trigger,
-      this.panelEl,
-      {
-        placement: this.placement,
-        strategy: "fixed",
-        middleware: [
-          offset(this.distance),
-          flip(),
-          shift({ padding: 8 }),
-          this.arrowEl ? arrow({ element: this.arrowEl, padding: 8 }) : undefined
-        ].filter((m): m is NonNullable<typeof m> => m !== undefined)
-      }
-    );
+    const { x, y, placement, middlewareData } = await computePosition(this.trigger, this.panelEl, {
+      placement: this.placement,
+      strategy: "fixed",
+      middleware: [
+        offset(this.distance),
+        flip(),
+        shift({ padding: 8 }),
+        this.arrowEl ? arrow({ element: this.arrowEl, padding: 8 }) : undefined
+      ].filter((m): m is NonNullable<typeof m> => m !== undefined)
+    });
     Object.assign(this.panelEl.style, { left: `${x}px`, top: `${y}px` });
 
     const arrowData = middlewareData.arrow;
@@ -393,9 +389,7 @@ export class FluidPopconfirm extends FluidElement {
    * controls (Cancel/Confirm) rather than walking out into the page behind it.
    */
   private trapFocus(e: KeyboardEvent): void {
-    const focusables = [this.cancelEl, this.confirmEl].filter(
-      (el): el is HTMLElement => !!el
-    );
+    const focusables = [this.cancelEl, this.confirmEl].filter((el): el is HTMLElement => !!el);
     if (focusables.length === 0) return;
     const first = focusables[0]!;
     const last = focusables[focusables.length - 1]!;
@@ -440,7 +434,9 @@ export class FluidPopconfirm extends FluidElement {
         aria-hidden="true"
         focusable="false"
       >
-        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+        <path
+          d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+        />
         <line x1="12" x2="12" y1="9" y2="13" />
         <line x1="12" x2="12.01" y1="17" y2="17" />
       </svg>`;

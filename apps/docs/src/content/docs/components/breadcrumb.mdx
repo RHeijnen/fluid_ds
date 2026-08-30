@@ -32,6 +32,7 @@ auto-marks the last visible item as `current` and hides its trailing separator.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/breadcrumb/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +44,7 @@ auto-marks the last visible item as `current` and hides its trailing separator.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/breadcrumb"; // registers breadcrumb + breadcrumb-item
     ```
+
   </TabItem>
 </Tabs>
 
@@ -160,7 +162,7 @@ breadcrumb-specific.
 ### Target size
 
 Breadcrumb links are **inline text** within the trail, so they fall under the
-WCAG [target-size *inline* exception](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)
+WCAG [target-size _inline_ exception](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum)
 (2.5.8), they aren't floored to `--fluid-target-min`. The focus ring still
 honors `--fluid-focus-ring-width` (3px at AAA).
 

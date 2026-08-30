@@ -226,21 +226,54 @@ describe("<fluid-date-picker>", () => {
     expect(el.open).to.be.true;
   });
 
-  it("optionally opens when the text input is clicked", async () => {
+  it("clicking the field opens the picker and selects its value by default", async () => {
     const el = await fixture<FluidDatePicker>(
-      html`<fluid-date-picker aria-label="Date"></fluid-date-picker>`
+      html`<fluid-date-picker value="2026-06-15" aria-label="Field"></fluid-date-picker>`
     );
     const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
 
-    input.click();
-    await elementUpdated(el);
-    expect(el.open).to.be.false;
-
-    el.openOnInputClick = true;
-    await elementUpdated(el);
+    input.focus();
     input.click();
     await elementUpdated(el);
     expect(el.open).to.be.true;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionStart).to.equal(0);
+    expect(input.selectionEnd).to.equal(input.value.length);
+  });
+
+  it("no-auto-open keeps the picker closed while a focus still selects the value", async () => {
+    const el = await fixture<FluidDatePicker>(
+      html`<fluid-date-picker
+        value="2026-06-15"
+        no-auto-open
+        aria-label="Field"
+      ></fluid-date-picker>`
+    );
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+
+    input.focus();
+    await elementUpdated(el);
+    expect(el.open).to.be.false;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionEnd).to.equal(input.value.length);
+  });
+
+  it("no-select-on-focus opens on click without selecting the value", async () => {
+    const el = await fixture<FluidDatePicker>(
+      html`<fluid-date-picker
+        value="2026-06-15"
+        no-select-on-focus
+        aria-label="Field"
+      ></fluid-date-picker>`
+    );
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+
+    input.focus();
+    input.click();
+    await elementUpdated(el);
+    expect(el.open).to.be.true;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionStart).to.equal(input.selectionEnd);
   });
 
   it("selecting a day in the inner calendar updates value, fires fluid-change, and closes", async () => {
@@ -274,6 +307,48 @@ describe("<fluid-date-picker>", () => {
     const dialog = el.shadowRoot!.querySelector('[role="dialog"]')!;
     dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await elementUpdated(el);
+    expect(el.open).to.be.false;
+  });
+
+  it("fills its field wrapper and shrinks with it instead of overflowing", async () => {
+    const holder = await fixture<HTMLDivElement>(html`
+      <div style="width: 320px">
+        <fluid-date-picker value="2026-06-15" aria-label="Sizing"></fluid-date-picker>
+      </div>
+    `);
+    const el = holder.querySelector<FluidDatePicker>("fluid-date-picker")!;
+    await elementUpdated(el);
+    const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
+
+    expect(base.getBoundingClientRect().width).to.be.closeTo(320, 1);
+
+    /* The control has to squeeze into a narrow track rather than keep its
+       intrinsic width and spill over whatever sits next to it. Regression
+       guard: an inline-block host with no max-width stayed 216px wide and
+       overlapped its neighbour in a two-column row. */
+    holder.style.width = "150px";
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(base.getBoundingClientRect().width).to.be.closeTo(150, 1);
+    expect(base.getBoundingClientRect().right).to.be.at.most(
+      holder.getBoundingClientRect().right + 1
+    );
+  });
+
+  it("Escape closes for good: the returned focus does not reopen it", async () => {
+    const el = await fixture<FluidDatePicker>(
+      html`<fluid-date-picker value="2026-06-15" aria-label="Field"></fluid-date-picker>`
+    );
+    el.open = true;
+    await elementUpdated(el);
+    await aTimeout(20);
+
+    const dialog = el.shadowRoot!.querySelector('[role="dialog"]')!;
+    dialog.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await elementUpdated(el);
+    /* Closing hands focus back to the input. That must not read as a fresh
+       arrival at the field, or Escape can never actually dismiss the popover. */
+    await aTimeout(20);
     expect(el.open).to.be.false;
   });
 

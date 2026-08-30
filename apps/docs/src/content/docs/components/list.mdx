@@ -43,6 +43,7 @@ default slot (primary text), a **description** slot (secondary text), and a
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/list/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -54,6 +55,7 @@ default slot (primary text), a **description** slot (secondary text), and a
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/list";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -207,6 +209,7 @@ bubbles, so you can listen on the parent `<fluid-list>`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Workspaces.tsx"
@@ -222,6 +225,7 @@ bubbles, so you can listen on the parent `<fluid-list>`.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Workspaces.vue"
@@ -239,6 +243,7 @@ bubbles, so you can listen on the parent `<fluid-list>`.
       </fluid-list>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="workspaces.component.ts"
@@ -259,6 +264,7 @@ bubbles, so you can listen on the parent `<fluid-list>`.
       pick(e: Event) { console.log((e.target as HTMLElement).textContent?.trim()); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Workspaces.svelte"
@@ -272,6 +278,7 @@ bubbles, so you can listen on the parent `<fluid-list>`.
       <fluid-list-item interactive>Acme Corp</fluid-list-item>
     </fluid-list>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -344,6 +351,14 @@ not covered by a token.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Card" href="/components/card/" description="Free-form surface for grouped content." />
-  <LinkCard title="Menu" href="/components/menu/" description="A list of actions tied to a trigger." />
+  <LinkCard
+    title="Card"
+    href="/components/card/"
+    description="Free-form surface for grouped content."
+  />
+  <LinkCard
+    title="Menu"
+    href="/components/menu/"
+    description="A list of actions tied to a trigger."
+  />
 </CardGrid>

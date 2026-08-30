@@ -49,7 +49,8 @@ export class WizardStepAccent extends WizardStep {
   protected stepLede =
     "Choose one seed, we derive the full 10-stop ramp and check contrast for you. Buttons, links, and focus rings update live in the preview.";
 
-  @state() private seed: string = wizardStore.get().config.seed ?? defaultBrandStop(600) ?? "#2563eb";
+  @state() private seed: string =
+    wizardStore.get().config.seed ?? defaultBrandStop(600) ?? "#2563eb";
   @state() private ramp: DerivedStop[] = [];
 
   override connectedCallback(): void {
@@ -98,9 +99,10 @@ export class WizardStepAccent extends WizardStep {
 
       <div class="ramp" role="img" aria-label="Derived brand ramp">
         ${this.ramp.map(
-          (s) => html`<div class="swatch" style="background:${s.hex}" title="${s.cssVar}: ${s.hex}">
-            <span>${s.stop}</span>
-          </div>`
+          (s) =>
+            html`<div class="swatch" style="background:${s.hex}" title="${s.cssVar}: ${s.hex}">
+              <span>${s.stop}</span>
+            </div>`
         )}
       </div>
 

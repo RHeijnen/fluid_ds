@@ -18,11 +18,23 @@ pnpm add @fluid-ds/components @fluid-ds/tokens @fluid-ds/icons
 Or load from a CDN, no build step:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css"
+/>
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/icons@latest/dist/register-defaults.js"
+></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/button/define.js"
+></script>
 ```
 
 ## Use

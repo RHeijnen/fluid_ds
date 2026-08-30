@@ -2,22 +2,18 @@ import { expect, fixture, html, waitUntil, oneEvent, aTimeout } from "@open-wc/t
 
 import {
   confetti,
-  fireworks,
-  emojiBurst,
-  emojiRain,
-  emojiFountain,
-  bubbles,
+  pride,
   snow,
   sparkles,
-  streamers,
-  pulse,
-  stars,
-  hearts,
-  pride,
   activeEmitterCount,
+  activeParticleCount,
   isCanvasMounted,
+  EFFECTS,
+  EFFECT_CATALOG,
   EFFECT_NAMES,
-  type EffectHandle
+  EFFECT_ORIGIN_PRESETS,
+  type EffectHandle,
+  type EffectName
 } from "./index.js";
 import "../define/celebrate.js";
 import type { FluidCelebrate } from "./fluid-celebrate.js";
@@ -60,22 +56,19 @@ async function settle(handle: EffectHandle): Promise<void> {
 describe("effects: API contract", () => {
   afterEach(restoreMatchMedia);
 
-  const cases: [string, () => EffectHandle][] = [
-    ["confetti", () => confetti()],
-    ["confetti cannons", () => confetti({ cannons: true })],
-    ["fireworks", () => fireworks({ shells: 2, interval: 10 })],
-    ["emojiBurst", () => emojiBurst()],
-    ["emojiRain", () => emojiRain()],
-    ["emojiFountain", () => emojiFountain({ duration: 100 })],
-    ["bubbles", () => bubbles({ duration: 100 })],
-    ["snow", () => snow()],
-    ["sparkles", () => sparkles()],
-    ["streamers", () => streamers()],
-    ["pulse", () => pulse()],
-    ["stars", () => stars()],
-    ["hearts", () => hearts()],
-    ["pride", () => pride()]
-  ];
+  const cases: [string, () => EffectHandle][] = EFFECT_CATALOG.map((effect) => [
+    effect.name,
+    () =>
+      EFFECTS[effect.name]({
+        count: 6,
+        duration: 100,
+        shells: 1,
+        interval: 10,
+        particlesPerShell: 6,
+        rings: 1
+      })
+  ]);
+  cases.push(["confetti cannons", () => confetti({ cannons: true })]);
 
   for (const [name, make] of cases) {
     it(`${name} returns a handle with stop() and a finished promise`, async () => {
@@ -88,10 +81,46 @@ describe("effects: API contract", () => {
   }
 
   it("exposes every effect by name", () => {
-    expect(EFFECT_NAMES).to.have.lengthOf(13);
+    expect(EFFECT_NAMES).to.have.lengthOf(EFFECT_CATALOG.length);
     expect(EFFECT_NAMES).to.include("emojiFountain");
     expect(EFFECT_NAMES).to.include("bubbles");
   });
+
+  it("supports individual and grouped directed origin presets", async () => {
+    const single = confetti({ sources: EFFECT_ORIGIN_PRESETS["top-left"], count: 8 });
+    expect(activeEmitterCount()).to.equal(1);
+    await settle(single);
+
+    const corners = confetti({ sources: EFFECT_ORIGIN_PRESETS["all-corners"], count: 16 });
+    expect(activeEmitterCount()).to.equal(4);
+    await settle(corners);
+  });
+
+  it("keeps cannons as a bottom-corner compatibility alias", async () => {
+    const handle = confetti({ cannons: true, count: 8 });
+    expect(activeEmitterCount()).to.equal(2);
+    await settle(handle);
+  });
+
+  it("renders Pride as six ordered rainbow streams instead of corner confetti", async () => {
+    const handle = pride({ count: 24 });
+    expect(activeEmitterCount()).to.equal(6);
+    await settle(handle);
+  });
+
+  // `multiOrigin` is optional, so narrow with `in` before reading it: the
+  // catalog is a literal union and some members do not carry the key at all.
+  for (const effect of EFFECT_CATALOG.filter((entry) => "multiOrigin" in entry)) {
+    it(`${effect.name} honors grouped launch sources`, async () => {
+      const handle = EFFECTS[effect.name]({
+        sources: EFFECT_ORIGIN_PRESETS["top-corners"],
+        count: 12,
+        duration: 120
+      });
+      expect(activeEmitterCount()).to.be.at.least(2);
+      await settle(handle);
+    });
+  }
 });
 
 describe("effects: canvas lifecycle", () => {
@@ -133,6 +162,29 @@ describe("effects: canvas lifecycle", () => {
     await waitUntil(() => activeEmitterCount() === 0, "did not drain");
   });
 
+  it("fizzle() stops spawning but lets live particles drain, then resolves", async () => {
+    // Contrast with stop(): fizzle must NOT drop particles at once. It stops
+    // spawning (like a duration elapsing) and lets the already-live particles
+    // play out, so the effect eases away instead of hard-cutting.
+    const handle = sparkles({ rate: 60 });
+    await aTimeout(80); // let some sparkles spawn
+    expect(activeEmitterCount()).to.equal(1);
+    let resolved = false;
+    void handle.finished.then(() => {
+      resolved = true;
+    });
+    handle.fizzle();
+    await aTimeout(0);
+    expect(activeEmitterCount(), "fizzle must not drop particles immediately").to.equal(1);
+    expect(resolved, "finished must not resolve until the particles drain").to.equal(false);
+    // The sparkles fade out on their own; the emitter then drains and resolves.
+    await waitUntil(() => activeEmitterCount() === 0, "fizzled effect never drained", {
+      timeout: 3000
+    });
+    await handle.finished;
+    expect(resolved).to.equal(true);
+  });
+
   it("an ambient effect with a duration stops spawning and drains on its own", async () => {
     // `duration` must stop SPAWNING (update returns false), then let the
     // already-spawned particles die and the emitter finish, with NO stop().
@@ -158,6 +210,89 @@ describe("effects: canvas lifecycle", () => {
     await Promise.race([handle.finished, aTimeout(2500)]);
     await settle(handle);
     expect(activeEmitterCount()).to.equal(0);
+  });
+});
+
+describe("effects: termination (no runaway emitters)", () => {
+  afterEach(restoreMatchMedia);
+
+  /**
+   * Fire every effect so it MUST wind down without a `stop()`: continuous
+   * effects get a short `duration`, and point bursts get strong gravity so
+   * their particles fall off-screen fast. Keyed by `EffectName`, so a newly
+   * added effect fails to COMPILE until it is listed here (the map is no longer
+   * exhaustive), and then fails at RUNTIME if it never terminates. Together
+   * that is the guard: no effect, existing or future, may run forever, and none
+   * may resist a graceful fizzle.
+   */
+  const selfTerminating = Object.fromEntries(
+    EFFECT_NAMES.map((name) => [
+      name,
+      () =>
+        EFFECTS[name]({
+          count: 6,
+          gravity: 5000,
+          velocity: 1800,
+          duration: 60,
+          shells: 1,
+          interval: 10,
+          particlesPerShell: 6,
+          rings: 1
+        })
+    ])
+  ) as Record<EffectName, () => EffectHandle>;
+
+  for (const name of EFFECT_NAMES) {
+    it(`${name} stops spawning and does not run away`, async () => {
+      // Watch the particle count instead of waiting for a full drain: some
+      // effects (snow's flakes live up to 12s) legitimately take a long time to
+      // fall off-screen. Sample past every effect's spawn window (a firework's
+      // shell explodes near its apex, ~1.2s; pulse emits for ~0.9s): by then a
+      // correct effect has stopped spawning, so its count only holds or falls,
+      // while a runaway keeps climbing by the hundreds. This catches a future
+      // effect that ignores its duration and respawns forever.
+      const handle = selfTerminating[name]();
+      try {
+        await aTimeout(1700);
+        const first = activeParticleCount();
+        await aTimeout(600);
+        const later = activeParticleCount();
+        // Tolerance covers frame-timing jitter at the boundary; a real runaway
+        // overshoots it by orders of magnitude.
+        expect(later, `${name} kept spawning (runaway emitter)`).to.be.at.most(first + 3);
+      } finally {
+        handle.stop();
+      }
+    });
+  }
+
+  it("fizzle() winds an ambient effect down without a hard cut", async () => {
+    // fizzle must stop spawning but NOT drop the live particles: right after it,
+    // the particles are still there (contrast stop(), which clears them at once).
+    const handle = snow({ rate: 120 });
+    await aTimeout(120);
+    const before = activeParticleCount();
+    expect(before).to.be.greaterThan(0);
+    handle.fizzle();
+    await aTimeout(0);
+    expect(activeParticleCount(), "fizzle must not drop particles immediately").to.be.greaterThan(
+      0
+    );
+    // And it has stopped spawning: the count does not climb back up.
+    const p1 = activeParticleCount();
+    await aTimeout(400);
+    expect(activeParticleCount(), "fizzle must stop spawning").to.be.at.most(p1);
+    handle.stop();
+  });
+
+  it("stop() is a hard cut: an ambient effect's particles vanish at once", async () => {
+    const handle = snow({ rate: 80 });
+    await aTimeout(80);
+    expect(activeEmitterCount()).to.equal(1);
+    handle.stop();
+    expect(activeEmitterCount(), "stop() must drop the emitter synchronously").to.equal(0);
+    expect(activeParticleCount(), "stop() must clear the particles").to.equal(0);
+    await handle.finished;
   });
 });
 
@@ -193,7 +328,9 @@ describe("effects: colors override", () => {
 
 describe("<fluid-celebrate>", () => {
   it("passes an a11y audit as a non-visual behavior element", async () => {
-    const el = await fixture<FluidCelebrate>(html`<fluid-celebrate effect="confetti"></fluid-celebrate>`);
+    const el = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate effect="confetti"></fluid-celebrate>`
+    );
     await expect(el).to.be.accessible();
   });
 
@@ -204,18 +341,19 @@ describe("<fluid-celebrate>", () => {
       html`<fluid-celebrate effect="confetti"></fluid-celebrate>`
     );
     expect(el).to.be.an.instanceOf(customElements.get("fluid-celebrate"));
-    expect(getComputedStyle(el).display).to.equal("contents");
+    const style = getComputedStyle(el);
+    expect(style.display).to.equal("inline-block");
+    expect(el.getBoundingClientRect().width).to.equal(0);
+    expect(el.getBoundingClientRect().height).to.equal(0);
   });
 
   it("fire() dispatches fluid-celebrate-end", async () => {
+    setReducedMotion(true);
     const el = await fixture<FluidCelebrate>(
       html`<fluid-celebrate effect="confetti" count="6"></fluid-celebrate>`
     );
     const ended = oneEvent(el, "fluid-celebrate-end");
-    const fired = el.fire();
-    // stop quickly so the burst ends fast and deterministically.
-    el.stop();
-    await fired;
+    await el.fire();
     const ev = await ended;
     expect(ev).to.exist;
     expect(ev.bubbles).to.equal(true);
@@ -248,9 +386,39 @@ describe("<fluid-celebrate>", () => {
   it("observes the config attributes that #readOptions consumes so live changes refire", () => {
     const Ctor = customElements.get("fluid-celebrate") as typeof FluidCelebrate;
     const observed = Ctor.observedAttributes;
-    for (const attr of ["origin", "cannons", "shells", "rate", "duration", "spread"]) {
+    for (const attr of [
+      "origin",
+      "cannons",
+      "shells",
+      "rate",
+      "duration",
+      "spread",
+      "velocity",
+      "gravity",
+      "size",
+      "angle",
+      "interval",
+      "particles-per-shell",
+      "rings",
+      "radius"
+    ]) {
       expect(observed).to.include(attr);
     }
+  });
+
+  it("does not dispatch an end event for a canceled run", async () => {
+    const el = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate effect="snow" duration="5000"></fluid-celebrate>`
+    );
+    let ended = false;
+    el.addEventListener("fluid-celebrate-end", () => {
+      ended = true;
+    });
+    const fired = el.fire();
+    await waitUntil(() => activeEmitterCount() > 0, "snow never started");
+    el.stop();
+    await fired;
+    expect(ended).to.equal(false);
   });
 
   it("re-fires on connect when an observed config attribute changes under auto", async () => {
@@ -302,6 +470,7 @@ describe("<fluid-celebrate>", () => {
   });
 
   it("auto fires on connect and ends", async () => {
+    setReducedMotion(true);
     const el = document.createElement("fluid-celebrate") as FluidCelebrate;
     el.setAttribute("effect", "confetti");
     el.setAttribute("count", "6");
@@ -310,9 +479,6 @@ describe("<fluid-celebrate>", () => {
       el.addEventListener("fluid-celebrate-end", () => resolve(), { once: true });
     });
     document.body.appendChild(el);
-    // Let the deferred auto-fire kick in, then stop to drain fast.
-    await aTimeout(50);
-    el.stop();
     await ended;
     el.remove();
     await waitUntil(() => activeEmitterCount() === 0, "did not drain");

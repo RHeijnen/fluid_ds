@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-input>` is the single-line text field. It wraps a native `<input>` and
 is **form-associated** via `ElementInternals`, so it participates in `<form>`
 submission, `FormData`, and constraint validation exactly like the native
@@ -31,6 +30,7 @@ WCAG 2.2 guarantees (focus ring, target size, validity conveyed beyond color).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/input/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +42,7 @@ WCAG 2.2 guarantees (focus ring, target size, validity conveyed beyond color).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/input";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -65,9 +66,11 @@ on-screen keyboard and native validation.
   <fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-input type="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
+<ConformanceCode
+  code={`<fluid-input type="email" placeholder="you@example.com" aria-label="Email"></fluid-input>
 <fluid-input type="password" value="hunter2" aria-label="Password"></fluid-input>
-<fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>`} />
+<fluid-input type="search" placeholder="Search…" aria-label="Search"></fluid-input>`}
+/>
 
 ### Label and help text
 
@@ -78,14 +81,20 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-input label="Serial number" help-text="One serial number per line." placeholder="APO-100001"></fluid-input>
+  <fluid-input
+    label="Serial number"
+    help-text="One serial number per line."
+    placeholder="APO-100001"
+  ></fluid-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-input
+<ConformanceCode
+  code={`<fluid-input
   label="Serial number"
   help-text="One serial number per line."
   placeholder="APO-100001"
-></fluid-input>`} />
+></fluid-input>`}
+/>
 
 ### Sizes
 
@@ -98,9 +107,11 @@ Three sizes scale font + height together. Each meets the AA 24×24 target floor
   <fluid-input size="lg" placeholder="Large" aria-label="Large"></fluid-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-input size="sm" placeholder="Small" aria-label="Small"></fluid-input>
+<ConformanceCode
+  code={`<fluid-input size="sm" placeholder="Small" aria-label="Small"></fluid-input>
 <fluid-input size="md" placeholder="Medium" aria-label="Medium"></fluid-input>
-<fluid-input size="lg" placeholder="Large" aria-label="Large"></fluid-input>`} />
+<fluid-input size="lg" placeholder="Large" aria-label="Large"></fluid-input>`}
+/>
 
 ### Prefix & suffix
 
@@ -140,9 +151,11 @@ and the message, never by color alone.
   <fluid-input required placeholder="Required" aria-label="Required"></fluid-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-input readonly value="Read-only" aria-label="Read-only"></fluid-input>
+<ConformanceCode
+  code={`<fluid-input readonly value="Read-only" aria-label="Read-only"></fluid-input>
 <fluid-input disabled value="Disabled" aria-label="Disabled"></fluid-input>
-<fluid-input required placeholder="Required" aria-label="Required"></fluid-input>`} />
+<fluid-input required placeholder="Required" aria-label="Required"></fluid-input>`}
+/>
 
 ## Listening for input
 
@@ -161,6 +174,7 @@ current value in `event.detail.value`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="EmailField.tsx"
@@ -185,6 +199,7 @@ current value in `event.detail.value`.
       addEventListener` (above); React 19 supports `onfluidInput`. See the
       [framework guide](/guides/frameworks/#react).
     </Aside>
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="EmailField.vue"
@@ -197,6 +212,7 @@ current value in `event.detail.value`.
       <fluid-input aria-label="Email" @fluid-input="onInput" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="email-field.component.ts"
@@ -217,6 +233,7 @@ current value in `event.detail.value`.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="EmailField.svelte"
@@ -229,6 +246,7 @@ current value in `event.detail.value`.
 
     <fluid-input aria-label="Email" on:fluid-input={onInput} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -250,7 +268,13 @@ enclosing form, `required` blocks submission, and native constraints
     style="display:flex; gap:0.5rem; align-items:center;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Submitted: ' + new FormData(this).get('email');"
   >
-    <fluid-input name="email" type="email" placeholder="you@example.com" required aria-label="Email"></fluid-input>
+    <fluid-input
+      name="email"
+      type="email"
+      placeholder="you@example.com"
+      required
+      aria-label="Email"
+    ></fluid-input>
     <fluid-button type="submit">Subscribe</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -292,8 +316,8 @@ consumed** is every main var they fall back to.
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) lets you select an input and tweak these
-  tokens visually, then exports the CSS.
+  The [Theme builder](/playground/) lets you select an input and tweak these tokens visually, then
+  exports the CSS.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -305,8 +329,12 @@ native control is `part="input"`, so you can reach either with
 
 ```css
 /* A pill-shaped search field with a custom caret color. */
-fluid-input.search::part(base) { border-radius: 999px; }
-fluid-input.search::part(input) { caret-color: #6366f1; }
+fluid-input.search::part(base) {
+  border-radius: 999px;
+}
+fluid-input.search::part(input) {
+  caret-color: #6366f1;
+}
 ```
 
 ## When to use
@@ -314,7 +342,7 @@ fluid-input.search::part(input) { caret-color: #6366f1; }
 - Anywhere you'd use a native `<input type="...">` and want consistent Fluid
   styling, focus rings, and form participation.
 
-### When *not* to use
+### When _not_ to use
 
 - **Multi-line text**: use [`<fluid-textarea>`](/components/textarea/); it
   grows vertically and shares the same field family.
@@ -333,10 +361,10 @@ cross-component contract is in the [Accessibility guide](/guides/accessibility/)
 ### Keyboard
 
 Standard text-field editing, all native: caret movement, selection,
-<kbd>Home</kbd>/<kbd>End</kbd>, clipboard, etc. <kbd>Tab</kbd> moves focus in
-and out. The focus ring is shown for both keyboard and pointer focus (it marks
-the active field); its width reads `--fluid-focus-ring-width`, so AAA thickens
-it automatically.
+
+<kbd>Home</kbd>/<kbd>End</kbd>, clipboard, etc. <kbd>Tab</kbd> moves focus in and out. The focus
+ring is shown for both keyboard and pointer focus (it marks the active field); its width reads
+`--fluid-focus-ring-width`, so AAA thickens it automatically.
 
 ### Names
 
@@ -371,10 +399,10 @@ Ships **WCAG 2.2 AA** by default; flip the **Conformance** toggle at the top to
 `data-fluid-conformance="aaa"` wrapper). The input reads conformance tokens, so
 it scales with no per-component branching:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ```html
 <html data-fluid-conformance="aaa">
@@ -400,11 +428,7 @@ it scales with no per-component branching:
     href="/components/number-input/"
     description="Numeric input with stepper buttons."
   />
-  <LinkCard
-    title="Select"
-    href="/components/select/"
-    description="Pick one value from a list."
-  />
+  <LinkCard title="Select" href="/components/select/" description="Pick one value from a list." />
   <LinkCard
     title="Forms guide"
     href="/guides/forms/"

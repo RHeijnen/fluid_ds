@@ -11,7 +11,7 @@ const meta: Meta<Args> = {
   title: "Components/Layout/Card",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     variant: { control: "inline-radio", options: ["elevated", "outlined", "filled"] }
@@ -20,17 +20,17 @@ const meta: Meta<Args> = {
   render: (args) => html`
     <div style="max-width: 360px;">
       <fluid-card variant=${args.variant}>
-        <div
-          slot="header"
-          style="display:flex; align-items:center; justify-content:space-between;"
-        >
+        <div slot="header" style="display:flex; align-items:center; justify-content:space-between;">
           <span>Project status</span>
           <fluid-badge variant="success">Healthy</fluid-badge>
         </div>
         <p style="margin:0;">
           All systems operational. Latest deploy was 2 hours ago and passed all health checks.
         </p>
-        <div slot="footer" style="display:flex; gap: var(--fluid-space-2); justify-content:flex-end;">
+        <div
+          slot="footer"
+          style="display:flex; gap: var(--fluid-space-2); justify-content:flex-end;"
+        >
           <fluid-button variant="ghost">Details</fluid-button>
           <fluid-button>Deploy again</fluid-button>
         </div>

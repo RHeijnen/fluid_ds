@@ -143,7 +143,8 @@ export class WizardApp extends LitElement {
       color: var(--fluid-accent-base);
     }
     button.reset:focus-visible {
-      outline: var(--fluid-focus-ring-width, 2px) solid var(--fluid-focus-ring-color, var(--fluid-accent-base));
+      outline: var(--fluid-focus-ring-width, 2px) solid
+        var(--fluid-focus-ring-color, var(--fluid-accent-base));
       outline-offset: 2px;
     }
     .sr-only {
@@ -257,9 +258,9 @@ export class WizardApp extends LitElement {
           <fluid-badge variant="info">Configuration wizard</fluid-badge>
           <h1>Set up Fluid your way</h1>
           <p>
-            Start from a sensible default, then decide what to override. Every
-            choice previews live; you leave with a small CSS override block: just
-            the deltas, layered on top of the base tokens.
+            Start from a sensible default, then decide what to override. Every choice previews live;
+            you leave with a small CSS override block: just the deltas, layered on top of the base
+            tokens.
           </p>
         </div>
 

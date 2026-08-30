@@ -51,8 +51,7 @@ export interface ComponentEntry {
  */
 function guessType(cssVar: string): ComponentTokenRef["type"] {
   if (/-(bg|fg|color)(-|$)/.test(cssVar)) return "color";
-  if (/-(size|width|height|padding|radius|max-width)(-|$)/.test(cssVar))
-    return "dimension";
+  if (/-(size|width|height|padding|radius|max-width)(-|$)/.test(cssVar)) return "dimension";
   if (/duration/.test(cssVar)) return "duration";
   if (/font-family|family/.test(cssVar)) return "fontFamily";
   return "color";
@@ -157,11 +156,7 @@ const USES_FALLBACK: Record<string, string[]> = {
   ],
   "fluid-tab": ["--fluid-accent-base", "--fluid-text-primary", "--fluid-text-secondary"],
   "fluid-accordion": ["--fluid-border-default"],
-  "fluid-details": [
-    "--fluid-border-default",
-    "--fluid-text-primary",
-    "--fluid-text-secondary"
-  ],
+  "fluid-details": ["--fluid-border-default", "--fluid-text-primary", "--fluid-text-secondary"],
   "fluid-tooltip": [],
   "fluid-segmented-control": [
     "--fluid-surface-muted",
@@ -209,15 +204,9 @@ const OWN_FALLBACK: Record<string, ComponentTokenRef[]> = {
   "fluid-bar-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
   "fluid-line-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
   "fluid-pie-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
-  "fluid-doughnut-chart": [
-    { cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }
-  ],
-  "fluid-scatter-chart": [
-    { cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }
-  ],
-  "fluid-bubble-chart": [
-    { cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }
-  ],
+  "fluid-doughnut-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
+  "fluid-scatter-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
+  "fluid-bubble-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
   "fluid-radar-chart": [{ cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }],
   "fluid-polar-area-chart": [
     { cssVar: "--fluid-chart-height", label: "Height", type: "dimension" }

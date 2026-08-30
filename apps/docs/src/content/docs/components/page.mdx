@@ -17,11 +17,31 @@ On narrow viewports it falls back to a single-column stack.
 
 <Demo>
   <fluid-page style="width: 100%; height: 13rem; border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow: hidden;">
-    <header slot="header" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle); font-weight: 600;">My app</header>
-    <nav slot="navigation" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);">Nav</nav>
+    <header
+      slot="header"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle); font-weight: 600;"
+    >
+      My app
+    </header>
+    <nav
+      slot="navigation"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);"
+    >
+      Nav
+    </nav>
     <main style="padding: var(--fluid-space-3);">Main content area.</main>
-    <aside slot="aside" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);">Aside</aside>
-    <footer slot="footer" style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);">© 2026</footer>
+    <aside
+      slot="aside"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);"
+    >
+      Aside
+    </aside>
+    <footer
+      slot="footer"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-subtle);"
+    >
+      © 2026
+    </footer>
   </fluid-page>
 </Demo>
 
@@ -37,6 +57,7 @@ On narrow viewports it falls back to a single-column stack.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/page/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -48,6 +69,7 @@ On narrow viewports it falls back to a single-column stack.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/page";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -110,7 +132,7 @@ per route.
 
 - As the **outermost wrapper** on app-style pages. One per route.
 - For content-driven sites, a plain HTML structure may be a better fit
-, this is opinionated and aimed at app shells.
+  , this is opinionated and aimed at app shells.
 
 For a self-contained card with header / body / footer, use
 [`<fluid-card>`](/components/card/). For the entire content area split

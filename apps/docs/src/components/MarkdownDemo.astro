@@ -1,0 +1,103 @@
+---
+/**
+ * Live split view for the markdown page: editable Markdown source in a
+ * fluid-textarea on the left, rendered live by `<fluid-markdown>` on the
+ * right on every keystroke.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="md-demo" data-md-demo>
+    <fluid-textarea
+      class="md-source"
+      data-md-source
+      label="Markdown source"
+      rows={16}
+      resize="vertical"
+      spellcheck="false"></fluid-textarea>
+    <div class="md-preview">
+      <span class="md-preview-label">Rendered by <code>&lt;fluid-markdown&gt;</code></span>
+      <fluid-markdown class="md-output" data-md-output></fluid-markdown>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .md-demo {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .md-demo {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .md-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-inline-size: 0;
+  }
+  .md-preview-label {
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--fluid-text-secondary);
+  }
+  .md-output {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 8px);
+    background: var(--fluid-surface-base);
+    overflow-x: auto;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/markdown/define";
+
+  interface TextareaLike extends HTMLElement {
+    value: string;
+  }
+  interface MarkdownLike extends HTMLElement {
+    value: string | null;
+  }
+
+  const STARTER = [
+    "## Hello, Fluid",
+    "",
+    "Edit **this side** and watch the other side re-render live.",
+    "",
+    "- Lists, links and `inline code`",
+    "- [Marked](https://marked.js.org/) under the hood, sanitized by default",
+    "",
+    "> Blockquotes pick up the theme tokens too.",
+    "",
+    "| Feature | Status |",
+    "| ------- | ------ |",
+    "| Tables  | ✅     |",
+    "| Theming | ✅     |",
+    "",
+    "```ts",
+    'import "@fluid-ds/markdown/define";',
+    "```"
+  ].join("\n");
+
+  function setup(root: HTMLElement): void {
+    const source = root.querySelector<TextareaLike>("[data-md-source]");
+    const output = root.querySelector<MarkdownLike>("[data-md-output]");
+    if (!source || !output) return;
+
+    source.value = STARTER;
+    output.value = STARTER;
+
+    source.addEventListener("fluid-input", () => {
+      output.value = source.value;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-md-demo]")) setup(root);
+</script>

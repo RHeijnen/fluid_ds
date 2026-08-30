@@ -1,6 +1,6 @@
 /**
  * Side-effect entry that registers the curated default animation set.
- * Importing this file registers all 13 common animations.
+ * Importing this file registers all 18 common animations.
  *
  * If you only need a couple of them, skip this and import the individual
  * modules instead, they're tree-shakable:
@@ -30,6 +30,11 @@ import "./animations/pulse.js";
 import "./animations/shake.js";
 import "./animations/bounce.js";
 import "./animations/flash.js";
+import "./animations/wobble.js";
+import "./animations/jello.js";
+import "./animations/heartbeat.js";
+import "./animations/rubber-band.js";
+import "./animations/tada.js";
 
 // Loaders
 import "./animations/spin.js";

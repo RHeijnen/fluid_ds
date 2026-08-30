@@ -154,6 +154,9 @@ verification: 6,942 unit executions across 42 package/engine runs, 18 builds,
 
 Lift these directly onto marketing surfaces. Each maps to a capability below.
 
+- **Free, now and permanently.** MIT licensed: no license fees, no seat
+  pricing, no paid tier, no license key. Free for personal and commercial use;
+  credit is appreciated, never required.
 - **Framework-agnostic.** Standard web components: drop them into React, Vue,
   Angular, Svelte, Solid, or plain HTML. Wrappers are optional. (The same admin portal,
   built in native HTML, React, Next.js, and Angular, ships as a live demo.)
@@ -167,7 +170,7 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
   browser, with a visual Theme Builder that exports the CSS.
 - **Lean core, opt-in power.** Charts, markdown, media, QR, and animations ship
   as separate packages you add only if you need them.
-- **Bring your own icons.** Ships ~1,500 Lucide icons out of the box, but the
+- **Bring your own icons.** Ships ~1,545 Lucide icons out of the box, but the
   icon registry is open, register your own set or override ours under any name.
   Not locked to one icon library.
 - **Documented four ways.** A docs site, an interactive Storybook, a live
@@ -242,6 +245,17 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 - ✅ Every component built to **WCAG 2.2 Level AA**: semantics from the WAI-ARIA
   APG, keyboard contracts, focus management, 24×24 target sizes, 4.5:1 contrast,
   `prefers-reduced-motion` honored.
+- ✅ **Respects the reader's system preferences**, not just the page's. Reduced
+  motion, high contrast (Windows forced-colors), dark mode and right-to-left are
+  all settings someone chooses once in their operating system, and Fluid follows
+  them without the host app wiring anything up. Motion is the clearest case:
+  someone who gets migraines or motion sickness from animation sets "reduce
+  motion" in Windows or macOS, and Fluid's animations stand down. Where a CSS
+  media query cannot reach (canvas-backed charts, scripted sequences), the
+  components check the preference in JavaScript and take a still path instead.
+  Not a claim on trust: **light, dark, forced-colors, RTL and reduced-motion are
+  five machine-verified modes** in the visual-regression suite, rendered across
+  the whole component catalog on every run.
 - ✅ Internal standard enforced by a committed **accessibility skill** (cited to
   W3C primary sources) + a **component-authoring skill** + a build-time coverage
   gate.
@@ -265,8 +279,17 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
   (`data-fluid-id`). Component tokens fall back to the main semantic vars so all
   three levels work for free.
 - ✅ **Light + dark** schemes (`data-fluid-theme`).
-- ✅ **Three brand presets** out of the box: Default, Midnight, Corporate
-  (`data-fluid-brand`), pure CSS, swap at runtime.
+- ✅ **Brand presets** out of the box: Default, Midnight, Corporate (dense
+  enterprise surfaces: a ~15% tighter spacing ramp, squared corners, flat
+  elevation with ruled borders), Titanium
+  (metallic graphite chrome, gray data, colour kept for status), Glass
+  (frosted translucent surfaces over a colour wash) and Orchid (violet accent
+  track with soft radii and a ~35% roomier spacing ramp). Pure CSS applied via
+  `data-fluid-brand`, swappable at runtime, and each one now re-derives the
+  accent at its own scope so it themes a single subtree, not only `<html>`.
+  Glass composes with the light/dark scheme (wash and frost invert to a dark
+  material) and ships a `.fluid-glass-panel` helper so an app's own non-component
+  chrome frosts to match from one definition.
 - ✅ **Semantic action tones**: brand / neutral / success / danger / warning /
   info, theme-independent, so a delete button stays red across brands.
 - ✅ **Motion system**: overlays (dialog, drawer, toast, popover, tooltip,
@@ -280,14 +303,32 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 ### Theme Builder (playground) ✅
 
 - ✅ Live, in-browser visual token editor.
-- ✅ **Design Mode**: click any component to inspect + edit just the tokens it
-  uses; per-element isolation for one-off overrides.
-- ✅ Exports a ready-to-paste brand CSS file (and per-instance rules).
-- ✅ URL-shareable state.
+- ✅ **Composed preview scenes**, not a specimen grid. Sixteen tabbed sections
+  each render a realistic surface built from the catalog: a full event-setup
+  form, a document editor, a release status page, a project workspace, an
+  operational data grid (reorderable + resizable columns), a sprint board, a
+  booking console, a docs app frame, a workspace-settings page for overlays, a
+  press kit, an analytics board, marketing blocks, the rich-text editor, a node
+  graph, maps, and a file-parser import flow.
+- ✅ **Design Mode**: hover to see a component's name, click to inspect and edit
+  just the tokens it uses. Isolating scopes every edit to that component, so a
+  change reaches every instance of it and nothing else, which is the component
+  rung of the brand → component → instance ladder. Isolating is retroactive:
+  edits made while inspecting move into the component's own rule and the shared
+  theme reverts. An isolated component exposes both its own tokens and the
+  shared semantics it reads, each prefilled with the value it currently
+  resolves to.
+- ✅ Follows the light/dark switch: the preview re-resolves semantic tokens for
+  the active scheme, and canvas-backed charts repaint when tokens change.
+- ✅ Exports a ready-to-paste brand CSS file, plus a `fluid-x { … }` rule per
+  customized component. The preview injects that same CSS verbatim, so what is
+  previewed cannot drift from what is exported.
+- ✅ URL-shareable state: the theme diff and the per-component rules both live
+  in the hash, and a shared link restores and repaints on a fresh load.
 
 ### Icons ✅
 
-- ✅ Lucide-backed icon registry (~1,500 icons available; a curated default set
+- ✅ Lucide-backed icon registry (~1,545 icons available; a curated default set
   registered up front; lazy `loadIcon()` for the rest).
 - ✅ **Bring your own icons.** The registry is name→SVG, so consumers can
   register their own icon set under any name, or override Fluid's defaults:
@@ -336,10 +377,19 @@ Kept out of the core so the base bundle stays lean:
   lazily only when an `.xlsx` is dropped.
 - ✅ `@fluid-ds/media`: video / video playlist / animated image / zoomable
   frame / audio player / lightbox gallery.
-- ✅ `@fluid-ds/animations`: attribute-driven keyframe animation system
-  (`data-fluid-animation`) plus an imperative **event-effects** engine
-  (`confetti`, `fireworks`, emoji / image burst + rain, snow, sparkles,
-  streamers, pulse, and a declarative `<fluid-celebrate>`), reduced-motion aware.
+- ✅ `@fluid-ds/animations`: a standalone, dependency-free motion package with
+  its own shareable marketing page (`/animations.html`). Two halves: an
+  attribute-driven keyframe system (`data-fluid-animation` plus trigger /
+  duration / iterations / easing attributes on any element) and an imperative
+  canvas **event-effects** engine with **31 named effects** (confetti,
+  fireworks, pride, glitter, coins, embers, fireflies, fog, shooting stars, a
+  firework finale, butterflies with steered, side-entry flight paths that never
+  fly backwards or upside down, and more), plus a declarative
+  `<fluid-celebrate>` wrapper. Every effect returns a handle with `stop()` and
+  a graceful `fizzle()` wind-down, ambient effects take a `duration` and end on
+  their own, and a regression suite guards against runaway emitters. Palettes
+  are purpose-tuned per effect and tint to the live brand ramp only on request
+  (`colors: brandColors()`). Reduced-motion aware throughout.
 
 ### Documentation & developer surfaces ✅
 
@@ -347,16 +397,22 @@ Kept out of the core so the base bundle stays lean:
   examples + framework tabs, auto-generated API tables from the Custom Elements
   Manifest, theming/forms/a11y/SSR guides, plus a **CMS & server-rendered**
   guide covering Umbraco (Razor), WordPress, and Laravel (Blade) integration.
+  Every expansion-pack page opens with a **live, animated embedded demo** (a
+  node-graph pipeline run with marching-ants edges, a streaming charts
+  dashboard, a draggable kanban board, real celebration-effect triggers, a
+  fully offline map, and more), each pausing off-screen and honoring reduced
+  motion.
 - ✅ **Self-dogfooding code blocks**: every code sample in the docs renders
   through our own `<fluid-code-block>` (Expressive Code disabled). Shiki still
   highlights, dual-theme follows the light/dark toggle, and our header bar
   (filename / language + copy button) frames each block, proof the component
   holds up in production, not just in demos.
 - ✅ **Storybook**: interactive props / states / a11y explorer.
-- ✅ **Demos**: settings + admin sample apps, plus **four framework-integration
-  admin portals** — the _same_ portal built in **native HTML, React, Next.js,
-  and Angular** — proving the components are genuinely framework-agnostic
-  (see "Framework integration portals" below).
+- ✅ **Demos**: seven sample apps (settings, admin, data table, analytics,
+  booking, sprint board, QR studio) shipped as an installable PWA, plus
+  **four framework-integration admin portals**: the _same_ portal built in
+  **native HTML, React, Next.js, and Angular**, proving the components are
+  genuinely framework-agnostic (see "Framework integration portals" below).
 - ✅ **Unified website build**: one deploy artifact serving landing + docs +
   Storybook + Theme Builder + Bundle builder (`/wizard/`) + demos (including
   the four framework portals at `/demos/{native,react,next,angular}/`).
@@ -377,15 +433,35 @@ Kept out of the core so the base bundle stays lean:
   human review must reconcile the candidates, stale Chart captures, and accepted
   AspectRatio/Lightbox/Map pixels changed by hermetic story assets.
   Story attribution is not a passing screenshot comparison.
-- ✅ `pnpm verify` checks workspace and browser-test types, lint, catalog/presence,
-  generated-output and command-ownership guards, tokens, unit tests, packages,
-  Node SSR and built documentation links. Browser coverage is a separate gate;
-  presence checks are not line/function/branch coverage.
+- ✅ `pnpm verify` checks workspace and browser-test types, lint, formatting,
+  catalog/presence, generated-output and command-ownership guards, tokens, unit
+  tests, packages, Node SSR and built documentation links. Browser coverage is a
+  separate gate; presence checks are not line/function/branch coverage.
+- ✅ The catalog/presence gate covers **all 155 published elements across every
+  package**, core and expansion packs alike, and matches tags exactly. It
+  previously scanned only `packages/components` with a substring match, which
+  let expansion-pack elements lose their playground demo unnoticed.
+- ✅ Component maturity is declared once in `quality/maturity.json` and enforced
+  against the Storybook status of every element, so the two cannot drift.
 - 🔨 SSR import safety, DSD rendering and client hydration are distinct tested
   contracts. The representative framework matrix separates CSR from build-time
   static DSD. A packed Next production server additionally passes local
   request-time isolation and all-engine hydration; deployed adapter/ingress proof
   remains open.
+
+### Angular reactive-forms integration ✅
+
+- ✅ `@fluid-ds/angular`: ControlValueAccessor directives that bind Fluid form
+  controls with `[(ngModel)]`, `formControlName`, or `[formControl]`, no
+  hand-written bridge components. One accessor covers the fifteen
+  value-carrying controls (input, textarea, number input, masked input,
+  select, typeahead, segmented control, radio group, slider, rating, date
+  picker, time picker, color picker, tag input, OTP), a second covers the
+  boolean pair (checkbox, switch). Values keep the component's own type (a
+  slider hands the form a number), `disabled` follows the form state, and
+  blur marks controls touched. Compiled in Angular partial-compilation mode
+  (links on any Angular 20+ CLI build) and proven end to end in the
+  admin-angular demo's settings page, which now runs on a reactive form.
 
 ### Framework integration portals ✅
 
@@ -412,7 +488,7 @@ Kept out of the core so the base bundle stays lean:
 | `@fluid-ds/tokens`     | Design tokens → CSS + manifest                                                         | ✅     |
 | `@fluid-ds/components` | The core library: 103 component families (124 elements)                                | ✅     |
 | `@fluid-ds/icons`      | Lucide-backed icon registry                                                            | ✅     |
-| `@fluid-ds/themes`     | Brand presets (Midnight, Corporate)                                                    | ✅     |
+| `@fluid-ds/themes`     | Brand presets (Midnight, Corporate, Titanium, Glass, Orchid)                           | ✅     |
 | `@fluid-ds/charts`     | Charts (opt-in)                                                                        | ✅     |
 | `@fluid-ds/scheduler`  | Appointment / availability scheduler: bookable time slots + hours editor (opt-in)      | ✅     |
 | `@fluid-ds/table`      | Data grid: sortable, selectable, plus infinite loading + configurable columns (opt-in) | ✅     |
@@ -425,7 +501,8 @@ Kept out of the core so the base bundle stays lean:
 | `@fluid-ds/qr`         | QR codes, incl. logo-embedded fancy codes (opt-in)                                     | ✅     |
 | `@fluid-ds/parser`     | Blueprint-driven JSON / CSV / Excel file import (opt-in)                               | ✅     |
 | `@fluid-ds/media`      | Video / media (opt-in)                                                                 | ✅     |
-| `@fluid-ds/animations` | Keyframe animations + event effects, e.g. confetti (opt-in)                            | ✅     |
+| `@fluid-ds/animations` | Standalone keyframes + 31 canvas event effects with graceful wind-down (opt-in)        | ✅     |
+| `@fluid-ds/angular`    | Angular ControlValueAccessor directives: ngModel / reactive forms on fluid-\* controls | ✅     |
 
 ---
 

@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Mutation observer",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -18,10 +18,14 @@ export const Default: Story = {
       subtree
       @fluid-mutation=${(e: CustomEvent) => {
         const out = (e.currentTarget as HTMLElement).nextElementSibling;
-        if (out) out.textContent = `${e.detail.records.length} mutation(s) at ${new Date().toLocaleTimeString()}`;
+        if (out)
+          out.textContent = `${e.detail.records.length} mutation(s) at ${new Date().toLocaleTimeString()}`;
       }}
     >
-      <div id="watched" style="padding: var(--fluid-space-3); border: 1px dashed var(--fluid-border-default);">
+      <div
+        id="watched"
+        style="padding: var(--fluid-space-3); border: 1px dashed var(--fluid-border-default);"
+      >
         <button
           type="button"
           @click=${(e: Event) => {

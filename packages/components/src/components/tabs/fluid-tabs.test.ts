@@ -1,4 +1,4 @@
-import { aTimeout, expect, fixture, html, oneEvent } from "@open-wc/testing";
+import { aTimeout, elementUpdated, expect, fixture, html, oneEvent } from "@open-wc/testing";
 import "./define.js";
 import type { FluidTabs } from "./fluid-tabs.js";
 
@@ -79,6 +79,53 @@ describe("<fluid-tabs>", () => {
     api.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     await el.updateComplete;
     expect(el.value).to.equal("overview");
+  });
+
+  it("does not snap the indicator when the panel swap resizes the host", async () => {
+    const el = await fixture<FluidTabs>(html`
+      <fluid-tabs>
+        <fluid-tab slot="nav" panel="a">Alpha</fluid-tab>
+        <fluid-tab slot="nav" panel="b">Bravo tab with a longer label</fluid-tab>
+        <fluid-tab-panel name="a">Short</fluid-tab-panel>
+        <fluid-tab-panel name="b">
+          <p>Taller panel</p>
+          <p>with more than one line</p>
+          <p>so the host changes height</p>
+        </fluid-tab-panel>
+      </fluid-tabs>
+    `);
+    await elementUpdated(el);
+    await aTimeout(50);
+
+    const indicator = el.shadowRoot!.querySelector<HTMLElement>(".indicator")!;
+    const nav = el.shadowRoot!.querySelector<HTMLElement>(".nav")!;
+
+    /* Switching panels changes the host height, which fires the ResizeObserver
+       while the slide from the value change is still in flight. That callback
+       positions without animation, and re-applying `no-anim` mid-transition
+       makes the underline jump instead of slide. A MutationObserver catches
+       even a single-frame appearance of the class. */
+    let snapped = false;
+    const observer = new MutationObserver(() => {
+      if (indicator.classList.contains("no-anim")) snapped = true;
+    });
+    observer.observe(indicator, { attributes: true, attributeFilter: ["class"] });
+
+    el.value = "b";
+    await elementUpdated(el);
+    await aTimeout(120);
+    observer.disconnect();
+
+    expect(snapped, "the indicator snapped instead of sliding").to.equal(false);
+
+    // It still lands on the newly selected tab.
+    const tab = el.querySelector<HTMLElement>('fluid-tab[panel="b"]')!;
+    const expectedX = tab.getBoundingClientRect().left - nav.getBoundingClientRect().left;
+    expect(parseFloat(indicator.style.getPropertyValue("--_x"))).to.be.closeTo(expectedX, 1.5);
+    expect(parseFloat(indicator.style.getPropertyValue("--_w"))).to.be.closeTo(
+      tab.getBoundingClientRect().width,
+      1.5
+    );
   });
 
   it("wires aria-controls and aria-labelledby", async () => {

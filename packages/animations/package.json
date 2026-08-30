@@ -49,6 +49,10 @@
       "types": "./src/effects/index.ts",
       "import": "./src/effects/index.ts"
     },
+    "./effects/*": {
+      "types": "./src/effects/*.ts",
+      "import": "./src/effects/*.ts"
+    },
     "./animations/*": {
       "types": "./src/animations/*.ts",
       "import": "./src/animations/*.ts"
@@ -79,6 +83,10 @@
         "types": "./dist/effects/index.d.ts",
         "import": "./dist/effects/index.js"
       },
+      "./effects/*": {
+        "types": "./dist/effects/*.d.ts",
+        "import": "./dist/effects/*.js"
+      },
       "./animations/*": {
         "types": "./dist/animations/*.d.ts",
         "import": "./dist/animations/*.js"
@@ -106,7 +114,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js",
+    "test:tree-shaking": "node --test scripts/tree-shaking.test.mjs",
+    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js && pnpm test:tree-shaking",
     "dev": "tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
@@ -116,6 +125,7 @@
     "@web/test-runner": "^0.20.0",
     "@web/test-runner-playwright": "^0.11.0",
     "playwright": "^1.49.1",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite": "^6.4.3"
   }
 }

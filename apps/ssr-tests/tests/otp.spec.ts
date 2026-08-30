@@ -127,7 +127,9 @@ for (const mode of ["client", "dsd"] as const) {
         (host as HTMLElement & { setCustomValidity(message: string): void }).setCustomValidity("")
       );
       await boxes.nth(1).pressSequentially("234");
-      await expect.poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value)).toBe("1234");
+      await expect
+        .poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value))
+        .toBe("1234");
       for (const action of actions) await activate(page, action);
       expect(await page.evaluate(() => window.formFocusFixture.submissions)).toEqual(
         actions.map(({ submitter }) => ({ submitter, data: [["answer", "1234"]] }))
@@ -164,7 +166,11 @@ for (const mode of ["client", "dsd"] as const) {
       await page.keyboard.press("ControlOrMeta+c");
       await boxes.nth(1).focus();
       await page.keyboard.press("ControlOrMeta+v");
-      await expect.poll(() => page.locator("#field").evaluate((host) => (host as HTMLElement & { value: string }).value)).toBe("1468");
+      await expect
+        .poll(() =>
+          page.locator("#field").evaluate((host) => (host as HTMLElement & { value: string }).value)
+        )
+        .toBe("1468");
       await expect(boxes.nth(3)).toBeFocused();
       expect(await page.evaluate(() => window.otpEvents.slice(-2))).toEqual([
         event("fluid-input", "1468"),

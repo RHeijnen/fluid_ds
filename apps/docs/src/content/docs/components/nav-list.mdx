@@ -20,7 +20,9 @@ hierarchy.
 <Demo>
   <div style="max-width: 16rem;">
     <fluid-nav-list label="Main">
-      <fluid-nav-item href="#dashboard" current>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="#dashboard" current>
+        Dashboard
+      </fluid-nav-item>
       <fluid-nav-item href="#projects">Projects</fluid-nav-item>
       <fluid-nav-item href="#team">Team</fluid-nav-item>
       <fluid-nav-item href="#settings">Settings</fluid-nav-item>
@@ -40,6 +42,7 @@ hierarchy.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/nav-list/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -51,6 +54,7 @@ hierarchy.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/nav-list";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -64,7 +68,9 @@ when a page has more than one navigation region.
 <Demo>
   <div style="max-width: 16rem;">
     <fluid-nav-list label="Main">
-      <fluid-nav-item href="#dashboard" current>Dashboard</fluid-nav-item>
+      <fluid-nav-item href="#dashboard" current>
+        Dashboard
+      </fluid-nav-item>
       <fluid-nav-item href="#projects">Projects</fluid-nav-item>
       <fluid-nav-item href="#settings">Settings</fluid-nav-item>
     </fluid-nav-list>
@@ -122,7 +128,9 @@ The trailing `badge` slot takes a count or status indicator.
       </fluid-nav-item>
       <fluid-nav-item href="#unread">
         Unread
-        <fluid-badge slot="badge" variant="info">12</fluid-badge>
+        <fluid-badge slot="badge" variant="info">
+          12
+        </fluid-badge>
       </fluid-nav-item>
       <fluid-nav-item href="#flagged">Flagged</fluid-nav-item>
     </fluid-nav-list>
@@ -145,7 +153,9 @@ active style.
   <div style="max-width: 16rem;">
     <fluid-nav-list label="Docs">
       <fluid-nav-item href="#start">Getting started</fluid-nav-item>
-      <fluid-nav-item href="#tokens" current>Tokens</fluid-nav-item>
+      <fluid-nav-item href="#tokens" current>
+        Tokens
+      </fluid-nav-item>
       <fluid-nav-item href="#components">Components</fluid-nav-item>
     </fluid-nav-list>
   </div>
@@ -179,6 +189,7 @@ active style.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Sidebar.vue"
@@ -194,6 +205,7 @@ active style.
       </fluid-nav-list>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="sidebar.component.ts"
@@ -215,6 +227,7 @@ active style.
       @Input() path = "";
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Sidebar.svelte"
@@ -228,6 +241,7 @@ active style.
       <fluid-nav-item href="/projects" current={path === "/projects" || undefined}>Projects</fluid-nav-item>
     </fluid-nav-list>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -302,7 +316,19 @@ manual assistive-technology review remains required.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Menu" href="/components/menu/" description="A list of actions following the APG Menu pattern." />
-  <LinkCard title="Tree" href="/components/tree/" description="A hierarchical, expandable tree of nodes." />
-  <LinkCard title="Breadcrumb" href="/components/breadcrumb/" description="Shows the path to the current page." />
+  <LinkCard
+    title="Menu"
+    href="/components/menu/"
+    description="A list of actions following the APG Menu pattern."
+  />
+  <LinkCard
+    title="Tree"
+    href="/components/tree/"
+    description="A hierarchical, expandable tree of nodes."
+  />
+  <LinkCard
+    title="Breadcrumb"
+    href="/components/breadcrumb/"
+    description="Shows the path to the current page."
+  />
 </CardGrid>

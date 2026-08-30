@@ -1,4 +1,4 @@
-# Fluid DS component-review handoff
+# Fluid component-review handoff
 
 This is the continuation guide for the owner-led Storybook review that started
 after the 0.4.0 production-hardening work. The canonical checklist is
@@ -15,7 +15,7 @@ after the 0.4.0 production-hardening work. The canonical checklist is
 - The reviewed block is #001 through #028: all initial form controls and form
   primitives from `fluid-input` through `fluid-form`.
 - Resume at **#029 `fluid-avatar`** using
-  [Components/Content/Avatar — Initials](http://127.0.0.1:6006/?path=/story/components-content-avatar--initials).
+  [Components/Content/Avatar: Initials](http://127.0.0.1:6006/?path=/story/components-content-avatar--initials).
 - Do not mark a row Approved based only on automated checks. Approval records the
   owner's explicit visual acceptance.
 

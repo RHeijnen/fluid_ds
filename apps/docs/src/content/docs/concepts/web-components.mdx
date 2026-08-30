@@ -35,7 +35,7 @@ current or future native HTML tag.
 
 ## The registry
 
-A custom element doesn't work until it's *registered*. You register it by
+A custom element doesn't work until it's _registered_. You register it by
 calling `customElements.define()` with the tag name and the class:
 
 ```ts
@@ -64,7 +64,7 @@ if (!customElements.get("fluid-badge")) {
 ```
 
 That's the whole reason Fluid exposes side-effect `/define/*` entry
-points, importing `@fluid-ds/components/define/badge` *runs* this file and
+points, importing `@fluid-ds/components/define/badge` _runs_ this file and
 registers the element. (See [Build your own](/concepts/build-your-own/) for the
 full entry-point pattern.)
 
@@ -80,13 +80,13 @@ artifact works in every environment:
 - **Server-rendered pages**: the element is just markup until its define
   module loads and upgrades it.
 
-You write the component once. You don't ship a React build *and* a Vue build
-*and* a vanilla build, there's one element, and the platform is the runtime.
+You write the component once. You don't ship a React build _and_ a Vue build
+_and_ a vanilla build, there's one element, and the platform is the runtime.
 
 <Aside type="tip">
-  Web components and your framework aren't an either/or. Use Fluid elements
-  as leaf nodes inside React/Vue components, the framework owns layout and
-  data flow, the custom elements own their own rendering and styling.
+  Web components and your framework aren't an either/or. Use Fluid elements as leaf nodes inside
+  React/Vue components, the framework owns layout and data flow, the custom elements own their own
+  rendering and styling.
 </Aside>
 
 ## The three pillars
@@ -105,16 +105,15 @@ like `<fluid-button>` self-contained.
    a component guarantees it looks the same no matter what CSS surrounds it.
 
 3. **HTML Templates**: `<template>` and `<slot>` let an element declare inert
-   markup and define *holes* where the consumer's content gets projected.
+   markup and define _holes_ where the consumer's content gets projected.
 
 Fluid builds on all three through [Lit](https://lit.dev), a tiny library
 that handles reactive rendering and the boilerplate so each component is just a
 class with a `render()` method.
 
 <Aside>
-  Lit is an implementation detail, not a dependency you inherit. Consumers
-  import a *web component*, there is no "Lit component" in your app, just a
-  custom element the browser runs.
+  Lit is an implementation detail, not a dependency you inherit. Consumers import a *web component*,
+  there is no "Lit component" in your app, just a custom element the browser runs.
 </Aside>
 
 ## A tiny vanilla example

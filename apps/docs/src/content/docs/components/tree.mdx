@@ -35,6 +35,7 @@ focus, and implements the WAI-ARIA tree pattern.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tree/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +47,7 @@ focus, and implements the WAI-ARIA tree pattern.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tree"; // registers tree + tree-item
     ```
+
   </TabItem>
 </Tabs>
 
@@ -144,6 +146,7 @@ expands or collapses.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="FileTree.tsx"
@@ -166,6 +169,7 @@ expands or collapses.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="FileTree.vue"
@@ -180,6 +184,7 @@ expands or collapses.
       </fluid-tree>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="file-tree.component.ts"
@@ -202,6 +207,7 @@ expands or collapses.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="FileTree.svelte"
@@ -216,6 +222,7 @@ expands or collapses.
       <fluid-tree-item>Docs</fluid-tree-item>
     </fluid-tree>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -257,15 +264,15 @@ the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Move between visible items. |
-| <kbd>→</kbd> | Expand the focused item (or move to its first child if already expanded). |
-| <kbd>←</kbd> | Collapse (or move to the parent if already collapsed). |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last visible item. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused item (fires one bubbling `fluid-select`). |
-| Type a label prefix | Move focus to the next matching visible, enabled item. |
-| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Leave the tree, which has one tab stop. |
+| Key                                                | Action                                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------------- |
+| <kbd>↑</kbd> / <kbd>↓</kbd>                        | Move between visible items.                                               |
+| <kbd>→</kbd>                                       | Expand the focused item (or move to its first child if already expanded). |
+| <kbd>←</kbd>                                       | Collapse (or move to the parent if already collapsed).                    |
+| <kbd>Home</kbd> / <kbd>End</kbd>                   | Jump to the first / last visible item.                                    |
+| <kbd>Enter</kbd> / <kbd>Space</kbd>                | Select the focused item (fires one bubbling `fluid-select`).              |
+| Type a label prefix                                | Move focus to the next matching visible, enabled item.                    |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Leave the tree, which has one tab stop.                                   |
 
 Focus and selection are independent. Disabled nodes are skipped and cannot be
 activated. Collapsing a branch containing focus restores focus to a visible
@@ -292,10 +299,10 @@ The host is `role="tree"`; each item is `role="treeitem"` with `aria-expanded`
 Targets **WCAG 2.2 AA**; automated checks do not replace assistive-technology
 review. An ancestor `[data-fluid-conformance="aaa"]` lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

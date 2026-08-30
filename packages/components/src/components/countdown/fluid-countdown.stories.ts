@@ -13,7 +13,7 @@ const inFuture = (secs: number) => new Date(Date.now() + secs * 1000).toISOStrin
 const meta: Meta<Args> = {
   title: "Components/Content/Countdown",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     format: { control: "inline-radio", options: ["segments", "clock"] },
     autostart: { control: "boolean" },

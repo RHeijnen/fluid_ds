@@ -31,11 +31,12 @@ export function usesTokenPlugin() {
         const tags = jsDoc.tags ?? [];
         for (const tag of tags) {
           if (tag.tagName?.text !== "uses-token") continue;
-          const comment = typeof tag.comment === "string"
-            ? tag.comment
-            : Array.isArray(tag.comment)
-              ? tag.comment.map((c) => c.text ?? "").join("")
-              : "";
+          const comment =
+            typeof tag.comment === "string"
+              ? tag.comment
+              : Array.isArray(tag.comment)
+                ? tag.comment.map((c) => c.text ?? "").join("")
+                : "";
           // Format: "--fluid-name - Description text" (description optional)
           const match = /^\s*(--[\w-]+)(?:\s*-\s*(.+))?$/.exec(comment.trim());
           if (match) {

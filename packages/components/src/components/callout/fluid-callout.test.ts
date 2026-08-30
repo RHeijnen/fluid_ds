@@ -72,7 +72,7 @@ describe("<fluid-callout>", () => {
     el.textContent = "Updated status";
     await aTimeout(0);
     expect(el.shadowRoot!.querySelector("[part='base']")).to.equal(liveRoot);
-    const contentSlot = liveRoot.querySelector<HTMLSlotElement>(".body > slot:not([name])")!;
+    const contentSlot = liveRoot.querySelector<HTMLSlotElement>(".content > slot:not([name])")!;
     expect(
       contentSlot
         .assignedNodes({ flatten: true })
@@ -129,5 +129,43 @@ describe("<fluid-callout>", () => {
     await el.updateComplete;
     const close = el.shadowRoot!.querySelector<HTMLElement>(".close")!;
     expect(close.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
+  });
+
+  /* Regression: the default slot used to sit directly in the .body flex
+     column. A slot is display:contents, so every slotted node became a flex
+     item and flex items blockify: each inline <a> rendered on its own line. */
+
+  it("mixed inline body content flows inline (links do not blockify)", async () => {
+    const el = await fixture<FluidCallout>(
+      html`<fluid-callout style="width: 30rem"
+        >Read the <a href="#one">first guide</a> and the <a href="#two">second guide</a> for
+        more.</fluid-callout
+      > `
+    );
+    await el.updateComplete;
+    const [first, second] = Array.from(el.querySelectorAll("a"));
+    expect(getComputedStyle(first!).display).to.equal("inline");
+    expect(getComputedStyle(second!).display).to.equal("inline");
+    // Both links share one wide line box instead of stacking as rows.
+    expect(first!.getBoundingClientRect().top).to.equal(second!.getBoundingClientRect().top);
+  });
+
+  it("hides the header row when no header is slotted, shows it when one is", async () => {
+    const el = await fixture<FluidCallout>(html`<fluid-callout>Body only.</fluid-callout>`);
+    await el.updateComplete;
+    const header = el.shadowRoot!.querySelector<HTMLElement>(".header")!;
+    expect(header.classList.contains("empty")).to.equal(true);
+    expect(getComputedStyle(header).display).to.equal("none");
+
+    const lead = document.createElement("span");
+    lead.slot = "header";
+    lead.textContent = "Heads up";
+    el.append(lead);
+    await aTimeout(0);
+    expect(header.classList.contains("empty")).to.equal(false);
+
+    lead.remove();
+    await aTimeout(0);
+    expect(header.classList.contains("empty")).to.equal(true);
   });
 });

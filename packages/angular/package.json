@@ -1,0 +1,72 @@
+{
+  "name": "@fluid-ds/angular",
+  "version": "0.4.0",
+  "description": "Angular ControlValueAccessor directives for Fluid form components: bind fluid-* controls with ngModel and reactive forms.",
+  "fluidIntegration": "angular",
+  "type": "module",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/angular"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "angular",
+    "control-value-accessor",
+    "reactive-forms",
+    "web-components",
+    "design-system",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "ngc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test": "tsc --noEmit -p tsconfig.typecheck.json"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0",
+    "@angular/forms": "^20.0.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^20.3.27",
+    "@angular/compiler-cli": "^20.3.27",
+    "@angular/core": "^20.3.27",
+    "@angular/forms": "^20.3.27",
+    "rxjs": "^7.8.0",
+    "tslib": "^2.8.0",
+    "typescript": "~5.8.3"
+  }
+}

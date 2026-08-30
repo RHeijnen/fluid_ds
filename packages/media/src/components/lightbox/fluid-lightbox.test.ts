@@ -51,6 +51,55 @@ describe("<fluid-lightbox>", () => {
     expect(el.shadowRoot!.querySelector('[part="counter"]')?.textContent).to.contain("1 of 3");
   });
 
+  it("closes when the backdrop is clicked", async () => {
+    const el = await gallery();
+    el.openAt(0);
+    await elementUpdated(el);
+    const dialog = el.shadowRoot!.querySelector<HTMLDialogElement>("dialog")!;
+    expect(dialog.open).to.equal(true);
+
+    /* A native dialog gives Escape and a backdrop pseudo-element but no
+       backdrop-click close, so the component adds it. */
+    dialog.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(dialog.open).to.equal(false);
+  });
+
+  it("honors the documented no-light-dismiss attribute", async () => {
+    const el = await gallery();
+    el.setAttribute("no-light-dismiss", "");
+    el.openAt(0);
+    await elementUpdated(el);
+    const dialog = el.shadowRoot!.querySelector<HTMLDialogElement>("dialog")!;
+
+    dialog.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(dialog.open).to.equal(true);
+    el.close();
+  });
+
+  it("keeps a drag that starts on the image from dismissing the viewer", async () => {
+    const el = await gallery();
+    el.openAt(0);
+    await elementUpdated(el);
+    const dialog = el.shadowRoot!.querySelector<HTMLDialogElement>("dialog")!;
+    const img = el.shadowRoot!.querySelector("img") ?? dialog;
+
+    /* Press on the image, release on the backdrop. The click lands on the
+       backdrop, but the gesture began inside the content, so it is a slipped
+       drag rather than a dismissal. */
+    img.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    dialog.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(dialog.open).to.equal(true);
+    el.close();
+  });
+
   it("passes the a11y audit (thumbnails)", async () => {
     const el = await fixture<FluidLightbox>(html`
       <div style="--fluid-accent-base:#4f46e5;">

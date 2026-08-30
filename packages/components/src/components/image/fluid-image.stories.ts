@@ -5,7 +5,15 @@ import type { FluidImage } from "./fluid-image.js";
 
 type Args = Pick<
   FluidImage,
-  "src" | "alt" | "width" | "height" | "aspectRatio" | "loading" | "fit" | "placeholder" | "fallback"
+  | "src"
+  | "alt"
+  | "width"
+  | "height"
+  | "aspectRatio"
+  | "loading"
+  | "fit"
+  | "placeholder"
+  | "fallback"
 >;
 
 const sample = "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80";
@@ -14,7 +22,7 @@ const broken = "https://example.com/this-image-does-not-exist.jpg";
 const meta: Meta<Args> = {
   title: "Components/Content/Image",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     src: { control: "text" },
     alt: { control: "text" },
@@ -64,12 +72,7 @@ export const AspectRatio: Story = {
         width="240"
         aspect-ratio="16/9"
       ></fluid-image>
-      <fluid-image
-        src=${sample}
-        alt="Square crop"
-        width="160"
-        aspect-ratio="1/1"
-      ></fluid-image>
+      <fluid-image src=${sample} alt="Square crop" width="160" aspect-ratio="1/1"></fluid-image>
     </div>
   `
 };
@@ -78,7 +81,13 @@ export const Fit: Story = {
   render: () => html`
     <div style="display:flex; gap: var(--fluid-space-3); align-items:flex-start;">
       <fluid-image src=${sample} alt="Cover fit" width="200" height="200" fit="cover"></fluid-image>
-      <fluid-image src=${sample} alt="Contain fit" width="200" height="200" fit="contain"></fluid-image>
+      <fluid-image
+        src=${sample}
+        alt="Contain fit"
+        width="200"
+        height="200"
+        fit="contain"
+      ></fluid-image>
     </div>
   `
 };
@@ -115,12 +124,7 @@ export const ErrorWithFallback: Story = {
 
 export const ErrorSlot: Story = {
   render: () => html`
-    <fluid-image
-      src=${broken}
-      alt="Could not load"
-      width="320"
-      aspect-ratio="16/9"
-    >
+    <fluid-image src=${broken} alt="Could not load" width="320" aspect-ratio="16/9">
       <span slot="fallback">Image unavailable</span>
     </fluid-image>
   `

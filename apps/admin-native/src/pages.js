@@ -66,7 +66,9 @@ export const dashboard = {
     if (line) {
       line.data = {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-        datasets: [{ label: "Signups", data: [320, 410, 380, 520, 610, 740], tension: 0.4, fill: true }]
+        datasets: [
+          { label: "Signups", data: [320, 410, 380, 520, 610, 740], tension: 0.4, fill: true }
+        ]
       };
       line.options = { plugins: { legend: { display: false } } };
     }
@@ -88,7 +90,8 @@ function rowsHtml(filter = "") {
   const list = q
     ? users.filter((u) => (u.name + u.email + u.role).toLowerCase().includes(q))
     : users;
-  if (!list.length) return `<tr><td colspan="4" class="empty">No users match “${filter}”.</td></tr>`;
+  if (!list.length)
+    return `<tr><td colspan="4" class="empty">No users match “${filter}”.</td></tr>`;
   return list
     .map(
       (u) => `
@@ -165,7 +168,10 @@ export const usersPage = {
         notify(`Removed ${user.name}.`, "neutral");
       } else {
         user.status = user.status === "suspended" ? "active" : "suspended";
-        notify(`${user.name} is now ${user.status}.`, user.status === "active" ? "success" : "warning");
+        notify(
+          `${user.name} is now ${user.status}.`,
+          user.status === "active" ? "success" : "warning"
+        );
       }
       rerender();
     });
@@ -222,9 +228,9 @@ export const settings = {
     </fluid-card>
   `,
   mount(root) {
-    root.querySelector("#save-settings").addEventListener("click", () =>
-      notify("Settings saved.", "success")
-    );
+    root
+      .querySelector("#save-settings")
+      .addEventListener("click", () => notify("Settings saved.", "success"));
   }
 };
 

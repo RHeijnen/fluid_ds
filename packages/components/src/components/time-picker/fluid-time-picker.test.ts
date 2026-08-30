@@ -190,21 +190,75 @@ describe("<fluid-time-picker>", () => {
     expect(el.open).to.be.true;
   });
 
-  it("optionally opens when the text input is clicked", async () => {
+  it("clicking the field opens the picker and selects its value by default", async () => {
     const el = await fixture<FluidTimePicker>(
-      html`<fluid-time-picker aria-label="Time"></fluid-time-picker>`
+      html`<fluid-time-picker value="09:30" aria-label="Field"></fluid-time-picker>`
     );
     const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
 
-    input.click();
-    await elementUpdated(el);
-    expect(el.open).to.be.false;
-
-    el.openOnInputClick = true;
-    await elementUpdated(el);
+    input.focus();
     input.click();
     await elementUpdated(el);
     expect(el.open).to.be.true;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionStart).to.equal(0);
+    expect(input.selectionEnd).to.equal(input.value.length);
+  });
+
+  it("no-auto-open keeps the picker closed while a focus still selects the value", async () => {
+    const el = await fixture<FluidTimePicker>(
+      html`<fluid-time-picker value="09:30" no-auto-open aria-label="Field"></fluid-time-picker>`
+    );
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+
+    input.focus();
+    await elementUpdated(el);
+    expect(el.open).to.be.false;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionEnd).to.equal(input.value.length);
+  });
+
+  it("no-select-on-focus opens on click without selecting the value", async () => {
+    const el = await fixture<FluidTimePicker>(
+      html`<fluid-time-picker
+        value="09:30"
+        no-select-on-focus
+        aria-label="Field"
+      ></fluid-time-picker>`
+    );
+    const input = el.shadowRoot!.querySelector<HTMLInputElement>("input")!;
+
+    input.focus();
+    input.click();
+    await elementUpdated(el);
+    expect(el.open).to.be.true;
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    expect(input.selectionStart).to.equal(input.selectionEnd);
+  });
+
+  it("fills its field wrapper and shrinks with it instead of overflowing", async () => {
+    const holder = await fixture<HTMLDivElement>(html`
+      <div style="width: 320px">
+        <fluid-time-picker value="09:30" aria-label="Sizing"></fluid-time-picker>
+      </div>
+    `);
+    const el = holder.querySelector<FluidTimePicker>("fluid-time-picker")!;
+    await elementUpdated(el);
+    const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
+
+    expect(base.getBoundingClientRect().width).to.be.closeTo(320, 1);
+
+    /* The control has to squeeze into a narrow track rather than keep its
+       intrinsic width and spill over whatever sits next to it. Regression
+       guard: an inline-block host with no max-width stayed 216px wide and
+       overlapped its neighbour in a two-column row. */
+    holder.style.width = "150px";
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(base.getBoundingClientRect().width).to.be.closeTo(150, 1);
+    expect(base.getBoundingClientRect().right).to.be.at.most(
+      holder.getBoundingClientRect().right + 1
+    );
   });
 
   it("generates options from min/max/step", async () => {
@@ -219,6 +273,24 @@ describe("<fluid-time-picker>", () => {
     expect(options.length).to.equal(3);
     expect(options[0]!.textContent!.trim()).to.equal("09:00");
     expect(options[2]!.textContent!.trim()).to.equal("10:00");
+  });
+
+  it("reports the listbox placement so the popover can fuse to the field", async () => {
+    const el = await fixture<FluidTimePicker>(
+      html`<fluid-time-picker value="09:30" aria-label="Time"></fluid-time-picker>`
+    );
+    expect(el.hasAttribute("data-placement")).to.be.false;
+
+    el.open = true;
+    await elementUpdated(el);
+    await aTimeout(20);
+    // The CSS that squares off the shared edge keys on this attribute, so the
+    // popover reads as one shape with the field instead of a floating panel.
+    expect(el.getAttribute("data-placement")).to.be.oneOf(["bottom", "top"]);
+
+    el.open = false;
+    await elementUpdated(el);
+    expect(el.hasAttribute("data-placement")).to.be.false;
   });
 
   it("selecting an option commits the value, fires fluid-change, and closes", async () => {
@@ -380,11 +452,10 @@ describe("<fluid-time-picker>", () => {
       </div>
     `);
     const el = wrapper.querySelector<FluidTimePicker>("fluid-time-picker")!;
-    const expected = new Intl.DateTimeFormat("de", {
-      hour: "numeric",
-      minute: "2-digit",
-      hourCycle: "h23"
-    }).format(new Date(2000, 0, 1, 9, 15));
+    // A literal, not a second Intl call: rebuilding the expectation from a copy
+    // of the component's format options only asserts that the copy still
+    // matches, and drifts silently when ICU changes underneath both.
+    const expected = "09:15";
     expect(el.shadowRoot!.querySelector<HTMLInputElement>("input")!.value).to.equal(expected);
     wrapper.lang = "nl";
     await elementUpdated(el);

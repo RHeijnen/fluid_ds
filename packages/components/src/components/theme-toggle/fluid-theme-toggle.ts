@@ -80,58 +80,58 @@ export class FluidThemeToggle extends FluidElement {
   static override styles = [
     reducedMotion,
     css`
-    :host {
-      display: inline-flex;
-      vertical-align: middle;
-    }
+      :host {
+        display: inline-flex;
+        vertical-align: middle;
+      }
 
-    :host([hidden]) {
-      display: none;
-    }
+      :host([hidden]) {
+        display: none;
+      }
 
-    .base {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--fluid-theme-toggle-gap, var(--fluid-space-1));
-    }
+      .base {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--fluid-theme-toggle-gap, var(--fluid-space-1));
+      }
 
-    .button {
-      all: unset;
-      box-sizing: border-box;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: var(--fluid-theme-toggle-size, 2.25rem);
-      height: var(--fluid-theme-toggle-size, 2.25rem);
-      min-width: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
-      min-height: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
-      border-radius: var(--fluid-theme-toggle-radius, var(--fluid-radius-md));
-      border: 1px solid var(--fluid-theme-toggle-border, var(--fluid-border-default));
-      background: var(--fluid-theme-toggle-bg, transparent);
-      color: var(--fluid-theme-toggle-fg, var(--fluid-text-primary));
-      cursor: pointer;
-      transition:
-        background-color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
-          var(--fluid-easing-standard),
-        color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
-          var(--fluid-easing-standard);
-    }
+      .button {
+        all: unset;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--fluid-theme-toggle-size, 2.25rem);
+        height: var(--fluid-theme-toggle-size, 2.25rem);
+        min-width: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
+        min-height: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
+        border-radius: var(--fluid-theme-toggle-radius, var(--fluid-radius-md));
+        border: 1px solid var(--fluid-theme-toggle-border, var(--fluid-border-default));
+        background: var(--fluid-theme-toggle-bg, transparent);
+        color: var(--fluid-theme-toggle-fg, var(--fluid-text-primary));
+        cursor: pointer;
+        transition:
+          background-color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
+            var(--fluid-easing-standard),
+          color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
+            var(--fluid-easing-standard);
+      }
 
-    .button:hover {
-      background: var(--fluid-theme-toggle-hover-bg, var(--fluid-surface-muted));
-    }
+      .button:hover {
+        background: var(--fluid-theme-toggle-hover-bg, var(--fluid-surface-muted));
+      }
 
-    .button:focus-visible {
-      outline: var(--fluid-theme-toggle-focus-ring-width, var(--fluid-focus-ring-width, 2px))
-        solid var(--fluid-theme-toggle-focus-ring, var(--fluid-focus-ring-color));
-      outline-offset: var(--fluid-theme-toggle-focus-ring-offset, var(--fluid-focus-ring-offset));
-    }
+      .button:focus-visible {
+        outline: var(--fluid-theme-toggle-focus-ring-width, var(--fluid-focus-ring-width, 2px))
+          solid var(--fluid-theme-toggle-focus-ring, var(--fluid-focus-ring-color));
+        outline-offset: var(--fluid-theme-toggle-focus-ring-offset, var(--fluid-focus-ring-offset));
+      }
 
-    fluid-icon {
-      width: 1.125rem;
-      height: 1.125rem;
-    }
-  `
+      fluid-icon {
+        width: 1.125rem;
+        height: 1.125rem;
+      }
+    `
   ];
 
   /**
@@ -244,10 +244,7 @@ export class FluidThemeToggle extends FluidElement {
           aria-pressed=${isDark ? "true" : "false"}
           @click=${this.toggleTheme}
         >
-          <fluid-icon
-            part="icon"
-            name=${isDark ? "moon" : "sun"}
-          ></fluid-icon>
+          <fluid-icon part="icon" name=${isDark ? "moon" : "sun"}></fluid-icon>
         </button>
         ${this.brands.length > 0
           ? html`

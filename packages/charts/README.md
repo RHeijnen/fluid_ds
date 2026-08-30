@@ -28,18 +28,18 @@ chart.data = {
 
 ## Components
 
-| Tag | Use case |
-| --- | --- |
-| `<fluid-chart>` | Generic Chart.js wrapper, set `type` to any Chart.js type |
-| `<fluid-bar-chart>` | Bar (vertical or horizontal via Chart.js options) |
-| `<fluid-line-chart>` | Line |
-| `<fluid-pie-chart>` | Pie |
-| `<fluid-doughnut-chart>` | Doughnut |
-| `<fluid-scatter-chart>` | Scatter |
-| `<fluid-bubble-chart>` | Bubble |
-| `<fluid-radar-chart>` | Radar |
-| `<fluid-polar-area-chart>` | Polar area |
-| `<fluid-sparkline>` | Inline mini-line chart for metric callouts |
+| Tag                        | Use case                                                  |
+| -------------------------- | --------------------------------------------------------- |
+| `<fluid-chart>`            | Generic Chart.js wrapper, set `type` to any Chart.js type |
+| `<fluid-bar-chart>`        | Bar (vertical or horizontal via Chart.js options)         |
+| `<fluid-line-chart>`       | Line                                                      |
+| `<fluid-pie-chart>`        | Pie                                                       |
+| `<fluid-doughnut-chart>`   | Doughnut                                                  |
+| `<fluid-scatter-chart>`    | Scatter                                                   |
+| `<fluid-bubble-chart>`     | Bubble                                                    |
+| `<fluid-radar-chart>`      | Radar                                                     |
+| `<fluid-polar-area-chart>` | Polar area                                                |
+| `<fluid-sparkline>`        | Inline mini-line chart for metric callouts                |
 
 Each typed variant is a thin subclass that locks the chart type, pass
 `data` and `options` exactly as you would to Chart.js.

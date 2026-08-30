@@ -8,20 +8,20 @@ and with this document**:
 - [`button.mdx`](../apps/docs/src/content/docs/components/button.mdx): the
   lead page (full feature set: states, events, form, composition).
 - [`button-group.mdx`](../apps/docs/src/content/docs/components/button-group.mdx)
-, the same shape for a composition/layout component (skips the sections that
+  , the same shape for a composition/layout component (skips the sections that
   don't apply, see [§ When a section doesn't apply](#when-a-section-doesnt-apply)).
 
 This is a hard expectation, enforced by review. The build's coverage gate
-(`pnpm check:coverage`) only checks that a page *exists* per component; the
-*shape* below is your responsibility and a reviewer's (or the
+(`pnpm check:coverage`) only checks that a page _exists_ per component; the
+_shape_ below is your responsibility and a reviewer's (or the
 [`component-authoring`](../.claude/skills/component-authoring/SKILL.md) skill's)
 checklist item.
 
 > **Always run `pnpm docs:build` after editing any `.mdx`.** `pnpm verify` does
 > **not** compile the docs site, its `build` step only builds the component
 > packages, so MDX/JSX errors (a stray backtick inside a `css``` comment, an
-> unclosed inline-code span that makes MDX parse a later `<fluid-*>` as JSX)
-> slip past a green `verify`. `docs:build` is the only gate that catches them.
+unclosed inline-code span that makes MDX parse a later `<fluid-\*>`as JSX)
+slip past a green`verify`. `docs:build` is the only gate that catches them.
 
 ---
 
@@ -33,36 +33,36 @@ component page knows where to look. `MUST` = always present (unless the
 present whenever the component has the relevant surface.
 
 0. **No per-page conformance toggle.** The AA⇄AAA segmented control is **global**
-, it lives in the docs **header** (`HeaderConformanceToggle.astro`, rendered
+   , it lives in the docs **header** (`HeaderConformanceToggle.astro`, rendered
    via the `SocialIcons` override) and persists across every page via
    `localStorage` + a pre-paint restore in `Head.astro`. Pages MUST NOT import
    or render their own toggle. The "what AA/AAA means" explanation belongs in the
    page's **AA vs AAA** accessibility subsection (§10b), and only on pages where
    the conformance axis actually applies.
-1. **Lead paragraph** (MUST): one or two sentences: what the component *does*
+1. **Lead paragraph** (MUST): one or two sentences: what the component _does_
    and what's notable. Lead with the job, not the title; don't restate the
    name or open with filler ("the workhorse of…").
 2. **Hero `<Demo>`** (MUST): a small, representative example right under the
    lead. Visual first, prose later.
 3. **`## Install`** (MUST): `<Tabs syncKey="install">` with `CDN` and `npm`
-   tabs, showing the one-line setup for *just this component* (and any
+   tabs, showing the one-line setup for _just this component_ (and any
    companions it composes with, e.g. a split button registers button + group +
    dropdown).
 4. **`## Examples`** (MUST): then one `###` subsection per axis
    (variants → sizes → tones → states → composition), in increasing
    specialization. **Every `<Demo>` is immediately followed by a copyable
    snippet, and that snippet MUST be a `<ConformanceCode code={`…`} />`**, not a
-   static ```html fence. `ConformanceCode` renders the markup twice, plain (AA)
-   and wrapped in `data-fluid-conformance="aaa"` (AAA), and shows the one
-   matching the header toggle, so the code a reader copies always reproduces what
-   the live `<Demo>` is showing. A plain fence would silently stay AA even when
-   the header toggle is on AAA, a correctness bug, not a style nit. (Only on
-   pages whose component actually has a conformance delta, see §0 / §10b.) (Snippets that are
-   *not* component markup, a JS handler, a `<script>`, a CSS block, stay
+   static ```html fence. `ConformanceCode`renders the markup twice, plain (AA)
+and wrapped in`data-fluid-conformance="aaa"`(AAA), and shows the one
+matching the header toggle, so the code a reader copies always reproduces what
+the live`<Demo>`is showing. A plain fence would silently stay AA even when
+the header toggle is on AAA, a correctness bug, not a style nit. (Only on
+pages whose component actually has a conformance delta, see §0 / §10b.) (Snippets that are
+*not* component markup, a JS handler, a`<script>`, a CSS block, stay
    ordinary fences.) Demonstrate every public prop / state at least once across
    the examples.
 5. **`## Listening for <event>`** (SHOULD: when the component fires an event)
-, `## Listening for clicks` / `for fluid-change` / `for fluid-input`, using
+   , `## Listening for clicks` / `for fluid-change` / `for fluid-input`, using
    `<Tabs syncKey="framework">` with **HTML / React / Vue / Angular / Svelte**
    tabs in that exact order, each showing the same handler. If a custom
    `fluid-*` event sits alongside a native one, end with a short
@@ -70,7 +70,7 @@ present whenever the component has the relevant surface.
 6. **`## Inside a form`** (SHOULD: form-associated components only), a live
    `<Demo>` of field + submit, then a link to [`/guides/forms/`](/guides/forms/).
 7. **Composition** (SHOULD: where useful), `## As a link`, `## Inside a
-   button group`, `## As a popover trigger`, etc. A `<Demo>` + snippet each.
+button group`, `## As a popover trigger`, etc. A `<Demo>` + snippet each.
 8. **`## Theming`** (MUST): explain the **override ladder**: every styled
    property reads a component-scoped `--fluid-<name>-*` token that falls back
    to a main semantic var, giving brand → component → instance overrides for
@@ -87,14 +87,14 @@ present whenever the component has the relevant surface.
    `@csspart`, and the docs MUST point at `::part()` as the escape hatch for
    anything not tokenized. Tokens for the intended knobs **+** `::part()` for
    the long tail is the contract that makes the system "change anything"
-   *without* exploding into a token per CSS sub-property. Corollary: **don't
+   _without_ exploding into a token per CSS sub-property. Corollary: **don't
    split a shorthand (border-radius, padding, border-width, inset) into
    per-side/per-corner tokens**, the single token already accepts the
    shorthand value, and `::part()` covers the rest. Per-side control becomes a
    token only when it's an intentional, designed feature (then it's a prop or
    variant, not raw sub-tokens).
 9. **`## When to use`** + **`### When *not* to use`** (MUST): bulleted and
-   prescriptive; the "not" list cross-links the component you *should* reach
+   prescriptive; the "not" list cross-links the component you _should_ reach
    for instead.
 10. **`## Accessibility`** (MUST): this is a first-class section, not a
     footnote. Open with one sentence on the underlying semantics (native
@@ -112,25 +112,26 @@ present whenever the component has the relevant surface.
       `aria-pressed`, popup wiring, …).
     - **`### Motion & target size`**: `prefers-reduced-motion` behavior and
       the default 24×24 (AA) target floor.
-    - **`### AA vs AAA`** (MUST *when the component has a conformance delta*;
+    - **`### AA vs AAA`** (MUST _when the component has a conformance delta_;
       omit otherwise, see [§ doesn't-apply](#when-a-section-doesnt-apply)):
       explain that the component ships WCAG 2.2 AA by default and scales to AAA
       via `data-fluid-conformance="aaa"` (the **header** toggle is live, and the
       example snippets switch with it). Include the token-delta table for the
       dimensions the component exposes:
 
-      | Token | AA | AAA | Criterion |
-      | --- | --- | --- | --- |
-      | `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
-      | `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+      | Token                      | AA   | AAA      | Criterion      |
+      | -------------------------- | ---- | -------- | -------------- |
+      | `--fluid-target-min`       | 24px | **44px** | 2.5.8 → 2.5.5  |
+      | `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → 2.4.13 |
 
       A composition/layout component whose targets come from its children
       (e.g. button-group) instead adds a one-line note that the toggle applies
       through the members and links to the lead page's table.
+
 11. **`## API`** (MUST): `<ComponentApi tag="fluid-<name>" />`. The Custom
     Elements Manifest populates it; keep it auto-generated (pass editorial
     overrides as props rather than hand-writing tables). **The CSS-variable
-    listing must be COMPLETE**, which is a property of the *component source*,
+    listing must be COMPLETE**, which is a property of the _component source_,
     not the page: annotate **every** component-scoped token with
     `@cssproperty` and **every** main var the component reads with
     `@uses-token` in the element's JSDoc. The page just renders them, but if a
@@ -148,7 +149,7 @@ present whenever the component has the relevant surface.
 ## Framework-tabs convention
 
 When a section shows the same code across frameworks, use
-**`<Tabs syncKey="framework">`** with these tabs *exactly* in this order:
+**`<Tabs syncKey="framework">`** with these tabs _exactly_ in this order:
 
 - `HTML`
 - `React`
@@ -158,7 +159,7 @@ When a section shows the same code across frameworks, use
 
 `syncKey="framework"` makes the reader's framework choice persist across every
 page. The order matches the [Framework integrations
-guide](/guides/frameworks/). Each tab shows the *simplest* handler; deeper
+guide](/guides/frameworks/). Each tab shows the _simplest_ handler; deeper
 setup (TypeScript types, custom-element compiler hints) lives in the framework
 guide, link to it from an `<Aside type="note">` inside the tab when a snippet
 relies on something non-obvious. Don't pad snippets with default props
@@ -172,7 +173,14 @@ Top of every component page (drop the ones a given page doesn't use):
 import Demo from "../../../components/Demo.astro";
 import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
-import { Tabs, TabItem, Aside, Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+import {
+  Tabs,
+  TabItem,
+  Aside,
+  Card,
+  CardGrid,
+  LinkCard
+} from "@astrojs/starlight/components";
 ```
 
 There is **no** per-page conformance toggle, it's global (docs header). Import
@@ -206,7 +214,7 @@ Keep the order intact, but omit a section when its surface doesn't exist:
   one-line pointer to the lead page's AA/AAA table instead of a full table.
 - **No conformance axis** (the component exposes no target-size / focus-ring
   surface that AAA changes, e.g. progress bar/ring, spinner, skeleton, badge,
-  tag, divider, format-*, observers) → **omit the `### AA vs AAA` subsection
+  tag, divider, format-\*, observers) → **omit the `### AA vs AAA` subsection
   entirely.** A toggle that does nothing to the component is noise; don't
   document a delta that isn't there.
 - **Accessibility section only when applicable.** Components that render a UI

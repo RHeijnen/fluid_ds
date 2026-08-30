@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Date",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -22,7 +22,11 @@ export const Default: Story = {
       <li>short: <fluid-format-date date=${sample} date-style="short"></fluid-format-date></li>
       <li>
         date + time:
-        <fluid-format-date date=${sample} date-style="medium" time-style="short"></fluid-format-date>
+        <fluid-format-date
+          date=${sample}
+          date-style="medium"
+          time-style="short"
+        ></fluid-format-date>
       </li>
     </ul>
   `
@@ -31,10 +35,18 @@ export const Default: Story = {
 export const Locales: Story = {
   render: () => html`
     <ul style="line-height: 1.8;">
-      <li><fluid-format-date date=${sample} date-style="full" locale="en-US"></fluid-format-date></li>
-      <li><fluid-format-date date=${sample} date-style="full" locale="fr-FR"></fluid-format-date></li>
-      <li><fluid-format-date date=${sample} date-style="full" locale="ja-JP"></fluid-format-date></li>
-      <li><fluid-format-date date=${sample} date-style="full" locale="ar-EG"></fluid-format-date></li>
+      <li>
+        <fluid-format-date date=${sample} date-style="full" locale="en-US"></fluid-format-date>
+      </li>
+      <li>
+        <fluid-format-date date=${sample} date-style="full" locale="fr-FR"></fluid-format-date>
+      </li>
+      <li>
+        <fluid-format-date date=${sample} date-style="full" locale="ja-JP"></fluid-format-date>
+      </li>
+      <li>
+        <fluid-format-date date=${sample} date-style="full" locale="ar-EG"></fluid-format-date>
+      </li>
     </ul>
   `
 };

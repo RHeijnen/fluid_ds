@@ -1,0 +1,149 @@
+---
+/**
+ * Live demo for the scheduler expansion page: the real <fluid-scheduler>
+ * running on a studio's weekly opening hours. The availability engine
+ * measures notice and horizon against the real clock, so the seeded bookings
+ * are anchored to today exactly once at load: a partly booked Tuesday and
+ * Thursday, a fully booked Saturday, and a preselected slot next Monday.
+ * The demo is entirely user-driven: nothing auto-plays, so there is no
+ * motion to pause or reduce.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="sch-demo" data-sch-demo>
+    <div class="sch-hud">
+      <fluid-button size="sm" variant="secondary" data-sch-clear>Clear selection</fluid-button>
+      <span class="sch-status" data-sch-status></span>
+    </div>
+    <fluid-scheduler class="sch-picker" time-format="24h"></fluid-scheduler>
+  </div>
+</Demo>
+
+<style>
+  .sch-demo {
+    inline-size: 100%;
+  }
+  .sch-hud {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-end: 0.6rem;
+  }
+  .sch-status {
+    margin-inline-start: auto;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+  .sch-picker {
+    display: block;
+    inline-size: 100%;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/scheduler/define/scheduler";
+
+  interface SchedulerEl extends HTMLElement {
+    availability: unknown;
+    bookings: { start: string }[];
+    value: string | null;
+  }
+
+  const HINT = "Pick a day with a dot, then a free slot";
+
+  const pad = (n: number): string => String(n).padStart(2, "0");
+  const iso = (d: Date): string =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  /* Anchored once at load: the engine compares slots against the real clock,
+     so the seeded data must live in the actual upcoming week. */
+  const anchor = new Date();
+
+  /** ISO date of the next occurrence of a weekday (0 = Sunday), never today. */
+  function nextDate(weekday: number): string {
+    const d = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
+    const ahead = (weekday - d.getDay() + 7) % 7 || 7;
+    d.setDate(d.getDate() + ahead);
+    return iso(d);
+  }
+
+  /* Open Mon-Fri with a lunch break, Saturday mornings, closed Sunday. */
+  const studioHours = {
+    weekly: {
+      1: [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "17:00" }
+      ],
+      2: [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "17:00" }
+      ],
+      3: [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "17:00" }
+      ],
+      4: [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "17:00" }
+      ],
+      5: [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "16:00" }
+      ],
+      6: [{ start: "09:00", end: "12:00" }]
+    },
+    slotMinutes: 30,
+    maxAdvanceDays: 30
+  };
+
+  /** Seeded bookings: some taken slots, plus one fully booked Saturday. */
+  function seededBookings(): { start: string }[] {
+    const bookings: { start: string }[] = [];
+    const tuesday = nextDate(2);
+    for (const time of ["09:00", "09:30", "10:00"]) bookings.push({ start: `${tuesday}T${time}` });
+    const thursday = nextDate(4);
+    for (const time of ["13:00", "13:30", "15:00"]) bookings.push({ start: `${thursday}T${time}` });
+    const saturday = nextDate(6);
+    for (const time of ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"]) {
+      bookings.push({ start: `${saturday}T${time}` });
+    }
+    return bookings;
+  }
+
+  function setup(root: HTMLElement): void {
+    const scheduler = root.querySelector<SchedulerEl>("fluid-scheduler");
+    const status = root.querySelector<HTMLElement>("[data-sch-status]");
+    if (!scheduler || !status) return;
+
+    scheduler.availability = studioHours;
+    scheduler.bookings = seededBookings();
+
+    /* Land the reader on a visible selection: next Monday, 10:30. */
+    const monday = nextDate(1);
+    scheduler.value = `${monday}T10:30`;
+    status.textContent = `Preselected ${monday}, 10:30 to 11:00`;
+
+    scheduler.addEventListener("fluid-day-select", (event) => {
+      const date = (event as CustomEvent<{ date: string }>).detail.date;
+      status.textContent = `Slots for ${date}`;
+    });
+
+    scheduler.addEventListener("fluid-change", (event) => {
+      const detail = (event as CustomEvent<{ start: string; end: string }>).detail;
+      const [date = "", startTime = ""] = detail.start.split("T");
+      const endTime = detail.end.split("T")[1] ?? "";
+      status.textContent = `Booked ${date}, ${startTime} to ${endTime}`;
+    });
+
+    root.querySelector("[data-sch-clear]")?.addEventListener("click", () => {
+      scheduler.value = null;
+      status.textContent = HINT;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-sch-demo]")) setup(root);
+</script>

@@ -26,9 +26,7 @@ export function fluidCodeBlockTransformer() {
   return {
     name: "fluid-code-block-wrap",
     root(root) {
-      const pre = root.children.find(
-        (node) => node.type === "element" && node.tagName === "pre"
-      );
+      const pre = root.children.find((node) => node.type === "element" && node.tagName === "pre");
       if (!pre) return;
 
       const lang = this.options?.lang;

@@ -101,6 +101,18 @@ export default defineConfig({
           ]
         },
         {
+          label: "📚 Guides",
+          items: [
+            { label: "Forms", link: "/guides/forms/" },
+            { label: "Accessibility model", link: "/guides/accessibility/" },
+            { label: "Localization & RTL", link: "/guides/localization/" },
+            { label: "Animations", link: "/guides/animations/" },
+            { label: "Framework wrappers", link: "/guides/frameworks/" },
+            { label: "CMS & server-rendered", link: "/guides/cms/" },
+            { label: "SSR", link: "/guides/ssr/" }
+          ]
+        },
+        {
           label: "📦 Concepts",
           items: [
             { label: "Web components", link: "/concepts/web-components/" },
@@ -266,18 +278,6 @@ export default defineConfig({
             { label: "@fluid-ds/media", link: "/expansion/media/" },
             { label: "@fluid-ds/parser", link: "/expansion/parser/" },
             { label: "@fluid-ds/animations", link: "/expansion/animations-effects/" }
-          ]
-        },
-        {
-          label: "📚 Guides",
-          items: [
-            { label: "Forms", link: "/guides/forms/" },
-            { label: "Accessibility model", link: "/guides/accessibility/" },
-            { label: "Localization & RTL", link: "/guides/localization/" },
-            { label: "Animations", link: "/guides/animations/" },
-            { label: "Framework wrappers", link: "/guides/frameworks/" },
-            { label: "CMS & server-rendered", link: "/guides/cms/" },
-            { label: "SSR", link: "/guides/ssr/" }
           ]
         }
       ]

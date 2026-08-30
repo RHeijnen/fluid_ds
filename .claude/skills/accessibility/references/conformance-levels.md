@@ -17,20 +17,22 @@ rather than trusting a paraphrase.
 It was proposed at AA in an earlier editor's draft, marked "at risk", and moved
 to AAA before the final Recommendation. Any doc, lint rule, or skill that calls
 it AA is wrong. (Verified 3-0 against the spec.)
+
 - https://www.w3.org/TR/WCAG22/
 - https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance
 
 ## AA baseline vs AAA delta (the criteria a component can control)
 
-| Concern | AA criterion (default) | AAA criterion (opt-in) | The delta |
-| --- | --- | --- | --- |
-| Target size | **2.5.8** Target Size (Minimum), 24×24 CSS px | **2.5.5** Target Size (Enhanced), 44×44 CSS px | 24 → 44 |
-| Focus obscured | **2.4.11** Focus Not Obscured (Minimum), not *entirely* hidden | **2.4.12** Focus Not Obscured (Enhanced), not hidden *at all* | partial → none |
-| Focus indicator | (2.4.7 Focus Visible, AA, must be visible) | **2.4.13** Focus Appearance (AAA), area + contrast math | adds a size/contrast floor |
-| Text contrast | **1.4.3** Contrast (Minimum), 4.5:1 / 3:1 large | **1.4.6** Contrast (Enhanced), 7:1 / 4.5:1 large | 4.5 → 7 |
-| Text blocks |, | **1.4.8** Visual Presentation (AAA) | mostly author-owned |
+| Concern         | AA criterion (default)                                         | AAA criterion (opt-in)                                        | The delta                  |
+| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------- |
+| Target size     | **2.5.8** Target Size (Minimum), 24×24 CSS px                  | **2.5.5** Target Size (Enhanced), 44×44 CSS px                | 24 → 44                    |
+| Focus obscured  | **2.4.11** Focus Not Obscured (Minimum), not _entirely_ hidden | **2.4.12** Focus Not Obscured (Enhanced), not hidden _at all_ | partial → none             |
+| Focus indicator | (2.4.7 Focus Visible, AA, must be visible)                     | **2.4.13** Focus Appearance (AAA), area + contrast math       | adds a size/contrast floor |
+| Text contrast   | **1.4.3** Contrast (Minimum), 4.5:1 / 3:1 large                | **1.4.6** Contrast (Enhanced), 7:1 / 4.5:1 large              | 4.5 → 7                    |
+| Text blocks     | ,                                                              | **1.4.8** Visual Presentation (AAA)                           | mostly author-owned        |
 
 Primary sources:
+
 - 2.5.5 https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced
 - 2.5.8 https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html
 - 2.4.12 https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced
@@ -41,6 +43,7 @@ Primary sources:
 ## AAA criterion triage for a component library
 
 ### Component-controllable (the design system can satisfy these)
+
 - **2.5.5 Target Size (Enhanced)**: 44×44 via `--fluid-target-min`.
 - **2.4.12 Focus Not Obscured (Enhanced)**: don't let sticky chrome / popovers
   cover a focused element at all (vs "not entirely" for AA).
@@ -51,20 +54,23 @@ Primary sources:
   author-owned (line length, justification, resize).
 
 ### Author / content responsibility (the consumer owns these; we just don't block them)
+
 1.2.x media alternatives, 2.4.9 Link Purpose (Link Only), 2.4.10 Section
 Headings, 2.2.3 No Timing, 2.2.6 Timeouts, 3.1.3–3.1.6 reading level /
 pronunciation / abbreviations, 3.2.5 Change on Request, 3.3.5 Help,
 3.3.6 Error Prevention (All). The design system's job: provide the primitives
 (accessible name slots, heading-level props, no surprise context changes) so a
-consumer *can* meet these, and document the handoff.
+consumer _can_ meet these, and document the handoff.
 
 ### Not applicable to components
+
 Page-level / site-level AAA criteria (e.g. 2.4.8 Location, 3.2.5 site-wide
 behavior), out of scope.
 
 ## The numbers (verbatim-grounded)
 
 ### 2.5.5 / 2.5.8: "target" is the hit area, not the visible graphic
+
 WCAG defines **target** as "region of the display that will accept a pointer
 action, such as the interactive area of a user interface component." This is the
 normative basis for the hit-area-vs-visible technique: a 16×16 visible icon with
@@ -83,6 +89,7 @@ another target **or** the 24px circle of another undersized target. (Full
 compound condition, both clauses.)
 
 ### 2.4.13 Focus Appearance (AAA): area + contrast
+
 The focus indicator must have an **area at least as large as a 2-CSS-px-thick
 perimeter** of the unfocused component, **and** a **contrast ratio ≥ 3:1**
 between the focused and unfocused states of those same pixels. It is a minimum
@@ -93,19 +100,24 @@ Worked example for a 100×32 button: a 2px perimeter ≈ `2·(100+32)·2 = 528` 
 of indicator. A 2px solid outline around the full button trivially clears this.
 
 ### 1.4.6 Contrast (Enhanced, AAA): 7:1
+
 ≥ 7:1 for normal text, ≥ 4.5:1 for large text (≥18pt / ≥14pt bold), vs 1.4.3's
 4.5:1 / 3:1.
 
 ## The dual-conformance architecture
 
 ### `data-fluid-conformance`: a fourth axis
+
 Composes with the existing three (`data-fluid-theme`, `data-fluid-brand`, and
 the implicit scheme). Default is AA (attribute absent). Set `aaa` on `<html>`
 or any subtree:
 
 ```html
-<html data-fluid-conformance="aaa">            <!-- whole app -->
-<section data-fluid-conformance="aaa"> … </section>  <!-- one region -->
+<html data-fluid-conformance="aaa">
+  <!-- whole app -->
+  <section data-fluid-conformance="aaa">…</section>
+  <!-- one region -->
+</html>
 ```
 
 Because CSS custom properties inherit and re-resolve at their declaration scope,
@@ -117,12 +129,12 @@ memory applies here too.]**
 
 ### The conformance token spec (what the axis swaps)
 
-| Token | AA value | AAA value | Drives | SC |
-| --- | --- | --- | --- | --- |
-| `--fluid-target-min` | `24px` | `44px` | min hit target of icon buttons, checkbox, radio, switch, close buttons | 2.5.8 → 2.5.5 |
-| `--fluid-focus-ring-width` | `2px` | `3px` | every focusable control's ring | 2.4.7 / 2.4.13 |
-| `--fluid-focus-ring-offset` | `2px` | `2px` (keep ≥2 so the ring clears busy borders) | ring offset | 2.4.13 |
-| contrast stops | 4.5:1 pairs | 7:1 pairs | text-on-surface token pairs | 1.4.3 → 1.4.6 |
+| Token                       | AA value    | AAA value                                       | Drives                                                                 | SC             |
+| --------------------------- | ----------- | ----------------------------------------------- | ---------------------------------------------------------------------- | -------------- |
+| `--fluid-target-min`        | `24px`      | `44px`                                          | min hit target of icon buttons, checkbox, radio, switch, close buttons | 2.5.8 → 2.5.5  |
+| `--fluid-focus-ring-width`  | `2px`       | `3px`                                           | every focusable control's ring                                         | 2.4.7 / 2.4.13 |
+| `--fluid-focus-ring-offset` | `2px`       | `2px` (keep ≥2 so the ring clears busy borders) | ring offset                                                            | 2.4.13         |
+| contrast stops              | 4.5:1 pairs | 7:1 pairs                                       | text-on-surface token pairs                                            | 1.4.3 → 1.4.6  |
 
 Implementation: define these under a base layer at AA values, then re-declare
 under `[data-fluid-conformance="aaa"]` at AAA values. Components read the tokens
@@ -152,8 +164,9 @@ these tokens the same way (don't hard-code 24/44 or 2/3). The 7:1 contrast
 track (1.4.6) is a brand-palette concern and is not yet built.
 
 ### The hit-area technique (icon buttons reach 44 without bloating)
+
 The visible button stays its design size; a centered overlay grows the
-*interactive* target to `--fluid-target-min` without affecting layout:
+_interactive_ target to `--fluid-target-min` without affecting layout:
 
 ```css
 .button.icon-only {
@@ -182,6 +195,7 @@ precision**, so touch-only gating is a pragmatic choice, not a spec requirement.
 Level 5 before relying on it.]**
 
 ### The contrast problem (why AAA contrast is a separate, harder track)
+
 7:1 (1.4.6) can be guaranteed for the **built-in brands** by choosing
 AAA-passing stops, but **cannot** be guaranteed for **consumer-supplied custom
 brand colors**, we don't control those values. Honest stance: ship AAA-valid
@@ -191,6 +205,7 @@ token-contrast validator (sketched in `tokens.md`) should check both the 4.5:1
 (AA) and 7:1 (AAA) thresholds per pair.
 
 ### prefers-contrast / forced-colors interaction
+
 Whether `prefers-contrast: more` should auto-engage AAA contrast, and how
 `forced-colors` (Windows High Contrast) interacts with the manual toggle, is a
 real design question. Leaning: keep the manual `data-fluid-conformance` toggle
@@ -210,7 +225,7 @@ needed before claiming "first" publicly.
 
 ## 5-minute AAA review checklist (delta over the AA checklist)
 
-Run this *in addition* to the AA checklist in `SKILL.md` when a component must
+Run this _in addition_ to the AA checklist in `SKILL.md` when a component must
 work at AAA:
 
 1. Does every pointer target reach **44×44** via `--fluid-target-min` (not a
@@ -234,6 +249,7 @@ work at AAA:
   that obscures focus.
 
 ## Follow-ups (the unverified bits, for a future pass)
+
 - Confirm CSS custom-property cascade wording at MDN for the attribute-scoped
   override claim.
 - Confirm `prefers-contrast: more` / `forced-colors` / `pointer: coarse`

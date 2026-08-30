@@ -36,6 +36,7 @@ uniform.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/stack/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +48,7 @@ uniform.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/stack";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -108,7 +110,12 @@ aliases (`start` · `center` · `end` · `between` · `around` · `evenly` ·
 `stretch` · `baseline`).
 
 <Demo>
-  <fluid-stack direction="horizontal" justify="between" align="center" style="width: 24rem; border: 1px dashed var(--fluid-border-default); border-radius: var(--fluid-radius-md); padding: 0.75rem;">
+  <fluid-stack
+    direction="horizontal"
+    justify="between"
+    align="center"
+    style="width: 24rem; border: 1px dashed var(--fluid-border-default); border-radius: var(--fluid-radius-md); padding: 0.75rem;"
+  >
     <span>Left</span>
     <fluid-button size="sm">Right</fluid-button>
   </fluid-stack>
@@ -127,7 +134,7 @@ aliases (`start` · `center` · `end` · `between` · `around` · `evenly` ·
   a single axis.
 - A wrapping group of items (**cluster**): `direction="horizontal"` + `wrap`.
 
-### When *not* to use
+### When _not_ to use
 
 - **Two-dimensional, uniform cells**: use [`<fluid-grid>`](/components/grid/).
 - **Mixed-size tiles that pack densely**: use

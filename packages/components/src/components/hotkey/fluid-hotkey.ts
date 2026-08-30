@@ -229,10 +229,7 @@ export class FluidHotkey extends FluidElement {
     }
     // Mid-sequence: arm the timeout so a slow follow-up resets.
     this.clearSequenceTimer();
-    this.sequenceTimer = setTimeout(
-      () => this.resetSequence(),
-      FluidHotkey.SEQUENCE_TIMEOUT
-    );
+    this.sequenceTimer = setTimeout(() => this.resetSequence(), FluidHotkey.SEQUENCE_TIMEOUT);
   }
 
   private resetSequence(): void {

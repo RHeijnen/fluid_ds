@@ -54,6 +54,9 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @cssproperty --fluid-button-border - Outline color (secondary variant). Falls back to --fluid-border-default.
  * @cssproperty --fluid-button-active-border - Active outline color. Falls back to --fluid-button-border.
  * @cssproperty --fluid-button-radius - Corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-button-padding-block - Vertical inner padding, all sizes. Falls back to the per-size default (--fluid-space-1 / 0 / --fluid-space-3).
+ * @cssproperty --fluid-button-padding-inline - Horizontal inner padding, all sizes. Falls back to the per-size default (--fluid-space-3 / --fluid-space-4 / --fluid-space-5).
+ * @cssproperty --fluid-button-padding-inline-icon - Horizontal padding on a side occupied by a prefix/suffix icon (and both sides of icon-only buttons). Falls back one step tighter than the per-size default.
  * @cssproperty --fluid-button-gap - Gap between icon and label. Falls back to --fluid-space-2.
  * @cssproperty --fluid-button-font-family - Label font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-button-font-weight - Label weight. Falls back to --fluid-font-weight-medium.
@@ -264,7 +267,7 @@ export class FluidButton extends FluidElement {
 
     .button:focus-visible {
       outline: var(--fluid-button-focus-ring-width, var(--fluid-focus-ring-width)) solid
-        var(--fluid-focus-ring-color);
+        var(--fluid-button-focus-ring-color, var(--fluid-focus-ring-color));
       outline-offset: var(--fluid-button-focus-ring-offset, var(--fluid-focus-ring-offset));
     }
 
@@ -296,8 +299,8 @@ export class FluidButton extends FluidElement {
     /* font-size lives on :host([size]) (so the slotted label inherits it);
        these rules own only the padding + gap geometry. */
     .size-sm {
-      padding-block: var(--fluid-space-1);
-      padding-inline: var(--fluid-space-3);
+      padding-block: var(--fluid-button-padding-block, var(--fluid-space-1));
+      padding-inline: var(--fluid-button-padding-inline, var(--fluid-space-3));
       gap: 0.375rem;
     }
     .size-md {
@@ -305,31 +308,31 @@ export class FluidButton extends FluidElement {
         var(--fluid-button-height-md, var(--fluid-space-8, 2rem)),
         var(--fluid-target-min, 24px)
       );
-      padding-block: 0;
-      padding-inline: var(--fluid-space-4);
+      padding-block: var(--fluid-button-padding-block, 0);
+      padding-inline: var(--fluid-button-padding-inline, var(--fluid-space-4));
     }
     .size-lg {
-      padding-block: var(--fluid-space-3);
-      padding-inline: var(--fluid-space-5);
+      padding-block: var(--fluid-button-padding-block, var(--fluid-space-3));
+      padding-inline: var(--fluid-button-padding-inline, var(--fluid-space-5));
     }
 
     .size-sm.has-prefix {
-      padding-inline-start: var(--fluid-space-2);
+      padding-inline-start: var(--fluid-button-padding-inline-icon, var(--fluid-space-2));
     }
     .size-sm.has-suffix {
-      padding-inline-end: var(--fluid-space-2);
+      padding-inline-end: var(--fluid-button-padding-inline-icon, var(--fluid-space-2));
     }
     .size-md.has-prefix {
-      padding-inline-start: var(--fluid-space-3);
+      padding-inline-start: var(--fluid-button-padding-inline-icon, var(--fluid-space-3));
     }
     .size-md.has-suffix {
-      padding-inline-end: var(--fluid-space-3);
+      padding-inline-end: var(--fluid-button-padding-inline-icon, var(--fluid-space-3));
     }
     .size-lg.has-prefix {
-      padding-inline-start: var(--fluid-space-4);
+      padding-inline-start: var(--fluid-button-padding-inline-icon, var(--fluid-space-4));
     }
     .size-lg.has-suffix {
-      padding-inline-end: var(--fluid-space-4);
+      padding-inline-end: var(--fluid-button-padding-inline-icon, var(--fluid-space-4));
     }
 
     /*
@@ -340,12 +343,12 @@ export class FluidButton extends FluidElement {
      * hard-coding pixel widths.
      */
     .button.icon-only {
-      padding-inline: var(--fluid-space-2);
+      padding-inline: var(--fluid-button-padding-inline-icon, var(--fluid-space-2));
       aspect-ratio: 1 / 1;
       justify-content: center;
     }
     .button.icon-only.size-lg {
-      padding-inline: var(--fluid-space-3);
+      padding-inline: var(--fluid-button-padding-inline-icon, var(--fluid-space-3));
     }
 
     /*

@@ -12,7 +12,7 @@ type Args = Pick<
 const meta: Meta<Args> = {
   title: "Components/Feedback/Popconfirm",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     message: { control: "text" },
     confirmText: { control: "text" },
@@ -42,9 +42,7 @@ const meta: Meta<Args> = {
         placement=${args.placement}
         ?disabled=${args.disabled}
       >
-        <fluid-button slot="trigger" variant="secondary" tone="danger">
-          Delete
-        </fluid-button>
+        <fluid-button slot="trigger" variant="secondary" tone="danger"> Delete </fluid-button>
       </fluid-popconfirm>
     </div>
   `

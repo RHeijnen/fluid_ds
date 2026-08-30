@@ -40,6 +40,7 @@ layer, so they are never clipped by an ancestor's overflow or transform.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tour/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -51,6 +52,7 @@ layer, so they are never clipped by an ancestor's overflow or transform.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tour";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -69,7 +71,7 @@ an attribute. Each step needs a `target` selector, a `title`, and a `body`;
   const tour = document.getElementById("onboarding");
   tour.steps = [
     { target: "#search", title: "Search", body: "Find anything here.", placement: "bottom-start" },
-    { target: "#new",    title: "Create", body: "Start a new project.", placement: "bottom" },
+    { target: "#new", title: "Create", body: "Start a new project.", placement: "bottom" },
     { target: "#avatar", title: "Account", body: "Billing and settings.", placement: "left" }
   ];
   tour.show(); // or set the `open` attribute
@@ -87,7 +89,9 @@ persist progress or fire analytics.
 
 <script type="module">
   const t = document.getElementById("t");
-  t.steps = [/* ... */];
+  t.steps = [
+    /* ... */
+  ];
 
   t.addEventListener("fluid-step-change", (e) => console.log("now on step", e.detail.index));
   t.addEventListener("fluid-finish", () => localStorage.setItem("tour-done", "1"));
@@ -152,6 +156,7 @@ inheritance.
       return <fluid-tour ref={ref} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Onboarding.vue"
@@ -170,6 +175,7 @@ inheritance.
       <fluid-tour ref="tour" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="onboarding.component.ts"
@@ -190,6 +196,7 @@ inheritance.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Onboarding.svelte"
@@ -205,6 +212,7 @@ inheritance.
 
     <fluid-tour bind:this={tour}></fluid-tour>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -280,7 +288,15 @@ indicator, with no per-component branching.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Popover" href="/components/popover/" description="A single click-anchored floating panel." />
-  <LinkCard title="Tooltip" href="/components/tooltip/" description="A one-shot hover or focus hint." />
+  <LinkCard
+    title="Popover"
+    href="/components/popover/"
+    description="A single click-anchored floating panel."
+  />
+  <LinkCard
+    title="Tooltip"
+    href="/components/tooltip/"
+    description="A one-shot hover or focus hint."
+  />
   <LinkCard title="Dialog" href="/components/dialog/" description="A standalone modal dialog." />
 </CardGrid>

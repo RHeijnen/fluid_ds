@@ -8,7 +8,7 @@ type Args = Pick<FluidDescriptionList, "columns" | "divider">;
 const meta: Meta<Args> = {
   title: "Components/Content/Description list",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     columns: { control: { type: "number", min: 1, max: 4 } },
     divider: { control: "boolean" }
@@ -119,8 +119,8 @@ export const RichDetail: Story = {
       <fluid-description-item>
         <span slot="term">Bio</span>
         <span>
-          Mathematician and writer, known for early work on Charles Babbage's
-          proposed mechanical general-purpose computer.
+          Mathematician and writer, known for early work on Charles Babbage's proposed mechanical
+          general-purpose computer.
         </span>
       </fluid-description-item>
       <fluid-description-item>

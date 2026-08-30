@@ -126,8 +126,12 @@ export class FluidHero extends FluidElement {
     .content ::slotted(*) {
       margin: 0;
     }
-    :host([size="sm"]) { --fluid-hero-heading-size: clamp(1.6rem, 4vw, 2.5rem); }
-    :host([size="lg"]) { --fluid-hero-heading-size: clamp(2.4rem, 6vw, 4.25rem); }
+    :host([size="sm"]) {
+      --fluid-hero-heading-size: clamp(1.6rem, 4vw, 2.5rem);
+    }
+    :host([size="lg"]) {
+      --fluid-hero-heading-size: clamp(2.4rem, 6vw, 4.25rem);
+    }
 
     /* Background media sits behind the content with a readable scrim. */
     :host([media-position="background"]) .base {
@@ -148,23 +152,31 @@ export class FluidHero extends FluidElement {
       content: "";
       position: absolute;
       inset: 0;
-      background: var(--fluid-hero-overlay, color-mix(in srgb, var(--fluid-surface-base, #fff) 55%, transparent));
+      background: var(
+        --fluid-hero-overlay,
+        color-mix(in srgb, var(--fluid-surface-base, #fff) 55%, transparent)
+      );
     }
     :host([media-position="background"]) .content {
       position: relative;
       z-index: 1;
     }
-    :host([hidden]) { display: none; }
+    :host([hidden]) {
+      display: none;
+    }
     /* Collapse optional regions whose slot has no assigned content (toggled
        via slotchange) so they add no stray gap. */
-    [hidden] { display: none !important; }
+    [hidden] {
+      display: none !important;
+    }
   `;
 
   /** Horizontal alignment of the content column. */
   @property({ reflect: true }) align: HeroAlign = "start";
 
   /** Where the media sits relative to the content. */
-  @property({ reflect: true, attribute: "media-position" }) mediaPosition: HeroMediaPosition = "end";
+  @property({ reflect: true, attribute: "media-position" }) mediaPosition: HeroMediaPosition =
+    "end";
 
   /** Overall scale (drives the heading size + padding feel). */
   @property({ reflect: true }) size: HeroSize = "md";
@@ -191,12 +203,20 @@ export class FluidHero extends FluidElement {
     return html`
       <section part="base" class="base">
         <div part="content" class="content">
-          <div part="eyebrow" class="eyebrow" hidden><slot name="eyebrow" @slotchange=${this.syncEmpty}></slot></div>
+          <div part="eyebrow" class="eyebrow" hidden>
+            <slot name="eyebrow" @slotchange=${this.syncEmpty}></slot>
+          </div>
           <slot></slot>
-          <div part="description" class="description" hidden><slot name="description" @slotchange=${this.syncEmpty}></slot></div>
-          <div part="actions" class="actions" hidden><slot name="actions" @slotchange=${this.syncEmpty}></slot></div>
+          <div part="description" class="description" hidden>
+            <slot name="description" @slotchange=${this.syncEmpty}></slot>
+          </div>
+          <div part="actions" class="actions" hidden>
+            <slot name="actions" @slotchange=${this.syncEmpty}></slot>
+          </div>
         </div>
-        <div part="media" class="media" hidden><slot name="media" @slotchange=${this.syncEmpty}></slot></div>
+        <div part="media" class="media" hidden>
+          <slot name="media" @slotchange=${this.syncEmpty}></slot>
+        </div>
       </section>
     `;
   }

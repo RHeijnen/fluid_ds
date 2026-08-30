@@ -30,6 +30,7 @@ string; the raw characters the user typed are exposed as the read-only
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/masked-input/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +42,7 @@ string; the raw characters the user typed are exposed as the read-only
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/masked-input";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -51,9 +53,9 @@ string; the raw characters the user typed are exposed as the read-only
 The `mask` string drives everything. Each placeholder token accepts one
 character; literals between them are inserted for the user as they type.
 
-| Token | Accepts |
-| ----- | ------- |
-| `#`   | A digit (0-9) |
+| Token | Accepts             |
+| ----- | ------------------- |
+| `#`   | A digit (0-9)       |
 | `A`   | A letter (a-z, A-Z) |
 | `*`   | A letter or a digit |
 
@@ -91,9 +93,23 @@ character; literals between them are inserted for the user as they type.
 <Demo>
   <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
     <fluid-masked-input mask="(###) ###-####" aria-label="Default"></fluid-masked-input>
-    <fluid-masked-input mask="(###) ###-####" value="(555) 123-4567" aria-label="Filled"></fluid-masked-input>
-    <fluid-masked-input mask="(###) ###-####" disabled value="(555) 123-4567" aria-label="Disabled"></fluid-masked-input>
-    <fluid-masked-input mask="(###) ###-####" readonly value="(555) 123-4567" aria-label="Read-only"></fluid-masked-input>
+    <fluid-masked-input
+      mask="(###) ###-####"
+      value="(555) 123-4567"
+      aria-label="Filled"
+    ></fluid-masked-input>
+    <fluid-masked-input
+      mask="(###) ###-####"
+      disabled
+      value="(555) 123-4567"
+      aria-label="Disabled"
+    ></fluid-masked-input>
+    <fluid-masked-input
+      mask="(###) ###-####"
+      readonly
+      value="(555) 123-4567"
+      aria-label="Read-only"
+    ></fluid-masked-input>
   </div>
 </Demo>
 
@@ -115,6 +131,7 @@ API call, say), read the `unmaskedValue` property.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="PhoneField.tsx"
@@ -132,6 +149,7 @@ API call, say), read the `unmaskedValue` property.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="PhoneField.vue"
@@ -146,6 +164,7 @@ API call, say), read the `unmaskedValue` property.
       <fluid-masked-input mask="(###) ###-####" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="phone.component.ts"
@@ -166,6 +185,7 @@ API call, say), read the `unmaskedValue` property.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="PhoneField.svelte"
@@ -178,6 +198,7 @@ API call, say), read the `unmaskedValue` property.
 
     <fluid-masked-input mask="(###) ###-####" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -188,8 +209,18 @@ The field participates in `<form>` submission and validation like a native
 
 <Demo>
   <form style="display:flex; flex-direction:column; gap: var(--fluid-space-3); max-width: 320px;">
-    <fluid-masked-input name="phone" mask="(###) ###-####" required aria-label="Phone number"></fluid-masked-input>
-    <fluid-masked-input name="expiry" mask="##/##" required aria-label="Card expiry"></fluid-masked-input>
+    <fluid-masked-input
+      name="phone"
+      mask="(###) ###-####"
+      required
+      aria-label="Phone number"
+    ></fluid-masked-input>
+    <fluid-masked-input
+      name="expiry"
+      mask="##/##"
+      required
+      aria-label="Card expiry"
+    ></fluid-masked-input>
   </form>
 </Demo>
 
@@ -260,6 +291,14 @@ branching.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Input" href="/components/input/" description="Free-form single-line text field." />
-  <LinkCard title="OTP" href="/components/otp/" description="One-time passcode split across cells." />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="Free-form single-line text field."
+  />
+  <LinkCard
+    title="OTP"
+    href="/components/otp/"
+    description="One-time passcode split across cells."
+  />
 </CardGrid>

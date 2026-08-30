@@ -301,7 +301,11 @@ export class FluidCheckbox extends FluidFormAssociated {
 
   private refreshValidity(showInvalid = this.invalid): void {
     if (this.required && !this.checked) {
-      this.setValidity({ valueMissing: true }, this.term("checkThisBox"), this.inputEl ?? undefined);
+      this.setValidity(
+        { valueMissing: true },
+        this.term("checkThisBox"),
+        this.inputEl ?? undefined
+      );
       this.invalid = showInvalid;
     } else {
       this.setValidity({});

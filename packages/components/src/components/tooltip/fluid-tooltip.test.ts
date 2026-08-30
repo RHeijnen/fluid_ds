@@ -41,6 +41,43 @@ describe("<fluid-tooltip>", () => {
     expect(el.shadowRoot!.querySelector(".popover")!.classList.contains("visible")).to.be.true;
   });
 
+  it("positions next to its anchor even inside a filtered ancestor (top layer)", async () => {
+    /*
+     * A `filter` / `backdrop-filter` / `transform` ancestor establishes a
+     * containing block for position:fixed, so a plain fixed popover would
+     * anchor to that ancestor instead of the viewport and land far from its
+     * trigger. Rendering in the top layer (popover="manual") escapes that.
+     * This reproduces the frosted-card case: the wrapper is pushed 200px from
+     * the viewport's left edge and given a filter.
+     */
+    const wrap = await fixture<HTMLDivElement>(html`
+      <div style="position: absolute; left: 200px; top: 120px; filter: blur(0);">
+        <fluid-tooltip content="Favorites" placement="right" show-delay="0">
+          <button style="width: 40px; height: 40px;">Star</button>
+        </fluid-tooltip>
+      </div>
+    `);
+    const el = wrap.querySelector<FluidTooltip>("fluid-tooltip")!;
+    el.showDelay = 0;
+    const button = wrap.querySelector("button")!;
+    const popover = el.shadowRoot!.querySelector<HTMLElement>(".popover")!;
+
+    setTimeout(() => button.focus());
+    await oneEvent(el, "fluid-show");
+    await el.updateComplete;
+    await aTimeout(30);
+
+    // In the top layer the popover is :popover-open, and placement="right" lands
+    // it just past the anchor's right edge in viewport coordinates. Trapped by
+    // the filtered ancestor it would instead sit ~200px further right.
+    expect(popover.matches(":popover-open"), "tooltip should be in the top layer").to.be.true;
+    const anchor = button.getBoundingClientRect();
+    const tip = popover.getBoundingClientRect();
+    expect(tip.left).to.be.greaterThan(anchor.right - 1);
+    expect(tip.left - anchor.right).to.be.at.most(16);
+    expect(Math.abs(tip.top + tip.height / 2 - (anchor.top + anchor.height / 2))).to.be.at.most(24);
+  });
+
   it("hides on blur", async () => {
     const el = await fixture<FluidTooltip>(html`
       <fluid-tooltip content="Hi"><button>Trigger</button></fluid-tooltip>

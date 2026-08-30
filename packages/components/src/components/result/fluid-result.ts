@@ -231,12 +231,8 @@ export class FluidResult extends FluidElement {
             <fluid-icon name=${this.defaultIconName()}></fluid-icon>
           </slot>
         </span>
-        ${this.title
-          ? html`<p part="title" class="title">${this.title}</p>`
-          : ""}
-        ${this.subtitle
-          ? html`<p part="subtitle" class="subtitle">${this.subtitle}</p>`
-          : ""}
+        ${this.title ? html`<p part="title" class="title">${this.title}</p>` : ""}
+        ${this.subtitle ? html`<p part="subtitle" class="subtitle">${this.subtitle}</p>` : ""}
         <div part="content" class="content ${this.hasContentSlot ? "" : "empty"}">
           <slot @slotchange=${this.handleSlotChange}></slot>
         </div>

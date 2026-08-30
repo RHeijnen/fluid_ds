@@ -76,7 +76,7 @@
   /* Active state uses the Fluid accent pair (base + on-accent text), which is
      contrast-verified by design. Starlight's --sl-color-white resolves to
      near-black in light mode, which gave the selected button a failing
-     3.43:1 ratio (SC 1.4.3) — the accent-text token fixes that to ~5:1. */
+     3.43:1 ratio (SC 1.4.3); the accent-text token fixes that to ~5:1. */
   .conformance-toggle__seg button[aria-pressed="true"] {
     background: var(--fluid-accent-base, var(--sl-color-accent));
     color: var(--fluid-accent-text, #fff);

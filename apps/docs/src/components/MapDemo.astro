@@ -1,0 +1,96 @@
+---
+/**
+ * Live demo for the map page, fully offline: Leaflet's stylesheet is bundled
+ * locally (the static link marked data-fluid-map-leaflet-css below tells the
+ * component to skip its CDN autoload), the tile layer is a repeating inline
+ * SVG data URI, and every marker is a tone pin or emoji divIcon, so the page
+ * makes no network requests.
+ */
+import Demo from "./Demo.astro";
+import "../../../../packages/map/node_modules/leaflet/dist/leaflet.css";
+
+const svgDataUrl = (svg: string): string => `data:image/svg+xml,${encodeURIComponent(svg)}`;
+
+/* A seamless, deterministic "street map" tile, repeated for every tile. */
+const OFFLINE_TILE =
+  svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" fill="#eef2e8"/>
+  <path d="M-20 196 276 44" stroke="#bad9e8" stroke-width="42"/>
+  <path d="M-20 196 276 44" stroke="#d9f0f7" stroke-width="32"/>
+  <g fill="none" stroke="#fff" stroke-width="12">
+    <path d="M-12 58 268 164"/><path d="M42 -12 184 268"/><path d="M-12 232 232 -12"/>
+  </g>
+  <g fill="none" stroke="#d8d2c5" stroke-width="3">
+    <path d="M-12 58 268 164"/><path d="M42 -12 184 268"/><path d="M-12 232 232 -12"/>
+    <path d="M0 108h256M0 214h256M82 0v256M218 0v256"/>
+  </g>
+  <g fill="#d7e7ca"><rect x="12" y="12" width="54" height="34" rx="5"/><rect x="174" y="184" width="64" height="54" rx="6"/></g>
+</svg>`);
+---
+
+<Demo>
+  <link rel="stylesheet" href="data:text/css," data-fluid-map-leaflet-css />
+  <div class="map-demo" data-map-demo>
+    <fluid-map
+      class="map-el"
+      label="Offline delivery map demo"
+      tile-url={OFFLINE_TILE}
+      attribution="Inline SVG tiles, fully offline"></fluid-map>
+    <p class="map-status" data-map-status role="status">
+      Drag to pan, zoom with the controls or your wheel, and click a marker.
+    </p>
+  </div>
+</Demo>
+
+<style>
+  .map-demo {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .map-el {
+    --fluid-map-height: 22rem;
+    display: block;
+  }
+  .map-status {
+    margin: 0;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/map/define/map";
+  import type { FluidMap, FluidMapMarker } from "@fluid-ds/map";
+
+  const MARKERS: FluidMapMarker[] = [
+    { lat: 51.505, lng: -0.09, label: "Depot", tone: "info" },
+    { lat: 51.512, lng: -0.104, label: "Warehouse", tone: "success" },
+    { lat: 51.499, lng: -0.078, label: "Roadworks ahead", tone: "warning" },
+    { lat: 51.509, lng: -0.062, label: "Coffee stop", icon: { html: "☕", iconSize: [30, 30] } }
+  ];
+
+  function setup(root: HTMLElement): void {
+    const map = root.querySelector<FluidMap>("fluid-map");
+    const status = root.querySelector<HTMLElement>("[data-map-status]");
+    if (!map || !status) return;
+
+    map.center = [51.506, -0.085];
+    map.zoom = 14;
+    map.markers = MARKERS;
+
+    map.addEventListener("fluid-marker-click", (event: Event) => {
+      const detail = (event as CustomEvent<{ marker: FluidMapMarker }>).detail;
+      status.textContent = `Marker clicked: ${detail.marker.label ?? "unnamed"}.`;
+    });
+    map.addEventListener("fluid-move", (event: Event) => {
+      const detail = (event as CustomEvent<{ center: [number, number]; zoom: number }>).detail;
+      const [lat, lng] = detail.center;
+      status.textContent = `Center ${lat.toFixed(3)}, ${lng.toFixed(3)} at zoom ${detail.zoom}.`;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-map-demo]")) setup(root);
+</script>

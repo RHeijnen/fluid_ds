@@ -19,7 +19,7 @@ const sample: CalendarEvent[] = [
 const meta: Meta = {
   title: "Calendar/Event calendar",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: (args) => html`
     <fluid-event-calendar
       style="max-width: 44rem;"
@@ -37,8 +37,14 @@ const meta: Meta = {
   },
   argTypes: {
     month: { control: "text", description: 'Visible month as "YYYY-MM".' },
-    weekStart: { control: { type: "number", min: 0, max: 6 }, description: "First day of week (0 Sun - 6 Sat)." },
-    maxPerDay: { control: { type: "number", min: 0, max: 8 }, description: 'Chips per day before "+N more".' },
+    weekStart: {
+      control: { type: "number", min: 0, max: 6 },
+      description: "First day of week (0 Sun - 6 Sat)."
+    },
+    maxPerDay: {
+      control: { type: "number", min: 0, max: 8 },
+      description: 'Chips per day before "+N more".'
+    },
     locale: { control: "text", description: "BCP-47 locale for labels." }
   }
 };

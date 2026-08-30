@@ -1,0 +1,67 @@
+/*
+ * Orchid, a violet preset with room to breathe.
+ * Deep purple accent track, soft rounded corners, and a spacing ramp scaled
+ * up ~35% so buttons, fields and cards all sit in generous whitespace.
+ *
+ * Usage: load this stylesheet, then set `data-fluid-brand="orchid"` on
+ * <html> (global) or any subtree you want themed.
+ *
+ *   <html data-fluid-brand="orchid">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/orchid.css">
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme).
+ */
+[data-fluid-brand="orchid"] {
+  /* Brand palette, violet */
+  --fluid-color-brand-50: #f5f3ff;
+  --fluid-color-brand-100: #ede9fe;
+  --fluid-color-brand-200: #ddd6fe;
+  --fluid-color-brand-300: #c4b5fd;
+  --fluid-color-brand-400: #a78bfa;
+  --fluid-color-brand-500: #8b5cf6;
+  --fluid-color-brand-600: #7c3aed;
+  --fluid-color-brand-700: #6d28d9;
+  --fluid-color-brand-800: #5b21b6;
+  --fluid-color-brand-900: #4c1d95;
+
+  /* Soft, rounded shapes suit the airy look. */
+  --fluid-radius-sm: 0.5rem;
+  --fluid-radius-md: 1rem;
+  --fluid-radius-lg: 1.5rem;
+  --fluid-radius-xl: 2rem;
+  --fluid-field-border-radius: 1rem;
+
+  /* A lot of space: scale the spacing ramp up ~35%, so every component that
+     pads or gaps from the space scale reads open and unhurried. */
+  --fluid-space-1: 0.35rem;
+  --fluid-space-2: 0.7rem;
+  --fluid-space-3: 1rem;
+  --fluid-space-4: 1.35rem;
+  --fluid-space-5: 1.7rem;
+  --fluid-space-6: 2rem;
+  --fluid-space-8: 2.7rem;
+  --fluid-space-10: 3.4rem;
+  --fluid-space-12: 4rem;
+
+  /* Unhurried motion to match the density. */
+  --fluid-duration-fast: 160ms;
+  --fluid-duration-normal: 260ms;
+
+  /* Re-derive the brand-driven semantics at this scope, so the brand themes a
+     subtree and not only :root (a custom property that reads the brand ramp is
+     substituted where it is declared). */
+  --fluid-accent-base: var(--fluid-color-brand-600);
+  --fluid-accent-hover: var(--fluid-color-brand-700);
+  --fluid-accent-active: var(--fluid-color-brand-800);
+  --fluid-focus-ring-color: var(--fluid-color-brand-500);
+}
+
+/* Dark scheme re-derives the accent from lighter brand steps, matching the
+   base tokens, so a dark-mode subtree keeps its contrast. */
+[data-fluid-theme="dark"] [data-fluid-brand="orchid"],
+[data-fluid-brand="orchid"][data-fluid-theme="dark"] {
+  --fluid-accent-base: var(--fluid-color-brand-500);
+  --fluid-accent-hover: var(--fluid-color-brand-400);
+  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-focus-ring-color: var(--fluid-color-brand-400);
+}

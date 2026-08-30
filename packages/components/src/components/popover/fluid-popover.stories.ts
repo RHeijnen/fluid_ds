@@ -7,7 +7,7 @@ import "../input/define.js";
 const meta: Meta = {
   title: "Components/Navigation/Popover",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -18,7 +18,9 @@ export const Default: Story = {
     <div style="padding: 4rem;">
       <fluid-popover placement="bottom-start" distance="8">
         <fluid-button slot="trigger">Open popover</fluid-button>
-        <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); min-width: 16rem;">
+        <div
+          style="display:flex; flex-direction:column; gap: var(--fluid-space-3); min-width: 16rem;"
+        >
           <strong>Settings</strong>
           <fluid-input aria-label="Name" placeholder="Your name"></fluid-input>
           <fluid-button>Save</fluid-button>
@@ -33,7 +35,9 @@ export const RichContent: Story = {
     <div style="padding: 4rem;">
       <fluid-popover>
         <fluid-button slot="trigger" variant="secondary">User menu</fluid-button>
-        <div style="display:flex; flex-direction:column; gap: var(--fluid-space-2); min-width: 14rem;">
+        <div
+          style="display:flex; flex-direction:column; gap: var(--fluid-space-2); min-width: 14rem;"
+        >
           <strong>Hi, Ada</strong>
           <a href="#" style="color: var(--fluid-text-primary); text-decoration: none;">Profile</a>
           <a href="#" style="color: var(--fluid-text-primary); text-decoration: none;">Settings</a>

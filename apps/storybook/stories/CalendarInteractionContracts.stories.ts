@@ -17,32 +17,53 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 const allDays: Availability = {
-  weekly: Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map((day) => [day, [{ start: "09:00", end: "12:00" }]])),
+  weekly: Object.fromEntries(
+    [0, 1, 2, 3, 4, 5, 6].map((day) => [day, [{ start: "09:00", end: "12:00" }]])
+  ),
   slotMinutes: 60
 };
 const seed: Availability = {
   weekly: { 1: [{ start: "09:00", end: "17:00" }] },
-  slotMinutes: 30, stepMinutes: 15, bufferMinutes: 5, minNoticeMinutes: 90,
+  slotMinutes: 30,
+  stepMinutes: 15,
+  bufferMinutes: 5,
+  minNoticeMinutes: 90,
   exceptions: [{ date: "2035-12-25", closed: true }]
 };
 const renderEvents = () => html`
-  <fluid-event-calendar month="2026-06" locale="en-US" max-per-day="2" .events=${[
-    { id: "release", date: "2026-06-10", title: "Release" },
-    { id: "review", date: "2026-06-10", title: "Review" },
-    { id: "retro", date: "2026-06-10", title: "Retrospective" }
-  ]}></fluid-event-calendar>
+  <fluid-event-calendar
+    month="2026-06"
+    locale="en-US"
+    max-per-day="2"
+    .events=${[
+      { id: "release", date: "2026-06-10", title: "Release" },
+      { id: "review", date: "2026-06-10", title: "Review" },
+      { id: "retro", date: "2026-06-10", title: "Retrospective" }
+    ]}
+  ></fluid-event-calendar>
   <button type="button">After calendar</button>
 `;
 const renderScheduler = () => html`
   <form>
     <button type="button">Before scheduler</button>
-    <fluid-scheduler name="appointment" aria-label="Appointment" locale="en-GB"
-      value="2035-06-18T09:00" min="2035-06-01" max="2035-07-31" .availability=${allDays}
-      .bookings=${[{ start: "2035-06-18T10:00" }]}></fluid-scheduler>
+    <fluid-scheduler
+      name="appointment"
+      aria-label="Appointment"
+      locale="en-GB"
+      value="2035-06-18T09:00"
+      min="2035-06-01"
+      max="2035-07-31"
+      .availability=${allDays}
+      .bookings=${[{ start: "2035-06-18T10:00" }]}
+    ></fluid-scheduler>
     <button type="reset">Reset appointment</button>
   </form>
 `;
-const renderEditor = () => html`<fluid-availability-editor locale="en-US" .availability=${seed}></fluid-availability-editor>`;
+const renderEditor = () =>
+  html`<fluid-availability-editor
+    locale="en-US"
+    .availability=${seed}
+  ></fluid-availability-editor>`;
 
 export const EventCalendarContract: Story = {
   parameters: { quality: { componentTag: "fluid-event-calendar" } },
@@ -70,7 +91,10 @@ export const EventCalendarContract: Story = {
       const day = root.querySelector<HTMLElement>('[data-iso="2026-06-10"]')!;
       day.focus();
       await userEvent.keyboard("{F2}");
-      const release = within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", { name: "Release" });
+      const release = within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole(
+        "button",
+        { name: "Release" }
+      );
       await expect(root.activeElement).toBe(release);
       await userEvent.keyboard("{Enter}");
       await expect(events).toEqual(["release"]);
@@ -86,7 +110,11 @@ export const EventCalendarContract: Story = {
       await userEvent.keyboard("{PageDown}");
       await waitFor(() => expect(root.activeElement?.getAttribute("data-iso")).toBe("2026-07-10"));
       await expect(months).toEqual(["2026-07"]);
-      await userEvent.click(within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", { name: "Previous month" }));
+      await userEvent.click(
+        within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", {
+          name: "Previous month"
+        })
+      );
       await waitFor(() => expect(calendar.month).toBe("2026-06"));
       await expect(months).toEqual(["2026-07", "2026-06"]);
       await expect(root.querySelectorAll('[role="gridcell"][tabindex="0"]')).toHaveLength(1);
@@ -104,7 +132,9 @@ export const SchedulerBookingContract: Story = {
   play: async ({ canvasElement }) => {
     const scheduler = canvasElement.querySelector<FluidScheduler>("fluid-scheduler")!;
     await scheduler.updateComplete;
-    const slots = scheduler.shadowRoot!.querySelector("fluid-time-slots") as HTMLElement & { updateComplete: Promise<unknown> };
+    const slots = scheduler.shadowRoot!.querySelector("fluid-time-slots") as HTMLElement & {
+      updateComplete: Promise<unknown>;
+    };
     await slots.updateComplete;
     const radios = within(slots.shadowRoot!.querySelector<HTMLElement>('[part="base"]')!);
     const changes: CustomEvent[] = [];
@@ -119,10 +149,16 @@ export const SchedulerBookingContract: Story = {
       await userEvent.keyboard("{End}{Enter}");
       await waitFor(() => expect(scheduler.value).toBe("2035-06-18T11:00"));
       await expect(changes).toHaveLength(1);
-      await expect(changes[0]!.detail).toMatchObject({ value: "2035-06-18T11:00", start: "2035-06-18T11:00", end: "2035-06-18T12:00" });
+      await expect(changes[0]!.detail).toMatchObject({
+        value: "2035-06-18T11:00",
+        start: "2035-06-18T11:00",
+        end: "2035-06-18T12:00"
+      });
       await expect(changes[0]!.bubbles).toBe(true);
       await expect(changes[0]!.composed).toBe(true);
-      await expect(new FormData(canvasElement.querySelector("form")!).get("appointment")).toBe(scheduler.value);
+      await expect(new FormData(canvasElement.querySelector("form")!).get("appointment")).toBe(
+        scheduler.value
+      );
       scheduler.loading = true;
       await scheduler.updateComplete;
       await slots.updateComplete;
@@ -130,14 +166,23 @@ export const SchedulerBookingContract: Story = {
       scheduler.loading = false;
       await scheduler.updateComplete;
       const calendar = scheduler.shadowRoot!.querySelector("fluid-calendar")!;
-      await userEvent.click(within(calendar.shadowRoot!.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", { name: "Next month" }));
+      await userEvent.click(
+        within(calendar.shadowRoot!.querySelector<HTMLElement>('[part="base"]')!).getByRole(
+          "button",
+          { name: "Next month" }
+        )
+      );
       await waitFor(() => expect(ranges).toEqual([{ start: "2035-07-01", end: "2035-07-31" }]));
       const parent = scheduler.parentElement!;
       scheduler.remove();
       parent.insertBefore(scheduler, parent.querySelector('button[type="reset"]'));
-      await userEvent.click(within(canvasElement).getByRole("button", { name: "Reset appointment" }));
+      await userEvent.click(
+        within(canvasElement).getByRole("button", { name: "Reset appointment" })
+      );
       await waitFor(() => expect(scheduler.value).toBe("2035-06-18T09:00"));
-      await expect(new FormData(canvasElement.querySelector("form")!).get("appointment")).toBe("2035-06-18T09:00");
+      await expect(new FormData(canvasElement.querySelector("form")!).get("appointment")).toBe(
+        "2035-06-18T09:00"
+      );
     } finally {
       scheduler.removeEventListener("fluid-change", onChange);
       scheduler.removeEventListener("fluid-range-change", onRange);
@@ -149,10 +194,14 @@ export const AvailabilityEditingContract: Story = {
   parameters: { quality: { componentTag: "fluid-availability-editor" } },
   render: renderEditor,
   play: async ({ canvasElement }) => {
-    const editor = canvasElement.querySelector<FluidAvailabilityEditor>("fluid-availability-editor")!;
+    const editor = canvasElement.querySelector<FluidAvailabilityEditor>(
+      "fluid-availability-editor"
+    )!;
     await editor.updateComplete;
     const root = editor.shadowRoot!;
-    const monday = root.querySelector("fluid-switch") as HTMLElement & { updateComplete: Promise<unknown> };
+    const monday = root.querySelector("fluid-switch") as HTMLElement & {
+      updateComplete: Promise<unknown>;
+    };
     await monday.updateComplete;
     const toggle = monday.shadowRoot!.querySelector<HTMLInputElement>("input")!;
     const changes: Availability[] = [];
@@ -176,7 +225,12 @@ export const AvailabilityEditingContract: Story = {
       toggle.focus();
       await userEvent.keyboard(" ");
       await waitFor(() => expect(changes).toHaveLength(2));
-      await expect(changes[1]).toMatchObject({ slotMinutes: 30, stepMinutes: 15, bufferMinutes: 5, minNoticeMinutes: 90 });
+      await expect(changes[1]).toMatchObject({
+        slotMinutes: 30,
+        stepMinutes: 15,
+        bufferMinutes: 5,
+        minNoticeMinutes: 90
+      });
       await expect(changes[1]!.weekly[1]).toEqual([{ start: "09:00", end: "17:00" }]);
       const time = root.querySelector<HTMLInputElement>('input[type="time"]')!;
       // userEvent.clear cannot resolve focus inside a shadow-root time input.
@@ -187,7 +241,11 @@ export const AvailabilityEditingContract: Story = {
       fireEvent.change(time, { target: { value: "08:30" } });
       await waitFor(() => expect(changes).toHaveLength(3));
       await expect(changes[2]!.weekly[1]![0]!.start).toBe("08:30");
-      await userEvent.click(within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", { name: "Remove closed date" }));
+      await userEvent.click(
+        within(root.querySelector<HTMLElement>('[part="base"]')!).getByRole("button", {
+          name: "Remove closed date"
+        })
+      );
       await waitFor(() => expect(changes).toHaveLength(4));
       await expect(changes[3]!.exceptions).toBeUndefined();
       await expect(seed.weekly[1]![0]!.start).toBe("09:00");
@@ -198,5 +256,11 @@ export const AvailabilityEditingContract: Story = {
 };
 
 export const NativeEventFixture: Story = { tags: ["!interaction-contract"], render: renderEvents };
-export const NativeSchedulerFixture: Story = { tags: ["!interaction-contract"], render: renderScheduler };
-export const NativeAvailabilityFixture: Story = { tags: ["!interaction-contract"], render: renderEditor };
+export const NativeSchedulerFixture: Story = {
+  tags: ["!interaction-contract"],
+  render: renderScheduler
+};
+export const NativeAvailabilityFixture: Story = {
+  tags: ["!interaction-contract"],
+  render: renderEditor
+};

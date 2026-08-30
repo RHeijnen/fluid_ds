@@ -25,7 +25,7 @@ const placeholder = (label: string) => html`
 const meta: Meta<Args> = {
   title: "Components/Layout/Aspect ratio",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     ratio: {
       control: "inline-radio",

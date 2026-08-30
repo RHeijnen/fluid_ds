@@ -52,24 +52,24 @@ for (const name of names) {
     name === "scheduler"
       ? staticHtml`<fluid-scheduler id="field" name="answer" aria-label="Appointment" availability=${schedulerAvailability} required></fluid-scheduler>`
       : name === "date-range-picker"
-      ? staticHtml`<fluid-date-range-picker id="field" name="answer" aria-label="Travel dates" format="iso" required></fluid-date-range-picker>`
-      : name === "radio-group"
-      ? staticHtml`<fieldset id="field-shell"><legend>Delivery speed</legend><fluid-radio-group id="field" name="answer" aria-label="Delivery speed" required><fluid-radio value="unavailable" disabled>Unavailable</fluid-radio><fluid-radio value="standard">Standard</fluid-radio><fluid-radio value="express">Express</fluid-radio></fluid-radio-group></fieldset>`
-      : name === "otp"
-      ? staticHtml`<fluid-otp id="field" name="answer" aria-label="Verification code" length="4" required></fluid-otp>`
-      : name === "color-picker"
-      ? staticHtml`<fluid-color-picker id="field" name="answer" aria-label="Accent" value="" palette='["#ff0000","#00ff00"]' required></fluid-color-picker>`
-      : name === "masked-input"
-        ? staticHtml`<fluid-masked-input id="field" name="answer" aria-label="Masked value" mask="##/##" required></fluid-masked-input>`
-        : name === "select"
-          ? staticHtml`<fluid-select id="field" name="answer" label="Select value" required><fluid-option value="apple">Apple</fluid-option><fluid-option value="banana">Banana</fluid-option></fluid-select>`
-          : name === "time-picker"
-            ? staticHtml`<fluid-time-picker id="field" name="answer" label="Time value" min="09:00" max="10:00" step="30" format="12h" required></fluid-time-picker>`
-            : name === "date-picker"
-              ? staticHtml`<fluid-date-picker id="field" name="answer" label="Date value" format="iso" min="2026-08-01" max="2026-08-31" required></fluid-date-picker>`
-              : toggle
-                ? staticHtml`<${staticTag} id="field" name="answer" value="accepted" required>${label}</${staticTag}>`
-                : staticHtml`<${staticTag} id="field" name="answer" label=${label} required></${staticTag}>`;
+        ? staticHtml`<fluid-date-range-picker id="field" name="answer" aria-label="Travel dates" format="iso" required></fluid-date-range-picker>`
+        : name === "radio-group"
+          ? staticHtml`<fieldset id="field-shell"><legend>Delivery speed</legend><fluid-radio-group id="field" name="answer" aria-label="Delivery speed" required><fluid-radio value="unavailable" disabled>Unavailable</fluid-radio><fluid-radio value="standard">Standard</fluid-radio><fluid-radio value="express">Express</fluid-radio></fluid-radio-group></fieldset>`
+          : name === "otp"
+            ? staticHtml`<fluid-otp id="field" name="answer" aria-label="Verification code" length="4" required></fluid-otp>`
+            : name === "color-picker"
+              ? staticHtml`<fluid-color-picker id="field" name="answer" aria-label="Accent" value="" palette='["#ff0000","#00ff00"]' required></fluid-color-picker>`
+              : name === "masked-input"
+                ? staticHtml`<fluid-masked-input id="field" name="answer" aria-label="Masked value" mask="##/##" required></fluid-masked-input>`
+                : name === "select"
+                  ? staticHtml`<fluid-select id="field" name="answer" label="Select value" required><fluid-option value="apple">Apple</fluid-option><fluid-option value="banana">Banana</fluid-option></fluid-select>`
+                  : name === "time-picker"
+                    ? staticHtml`<fluid-time-picker id="field" name="answer" label="Time value" min="09:00" max="10:00" step="30" format="12h" required></fluid-time-picker>`
+                    : name === "date-picker"
+                      ? staticHtml`<fluid-date-picker id="field" name="answer" label="Date value" format="iso" min="2026-08-01" max="2026-08-31" required></fluid-date-picker>`
+                      : toggle
+                        ? staticHtml`<${staticTag} id="field" name="answer" value="accepted" required>${label}</${staticTag}>`
+                        : staticHtml`<${staticTag} id="field" name="answer" label=${label} required></${staticTag}>`;
   const serverForm = await renderFluidToString(staticHtml`
     <form id="native-form">
       <div class="actions">
@@ -83,24 +83,24 @@ for (const name of names) {
     name === "scheduler"
       ? `<fluid-scheduler id="field" name="answer" aria-label="Appointment" availability='${schedulerAvailability}' required></fluid-scheduler>`
       : name === "date-range-picker"
-      ? '<fluid-date-range-picker id="field" name="answer" aria-label="Travel dates" format="iso" required></fluid-date-range-picker>'
-      : name === "radio-group"
-      ? '<fieldset id="field-shell"><legend>Delivery speed</legend><fluid-radio-group id="field" name="answer" aria-label="Delivery speed" required><fluid-radio value="unavailable" disabled>Unavailable</fluid-radio><fluid-radio value="standard">Standard</fluid-radio><fluid-radio value="express">Express</fluid-radio></fluid-radio-group></fieldset>'
-      : name === "otp"
-      ? '<fluid-otp id="field" name="answer" aria-label="Verification code" length="4" required></fluid-otp>'
-      : name === "color-picker"
-      ? '<fluid-color-picker id="field" name="answer" aria-label="Accent" value="" palette=\'["#ff0000","#00ff00"]\' required></fluid-color-picker>'
-      : name === "masked-input"
-        ? '<fluid-masked-input id="field" name="answer" aria-label="Masked value" mask="##/##" required></fluid-masked-input>'
-        : name === "select"
-          ? '<fluid-select id="field" name="answer" label="Select value" required><fluid-option value="apple">Apple</fluid-option><fluid-option value="banana">Banana</fluid-option></fluid-select>'
-          : name === "time-picker"
-            ? '<fluid-time-picker id="field" name="answer" label="Time value" min="09:00" max="10:00" step="30" format="12h" required></fluid-time-picker>'
-            : name === "date-picker"
-              ? '<fluid-date-picker id="field" name="answer" label="Date value" format="iso" min="2026-08-01" max="2026-08-31" required></fluid-date-picker>'
-              : toggle
-                ? `<${tag} id="field" name="answer" value="accepted" required>${label}</${tag}>`
-                : `<${tag} id="field" name="answer" label="${label}" required></${tag}>`;
+        ? '<fluid-date-range-picker id="field" name="answer" aria-label="Travel dates" format="iso" required></fluid-date-range-picker>'
+        : name === "radio-group"
+          ? '<fieldset id="field-shell"><legend>Delivery speed</legend><fluid-radio-group id="field" name="answer" aria-label="Delivery speed" required><fluid-radio value="unavailable" disabled>Unavailable</fluid-radio><fluid-radio value="standard">Standard</fluid-radio><fluid-radio value="express">Express</fluid-radio></fluid-radio-group></fieldset>'
+          : name === "otp"
+            ? '<fluid-otp id="field" name="answer" aria-label="Verification code" length="4" required></fluid-otp>'
+            : name === "color-picker"
+              ? '<fluid-color-picker id="field" name="answer" aria-label="Accent" value="" palette=\'["#ff0000","#00ff00"]\' required></fluid-color-picker>'
+              : name === "masked-input"
+                ? '<fluid-masked-input id="field" name="answer" aria-label="Masked value" mask="##/##" required></fluid-masked-input>'
+                : name === "select"
+                  ? '<fluid-select id="field" name="answer" label="Select value" required><fluid-option value="apple">Apple</fluid-option><fluid-option value="banana">Banana</fluid-option></fluid-select>'
+                  : name === "time-picker"
+                    ? '<fluid-time-picker id="field" name="answer" label="Time value" min="09:00" max="10:00" step="30" format="12h" required></fluid-time-picker>'
+                    : name === "date-picker"
+                      ? '<fluid-date-picker id="field" name="answer" label="Date value" format="iso" min="2026-08-01" max="2026-08-31" required></fluid-date-picker>'
+                      : toggle
+                        ? `<${tag} id="field" name="answer" value="accepted" required>${label}</${tag}>`
+                        : `<${tag} id="field" name="answer" label="${label}" required></${tag}>`;
   const clientForm = `<form id="native-form"><div class="actions"><button id="native-submit" type="submit">Native submit</button><fluid-button id="fluid-submit" type="submit">Fluid submit</fluid-button></div>${clientField}</form>`;
   for (const mode of ["client", "dsd"]) {
     await writeFile(

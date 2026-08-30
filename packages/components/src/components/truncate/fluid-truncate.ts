@@ -199,11 +199,7 @@ export class FluidTruncate extends FluidElement {
   override render(): TemplateResult {
     return html`
       <div part="base" class="base">
-        <div
-          part="content"
-          id=${this.contentId}
-          class="content ${this.expanded ? "expanded" : ""}"
-        >
+        <div part="content" id=${this.contentId} class="content ${this.expanded ? "expanded" : ""}">
           <slot @slotchange=${() => this.measure()}></slot>
         </div>
         ${this.overflowing

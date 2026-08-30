@@ -5,6 +5,7 @@ description: "Modal dialog built on the native <dialog> element. Focus trap, Esc
 
 import Demo from "../../../components/Demo.astro";
 import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 `<fluid-dialog>` wraps the native `<dialog>` element, so the browser handles the
@@ -12,14 +13,21 @@ focus trap, backdrop, and top-layer rendering for free. You get a styled,
 themable shell on top: label / body / footer slots, an optional built-in close
 button, and a backdrop click that dismisses by default.
 
+Every dialog on this page is real. Open one and try <kbd>Tab</kbd> (focus stays
+inside), <kbd>Escape</kbd>, and a click on the backdrop.
+
 <Demo>
   <fluid-button onclick="document.querySelector('#hero-dialog').show()">Open dialog</fluid-button>
   <fluid-dialog id="hero-dialog">
     <span slot="label">Confirm delete</span>
     <p>This permanently deletes the item, there's no undo.</p>
     <div slot="footer">
-      <fluid-button variant="ghost" onclick="document.querySelector('#hero-dialog').hide()">Cancel</fluid-button>
-      <fluid-button onclick="document.querySelector('#hero-dialog').hide()">Delete</fluid-button>
+      <fluid-button variant="ghost" onclick="document.querySelector('#hero-dialog').hide()">
+        Cancel
+      </fluid-button>
+      <fluid-button tone="danger" onclick="document.querySelector('#hero-dialog').hide()">
+        Delete
+      </fluid-button>
     </div>
   </fluid-dialog>
 </Demo>
@@ -36,6 +44,7 @@ button, and a backdrop click that dismisses by default.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dialog/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +56,7 @@ button, and a backdrop click that dismisses by default.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/dialog";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -54,90 +64,278 @@ button, and a backdrop click that dismisses by default.
 
 ### Basic
 
+The `label` slot is the title row, the default slot is the body, and `footer`
+holds the actions. Leave the footer out and that band collapses.
+
 <Demo>
-  <fluid-button
-    id="demo-dialog-trigger"
-    onclick="document.querySelector('#demo-dialog').show()"
-  >
+  <fluid-button id="demo-dialog-trigger" onclick="document.querySelector('#demo-dialog').show()">
     Open dialog
   </fluid-button>
   <fluid-dialog id="demo-dialog">
     <span slot="label">Confirm delete</span>
     <p>This will permanently delete the item. There's no undo.</p>
     <div slot="footer">
-      <fluid-button variant="ghost" onclick="document.querySelector('#demo-dialog').hide()">Cancel</fluid-button>
-      <fluid-button onclick="document.querySelector('#demo-dialog').hide()">Delete</fluid-button>
+      <fluid-button variant="ghost" onclick="document.querySelector('#demo-dialog').hide()">
+        Cancel
+      </fluid-button>
+      <fluid-button tone="danger" onclick="document.querySelector('#demo-dialog').hide()">
+        Delete
+      </fluid-button>
     </div>
   </fluid-dialog>
 </Demo>
 
-```html
-<fluid-button id="open">Open</fluid-button>
+<ConformanceCode
+  code={`<fluid-button id="open">Open</fluid-button>
 <fluid-dialog id="confirm-delete">
   <span slot="label">Confirm delete</span>
   <p>This will permanently delete the item. There's no undo.</p>
   <div slot="footer">
     <fluid-button variant="ghost">Cancel</fluid-button>
-    <fluid-button>Delete</fluid-button>
+    <fluid-button tone="danger">Delete</fluid-button>
   </div>
-</fluid-dialog>
+</fluid-dialog>`}
+/>
 
-<script type="module">
-  const open = document.querySelector("#open");
-  const dlg = document.querySelector("#confirm-delete");
-  open.addEventListener("click", () => dlg.show());
-</script>
+```js
+const open = document.querySelector("#open");
+const dlg = document.querySelector("#confirm-delete");
+open.addEventListener("click", () => dlg.show());
 ```
 
 ### Sizes
 
-Five preset sizes, `sm`, `md` (default), `lg`, `xl`, and `fullscreen`.
+Five presets: `sm`, `md` (the default), `lg`, `xl`, and `fullscreen`. They set
+the panel's width; the height always grows with the content up to the viewport.
+Each button below opens the real dialog at that size, so you can compare them
+against your own screen rather than a screenshot.
 
-```html
-<fluid-dialog size="sm">…</fluid-dialog>
-<fluid-dialog size="fullscreen">…</fluid-dialog>
-```
+<Demo>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-size-sm').show()">
+    sm
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-size-md').show()">
+    md
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-size-lg').show()">
+    lg
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-size-xl').show()">
+    xl
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-size-full').show()">
+    fullscreen
+  </fluid-button>
+  <fluid-dialog id="dialog-size-sm" size="sm">
+    <span slot="label">Size: sm</span>
+    <p>Narrow. Good for a one-line confirmation.</p>
+  </fluid-dialog>
+  <fluid-dialog id="dialog-size-md" size="md">
+    <span slot="label">Size: md</span>
+    <p>The default. Comfortable for a short form or a paragraph of copy.</p>
+  </fluid-dialog>
+  <fluid-dialog id="dialog-size-lg" size="lg">
+    <span slot="label">Size: lg</span>
+    <p>Roomier. Use it when the body has two columns or a small table.</p>
+  </fluid-dialog>
+  <fluid-dialog id="dialog-size-xl" size="xl">
+    <span slot="label">Size: xl</span>
+    <p>Wide. About as far as a modal should go before it becomes a page.</p>
+  </fluid-dialog>
+  <fluid-dialog id="dialog-size-full" size="fullscreen">
+    <span slot="label">Size: fullscreen</span>
+    <p>
+      Edge to edge. Reach for this on small screens, or for an immersive task like cropping an
+      image.
+    </p>
+  </fluid-dialog>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dialog size="sm">…</fluid-dialog>
+<fluid-dialog size="lg">…</fluid-dialog>
+<fluid-dialog size="fullscreen">…</fluid-dialog>`}
+/>
+
+### Dismiss behavior
+
+A click on the backdrop closes the dialog by default. Add `no-light-dismiss`
+when a stray click would lose work, and `no-close-button` to drop the built-in
+× so the footer buttons are the only way out. Open both and try clicking
+outside the panel: the first closes, the second doesn't.
+
+<Demo>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-light').show()">
+    Backdrop closes it
+  </fluid-button>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-sticky').show()">
+    Backdrop does nothing
+  </fluid-button>
+  <fluid-dialog id="dialog-light">
+    <span slot="label">Default dismissal</span>
+    <p>Click the backdrop, press Escape, or use the × in the corner.</p>
+  </fluid-dialog>
+  <fluid-dialog id="dialog-sticky" no-light-dismiss no-close-button>
+    <span slot="label">Unsaved changes</span>
+    <p>
+      No backdrop dismissal and no × button. You have to answer with one of the footer buttons.
+      Escape still works, the browser owns that key on a native dialog.
+    </p>
+    <div slot="footer">
+      <fluid-button variant="ghost" onclick="document.querySelector('#dialog-sticky').hide()">
+        Discard
+      </fluid-button>
+      <fluid-button onclick="document.querySelector('#dialog-sticky').hide()">
+        Keep editing
+      </fluid-button>
+    </div>
+  </fluid-dialog>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dialog no-light-dismiss>…</fluid-dialog>
+<fluid-dialog no-light-dismiss no-close-button>…</fluid-dialog>`}
+/>
+
+<Aside type="caution">
+  <kbd>Escape</kbd> is handled by the native `<dialog>` element and can't be
+  switched off. Never design a flow that depends on the user being unable to
+  leave: keep the destructive path behind an explicit button, and make closing
+  the safe outcome.
+</Aside>
+
+### A form inside a dialog
+
+The common real-world dialog is a small form. Wrap the **whole dialog** in the
+`<form>`, not just the body: a `type="submit"` button finds its form with
+`closest("form")`, so a footer button only submits when the form is an ancestor
+of the dialog. Submit the live one below and it writes the value back to the
+page, then closes itself.
+
+<Demo>
+  <fluid-button onclick="document.querySelector('#dialog-form').show()">
+    Rename project
+  </fluid-button>
+  <output id="dialog-form-result" style="font-size:0.875rem; color: var(--fluid-text-secondary);">
+    Current name: Untitled
+  </output>
+  <form onsubmit="event.preventDefault(); const v = new FormData(this).get('project-name'); document.getElementById('dialog-form-result').textContent = 'Current name: ' + (v || 'Untitled'); document.querySelector('#dialog-form').hide();">
+    <fluid-dialog id="dialog-form" size="sm">
+      <span slot="label">Rename project</span>
+      <fluid-input
+        name="project-name"
+        label="Project name"
+        help-text="Visible to everyone in the workspace."
+        placeholder="Untitled"
+        style="width:100%;"
+      ></fluid-input>
+      <div slot="footer">
+        <fluid-button variant="ghost" onclick="document.querySelector('#dialog-form').hide()">
+          Cancel
+        </fluid-button>
+        <fluid-button type="submit">Save</fluid-button>
+      </div>
+    </fluid-dialog>
+  </form>
+</Demo>
+
+<ConformanceCode
+  code={`<form id="rename-form">
+  <fluid-dialog id="rename" size="sm">
+    <span slot="label">Rename project</span>
+    <fluid-input name="project-name" label="Project name"></fluid-input>
+    <div slot="footer">
+      <fluid-button variant="ghost">Cancel</fluid-button>
+      <fluid-button type="submit">Save</fluid-button>
+    </div>
+  </fluid-dialog>
+</form>`}
+/>
+
+See the [Forms guide](/guides/forms/) for validation and submission wiring.
+
+### Long content
+
+The body scrolls on its own, so the header and footer stay pinned while the
+content runs past the viewport. Nothing to configure; open this one and scroll
+inside it.
+
+<Demo>
+  <fluid-button variant="secondary" onclick="document.querySelector('#dialog-scroll').show()">
+    Open terms
+  </fluid-button>
+  <fluid-dialog id="dialog-scroll">
+    <span slot="label">Terms of service</span>
+    <p>Scroll: the title row and the footer stay put while this body moves.</p>
+    <p>1. The service is provided as is.</p>
+    <p>2. You keep ownership of everything you upload.</p>
+    <p>3. We keep backups for thirty days.</p>
+    <p>4. Either side can end the agreement with notice.</p>
+    <p>5. Disputes are handled in the jurisdiction named in your invoice.</p>
+    <p>6. We will tell you before these terms change.</p>
+    <p>7. Rate limits apply to automated access.</p>
+    <p>8. Abuse of the service ends access immediately.</p>
+    <p>9. Fees are billed monthly in advance.</p>
+    <p>10. Refunds are pro-rated to the day.</p>
+    <p>11. Support is available on business days.</p>
+    <p>12. This list exists only to make the dialog scroll.</p>
+    <div slot="footer">
+      <fluid-button onclick="document.querySelector('#dialog-scroll').hide()">Accept</fluid-button>
+    </div>
+  </fluid-dialog>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-dialog>
+  <span slot="label">Terms of service</span>
+  <p>Long content scrolls inside the body…</p>
+  <div slot="footer">
+    <fluid-button>Accept</fluid-button>
+  </div>
+</fluid-dialog>`}
+/>
 
 ### Programmatic control
 
-The dialog exposes `show()` and `hide()` methods plus a `fluid-show`
-and `fluid-hide` event pair you can listen for.
+`show()` and `hide()` are the whole imperative surface, and `open` reflects the
+state as an attribute so CSS and tests can see it. Setting `open` directly does
+the same thing as calling the methods. The button below opens a dialog and
+closes it again two seconds later, without a click:
+
+<Demo>
+  <fluid-button
+    variant="secondary"
+    onclick="const d = document.querySelector('#dialog-timed'); d.show(); setTimeout(() => d.hide(), 2000);"
+  >
+    Open for two seconds
+  </fluid-button>
+  <fluid-dialog id="dialog-timed" size="sm">
+    <span slot="label">Closing shortly</span>
+    <p>This dialog closes itself in two seconds. Escape still beats the timer.</p>
+  </fluid-dialog>
+</Demo>
 
 ```ts
 const dialog = document.querySelector("fluid-dialog");
-dialog.show();
+dialog.show(); // same as dialog.open = true
+dialog.hide(); // same as dialog.open = false
 
 dialog.addEventListener("fluid-hide", () => {
   console.log("user dismissed");
 });
 ```
 
-### Disabling backdrop dismiss
-
-By default a click on the backdrop closes the dialog. Set
-`no-light-dismiss` to require a button click instead, useful for
-unsaved-changes warnings.
-
-```html
-<fluid-dialog no-light-dismiss>…</fluid-dialog>
-```
-
-## When to use
-
-- A blocking interaction the user must respond to before continuing
-  (confirm delete, sign in, complete a form).
-- Anything that fits on one screen and needs the full attention of the
-  user.
-
-Reach for [`<fluid-drawer>`](/components/drawer/) instead when the
-content is a side-anchored panel (settings, filters, nav). Reach for
-[`<fluid-popover>`](/components/popover/) when the content is
-contextual and shouldn't block.
+<Aside type="note">
+  `hide()` returns immediately: the close animation is still running when the call resolves. If you
+  need to act once the dialog is really gone (restoring focus somewhere unusual, tearing down
+  state), do it in the `fluid-hide` handler below rather than on the line after `hide()`.
+</Aside>
 
 ## Listening for changes
 
 `<fluid-dialog>` fires **`fluid-show`** when it opens and **`fluid-hide`** when
-it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
+it closes (button, <kbd>Escape</kbd>, or backdrop). Drive it with `show()` /
+`hide()`.
 
 <Tabs syncKey="framework">
   <TabItem label="HTML">
@@ -150,6 +348,7 @@ it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
       d.show();
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Confirm.tsx"
@@ -167,6 +366,7 @@ it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
       return <fluid-dialog ref={ref}><span slot="label">Hi</span>…</fluid-dialog>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Confirm.vue"
@@ -178,6 +378,7 @@ it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
       <fluid-dialog @fluid-hide="() => {}"><span slot="label">Hi</span>…</fluid-dialog>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="confirm.component.ts"
@@ -194,6 +395,7 @@ it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
       onHide() {}
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Confirm.svelte"
@@ -203,6 +405,7 @@ it closes (button, Escape, or backdrop). Drive it with `show()` / `hide()`.
 
     <fluid-dialog on:fluid-hide={() => {}}><span slot="label">Hi</span>…</fluid-dialog>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -214,23 +417,56 @@ backdrop (`--fluid-dialog-backdrop`), radius, and separators. The **complete
 list** is in the [API table below](#api).
 
 ```css title="brand.css"
+/* Every dialog under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-dialog-bg: var(--fluid-surface-base);
   --fluid-dialog-radius: 12px;
   --fluid-dialog-backdrop: rgb(0 0 0 / 0.5);
 }
+
+/* One dialog with a heavier scrim, for a destructive confirmation. */
+[data-fluid-id="destructive-confirm"] {
+  --fluid-dialog-backdrop: rgb(0 0 0 / 0.75);
+}
 ```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a dialog and tweak the panel, backdrop, and
+  radius tokens visually, then exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The native element is [`part="base"`](#api); inside are `part="panel"`,
 `part="header"`, `part="body"`, `part="footer"`, and `part="close"`. Reach them
 with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
-CSS not covered by a token.
+CSS not covered by a token:
 
-## API
+```css
+/* A taller scroll area for a dialog that is mostly a list. */
+fluid-dialog.picker::part(body) {
+  max-height: 60vh;
+}
+```
 
-<ComponentApi tag="fluid-dialog" />
+## When to use
+
+- A blocking interaction the user must respond to before continuing
+  (confirm delete, sign in, complete a short form).
+- Anything that fits on one screen and needs the user's full attention.
+
+### When _not_ to use
+
+- **A side-anchored panel** (settings, filters, nav): use
+  [`<fluid-drawer>`](/components/drawer/).
+- **Contextual content that shouldn't block**: use
+  [`<fluid-popover>`](/components/popover/), or
+  [`<fluid-dropdown>`](/components/dropdown/) for a list of actions.
+- **A confirmation that just needs a nudge**: a full modal for "delete this
+  tag?" is heavy. Use [`<fluid-popconfirm>`](/components/popconfirm/) anchored
+  to the button.
+- **Telling the user something succeeded**: nothing to answer, so don't block.
+  Use [`<fluid-toast>`](/components/toast/).
 
 ## Accessibility
 
@@ -252,7 +488,10 @@ platform's modal semantics. The cross-component contract is in the
 - The native `<dialog>` exposes `role="dialog"` + `aria-modal="true"`.
 - The `label` slot is the accessible name; with no label, set `aria-label` on
   the host ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)).
-- The built-in close button is labeled "Close dialog".
+  The host moves that value onto the inner native dialog, since `aria-label` is
+  not valid on a role-less custom-element host.
+- The built-in close button is labeled "Close dialog". If you set
+  `no-close-button`, make sure a footer button still offers a way out.
 
 ### Motion & target size
 
@@ -262,12 +501,17 @@ platform's modal semantics. The cross-component contract is in the
 
 ### AA vs AAA
 
-Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+Ships **WCAG 2.2 AA**; the **Conformance** toggle at the top of this page (or an
+ancestor `[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+
+## API
+
+<ComponentApi tag="fluid-dialog" />
 
 ## Related
 
@@ -286,6 +530,11 @@ Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
     title="Toast"
     href="/components/toast/"
     description="Transient confirmation that needs no acknowledgement."
+  />
+  <LinkCard
+    title="Popconfirm"
+    href="/components/popconfirm/"
+    description="A lighter yes/no anchored to the button that triggered it."
   />
   <LinkCard
     title="Framework integrations"

@@ -9,7 +9,7 @@ const meta: Meta<Args> = {
   title: "Components/Layout/Divider",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     orientation: { control: "inline-radio", options: ["horizontal", "vertical"] }

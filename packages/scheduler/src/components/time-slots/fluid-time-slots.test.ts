@@ -12,7 +12,9 @@ const SLOTS: Slot[] = [
 ];
 
 async function slotsFixture(value: string | null = null): Promise<FluidTimeSlots> {
-  const el = await fixture<FluidTimeSlots>(html`<fluid-time-slots .slots=${SLOTS} .value=${value}></fluid-time-slots>`);
+  const el = await fixture<FluidTimeSlots>(
+    html`<fluid-time-slots .slots=${SLOTS} .value=${value}></fluid-time-slots>`
+  );
   await elementUpdated(el);
   return el;
 }
@@ -99,7 +101,9 @@ describe("<fluid-time-slots>", () => {
   });
 
   it("shows an empty message when there are no slots", async () => {
-    const el = await fixture<FluidTimeSlots>(html`<fluid-time-slots .slots=${[]}></fluid-time-slots>`);
+    const el = await fixture<FluidTimeSlots>(
+      html`<fluid-time-slots .slots=${[]}></fluid-time-slots>`
+    );
     await elementUpdated(el);
     expect(el.shadowRoot!.querySelector('[part="empty"]')).to.exist;
   });

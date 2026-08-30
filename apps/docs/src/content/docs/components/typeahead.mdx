@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-typeahead>` is the autocomplete input, a text field that opens a
 filtered listbox as you type. Feed it options four ways: an array property, a
 JSON-string attribute, an async loader function, or slotted `<fluid-option>`
@@ -36,6 +35,7 @@ mode. Form-associated; implements the WAI-ARIA combobox pattern.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/typeahead/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +47,7 @@ mode. Form-associated; implements the WAI-ARIA combobox pattern.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/typeahead";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -65,11 +66,13 @@ For vanilla HTML with a static list, pass a JSON array string.
   ></fluid-typeahead>
 </Demo>
 
-<ConformanceCode code={`<fluid-typeahead
+<ConformanceCode
+  code={`<fluid-typeahead
   name="country"
   placeholder="Pick a country…"
   options='["United States","Canada","Mexico","United Kingdom"]'
-></fluid-typeahead>`} />
+></fluid-typeahead>`}
+/>
 
 ### Static options (property)
 
@@ -96,11 +99,13 @@ For richer markup, slot `<fluid-option>` children.
   </fluid-typeahead>
 </Demo>
 
-<ConformanceCode code={`<fluid-typeahead placeholder="Pick a country…">
+<ConformanceCode
+  code={`<fluid-typeahead placeholder="Pick a country…">
   <fluid-option value="us">United States</fluid-option>
   <fluid-option value="ca">Canada</fluid-option>
   <fluid-option value="mx">Mexico</fluid-option>
-</fluid-typeahead>`} />
+</fluid-typeahead>`}
+/>
 
 ### Async loader
 
@@ -127,15 +132,23 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-typeahead label="Country" help-text="Start typing to filter the list." placeholder="Pick a country…" options='["United States","Canada","Mexico","United Kingdom"]' style="max-width: 20rem;"></fluid-typeahead>
+  <fluid-typeahead
+    label="Country"
+    help-text="Start typing to filter the list."
+    placeholder="Pick a country…"
+    options='["United States","Canada","Mexico","United Kingdom"]'
+    style="max-width: 20rem;"
+  ></fluid-typeahead>
 </Demo>
 
-<ConformanceCode code={`<fluid-typeahead
+<ConformanceCode
+  code={`<fluid-typeahead
   label="Country"
   help-text="Start typing to filter the list."
   placeholder="Pick a country…"
   options='["United States","Canada","Mexico","United Kingdom"]'
-></fluid-typeahead>`} />
+></fluid-typeahead>`}
+/>
 
 ### Multi-pick with `keep-open`
 
@@ -145,7 +158,13 @@ its own `fluid-change` event. Collect the picks in your own state (tags, a
 chip list, a form array); the field itself keeps reporting single choices.
 
 <Demo>
-  <fluid-typeahead keep-open aria-label="Add toppings" placeholder="Add toppings…" options='["Basil","Mozzarella","Mushroom","Olive","Pepperoni"]' style="max-width: 20rem;"></fluid-typeahead>
+  <fluid-typeahead
+    keep-open
+    aria-label="Add toppings"
+    placeholder="Add toppings…"
+    options='["Basil","Mozzarella","Mushroom","Olive","Pepperoni"]'
+    style="max-width: 20rem;"
+  ></fluid-typeahead>
 </Demo>
 
 <ConformanceCode code={`<fluid-typeahead
@@ -167,15 +186,32 @@ chip list, a form array); the field itself keeps reporting single choices.
 
 <Demo>
   <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:20rem;">
-    <fluid-typeahead size="sm" aria-label="Small" placeholder="Small" options='["Apple","Banana"]'></fluid-typeahead>
-    <fluid-typeahead size="md" aria-label="Medium" placeholder="Medium" options='["Apple","Banana"]'></fluid-typeahead>
-    <fluid-typeahead size="lg" aria-label="Large" placeholder="Large" options='["Apple","Banana"]'></fluid-typeahead>
+    <fluid-typeahead
+      size="sm"
+      aria-label="Small"
+      placeholder="Small"
+      options='["Apple","Banana"]'
+    ></fluid-typeahead>
+    <fluid-typeahead
+      size="md"
+      aria-label="Medium"
+      placeholder="Medium"
+      options='["Apple","Banana"]'
+    ></fluid-typeahead>
+    <fluid-typeahead
+      size="lg"
+      aria-label="Large"
+      placeholder="Large"
+      options='["Apple","Banana"]'
+    ></fluid-typeahead>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-typeahead size="sm" …></fluid-typeahead>
+<ConformanceCode
+  code={`<fluid-typeahead size="sm" …></fluid-typeahead>
 <fluid-typeahead size="md" …></fluid-typeahead>
-<fluid-typeahead size="lg" …></fluid-typeahead>`} />
+<fluid-typeahead size="lg" …></fluid-typeahead>`}
+/>
 
 ## Listening for changes
 
@@ -194,6 +230,7 @@ chosen `{ value, label, data? }`).
       el.addEventListener("fluid-change", (e) => console.log("picked:", e.detail.option));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="CountrySearch.tsx"
@@ -212,6 +249,7 @@ chosen `{ value, label, data? }`).
       return <fluid-typeahead ref={ref} aria-label="Country" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="CountrySearch.vue"
@@ -224,6 +262,7 @@ chosen `{ value, label, data? }`).
       <fluid-typeahead aria-label="Country" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="country-search.component.ts"
@@ -242,6 +281,7 @@ chosen `{ value, label, data? }`).
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="CountrySearch.svelte"
@@ -254,6 +294,7 @@ chosen `{ value, label, data? }`).
 
     <fluid-typeahead aria-label="Country" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -287,8 +328,8 @@ typeahead matches your inputs by default. The **complete list** is in the
 ```
 
 <Aside type="tip">
-  Select a `fluid-typeahead` in the [Theme builder](/playground/) to tweak the
-  input, listbox, and highlight tokens visually.
+  Select a `fluid-typeahead` in the [Theme builder](/playground/) to tweak the input, listbox, and
+  highlight tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -303,7 +344,7 @@ not covered by a token.
 - The user picks from a list **but** can type to filter or search.
 - Remote-loaded suggestions (search-as-you-type).
 
-### When *not* to use
+### When _not_ to use
 
 - **A fixed list with no filtering**: use
   [`<fluid-select>`](/components/select/).
@@ -318,14 +359,14 @@ contract is in the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| _type_ | Filter options; the listbox opens once the query reaches `min-query`. |
-| <kbd>↓</kbd> | Open the listbox / move to the next option. |
-| <kbd>↑</kbd> | Open the listbox / move to the previous option. |
-| <kbd>Enter</kbd> | Commit the active option. |
-| <kbd>Escape</kbd> | Close without committing. |
-| <kbd>Tab</kbd> | Close the listbox and move on. |
+| Key               | Action                                                                |
+| ----------------- | --------------------------------------------------------------------- |
+| _type_            | Filter options; the listbox opens once the query reaches `min-query`. |
+| <kbd>↓</kbd>      | Open the listbox / move to the next option.                           |
+| <kbd>↑</kbd>      | Open the listbox / move to the previous option.                       |
+| <kbd>Enter</kbd>  | Commit the active option.                                             |
+| <kbd>Escape</kbd> | Close without committing.                                             |
+| <kbd>Tab</kbd>    | Close the listbox and move on.                                        |
 
 The input keeps DOM focus the entire time; `aria-activedescendant` points at the
 active option so screen readers announce navigation.
@@ -353,10 +394,10 @@ announced label stays the full option text.
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

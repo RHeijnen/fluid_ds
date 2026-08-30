@@ -10,7 +10,7 @@ const meta: Meta<Args> = {
   title: "Components/Layout/Fold",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     open: { control: "boolean" },
@@ -32,8 +32,8 @@ const meta: Meta<Args> = {
       open-label=${args.openLabel}
     >
       <p style="margin: var(--fluid-space-3) 0 0; color: var(--fluid-text-secondary);">
-        The details a reader only sometimes needs: device attributes, raw
-        identifiers, the long tail of a record.
+        The details a reader only sometimes needs: device attributes, raw identifiers, the long tail
+        of a record.
       </p>
     </fluid-fold>
   `

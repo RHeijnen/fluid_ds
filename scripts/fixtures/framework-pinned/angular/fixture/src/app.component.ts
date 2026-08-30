@@ -65,7 +65,12 @@ const NAV: NavItem[] = [
               <fluid-option value="corporate">Corporate</fluid-option>
             </fluid-select>
             <fluid-tooltip content="Toggle light / dark">
-              <fluid-button variant="ghost" size="sm" aria-label="Toggle theme" (click)="toggleTheme()">
+              <fluid-button
+                variant="ghost"
+                size="sm"
+                aria-label="Toggle theme"
+                (click)="toggleTheme()"
+              >
                 <fluid-icon name="sun-moon"></fluid-icon>
               </fluid-button>
             </fluid-tooltip>

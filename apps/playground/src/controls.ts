@@ -2,15 +2,16 @@ import { LitElement, html, css, type PropertyValues, type TemplateResult } from 
 import { customElement, property, state } from "lit/decorators.js";
 import type { TokenEntry } from "./manifest.js";
 import { themeStore } from "./store.js";
-import { elementOverridesStore } from "./element-overrides-store.js";
+import { componentOverridesStore } from "./component-overrides-store.js";
+import { resolveTokenDefault } from "./token-defaults.js";
 
 /**
  * Where a control's edits land:
  *   - "global": the shared theme store (cascades to the whole preview).
- *   - "element": inline CSS variables on one specific preview element, so the
- *     change is isolated to that single instance.
+ *   - "component": a rule scoped to one component tag, so the change reaches
+ *     every instance of that component and nothing else.
  */
-export type ControlScope = "global" | "element";
+export type ControlScope = "global" | "component";
 
 /**
  * Render the appropriate input control for a given token, wired to the store.
@@ -137,7 +138,7 @@ export class TokenControl extends LitElement {
   /** Edit target. Driven by the "Isolate to this element" toggle in the form. */
   @property() scope: ControlScope = "global";
 
-  /** The element to scope edits to when `scope === "element"`. */
+  /** A representative instance, used to name the component and read its defaults. */
   @property({ attribute: false }) element: HTMLElement | null = null;
 
   @state() private current = "";
@@ -167,38 +168,31 @@ export class TokenControl extends LitElement {
 
   /** Pull the current value + changed-state from whichever scope is active. */
   private syncFromSource(): void {
-    if (this.scope === "element" && this.element) {
-      const inline = this.element.style.getPropertyValue(this.token.cssVar).trim();
-      this.changed = inline !== "";
-      // Seed the control from whatever the element is actually rendering.
-      // Priority: inline > global override > resolved computed value. The
-      // computed-style fallback matters because an element about to be
-      // isolated usually inherits its color from a semantic token (e.g.
-      // --fluid-button-bg falls back to --fluid-accent-base), so without
-      // it the picker would open empty even though the element clearly
-      // renders a color on screen.
+    if (this.scope === "component" && this.element) {
+      const tag = this.element.tagName.toLowerCase();
+      const scoped = componentOverridesStore.forTag(tag)[this.token.cssVar] ?? "";
+      this.changed = scoped !== "";
+      // Priority: this component's own override > the shared theme > whatever
+      // the component's stylesheet says the token falls back to. That last
+      // step is what fills the field for a component token, which is never
+      // declared and so computes to "" however plainly it is painted.
       this.current =
-        inline ||
+        scoped ||
         themeStore.get(this.token.cssVar) ||
-        getComputedStyle(this.element).getPropertyValue(this.token.cssVar).trim() ||
-        "";
+        resolveTokenDefault(this.element, this.token.cssVar);
     } else {
-      this.current = themeStore.get(this.token.cssVar) ?? "";
+      this.current =
+        themeStore.get(this.token.cssVar) || resolveTokenDefault(this.element, this.token.cssVar);
       this.changed = !!themeStore.diff()[this.token.cssVar];
     }
   }
 
   private commit(value: string): void {
-    if (this.scope === "element" && this.element) {
-      // Two parallel writes:
-      //  1. Inline style: so the change shows up instantly in the live
-      //     preview without waiting for a store round-trip.
-      //  2. elementOverridesStore: so the override is persisted (and will
-      //     end up in the URL hash + CSS export later this pass).
-      if (value === "") this.element.style.removeProperty(this.token.cssVar);
-      else this.element.style.setProperty(this.token.cssVar, value);
-      const id = this.element.getAttribute("data-fluid-id");
-      if (id) elementOverridesStore.set(id, this.token.cssVar, value);
+    if (this.scope === "component" && this.element) {
+      // One rule for the whole component, no inline styles on the instance
+      // that happened to be clicked: what the preview shows is exactly the
+      // CSS that gets exported.
+      componentOverridesStore.set(this.element.tagName.toLowerCase(), this.token.cssVar, value);
       this.syncFromSource();
     } else {
       themeStore.set(this.token.cssVar, value);
@@ -206,10 +200,8 @@ export class TokenControl extends LitElement {
   }
 
   private resetToken(): void {
-    if (this.scope === "element" && this.element) {
-      this.element.style.removeProperty(this.token.cssVar);
-      const id = this.element.getAttribute("data-fluid-id");
-      if (id) elementOverridesStore.set(id, this.token.cssVar, "");
+    if (this.scope === "component" && this.element) {
+      componentOverridesStore.set(this.element.tagName.toLowerCase(), this.token.cssVar, "");
       this.syncFromSource();
     } else {
       themeStore.set(this.token.cssVar, "");

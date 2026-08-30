@@ -30,6 +30,7 @@ wrapped in a `<nav aria-label="Pagination">`. The current page carries
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/pagination/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -41,6 +42,7 @@ wrapped in a `<nav aria-label="Pagination">`. The current page carries
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/pagination";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -115,6 +117,7 @@ or treat the event as the source of truth and re-render your data list.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Results.tsx"
@@ -132,6 +135,7 @@ or treat the event as the source of truth and re-render your data list.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Results.vue"
@@ -148,6 +152,7 @@ or treat the event as the source of truth and re-render your data list.
         @fluid-page-change="page = $event.detail.page" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="results.component.ts"
@@ -167,6 +172,7 @@ or treat the event as the source of truth and re-render your data list.
       page = 1;
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Results.svelte"
@@ -178,6 +184,7 @@ or treat the event as the source of truth and re-render your data list.
     <fluid-pagination total-pages="20" page={page}
       on:fluid-page-change={(e) => (page = e.detail.page)}></fluid-pagination>
     ```
+
   </TabItem>
 </Tabs>
 

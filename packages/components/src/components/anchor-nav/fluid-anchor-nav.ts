@@ -64,7 +64,7 @@ export type FluidAnchorNavActiveChangeEvent = CustomEvent<FluidAnchorNavActiveCh
  * @fires {FluidAnchorNavActiveChangeEvent} fluid-active-change - Dispatched with `{ id }` when the section in view
  *   changes. `id` is the target id of the now-active section, or `null` when no
  *   tracked section is in view.
-*/
+ */
 export class FluidAnchorNav extends FluidElement {
   static override styles = [
     css`
@@ -89,8 +89,7 @@ export class FluidAnchorNav extends FluidElement {
         display: flex;
         flex-direction: column;
         gap: var(--fluid-anchor-nav-gap, var(--fluid-space-1));
-        border-inline-start: 1px solid
-          var(--fluid-anchor-nav-marker, var(--fluid-border-default));
+        border-inline-start: 1px solid var(--fluid-anchor-nav-marker, var(--fluid-border-default));
       }
 
       li {
@@ -126,10 +125,7 @@ export class FluidAnchorNav extends FluidElement {
       a[aria-current="true"] {
         color: var(--fluid-anchor-nav-active-fg, var(--fluid-accent-base));
         font-weight: var(--fluid-font-weight-medium);
-        border-inline-start-color: var(
-          --fluid-anchor-nav-active-marker,
-          var(--fluid-accent-base)
-        );
+        border-inline-start-color: var(--fluid-anchor-nav-active-marker, var(--fluid-accent-base));
       }
 
       .level-2 {
@@ -152,7 +148,7 @@ export class FluidAnchorNav extends FluidElement {
         );
       }
     `,
-    reducedMotion,
+    reducedMotion
   ];
 
   /**
@@ -236,9 +232,7 @@ export class FluidAnchorNav extends FluidElement {
 
   private _collectFromHeadings(): FluidAnchorNavItem[] {
     const root = this._scopeRoot();
-    const headings = Array.from(
-      root.querySelectorAll<HTMLElement>(this.headingSelector)
-    );
+    const headings = Array.from(root.querySelectorAll<HTMLElement>(this.headingSelector));
     const out: FluidAnchorNavItem[] = [];
     for (const h of headings) {
       if (!h.id) continue;
@@ -247,15 +241,14 @@ export class FluidAnchorNav extends FluidElement {
       out.push({
         id: h.id,
         label: (h.textContent ?? "").trim(),
-        level: level && level[1] ? Number(level[1]) : 2,
+        level: level && level[1] ? Number(level[1]) : 2
       });
     }
     return out;
   }
 
   private _rebuild(): void {
-    this._resolved =
-      this.items.length > 0 ? this.items : this._collectFromHeadings();
+    this._resolved = this.items.length > 0 ? this.items : this._collectFromHeadings();
     this._setupObserver();
   }
 
@@ -278,13 +271,10 @@ export class FluidAnchorNav extends FluidElement {
     this._targets = targets;
     if (targets.length === 0) return;
 
-    this._observer = new IntersectionObserver(
-      (entries) => this._onIntersect(entries),
-      {
-        rootMargin: `-${this.topOffset}px 0px -70% 0px`,
-        threshold: 0,
-      }
-    );
+    this._observer = new IntersectionObserver((entries) => this._onIntersect(entries), {
+      rootMargin: `-${this.topOffset}px 0px -70% 0px`,
+      threshold: 0
+    });
     for (const t of targets) this._observer.observe(t);
   }
 
@@ -316,7 +306,7 @@ export class FluidAnchorNav extends FluidElement {
       new CustomEvent<FluidAnchorNavActiveChangeDetail>("fluid-active-change", {
         detail: { id },
         bubbles: true,
-        composed: true,
+        composed: true
       })
     );
   }
@@ -330,11 +320,10 @@ export class FluidAnchorNav extends FluidElement {
     }
     e.preventDefault();
     const prefersReduced =
-      typeof matchMedia === "function" &&
-      matchMedia("(prefers-reduced-motion: reduce)").matches;
+      typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
     target.scrollIntoView({
       behavior: prefersReduced ? "auto" : "smooth",
-      block: "start",
+      block: "start"
     });
     // Move focus for keyboard / screen-reader users without re-scrolling.
     const hadTabindex = target.hasAttribute("tabindex");

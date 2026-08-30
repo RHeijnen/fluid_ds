@@ -1,7 +1,9 @@
 ---
 title: "@fluid-ds/animations: effects"
-description: "Imperative canvas celebration effects for Fluid: confetti, fireworks, emoji rain, snow, sparkles, streamers, pulse, and more. Zero dependencies, reduced-motion aware."
+description: "Imperative canvas celebration effects for Fluid: 31 named effects, from confetti and fireworks to butterflies and fog. Zero dependencies, reduced-motion aware."
 ---
+
+import EffectsDemo from "../../../components/EffectsDemo.astro";
 
 The `@fluid-ds/animations` pack ships two systems side by side. The
 [attribute-driven keyframe registry](/guides/animations/) animates elements
@@ -9,6 +11,13 @@ in place; the **effects** subsystem adds imperative
 "event" celebrations that paint on a shared overlay canvas: confetti on a
 purchase, fireworks on a milestone, snow over the holidays, a sparkle around a
 premium call to action.
+
+Try it live: every button below calls the real effect function from
+`@fluid-ds/animations/effects`, anchored to the button you click. Pick an
+ambient effect (snow, butterflies, bubbles) and start it to let it play over
+the whole page until you stop it or scroll the demo out of view.
+
+<EffectsDemo />
 
 The engine is a tiny self-contained particle system with zero third-party
 dependencies. One pooled full-viewport `<canvas>` (fixed, click-through, top
@@ -46,32 +55,56 @@ Every effect returns an `EffectHandle`:
 
 ```ts
 interface EffectHandle {
-  stop(): void;            // halt now (idempotent)
+  stop(): void; // halt now (idempotent)
+  fizzle(): void; // stop spawning and let live particles drain
   finished: Promise<void>; // resolves when the burst ends, or on stop()
 }
 ```
 
 For point bursts (confetti, fireworks) `finished` resolves when the last
-particle dies. For ambient effects (snow, sparkles, emoji rain) it resolves
-when you call `stop()`.
+particle dies. Ambient effects resolve when their duration elapses or when you
+call `stop()` / `fizzle()`.
 
 ## Effects
 
-| Function | Kind | Notes |
-| --- | --- | --- |
-| `confetti(opts)` | point burst | `origin`, plus a `cannons` two-sided option |
-| `fireworks(opts)` | sequence | rockets launch and explode at their apex |
-| `emojiBurst(opts)` | point burst | custom emoji array OR image URLs |
-| `emojiRain(opts)` | ambient | emoji or images falling from above |
-| `emojiFountain(opts)` | ambient | emoji spraying up from a point and arcing back |
-| `bubbles(opts)` | ambient | translucent bubbles drifting up and popping |
-| `snow(opts)` | ambient | gentle falling flakes, runs until stopped |
-| `sparkles(opts)` | ambient | subtle shimmer around an element |
-| `streamers(opts)` | point burst | fluttering ribbon strips |
-| `pulse(opts)` | one-shot | success ripple expanding from an element |
-| `stars(opts)` | point burst | preset emoji burst of stars |
-| `hearts(opts)` | point burst | preset emoji burst of hearts |
-| `pride(opts)` | point burst | rainbow-palette confetti cannons |
+There are **31 named effects**, all listed below. The same list is available at
+runtime as `EFFECT_NAMES`, and `EFFECT_CATALOG` carries each effect's label,
+kind and tunable controls. The [animation lab](/animations.html) builds its
+controls from that catalog, so you can try any of them before wiring one up.
+
+| Function                | Kind        | Notes                                               |
+| ----------------------- | ----------- | --------------------------------------------------- |
+| `confetti(opts)`        | point burst | one `origin` or reusable multi-source presets       |
+| `fireworks(opts)`       | sequence    | rockets launch and explode at their apex            |
+| `emojiBurst(opts)`      | point burst | custom emoji array or loaded image sources          |
+| `emojiRain(opts)`       | ambient     | emoji or images falling from above                  |
+| `rain(opts)`            | ambient     | natural cool-blue rain streaks                      |
+| `emojiFountain(opts)`   | ambient     | emoji spraying up from a point and arcing back      |
+| `bubbles(opts)`         | ambient     | translucent bubbles drifting up and popping         |
+| `snow(opts)`            | ambient     | gentle falling flakes, runs until stopped           |
+| `sparkles(opts)`        | ambient     | subtle shimmer around an element                    |
+| `streamers(opts)`       | point burst | fluttering ribbon strips                            |
+| `pulse(opts)`           | one-shot    | success ripple expanding from an element            |
+| `stars(opts)`           | point burst | preset emoji burst of stars                         |
+| `hearts(opts)`          | point burst | preset emoji burst of hearts                        |
+| `pride(opts)`           | point burst | six ordered rainbow ribbon streams                  |
+| `ribbons(opts)`         | point burst | curling ribbon strips                               |
+| `glitter(opts)`         | point burst | dense four-point sparkle dust                       |
+| `balloons(opts)`        | ambient     | highlighted balloons with strings                   |
+| `leaves(opts)`          | ambient     | tumbling autumn leaves                              |
+| `petals(opts)`          | ambient     | soft flower petals drifting down                    |
+| `coins(opts)`           | point burst | spinning reward coins                               |
+| `shootingStars(opts)`   | ambient     | fast diagonal comets                                |
+| `fireflies(opts)`       | ambient     | wandering glow points                               |
+| `embers(opts)`          | ambient     | rising orange heat sparks                           |
+| `magicTrail(opts)`      | ambient     | sparkle trail following an element or point         |
+| `dustMotes(opts)`       | ambient     | slow sunlit particles for subtle depth              |
+| `fog(opts)`             | ambient     | layered translucent mist banks                      |
+| `butterflies(opts)`     | ambient     | steered flight in from either side, never backwards |
+| `hailstorm(opts)`       | ambient     | fast ice pellets driven by a strong gust            |
+| `shockwaveDebris(opts)` | point burst | expanding impact ring with sharp fragments          |
+| `fireworkFinale(opts)`  | sequence    | coordinated waves of simultaneous sky bursts        |
+| `successCheck(opts)`    | sequence    | checkmark trace followed by particle dispersal      |
 
 ### Origin
 
@@ -80,11 +113,21 @@ absolute **viewport point** `{ x, y }`, or a **relative point**
 `{ rx, ry }` in `[0, 1]` on each axis. The default is horizontal center,
 near the top.
 
+Burst effects also accept multiple directed `sources`. Use the exported
+`EFFECT_ORIGIN_PRESETS` for individual corners and edges, or grouped starts:
+
+```ts
+import { confetti, EFFECT_ORIGIN_PRESETS } from "@fluid-ds/animations/effects";
+
+confetti({ sources: EFFECT_ORIGIN_PRESETS["top-left"] });
+confetti({ sources: EFFECT_ORIGIN_PRESETS["top-corners"] });
+confetti({ sources: EFFECT_ORIGIN_PRESETS["all-corners"] });
+```
+
 ### Colors
 
-Colors default to the live Fluid brand accent plus the semantic status tones,
-read from CSS custom properties on the document, so a burst always matches the
-active brand and theme. Override per call with a `colors` array.
+Each effect has a purpose-tuned default palette. Override per call with a
+`colors` array, or pass `brandColors()` to sample the active Fluid brand ramp.
 
 ```ts
 confetti({ colors: ["#ff4d4f", "#ffd166", "#06d6a0"] });
@@ -106,10 +149,12 @@ document.querySelector("#buy")?.addEventListener("click", async (e) => {
 });
 ```
 
-Two-sided cannons for a bigger moment:
+The old two-sided cannons option remains compatible, but named sources are
+more composable:
 
 ```ts
 confetti({ cannons: true, count: 160 });
+confetti({ sources: EFFECT_ORIGIN_PRESETS["bottom-corners"], count: 160 });
 ```
 
 ### Fireworks
@@ -158,7 +203,7 @@ setTimeout(() => jet.stop(), 4000);
 ```ts
 import { snow } from "@fluid-ds/animations/effects";
 
-const winter = snow();          // ambient, runs forever
+const winter = snow(); // ambient, runs forever
 // ...later
 winter.stop();
 ```
@@ -185,8 +230,8 @@ saveButton.addEventListener("click", () => {
 
 ## The `<fluid-celebrate>` component
 
-Prefer declarative? `<fluid-celebrate>` wraps the same presets. It renders
-nothing visible (`display: contents`); the effect draws on the shared canvas.
+Prefer declarative? `<fluid-celebrate>` wraps the same presets. It renders as a
+zero-size transparent inline anchor; the effect draws on the shared canvas.
 
 ```ts
 import "@fluid-ds/animations/define/celebrate";
@@ -211,23 +256,26 @@ Fire imperatively and react to the end:
 
 ### Attributes and properties
 
-| Name | Type | Notes |
-| --- | --- | --- |
-| `effect` | attribute | preset name (default `confetti`) |
-| `auto` | boolean attr | fire once on connect |
-| `count` | number attr | particles, forwarded to the preset |
-| `colors` | attr or `.colors` prop | space/comma list, or a JS array |
-| `emojis` | `emojis` attr or `.emojis` prop | glyph list (`"🎉 ❤️ 🔥"`) or a JS array; picked at random per particle |
-| `origin` | attr | `"self"`, `"x,y"`, or relative `"rx,ry"` (both in `[0,1]`) |
-| `cannons` | boolean attr | two-sided confetti / pride |
-| `shells`, `rate`, `duration`, `spread` | number attrs | forwarded where the preset uses them |
+| Name                                   | Type                            | Notes                                                                  |
+| -------------------------------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| `effect`                               | attribute                       | preset name (default `confetti`)                                       |
+| `auto`                                 | boolean attr                    | fire once on connect                                                   |
+| `count`                                | number attr                     | particles, forwarded to the preset                                     |
+| `colors`                               | attr or `.colors` prop          | space/comma list, or a JS array                                        |
+| `emojis`                               | `emojis` attr or `.emojis` prop | glyph list (`"🎉 ❤️ 🔥"`) or a JS array; picked at random per particle |
+| `origin`                               | attr                            | `"self"`, `"x,y"`, or relative `"rx,ry"` (both in `[0,1]`)             |
+| `cannons`                              | boolean attr                    | legacy alias for bottom-corner confetti                                |
+| `shells`, `rate`, `duration`, `spread` | number attrs                    | forwarded where the preset uses them                                   |
+| `velocity`, `gravity`, `size`, `angle` | number attrs                    | point-burst physics                                                    |
+| `interval`, `particles-per-shell`      | number attrs                    | fireworks sequencing                                                   |
+| `rings`, `radius`                      | number attrs                    | pulse geometry                                                         |
 
 ### Methods and events
 
-| Member | Description |
-| --- | --- |
-| `fire()` | fires the configured effect once; resolves when it ends |
-| `stop()` | stops the current effect |
+| Member                | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| `fire()`              | fires the configured effect once; resolves when it ends    |
+| `stop()`              | stops the current effect                                   |
 | `fluid-celebrate-end` | event (bubbles, composed) dispatched when a burst finishes |
 
 ## Accessibility

@@ -7,7 +7,7 @@ import "../icon/define.js";
 const meta: Meta = {
   title: "Components/Feedback/Empty state",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-empty-state heading="No projects yet">
       <fluid-icon slot="media" name="folder"></fluid-icon>
@@ -33,5 +33,6 @@ export const NoResults: Story = {
 };
 
 export const TextOnly: Story = {
-  render: () => html`<fluid-empty-state heading="Inbox zero">You're all caught up.</fluid-empty-state>`
+  render: () =>
+    html`<fluid-empty-state heading="Inbox zero">You're all caught up.</fluid-empty-state>`
 };

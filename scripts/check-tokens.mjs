@@ -229,9 +229,7 @@ async function main() {
   if (ladderViolations.length) {
     console.error("\n✗ Component styles that bypass their override ladder:\n");
     for (const { file, line, token, component } of ladderViolations) {
-      console.error(
-        `  ${file}:${line} reads ${token} without a --fluid-${component}-* wrapper`
-      );
+      console.error(`  ${file}:${line} reads ${token} without a --fluid-${component}-* wrapper`);
     }
   }
   console.error(

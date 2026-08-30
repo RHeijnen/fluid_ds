@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Editor/Rich text editor",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     label: { control: "text" },
     placeholder: { control: "text" }

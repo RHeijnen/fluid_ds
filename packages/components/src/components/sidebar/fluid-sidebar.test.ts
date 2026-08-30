@@ -19,17 +19,23 @@ describe("<fluid-sidebar>", () => {
   });
 
   it("falls back to a default landmark label", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`
+    );
     expect(el.shadowRoot!.querySelector("aside")!.getAttribute("aria-label")).to.equal("Sidebar");
   });
 
   it("is open by default", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`
+    );
     expect(el.open).to.be.true;
   });
 
   it("toggle() flips open and fires fluid-toggle with the new state", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`
+    );
     setTimeout(() => el.toggle());
     const event = await oneEvent(el, "fluid-toggle");
     expect(event.detail.open).to.be.false;
@@ -37,7 +43,9 @@ describe("<fluid-sidebar>", () => {
   });
 
   it("reflects open to an attribute", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar open><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar open><a href="#">Home</a></fluid-sidebar>`
+    );
     el.hide();
     await elementUpdated(el);
     expect(el.hasAttribute("open")).to.be.false;
@@ -53,7 +61,9 @@ describe("<fluid-sidebar>", () => {
   });
 
   it("base background reads the --fluid-sidebar-* override ladder", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`
+    );
     el.style.setProperty("--fluid-sidebar-bg", "rgb(1, 2, 3)");
     await elementUpdated(el);
     const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
@@ -65,9 +75,7 @@ describe("<fluid-sidebar>", () => {
       <fluid-sidebar overlay open aria-label="Nav"><a href="#">Home</a></fluid-sidebar>
     `);
     await elementUpdated(el);
-    setTimeout(() =>
-      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    );
+    setTimeout(() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })));
     await oneEvent(el, "fluid-toggle");
     expect(el.open).to.be.false;
   });
@@ -101,26 +109,32 @@ describe("<fluid-sidebar>", () => {
     const last = items[1]!.shadowRoot!.querySelector<HTMLAnchorElement>("a")!;
     expect(items[0]!.shadowRoot!.activeElement).to.equal(first);
 
-    first.dispatchEvent(new KeyboardEvent("keydown", {
-      key: "Tab",
-      bubbles: true,
-      composed: true,
-      cancelable: true
-    }));
+    first.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      })
+    );
     expect(items[1]!.shadowRoot!.activeElement).to.equal(last);
 
     last.focus();
-    last.dispatchEvent(new KeyboardEvent("keydown", {
-      key: "Tab",
-      bubbles: true,
-      composed: true,
-      cancelable: true
-    }));
+    last.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      })
+    );
     expect(items[0]!.shadowRoot!.activeElement).to.equal(first);
   });
 
   it("inline mode does not render a backdrop", async () => {
-    const el = await fixture<FluidSidebar>(html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`);
+    const el = await fixture<FluidSidebar>(
+      html`<fluid-sidebar><a href="#">Home</a></fluid-sidebar>`
+    );
     expect(el.shadowRoot!.querySelector(".backdrop")).to.be.null;
   });
 

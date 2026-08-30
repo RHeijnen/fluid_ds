@@ -70,7 +70,9 @@ async function deepActivePart(page: Page): Promise<string | null> {
   return page.evaluate(() => {
     let active: Element | null = document.activeElement;
     while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-    return active?.getAttribute("part") ?? active?.getAttribute("class") ?? active?.localName ?? null;
+    return (
+      active?.getAttribute("part") ?? active?.getAttribute("class") ?? active?.localName ?? null
+    );
   });
 }
 
@@ -97,7 +99,10 @@ for (const mode of ["client", "dsd"] as const) {
       await expect.poll(() => deepActivePart(page)).toMatch(/dialog|preset/);
       expect(
         await field.evaluate((host) => {
-          const picker = host as HTMLElement & { validity: ValidityState; validationMessage: string };
+          const picker = host as HTMLElement & {
+            validity: ValidityState;
+            validationMessage: string;
+          };
           return [picker.validity.customError, picker.validationMessage];
         })
       ).toEqual([true, "Choose approved travel dates"]);
@@ -128,7 +133,9 @@ for (const mode of ["client", "dsd"] as const) {
         })
       ).toEqual([null, null]);
       expect(
-        await page.locator("#native-form").evaluate((form) => [...new FormData(form as HTMLFormElement)])
+        await page
+          .locator("#native-form")
+          .evaluate((form) => [...new FormData(form as HTMLFormElement)])
       ).toEqual([]);
       expect(await page.evaluate(() => window.rangeEvents)).toEqual([]);
 
@@ -185,7 +192,9 @@ for (const mode of ["client", "dsd"] as const) {
       await page.locator("#native-form").evaluate((form) => (form as HTMLFormElement).reset());
       await expect(input).toHaveValue("");
       expect(
-        await page.locator("#native-form").evaluate((form) => [...new FormData(form as HTMLFormElement)])
+        await page
+          .locator("#native-form")
+          .evaluate((form) => [...new FormData(form as HTMLFormElement)])
       ).toEqual([]);
       await page.evaluate(() => window.formFocusFixture.assertServerNodes());
       expect(errors).toEqual([]);

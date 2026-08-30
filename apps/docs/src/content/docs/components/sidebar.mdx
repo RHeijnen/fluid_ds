@@ -17,8 +17,13 @@ It fires **`fluid-toggle`** whenever the open state changes.
   <div style="block-size: 300px; display:flex; border:1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md); overflow:hidden;">
     <fluid-sidebar aria-label="Primary navigation">
       <strong slot="header">Fluid</strong>
-      <nav aria-label="Primary" style="display:flex; flex-direction:column; gap: var(--fluid-space-1);">
-        <a href="#" aria-current="page">Dashboard</a>
+      <nav
+        aria-label="Primary"
+        style="display:flex; flex-direction:column; gap: var(--fluid-space-1);"
+      >
+        <a href="#" aria-current="page">
+          Dashboard
+        </a>
         <a href="#">Projects</a>
         <a href="#">Team</a>
         <a href="#">Settings</a>
@@ -41,6 +46,7 @@ It fires **`fluid-toggle`** whenever the open state changes.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/sidebar/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -52,6 +58,7 @@ It fires **`fluid-toggle`** whenever the open state changes.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/sidebar";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -124,6 +131,7 @@ listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Shell.tsx"
@@ -143,6 +151,7 @@ listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Shell.vue"
@@ -160,6 +169,7 @@ listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
       </fluid-sidebar>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="shell.component.ts"
@@ -182,6 +192,7 @@ listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
       onToggle(e: CustomEvent) { console.log(e.detail.open); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Shell.svelte"
@@ -196,6 +207,7 @@ listen to keep your own UI (a hamburger button's `aria-expanded`, say) in sync.
       <nav aria-label="Primary"><a href="/">Home</a></nav>
     </fluid-sidebar>
     ```
+
   </TabItem>
 </Tabs>
 

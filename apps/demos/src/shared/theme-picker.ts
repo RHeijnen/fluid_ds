@@ -25,8 +25,11 @@ interface Brand {
 
 const BRANDS: Brand[] = [
   { id: "default", label: "Default" },
+  { id: "glass", label: "Glass" },
+  { id: "titanium", label: "Titanium" },
   { id: "midnight", label: "Midnight" },
-  { id: "corporate", label: "Corporate" }
+  { id: "corporate", label: "Corporate" },
+  { id: "orchid", label: "Orchid" }
 ];
 
 function applyScheme(scheme: Scheme): void {

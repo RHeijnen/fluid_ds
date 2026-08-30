@@ -15,9 +15,7 @@ section (honoring `prefers-reduced-motion`) and the component emits
 **`fluid-active-change`** whenever the active section changes.
 
 <Demo>
-  <fluid-anchor-nav
-    items='[{"id":"intro","label":"Introduction","level":2},{"id":"install","label":"Installation","level":2},{"id":"config","label":"Configuration","level":3},{"id":"usage","label":"Usage","level":2}]'
-  ></fluid-anchor-nav>
+  <fluid-anchor-nav items='[{"id":"intro","label":"Introduction","level":2},{"id":"install","label":"Installation","level":2},{"id":"config","label":"Configuration","level":3},{"id":"usage","label":"Usage","level":2}]'></fluid-anchor-nav>
 </Demo>
 
 ## Install
@@ -32,6 +30,7 @@ section (honoring `prefers-reduced-motion`) and the component emits
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/anchor-nav/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +42,7 @@ section (honoring `prefers-reduced-motion`) and the component emits
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/anchor-nav";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -55,9 +55,7 @@ match the `id` of a section in the document. `level` (2 for top-level, 3 for
 nested) controls indentation.
 
 <Demo>
-  <fluid-anchor-nav
-    items='[{"id":"overview","label":"Overview","level":2},{"id":"props","label":"Properties","level":3},{"id":"events","label":"Events","level":3},{"id":"examples","label":"Examples","level":2}]'
-  ></fluid-anchor-nav>
+  <fluid-anchor-nav items='[{"id":"overview","label":"Overview","level":2},{"id":"props","label":"Properties","level":3},{"id":"events","label":"Events","level":3},{"id":"examples","label":"Examples","level":2}]'></fluid-anchor-nav>
 </Demo>
 
 ```html
@@ -112,6 +110,7 @@ in view changes (`id` is `null` when nothing tracked is in view).
         .addEventListener("fluid-active-change", (e) => console.log(e.detail.id));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Toc.tsx"
@@ -131,6 +130,7 @@ in view changes (`id` is `null` when nothing tracked is in view).
       return <fluid-anchor-nav ref={ref} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Toc.vue"
@@ -147,6 +147,7 @@ in view changes (`id` is `null` when nothing tracked is in view).
       <fluid-anchor-nav @fluid-active-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="toc.component.ts"
@@ -163,6 +164,7 @@ in view changes (`id` is `null` when nothing tracked is in view).
       onChange(e: CustomEvent<{ id: string | null }>) { console.log(e.detail.id); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Toc.svelte"
@@ -175,6 +177,7 @@ in view changes (`id` is `null` when nothing tracked is in view).
 
     <fluid-anchor-nav on:fluid-active-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -238,6 +241,14 @@ covered by a token.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Tabs" href="/components/tabs/" description="Mutually exclusive panels in one viewport." />
-  <LinkCard title="Breadcrumb" href="/components/breadcrumb/" description="Hierarchical location trail." />
+  <LinkCard
+    title="Tabs"
+    href="/components/tabs/"
+    description="Mutually exclusive panels in one viewport."
+  />
+  <LinkCard
+    title="Breadcrumb"
+    href="/components/breadcrumb/"
+    description="Hierarchical location trail."
+  />
 </CardGrid>

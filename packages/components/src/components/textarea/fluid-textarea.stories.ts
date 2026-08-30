@@ -24,7 +24,7 @@ type Args = Pick<
 const meta: Meta<Args> = {
   title: "Components/Forms/Textarea",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     placeholder: { control: "text" },
     rows: { control: "number" },

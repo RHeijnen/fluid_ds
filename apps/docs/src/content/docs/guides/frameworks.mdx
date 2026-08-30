@@ -20,10 +20,15 @@ The same admin workflow, including charts, users, dialogs, settings and
 brand/theme controls, is built four ways using the same Fluid components.
 This is shared functionality, not a certified cross-framework pixel comparison.
 
-- [**Native HTML**](/demos/native/) — buildless, import-map + ES modules.
-- [**React**](/demos/react/) — React 19 + Vite.
-- [**Next.js**](/demos/next/) — Next.js 15 App Router, static host HTML with client upgrade.
-- [**Angular**](/demos/angular/) — Angular 20 standalone.
+- [**Native HTML**](/demos/native/): buildless, import-map + ES modules.
+- [**React**](/demos/react/): React 19 + Vite.
+- [**Next.js**](/demos/next/): Next.js 15 App Router, static host HTML with client upgrade.
+- [**Angular**](/demos/angular/): Angular 20 standalone, with its settings page
+  running on a reactive form through `@fluid-ds/angular`.
+
+The [demos gallery](/demos/) also carries the framework-free sample apps
+(settings, admin, data table, analytics, booking, sprint board, QR studio),
+which is where the expansion packs are shown in context.
 
 The source for all four lives under `apps/admin-*` in the repo and is the
 canonical reference for the per-framework patterns documented below.
@@ -40,7 +45,7 @@ final raw packs byte-identical.
 The rendering boundary matters. React, Vue, Angular, and plain TypeScript/HTML are
 client-rendered fixtures, and their negative controls require the production response
 to contain no Fluid declarative shadow DOM. Astro, Next.js, and SvelteKit generate
-Fluid DSD at build time, then verify delayed registration, hydration, retained server
+the declarative shadow DOM at build time, then verify delayed registration, hydration, retained server
 nodes, and representative properties, events, slots, and form behavior. A separate
 packed Next production-server gate passes concurrent request isolation,
 private/no-store semantics, and the same three-engine hydration contract. These are
@@ -276,6 +281,93 @@ events:
 
 Note Angular's template parser is case-sensitive, use `(fluid-change)`
 exactly as the event name, not `(fluidChange)`.
+
+### Reactive forms and ngModel
+
+Angular's form APIs bind through a `ControlValueAccessor`, and it only ships
+those for native controls, so a custom element normally needs a hand-written
+bridge component per control. `@fluid-ds/angular` ships the accessors instead:
+install it next to `@fluid-ds/components` and every Fluid form control binds
+with `[(ngModel)]`, `formControlName`, or `[formControl]` like a native input.
+
+```bash
+npm i @fluid-ds/angular @fluid-ds/components
+```
+
+Import `FLUID_FORM_DIRECTIVES` alongside `ReactiveFormsModule` (or `FormsModule`
+if you use `ngModel`), then bind as usual:
+
+```ts title="settings.component.ts"
+import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { FLUID_FORM_DIRECTIVES } from "@fluid-ds/angular";
+import "@fluid-ds/components/define/input";
+import "@fluid-ds/components/define/select";
+import "@fluid-ds/components/define/rating";
+import "@fluid-ds/components/define/switch";
+
+@Component({
+  selector: "app-settings",
+  imports: [ReactiveFormsModule, FLUID_FORM_DIRECTIVES],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <fluid-input label="Display name" formControlName="name"></fluid-input>
+      <fluid-select formControlName="density">
+        <fluid-option value="comfortable">Comfortable</fluid-option>
+        <fluid-option value="compact">Compact</fluid-option>
+      </fluid-select>
+      <fluid-rating formControlName="satisfaction"></fluid-rating>
+      <fluid-switch formControlName="notifications">Notifications</fluid-switch>
+      <fluid-button type="submit">Save</fluid-button>
+    </form>
+  `
+})
+export class SettingsComponent {
+  form = new FormGroup({
+    name: new FormControl("Rene"),
+    density: new FormControl("comfortable"),
+    satisfaction: new FormControl(4),
+    notifications: new FormControl(true)
+  });
+
+  save() {
+    console.log(this.form.value);
+  }
+}
+```
+
+Two directives cover the catalog, and `FLUID_FORM_DIRECTIVES` is just both of
+them in one import:
+
+| Directive                            | Binds through                                           | Elements                                                                                                                                                               |
+| ------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FluidValueAccessorDirective`        | the `value` property, on `fluid-input` / `fluid-change` | input, textarea, number input, masked input, select, typeahead, segmented control, radio group, slider, rating, date picker, time picker, color picker, tag input, OTP |
+| `FluidCheckedValueAccessorDirective` | the `checked` property, on `fluid-change`               | checkbox, switch                                                                                                                                                       |
+
+What that buys you, and where the edges are:
+
+- The accessor reads the element's own `value`, so the control's type survives
+  the trip. A rating hands the form a number and a tag input hands it an array
+  of strings, while the text-like controls hand it a string as they always did.
+- A `null` or `undefined` model writes as an empty string, matching Angular's
+  own `DefaultValueAccessor`. Initialize numeric controls with a real number.
+- `control.disable()` mirrors onto the element's `disabled` property, and blur
+  marks the control touched, so validation timing behaves like a native field.
+- The directives attach only where a form binding is present, the same
+  convention Angular's own accessors use, so unbound `fluid-*` elements carry no
+  Angular behavior. You still need `CUSTOM_ELEMENTS_SCHEMA` for the `fluid-*`
+  tags that have no form binding on them.
+- Compound-value controls (date range picker, range slider) are not covered yet.
+  Bind their properties and events directly.
+- The package is compiled in Angular's partial-compilation mode, so any Angular
+  20+ CLI build links it as part of its normal build.
+- Registering the elements stays your own `@fluid-ds/components/define/*`
+  side-effect import, exactly as it is without this package.
+
+The [Angular admin portal](/demos/angular/) runs its settings page on this. See
+the [Forms guide](/guides/forms/) for how it sits next to the other frameworks'
+form libraries.
 
 ---
 

@@ -15,7 +15,11 @@ disables nested native controls, and we mirror the state onto every slotted
 control so custom `fluid-*` controls disable too.
 
 <Demo>
-  <fluid-fieldset legend="Contact details" description="We will only use this to reach you about your order." style="max-width: 24rem;">
+  <fluid-fieldset
+    legend="Contact details"
+    description="We will only use this to reach you about your order."
+    style="max-width: 24rem;"
+  >
     <label style="display:flex; flex-direction:column; gap:0.25rem;">
       <span>Email</span>
       <input type="email" name="email" />
@@ -39,6 +43,7 @@ control so custom `fluid-*` controls disable too.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/fieldset/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -50,6 +55,7 @@ control so custom `fluid-*` controls disable too.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/fieldset";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -61,7 +67,11 @@ A native `<fieldset>` with a `<legend>` is the recommended way to give a radio
 group an accessible name. Slot the radios straight in.
 
 <Demo>
-  <fluid-fieldset legend="Plan" description="Pick the plan that fits your team." style="max-width: 24rem;">
+  <fluid-fieldset
+    legend="Plan"
+    description="Pick the plan that fits your team."
+    style="max-width: 24rem;"
+  >
     <label style="display:flex; gap:0.5rem; align-items:center;">
       <input type="radio" name="plan" value="free" checked /> Free
     </label>
@@ -88,7 +98,11 @@ Set `error` for a `role="alert"` message under the group. It is wired into the
 fieldset's `aria-describedby`, so assistive tech announces it with the group.
 
 <Demo>
-  <fluid-fieldset legend="Shipping address" error="Please complete every required field." style="max-width: 24rem;">
+  <fluid-fieldset
+    legend="Shipping address"
+    error="Please complete every required field."
+    style="max-width: 24rem;"
+  >
     <label style="display:flex; flex-direction:column; gap:0.25rem;">
       <span>Street</span>
       <input type="text" name="street" />
@@ -114,7 +128,12 @@ disable too. Controls the author disabled independently stay disabled when the
 group is re-enabled.
 
 <Demo>
-  <fluid-fieldset legend="Billing" description="Editing is locked while your payment is processing." disabled style="max-width: 24rem;">
+  <fluid-fieldset
+    legend="Billing"
+    description="Editing is locked while your payment is processing."
+    disabled
+    style="max-width: 24rem;"
+  >
     <label style="display:flex; flex-direction:column; gap:0.25rem;">
       <span>Card number</span>
       <input type="text" name="card" />
@@ -152,7 +171,7 @@ Use the `legend` slot when the caption needs markup instead of plain text.
 - Disabling a whole section of a form at once.
 
 Reach for [`<fluid-field>`](/components/field/) when you need a label,
-description, and error around a *single* control rather than a group.
+description, and error around a _single_ control rather than a group.
 
 ## Theming
 
@@ -197,7 +216,7 @@ not covered by a token.
 
 - Fieldset is a passive grouping container with no interactive target of its
   own, so the AA target-size criterion (SC 2.5.8, 24×24) and the AAA target size
-  (SC 2.5.5, 44×44) apply to the *controls you slot in*, not to the fieldset.
+  (SC 2.5.5, 44×44) apply to the _controls you slot in_, not to the fieldset.
 - The legend, description, and error text all meet the AA 4.5:1 contrast
   requirement (SC 1.4.3) against the surface in every brand and theme; the
   border meets the 3:1 non-text contrast requirement (SC 1.4.11).

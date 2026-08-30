@@ -17,6 +17,295 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **Latest block, 2026-08-30 evening (docs pass: dead links, 0.4 feature
+> docs, interactive examples).** Rides UNCOMMITTED on top of the temp-commit
+> stack; the owner has an explicit commit hold in place ("do not commit
+> anything yet"), so the checkpoint squash is still pending. Three parallel
+> agents plus a main-loop review swept `apps/docs`:
+>
+> 1. **External links audited** (199 unique URLs): the CDN pages pinned
+>    `@fluid-ds/components@1.2.3`, a version that never existed (npm `latest`
+>    is 0.3.8), now pinned to real versions. RELEASE CHECKLIST: when 0.4.0
+>    publishes, bump the pinned examples in `getting-started/{cdn,
+installation}.mdx`. Two stale spec fragment anchors fixed; 33 w3.org
+>    403s are bot-blocking, spot-verified alive.
+> 2. **0.4 features documented**: Angular reactive-forms section in the
+>    frameworks guide (with `CUSTOM_ELEMENTS_SCHEMA`, verified against the
+>    real app), forms-guide Angular tab rewritten around `@fluid-ds/angular`
+>    (the old `CUSTOM_ELEMENTS_SCHEMA`-only example never worked), brand page
+>    now covers all six presets with live demos + a "What Glass frosts"
+>    section, dark-mode/index/installation refreshed, expansion pages link
+>    their live demos, 31-effect catalog confirmed.
+> 3. **Six weakest component pages upgraded to live interactive examples**
+>    (tooltip, card, dropdown, dialog, toast, tabs) per the template; factual
+>    fixes on the way: card documented nonexistent variants, toast's default
+>    duration was wrong. badge.mdx is the next-weakest candidate.
+> 4. **Main-loop fixes**: fluid-tag's success/warning/danger variants
+>    hard-coded status hexes instead of reading the color-scale tokens, so
+>    Titanium's documented monochrome remap never reached tags (fixed +
+>    `@uses-token` annotations + CEM regenerated; 18/18 tests, tokens gate
+>    green). Playground export-panel UI/comments still described the deleted
+>    `data-fluid-id` per-element model, rewritten for component-scoped rules,
+>    and `theming/{basics,per-element}.mdx` updated to match (manual
+>    `data-fluid-id` instance overrides remain the documented convention).
+>    Docs header brand picker gained Titanium + Orchid (Glass stays out: it
+>    would wash the Starlight chrome). Starlight `.not-content` link rule
+>    fixed (hero button was invisible). angular/demos READMEs corrected.
+>
+> `check:docs` green on the final tree: 136 pages, 26k+ links, 0 failures.
+>
+> **Second wave (same evening): live demos on every expansion page + nav.**
+> The owner asked for "animations and visual previews / demos" (citing the
+> node canvas) and for Guides higher in the sidebar. Guides now sits directly
+> under Getting started (astro.config.mjs). Every expansion pack page got a
+> live embedded demo via a per-pack `.astro` component in
+> `apps/docs/src/components/` (NodeGraphDemo is the hand-built exemplar; the
+> other twelve follow its pattern: pack define imported in the component
+> script, IntersectionObserver pause, prefers-reduced-motion fallback):
+> node-graph (looping simulated pipeline run with marching ants), charts
+> (streaming dashboard), qr (live generator + PNG download), table (windowed
+> 500-row infinite table), kanban (draggable board with `fluid-move`
+> readout), scheduler (studio week anchored to today), event calendar
+> (seeded release cycle), effects (real burst buttons + stoppable ambient),
+> markdown (split editor/preview), editor (live rich text), media
+> (synthesized WAV + zoomable SVG), parser (live CSV blueprint pipeline),
+> map (fully offline: bundled Leaflet CSS, SVG data-URI tiles, zero CDN).
+> To make this possible every expansion pack is now a workspace dependency
+> of `apps/docs` (package.json + lockfile; the reviewed xlsx integrity hash
+> survived the install, keys merely reordered). All demos verified live in
+> the browser (charts needed a cache-busted reload after Vite re-optimized;
+> production build has no optimizer).
+>
+> **0.4.0 readiness once-over (same night).** The full verify chain was
+> re-run stage by stage on the final tree. GREEN: typecheck, lint, format,
+> coverage (155), quality (report refreshed: segmented-control 16 -> 18
+> cases from tonight's regression tests), cem, package artifacts, framework
+> isolation, all four browser suites, coverage inventory, tokens (1413),
+> build (19 packages), SSR (1946 cold imports, 155 rendered), docs (136
+> pages, 26,182 links, 0 failures). Fixed on the way: `.prettierignore` now
+> covers `.next`/`out` build output and the generated React jsx surface
+> (whose bytes are owned by `check-generated.mjs`, a latent gate conflict),
+> wrappers regenerated to generator-exact bytes, the xlsx lock entry
+> restored to its reviewed serialization after pnpm reordered the keys,
+> FEATURES.md brought current, and the last "Fluid DS" strings and em
+> dashes removed from prose. RED, unchanged, all three documented
+> certification bindings: Linux patch proof (needs Linux + current lock),
+> pinned replay profile hash + react retained bundle bytes (needs the
+> seven-lane packed evidence rerun), and the Windows PID-reuse teardown
+> watchdog (components 2156/2156 and charts 49/49 assertions pass in
+> isolation; evidence `owned-pid-reused-without-generation-proof`).
+> Release checklist for the actual npm publish: regenerate those three,
+> refresh `docs/verification-and-test-inventory-0.4.0.md` numbers, and bump
+> the docs CDN pins from 0.3.8 once 0.4.0 is on the registry.
+
+> **Earlier same day, 2026-08-30 (glass demos, @fluid-ds/angular, four new
+> demos, Android story).** Continues the same temp-commit stack on `main`
+> (squash later, nothing pushed). Four blocks of work, each its own temp
+> commit:
+>
+> 1. **Glass coverage for the demos.** The demos shell chrome (header,
+>    sidebar, index tiles) now carries `fluid-glass-panel`, one header rule
+>    dropped to `:where()` specificity so the theme helper can win, and
+>    `packages/themes/src/glass.css` gained a data-grid section: both table
+>    components re-tune their surface tokens to the frost (auto-inverts in
+>    dark) with blur via `::part`. Verified in-browser across all demos in
+>    light + dark, including the frosted column-manager dialog.
+> 2. **`packages/angular` (`@fluid-ds/angular` 0.4.0).** ControlValueAccessor
+>    directives (one for the 15 value controls, one for checkbox/switch,
+>    shared base) compiled with ngc in partial mode, built into `dist/` like
+>    every other package. The admin-angular settings page now runs a real
+>    reactive form through it; verified live at :5391 (writeValue, edits,
+>    validation, disabled mirroring). admin-angular's predev/prebuild also
+>    build the package.
+> 3. **Four new demos** in `apps/demos`: booking (scheduler), board (kanban),
+>    analytics (charts incl. radar/polar/sparklines), qr (QR studio). New
+>    routes in the shell, tiles on the index, shared page CSS, vite inputs.
+>    All verified interactively. Found a REAL component bug on the way:
+>    fluid-segmented-control loses a non-first authored `value` when parsed
+>    into a connected container (task chip filed; qr.ts works around it).
+> 4. **Android story**: `docs/ANDROID.md` (PWA route shipped + Capacitor
+>    recipe documented, no unverifiable Gradle tree committed) and the demos
+>    app is now an installable PWA (manifest + generated maskable icons,
+>    verified resolving at both mounts). No Android SDK on this machine, so
+>    no APK was built; that is stated in the doc.
+>
+> Also this session, earlier blocks: butterflies flight-model rework, the
+> landing marketing pass, the slot-in-flex component fixes (callout,
+> timeline-item, progress-bar, radio), demos theme-system alignment, and the
+> fluid-segmented-control connected-parse value fix (attribute read-through
+> for not-yet-upgraded segments; never stomps an authored value whose
+> segment has not arrived; two regression tests).
+>
+> **Closing verify (2026-08-30, this machine, chromium+webkit).** Every
+> stage of `pnpm verify` was run to completion (stage by stage after the
+> chain stopped at known gates). GREEN: typecheck (incl. 147 browser-test
+> files), lint, format, coverage (155), quality, cem (19-package publication
+> checks), package artifacts (19), framework isolation, browser
+> selection/ownership/policy/lifecycle, coverage inventory, tokens, build
+> (19 packages), SSR (with a documented Angular-linker cold-import
+> exemption), docs (136 pages, 26,055 links, 0 failures), and the offline
+> 19-package release rehearsal (`publish:dry` PASSED, fresh evidence
+> recorded). Fixed on the way: a pre-existing browser-test TS error, stale
+> quality report, pnpm-dropped xlsx lock integrity (restored the reviewed
+> sha512), regenerated react wrappers, release roster 18 -> 19.
+> NOT green, needs deliberate regeneration, not code fixes: (1) retained
+> Linux patch proof (lock changed; regenerate on a Linux machine), (2)
+> pinned framework replay profile lock-hash + retained react bundle bytes
+> (re-run the seven-lane packed-consumer evidence, then
+> prepare-framework-pinned-corpus), (3) unit-matrix supervised teardown
+> trips the documented Windows PID-reuse unknown-ownership watchdog while
+> every executed assertion passes on both engines with zero leaks (3/3
+> reproductions; evidence under quality/evidence/wtr-lifecycle/). Per repo
+> policy these bind release certification, not day-to-day correctness.
+
+> **Previous session block, 2026-08-30 (butterflies rework + landing marketing pass).**
+> Work is committed to `main` as **temp commits to be squashed later**
+> (`e219e7f temp`, `dbd5b57 temp: butterfly rework`, plus the landing pass on
+> top). **Nothing has been pushed**, published or tagged.
+>
+> The `butterflies` effect was rebuilt as a steering-based flight model:
+> every butterfly enters from off-screen left or right (never mid-viewport),
+> follows a per-butterfly flight plan (layered sine swoop/weave/surge, an
+> altitude band, ~50 degree pitch cap), and always faces its velocity, so
+> backwards or upside-down flight is impossible. About 30% of entries bring a
+> phase-shifted partner (courtship-pair weave). The renderer gained real
+> anatomy: fore + hindwings, eased asymmetric wingbeat, open-wing glides,
+> body/antennae. Wind-down is handled inside the effect (the engine freezes a
+> `false`-returning `update`, which would have frozen steering). 60fps under
+> swarm load; all 136 browser tests + 31 tree-shaking tests pass. Note:
+> external `fizzle()` freezes steering by engine contract (nothing calls it on
+> butterflies today).
+>
+> The landing (`apps/landing/src/main.ts`) got the queued marketing pass: a
+> **live theme switcher in the sticky nav** (brand select + dark toggle
+> flipping `data-fluid-brand`/`data-fluid-theme` on `<html>`; the parked hero
+> switcher block was removed), the **tour retargeted** to five real targets
+> (nav switcher, portal, motion band, whatsnew, charts; the old first step
+> pointed at removed markup), the motion band updated (31 effects, butterflies
+> button, honest copy), **"New in v0.3" renamed to v0.4** with a new
+> `@fluid-ds/animations` headliner card ("Release the butterflies"), and
+> **free/pricing messaging added** (hero badge "Free forever · MIT", the CTA
+> "Free, open source, and staying that way", footer line, and a pitch
+> one-liner in `docs/FEATURES.md`). Informal copy was toned down per owner
+> steer ("honest, to the point, written like a human"). `docs/FEATURES.md`'s
+> animations bullet and pack-table row now describe the real 31-effect system
+> with `fizzle()`. Verified in-browser: light/dark x Default/Titanium, tour
+> walk-through, both butterfly buttons, chart repaints.
+>
+> Everything below this line describes the earlier 08-30 session and remains
+> accurate for the animations package itself.
+
+> **Previous session, 2026-08-30 (standalone animations + landing).** That work
+> is now part of the temp commits above. Nothing has been pushed,
+> published or tagged.
+>
+> The focus was `@fluid-ds/animations` as a self-contained package and the
+> marketing surface for it. The system now has its own **dedicated, shareable
+> page**: `apps/landing/animations.html` (+ `src/animations.ts`), wired through
+> the Vite multi-page input in `apps/landing/vite.config.ts`; the main landing
+> also carries a full-width motion band (`src/main.ts`). The page needs no other
+> Fluid component to run.
+>
+> Two halves ship in one package: attribute-driven keyframes (a global controller
+> reads `data-fluid-animation` plus `-trigger` / `-duration` / `-iterations` /
+> `-easing` off any element) and an imperative **canvas effects engine** that
+> returns an `EffectHandle`. There are **17 named effects** (`EFFECT_NAMES`):
+> confetti, fireworks, emojiBurst, emojiRain, emojiFountain, bubbles, snow,
+> sparkles, streamers, pulse, stars, hearts, pride, ribbons, glitter, balloons,
+> leaves. `<fluid-celebrate>` wraps presets; its fire method is `.fire()`, not
+> `.celebrate()`.
+>
+> **Graceful termination (the recurring "it never stops" bug) is fixed.**
+> `EffectHandle` gained `fizzle()` and the engine gained `windDownEmitter` (stop
+> spawning, let live particles finish) alongside the existing `stop()` hard cut.
+> Continuous effects (snow, rain, leaves, bubbles, sparkles) now take a duration
+> and fizzle out instead of emitting forever.
+>
+> **Colours are festive by default and brand-tinted only on request.**
+> `defaultColors()` is a fixed festive palette (brand-independent); `brandColors()`
+> reads the live `--fluid-color-brand-300..700` ramp and is opt-in, e.g.
+> `confetti({ colors: brandColors() })`. The /animations.html demo shows this off
+> with a "Brand colors" switch, plus a brand picker and a dark toggle in its
+> header. New particle shapes `ribbon` and `sparkle` differentiate streamers,
+> ribbons and glitter from confetti squares.
+>
+> **Regression tests are the guard against silent runaways.**
+> `packages/animations/src/effects/effects.test.ts` is 90 passing tests with
+> compile-time per-effect coverage (`Record<EffectName>`), "no runaway emitter"
+> particle-count sampling, and fizzle-vs-stop contracts, so a new effect that
+> forgets to terminate fails the suite. A Fable sub-agent added the last four
+> effects and five keyframes; the CEM was regenerated (155 elements verify).
+>
+> Also in this tree from earlier in the day: the Titanium monochrome-status theme,
+> Corporate paddings, a glass dark-mode repair, the demo light/dark and
+> measurement overlays, and a landing feature-card / stats refresh with the old
+> "Raw HTML vs Fluid" section removed.
+>
+> **Green this session:** animations typecheck, effects tests (90), landing
+> typecheck, `format:check`, `lint`, and `check:cem` (155 elements). No full
+> `pnpm verify` was run.
+>
+> **Pick up next.** (1) `docs/FEATURES.md` still advertises the OLD effect set:
+> the `@fluid-ds/animations` bullet near line 374 and the pack table near line 469
+> say "confetti, fireworks, sparkles, streamers, pulse" and mention nothing about
+> the standalone marketing page, the 17 effects, graceful fizzle, or the
+> festive-default / opt-in-brand colour model. It is the source the landing draws
+> from, so refresh it. (2) Aesthetic steer wanted: the owner finds the default set
+> a bit generic ("very google-like") and ribbons "kinda meh"; that is subjective
+> polish, not a bug. (3) Deferred to a later session: Angular reactive-form
+> wrappers mirroring the existing React ones.
+
+> **Previous session, 2026-08-29 (theme builder).** All work below is
+> **uncommitted**. Nothing has been pushed, published or tagged.
+>
+> Design Mode was reworked from per-instance to **component-scoped**
+> isolation. Isolating now writes one `fluid-x { … }` rule that reaches every
+> instance of that component, which is the component rung of the documented
+> brand → component → instance ladder. The previous model targeted a single
+> element through a `data-fluid-id`, which was never the intended design (it
+> dates from the initial commit, not from this session). That removed
+> `element-overrides-store.ts`, the generated `radio-1` ids, the id-rename UI
+> and the locator machinery; `component-overrides-store.ts` replaces them. The
+> preview injects the store's CSS verbatim, so preview and export cannot drift,
+> and the hash key is now `#components=`. A shared link restores and repaints
+> on a fresh load, which it never did before.
+>
+> Also in the builder: inspector fields prefill with the value a token actually
+> resolves to (component tokens are never declared, so their default is read
+> out of the component's own stylesheet); Reset counts and clears component
+> overrides as well as theme ones; and hovering in Design Mode shows the
+> component name, not just an outline.
+>
+> Component fixes this session: the three pickers fill and shrink with their
+> container instead of overflowing a narrow grid track; the time picker's
+> popover is fused to its field like `fluid-select`; picker popovers open on
+> click rather than focus (focus also arrives from validation and from an
+> overlay closing, which used to strand the user in a popover); time labels no
+> longer vary with the browser's ICU version; and
+> `--fluid-button-focus-ring-color` was documented but never referenced, so
+> setting it did nothing.
+>
+> **Queued for the website / marketing pass.** Advertise that Fluid follows the
+> reader's operating-system preferences: reduced motion, high contrast
+> (forced-colors), dark mode and right-to-left. Reduced motion is an OS
+> accessibility setting people with vestibular disorders, motion sickness or
+> migraine actually rely on, and it is currently buried in one clause of a
+> WCAG bullet in `docs/FEATURES.md` rather than said plainly on the landing
+> page. The claim is verifiable rather than aspirational: those are five
+> machine-verified visual-regression modes rendered across the whole catalog,
+> which is a stronger story than "accessible" on its own. See the bullet added
+> under "Accessibility: WCAG 2.2" in `docs/FEATURES.md` for the wording to draw
+> from.
+>
+> **Known gaps.** `apps/playground` still has no test harness at all (no `test`
+> script), so every builder change above is verified only in the browser. That
+> is the first thing to pick up if the builder is touched again. Two release
+> gates fail for reasons unrelated to this work: the retained **Linux**
+> dependency-remediation proof needs regenerating against the modified
+> `pnpm-lock.yaml`, and the Windows supervised-teardown check intermittently
+> reports `unknown-ownership` (all assertions pass, nothing leaks). Component
+> suites are green at 2148 tests.
+
 > **Latest continuation, 2026-08-28.** Product commit `d2d0ee8` (`0.4 hardening`)
 > was pushed manually; at the start of the follow-up documentation work, `main`
 > and `origin/main` were synchronized and the worktree was clean. The full forms
@@ -736,6 +1025,93 @@ Things true across machines (machine-specific quirks go in private memory):
 
 ## Log
 
+### 2026-08-30 (evening): docs pass with parallel agents
+
+- Dead-link audit (2 dead CDN pins to a never-published 1.2.3, 2 stale
+  anchors), 0.4 feature docs (Angular forms, six presets, Glass frost map,
+  31 effects), six component pages upgraded to live examples (tooltip, card,
+  dropdown, dialog, toast, tabs) with factual fixes (card variants, toast
+  duration).
+- Component fix: fluid-tag status variants now read the color-scale tokens
+  instead of hard-coded hexes, so theme remaps (Titanium monochrome) reach
+  them. CEM regenerated.
+- Playground export-panel copy + theming docs updated from the deleted
+  data-fluid-id model to component-scoped rules; docs brand picker gained
+  Titanium + Orchid.
+- `check:docs` green: 136 pages, 26k+ links, 0 failures. All of it
+  uncommitted (owner's commit hold).
+- Second wave: Guides moved directly under Getting started in the sidebar,
+  and all thirteen expansion pages got live embedded demos (per-pack .astro
+  components; node-graph's looping pipeline run is the exemplar). Every
+  expansion pack is now a workspace dep of apps/docs.
+
+### 2026-08-30 (later): butterflies flight model, landing marketing pass
+
+- Rebuilt the `butterflies` effect: side-entry only, per-butterfly steered
+  flight plans (never backwards or upside down), courtship pairs, depth-scaled
+  size/speed/opacity/wingbeat, a four-wing renderer with glides, and internal
+  wind-down so steering survives the `duration` path. 136 browser + 31
+  tree-shaking tests green, 60fps under swarm load.
+- Landing marketing pass: nav theme switcher (brand + dark on `<html>`), tour
+  retargeted to five live targets, motion band refreshed with butterflies and
+  the 31-effect count, "New in v0.3" renamed to v0.4 with an animations
+  headliner card, free/no-license messaging added (hero badge, CTA, footer,
+  FEATURES.md pitch line), copy de-snarked throughout.
+- `docs/FEATURES.md`: animations bullet + pack row refreshed to the 31-effect
+  reality (the queued pick-up item); added the "Free, now and permanently"
+  pitch one-liner.
+- All work sits in temp commits on `main`, to be squashed; not pushed.
+
+### 2026-08-30: standalone animation system, dedicated marketing page
+
+- Gave `@fluid-ds/animations` its own shareable marketing page
+  (`apps/landing/animations.html` + `src/animations.ts`, Vite multi-page) plus a
+  full-width motion band on the main landing. The page runs with no other Fluid
+  component.
+- Fixed the recurring "effect never stops" class of bug: added `fizzle()` to
+  `EffectHandle` and `windDownEmitter` to the engine (stop spawning, let live
+  particles drain). Continuous effects (snow, rain, leaves, bubbles, sparkles)
+  now take a duration and fizzle instead of running forever.
+- Reworked colours to festive-by-default, brand-tint-on-request: `defaultColors()`
+  is a fixed festive palette; `brandColors()` (opt-in) reads the live brand ramp.
+  The demo showcases it with a "Brand colors" switch, a brand picker and a dark
+  toggle.
+- Added `ribbon` and `sparkle` particle shapes and differentiated streamers,
+  ribbons and glitter from confetti (streamers had been drawing plain squares,
+  identical to confetti).
+- Preview loop is now a slow ping-pong (`updateTiming({ direction: "alternate" })`);
+  redundant fade-in/out and per-direction slide variants were collapsed.
+- Wrote `effects.test.ts`: 90 tests with compile-time per-effect coverage
+  (`Record<EffectName>`) and "no runaway" sampling, so a new effect cannot
+  silently emit forever. A Fable sub-agent added four effects and five keyframes;
+  the CEM was regenerated (155 elements).
+- Fixed the demo's "Brand colors" toggle alignment: it keeps its label on top like
+  the other controls and sits in a 38px slot, so it lines up with the Origin
+  dropdown's centre (measured delta 0). The `fluid-switch` itself was already
+  centred; this was demo layout, not a core component bug.
+- Green: animations typecheck, effects tests (90), landing typecheck,
+  `format:check`, `lint`, `check:cem`. Not committed, not pushed, not tagged.
+
+### 2026-08-29: component-scoped Design Mode, shareable theme links
+
+- Replaced per-instance isolation with component-scoped isolation: one
+  `fluid-x { … }` rule per customized component, reaching every instance.
+  Deleted the `data-fluid-id` model, the generated ids and the rename UI.
+- The preview now injects the override CSS verbatim, so what is previewed is
+  what is exported. Shared links (`#components=`) restore and repaint.
+- Inspector fields prefill from the value a token resolves to, read out of the
+  component's own stylesheet for tokens that are never declared. Fixed
+  `defaults()` so semantics resolve too, which also stopped a semantic set to
+  its own default being recorded as an override.
+- Reset now counts and clears component overrides, not only theme ones.
+- Design Mode shows the component name on hover.
+- Pickers: fill/shrink contract, fused time-picker popover, click-to-open,
+  ICU-independent time labels. `--fluid-button-focus-ring-color` now works.
+- Tests added for every component changed, each verified to fail against the
+  old code, plus a family-wide field sizing contract. `apps/playground` remains
+  untested: it has no harness.
+- Not committed, not pushed, not tagged.
+
 ### 2026-08-27: first localization and RTL tranche verified
 
 - Created a machine-guarded owned-string inventory for all 155 elements and a
@@ -1423,7 +1799,7 @@ preview.ts` lists core categories first then the packs. Added the missing
   size 21.7→32px for SC 2.5.8; selected-button contrast 3.43→5.17 for SC 1.4.3,
   caused by Starlight's `--sl-color-white` resolving near-black in light mode);
   fixed the GitHub/brand-select overlap (Astro emitted the GitHub `<a>` inside
-  `<starlight-brand-select>` — wrapped our controls in a boundary element); and
+  `<starlight-brand-select>`; wrapped our controls in a boundary element); and
   scoped the header background/border to `header.header` so the divider stops
   hugging the logo/search (it was painting on the inner content row too).
 - **Deployment decided + wired:** Cloudflare Pages, deploy-on-`main`, alpha

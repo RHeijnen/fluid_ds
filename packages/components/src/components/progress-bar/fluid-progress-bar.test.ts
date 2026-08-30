@@ -278,4 +278,23 @@ describe("<fluid-progress-bar>", () => {
     expect(style.animationIterationCount).to.equal("infinite");
     expect(style.animationDuration).to.equal(reduced ? "6s" : "1.5s");
   });
+
+  /* Regression: the label slot used to sit directly in the space-between flex
+     row, so mixed content ("Uploading <b>file</b>") split into separate flex
+     items spread across the full row width. */
+  it("mixed inline label content stays together instead of spreading", async () => {
+    const el = await fixture<FluidProgressBar>(html`
+      <fluid-progress-bar value="40" show-value style="width: 24rem"
+        >Uploading <b>file.zip</b></fluid-progress-bar
+      >
+    `);
+    await el.updateComplete;
+    const bold = el.querySelector("b")!;
+    expect(getComputedStyle(bold).display).to.equal("inline");
+    // The bold fragment hugs its preceding text on the left side of the row;
+    // only the value text sits at the far end.
+    const label = el.shadowRoot!.querySelector<HTMLElement>("[part='label']")!;
+    const mid = label.getBoundingClientRect().left + label.getBoundingClientRect().width / 2;
+    expect(bold.getBoundingClientRect().right).to.be.lessThan(mid);
+  });
 });

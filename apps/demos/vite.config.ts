@@ -30,7 +30,11 @@ export default defineConfig({
         index: resolve(__dirname, "index.html"),
         settings: resolve(__dirname, "settings/index.html"),
         admin: resolve(__dirname, "admin/index.html"),
-        "data-table": resolve(__dirname, "data-table/index.html")
+        "data-table": resolve(__dirname, "data-table/index.html"),
+        booking: resolve(__dirname, "booking/index.html"),
+        board: resolve(__dirname, "board/index.html"),
+        analytics: resolve(__dirname, "analytics/index.html"),
+        qr: resolve(__dirname, "qr/index.html")
       }
     }
   },

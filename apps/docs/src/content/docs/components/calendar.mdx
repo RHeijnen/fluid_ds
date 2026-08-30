@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-calendar>` renders a single month as an accessible `role="grid"` of day
 buttons, with roving-tabindex focus and the full WAI-ARIA APG keyboard contract.
 It is the engine behind [`<fluid-date-picker>`](/components/date-picker/) and
@@ -32,6 +31,7 @@ timezone-safe ISO `YYYY-MM-DD` string.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/calendar/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +43,7 @@ timezone-safe ISO `YYYY-MM-DD` string.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/calendar";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -68,7 +69,9 @@ disabled, and the prev/next nav stops at the boundary month.
   <fluid-calendar value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-calendar>
 </Demo>
 
-<ConformanceCode code={`<fluid-calendar value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-calendar>`} />
+<ConformanceCode
+  code={`<fluid-calendar value="2026-06-15" min="2026-06-08" max="2026-06-24"></fluid-calendar>`}
+/>
 
 ### Week start
 
@@ -86,6 +89,7 @@ is `1` (Monday). Weekday header names follow the `locale`.
 <fluid-calendar value="2026-06-15" week-start="1"></fluid-calendar>
 
 <!-- Sunday-first -->
+
 <fluid-calendar value="2026-06-15" week-start="0"></fluid-calendar>`} />
 
 ### Locale
@@ -110,15 +114,22 @@ band between two endpoints. This is how the
 standalone, it is a read-only highlight unless you wire `fluid-date-activate`.
 
 <Demo>
-  <fluid-calendar range range-start="2026-06-08" range-end="2026-06-19" view="2026-06-15"></fluid-calendar>
+  <fluid-calendar
+    range
+    range-start="2026-06-08"
+    range-end="2026-06-19"
+    view="2026-06-15"
+  ></fluid-calendar>
 </Demo>
 
-<ConformanceCode code={`<fluid-calendar
+<ConformanceCode
+  code={`<fluid-calendar
   range
   range-start="2026-06-08"
   range-end="2026-06-19"
   view="2026-06-15"
-></fluid-calendar>`} />
+></fluid-calendar>`}
+/>
 
 ### No nav
 
@@ -129,7 +140,9 @@ picker) can drive the displayed month itself via the `view` attribute.
   <fluid-calendar value="2026-06-15" no-nav></fluid-calendar>
 </Demo>
 
-<ConformanceCode code={`<fluid-calendar value="2026-06-15" no-nav view="2026-06-15"></fluid-calendar>`} />
+<ConformanceCode
+  code={`<fluid-calendar value="2026-06-15" no-nav view="2026-06-15"></fluid-calendar>`}
+/>
 
 ## Listening for changes
 
@@ -152,6 +165,7 @@ nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="MonthCalendar.tsx"
@@ -172,6 +186,7 @@ nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
       return <fluid-calendar ref={ref} />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="MonthCalendar.vue"
@@ -184,6 +199,7 @@ nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
       <fluid-calendar @fluid-date-activate="onPick" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="month-calendar.component.ts"
@@ -204,6 +220,7 @@ nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="MonthCalendar.svelte"
@@ -216,6 +233,7 @@ nav, and `fluid-date-hover` fires on pointer-enter (used for range previews).
 
     <fluid-calendar on:fluid-date-activate={onPick} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -251,8 +269,7 @@ var those knobs fall back to.
 ```
 
 <Aside type="tip">
-  The [Theme builder](/playground/) lets you tweak these tokens visually and
-  exports the CSS above.
+  The [Theme builder](/playground/) lets you tweak these tokens visually and exports the CSS above.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -277,7 +294,7 @@ fluid-calendar::part(day-selected) {
 - The **building block** for a custom date control: listen to `fluid-date-activate`
   and drive `value` / `view` yourself.
 
-### When *not* to use
+### When _not_ to use
 
 - A **compact single-date field** that submits a value: use
   [`<fluid-date-picker>`](/components/date-picker/).
@@ -294,14 +311,14 @@ day. The notes below are calendar-specific; the cross-component contract is in t
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>←</kbd> / <kbd>→</kbd> | Move focus ±1 day. |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Move focus ±1 week. |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last day of the week. |
-| <kbd>PageUp</kbd> / <kbd>PageDown</kbd> | Move ±1 month. |
-| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | Move ±1 year. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused day (fires `fluid-date-activate`). |
+| Key                                                                       | Action                                                |
+| ------------------------------------------------------------------------- | ----------------------------------------------------- |
+| <kbd>←</kbd> / <kbd>→</kbd>                                               | Move focus ±1 day.                                    |
+| <kbd>↑</kbd> / <kbd>↓</kbd>                                               | Move focus ±1 week.                                   |
+| <kbd>Home</kbd> / <kbd>End</kbd>                                          | Jump to the first / last day of the week.             |
+| <kbd>PageUp</kbd> / <kbd>PageDown</kbd>                                   | Move ±1 month.                                        |
+| <kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd> | Move ±1 year.                                         |
+| <kbd>Enter</kbd> / <kbd>Space</kbd>                                       | Select the focused day (fires `fluid-date-activate`). |
 
 Moving past the edge of the shown month advances the displayed month and keeps
 focus on the new day. The focus ring is `:focus-visible` and reads
@@ -336,10 +353,10 @@ targets grow and the focus ring thickens. It is not a mock-up: the toggle sets t
 real `data-fluid-conformance` attribute on `<html>`. The calendar reads conformance
 tokens, so it scales with zero per-component branching:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

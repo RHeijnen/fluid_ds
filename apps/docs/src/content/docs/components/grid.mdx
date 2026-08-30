@@ -15,12 +15,24 @@ breakpoint-aware count. Drop in [`<fluid-col>`](#fluid-col) to span cells.
 
 <Demo>
   <fluid-grid cols="3" gap="0.75rem" style="width:100%;">
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">2</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">3</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">4</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">5</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">6</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      1
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      2
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      3
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      4
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      5
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      6
+    </div>
   </fluid-grid>
 </Demo>
 
@@ -36,6 +48,7 @@ breakpoint-aware count. Drop in [`<fluid-col>`](#fluid-col) to span cells.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/grid/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +60,7 @@ breakpoint-aware count. Drop in [`<fluid-col>`](#fluid-col) to span cells.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/grid"; // registers grid + col
     ```
+
   </TabItem>
 </Tabs>
 
@@ -59,11 +73,21 @@ allows and reflows on resize. The most robust responsive default.
 
 <Demo>
   <fluid-grid min-col-width="8rem" gap="0.75rem" style="width:100%;">
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">A</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">B</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">C</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">D</div>
-    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">E</div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      A
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      B
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      C
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      D
+    </div>
+    <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+      E
+    </div>
   </fluid-grid>
 </Demo>
 
@@ -94,10 +118,26 @@ Wrap items in `<fluid-col>` to span columns (`span`, with responsive
 
 <Demo>
   <fluid-grid cols="4" gap="0.75rem" style="width:100%;">
-    <fluid-col span="2"><div style="background:var(--fluid-accent-base);color:var(--fluid-accent-text);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">span 2</div></fluid-col>
-    <fluid-col><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div></fluid-col>
-    <fluid-col><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">1</div></fluid-col>
-    <fluid-col span="4"><div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">span 4</div></fluid-col>
+    <fluid-col span="2">
+      <div style="background:var(--fluid-accent-base);color:var(--fluid-accent-text);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+        span 2
+      </div>
+    </fluid-col>
+    <fluid-col>
+      <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+        1
+      </div>
+    </fluid-col>
+    <fluid-col>
+      <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+        1
+      </div>
+    </fluid-col>
+    <fluid-col span="4">
+      <div style="background:var(--fluid-surface-muted);border-radius:var(--fluid-radius-md);padding:1rem;text-align:center;">
+        span 4
+      </div>
+    </fluid-col>
   </fluid-grid>
 </Demo>
 
@@ -115,7 +155,7 @@ Wrap items in `<fluid-col>` to span columns (`span`, with responsive
 - **Uniform card / tile layouts** that should reflow with the viewport.
 - **Page scaffolding**: sidebars, content columns, dashboards.
 
-### When *not* to use
+### When _not_ to use
 
 - **Mixed-size tiles that should pack densely**: use
   [`<fluid-mosaic>`](/components/mosaic/).
@@ -137,8 +177,8 @@ fluid-grid {
 ```
 
 <Aside type="note">
-  The grid container itself uses `display: grid`, so slotted children become its
-  grid items directly, there's no inner wrapper to fight with.
+  The grid container itself uses `display: grid`, so slotted children become its grid items
+  directly, there's no inner wrapper to fight with.
 </Aside>
 
 ## Accessibility

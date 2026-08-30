@@ -44,6 +44,7 @@ root.innerHTML = `
             <fluid-icon name="${n.icon}"></fluid-icon><span>${n.label}</span></a>`
         ).join("")}
       </nav>
+      <a class="sidebar-back" href="../">&larr; All demos</a>
       <div class="sidebar-foot muted">Native HTML · no framework</div>
     </aside>
 

@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Content/Comparison",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;

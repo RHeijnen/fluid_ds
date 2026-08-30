@@ -28,7 +28,30 @@
  */
 
 /** The shape a particle is drawn as. */
-export type ParticleShape = "square" | "circle" | "emoji" | "image";
+export type ParticleShape =
+  | "square"
+  | "circle"
+  | "ring"
+  | "bubble"
+  | "balloon"
+  | "leaf"
+  | "coin"
+  | "comet"
+  | "raindrop"
+  | "firefly"
+  | "ember"
+  | "magic"
+  | "fog"
+  | "butterfly"
+  | "hail"
+  | "shard"
+  | "ribbon"
+  | "sparkle"
+  | "emoji"
+  | "image";
+
+/** Draw a particle after the engine has applied opacity, position, and rotation. */
+export type ParticleRenderer = (context: CanvasRenderingContext2D, particle: Particle) => void;
 
 /** A single live particle. All distances are CSS pixels, times in ms. */
 export interface Particle {
@@ -45,6 +68,8 @@ export interface Particle {
   size: number;
   color: string;
   shape: ParticleShape;
+  /** Effect-scoped renderer, allowing unused shape implementations to tree-shake. */
+  renderer: ParticleRenderer;
   /** Current rotation in radians. */
   rotation: number;
   /** Spin in radians per second. */
@@ -88,6 +113,13 @@ export interface Emitter {
   resolve: () => void;
   /** A single static frame to paint when motion is reduced. */
   reducedMotionStill?: (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
+  /** Optional full-canvas atmosphere layered behind particles. */
+  overlay?: {
+    background: string;
+    backgroundPosition?: string;
+    backgroundSize?: string;
+    backdropFilter?: string;
+  };
 }
 
 /** True when the user asked for reduced motion. SSR-safe. */
@@ -142,7 +174,7 @@ function createCanvas(): HTMLCanvasElement {
 function ensureCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
   if (!canvas || !canvas.isConnected) {
     canvas = createCanvas();
-    document.body.appendChild(canvas);
+    (document.body ?? document.documentElement).appendChild(canvas);
     const context = canvas.getContext("2d");
     if (!context) {
       throw new Error("@fluid-ds/animations: 2D canvas context unavailable.");
@@ -234,6 +266,18 @@ export function stopEmitter(emitter: Emitter): void {
   if (emitters.size === 0) stopLoop();
 }
 
+/**
+ * Wind an emitter down gracefully: it spawns no more particles (its `update` is
+ * never called again), but the ones already on screen finish their motion, and
+ * the emitter ends itself and resolves once they are gone. Contrast with
+ * {@link stopEmitter}, which drops the particles at once. This reuses the same
+ * "spawn no more" path a `duration` uses when it elapses, so a manual stop
+ * fizzles out exactly like a timed one.
+ */
+export function windDownEmitter(emitter: Emitter): void {
+  spawnEnded.add(emitter);
+}
+
 function stopLoop(): void {
   if (rafId) {
     cancelAnimationFrame(rafId);
@@ -276,13 +320,14 @@ function tick(now: number): void {
     }
     emitter.particles = next;
 
-    const finished =
-      emitter.done || (!stillSpawning && emitter.particles.length === 0);
+    const finished = emitter.done || (!stillSpawning && emitter.particles.length === 0);
     if (finished) {
       emitters.delete(emitter);
       emitter.resolve();
     }
   }
+
+  syncOverlayStyle();
 
   ctx.restore();
 
@@ -291,6 +336,18 @@ function tick(now: number): void {
   } else {
     stopLoop();
   }
+}
+
+function syncOverlayStyle(): void {
+  if (!canvas) return;
+  let overlay: Emitter["overlay"];
+  for (const emitter of emitters) {
+    if (emitter.overlay) overlay = emitter.overlay;
+  }
+  canvas.style.background = overlay?.background ?? "transparent";
+  canvas.style.backgroundPosition = overlay?.backgroundPosition ?? "0 0";
+  canvas.style.backgroundSize = overlay?.backgroundSize ?? "auto";
+  canvas.style.backdropFilter = overlay?.backdropFilter ?? "none";
 }
 
 function stepParticle(p: Particle, dt: number): void {
@@ -339,7 +396,8 @@ function emojiSprite(glyph: string): HTMLCanvasElement | null {
   return canvas;
 }
 
-function drawParticle(context: CanvasRenderingContext2D, p: Particle): void {
+/** @deprecated Internal fallback; public effects use tree-shakeable scoped renderers. */
+export function drawLegacyParticle(context: CanvasRenderingContext2D, p: Particle): void {
   context.save();
   context.globalAlpha = Math.max(0, Math.min(1, p.opacity));
   context.translate(p.x, p.y);
@@ -350,6 +408,207 @@ function drawParticle(context: CanvasRenderingContext2D, p: Particle): void {
       context.fillStyle = p.color;
       context.beginPath();
       context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "ring": {
+      context.strokeStyle = p.color;
+      context.lineWidth = Math.max(1.5, p.size * 0.08);
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.stroke();
+      break;
+    }
+    case "bubble": {
+      context.fillStyle = p.color;
+      context.strokeStyle = "rgba(255,255,255,0.75)";
+      context.lineWidth = Math.max(1, p.size * 0.1);
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+      context.beginPath();
+      context.arc(-p.size * 0.28, -p.size * 0.28, p.size * 0.2, Math.PI, Math.PI * 1.55);
+      context.stroke();
+      break;
+    }
+    case "balloon": {
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.ellipse(0, 0, p.size * 0.82, p.size * 1.08, 0, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "rgba(255,255,255,0.35)";
+      context.beginPath();
+      context.ellipse(
+        -p.size * 0.25,
+        -p.size * 0.32,
+        p.size * 0.13,
+        p.size * 0.28,
+        -0.4,
+        0,
+        Math.PI * 2
+      );
+      context.fill();
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.moveTo(-p.size * 0.16, p.size);
+      context.lineTo(p.size * 0.16, p.size);
+      context.lineTo(0, p.size * 1.28);
+      context.closePath();
+      context.fill();
+      context.strokeStyle = "rgba(60,60,70,0.55)";
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(0, p.size * 1.25);
+      context.quadraticCurveTo(p.size * 0.35, p.size * 1.9, 0, p.size * 2.5);
+      context.stroke();
+      break;
+    }
+    case "leaf": {
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.moveTo(0, -p.size * 1.5);
+      context.bezierCurveTo(p.size * 1.15, -p.size * 0.7, p.size, p.size * 0.8, 0, p.size * 1.5);
+      context.bezierCurveTo(-p.size, p.size * 0.8, -p.size * 1.15, -p.size * 0.7, 0, -p.size * 1.5);
+      context.fill();
+      context.strokeStyle = "rgba(70,45,20,0.45)";
+      context.lineWidth = Math.max(0.75, p.size * 0.08);
+      context.beginPath();
+      context.moveTo(0, -p.size * 1.15);
+      context.lineTo(0, p.size * 1.25);
+      context.stroke();
+      break;
+    }
+    case "coin": {
+      context.fillStyle = p.color;
+      context.strokeStyle = "rgba(120,70,0,0.7)";
+      context.lineWidth = Math.max(1, p.size * 0.16);
+      context.beginPath();
+      context.ellipse(0, 0, p.size, p.size * 0.72, 0, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+      context.strokeStyle = "rgba(255,255,255,0.55)";
+      context.lineWidth = Math.max(0.8, p.size * 0.1);
+      context.beginPath();
+      context.arc(0, 0, p.size * 0.55, 0, Math.PI * 2);
+      context.stroke();
+      break;
+    }
+    case "comet": {
+      context.fillStyle = p.color;
+      context.globalAlpha *= 0.28;
+      context.fillRect(-p.size * 7, -p.size * 0.35, p.size * 7, p.size * 0.7);
+      context.globalAlpha = Math.max(0, Math.min(1, p.opacity));
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "raindrop": {
+      context.strokeStyle = p.color;
+      context.lineWidth = Math.max(1, p.size * 0.16);
+      context.lineCap = "round";
+      context.beginPath();
+      context.moveTo(0, -p.size * 1.8);
+      context.lineTo(0, p.size * 0.65);
+      context.stroke();
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.arc(0, p.size * 0.72, Math.max(1, p.size * 0.18), 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "firefly": {
+      context.shadowColor = p.color;
+      context.shadowBlur = p.size * 3.5;
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+      context.fillStyle = "rgba(255,255,255,0.9)";
+      context.beginPath();
+      context.arc(-p.size * 0.2, -p.size * 0.2, p.size * 0.32, 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "ember": {
+      context.shadowColor = p.color;
+      context.shadowBlur = p.size * 2.5;
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.ellipse(0, 0, p.size * 0.42, p.size * 1.55, 0, 0, Math.PI * 2);
+      context.fill();
+      context.shadowBlur = 0;
+      break;
+    }
+    case "magic": {
+      context.shadowColor = p.color;
+      context.shadowBlur = p.size * 3.2;
+      context.fillStyle = p.color;
+      const r = p.size;
+      const t = Math.max(0.8, r * 0.34);
+      context.beginPath();
+      context.moveTo(0, -r);
+      context.lineTo(t, 0);
+      context.lineTo(0, r);
+      context.lineTo(-t, 0);
+      context.closePath();
+      context.moveTo(-r, 0);
+      context.lineTo(0, -t);
+      context.lineTo(r, 0);
+      context.lineTo(0, t);
+      context.closePath();
+      context.fill();
+      context.shadowBlur = 0;
+      break;
+    }
+    case "fog": {
+      // A stretched radial gradient avoids the hard-edged "floating oval"
+      // look and lets overlapping banks merge into one continuous fog field.
+      context.scale(2.35, 0.72);
+      const fogGradient = context.createRadialGradient(0, 0, p.size * 0.08, 0, 0, p.size);
+      fogGradient.addColorStop(0, p.color);
+      fogGradient.addColorStop(0.48, p.color);
+      fogGradient.addColorStop(1, "transparent");
+      context.fillStyle = fogGradient;
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "butterfly": {
+      const flap = 0.22 + 0.78 * Math.abs(Math.sin(p.life * (p.wobbleSpeed ?? 7)));
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.ellipse(-p.size * 0.48, 0, p.size * 0.62 * flap, p.size, -0.45, 0, Math.PI * 2);
+      context.ellipse(p.size * 0.48, 0, p.size * 0.62 * flap, p.size, 0.45, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = "rgba(45,35,55,0.8)";
+      context.fillRect(-p.size * 0.08, -p.size * 0.72, p.size * 0.16, p.size * 1.44);
+      break;
+    }
+    case "hail": {
+      context.fillStyle = p.color;
+      context.strokeStyle = "rgba(148,163,184,0.75)";
+      context.lineWidth = Math.max(0.8, p.size * 0.12);
+      context.beginPath();
+      context.arc(0, 0, p.size, 0, Math.PI * 2);
+      context.fill();
+      context.stroke();
+      context.fillStyle = "rgba(255,255,255,0.9)";
+      context.beginPath();
+      context.arc(-p.size * 0.3, -p.size * 0.3, p.size * 0.2, 0, Math.PI * 2);
+      context.fill();
+      break;
+    }
+    case "shard": {
+      context.fillStyle = p.color;
+      context.beginPath();
+      context.moveTo(0, -p.size * 1.45);
+      context.lineTo(p.size * 0.7, p.size);
+      context.lineTo(-p.size * 0.45, p.size * 0.45);
+      context.closePath();
       context.fill();
       break;
     }
@@ -368,11 +627,39 @@ function drawParticle(context: CanvasRenderingContext2D, p: Particle): void {
       }
       break;
     }
+    case "ribbon": {
+      context.fillStyle = p.color;
+      // A long, thin strip whose width breathes as it tumbles, so it reads as
+      // a party ribbon curling and flashing its edge on the way down.
+      const flutter = 0.25 + 0.75 * Math.abs(Math.cos(p.life * (p.wobbleSpeed ?? 4)));
+      const w = p.size * 0.6 * flutter;
+      const h = p.size * 3.2;
+      context.fillRect(-w, -h, w * 2, h * 2);
+      break;
+    }
+    case "sparkle": {
+      context.fillStyle = p.color;
+      // A four-point twinkle: two crossed spikes. Paired with a quick opacity
+      // fade this reads as glinting glitter, not paper confetti.
+      const r = p.size;
+      const t = Math.max(0.6, r * 0.32);
+      context.beginPath();
+      context.moveTo(0, -r);
+      context.lineTo(t, 0);
+      context.lineTo(0, r);
+      context.lineTo(-t, 0);
+      context.closePath();
+      context.moveTo(-r, 0);
+      context.lineTo(0, -t);
+      context.lineTo(r, 0);
+      context.lineTo(0, t);
+      context.closePath();
+      context.fill();
+      break;
+    }
     case "square":
     default: {
       context.fillStyle = p.color;
-      // A slight height squash makes paper confetti read as 3D as it
-      // tumbles. Reuse `wobble` only when it is a ribbon; otherwise full.
       context.fillRect(-p.size, -p.size, p.size * 2, p.size * 2);
       break;
     }
@@ -381,9 +668,27 @@ function drawParticle(context: CanvasRenderingContext2D, p: Particle): void {
   context.restore();
 }
 
+function drawParticle(context: CanvasRenderingContext2D, particle: Particle): void {
+  context.save();
+  context.globalAlpha = Math.max(0, Math.min(1, particle.opacity));
+  context.translate(particle.x, particle.y);
+  context.rotate(particle.rotation);
+  particle.renderer(context, particle);
+  context.restore();
+}
+
 /** Test-only: how many emitters are currently active. */
 export function activeEmitterCount(): number {
   return emitters.size;
+}
+
+/** Test-only: total live particles across every active emitter. Lets a test
+ *  watch that an effect stops spawning (the count holds or falls) rather than
+ *  runs away (it climbs), without waiting for slow particles to fully drain. */
+export function activeParticleCount(): number {
+  let total = 0;
+  for (const emitter of emitters) total += emitter.particles.length;
+  return total;
 }
 
 /** Test-only: is the shared canvas currently in the DOM. */

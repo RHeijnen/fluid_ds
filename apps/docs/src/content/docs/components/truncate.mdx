@@ -16,11 +16,10 @@ shows no control at all.
 <Demo>
   <div style="max-width: 28rem;">
     <fluid-truncate lines="3">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-      velit esse cillum dolore eu fugiat nulla pariatur.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+      voluptate velit esse cillum dolore eu fugiat nulla pariatur.
     </fluid-truncate>
   </div>
 </Demo>
@@ -37,6 +36,7 @@ shows no control at all.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/truncate/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -48,6 +48,7 @@ shows no control at all.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/truncate";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -60,18 +61,19 @@ Set `lines` to control how many lines show when collapsed (default `3`).
 <Demo>
   <div style="max-width: 28rem;">
     <fluid-truncate lines="2">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris nisi ut aliquip ex ea commodo consequat.
     </fluid-truncate>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-truncate lines="2">
+<ConformanceCode
+  code={`<fluid-truncate lines="2">
   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
   tempor incididunt ut labore et dolore magna aliqua.
-</fluid-truncate>`} />
+</fluid-truncate>`}
+/>
 
 ### Already expanded
 
@@ -81,34 +83,36 @@ can read or set it from script.
 <Demo>
   <div style="max-width: 28rem;">
     <fluid-truncate lines="3" expanded>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat. Duis aute irure dolor in reprehenderit.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.
     </fluid-truncate>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-truncate lines="3" expanded>
+<ConformanceCode
+  code={`<fluid-truncate lines="3" expanded>
   Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-</fluid-truncate>`} />
+</fluid-truncate>`}
+/>
 
 ### Custom labels
 
 <Demo>
   <div style="max-width: 28rem;">
     <fluid-truncate lines="2" more-label="Read full description" less-label="Collapse">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-      veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-      commodo consequat.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+      laboris nisi ut aliquip ex ea commodo consequat.
     </fluid-truncate>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-truncate more-label="Read full description" less-label="Collapse">
+<ConformanceCode
+  code={`<fluid-truncate more-label="Read full description" less-label="Collapse">
   Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-</fluid-truncate>`} />
+</fluid-truncate>`}
+/>
 
 ### No overflow
 
@@ -120,7 +124,9 @@ When the text fits within `lines`, no toggle renders at all.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-truncate lines="3">A short caption that fits on one line.</fluid-truncate>`} />
+<ConformanceCode
+  code={`<fluid-truncate lines="3">A short caption that fits on one line.</fluid-truncate>`}
+/>
 
 ## Listening for fluid-toggle
 
@@ -138,6 +144,7 @@ with `detail.expanded` carrying the new state.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Bio.tsx"
@@ -155,6 +162,7 @@ with `detail.expanded` carrying the new state.
       return <fluid-truncate ref={ref} lines={3}>{text}</fluid-truncate>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Bio.vue"
@@ -169,6 +177,7 @@ with `detail.expanded` carrying the new state.
       </fluid-truncate>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="bio.component.ts"
@@ -188,6 +197,7 @@ with `detail.expanded` carrying the new state.
       onToggle(e: any) { console.log(e.detail.expanded); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Bio.svelte"
@@ -200,6 +210,7 @@ with `detail.expanded` carrying the new state.
       {text}
     </fluid-truncate>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -232,9 +243,7 @@ and the disclosure button is `part="toggle"`. Reach any of them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
 not covered by a token.
 
-<Aside type="tip">
-  Retune the toggle color live in the [Theme builder](/playground/).
-</Aside>
+<Aside type="tip">Retune the toggle color live in the [Theme builder](/playground/).</Aside>
 
 ## When to use
 
@@ -242,7 +251,7 @@ not covered by a token.
 - Multi-line captions where the full text is occasionally useful but not always.
 - Comment bodies in a dense feed.
 
-### When *not* to use
+### When _not_ to use
 
 - For collapsing arbitrary rich content (headings, media, forms), reach for an
   [accordion](/components/accordion/) or
@@ -261,10 +270,10 @@ carries no role. See the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| `Tab` | Moves focus to the show-more / show-less button (when present). |
-| `Enter` / `Space` | Toggles the content open or closed. |
+| Key               | Action                                                          |
+| ----------------- | --------------------------------------------------------------- |
+| `Tab`             | Moves focus to the show-more / show-less button (when present). |
+| `Enter` / `Space` | Toggles the content open or closed.                             |
 
 The button shows a `:focus-visible` ring built from the focus-ring tokens
 (`--fluid-focus-ring-width`, `--fluid-focus-ring-offset`).
@@ -294,10 +303,10 @@ Truncate ships WCAG 2.2 AA by default and scales to AAA when an ancestor sets
 `data-fluid-conformance="aaa"` (the header toggle is live, and the snippets
 above switch with it). The toggle reads these tokens:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → 2.5.5 |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → 2.4.13 |
+| Token                      | AA   | AAA      | Criterion      |
+| -------------------------- | ---- | -------- | -------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → 2.5.5  |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → 2.4.13 |
 
 ## API
 
@@ -306,8 +315,24 @@ above switch with it). The toggle reads these tokens:
 ## Related
 
 <CardGrid>
-  <LinkCard title="Accordion" href="/components/accordion/" description="Collapse structured sections, not just text." />
-  <LinkCard title="Details" href="/components/accordion/#standalone-disclosure" description="Standalone disclosure for arbitrary content." />
-  <LinkCard title="Accessibility guide" href="/guides/accessibility/" description="The cross-component a11y contract." />
-  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+  <LinkCard
+    title="Accordion"
+    href="/components/accordion/"
+    description="Collapse structured sections, not just text."
+  />
+  <LinkCard
+    title="Details"
+    href="/components/accordion/#standalone-disclosure"
+    description="Standalone disclosure for arbitrary content."
+  />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Use Fluid in React, Vue, Angular, Svelte."
+  />
 </CardGrid>

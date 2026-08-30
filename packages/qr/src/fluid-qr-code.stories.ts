@@ -13,7 +13,7 @@ const meta: Meta = {
   title: "QR/QR code",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     value: { control: "text" },
@@ -114,12 +114,17 @@ export const Artistic: Story = {
 export const Export: Story = {
   render: () => html`
     <div style="display: grid; gap: 1rem; justify-items: start;">
-      <fluid-qr-code id="export-demo" value="https://fluid.example.com" size="200" logo=${LOGO}></fluid-qr-code>
+      <fluid-qr-code
+        id="export-demo"
+        value="https://fluid.example.com"
+        size="200"
+        logo=${LOGO}
+      ></fluid-qr-code>
       <button
         @click=${async () => {
-          const el = document.querySelector<HTMLElement & { download: (f?: string) => Promise<void> }>(
-            "#export-demo"
-          );
+          const el = document.querySelector<
+            HTMLElement & { download: (f?: string) => Promise<void> }
+          >("#export-demo");
           if (el) await el.download("fluid-qr.png");
         }}
       >

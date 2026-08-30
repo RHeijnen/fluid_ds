@@ -31,6 +31,7 @@ sibling of [`<fluid-slider>`](/components/slider/).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/range-slider/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +43,7 @@ sibling of [`<fluid-slider>`](/components/slider/).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/range-slider";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -67,7 +69,13 @@ Set `min`, `max`, and `step` for any numeric scale, including negative ranges.
 
 <Demo>
   <div style="max-width: 360px;">
-    <fluid-range-slider min="-50" max="50" step="5" value-min="-20" value-max="30"></fluid-range-slider>
+    <fluid-range-slider
+      min="-50"
+      max="50"
+      step="5"
+      value-min="-20"
+      value-max="30"
+    ></fluid-range-slider>
   </div>
 </Demo>
 
@@ -109,6 +117,7 @@ Both carry `detail: { min, max }` with the current thumb values.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="PriceFilter.tsx"
@@ -126,6 +135,7 @@ Both carry `detail: { min, max }` with the current thumb values.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="PriceFilter.vue"
@@ -141,6 +151,7 @@ Both carry `detail: { min, max }` with the current thumb values.
         @fluid-input="range = $event.detail" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="price-filter.component.ts"
@@ -161,6 +172,7 @@ Both carry `detail: { min, max }` with the current thumb values.
       range = { min: 200, max: 800 };
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="PriceFilter.svelte"
@@ -173,6 +185,7 @@ Both carry `detail: { min, max }` with the current thumb values.
       value-min={range.min} value-max={range.max}
       on:fluid-input={(e) => (range = e.detail)} />
     ```
+
   </TabItem>
 </Tabs>
 

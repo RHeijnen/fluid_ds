@@ -9,7 +9,7 @@ type Args = Pick<FluidToolbar, "orientation">;
 const meta: Meta<Args> = {
   title: "Components/Navigation/Toolbar",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     orientation: { control: "inline-radio", options: ["horizontal", "vertical"] }
   },

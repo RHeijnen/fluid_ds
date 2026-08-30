@@ -60,8 +60,9 @@ test("rejects malformed encoded targets", () => {
 });
 
 test("mounted docs do not silently exempt mistyped root-relative documentation links", () => {
-  const result = check('<a href="/guide/">Missing base</a><a href="/">Landing</a>', undefined,
-    { base: "/docs/" });
+  const result = check('<a href="/guide/">Missing base</a><a href="/">Landing</a>', undefined, {
+    base: "/docs/"
+  });
   assert.equal(result.failures[0].reason, "Link escapes documentation base");
   assert.equal(result.outsideScope, 1);
 });

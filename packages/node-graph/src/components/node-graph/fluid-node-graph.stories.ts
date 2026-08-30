@@ -34,7 +34,14 @@ const types: Record<string, NodeGraphNodeType> = {
 
 const nodes: NodeGraphNode[] = [
   { id: "start", type: "trigger", x: 40, y: 120, label: "Every night", summary: "Daily at 02:00" },
-  { id: "sync", type: "task", x: 344, y: 48, label: "Sync data", summary: "Pull the latest records" },
+  {
+    id: "sync",
+    type: "task",
+    x: 344,
+    y: 48,
+    label: "Sync data",
+    summary: "Pull the latest records"
+  },
   { id: "retry", type: "delay", x: 344, y: 240, label: "Wait 10 minutes" },
   { id: "notify", type: "task", x: 648, y: 48, label: "Notify team", summary: "Email the summary" },
   { id: "halt", type: "stop", x: 648, y: 240, label: "Stop", summary: "Give up for tonight" }
@@ -50,7 +57,7 @@ const edges: NodeGraphEdge[] = [
 const meta: Meta = {
   title: "Node graph/Editor",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: (args) => html`
     <fluid-node-graph
       style="height: 480px"
@@ -132,14 +139,21 @@ export const AddingNodes: Story = {
   render: () => {
     let counter = 0;
     const add = (event: Event, type: string) => {
-      const graph = (event.currentTarget as HTMLElement)
-        .parentElement?.querySelector("fluid-node-graph");
+      const graph = (event.currentTarget as HTMLElement).parentElement?.querySelector(
+        "fluid-node-graph"
+      );
       if (!graph) return;
       counter += 1;
       const jitter = (counter % 5) * 24;
       graph.nodes = [
         ...graph.nodes,
-        { id: `new-${counter}`, type, x: 344 + jitter, y: 120 + jitter, label: `New ${type} ${counter}` }
+        {
+          id: `new-${counter}`,
+          type,
+          x: 344 + jitter,
+          y: 120 + jitter,
+          label: `New ${type} ${counter}`
+        }
       ];
     };
     return html`

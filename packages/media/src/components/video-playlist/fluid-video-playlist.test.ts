@@ -1,5 +1,6 @@
 import { expect, fixture, html, elementUpdated } from "@open-wc/testing";
 import "./define.js";
+import storyMeta from "./fluid-video-playlist.stories.js";
 import type { FluidVideoPlaylist, PlaylistEntry } from "./fluid-video-playlist.js";
 
 const ENTRIES: PlaylistEntry[] = [
@@ -75,6 +76,45 @@ describe("<fluid-video-playlist>", () => {
     expect(active.textContent!.trim()).to.equal("One");
   });
 
+  it("does not autoplay on arrival, but does once an entry is chosen", async () => {
+    const el = await fixture<FluidVideoPlaylist>(
+      html`<fluid-video-playlist .entries=${ENTRIES}></fluid-video-playlist>`
+    );
+    const video = el.shadowRoot!.querySelector("fluid-video")!;
+
+    /* A playlist that starts playing on mount makes any page carrying one begin
+       moving on its own, and with auto-advance it then walks the whole list.
+       Motion the viewer did not ask for is what WCAG 2.2.2 is about. */
+    expect(video.hasAttribute("autoplay"), "must not autoplay on mount").to.be.false;
+
+    el.goTo(1);
+    await elementUpdated(el);
+    expect(
+      el.shadowRoot!.querySelector("fluid-video")!.hasAttribute("autoplay"),
+      "a chosen entry should play"
+    ).to.be.true;
+  });
+
+  it("keeps the entry list hugging its entries instead of stretching", async () => {
+    const el = await fixture<FluidVideoPlaylist>(
+      html`<fluid-video-playlist .entries=${ENTRIES}></fluid-video-playlist>`
+    );
+    await elementUpdated(el);
+    const list = el.shadowRoot!.querySelector<HTMLElement>(".list")!;
+
+    /* As a grid item the list stretched to the player's height, so a short
+       playlist drew a tall bordered box with the entries huddled at the top and
+       an empty region beneath them. */
+    expect(getComputedStyle(list).alignSelf).to.equal("start");
+    const items = [...el.shadowRoot!.querySelectorAll<HTMLElement>(".item")];
+    const contentHeight = items.reduce((n, item) => n + item.getBoundingClientRect().height, 0);
+    const slack = list.getBoundingClientRect().height - contentHeight;
+    expect(
+      slack,
+      `the list has ${slack.toFixed(1)}px of dead space below its entries`
+    ).to.be.at.most(4);
+  });
+
   it("clamps goTo to valid bounds", async () => {
     const el = await makePlaylist();
     el.goTo(-1);
@@ -90,7 +130,9 @@ describe("<fluid-video-playlist>", () => {
   });
 
   it("does NOT emit fluid-change on initial mount", async () => {
-    const el = await fixture<FluidVideoPlaylist>(html`<fluid-video-playlist></fluid-video-playlist>`);
+    const el = await fixture<FluidVideoPlaylist>(
+      html`<fluid-video-playlist></fluid-video-playlist>`
+    );
     let fired = false;
     el.addEventListener("fluid-change", () => (fired = true));
     el.entries = ENTRIES;
@@ -150,7 +192,9 @@ describe("<fluid-video-playlist>", () => {
     endCurrentClip(el);
     await elementUpdated(el);
     expect(seen).to.deep.equal([1]);
-    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal("Two");
+    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal(
+      "Two"
+    );
   });
 
   it("rejects fractional and non-finite indexes without emitting change", async () => {
@@ -160,7 +204,36 @@ describe("<fluid-video-playlist>", () => {
     for (const index of [0.5, NaN, Infinity, -Infinity]) el.goTo(index);
     await elementUpdated(el);
     expect(seen).to.deep.equal([]);
-    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal("One");
+    expect(el.shadowRoot!.querySelector('[aria-pressed="true"]')!.textContent!.trim()).to.equal(
+      "One"
+    );
+  });
+
+  it("ships demo entries that reach the native player, and switches them", async () => {
+    // Regression guard. The demo fixtures used to carry sources the browser can
+    // never fetch (empty strings in the story, a dead third-party bucket in the
+    // playground). Both render as a black box with working controls and no
+    // frame, because fluid-video drops an empty src and the native element
+    // reports MEDIA_ERR_SRC_NOT_SUPPORTED for an unfetchable one.
+    const renderStory = storyMeta.render as unknown as () => HTMLElement;
+    const el = (await fixture(renderStory())) as FluidVideoPlaylist;
+    await elementUpdated(el);
+    const entries = el.entries;
+    expect(entries.length).to.be.greaterThan(1);
+    for (const entry of entries) {
+      expect(entry.src, "demo entry src must not be empty").to.be.a("string").and.not.equal("");
+      expect(entry.src.startsWith("/"), `${entry.src} must be a locally served asset`).to.be.true;
+    }
+
+    const player = el.shadowRoot!.querySelector("fluid-video")!;
+    await elementUpdated(player);
+    const native = player.shadowRoot!.querySelector("video")!;
+    expect(native.getAttribute("src")).to.equal(entries[0]!.src);
+
+    el.goTo(1);
+    await elementUpdated(el);
+    await elementUpdated(player);
+    expect(native.getAttribute("src")).to.equal(entries[1]!.src);
   });
 
   it("keeps selection and the player name valid when entries shrink", async () => {

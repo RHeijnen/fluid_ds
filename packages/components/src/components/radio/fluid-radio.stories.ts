@@ -10,7 +10,7 @@ type Args = Pick<FluidRadioGroup, "value" | "orientation" | "required">;
 const meta: Meta<Args> = {
   title: "Components/Forms/Radio",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     orientation: { control: "inline-radio", options: ["vertical", "horizontal"] },

@@ -19,11 +19,13 @@ color/contrast, theming, focus rings, a component not upgrading, or any
 "it looks different in X than Y" report.
 
 Do NOT:
+
 - Theorize a root cause from the source code alone and present it as the answer.
 - Blame cache, "stale build", or "it should work now" without checking.
 - Say "this is fixed" after editing CSS without re-measuring the rendered result.
 
 DO:
+
 - Open the actual page, read the actual computed values, find the actual number
   that's wrong, then fix the thing that produces that number.
 
@@ -43,8 +45,8 @@ DO:
    - `slot.assignedNodes({flatten:true})` to see what's actually slotted (this is
      how we found the `<p>` wrapper),
    - a `Range` or an inserted probe element to measure a text line box.
-   Compare the broken surface against the good one (e.g. docs vs Storybook):
-   diff the numbers.
+     Compare the broken surface against the good one (e.g. docs vs Storybook):
+     diff the numbers.
 4. **Screenshot** (`take_screenshot`) when the geometry numbers look fine but it
    still "looks wrong", your eyes catch things `getComputedStyle` won't, and it
    confirms what's actually on screen vs what you assume is.
@@ -57,6 +59,7 @@ DO:
 ## Worked example (the button)
 
 Symptom: docs button looked taller/misaligned vs Storybook.
+
 - Probe 1: `getBoundingClientRect().height` → 48.8px in docs, 32.8px in Storybook.
   (Established it's real and quantified, not cache.)
 - Probe 2: measured slots → the default slot's assigned node was a `<P>`, not a

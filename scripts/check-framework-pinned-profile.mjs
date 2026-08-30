@@ -44,11 +44,7 @@ export function aggregateArtifactHash(hashes) {
 export function validatePinnedProfile(profile) {
   assert.equal(profile.schemaVersion, 1, "Unsupported pinned framework profile schema");
   assert.equal(profile.packageManager, "pnpm@9.15.0", "Pinned pnpm profile drifted");
-  assert.match(
-    profile.rootBaseRevision,
-    /^[0-9a-f]{40}$/,
-    "Missing exact root base revision"
-  );
+  assert.match(profile.rootBaseRevision, /^[0-9a-f]{40}$/, "Missing exact root base revision");
   assert.match(profile.rootLockSha256, /^[0-9a-f]{64}$/, "Missing exact root lock hash");
   assert.equal(profile.lanes?.length, 7, "Pinned profile must contain exactly seven lanes");
   assert.deepEqual(

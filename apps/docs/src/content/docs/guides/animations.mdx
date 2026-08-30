@@ -12,10 +12,16 @@ Fluid has **two layers of motion**:
    tabs / segmented-control slide their active indicator. You don't wire anything;
    it's part of the component. Every bit of it is **token-driven, swappable, and
    opt-out-able** (below).
-2. **Element motion (`@fluid-ds/animations`).** An opt-in package to animate *any*
+2. **Element motion (`@fluid-ds/animations`).** An opt-in package to animate _any_
    element declaratively via `data-fluid-animation`, reveal-on-scroll, attention
    pulses, etc. (covered further down). For one-off imperative motion, the core
    [`<fluid-animation>`](/components/animation/) element wraps the Web Animations API.
+
+The same `@fluid-ds/animations` package carries a third, separate thing: a
+canvas **[event-effects engine](/expansion/animations-effects/)** with 31 named
+celebration effects (confetti, fireworks, snow, butterflies, and so on) plus a
+`<fluid-celebrate>` wrapper. That is one-off celebration, not element motion, so
+it has its own page.
 
 ---
 
@@ -26,15 +32,15 @@ color and shape. Two things are tokenized: **timing** and **which animation runs
 
 **Shared motion tokens** (`@fluid-ds/tokens`, theme-independent):
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `--fluid-duration-fast` / `-normal` / `-slow` / `-slower` | 120 / 200 / 320 / 480 ms | timing steps |
-| `--fluid-easing-standard` | `cubic-bezier(0.2,0,0,1)` | general |
-| `--fluid-easing-decelerate` | `cubic-bezier(0,0,0,1)` | enter (things appearing) |
-| `--fluid-easing-accelerate` | `cubic-bezier(0.3,0,1,1)` | exit (things leaving) |
-| `--fluid-easing-emphasized` | `cubic-bezier(0.05,0.7,0.1,1)` | expressive enter (large panels) |
+| Token                                                     | Value                          | Use                             |
+| --------------------------------------------------------- | ------------------------------ | ------------------------------- |
+| `--fluid-duration-fast` / `-normal` / `-slow` / `-slower` | 120 / 200 / 320 / 480 ms       | timing steps                    |
+| `--fluid-easing-standard`                                 | `cubic-bezier(0.2,0,0,1)`      | general                         |
+| `--fluid-easing-decelerate`                               | `cubic-bezier(0,0,0,1)`        | enter (things appearing)        |
+| `--fluid-easing-accelerate`                               | `cubic-bezier(0.3,0,1,1)`      | exit (things leaving)           |
+| `--fluid-easing-emphasized`                               | `cubic-bezier(0.05,0.7,0.1,1)` | expressive enter (large panels) |
 
-**Swap which animation a component uses.** The animation *name* is itself a token,
+**Swap which animation a component uses.** The animation _name_ is itself a token,
 so point it at any of the shipped presets (`fluid-fade-in/out`, `fluid-scale-in/out`,
 `fluid-slide-in-{up,down,left,right}` + `-out`):
 
@@ -53,8 +59,12 @@ so point it at any of the shipped presets (`fluid-fade-in/out`, `fluid-scale-in/
 element):
 
 ```css
-:root { --fluid-motion: 0; }          /* off everywhere */
-.calm-section { --fluid-motion: 0.5; } /* half-speed in one region */
+:root {
+  --fluid-motion: 0;
+} /* off everywhere */
+.calm-section {
+  --fluid-motion: 0.5;
+} /* half-speed in one region */
 ```
 
 Or disable a single component's animation by name: `--fluid-dialog-enter-animation: none`.
@@ -93,10 +103,7 @@ move, then paste the attribute(s) onto the matching element in your app.
   src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/register-defaults.js"
 ></script>
 
-<fluid-card
-  data-fluid-animation="fade-in"
-  data-fluid-animation-trigger="in-view"
->
+<fluid-card data-fluid-animation="fade-in" data-fluid-animation-trigger="in-view">
   Fades in when scrolled into view.
 </fluid-card>
 ```
@@ -109,7 +116,7 @@ pnpm add @fluid-ds/animations
 
 ```ts
 import "@fluid-ds/animations/define/controller"; // boots the global controller
-import "@fluid-ds/animations/register-defaults"; // 12 default animations
+import "@fluid-ds/animations/register-defaults"; // 18 default animations
 ```
 
 If you only want a couple of the defaults, skip `register-defaults` and
@@ -123,14 +130,14 @@ import "@fluid-ds/animations/animations/slide-up";
 
 ## Attributes
 
-| Attribute                            | Purpose                                              | Default     |
-| ------------------------------------ | ---------------------------------------------------- | ----------- |
-| `data-fluid-animation`               | Animation name from the registry                     | required    |
-| `data-fluid-animation-trigger`       | `mount` / `in-view` / `hover` / `click` / `manual`   | `mount`     |
-| `data-fluid-animation-duration`      | Milliseconds                                         | per-anim    |
-| `data-fluid-animation-delay`         | Milliseconds                                         | `0`         |
-| `data-fluid-animation-easing`        | Any CSS easing function                              | per-anim    |
-| `data-fluid-animation-iterations`    | Integer or `infinite`                                | per-anim    |
+| Attribute                         | Purpose                                            | Default  |
+| --------------------------------- | -------------------------------------------------- | -------- |
+| `data-fluid-animation`            | Animation name from the registry                   | required |
+| `data-fluid-animation-trigger`    | `mount` / `in-view` / `hover` / `click` / `manual` | `mount`  |
+| `data-fluid-animation-duration`   | Milliseconds                                       | per-anim |
+| `data-fluid-animation-delay`      | Milliseconds                                       | `0`      |
+| `data-fluid-animation-easing`     | Any CSS easing function                            | per-anim |
+| `data-fluid-animation-iterations` | Integer or `infinite`                              | per-anim |
 
 Triggers in detail:
 
@@ -144,17 +151,18 @@ Triggers in detail:
 
 ## The default animations
 
-The `register-defaults` entry registers thirteen animations:
+The `register-defaults` entry registers eighteen animations:
 
-| Category   | Names                                                                |
-| ---------- | -------------------------------------------------------------------- |
-| Reveals    | `fade-in`, `fade-out`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale-in`, `zoom-in` |
-| Attention  | `pulse`, `shake`, `bounce`, `flash`                                  |
-| Loaders    | `spin`                                                               |
+| Category  | Names                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------- |
+| Reveals   | `fade-in`, `fade-out`, `slide-up`, `slide-down`, `slide-left`, `slide-right`, `scale-in`, `zoom-in` |
+| Attention | `pulse`, `shake`, `bounce`, `flash`, `wobble`, `jello`, `heartbeat`, `rubber-band`, `tada`          |
+| Loaders   | `spin`                                                                                              |
 
-Live demos for each animation live in **[Storybook → Animations][sb]**.
+Live demos for every preset, using its real default timing, live in the
+**[standalone animation lab][lab]**.
 
-[sb]: https://your-deploy-host/storybook/?path=/story/animations-overview--catalog
+[lab]: /animations.html
 
 ## Per-component examples
 
@@ -166,24 +174,28 @@ These are attribute-only, there's nothing component-specific to wire.
   data-fluid-animation="slide-up"
   data-fluid-animation-trigger="in-view"
   data-fluid-animation-delay="0"
->…</fluid-card>
+  >…</fluid-card
+>
 <fluid-card
   data-fluid-animation="slide-up"
   data-fluid-animation-trigger="in-view"
   data-fluid-animation-delay="120"
->…</fluid-card>
+  >…</fluid-card
+>
 <fluid-card
   data-fluid-animation="slide-up"
   data-fluid-animation-trigger="in-view"
   data-fluid-animation-delay="240"
->…</fluid-card>
+  >…</fluid-card
+>
 
 <!-- A subtle pulse on a CTA, looping. -->
 <fluid-button
   data-fluid-animation="pulse"
   data-fluid-animation-trigger="mount"
   data-fluid-animation-iterations="infinite"
->Sign up free</fluid-button>
+  >Sign up free</fluid-button
+>
 
 <!-- Shake an input on a failed submission attempt. -->
 <fluid-input
@@ -224,9 +236,8 @@ element.
 ## Reduced motion
 
 <Aside type="tip">
-The controller respects `prefers-reduced-motion: reduce`. Animations
-collapse to a 0&nbsp;ms tick that lands on the final frame, users get
-the static end state, never the motion.
+  The controller respects `prefers-reduced-motion: reduce`. Animations collapse to a 0&nbsp;ms tick
+  that lands on the final frame, users get the static end state, never the motion.
 </Aside>
 
 You don't have to gate the attributes yourself or wrap them in a media
@@ -260,7 +271,7 @@ import {
   manually (importing `@fluid-ds/animations/define/controller` does this
   for you)
 
-## When *not* to use this
+## When _not_ to use this
 
 - For component-internal motion (the focus ring on a button, the slide
   on a tabs indicator), that's part of the component and lives in its
@@ -275,7 +286,7 @@ import {
 
 ## Theming consideration
 
-Durations and easings *could* be wired through the
+Durations and easings _could_ be wired through the
 `--fluid-duration-*` and `--fluid-easing-*` semantic tokens, they're
 defined in `@fluid-ds/tokens`. Today the default animations use
 hand-picked values per animation; a future revision may expose

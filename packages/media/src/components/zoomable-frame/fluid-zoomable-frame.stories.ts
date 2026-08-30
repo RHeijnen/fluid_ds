@@ -10,7 +10,7 @@ const SAMPLE_TWO =
 const meta: Meta = {
   title: "Media/ZoomableFrame",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-zoomable-frame style="width: 32rem; height: 20rem;">
       <img src=${SAMPLE_ONE} alt="Zoomable sample illustration" />

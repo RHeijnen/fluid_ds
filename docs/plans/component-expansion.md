@@ -16,6 +16,7 @@ speed-dial (FAB), pricing-table.
 **`@fluid-ds/media`** (existing pack): audio player, lightbox / gallery.
 
 **New expansion packs** (domain-specific, heavier deps):
+
 - `@fluid-ds/table` — data grid (sort / filter / select / virtualize).
 - `@fluid-ds/calendar` — event calendar (month / week / day views), distinct
   from the booking `@fluid-ds/scheduler`.

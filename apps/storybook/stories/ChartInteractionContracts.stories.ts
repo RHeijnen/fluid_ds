@@ -27,18 +27,31 @@ function chartType(tag: string): ChartType {
   return tag.replace("fluid-", "").replace("-chart", "") as ChartType;
 }
 
-function isArc(type: ChartType) { return ["pie", "doughnut", "polarArea"].includes(type); }
+function isArc(type: ChartType) {
+  return ["pie", "doughnut", "polarArea"].includes(type);
+}
 
 function chartData(type: ChartType, updated = false): ChartData {
-  const values = type === "scatter" ? [{ x: 1, y: updated ? 9 : 3 }, { x: 2, y: 7 }]
-    : type === "bubble" ? [{ x: 1, y: updated ? 9 : 3, r: 5 }, { x: 2, y: 7, r: 8 }]
-    : [updated ? 9 : 3, 7, 5];
+  const values =
+    type === "scatter"
+      ? [
+          { x: 1, y: updated ? 9 : 3 },
+          { x: 2, y: 7 }
+        ]
+      : type === "bubble"
+        ? [
+            { x: 1, y: updated ? 9 : 3, r: 5 },
+            { x: 2, y: 7, r: 8 }
+          ]
+        : [updated ? 9 : 3, 7, 5];
   return {
     labels: [updated ? "Updated North" : "North", "South", "West"],
-    datasets: isArc(type) ? [{ data: values }] : [
-      { label: updated ? "Updated revenue" : "Revenue", data: values },
-      { label: "Costs", data: values }
-    ]
+    datasets: isArc(type)
+      ? [{ data: values }]
+      : [
+          { label: updated ? "Updated revenue" : "Revenue", data: values },
+          { label: "Costs", data: values }
+        ]
   } as ChartData;
 }
 
@@ -54,12 +67,16 @@ function renderChart(tag: string) {
       </${element}>
       <button>After chart</button>
       <button @click=${(event: Event) => {
-        const chart = (event.currentTarget as HTMLElement).closest("section")!.querySelector<FluidChart>(tag)!;
+        const chart = (event.currentTarget as HTMLElement)
+          .closest("section")!
+          .querySelector<FluidChart>(tag)!;
         chart.data = chartData(type, true);
         chart.querySelector('[slot="fallback"]')!.textContent = "North: 9. South: 7. West: 5.";
       }}>Update chart data</button>
       <button @click=${(event: Event) => {
-        const chart = (event.currentTarget as HTMLElement).closest("section")!.querySelector<FluidChart>(tag)!;
+        const chart = (event.currentTarget as HTMLElement)
+          .closest("section")!
+          .querySelector<FluidChart>(tag)!;
         const next = chart.nextSibling;
         const parent = chart.parentNode!;
         chart.remove();
@@ -72,15 +89,21 @@ function renderChart(tag: string) {
 async function exerciseChart(canvas: HTMLElement, tag: string) {
   const chart = canvas.querySelector<FluidChart>(tag)!;
   const button = () => chart.shadowRoot!.querySelector<HTMLButtonElement>("button")!;
-  const visible = () => isArc(chart.type) ? chart.instance!.getDataVisibility(0) : chart.instance!.isDatasetVisible(0);
+  const visible = () =>
+    isArc(chart.type) ? chart.instance!.getDataVisibility(0) : chart.instance!.isDatasetVisible(0);
   const events: CustomEvent<{ visible: boolean; label: string }>[] = [];
-  const record = (event: Event) => events.push(event as CustomEvent<{ visible: boolean; label: string }>);
+  const record = (event: Event) =>
+    events.push(event as CustomEvent<{ visible: boolean; label: string }>);
   chart.addEventListener("fluid-legend-change", record);
   try {
     await waitFor(() => expect(button()).not.toBeNull());
-    await expect(chart.shadowRoot!.querySelector("canvas")!.getAttribute("aria-label")).toBe("Regional results");
+    await expect(chart.shadowRoot!.querySelector("canvas")!.getAttribute("aria-label")).toBe(
+      "Regional results"
+    );
     await expect(button().getBoundingClientRect().height).toBeGreaterThanOrEqual(24);
-    await expect(chart.shadowRoot!.querySelector("canvas")!.getBoundingClientRect().height).toBeGreaterThan(0);
+    await expect(
+      chart.shadowRoot!.querySelector("canvas")!.getBoundingClientRect().height
+    ).toBeGreaterThan(0);
     await userEvent.click(button());
     await waitFor(() => expect(button().getAttribute("aria-pressed")).toBe("false"));
     await expect(visible()).toBe(false);
@@ -105,55 +128,86 @@ async function exerciseChart(canvas: HTMLElement, tag: string) {
       )
     );
     await expect(events.map((event) => event.detail.visible)).toEqual([false, true, false, true]);
-    await expect(events.every((event) => event.target === chart && event.bubbles && event.composed)).toBe(true);
+    await expect(
+      events.every((event) => event.target === chart && event.bubbles && event.composed)
+    ).toBe(true);
     await expect(chart.querySelector('[slot="fallback"]')!.textContent).toContain("North: 9");
-  } finally { chart.removeEventListener("fluid-legend-change", record); }
+  } finally {
+    chart.removeEventListener("fluid-legend-change", record);
+  }
 }
 
 export const GenericChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-chart" } },
   render: () => renderChart("fluid-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-chart");
+  }
 };
 export const BarChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-bar-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-bar-chart" } },
   render: () => renderChart("fluid-bar-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-bar-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-bar-chart");
+  }
 };
 export const LineChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-line-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-line-chart" } },
   render: () => renderChart("fluid-line-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-line-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-line-chart");
+  }
 };
 export const PieChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-pie-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-pie-chart" } },
   render: () => renderChart("fluid-pie-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-pie-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-pie-chart");
+  }
 };
 export const DoughnutChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-doughnut-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-doughnut-chart" } },
   render: () => renderChart("fluid-doughnut-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-doughnut-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-doughnut-chart");
+  }
 };
 export const RadarChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-radar-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-radar-chart" } },
   render: () => renderChart("fluid-radar-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-radar-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-radar-chart");
+  }
 };
 export const PolarAreaChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-polar-area-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-polar-area-chart" } },
   render: () => renderChart("fluid-polar-area-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-polar-area-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-polar-area-chart");
+  }
 };
 export const ScatterChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-scatter-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-scatter-chart" } },
   render: () => renderChart("fluid-scatter-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-scatter-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-scatter-chart");
+  }
 };
 export const BubbleChartContract: Story = {
-  tags: ["interaction-contract"], parameters: { quality: { componentTag: "fluid-bubble-chart" } },
+  tags: ["interaction-contract"],
+  parameters: { quality: { componentTag: "fluid-bubble-chart" } },
   render: () => renderChart("fluid-bubble-chart"),
-  play: async ({ canvasElement }) => { await exerciseChart(canvasElement, "fluid-bubble-chart"); }
+  play: async ({ canvasElement }) => {
+    await exerciseChart(canvasElement, "fluid-bubble-chart");
+  }
 };
 
 export const GenericKeyboardFixture: Story = { render: GenericChartContract.render };

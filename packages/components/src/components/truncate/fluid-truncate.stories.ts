@@ -17,7 +17,7 @@ sunt in culpa qui officia deserunt mollit anim id est laborum.`;
 const meta: Meta<Args> = {
   title: "Components/Content/Truncate",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     lines: { control: { type: "number", min: 1, max: 10 } },
     expanded: { control: "boolean" },

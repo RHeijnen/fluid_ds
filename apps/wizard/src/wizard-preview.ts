@@ -96,8 +96,8 @@ export class WizardPreview extends LitElement {
       border-radius: var(--fluid-radius-full);
       background: var(--fluid-accent-base);
       box-shadow: 0 0 0 0 color-mix(in srgb, var(--fluid-accent-base) 50%, transparent);
-      animation: motion-sweep calc(1s * var(--fluid-motion, 1)) var(--fluid-easing-emphasized, ease-in-out)
-        infinite alternate;
+      animation: motion-sweep calc(1s * var(--fluid-motion, 1))
+        var(--fluid-easing-emphasized, ease-in-out) infinite alternate;
     }
     /* Sweep left↔right across the track with a gentle squash + glow pulse. */
     @keyframes motion-sweep {
@@ -172,8 +172,7 @@ export class WizardPreview extends LitElement {
     // prefers-color-scheme snippet for real apps).
     const dark =
       config.scheme === "dark" ||
-      (config.scheme === "auto" &&
-        window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+      (config.scheme === "auto" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
     root.setAttribute("data-fluid-theme", dark ? "dark" : "light");
     if (config.preset && config.preset !== "custom" && config.preset !== "default") {
       root.setAttribute("data-fluid-brand", config.preset);
@@ -216,8 +215,8 @@ export class WizardPreview extends LitElement {
           <fluid-card>
             <h3 slot="header" style="margin:0;font-size:var(--fluid-font-size-lg);">Card title</h3>
             <p class="muted">
-              Buttons, links, focus rings, and surfaces all follow the accent and
-              scheme you choose. This is what your app will look like.
+              Buttons, links, focus rings, and surfaces all follow the accent and scheme you choose.
+              This is what your app will look like.
             </p>
             <div slot="footer" class="row" style="justify-content:flex-end;">
               <fluid-button variant="ghost" size="sm">Cancel</fluid-button>

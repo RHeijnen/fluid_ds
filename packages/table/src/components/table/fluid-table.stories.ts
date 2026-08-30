@@ -20,7 +20,7 @@ const rows: FluidTableRow[] = [
 const meta: Meta = {
   title: "Table/Data table",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-table
       caption="Contributors"

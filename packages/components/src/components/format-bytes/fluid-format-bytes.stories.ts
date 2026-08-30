@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Bytes",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -21,9 +21,7 @@ export const Default: Story = {
         binary 1,234,567:
         <fluid-format-bytes value="1234567" base="binary"></fluid-format-bytes>
       </li>
-      <li>
-        long: <fluid-format-bytes value="1234567" display="long"></fluid-format-bytes>
-      </li>
+      <li>long: <fluid-format-bytes value="1234567" display="long"></fluid-format-bytes></li>
       <li>bits: <fluid-format-bytes value="125000" unit="bit"></fluid-format-bytes>/s</li>
     </ul>
   `

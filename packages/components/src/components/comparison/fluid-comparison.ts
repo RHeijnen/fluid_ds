@@ -33,7 +33,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @fires fluid-position-change - Fired during drag; detail = { position }.
  * @cssproperty --fluid-comparison-shadow-md - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidComparison extends FluidElement {
   static override styles = css`
     :host {

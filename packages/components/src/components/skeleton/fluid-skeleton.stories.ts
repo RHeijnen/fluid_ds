@@ -8,7 +8,7 @@ type Args = Pick<FluidSkeleton, "effect">;
 const meta: Meta<Args> = {
   title: "Components/Feedback/Skeleton",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     effect: { control: "inline-radio", options: ["pulse", "sheen", "none"] }
   },

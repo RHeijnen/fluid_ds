@@ -2,8 +2,10 @@ import { FluidTabs } from "./fluid-tabs.js";
 import { FluidTab } from "./fluid-tab.js";
 import { FluidTabPanel } from "./fluid-tab-panel.js";
 
-if (typeof customElements !== "undefined" && !customElements.get("fluid-tabs")) customElements.define("fluid-tabs", FluidTabs);
-if (typeof customElements !== "undefined" && !customElements.get("fluid-tab")) customElements.define("fluid-tab", FluidTab);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tabs"))
+  customElements.define("fluid-tabs", FluidTabs);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-tab"))
+  customElements.define("fluid-tab", FluidTab);
 if (typeof customElements !== "undefined" && !customElements.get("fluid-tab-panel"))
   customElements.define("fluid-tab-panel", FluidTabPanel);
 

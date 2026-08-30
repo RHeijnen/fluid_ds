@@ -30,14 +30,18 @@ of the brand and component scopes without fighting them.
 
 <Demo title="One button overridden, its neighbor untouched">
   <fluid-button>Default</fluid-button>
-  <fluid-button data-fluid-id="primary-cta"
-    style="--fluid-button-bg: linear-gradient(90deg,#6366f1,#22d3ee); --fluid-button-text:#fff; --fluid-button-radius:999px;">
+  <fluid-button
+    data-fluid-id="primary-cta"
+    style="--fluid-button-bg: linear-gradient(90deg,#6366f1,#22d3ee); --fluid-button-text:#fff; --fluid-button-radius:999px;"
+  >
     Get started
   </fluid-button>
 </Demo>
 
-<small>(The demo sets the tokens inline to keep the example self-contained; in
-your app you'd put them in the `[data-fluid-id="primary-cta"]` rule above.)</small>
+<small>
+  (The demo sets the tokens inline to keep the example self-contained; in your app you'd put them in
+  the `[data-fluid-id="primary-cta"]` rule above.)
+</small>
 
 ## Why an attribute, not a class
 
@@ -50,13 +54,14 @@ overrides are:
 
 It also never collides with utility classes or CSS-in-JS hashes.
 
-## Let the Theme builder write it
+## Let the Theme builder find the tokens
 
-You don't have to hand-author these. Open the [Theme builder](/playground/),
+You don't have to guess token names. Open the [Theme builder](/playground/),
 click any component to **isolate** it, and tweak its tokens visually. The
-builder stamps a stable `data-fluid-id` on the element and emits exactly the
-scoped rule above, ready to paste into your stylesheet. It's the fastest way to
-land a one-off without guessing token names.
+builder emits a **component-scoped** rule (`fluid-button { ... }`) that reaches
+every instance, the middle rung of the ladder. For a one-off, copy the
+declarations out of that rule into your own `[data-fluid-id="..."]` selector,
+and only the tagged element changes. Same tokens, one rung narrower.
 
 ## Where to go next
 

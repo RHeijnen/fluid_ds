@@ -10,7 +10,7 @@ type Args = Pick<FluidNavList, "label">;
 const meta: Meta<Args> = {
   title: "Components/Navigation/Nav list",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     label: { control: "text" }
   },

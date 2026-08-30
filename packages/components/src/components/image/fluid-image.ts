@@ -48,7 +48,7 @@ export type FluidImageLoading = "eager" | "lazy";
  * @fires fluid-error - Dispatched when the image fails to load (after the
  *   fallback src, if any, also fails).
  * @cssproperty --fluid-image-text-secondary - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidImage extends FluidElement {
   static override styles = [
     css`
@@ -146,9 +146,7 @@ export class FluidImage extends FluidElement {
   private handleLoad = (): void => {
     this.loaded = true;
     this.errored = false;
-    this.dispatchEvent(
-      new CustomEvent("fluid-load", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent("fluid-load", { bubbles: true, composed: true }));
   };
 
   private handleError = (): void => {
@@ -158,14 +156,11 @@ export class FluidImage extends FluidElement {
       return;
     }
     this.errored = true;
-    this.dispatchEvent(
-      new CustomEvent("fluid-error", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent("fluid-error", { bubbles: true, composed: true }));
   };
 
   override render(): TemplateResult {
-    const currentSrc =
-      this.usingFallback && this.fallback ? this.fallback : this.src;
+    const currentSrc = this.usingFallback && this.fallback ? this.fallback : this.src;
 
     const hostStyle = styleMap({
       width: this.width ? `${this.width}px` : undefined,

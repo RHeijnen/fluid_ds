@@ -11,7 +11,7 @@ type Args = Pick<FluidCallout, "variant" | "dismissible"> & {
 const meta: Meta<Args> = {
   title: "Components/Feedback/Callout",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     variant: {
       control: "inline-radio",
@@ -67,4 +67,24 @@ export const AllVariants: Story = {
 
 export const Dismissible: Story = {
   args: { dismissible: true }
+};
+
+/** Prose with inline links must flow as one paragraph, links do not get their
+ *  own lines. Regression story for the slot-in-flex blockification bug. */
+export const InlineLinks: Story = {
+  render: () => html`
+    <fluid-callout variant="info">
+      <span slot="header">Theming is the whole point</span>
+      Change a brand variable and everything reflows. The
+      <a href="#theming">theming guide</a> has the full model, and the
+      <a href="#builder">theme builder</a> lets you design a brand right in the browser.
+    </fluid-callout>
+  `
+};
+
+/** No header slotted: the body must sit flush, with no phantom gap row. */
+export const BodyOnly: Story = {
+  render: () => html`
+    <fluid-callout variant="success">Saved. Your changes are live.</fluid-callout>
+  `
 };

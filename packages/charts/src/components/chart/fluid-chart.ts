@@ -17,6 +17,8 @@ Chart.register(...registerables);
 
 /** Cartesian types get x/y grid + tick theming; radial/arc types don't. */
 const CARTESIAN = new Set<ChartType>(["line", "bar", "scatter", "bubble"]);
+/* Charts whose arcs are laid out radially rather than on an x/y grid. */
+const RADIAL = new Set<ChartType>(["doughnut", "pie", "polarArea"]);
 
 /** #rgb / #rrggbb → rgba() string (passes through anything non-hex). */
 function rgba(hex: string, alpha: number): string {
@@ -86,6 +88,8 @@ interface FluidTheme {
  * @fires fluid-legend-change - A legend control was activated. Detail includes label, visible, datasetIndex or index.
  *
  * @cssproperty --fluid-chart-height - Default height of the chart. Falls back to 16rem.
+ * @cssproperty --fluid-chart-padding - Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.
+ * @cssproperty --fluid-chart-doughnut-shadow - Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.
  * @cssproperty --fluid-chart-legend-gap - Space between legend controls.
  * @cssproperty --fluid-chart-legend-bg - Legend control background.
  * @cssproperty --fluid-chart-legend-fg - Legend text color.
@@ -259,6 +263,51 @@ export class FluidChart extends FluidElement {
     return this.chart;
   }
 
+  /** Did the consumer ask for a stacked bar chart? */
+  private isStacked(): boolean {
+    const scales = (this.options as { scales?: Record<string, { stacked?: boolean }> })?.scales;
+    if (!scales) return false;
+    return Object.values(scales).some((scale) => scale?.stacked === true);
+  }
+
+  /**
+   * Scriptable `borderRadius` for stacked bars: round the top of the topmost
+   * visible segment and the bottom of the bottommost one, leaving the joins
+   * between segments square so the column reads as a single rounded bar.
+   */
+  private stackedBarRadius(radius: number) {
+    return (ctx: { chart: Chart; datasetIndex: number; dataIndex: number }) => {
+      const { chart, datasetIndex, dataIndex } = ctx;
+      const valueAt = (i: number) => Number(chart.data.datasets[i]?.data?.[dataIndex] ?? 0);
+      if (!valueAt(datasetIndex)) return 0;
+      const filled = chart.data.datasets
+        .map((_, i) => i)
+        .filter((i) => chart.isDatasetVisible(i) && valueAt(i) !== 0);
+      const isBottom = filled[0] === datasetIndex;
+      const isTop = filled[filled.length - 1] === datasetIndex;
+      return {
+        topLeft: isTop ? radius : 0,
+        topRight: isTop ? radius : 0,
+        bottomLeft: isBottom ? radius : 0,
+        bottomRight: isBottom ? radius : 0
+      };
+    };
+  }
+
+  /**
+   * Re-read the Fluid tokens in scope and repaint.
+   *
+   * The chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /
+   * `data-fluid-conformance` change on the document element. Runtime theming
+   * that instead writes CSS custom properties onto an ANCESTOR (a theme
+   * builder, a scoped brand wrapper, an animated token transition) produces no
+   * attribute mutation and therefore no repaint, because there is no way to
+   * observe an inherited custom-property change. Call this after such a change.
+   */
+  refresh(): void {
+    this.retheme();
+  }
+
   /** Full re-theme (re-reads tokens, rebuilds gradients). */
   private retheme(): void {
     if (!this.chart) return;
@@ -342,6 +391,21 @@ export class FluidChart extends FluidElement {
         }
       };
     }
+    /*
+     * Drawing-area padding, overridable with --fluid-chart-padding.
+     *
+     * Radial charts (doughnut/pie/polar) default to a small inset: with
+     * maintainAspectRatio:false and no padding, Chart.js fits the ring flush
+     * to the canvas edges, so the arc touches the top and bottom and reads as
+     * cramped inside a card. The inset also leaves room for the doughnut's drop
+     * shadow. Cartesian charts default to none, since their axes already space
+     * the plot. Either way a consumer can set the token to any pixel value.
+     */
+    const padRaw = getComputedStyle(this).getPropertyValue("--fluid-chart-padding").trim();
+    const parsedPad = Number.parseFloat(padRaw);
+    base.layout = {
+      padding: Number.isFinite(parsedPad) ? parsedPad : RADIAL.has(this.type) ? 10 : 0
+    };
     if (this.type === "doughnut") base.cutout = "70%";
     return base as ChartOptions;
   }
@@ -361,19 +425,30 @@ export class FluidChart extends FluidElement {
       center && typeof center === "object" && "label" in center
         ? String((center as { label: unknown }).label)
         : null;
+    /*
+     * The ring drop shadow is opt-in, off by default. Drawn on the canvas, it
+     * spills past the plot area and is clipped by the tight edge, which looks
+     * worse than no shadow at all. A consumer (or a theme) turns it on by
+     * setting --fluid-chart-doughnut-shadow to a CSS color; leaving it unset,
+     * "none" or transparent means no shadow. When enabling it, give the chart
+     * room with --fluid-chart-padding so the softened edge is not cut off.
+     */
+    const shadow = getComputedStyle(this).getPropertyValue("--fluid-chart-doughnut-shadow").trim();
+    const hasShadow = shadow !== "" && shadow !== "none" && shadow !== "transparent";
     return [
       {
         id: "fluidArcDecor",
         beforeDatasetsDraw(chart) {
+          if (!hasShadow) return;
           const c = chart.ctx;
           c.save();
-          c.shadowColor = "rgba(2, 6, 23, 0.16)";
+          c.shadowColor = shadow;
           c.shadowBlur = 16;
           c.shadowOffsetY = 6;
         },
         afterDatasetsDraw: (chart) => {
           const c = chart.ctx;
-          c.restore(); // drop the shadow before drawing text
+          if (hasShadow) c.restore(); // drop the shadow before drawing text
           const ds = chart.data.datasets?.[0];
           const area = chart.chartArea;
           if (!ds || !area) return;
@@ -430,7 +505,12 @@ export class FluidChart extends FluidElement {
         if (ds.hoverOffset == null) ds.hoverOffset = 8;
       } else if (this.type === "bar") {
         if (ds.backgroundColor == null) ds.backgroundColor = color;
-        if (ds.borderRadius == null) ds.borderRadius = 6;
+        if (ds.borderRadius == null) {
+          // In a stack, rounding all four corners of every segment puts caps
+          // in the middle of the column. Round only the outer edges of each
+          // stack instead; grouped bars keep the plain radius.
+          ds.borderRadius = this.isStacked() ? this.stackedBarRadius(6) : 6;
+        }
       } else if (this.type === "line") {
         if (ds.borderColor == null) ds.borderColor = color;
         if (ds.pointBackgroundColor == null) ds.pointBackgroundColor = color;

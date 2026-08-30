@@ -27,7 +27,7 @@ const meta: Meta<Args> = {
   title: "Components/Forms/ColorPicker",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     value: { control: "color" },

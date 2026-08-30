@@ -1,7 +1,7 @@
 import { LitElement, html, css, type TemplateResult } from "lit";
 import { customElement, query, state } from "lit/decorators.js";
 import { themeStore } from "./store.js";
-import { elementOverridesStore } from "./element-overrides-store.js";
+import { componentOverridesStore } from "./component-overrides-store.js";
 
 /** Packages a consumer needs to use a Fluid theme. */
 const PACKAGES = ["@fluid-ds/components", "@fluid-ds/tokens", "@fluid-ds/icons"];
@@ -14,16 +14,16 @@ const BRAND_ATTR = `data-fluid-brand="custom"`;
 const BRAND_SELECTOR = `[${BRAND_ATTR}]`;
 
 /**
- * Assemble the export CSS: brand-wide block on top, per-element blocks
- * below. Per-element blocks select on `data-fluid-id`, which the playground
- * stamps on the isolated element and the consumer drops onto whichever real
- * element in their app should receive that look.
+ * Assemble the export CSS: brand-wide block on top, component-scoped blocks
+ * below. Component blocks select on the element tag itself (`fluid-button`),
+ * so the rule reaches every instance of that component, the component rung of
+ * the brand -> component -> instance override ladder.
  */
 function buildCss(): string {
   const brand = themeStore.toCSS(BRAND_SELECTOR);
-  const elements = elementOverridesStore.toCSS();
+  const elements = componentOverridesStore.toCSS();
   if (!elements) return brand;
-  const note = `/* Per-instance overrides, tag the matching element with the same\n   data-fluid-id and these vars will apply. The attribute name is\n   part of the Fluid namespace so it stays distinct from your own\n   class/id system. */`;
+  const note = `/* Component overrides, each rule targets the component's tag and\n   reaches every instance. To retheme a single instance instead, copy\n   the declarations into any selector of your own (a class, an id, an\n   attribute) that matches just that element. */`;
   return `${brand}\n\n${note}\n${elements}\n`;
 }
 
@@ -190,10 +190,10 @@ export class ExportPanel extends LitElement {
     const refresh = () => {
       this.css = buildCss();
       this.changeCount = Object.keys(themeStore.diff()).length;
-      this.elementCount = elementOverridesStore.size();
+      this.elementCount = componentOverridesStore.valueCount();
     };
     this.unsubscribeTheme = themeStore.subscribe(refresh);
-    this.unsubscribeElements = elementOverridesStore.subscribe(refresh);
+    this.unsubscribeElements = componentOverridesStore.subscribe(refresh);
   }
 
   override disconnectedCallback(): void {
@@ -254,13 +254,9 @@ export class ExportPanel extends LitElement {
       }
       const parts: string[] = [];
       if (this.changeCount > 0)
-        parts.push(
-          `${this.changeCount} brand override${this.changeCount === 1 ? "" : "s"}`
-        );
+        parts.push(`${this.changeCount} brand override${this.changeCount === 1 ? "" : "s"}`);
       if (this.elementCount > 0)
-        parts.push(
-          `${this.elementCount} isolated element${this.elementCount === 1 ? "" : "s"}`
-        );
+        parts.push(`${this.elementCount} isolated element${this.elementCount === 1 ? "" : "s"}`);
       return parts.join(" · ");
     })();
     return html`
@@ -277,11 +273,7 @@ export class ExportPanel extends LitElement {
         ${hasChanges ? html`<span class="count">${totalChanges}</span>` : ""}
       </button>
 
-      <fluid-dialog
-        size="lg"
-        aria-label="Use your theme"
-        @fluid-hide=${this.handleDialogHide}
-      >
+      <fluid-dialog size="lg" aria-label="Use your theme" @fluid-hide=${this.handleDialogHide}>
         <span slot="label">Use your theme</span>
 
         <div class="dialog-header">
@@ -290,16 +282,12 @@ export class ExportPanel extends LitElement {
 
         <ol class="steps">
           <li>
-            <div class="step-label">
-              <span class="step-num">1</span> Install the packages
-            </div>
+            <div class="step-label"><span class="step-num">1</span> Install the packages</div>
             <fluid-code-block .code=${this.installSnippet} language="bash"></fluid-code-block>
           </li>
 
           <li>
-            <div class="step-label">
-              <span class="step-num">2</span> Load it in your app entry
-            </div>
+            <div class="step-label"><span class="step-num">2</span> Load it in your app entry</div>
             <fluid-code-block .code=${this.setupSnippet} language="ts"></fluid-code-block>
           </li>
 
@@ -311,24 +299,18 @@ export class ExportPanel extends LitElement {
             <fluid-code-block .code=${this.css} language="css"></fluid-code-block>
             <p class="hint">
               ${hasChanges
-                ? html`Brand overrides activate when you add <code>${BRAND_ATTR}</code>
-                    to a wrapping element (e.g. <code>&lt;body&gt;</code>). Each
-                    isolated element rule targets a specific
-                    <code>data-fluid-id</code>, drop the same attribute on the
-                    matching element in your app to apply it.`
-                : html`No customizations yet, tweak some tokens in the sidebar and
-                    they'll appear here, scoped under <code>${BRAND_SELECTOR}</code>.
-                    Isolate any specific instance in Design mode to add per-element
-                    rules.`}
+                ? html`Brand overrides activate when you add <code>${BRAND_ATTR}</code> to a
+                    wrapping element (e.g. <code>&lt;body&gt;</code>). Each component rule targets
+                    the component's tag directly, so it applies to every instance the moment the
+                    stylesheet loads.`
+                : html`No customizations yet, tweak some tokens in the sidebar and they'll appear
+                    here, scoped under <code>${BRAND_SELECTOR}</code>. Isolate a component in Design
+                    mode to add component-scoped rules.`}
             </p>
           </li>
         </ol>
 
-        <fluid-button
-          slot="footer"
-          variant="ghost"
-          @click=${() => this.dialogEl?.hide()}
-        >
+        <fluid-button slot="footer" variant="ghost" @click=${() => this.dialogEl?.hide()}>
           Close
         </fluid-button>
         <fluid-button

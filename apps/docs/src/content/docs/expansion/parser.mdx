@@ -3,11 +3,20 @@ title: "@fluid-ds/parser"
 description: "Drop a JSON / CSV / Excel file onto a Fluid file-drop and get validated, typed rows out, mapped + coerced + validated against a declarative blueprint."
 ---
 
+import ParserDemo from "../../../components/ParserDemo.astro";
+
 An opt-in expansion pack for data import. You describe the shape you want with a
 declarative **blueprint** (fields with types, aliases, ranges, and validators);
 the parser sniffs the file format, fuzzy-maps the source columns to your fields,
 coerces and validates every cell, and hands back clean typed rows plus a full
 error report. A mapping UI and an error-preview table come with it.
+
+The panel below runs the real headless core live: edit the CSV on the left
+(the sample includes a bad email, an out-of-range age, an unknown enum value,
+and a duplicate row) and watch the typed rows, auto-mapping, and cell errors
+update on every keystroke.
+
+<ParserDemo />
 
 It splits into a **headless core** (`@fluid-ds/parser/core`, zero UI, runs
 server-side) and two web components built on the core. Standard web components,
@@ -31,10 +40,10 @@ import { parseFile, applyBlueprint } from "@fluid-ds/parser/core";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
-| `<fluid-file-parser>` | The full flow: dropzone intake, auto-mapping, a validated preview table, confirm, and CSV / JSON download. |
-| `<fluid-column-mapper>` | The source-column to blueprint-field mapping UI, usable on its own. |
+| Tag                     | Use                                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `<fluid-file-parser>`   | The full flow: dropzone intake, auto-mapping, a validated preview table, confirm, and CSV / JSON download. |
+| `<fluid-column-mapper>` | The source-column to blueprint-field mapping UI, usable on its own.                                        |
 
 ## A blueprint
 
@@ -48,10 +57,22 @@ import type { Blueprint } from "@fluid-ds/parser/core";
 
 const blueprint: Blueprint = {
   fields: [
-    { key: "name", label: "Full name", type: "string", required: true, aliases: ["name", "full name"] },
+    {
+      key: "name",
+      label: "Full name",
+      type: "string",
+      required: true,
+      aliases: ["name", "full name"]
+    },
     { key: "email", label: "Email", type: "email", required: true, aliases: ["e-mail", "mail"] },
     { key: "age", label: "Age", type: "integer", min: 0, max: 120 },
-    { key: "role", label: "Role", type: "enum", options: ["engineer", "designer", "manager"], default: "engineer" },
+    {
+      key: "role",
+      label: "Role",
+      type: "enum",
+      options: ["engineer", "designer", "manager"],
+      default: "engineer"
+    },
     { key: "joined", label: "Joined", type: "date", format: "iso" },
     { key: "active", label: "Active", type: "boolean", default: true }
   ],
@@ -79,7 +100,12 @@ bad cells highlighted, and emits `fluid-parse` on confirm.
       { key: "name", label: "Full name", type: "string", required: true, aliases: ["name"] },
       { key: "email", type: "email", required: true, aliases: ["e-mail", "mail"] },
       { key: "age", type: "integer", min: 0, max: 120 },
-      { key: "role", type: "enum", options: ["engineer", "designer", "manager"], default: "engineer" }
+      {
+        key: "role",
+        type: "enum",
+        options: ["engineer", "designer", "manager"],
+        default: "engineer"
+      }
     ],
     dedupeBy: "email"
   };
@@ -147,10 +173,10 @@ const blueprint: Blueprint = {
 const raw = await parseFile(file); // File from a drop / <input type="file">
 const result = applyBlueprint(raw, blueprint);
 
-result.rows;    // [{ sku: "ABC-1234", price: 9.99, stock: 0 }, …]
-result.errors;  // [{ row: 2, field: "price", value: "free", message: 'Price is not a number: "free"' }, …]
+result.rows; // [{ sku: "ABC-1234", price: 9.99, stock: 0 }, …]
+result.errors; // [{ row: 2, field: "price", value: "free", message: 'Price is not a number: "free"' }, …]
 result.mapping; // { sku: "Product Code", price: "Unit Price", stock: null }
-result.stats;   // { total, kept, duplicates, truncated, errorCount }
+result.stats; // { total, kept, duplicates, truncated, errorCount }
 ```
 
 `parseFile` reads JSON / CSV / TSV natively (with delimiter sniffing and an
@@ -172,16 +198,16 @@ Both components follow the Fluid override ladder: every styled property reads a
 component token that falls back to a semantic variable, so brand themes flow
 through and you can retheme one instance, one component, or the whole brand.
 
-| Token | Falls back to |
-| --- | --- |
-| `--fluid-parser-table-bg` | `--fluid-surface-base` |
-| `--fluid-parser-table-header-bg` | `--fluid-surface-muted` |
-| `--fluid-parser-table-border` | `--fluid-border-default` |
-| `--fluid-parser-invalid-bg` | a tint of `--fluid-danger-base` |
-| `--fluid-parser-invalid-fg` | `--fluid-danger-text` |
-| `--fluid-mapper-select-bg` | `--fluid-surface-base` |
-| `--fluid-mapper-border` | `--fluid-border-default` |
-| `--fluid-mapper-danger` | `--fluid-danger-base` |
+| Token                            | Falls back to                   |
+| -------------------------------- | ------------------------------- |
+| `--fluid-parser-table-bg`        | `--fluid-surface-base`          |
+| `--fluid-parser-table-header-bg` | `--fluid-surface-muted`         |
+| `--fluid-parser-table-border`    | `--fluid-border-default`        |
+| `--fluid-parser-invalid-bg`      | a tint of `--fluid-danger-base` |
+| `--fluid-parser-invalid-fg`      | `--fluid-danger-text`           |
+| `--fluid-mapper-select-bg`       | `--fluid-surface-base`          |
+| `--fluid-mapper-border`          | `--fluid-border-default`        |
+| `--fluid-mapper-danger`          | `--fluid-danger-base`           |
 
 The intake reuses `fluid-dropzone` and the validation summary reuses
 `fluid-callout`, so both inherit their own token ladders too.

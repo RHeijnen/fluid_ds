@@ -8,7 +8,7 @@ type Args = Pick<FluidList, "label" | "bordered" | "divided">;
 const meta: Meta<Args> = {
   title: "Components/Content/List",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     label: { control: "text" },
     bordered: { control: "boolean" },

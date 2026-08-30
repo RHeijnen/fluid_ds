@@ -10,7 +10,7 @@ type Args = Pick<FluidOption, "value" | "active" | "selected" | "disabled"> & {
 const meta: Meta<Args> = {
   title: "Components/Forms/Option",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     label: { control: "text" },
     value: { control: "text" },

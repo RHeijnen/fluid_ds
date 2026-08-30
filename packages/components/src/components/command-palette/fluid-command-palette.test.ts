@@ -33,7 +33,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("renders a modal dialog when open", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const dialog = el.shadowRoot!.querySelector('[role="dialog"]')!;
     expect(dialog).to.exist;
@@ -50,7 +52,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("the input has the combobox contract", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     expect(combobox.id).to.equal("command-search");
@@ -61,7 +65,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("filters items by substring as the query changes", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     combobox.value = "file";
@@ -72,7 +78,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("shows the empty state when nothing matches", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     combobox.value = "zzzz";
@@ -84,7 +92,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("ArrowDown / ArrowUp move the active option via aria-activedescendant", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     const opts = options(el);
@@ -102,7 +112,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("ArrowUp from the top wraps to the last option", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     combobox.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
@@ -112,7 +124,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("fires fluid-query as the search text changes", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     combobox.value = "cop";
@@ -122,11 +136,10 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("keeps a pinned item whatever the query says", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
-    el.items = [
-      { id: "resolved", label: "Manage the thing", pinned: true },
-      ...items
-    ];
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
+    el.items = [{ id: "resolved", label: "Manage the thing", pinned: true }, ...items];
     el.open = true;
     await elementUpdated(el);
     const combobox = input(el);
@@ -140,7 +153,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("Enter fires fluid-select with { id, item } and closes", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     combobox.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
@@ -156,7 +171,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("clicking an option fires fluid-select for that item", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     setTimeout(() => options(el)[2]!.click());
     const event = await oneEvent(el, "fluid-select");
@@ -164,7 +181,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("Escape closes the palette and fires fluid-close", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     const combobox = input(el);
     setTimeout(() =>
@@ -177,7 +196,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("reflects the open attribute", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     el.show();
     await elementUpdated(el);
     expect(el.hasAttribute("open")).to.be.true;
@@ -187,7 +208,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("moves focus to the input on open", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     await el.updateComplete;
     await aTimeout(20);
@@ -195,7 +218,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("option rows respect --fluid-target-min (AAA hit area)", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     el.style.setProperty("--fluid-target-min", "44px");
     await elementUpdated(el);
@@ -204,7 +229,9 @@ describe("<fluid-command-palette>", () => {
   });
 
   it("active option background reads the override ladder", async () => {
-    const el = await fixture<FluidCommandPalette>(html`<fluid-command-palette></fluid-command-palette>`);
+    const el = await fixture<FluidCommandPalette>(
+      html`<fluid-command-palette></fluid-command-palette>`
+    );
     await open(el);
     el.style.setProperty("--fluid-command-palette-active-bg", "rgb(1, 2, 3)");
     await elementUpdated(el);

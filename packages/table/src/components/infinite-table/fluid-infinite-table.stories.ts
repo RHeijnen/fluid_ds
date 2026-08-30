@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
-import type {
-  FluidInfiniteTableColumn,
-  FluidInfiniteTableRow
-} from "./fluid-infinite-table.js";
+import type { FluidInfiniteTableColumn, FluidInfiniteTableRow } from "./fluid-infinite-table.js";
 
 const rows: FluidInfiniteTableRow[] = Array.from({ length: 80 }, (_, index) => ({
   id: index + 1,
@@ -30,15 +27,14 @@ const columns: FluidInfiniteTableColumn[] = [
     key: "status",
     label: "Status",
     width: "8rem",
-    renderCell: ({ row }) =>
-      html`<span>${row["online"] ? "● Online" : "○ Offline"}</span>`
+    renderCell: ({ row }) => html`<span>${row["online"] ? "● Online" : "○ Offline"}</span>`
   }
 ];
 
 const meta: Meta = {
   title: "Table/Infinite table",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-infinite-table
       caption="Terminal fleet"
@@ -116,11 +112,7 @@ export const Loading: Story = {
 
 export const Empty: Story = {
   render: () => html`
-    <fluid-infinite-table
-      caption="No matching terminals"
-      .columns=${columns}
-      .rows=${[]}
-    >
+    <fluid-infinite-table caption="No matching terminals" .columns=${columns} .rows=${[]}>
       <strong slot="empty">No terminals match these filters</strong>
     </fluid-infinite-table>
   `

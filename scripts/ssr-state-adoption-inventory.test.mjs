@@ -51,7 +51,11 @@ test("state-adoption inventory exactly covers every published form-associated el
     if (entry.status === "supported") {
       assert.ok(entry.contract?.length > 20, `${entry.tag}: missing supported contract`);
       assert.ok(entry.evidence?.length > 10, `${entry.tag}: missing evidence`);
-      assert.equal(entry.reason, undefined, `${entry.tag}: supported entries cannot use gap rationale`);
+      assert.equal(
+        entry.reason,
+        undefined,
+        `${entry.tag}: supported entries cannot use gap rationale`
+      );
     } else {
       assert.ok(entry.reason?.length > 20, `${entry.tag}: missing boundary rationale`);
       assert.equal(entry.evidence, undefined, `${entry.tag}: gaps cannot claim passing evidence`);
@@ -65,7 +69,12 @@ test("baseline denominator cannot hide applicable gaps behind catalog totals", a
   const supported = applicable.filter((entry) => entry.status === "supported");
   const gaps = applicable.filter((entry) => entry.status === "applicable-gap");
   assert.deepEqual(
-    { catalog: entries.length, applicable: applicable.length, supported: supported.length, gaps: gaps.length },
+    {
+      catalog: entries.length,
+      applicable: applicable.length,
+      supported: supported.length,
+      gaps: gaps.length
+    },
     { catalog: 22, applicable: 14, supported: 14, gaps: 0 }
   );
 });

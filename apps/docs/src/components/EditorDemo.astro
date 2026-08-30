@@ -1,0 +1,82 @@
+---
+/**
+ * Live demo for the editor page: `<fluid-rich-text-editor>` preloaded with
+ * starter content so the toolbar can be used immediately, plus a collapsible
+ * readout of the sanitized HTML `value` that updates on every edit.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="ed-demo" data-ed-demo>
+    <fluid-rich-text-editor
+      class="ed-editor"
+      data-ed-editor
+      label="Try the editor"
+      placeholder="Start typing..."></fluid-rich-text-editor>
+    <details class="ed-html">
+      <summary>The sanitized HTML value (updates live via <code>fluid-change</code>)</summary>
+      <pre class="ed-html-pre"><code data-ed-output></code></pre>
+    </details>
+  </div>
+</Demo>
+
+<style>
+  .ed-demo {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .ed-editor {
+    display: block;
+  }
+  .ed-html summary {
+    cursor: pointer;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-text-secondary);
+  }
+  .ed-html-pre {
+    margin: 0.5rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 8px);
+    background: var(--fluid-surface-base);
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-x: auto;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/editor/define/rich-text-editor";
+
+  interface EditorLike extends HTMLElement {
+    value: string;
+  }
+
+  const STARTER = [
+    "<p>This editor is <strong>live</strong>. Select some text and use the toolbar ",
+    "(or <em>Ctrl/Cmd + B / I / U</em>) to format it.</p>",
+    "<ul><li>Bold, italic, underline</li><li>Bullet and numbered lists</li>",
+    "<li>Links and clear formatting</li></ul>",
+    "<p>Everything you type is sanitized before it reaches the <code>value</code> below.</p>"
+  ].join("");
+
+  function setup(root: HTMLElement): void {
+    const editor = root.querySelector<EditorLike>("[data-ed-editor]");
+    const output = root.querySelector<HTMLElement>("[data-ed-output]");
+    if (!editor || !output) return;
+
+    editor.value = STARTER;
+    output.textContent = STARTER;
+
+    editor.addEventListener("fluid-change", (event: Event) => {
+      const detail = (event as CustomEvent<{ value: string }>).detail;
+      output.textContent = detail.value;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-ed-demo]")) setup(root);
+</script>

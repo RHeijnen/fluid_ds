@@ -187,9 +187,27 @@ export class FluidTabs extends FluidElement {
     }
     const n = nav.getBoundingClientRect();
     const t = tab.getBoundingClientRect();
+    const x = `${t.left - n.left + nav.scrollLeft}px`;
+    const w = `${t.width}px`;
+    /*
+     * No-op when the target is already current. Switching tabs swaps panels
+     * of different heights, which resizes the host and fires the
+     * ResizeObserver's animate=false call while the slide from the value
+     * change is still in flight; without this guard that call re-applies
+     * `no-anim` mid-transition and the underline snaps instead of sliding.
+     * A resize that actually moves the strip still recomputes fresh values
+     * and falls through.
+     */
+    if (
+      indicator.classList.contains("ready") &&
+      indicator.style.getPropertyValue("--_x") === x &&
+      indicator.style.getPropertyValue("--_w") === w
+    ) {
+      return;
+    }
     if (!animate) indicator.classList.add("no-anim");
-    indicator.style.setProperty("--_x", `${t.left - n.left + nav.scrollLeft}px`);
-    indicator.style.setProperty("--_w", `${t.width}px`);
+    indicator.style.setProperty("--_x", x);
+    indicator.style.setProperty("--_w", w);
     indicator.classList.add("ready");
     if (!animate) {
       void indicator.offsetWidth;

@@ -57,6 +57,14 @@ export class FluidProgressBar extends FluidElement {
       color: var(--fluid-progress-bar-label-fg, var(--fluid-text-primary));
     }
 
+    /* Block wrapper for the slotted label. Without it every slotted node
+       becomes its own flex item, and space-between spreads mixed content
+       ("Uploading <b>file</b>") across the full row. */
+    .label-text {
+      display: block;
+      min-width: 0;
+    }
+
     .value-text {
       font-variant-numeric: tabular-nums;
       color: var(--fluid-progress-bar-value-fg, var(--fluid-text-secondary));
@@ -158,7 +166,7 @@ export class FluidProgressBar extends FluidElement {
           : `${Math.round(value)}%`;
     return html`
       <div part="label" class="label">
-        <slot></slot>
+        <span class="label-text"><slot></slot></span>
         ${this.showValue ? html`<span class="value-text">${display}</span>` : ""}
       </div>
     `;

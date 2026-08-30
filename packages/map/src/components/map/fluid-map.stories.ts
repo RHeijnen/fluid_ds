@@ -18,7 +18,7 @@ const markers = [
 const meta: Meta = {
   title: "Map/Map",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => {
     ensureOfflineMapStyles();
     return html`

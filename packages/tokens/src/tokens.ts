@@ -309,7 +309,7 @@ export const primitives = {
   target: {
     $label: "Target size",
     $description:
-      "Minimum interactive hit-target size. AA default 24px (SC 2.5.8); the opt-in AAA conformance mode (data-fluid-conformance=\"aaa\") raises it to 44px (SC 2.5.5). Components read --fluid-target-min and never branch on conformance.",
+      'Minimum interactive hit-target size. AA default 24px (SC 2.5.8); the opt-in AAA conformance mode (data-fluid-conformance="aaa") raises it to 44px (SC 2.5.5). Components read --fluid-target-min and never branch on conformance.',
     min: t("24px", "dimension")
   },
   field: {

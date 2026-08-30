@@ -34,12 +34,13 @@ For absolute dates, reach for [`<fluid-format-date>`](/components/format-date/).
     ```ts
     import "@fluid-ds/components/define/relative-time";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  Renders plain inline text and reads no design tokens beyond the inherited
-  text color, so no `@fluid-ds/tokens` stylesheet is required.
+  Renders plain inline text and reads no design tokens beyond the inherited text color, so no
+  `@fluid-ds/tokens` stylesheet is required.
 </Aside>
 
 ## Examples
@@ -66,8 +67,10 @@ For absolute dates, reach for [`<fluid-format-date>`](/components/format-date/).
 ### Short / narrow
 
 <Demo>
-  <fluid-relative-time date="2026-05-29T12:30:00Z" format="long"></fluid-relative-time><br/>
-  <fluid-relative-time date="2026-05-29T12:30:00Z" format="short"></fluid-relative-time><br/>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" format="long"></fluid-relative-time>
+  <br />
+  <fluid-relative-time date="2026-05-29T12:30:00Z" format="short"></fluid-relative-time>
+  <br />
   <fluid-relative-time date="2026-05-29T12:30:00Z" format="narrow"></fluid-relative-time>
 </Demo>
 
@@ -95,14 +98,15 @@ string, or invalid formatting options preserve the existing ISO-string fallback
 for a valid date. Language-only updates do not restart the refresh timer.
 
 <Aside type="note">
-  Native ancestor language inheritance during SSR remains unverified and is not
-  provided by this formatter change. Pass an explicit `locale` for predictable
-  server output; without available context the server uses English. This does
-  not promise full locale hydration parity or request-scoped translation state.
+  Native ancestor language inheritance during SSR remains unverified and is not provided by this
+  formatter change. Pass an explicit `locale` for predictable server output; without available
+  context the server uses English. This does not promise full locale hydration parity or
+  request-scoped translation state.
 </Aside>
 
 <Demo>
-  <fluid-relative-time date="2026-05-29T12:30:00Z" locale="fr-FR"></fluid-relative-time><br/>
+  <fluid-relative-time date="2026-05-29T12:30:00Z" locale="fr-FR"></fluid-relative-time>
+  <br />
   <fluid-relative-time date="2026-05-29T12:30:00Z" locale="ja-JP"></fluid-relative-time>
 </Demo>
 

@@ -6,7 +6,7 @@ import "../button/define.js";
 const meta: Meta = {
   title: "Components/Feedback/Drawer",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -25,9 +25,7 @@ export const AllPlacements: Story = {
       <div style="display:flex; gap: var(--fluid-space-2); flex-wrap: wrap;">
         ${(["start", "end", "top", "bottom"] as const).map(
           (p) => html`
-            <fluid-button @click=${(e: Event) => showDrawer(e, p)}>
-              Open ${p}
-            </fluid-button>
+            <fluid-button @click=${(e: Event) => showDrawer(e, p)}> Open ${p} </fluid-button>
           `
         )}
       </div>

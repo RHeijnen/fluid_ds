@@ -12,7 +12,7 @@ docs, MDX, comments, commit bodies, READMEs, marketing):
    **Fluid**. Spell out **"Fluid Design System"** only on the rare occasion the
    full term is genuinely needed (a formal first mention). The string "Fluid DS"
    must never appear in prose.
-   - This rule is about *prose only*. It does NOT change identifiers: the npm
+   - This rule is about _prose only_. It does NOT change identifiers: the npm
      scope `@fluid-ds/*`, the repo folder `fluid_ds`, the `--fluid-*` CSS tokens,
      the `fluid-*` element names, and `data-fluid-*` attributes all stay exactly
      as they are.

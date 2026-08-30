@@ -33,6 +33,7 @@ a `<fluid-segment>`; the container implements the WAI-ARIA radiogroup pattern.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/segmented-control/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -44,6 +45,7 @@ a `<fluid-segment>`; the container implements the WAI-ARIA radiogroup pattern.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/segmented-control"; // registers segmented-control + segment
     ```
+
   </TabItem>
 </Tabs>
 
@@ -73,7 +75,9 @@ a `<fluid-segment>`; the container implements the WAI-ARIA radiogroup pattern.
   <fluid-segmented-control value="list" aria-label="View">
     <fluid-segment value="list">List</fluid-segment>
     <fluid-segment value="grid">Grid</fluid-segment>
-    <fluid-segment value="kanban" disabled>Kanban</fluid-segment>
+    <fluid-segment value="kanban" disabled>
+      Kanban
+    </fluid-segment>
   </fluid-segmented-control>
 </Demo>
 
@@ -113,6 +117,7 @@ when the selection changes.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="RangePicker.tsx"
@@ -136,6 +141,7 @@ when the selection changes.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="RangePicker.vue"
@@ -151,6 +157,7 @@ when the selection changes.
       </fluid-segmented-control>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="range-picker.component.ts"
@@ -174,6 +181,7 @@ when the selection changes.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="RangePicker.svelte"
@@ -189,6 +197,7 @@ when the selection changes.
       <fluid-segment value="week">Week</fluid-segment>
     </fluid-segmented-control>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -228,10 +237,10 @@ the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
+| Key                                                          | Action                                      |
+| ------------------------------------------------------------ | ------------------------------------------- |
 | <kbd>←</kbd> / <kbd>→</kbd> (or <kbd>↑</kbd> / <kbd>↓</kbd>) | Move selection (disabled segments skipped). |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last segment. |
+| <kbd>Home</kbd> / <kbd>End</kbd>                             | Jump to the first / last segment.           |
 
 ### Names & roles
 
@@ -249,10 +258,10 @@ chosen ([SC 4.1.2](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value))
 
 Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

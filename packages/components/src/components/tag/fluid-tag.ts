@@ -48,6 +48,15 @@ export type FluidTagSize = "sm" | "md" | "lg";
  * @uses-token --fluid-color-brand-50 - Info variant default background.
  * @uses-token --fluid-color-brand-200 - Info variant default border.
  * @uses-token --fluid-color-brand-800 - Info variant default text.
+ * @uses-token --fluid-color-emerald-50 - Success variant default background.
+ * @uses-token --fluid-color-emerald-200 - Success variant default border.
+ * @uses-token --fluid-color-emerald-800 - Success variant default text.
+ * @uses-token --fluid-color-amber-50 - Warning variant default background.
+ * @uses-token --fluid-color-amber-300 - Warning variant default border.
+ * @uses-token --fluid-color-amber-800 - Warning variant default text.
+ * @uses-token --fluid-color-red-50 - Danger variant default background.
+ * @uses-token --fluid-color-red-200 - Danger variant default border.
+ * @uses-token --fluid-color-red-800 - Danger variant default text.
  * @uses-token --fluid-target-min - Remove button minimum hit-target size.
  *
  * @fires fluid-remove - Dispatched when the user clicks the remove button.
@@ -98,19 +107,19 @@ export class FluidTag extends FluidElement {
       box-shadow: inset 0 0 0 1px var(--fluid-tag-info-border, var(--fluid-color-brand-200));
     }
     .variant-success {
-      background-color: var(--fluid-tag-success-bg, #ecfdf5);
-      color: var(--fluid-tag-success-fg, #065f46);
-      box-shadow: inset 0 0 0 1px var(--fluid-tag-success-border, #a7f3d0);
+      background-color: var(--fluid-tag-success-bg, var(--fluid-color-emerald-50));
+      color: var(--fluid-tag-success-fg, var(--fluid-color-emerald-800));
+      box-shadow: inset 0 0 0 1px var(--fluid-tag-success-border, var(--fluid-color-emerald-200));
     }
     .variant-warning {
-      background-color: var(--fluid-tag-warning-bg, #fffbeb);
-      color: var(--fluid-tag-warning-fg, #92400e);
-      box-shadow: inset 0 0 0 1px var(--fluid-tag-warning-border, #fcd34d);
+      background-color: var(--fluid-tag-warning-bg, var(--fluid-color-amber-50));
+      color: var(--fluid-tag-warning-fg, var(--fluid-color-amber-800));
+      box-shadow: inset 0 0 0 1px var(--fluid-tag-warning-border, var(--fluid-color-amber-300));
     }
     .variant-danger {
-      background-color: var(--fluid-tag-danger-bg, #fef2f2);
-      color: var(--fluid-tag-danger-fg, #991b1b);
-      box-shadow: inset 0 0 0 1px var(--fluid-tag-danger-border, #fecaca);
+      background-color: var(--fluid-tag-danger-bg, var(--fluid-color-red-50));
+      color: var(--fluid-tag-danger-fg, var(--fluid-color-red-800));
+      box-shadow: inset 0 0 0 1px var(--fluid-tag-danger-border, var(--fluid-color-red-200));
     }
 
     .remove {
@@ -186,9 +195,7 @@ export class FluidTag extends FluidElement {
   private handleRemove = (e: Event) => {
     e.stopPropagation();
     if (this.disabled) return;
-    this.dispatchEvent(
-      new CustomEvent("fluid-remove", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent("fluid-remove", { bubbles: true, composed: true }));
   };
 
   override render(): TemplateResult {

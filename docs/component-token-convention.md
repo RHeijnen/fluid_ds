@@ -39,15 +39,15 @@ design panel picks it up:
 
 Component tokens follow `--fluid-{tag-without-prefix}-{role}`:
 
-| Role                | Example                          |
-| ------------------- | -------------------------------- |
-| Background          | `--fluid-card-bg`                |
-| Foreground / text   | `--fluid-card-fg`                |
-| Border              | `--fluid-card-border`            |
-| Accent / brand fill | `--fluid-card-accent`            |
-| Specific surface    | `--fluid-card-header-bg`         |
-| Sizing              | `--fluid-card-padding`           |
-| Radius              | `--fluid-card-radius`            |
+| Role                | Example                  |
+| ------------------- | ------------------------ |
+| Background          | `--fluid-card-bg`        |
+| Foreground / text   | `--fluid-card-fg`        |
+| Border              | `--fluid-card-border`    |
+| Accent / brand fill | `--fluid-card-accent`    |
+| Specific surface    | `--fluid-card-header-bg` |
+| Sizing              | `--fluid-card-padding`   |
+| Radius              | `--fluid-card-radius`    |
 
 For multi-element components (e.g. a dialog has a header, body, footer) the
 role goes after the element: `--fluid-dialog-header-bg`,
@@ -72,11 +72,17 @@ You might see both forms in the codebase:
 
 ```css
 /* Form A, inline fallback (preferred) */
-.button { background: var(--fluid-button-bg, var(--fluid-accent-base)); }
+.button {
+  background: var(--fluid-button-bg, var(--fluid-accent-base));
+}
 
 /* Form B, :host declaration */
-:host { --fluid-button-bg: var(--fluid-accent-base); }
-.button { background: var(--fluid-button-bg); }
+:host {
+  --fluid-button-bg: var(--fluid-accent-base);
+}
+.button {
+  background: var(--fluid-button-bg);
+}
 ```
 
 Form A is preferred because it doesn't pin the resolved value at the host

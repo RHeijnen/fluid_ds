@@ -9,8 +9,10 @@ export default [
   {
     ignores: [
       "**/node_modules/**",
-      // Local pnpm patch extraction, not authored source (also gitignored).
-      ".codex-tmp/test-runner-viewmode/**",
+      // Local scratch directory (gitignored in full): patch extraction, tool
+      // checkpoints and formatted scratch copies, none of it authored source.
+      // Ignored wholesale so a local lint matches CI, where it does not exist.
+      ".codex-tmp/**",
       // Retained certification logs, traces and diagnostic copies are not shipped source.
       "quality/evidence/**",
       "**/dist/**",

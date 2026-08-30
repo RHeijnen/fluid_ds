@@ -3,8 +3,20 @@ title: "@fluid-ds/kanban"
 description: "An accessible drag-and-drop kanban board web component."
 ---
 
+import KanbanDemo from "../../../components/KanbanDemo.astro";
+
 A kanban board for Fluid: columns of draggable cards you can rearrange with a
 pointer, native move buttons, or the keyboard. Expansion pack.
+
+The board below is live: drag a card into another column, tap its arrow
+buttons, or focus it and press Space to pick it up with the keyboard. Every
+move is the pack's real `fluid-move` event, mirrored in the readout above the
+board.
+
+<KanbanDemo />
+
+See it running: the [sprint board demo](/demos/board/) is a board mid-sprint, so
+you can drag cards between columns or move them entirely by keyboard.
 
 ## Install
 
@@ -20,8 +32,8 @@ import "@fluid-ds/kanban/define/kanban";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
+| Tag              | Use                                                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<fluid-kanban>` | A board of columns, each holding an ordered list of cards. Cards move by native HTML5 drag and drop or by keyboard, and every move emits an event. |
 
 ## Use
@@ -58,34 +70,34 @@ not an attribute):
 
 ### Properties
 
-| Property | Type | Default | Description |
-| --- | --- | --- | --- |
-| `columns` | `KanbanColumn[]` | `[]` | The board data. Each column is `{ id, title, cards }`, each card is `{ id, title, description? }`. |
-| `moveUpLabel`, `moveDownLabel`, `movePreviousLabel`, `moveNextLabel` | `string` | English move labels | Localizable accessible names for the move buttons. The card title is appended. Corresponding attributes are `move-up-label`, `move-down-label`, `move-previous-label`, and `move-next-label`. |
+| Property                                                             | Type             | Default             | Description                                                                                                                                                                                   |
+| -------------------------------------------------------------------- | ---------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `columns`                                                            | `KanbanColumn[]` | `[]`                | The board data. Each column is `{ id, title, cards }`, each card is `{ id, title, description? }`.                                                                                            |
+| `moveUpLabel`, `moveDownLabel`, `movePreviousLabel`, `moveNextLabel` | `string`         | English move labels | Localizable accessible names for the move buttons. The card title is appended. Corresponding attributes are `move-up-label`, `move-down-label`, `move-previous-label`, and `move-next-label`. |
 
 ### Methods
 
-| Method | Description |
-| --- | --- |
+| Method                                | Description                                                                                                                                                                             |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `moveCard(cardId, toColumn, toIndex)` | Move a card to the target column index, update state, announce, and emit `fluid-move`. Returns the new position or `null` for invalid inputs. Unchanged positions do not emit an event. |
 
 ### Events
 
-| Event | Detail | Fired when |
-| --- | --- | --- |
+| Event        | Detail                                    | Fired when                                                                                                            |
+| ------------ | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `fluid-move` | `{ cardId, fromColumn, toColumn, index }` | A card is moved by drag or keyboard. `fromColumn` and `toColumn` are column ids; `index` is the destination position. |
 
 ## Keyboard
 
 The keyboard path is a first-class peer of drag and drop, not a fallback.
 
-| Key | Action |
-| --- | --- |
-| `Tab` | Move focus between cards. |
-| `Space` / `Enter` | Pick up the focused card, or drop a card that is held. |
-| `ArrowLeft` / `ArrowRight` | Move a held card to the previous / next column. |
-| `ArrowUp` / `ArrowDown` | Reorder a held card within its column. |
-| `Escape` | Cancel the current pickup and restore the card to its original column and position. |
+| Key                        | Action                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| `Tab`                      | Move focus between cards.                                                           |
+| `Space` / `Enter`          | Pick up the focused card, or drop a card that is held.                              |
+| `ArrowLeft` / `ArrowRight` | Move a held card to the previous / next column.                                     |
+| `ArrowUp` / `ArrowDown`    | Reorder a held card within its column.                                              |
+| `Escape`                   | Cancel the current pickup and restore the card to its original column and position. |
 
 Each column is a labelled `group`; cards live in a `list` with `listitem`
 children, and the held state is reflected with `aria-grabbed`. Every pickup,

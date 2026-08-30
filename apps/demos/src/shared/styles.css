@@ -47,8 +47,12 @@ a {
  * (apps/landing/src/styles.css) so navigating between root and
  * /demos/ has zero header layout jump. If you tweak one, tweak the
  * other.
+ *
+ * `:where()` keeps this rule's specificity below the theme package's
+ * `.fluid-glass-panel` helper, so the Glass brand can frost the header
+ * without the demos restating the frost recipe.
  */
-.demo-shell header.site-nav {
+:where(.demo-shell) header.site-nav {
   grid-area: header;
   position: sticky;
   top: 0;
@@ -93,7 +97,9 @@ a {
   color: var(--fluid-text-secondary);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
-  transition: background 100ms ease, color 100ms ease;
+  transition:
+    background 100ms ease,
+    color 100ms ease;
 }
 
 .demo-shell header.site-nav nav.primary a:hover {
@@ -102,7 +108,11 @@ a {
 }
 
 .demo-shell header.site-nav nav.primary a[aria-current="page"] {
-  background: color-mix(in srgb, var(--fluid-color-primary, var(--fluid-accent-base)) 14%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--fluid-color-primary, var(--fluid-accent-base)) 14%,
+    transparent
+  );
   color: var(--fluid-color-primary, var(--fluid-accent-base));
   font-weight: 600;
 }
@@ -148,7 +158,11 @@ a {
 }
 
 .demo-shell aside nav a[aria-current="page"] {
-  background: color-mix(in srgb, var(--fluid-color-primary, var(--fluid-accent-base)) 14%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--fluid-color-primary, var(--fluid-accent-base)) 14%,
+    transparent
+  );
   color: var(--fluid-color-primary, var(--fluid-accent-base));
   font-weight: 600;
 }
@@ -178,6 +192,11 @@ a {
   color: var(--fluid-text-secondary);
 }
 
+/* Give the brand select room for its longest option ("Corporate"). */
+.demo-theme-picker fluid-select {
+  min-inline-size: 8rem;
+}
+
 .demo-theme-picker label {
   margin-right: 0.25rem;
 }
@@ -205,13 +224,34 @@ table tbody tr:hover {
 /* ------------------------------------------------------------------ */
 /* Demos index: hero + clickable tiles                                 */
 /* ------------------------------------------------------------------ */
-.demo-index { max-width: 60rem; }
-.demo-hero { margin-bottom: 2.5rem; }
-.demo-hero h1 { font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -0.02em; margin: 0.75rem 0 0.5rem; }
-.demo-lead { color: var(--fluid-text-secondary); max-width: 40rem; font-size: 1.05rem; margin: 0; }
+.demo-index {
+  max-width: 60rem;
+}
+.demo-hero {
+  margin-bottom: 2.5rem;
+}
+.demo-hero h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  letter-spacing: -0.02em;
+  margin: 0.75rem 0 0.5rem;
+}
+.demo-lead {
+  color: var(--fluid-text-secondary);
+  max-width: 40rem;
+  font-size: 1.05rem;
+  margin: 0;
+}
 
-.demo-section-title { font-size: 1.25rem; margin: 2.25rem 0 0.25rem; letter-spacing: -0.01em; }
-.demo-section-sub { color: var(--fluid-text-secondary); max-width: 40rem; margin: 0 0 1rem; }
+.demo-section-title {
+  font-size: 1.25rem;
+  margin: 2.25rem 0 0.25rem;
+  letter-spacing: -0.01em;
+}
+.demo-section-sub {
+  color: var(--fluid-text-secondary);
+  max-width: 40rem;
+  margin: 0 0 1rem;
+}
 
 .demo-grid {
   display: grid;
@@ -229,7 +269,10 @@ table tbody tr:hover {
   background: var(--fluid-surface-base);
   border: 1px solid var(--fluid-border-default);
   border-radius: var(--fluid-radius-lg, 0.75rem);
-  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 .demo-tile:hover {
   transform: translateY(-3px);
@@ -247,9 +290,24 @@ table tbody tr:hover {
   border-radius: 0.6rem;
   background: var(--fluid-surface-muted);
 }
-.demo-tile-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
-.demo-tile-title { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 1.05rem; }
-.demo-tile-desc { color: var(--fluid-text-secondary); font-size: 0.92rem; line-height: 1.5; }
+.demo-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+.demo-tile-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.demo-tile-desc {
+  color: var(--fluid-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
 .demo-tile-go {
   margin-left: auto;
   align-self: center;
@@ -261,8 +319,158 @@ table tbody tr:hover {
   font-size: 0.9rem;
   white-space: nowrap;
 }
-.demo-foot { margin-top: 2.5rem; color: var(--fluid-text-secondary); font-size: 0.95rem; }
+.demo-foot {
+  margin-top: 2.5rem;
+  color: var(--fluid-text-secondary);
+  font-size: 0.95rem;
+}
 
 @media (max-width: 560px) {
-  .demo-tile-go { display: none; }
+  .demo-tile-go {
+    display: none;
+  }
+}
+
+/* Under Glass, bare page copy (the index hero, section subs, page leads)
+   sits directly on the vivid color wash and loses contrast. The index and
+   the pack-demo pages carry `fluid-glass-panel` in their markup, inert in
+   every other brand; these rules only shape that sheet when it frosts. */
+[data-fluid-brand="glass"] .demo-index,
+[data-fluid-brand="glass"] .demo-page {
+  padding: 1.5rem 1.75rem;
+  border-radius: var(--fluid-radius-lg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared chrome for the pack demos (booking, board, analytics, qr)    */
+/* ------------------------------------------------------------------ */
+.demo-page {
+  max-width: 64rem;
+}
+.demo-page-wide {
+  max-width: none;
+}
+.demo-page-head {
+  margin-bottom: 1.5rem;
+}
+.demo-page-head h1 {
+  margin: 0.75rem 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+.muted-lead {
+  margin: 0;
+  color: var(--fluid-text-secondary);
+  max-width: 46rem;
+}
+.demo-two-col {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .demo-two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Booking */
+.booking-lines {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.booking-lines div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--fluid-border-default);
+  padding-bottom: 0.5rem;
+}
+.booking-lines div:last-child {
+  border-bottom: 0;
+}
+.booking-lines dt {
+  color: var(--fluid-text-secondary);
+  font-size: 0.9rem;
+}
+.booking-lines dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Sprint board */
+.board-feed-card {
+  display: block;
+  margin-top: 1.25rem;
+}
+.board-feed {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+/* Analytics */
+.analytics-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.analytics-kpis .kpi-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fluid-text-secondary);
+}
+.analytics-kpis .kpi-num {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.15rem 0 0.5rem;
+}
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1.25rem;
+}
+.analytics-grid fluid-card {
+  min-width: 0;
+}
+
+/* QR studio */
+.qr-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.qr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--fluid-text-secondary);
+}
+.qr-field-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--fluid-text-primary);
+}
+.qr-colors {
+  display: flex;
+  gap: 1.5rem;
+}
+.qr-stage {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem 0;
 }

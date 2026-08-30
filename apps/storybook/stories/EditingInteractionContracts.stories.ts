@@ -14,7 +14,9 @@ export default meta;
 type Story = StoryObj;
 
 function editorFor(event: Event) {
-  return (event.currentTarget as HTMLElement).closest("section")!.querySelector<FluidRichTextEditor>("fluid-rich-text-editor")!;
+  return (event.currentTarget as HTMLElement)
+    .closest("section")!
+    .querySelector<FluidRichTextEditor>("fluid-rich-text-editor")!;
 }
 
 const editorFixture = () => html`
@@ -22,18 +24,39 @@ const editorFixture = () => html`
     <button>Before editor</button>
     <fluid-rich-text-editor label="Project note"></fluid-rich-text-editor>
     <button>After editor</button>
-    <button @click=${(event: Event) => { editorFor(event).readOnly = true; }}>Make readonly</button>
-    <button @click=${(event: Event) => { editorFor(event).readOnly = false; }}>Edit note</button>
-    <button @click=${(event: Event) => {
-      editorFor(event).value = '<p><a href="javascript:alert(1)" onclick="alert(2)">Unsafe link</a><strong>Safe content</strong></p>';
-    }}>Load untrusted HTML</button>
-    <button @click=${(event: Event) => {
-      const editor = editorFor(event);
-      const parent = editor.parentNode!;
-      const next = editor.nextSibling;
-      editor.remove();
-      parent.insertBefore(editor, next);
-    }}>Reconnect editor</button>
+    <button
+      @click=${(event: Event) => {
+        editorFor(event).readOnly = true;
+      }}
+    >
+      Make readonly
+    </button>
+    <button
+      @click=${(event: Event) => {
+        editorFor(event).readOnly = false;
+      }}
+    >
+      Edit note
+    </button>
+    <button
+      @click=${(event: Event) => {
+        editorFor(event).value =
+          '<p><a href="javascript:alert(1)" onclick="alert(2)">Unsafe link</a><strong>Safe content</strong></p>';
+      }}
+    >
+      Load untrusted HTML
+    </button>
+    <button
+      @click=${(event: Event) => {
+        const editor = editorFor(event);
+        const parent = editor.parentNode!;
+        const next = editor.nextSibling;
+        editor.remove();
+        parent.insertBefore(editor, next);
+      }}
+    >
+      Reconnect editor
+    </button>
   </section>
 `;
 
@@ -78,34 +101,57 @@ export const RichTextEditorContract: Story = {
       await userEvent.click(controls.find((control) => control.textContent === "Make readonly")!);
       await waitFor(() => expect(textbox.getAttribute("aria-readonly")).toBe("true"));
       await expect(textbox.getAttribute("contenteditable")).toBe("false");
-      await expect([...editor.shadowRoot!.querySelectorAll("button")].every((button) => button.disabled)).toBe(true);
+      await expect(
+        [...editor.shadowRoot!.querySelectorAll("button")].every((button) => button.disabled)
+      ).toBe(true);
       const beforeAssignment = events.length;
-      await userEvent.click(controls.find((control) => control.textContent === "Load untrusted HTML")!);
+      await userEvent.click(
+        controls.find((control) => control.textContent === "Load untrusted HTML")!
+      );
       await waitFor(() => expect(editor.value).toContain("Safe content"));
       await expect(textbox.querySelector("a")!.hasAttribute("href")).toBe(false);
       await expect(textbox.querySelector("a")!.hasAttribute("onclick")).toBe(false);
       await expect(events.length).toBe(beforeAssignment);
-      await expect(events.every((event) => event.target === editor && event.bubbles && event.composed)).toBe(true);
-    } finally { editor.removeEventListener("fluid-change", record); }
+      await expect(
+        events.every((event) => event.target === editor && event.bubbles && event.composed)
+      ).toBe(true);
+    } finally {
+      editor.removeEventListener("fluid-change", record);
+    }
   }
 };
 
 const kanbanFixture = () => html`
   <section>
     <button>Before board</button>
-    <fluid-kanban .columns=${[
-      { id: "todo", title: "To do", cards: [{ id: "alpha", title: "Alpha" }, { id: "bravo", title: "Bravo" }] },
-      { id: "doing", title: "In progress", cards: [{ id: "charlie", title: "Charlie" }] },
-      { id: "done", title: "Done", cards: [] }
-    ]}></fluid-kanban>
+    <fluid-kanban
+      .columns=${[
+        {
+          id: "todo",
+          title: "To do",
+          cards: [
+            { id: "alpha", title: "Alpha" },
+            { id: "bravo", title: "Bravo" }
+          ]
+        },
+        { id: "doing", title: "In progress", cards: [{ id: "charlie", title: "Charlie" }] },
+        { id: "done", title: "Done", cards: [] }
+      ]}
+    ></fluid-kanban>
     <button>After board</button>
-    <button @click=${(event: Event) => {
-      const board = (event.currentTarget as HTMLElement).closest("section")!.querySelector("fluid-kanban")!;
-      const parent = board.parentNode!;
-      const next = board.nextSibling;
-      board.remove();
-      parent.insertBefore(board, next);
-    }}>Reconnect board</button>
+    <button
+      @click=${(event: Event) => {
+        const board = (event.currentTarget as HTMLElement)
+          .closest("section")!
+          .querySelector("fluid-kanban")!;
+        const parent = board.parentNode!;
+        const next = board.nextSibling;
+        board.remove();
+        parent.insertBefore(board, next);
+      }}
+    >
+      Reconnect board
+    </button>
   </section>
 `;
 
@@ -138,9 +184,15 @@ export const KanbanMoveContract: Story = {
         { cardId: "alpha", fromColumn: "done", toColumn: "doing", index: 0 },
         { cardId: "alpha", fromColumn: "doing", toColumn: "doing", index: 1 }
       ]);
-      await expect(events.every((event) => event.target === board && event.bubbles && event.composed)).toBe(true);
-      await expect(board.shadowRoot!.querySelector('[role="status"]')!.textContent).toContain("position 2 of 2");
-    } finally { board.removeEventListener("fluid-move", record); }
+      await expect(
+        events.every((event) => event.target === board && event.bubbles && event.composed)
+      ).toBe(true);
+      await expect(board.shadowRoot!.querySelector('[role="status"]')!.textContent).toContain(
+        "position 2 of 2"
+      );
+    } finally {
+      board.removeEventListener("fluid-move", record);
+    }
   }
 };
 

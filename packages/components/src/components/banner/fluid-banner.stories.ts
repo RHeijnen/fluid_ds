@@ -11,7 +11,7 @@ type Args = Pick<FluidBanner, "variant" | "dismissible" | "label"> & {
 const meta: Meta<Args> = {
   title: "Components/Feedback/Banner",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     variant: {
       control: "inline-radio",
@@ -27,11 +27,7 @@ const meta: Meta<Args> = {
     text: "We are performing scheduled maintenance this weekend."
   },
   render: (args) => html`
-    <fluid-banner
-      variant=${args.variant}
-      ?dismissible=${args.dismissible}
-      label=${args.label}
-    >
+    <fluid-banner variant=${args.variant} ?dismissible=${args.dismissible} label=${args.label}>
       ${args.text}
     </fluid-banner>
   `

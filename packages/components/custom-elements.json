@@ -6212,6 +6212,18 @@
               "name": "--fluid-button-radius"
             },
             {
+              "description": "Vertical inner padding, all sizes. Falls back to the per-size default (--fluid-space-1 / 0 / --fluid-space-3).",
+              "name": "--fluid-button-padding-block"
+            },
+            {
+              "description": "Horizontal inner padding, all sizes. Falls back to the per-size default (--fluid-space-3 / --fluid-space-4 / --fluid-space-5).",
+              "name": "--fluid-button-padding-inline"
+            },
+            {
+              "description": "Horizontal padding on a side occupied by a prefix/suffix icon (and both sides of icon-only buttons). Falls back one step tighter than the per-size default.",
+              "name": "--fluid-button-padding-inline-icon"
+            },
+            {
               "description": "Gap between icon and label. Falls back to --fluid-space-2.",
               "name": "--fluid-button-gap"
             },
@@ -7960,6 +7972,10 @@
               "name": "body"
             },
             {
+              "description": "The default-slot wrapper below the header.",
+              "name": "content"
+            },
+            {
               "description": "The dismiss button. Every styled property reads a component-scoped `--fluid-callout-*` token that falls back to a main semantic var or color primitive (the override ladder).",
               "name": "close"
             }
@@ -8251,6 +8267,29 @@
               "kind": "field",
               "name": "handleDismiss",
               "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "handleHeaderSlotChange",
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "updateHeaderEmpty",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "slot",
+                  "type": {
+                    "text": "HTMLSlotElement"
+                  }
+                }
+              ]
             },
             {
               "kind": "method",
@@ -12138,7 +12177,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "A command launcher (the \"⌘K\" pattern): a modal dialog containing a search\r\ninput and a filtered results list. The dialog traps focus, closes on Escape,\r\nand restores focus to whatever was focused before it opened. The input is a\r\ncombobox driving a listbox of results; the user filters by typing, moves the\r\nactive result with ArrowUp / ArrowDown, and runs it with Enter.\r\n\r\nClosest WAI-ARIA APG analog: the Combobox pattern with `aria-activedescendant`\r\nmanaging the active option, wrapped in the Dialog (Modal) pattern for the\r\noverlay, focus trap, and focus restoration. DOM focus stays on the input; the\r\nactive option is tracked with `aria-activedescendant`.",
+          "description": "A command launcher (the \"⌘K\" pattern): a modal dialog containing a search\ninput and a filtered results list. The dialog traps focus, closes on Escape,\nand restores focus to whatever was focused before it opened. The input is a\ncombobox driving a listbox of results; the user filters by typing, moves the\nactive result with ArrowUp / ArrowDown, and runs it with Enter.\n\nClosest WAI-ARIA APG analog: the Combobox pattern with `aria-activedescendant`\nmanaging the active option, wrapped in the Dialog (Modal) pattern for the\noverlay, focus trap, and focus restoration. DOM focus stays on the input; the\nactive option is tracked with `aria-activedescendant`.",
           "name": "FluidCommandPalette",
           "cssProperties": [
             {
@@ -12788,14 +12827,14 @@
           "events": [
             {
               "name": "fluid-close",
-              "description": "Fired when the palette closes (Escape, backdrop, or programmatically).\r\n *",
+              "description": "Fired when the palette closes (Escape, backdrop, or programmatically).\n *",
               "type": {
                 "text": "CustomEvent<unknown>"
               }
             },
             {
               "name": "fluid-open",
-              "description": "Fired when the palette opens.\r\n *",
+              "description": "Fired when the palette opens.\n *",
               "type": {
                 "text": "CustomEvent<unknown>"
               }
@@ -12809,7 +12848,7 @@
             },
             {
               "name": "fluid-select",
-              "description": "Fired when an item is chosen. `event.detail` = `{ id, item }`.\r\n *",
+              "description": "Fired when an item is chosen. `event.detail` = `{ id, item }`.\n *",
               "type": {
                 "text": "CustomEvent<unknown>"
               }
@@ -16132,13 +16171,23 @@
             },
             {
               "kind": "field",
-              "name": "openOnInputClick",
+              "name": "noAutoOpen",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Open the calendar when the text input is clicked.",
-              "attribute": "open-on-input-click"
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "attribute": "no-auto-open"
+            },
+            {
+              "kind": "field",
+              "name": "noSelectOnFocus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "attribute": "no-select-on-focus"
             },
             {
               "kind": "field",
@@ -16337,8 +16386,36 @@
             },
             {
               "kind": "field",
+              "name": "suppressFocusSelect",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Focusing the field opens the picker and selects the current value, so a\nclick on the text offers the same thing a click on the trigger does and\nthe value is immediately replaceable.\n\nThe selection is deferred a frame because the browser places the caret\nafter this event, which would otherwise drop a selection made here."
+            },
+            {
+              "kind": "method",
+              "name": "refocusInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Return focus to the field without re-selecting its text. Closing the\npopover hands focus back to the input, and that is a continuation of the\ninteraction the user just finished rather than a fresh arrival at the\nfield, so it should not grab the value again."
+            },
+            {
+              "kind": "field",
               "name": "onInputClick",
-              "privacy": "private"
+              "privacy": "private",
+              "description": "Opening is driven by a click on the field rather than by focus. Focus also\narrives from constraint validation, from an overlay above the field\nclosing, and from any programmatic .focus(), none of which are a request\nto see the options, and opening there strands the user in a surface they\nnever asked for. Keyboard users open with ArrowDown, per the APG combobox\npattern."
+            },
+            {
+              "kind": "field",
+              "name": "onInputFocus",
+              "privacy": "private",
+              "description": "Focusing the field selects its current value, so one click is enough to\ntype or paste a replacement instead of having to clear the field first.\n\nDeferred a frame because the browser places the caret after this event,\nwhich would otherwise drop a selection made here."
             },
             {
               "kind": "field",
@@ -16504,13 +16581,22 @@
               "fieldName": "open"
             },
             {
-              "name": "open-on-input-click",
+              "name": "no-auto-open",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Open the calendar when the text input is clicked.",
-              "fieldName": "openOnInputClick"
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "fieldName": "noAutoOpen"
+            },
+            {
+              "name": "no-select-on-focus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "fieldName": "noSelectOnFocus"
             },
             {
               "name": "label",
@@ -17423,6 +17509,26 @@
             },
             {
               "kind": "field",
+              "name": "noAutoOpen",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "attribute": "no-auto-open"
+            },
+            {
+              "kind": "field",
+              "name": "noSelectOnFocus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "attribute": "no-select-on-focus"
+            },
+            {
+              "kind": "field",
               "name": "datePattern",
               "type": {
                 "text": "string | null"
@@ -17765,13 +17871,19 @@
             },
             {
               "kind": "field",
-              "name": "onInputFocus",
+              "name": "onInputClick",
               "privacy": "private",
-              "description": "Focusing the field opens the calendar, so reaching it by keyboard or by\nclicking the text offers the same thing a click on the trigger does.\nSuppressed while returning focus after apply/cancel, which would otherwise\nreopen the dialog the moment it closed."
+              "description": "Opening is driven by a click on the field rather than by focus. Focus also\narrives from constraint validation, from an overlay above the field\nclosing, and from any programmatic .focus(), none of which are a request\nto see the options, and opening there strands the user in a surface they\nnever asked for. Keyboard users open with ArrowDown, per the APG combobox\npattern."
             },
             {
               "kind": "field",
-              "name": "suppressFocusOpen",
+              "name": "onInputFocus",
+              "privacy": "private",
+              "description": "Focusing the field selects its current value, so one click is enough to\ntype or paste a replacement instead of having to clear the field first.\n\nDeferred a frame because the browser places the caret after this event,\nwhich would otherwise drop a selection made here."
+            },
+            {
+              "kind": "field",
+              "name": "suppressFocusSelect",
               "type": {
                 "text": "boolean"
               },
@@ -17787,7 +17899,7 @@
                   "text": "void"
                 }
               },
-              "description": "Return focus to the field without the focus handler reopening it."
+              "description": "Return focus to the field without re-selecting its text. Closing the\npopover hands focus back to the input, and that is a continuation of the\ninteraction the user just finished rather than a fresh arrival at the\nfield, so it should not grab the value again."
             },
             {
               "kind": "field",
@@ -18051,6 +18163,24 @@
               "default": "false",
               "description": "Let the range be typed as well as picked. Off by default: the field is\nread-only and the calendar is the only way in, which is what most callers\nwant. Turned on, the text is parsed on Enter or blur and applied like a\ncalendar selection; anything unparseable reverts to the committed range.",
               "fieldName": "typeable"
+            },
+            {
+              "name": "no-auto-open",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "fieldName": "noAutoOpen"
+            },
+            {
+              "name": "no-select-on-focus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "fieldName": "noSelectOnFocus"
             },
             {
               "name": "date-pattern",
@@ -19388,8 +19518,7 @@
                 "text": "boolean"
               },
               "default": "true",
-              "description": "Whether clicking the backdrop closes the dialog. Default true.",
-              "attribute": "light-dismiss"
+              "description": "Whether clicking the backdrop closes the dialog. Default true.\n\nPROPERTY ONLY, on purpose. A boolean attribute cannot express\n`false` (its mere presence means true), so a `light-dismiss`\nattribute could never turn a true-by-default behavior off and would\nonly mislead. Use the `no-light-dismiss` attribute from markup, or\nset this property from JavaScript."
             },
             {
               "kind": "field",
@@ -19482,6 +19611,34 @@
               }
             },
             {
+              "kind": "field",
+              "name": "dismissCandidate",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "A backdrop click reports the dialog element itself as the target. The\npointerdown guard additionally requires the gesture to have STARTED on the\nbackdrop, so a drag that begins inside the panel (selecting text, dragging\na slider) and releases outside it does not dismiss."
+            },
+            {
+              "kind": "method",
+              "name": "handleBackdropPointerDown",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "e",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ]
+            },
+            {
               "kind": "method",
               "name": "handleBackdropClick",
               "privacy": "private",
@@ -19556,15 +19713,6 @@
               "default": "\"md\"",
               "description": "Size variant.",
               "fieldName": "size"
-            },
-            {
-              "name": "light-dismiss",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Whether clicking the backdrop closes the dialog. Default true.",
-              "fieldName": "lightDismiss"
             },
             {
               "name": "no-light-dismiss",
@@ -20413,8 +20561,7 @@
                 "text": "boolean"
               },
               "default": "true",
-              "description": "Backdrop click closes.",
-              "attribute": "light-dismiss"
+              "description": "Whether clicking the backdrop closes the drawer. Default true.\n\nPROPERTY ONLY, on purpose. A boolean attribute cannot express\n`false` (its mere presence means true), so a `light-dismiss`\nattribute could never turn a true-by-default behavior off and would\nonly mislead. Use the `no-light-dismiss` attribute from markup, or\nset this property from JavaScript."
             },
             {
               "kind": "field",
@@ -20509,6 +20656,21 @@
             },
             {
               "kind": "field",
+              "name": "dismissCandidate",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "A backdrop click reports the dialog element itself as the target. The\npointerdown guard additionally requires the gesture to have STARTED on the\nbackdrop, so a drag that begins inside the panel (selecting text, dragging\na slider) and releases outside it does not dismiss."
+            },
+            {
+              "kind": "field",
+              "name": "handleBackdropPointerDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
               "name": "handleBackdropClick",
               "privacy": "private"
             }
@@ -20569,15 +20731,6 @@
               "default": "\"end\"",
               "description": "Edge to anchor to.",
               "fieldName": "placement"
-            },
-            {
-              "name": "light-dismiss",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "true",
-              "description": "Backdrop click closes.",
-              "fieldName": "lightDismiss"
             },
             {
               "name": "no-light-dismiss",
@@ -49400,8 +49553,12 @@
               "name": "base"
             },
             {
-              "description": "The circular indicator. Every styled property reads a component-scoped `--fluid-radio-*` token that falls back to a main semantic var (the override ladder).",
+              "description": "The circular indicator.",
               "name": "control"
+            },
+            {
+              "description": "The label slot wrapper (matches checkbox and switch). Every styled property reads a component-scoped `--fluid-radio-*` token that falls back to a main semantic var (the override ladder).",
+              "name": "label"
             }
           ],
           "slots": [
@@ -54286,6 +54443,52 @@
                   "text": "FluidSegment[]"
                 }
               }
+            },
+            {
+              "kind": "method",
+              "name": "segmentValue",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "segment",
+                  "type": {
+                    "text": "FluidSegment"
+                  }
+                }
+              ],
+              "description": "Markup parsed into a CONNECTED container upgrades in tree order: the\ngroup's callbacks can run while its `fluid-segment` children exist but\nare not upgraded yet, so their Lit accessors (`value` / `disabled`) are\nstill missing. Read through to the attributes in that window so a\nnot-yet-upgraded segment still matches the authored value."
+            },
+            {
+              "kind": "method",
+              "name": "segmentDisabled",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "segment",
+                  "type": {
+                    "text": "FluidSegment"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "lastResolvedValue",
+              "type": {
+                "text": "string | undefined"
+              },
+              "privacy": "private",
+              "description": "The last `value` that actually resolved to a segment. A value that has\nnever resolved is treated as \"its segment has not arrived yet\" (the\ndocument parser streams children in after the group upgrades) and is\npreserved, while a previously resolved value whose segment disappears\nfalls back like before."
             },
             {
               "kind": "method",
@@ -61545,11 +61748,11 @@
               "name": "--fluid-stat-label-fg"
             },
             {
-              "description": "Upward trend color. Falls back to --fluid-success-text.",
+              "description": "Upward trend color. Falls back to --fluid-success-base.",
               "name": "--fluid-stat-up-fg"
             },
             {
-              "description": "Downward trend color. Falls back to --fluid-danger-text.",
+              "description": "Downward trend color. Falls back to --fluid-danger-base.",
               "name": "--fluid-stat-down-fg"
             },
             {
@@ -61936,11 +62139,11 @@
               "description": "Label + neutral change text."
             },
             {
-              "name": "--fluid-success-text",
+              "name": "--fluid-success-base",
               "description": "Upward trend."
             },
             {
-              "name": "--fluid-danger-text",
+              "name": "--fluid-danger-base",
               "description": "Downward trend."
             }
           ],
@@ -66896,6 +67099,42 @@
               "description": "Info variant default text."
             },
             {
+              "name": "--fluid-color-emerald-50",
+              "description": "Success variant default background."
+            },
+            {
+              "name": "--fluid-color-emerald-200",
+              "description": "Success variant default border."
+            },
+            {
+              "name": "--fluid-color-emerald-800",
+              "description": "Success variant default text."
+            },
+            {
+              "name": "--fluid-color-amber-50",
+              "description": "Warning variant default background."
+            },
+            {
+              "name": "--fluid-color-amber-300",
+              "description": "Warning variant default border."
+            },
+            {
+              "name": "--fluid-color-amber-800",
+              "description": "Warning variant default text."
+            },
+            {
+              "name": "--fluid-color-red-50",
+              "description": "Danger variant default background."
+            },
+            {
+              "name": "--fluid-color-red-200",
+              "description": "Danger variant default border."
+            },
+            {
+              "name": "--fluid-color-red-800",
+              "description": "Danger variant default text."
+            },
+            {
               "name": "--fluid-target-min",
               "description": "Remove button minimum hit-target size."
             }
@@ -68841,6 +69080,10 @@
               "name": "--fluid-time-picker-radius"
             },
             {
+              "description": "Field + option font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-time-picker-font-family"
+            },
+            {
               "description": "Popover background. Falls back to --fluid-surface-base.",
               "name": "--fluid-time-picker-listbox-bg"
             },
@@ -68849,20 +69092,52 @@
               "name": "--fluid-time-picker-listbox-shadow"
             },
             {
+              "description": "Color of the rail marking the keyboard-active option. Falls back to --fluid-accent-base.",
+              "name": "--fluid-time-picker-option-active-rail"
+            },
+            {
+              "description": "Popover corner radius. Falls back to --fluid-time-picker-radius, so the popover and the field share the corner they meet at.",
+              "name": "--fluid-time-picker-listbox-radius"
+            },
+            {
+              "description": "Inset around the option list. Falls back to --fluid-space-1.",
+              "name": "--fluid-time-picker-listbox-padding"
+            },
+            {
+              "description": "Height at which the option list starts scrolling. Falls back to 16rem.",
+              "name": "--fluid-time-picker-listbox-max-height"
+            },
+            {
+              "description": "Scrollbar thumb color in the popover. Falls back to --fluid-border-strong.",
+              "name": "--fluid-time-picker-border-strong"
+            },
+            {
               "description": "Option text color. Falls back to --fluid-text-primary.",
               "name": "--fluid-time-picker-option-fg"
             },
             {
-              "description": "Active/hovered option background. Falls back to --fluid-surface-muted.",
+              "description": "Active/hovered option background. Falls back to an 8% --fluid-accent-base tint.",
               "name": "--fluid-time-picker-option-active-bg"
             },
             {
-              "description": "Selected option background. Falls back to --fluid-accent-base.",
+              "description": "Active option rail width. Falls back to 2px.",
+              "name": "--fluid-time-picker-option-active-rail-width"
+            },
+            {
+              "description": "Active option rail inset. Falls back to 4px.",
+              "name": "--fluid-time-picker-option-active-rail-inset"
+            },
+            {
+              "description": "Selected option background. Falls back to a 16% --fluid-accent-base tint.",
               "name": "--fluid-time-picker-option-selected-bg"
             },
             {
-              "description": "Selected option text. Falls back to --fluid-accent-text.",
+              "description": "Selected option text. Falls back to --fluid-text-primary.",
               "name": "--fluid-time-picker-option-selected-fg"
+            },
+            {
+              "description": "Selected option font weight. Falls back to --fluid-font-weight-medium.",
+              "name": "--fluid-time-picker-option-selected-font-weight"
             },
             {
               "description": "Focus ring width. Falls back to --fluid-focus-ring-width.",
@@ -69599,13 +69874,23 @@
             },
             {
               "kind": "field",
-              "name": "openOnInputClick",
+              "name": "noAutoOpen",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Open the time options when the text input is clicked.",
-              "attribute": "open-on-input-click"
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "attribute": "no-auto-open"
+            },
+            {
+              "kind": "field",
+              "name": "noSelectOnFocus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "attribute": "no-select-on-focus"
             },
             {
               "kind": "field",
@@ -69616,6 +69901,16 @@
               "privacy": "private",
               "default": "\"\"",
               "description": "Live text in the input (drives type-to-filter)."
+            },
+            {
+              "kind": "field",
+              "name": "filtering",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "True only while the typed text is a user-entered filter.\n\n`typed` also mirrors the committed value so the field shows it, which\nmeant opening a picker that already had a value filtered the list down to\nthat single option: you could never see the others without clearing the\nfield first. Filtering therefore starts on input and stops whenever the\ntext goes back to mirroring the value."
             },
             {
               "kind": "field",
@@ -69845,7 +70140,14 @@
             {
               "kind": "field",
               "name": "onInputClick",
-              "privacy": "private"
+              "privacy": "private",
+              "description": "Opening is driven by a click on the field rather than by focus. Focus also\narrives from constraint validation, from an overlay above the field\nclosing, and from any programmatic .focus(), none of which are a request\nto see the options, and opening there strands the user in a surface they\nnever asked for. Keyboard users open with ArrowDown, per the APG combobox\npattern."
+            },
+            {
+              "kind": "field",
+              "name": "onInputFocus",
+              "privacy": "private",
+              "description": "Focusing the field selects its current value, so one click is enough to\ntype or paste a replacement instead of having to clear the field first.\n\nDeferred a frame because the browser places the caret after this event,\nwhich would otherwise drop a selection made here."
             },
             {
               "kind": "method",
@@ -69885,6 +70187,26 @@
                 }
               },
               "description": "Parse the typed text (a display label or canonical value) and commit if it maps to an option."
+            },
+            {
+              "kind": "field",
+              "name": "suppressFocusSelect",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "refocusInput",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Return focus to the field without re-selecting its text. Closing the\npopover hands focus back to the input, and that is a continuation of the\ninteraction the user just finished rather than a fresh arrival at the\nfield, so it should not grab the value again."
             },
             {
               "kind": "method",
@@ -70037,13 +70359,22 @@
               "fieldName": "open"
             },
             {
-              "name": "open-on-input-click",
+              "name": "no-auto-open",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
-              "description": "Open the time options when the text input is clicked.",
-              "fieldName": "openOnInputClick"
+              "description": "Prevent clicking the field from opening the picker.\n\nOpening on click is the default so the text and the trigger button offer\nthe same thing. Set this when the picker should only open from its\ntrigger button or from ArrowDown.",
+              "fieldName": "noAutoOpen"
+            },
+            {
+              "name": "no-select-on-focus",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent focusing the field from selecting its current value.\n\nSelecting is the default so one click is enough to type or paste a\nreplacement instead of having to clear the field first.",
+              "fieldName": "noSelectOnFocus"
             },
             {
               "name": "label",
@@ -70075,10 +70406,6 @@
               "description": "Field + listbox background."
             },
             {
-              "name": "--fluid-surface-muted",
-              "description": "Active option background."
-            },
-            {
               "name": "--fluid-text-primary",
               "description": "Field + option text."
             },
@@ -70092,15 +70419,27 @@
             },
             {
               "name": "--fluid-accent-base",
-              "description": "Focus border + selected option background."
+              "description": "Focus border, option tints and active rail."
             },
             {
-              "name": "--fluid-accent-text",
-              "description": "Selected option text."
+              "name": "--fluid-font-weight-medium",
+              "description": "Selected option font weight."
+            },
+            {
+              "name": "--fluid-radius-full",
+              "description": "Active option rail radius."
             },
             {
               "name": "--fluid-field-border-radius",
               "description": "Field radius."
+            },
+            {
+              "name": "--fluid-space-1",
+              "description": "Default inset around the option list."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Default scrollbar thumb color in the popover."
             },
             {
               "name": "--fluid-field-height-md",
@@ -70223,6 +70562,10 @@
             {
               "description": "The text column (time + slotted content).",
               "name": "content"
+            },
+            {
+              "description": "The default-slot wrapper below the time row.",
+              "name": "body"
             }
           ],
           "slots": [
@@ -74076,12 +74419,24 @@
               "name": "--fluid-transfer-option-hover-bg"
             },
             {
-              "description": "Selected option background. Falls back to --fluid-accent-base.",
+              "description": "Selected option background. Falls back to a 16% --fluid-accent-base tint.",
               "name": "--fluid-transfer-option-selected-bg"
             },
             {
-              "description": "Selected option text color. Falls back to --fluid-accent-text.",
+              "description": "Selected option text color. Falls back to --fluid-text-primary.",
               "name": "--fluid-transfer-option-selected-fg"
+            },
+            {
+              "description": "Selected option font weight. Falls back to --fluid-font-weight-medium.",
+              "name": "--fluid-transfer-option-selected-font-weight"
+            },
+            {
+              "description": "Selected option background on hover. Falls back to a 24% --fluid-accent-base tint.",
+              "name": "--fluid-transfer-option-selected-hover-bg"
+            },
+            {
+              "description": "Active-row ring while selected. Falls back to --fluid-accent-base.",
+              "name": "--fluid-transfer-option-selected-ring"
             },
             {
               "description": "Disabled option text color. Falls back to --fluid-text-secondary.",
@@ -75242,10 +75597,6 @@
               "description": "Selected option background."
             },
             {
-              "name": "--fluid-accent-text",
-              "description": "Selected option text color."
-            },
-            {
               "name": "--fluid-field-border-width",
               "description": "Default border width."
             },
@@ -75300,6 +75651,10 @@
             {
               "name": "--fluid-easing-standard",
               "description": "Hover transition easing."
+            },
+            {
+              "name": "--fluid-space-1",
+              "description": "Gap between the two transfer buttons."
             }
           ],
           "tagName": "fluid-transfer",

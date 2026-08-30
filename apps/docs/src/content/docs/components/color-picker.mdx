@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-color-picker>` is a single field with three input paths: click the left
 swatch to open the OS color picker, type a hex value in the field, or click one
 of the optional preset swatches. The swatch is slotted into the `prefix` of an
@@ -35,6 +34,7 @@ control. Form-associated; validates hex inline.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/color-picker/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +46,7 @@ control. Form-associated; validates hex inline.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/color-picker";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,7 +58,9 @@ control. Form-associated; validates hex inline.
   <fluid-color-picker value="#6366f1" aria-label="Primary color"></fluid-color-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-color-picker name="primary" value="#6366f1"></fluid-color-picker>`} />
+<ConformanceCode
+  code={`<fluid-color-picker name="primary" value="#6366f1"></fluid-color-picker>`}
+/>
 
 ### With a preset palette
 
@@ -72,10 +75,12 @@ Clicking a preset fires both `fluid-input` and `fluid-change`.
   ></fluid-color-picker>
 </Demo>
 
-<ConformanceCode code={`<fluid-color-picker
+<ConformanceCode
+  code={`<fluid-color-picker
   value="#0ea5e9"
   palette='["#0ea5e9","#6366f1","#a855f7","#ec4899"]'
-></fluid-color-picker>`} />
+></fluid-color-picker>`}
+/>
 
 ## Inside a form
 
@@ -108,6 +113,7 @@ carry `{ value }` in `detail`.
       el.addEventListener("fluid-change", (e) => console.log("committed:", e.detail.value));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="AccentPicker.tsx"
@@ -126,6 +132,7 @@ carry `{ value }` in `detail`.
       return <fluid-color-picker ref={ref} aria-label="Accent" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="AccentPicker.vue"
@@ -138,6 +145,7 @@ carry `{ value }` in `detail`.
       <fluid-color-picker aria-label="Accent" @fluid-input="onInput" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="accent-picker.component.ts"
@@ -156,6 +164,7 @@ carry `{ value }` in `detail`.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="AccentPicker.svelte"
@@ -168,6 +177,7 @@ carry `{ value }` in `detail`.
 
     <fluid-color-picker aria-label="Accent" on:fluid-input={onInput} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -178,7 +188,7 @@ carry `{ value }` in `detail`.
 - A small set of brand colors users should mostly pick from: provide a
   `palette`, and the open-the-picker fallback handles edge cases.
 
-### When *not* to use
+### When _not_ to use
 
 - **Multi-color inputs** (gradients): build the composite from this component
   plus separate inputs for stops.
@@ -201,8 +211,8 @@ background, focus ring) apply too. The **complete list** is in the
 ```
 
 <Aside type="tip">
-  Select a `fluid-color-picker` in the [Theme builder](/playground/) to tweak
-  the swatch, preset, and focus tokens visually.
+  Select a `fluid-color-picker` in the [Theme builder](/playground/) to tweak the swatch, preset,
+  and focus tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -245,10 +255,10 @@ submitting the parent form surfaces the browser's prompt
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

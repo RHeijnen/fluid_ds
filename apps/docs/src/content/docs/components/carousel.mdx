@@ -16,13 +16,19 @@ Children are `<fluid-carousel-item>` elements, one per slide.
 <Demo>
   <fluid-carousel style="max-width: 32rem;">
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">Slide 1</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">
+        Slide 1
+      </div>
     </fluid-carousel-item>
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">Slide 2</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">
+        Slide 2
+      </div>
     </fluid-carousel-item>
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">Slide 3</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">
+        Slide 3
+      </div>
     </fluid-carousel-item>
   </fluid-carousel>
 </Demo>
@@ -42,6 +48,7 @@ The define module registers **both** `<fluid-carousel>` and
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/carousel/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -53,6 +60,7 @@ The define module registers **both** `<fluid-carousel>` and
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/carousel"; // registers carousel + carousel-item
     ```
+
   </TabItem>
 </Tabs>
 
@@ -63,22 +71,28 @@ The define module registers **both** `<fluid-carousel>` and
 <Demo>
   <fluid-carousel style="max-width: 32rem;">
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">Slide 1</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-100); font-size: 2rem;">
+        Slide 1
+      </div>
     </fluid-carousel-item>
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">Slide 2</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-200); font-size: 2rem;">
+        Slide 2
+      </div>
     </fluid-carousel-item>
     <fluid-carousel-item>
-      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">Slide 3</div>
+      <div style="display: grid; place-items: center; width: 100%; height: 100%; background: var(--fluid-color-brand-300); font-size: 2rem;">
+        Slide 3
+      </div>
     </fluid-carousel-item>
   </fluid-carousel>
 </Demo>
 
 ```html
 <fluid-carousel>
-  <fluid-carousel-item><img src="/1.jpg" alt="…"></fluid-carousel-item>
-  <fluid-carousel-item><img src="/2.jpg" alt="…"></fluid-carousel-item>
-  <fluid-carousel-item><img src="/3.jpg" alt="…"></fluid-carousel-item>
+  <fluid-carousel-item><img src="/1.jpg" alt="…" /></fluid-carousel-item>
+  <fluid-carousel-item><img src="/2.jpg" alt="…" /></fluid-carousel-item>
+  <fluid-carousel-item><img src="/3.jpg" alt="…" /></fluid-carousel-item>
 </fluid-carousel>
 ```
 
@@ -88,9 +102,7 @@ Set `autoplay` to a millisecond interval. The carousel pauses when the
 pointer is over it (turn off via `pause-on-hover="false"`).
 
 ```html
-<fluid-carousel autoplay="4000" loop>
-  …
-</fluid-carousel>
+<fluid-carousel autoplay="4000" loop> … </fluid-carousel>
 ```
 
 ### Hiding nav or pagination
@@ -99,8 +111,7 @@ pointer is over it (turn off via `pause-on-hover="false"`).
 dots. Useful when the surrounding UI provides its own controls.
 
 ```html
-<fluid-carousel no-pagination>…</fluid-carousel>
-<fluid-carousel no-navigation>…</fluid-carousel>
+<fluid-carousel no-pagination>…</fluid-carousel> <fluid-carousel no-navigation>…</fluid-carousel>
 ```
 
 ### Programmatic control
@@ -129,6 +140,7 @@ swipe, button, dot, keyboard, or autoplay, with the new index on
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Hero.tsx"
@@ -146,6 +158,7 @@ swipe, button, dot, keyboard, or autoplay, with the new index on
       return <fluid-carousel ref={ref}>{/* items */}</fluid-carousel>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Hero.vue"
@@ -158,6 +171,7 @@ swipe, button, dot, keyboard, or autoplay, with the new index on
       <fluid-carousel @fluid-slide-change="onChange"><!-- items --></fluid-carousel>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="hero.component.ts"
@@ -174,6 +188,7 @@ swipe, button, dot, keyboard, or autoplay, with the new index on
       onChange(e: any) { console.log(e.detail.index); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Hero.svelte"
@@ -184,6 +199,7 @@ swipe, button, dot, keyboard, or autoplay, with the new index on
 
     <fluid-carousel on:fluid-slide-change={onChange}><!-- items --></fluid-carousel>
     ```
+
   </TabItem>
 </Tabs>
 

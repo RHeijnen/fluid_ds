@@ -1,0 +1,142 @@
+/*
+ * Titanium, a metallic graphite preset.
+ *
+ * Cool grays for chrome and data visualisation, with a near-black graphite
+ * accent for primary controls. Status tones (success / danger / warning /
+ * info) are theme-independent, so tags and badges keep their colour: the look
+ * is "mostly grays, colour only where it carries meaning".
+ *
+ * Usage: load this stylesheet, then set `data-fluid-brand="titanium"` on
+ * <html> (global) or any subtree you want themed.
+ *
+ *   <html data-fluid-brand="titanium">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/titanium.css">
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme).
+ */
+[data-fluid-brand="titanium"] {
+  /* Brand palette, cool gunmetal grays. The accent derives from brand-600, so
+     that step is a dark graphite: primary buttons and the active nav read as
+     near-black, while chart ramps drawn from the lighter steps stay gray. */
+  --fluid-color-brand-50: #f6f7f9;
+  --fluid-color-brand-100: #eceef2;
+  --fluid-color-brand-200: #d8dce3;
+  --fluid-color-brand-300: #b7bfca;
+  --fluid-color-brand-400: #8b94a4;
+  --fluid-color-brand-500: #5f6879;
+  --fluid-color-brand-600: #3a4150;
+  --fluid-color-brand-700: #2b313c;
+  --fluid-color-brand-800: #1e222b;
+  --fluid-color-brand-900: #12151b;
+
+  /* Crisp, machined corners: the default radius style, a touch tighter, so the
+     look reads precise rather than soft. */
+  --fluid-radius-sm: 0.1875rem;
+  --fluid-radius-md: 0.375rem;
+  --fluid-radius-lg: 0.5rem;
+  --fluid-radius-xl: 0.75rem;
+
+  /* A stylish, technical typeface to suit the metallic look. The theme only
+     names the font; the consuming app loads it (e.g. Space Grotesk from Google
+     Fonts). It degrades cleanly to the default sans stack when absent. */
+  --fluid-font-family-sans:
+    "Space Grotesk", "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+
+  /* Roomier density: scale the whole spacing ramp up ~20%, so inner paddings,
+     gaps and control heights all read a little bigger and more premium. Every
+     component that pads from the space scale grows together. */
+  --fluid-space-1: 0.3rem;
+  --fluid-space-2: 0.6rem;
+  --fluid-space-3: 0.9rem;
+  --fluid-space-4: 1.2rem;
+  --fluid-space-5: 1.5rem;
+  --fluid-space-6: 1.8rem;
+  --fluid-space-8: 2.4rem;
+  --fluid-space-10: 3rem;
+  --fluid-space-12: 3.6rem;
+
+  /* Re-derive the brand-driven semantics at this scope. A custom property that
+     reads the brand ramp is substituted where it is declared, so the base
+     :root accent keeps the default brand unless it is re-declared here. This
+     is what makes the brand work on a subtree, not only at :root. */
+  --fluid-accent-base: var(--fluid-color-brand-600);
+  --fluid-accent-hover: var(--fluid-color-brand-700);
+  --fluid-accent-active: var(--fluid-color-brand-800);
+  --fluid-focus-ring-color: var(--fluid-color-brand-500);
+}
+
+/* Dark scheme re-derives the accent from lighter brand steps, the same way the
+   base tokens do, so a dark-mode subtree keeps the right contrast. */
+[data-fluid-theme="dark"] [data-fluid-brand="titanium"],
+[data-fluid-brand="titanium"][data-fluid-theme="dark"] {
+  --fluid-accent-base: var(--fluid-color-brand-500);
+  --fluid-accent-hover: var(--fluid-color-brand-400);
+  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-focus-ring-color: var(--fluid-color-brand-400);
+}
+
+/*
+ * Monochrome status tones.
+ *
+ * Titanium is deliberately a black-and-white theme, so the positive and
+ * informational status tones drop their colour and use the same gunmetal ramp
+ * as the rest of the theme: a "+12.4%" badge reads as light gray, not green.
+ * This is an intentional departure from the usual convention that status tones
+ * are theme-independent.
+ *
+ * Danger keeps its red. An error is the one signal that should stay
+ * unmistakable even in a monochrome theme, so it is left untouched.
+ *
+ * Two layers: the raw success/warning/info colour scales are remapped (badges,
+ * tags and dots read these directly), and the semantic tones are re-declared
+ * so they re-derive from the grayed scales at this scope rather than keeping
+ * the base :root colour.
+ */
+[data-fluid-brand="titanium"] {
+  /* Success (was emerald), warning (was amber) and info (was sky) -> gunmetal. */
+  --fluid-color-emerald-50: #f6f7f9;
+  --fluid-color-emerald-100: #eceef2;
+  --fluid-color-emerald-200: #d8dce3;
+  --fluid-color-emerald-300: #b7bfca;
+  --fluid-color-emerald-400: #8b94a4;
+  --fluid-color-emerald-500: #5f6879;
+  --fluid-color-emerald-600: #3a4150;
+  --fluid-color-emerald-700: #2b313c;
+  --fluid-color-emerald-800: #1e222b;
+  --fluid-color-emerald-900: #12151b;
+
+  --fluid-color-amber-50: #f6f7f9;
+  --fluid-color-amber-100: #eceef2;
+  --fluid-color-amber-200: #d8dce3;
+  --fluid-color-amber-300: #b7bfca;
+  --fluid-color-amber-400: #8b94a4;
+  --fluid-color-amber-500: #5f6879;
+  --fluid-color-amber-600: #3a4150;
+  --fluid-color-amber-700: #2b313c;
+  --fluid-color-amber-800: #1e222b;
+  --fluid-color-amber-900: #12151b;
+
+  --fluid-color-sky-50: #f6f7f9;
+  --fluid-color-sky-100: #eceef2;
+  --fluid-color-sky-200: #d8dce3;
+  --fluid-color-sky-300: #b7bfca;
+  --fluid-color-sky-400: #8b94a4;
+  --fluid-color-sky-500: #5f6879;
+  --fluid-color-sky-600: #3a4150;
+  --fluid-color-sky-700: #2b313c;
+  --fluid-color-sky-800: #1e222b;
+  --fluid-color-sky-900: #12151b;
+
+  /* Re-derive the semantic tones from the grayed scales at this scope, so
+     tone-based components (timelines, tone buttons) go gray too. */
+  --fluid-success-base: var(--fluid-color-emerald-700);
+  --fluid-success-hover: var(--fluid-color-emerald-800);
+  --fluid-success-active: var(--fluid-color-emerald-900);
+  --fluid-warning-base: var(--fluid-color-amber-500);
+  --fluid-warning-hover: var(--fluid-color-amber-600);
+  --fluid-warning-active: var(--fluid-color-amber-700);
+  --fluid-info-base: var(--fluid-color-sky-600);
+  --fluid-info-hover: var(--fluid-color-sky-700);
+  --fluid-info-active: var(--fluid-color-sky-800);
+}

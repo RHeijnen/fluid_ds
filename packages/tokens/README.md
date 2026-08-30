@@ -6,9 +6,18 @@ scheme) and a JSON manifest. Drop the CSS into your `<head>` or import it
 in your bundler.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css" />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/base.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/light.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@fluid-ds/tokens@latest/dist/dark.css"
+/>
 ```
 
 ## Install

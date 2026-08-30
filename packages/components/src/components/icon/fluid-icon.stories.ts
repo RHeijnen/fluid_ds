@@ -11,7 +11,7 @@ const meta: Meta<Args> = {
   title: "Components/Content/Icon",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     name: { control: "select", options: listIcons() },

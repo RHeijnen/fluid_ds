@@ -17,9 +17,9 @@ adopts the new brand.
 
 ```css title="brand.css"
 [data-fluid-brand="custom"] {
-  --fluid-accent-base: #6366f1;   /* the accent every component reads */
+  --fluid-accent-base: #6366f1; /* the accent every component reads */
   --fluid-success-base: #16a34a;
-  --fluid-danger-base:  #dc2626;
+  --fluid-danger-base: #dc2626;
 }
 ```
 
@@ -50,7 +50,7 @@ global brand.
 
 ```css
 [data-fluid-brand="custom"] {
-  --fluid-button-bg: #db2777;          /* changes only buttons */
+  --fluid-button-bg: #db2777; /* changes only buttons */
 }
 ```
 
@@ -59,10 +59,11 @@ exposes, look for the **CSS custom properties** section.
 
 ## 3. Per-element overrides
 
-If you want a single instance to look different from its siblings, use the
-[Theme builder](/playground/) to isolate the element. The builder stamps a stable
-`data-fluid-id` attribute on the element and emits a CSS rule scoped to that
-id:
+If you want a single instance to look different from its siblings, scope the
+component tokens to a selector that matches just that element. The house
+convention is a `data-fluid-id` attribute, which keeps theming hooks in a
+namespace distinct from your own class system, easy to grep for, easy to
+audit, easy to remove:
 
 ```css
 [data-fluid-id="primary-cta"] {
@@ -70,9 +71,11 @@ id:
 }
 ```
 
-Drop the same attribute on the matching element in your app and the override
-applies. The `data-fluid-*` namespace stays distinct from your own class
-system so it's easy to grep for, easy to audit, easy to remove.
+You don't have to guess token names: isolate the component in the
+[Theme builder](/playground/)'s Design mode and tweak it visually. The builder
+emits a component-scoped rule (`fluid-button { ... }`); to narrow it to one
+instance, copy those declarations into your `[data-fluid-id]` rule. See
+[per-element overrides](/theming/per-element/) for the full pattern.
 
 ## Dark mode
 

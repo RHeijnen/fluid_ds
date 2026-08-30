@@ -6,7 +6,7 @@ const meta: Meta = {
   title: "Components/Utilities/Animation",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   }
 };
 
@@ -30,10 +30,7 @@ export const Preset: Story = {
 export const CustomKeyframes: Story = {
   render: () => {
     const el = document.createElement("fluid-animation") as any;
-    el.keyframes = [
-      { transform: "rotate(0deg)" },
-      { transform: "rotate(360deg)" }
-    ];
+    el.keyframes = [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }];
     el.duration = 1200;
     el.iterations = Infinity;
     el.play = true;

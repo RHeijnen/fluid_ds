@@ -1,0 +1,213 @@
+---
+/**
+ * Live hero demo for the effects page: every button fires the real effect
+ * function from `@fluid-ds/animations/effects` on the shared overlay canvas,
+ * anchored to the button that was clicked when the effect supports an origin.
+ *
+ * An ambient effect (snow, butterflies, ...) can be toggled on; it is
+ * force-stopped the moment the demo scrolls out of view, and everything is
+ * disabled (with a note) under prefers-reduced-motion.
+ */
+import Demo from "./Demo.astro";
+
+const BURSTS = [
+  { name: "confetti", label: "Confetti", emoji: "🎉" },
+  { name: "fireworks", label: "Fireworks", emoji: "🎆" },
+  { name: "fireworkFinale", label: "Finale", emoji: "🎇" },
+  { name: "pride", label: "Pride", emoji: "🌈" },
+  { name: "hearts", label: "Hearts", emoji: "💖" },
+  { name: "stars", label: "Stars", emoji: "⭐" },
+  { name: "coins", label: "Coins", emoji: "🪙" },
+  { name: "glitter", label: "Glitter", emoji: "🌟" },
+  { name: "shockwaveDebris", label: "Shockwave", emoji: "💥" },
+  { name: "successCheck", label: "Success check", emoji: "✅" }
+];
+---
+
+<Demo>
+  <div class="fx-demo" data-fx-demo>
+    <p class="fx-reduced" data-fx-reduced hidden>
+      Your system asks for reduced motion, so the effect triggers are disabled here. Each effect
+      would render as a single brief static flash instead of animating.
+    </p>
+    <div class="fx-grid" role="group" aria-label="Fire an effect">
+      {
+        BURSTS.map((burst) => (
+          <fluid-button size="sm" variant="secondary" data-fx-effect={burst.name}>
+            <span aria-hidden="true">{burst.emoji}</span> {burst.label}
+          </fluid-button>
+        ))
+      }
+    </div>
+    <div class="fx-ambient">
+      <fluid-select data-fx-ambient-select label="Ambient effect" value="snow" size="sm">
+        <fluid-option value="snow">❄️ Snow</fluid-option>
+        <fluid-option value="butterflies">🦋 Butterflies</fluid-option>
+        <fluid-option value="bubbles">🫧 Bubbles</fluid-option>
+        <fluid-option value="embers">🔥 Embers</fluid-option>
+        <fluid-option value="fireflies">🪲 Fireflies</fluid-option>
+      </fluid-select>
+      <fluid-button size="sm" variant="primary" data-fx-ambient-toggle>Start ambient</fluid-button>
+      <span class="fx-status" data-fx-status role="status"></span>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .fx-demo {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  .fx-reduced {
+    margin: 0;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-text-secondary);
+  }
+  .fx-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .fx-ambient {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 0.75rem;
+    padding-block-start: 0.75rem;
+    border-block-start: 1px solid var(--fluid-border-default);
+  }
+  .fx-ambient fluid-select {
+    min-inline-size: 12rem;
+  }
+  .fx-status {
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-text-secondary);
+    align-self: center;
+  }
+</style>
+
+<script>
+  import {
+    EFFECTS,
+    EFFECT_CATALOG,
+    type EffectHandle,
+    type EffectName
+  } from "@fluid-ds/animations/effects";
+
+  interface SelectLike extends HTMLElement {
+    value: string;
+  }
+
+  const AMBIENT_STATUS: Partial<Record<EffectName, string>> = {
+    snow: "Snow is falling over the whole page.",
+    butterflies: "Butterflies are drifting across the page.",
+    bubbles: "Bubbles are rising up the page.",
+    embers: "Embers are climbing from the bottom edge.",
+    fireflies: "Fireflies are wandering around the page."
+  };
+
+  function catalogEntry(name: string) {
+    return EFFECT_CATALOG.find((effect) => effect.name === name);
+  }
+
+  function setup(root: HTMLElement): void {
+    const status = root.querySelector<HTMLElement>("[data-fx-status]");
+    const note = root.querySelector<HTMLElement>("[data-fx-reduced]");
+    const toggle = root.querySelector<HTMLElement>("[data-fx-ambient-toggle]");
+    const select = root.querySelector<SelectLike>("[data-fx-ambient-select]");
+    const burstButtons = Array.from(root.querySelectorAll<HTMLElement>("[data-fx-effect]"));
+    if (!status || !toggle || !select) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const live = new Set<EffectHandle>();
+    let ambient: EffectHandle | null = null;
+    let visible = true;
+
+    const sync = (): void => {
+      toggle.textContent = ambient ? "Stop ambient" : "Start ambient";
+      if (ambient) {
+        const entry = catalogEntry(select.value);
+        status.textContent = (entry && AMBIENT_STATUS[entry.name]) ?? "Ambient effect running.";
+      } else if (!reduceMotion.matches) {
+        status.textContent = "";
+      }
+    };
+
+    const stopAmbient = (): void => {
+      if (ambient) {
+        ambient.stop();
+        ambient = null;
+      }
+      sync();
+    };
+
+    const startAmbient = (): void => {
+      if (reduceMotion.matches || !visible) return;
+      if (ambient) ambient.stop();
+      const entry = catalogEntry(select.value);
+      if (!entry) return;
+      const handle = EFFECTS[entry.name]({});
+      ambient = handle;
+      void handle.finished.then(() => {
+        if (ambient === handle) {
+          ambient = null;
+          sync();
+        }
+      });
+      sync();
+    };
+
+    for (const button of burstButtons) {
+      button.addEventListener("click", () => {
+        if (reduceMotion.matches || !visible) return;
+        const entry = catalogEntry(button.dataset.fxEffect ?? "");
+        if (!entry) return;
+        const handle = EFFECTS[entry.name](entry.origin ? { origin: button } : {});
+        live.add(handle);
+        void handle.finished.then(() => live.delete(handle));
+      });
+    }
+
+    toggle.addEventListener("click", () => {
+      if (reduceMotion.matches) return;
+      if (ambient) stopAmbient();
+      else startAmbient();
+    });
+
+    select.addEventListener("fluid-change", () => {
+      /* Swap the running ambient effect in place when a new one is chosen. */
+      if (ambient) startAmbient();
+    });
+
+    /* Force-stop everything the moment the demo scrolls out of view. */
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          visible = entry.isIntersecting;
+          if (!visible) {
+            for (const handle of live) handle.stop();
+            live.clear();
+            stopAmbient();
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(root);
+
+    const applyReducedMotion = (): void => {
+      const reduced = reduceMotion.matches;
+      if (note) note.hidden = !reduced;
+      for (const button of burstButtons) button.toggleAttribute("disabled", reduced);
+      toggle.toggleAttribute("disabled", reduced);
+      if (reduced) stopAmbient();
+      sync();
+    };
+    reduceMotion.addEventListener("change", applyReducedMotion);
+    applyReducedMotion();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-fx-demo]")) setup(root);
+</script>

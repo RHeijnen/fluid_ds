@@ -9,6 +9,15 @@ optional markers. Drive it with plain properties so it works from any
 framework. Expansion pack.
 
 import { Aside } from "@astrojs/starlight/components";
+import MapDemo from "../../../components/MapDemo.astro";
+
+The map below is live and fully self-contained: drag, zoom, and click the
+markers. It uses the documented offline setup (a locally bundled stylesheet, an
+inline SVG `tile-url`, tone pins, and an emoji `divIcon`), so this page makes
+no tile or CDN requests; with the default OpenStreetMap tiles you get real
+imagery instead of the repeating pattern.
+
+<MapDemo />
 
 <Aside type="note">
   Leaflet needs its global stylesheet and a sized container, neither of which
@@ -34,8 +43,8 @@ import "@fluid-ds/map/define/map";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
+| Tag           | Use                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------- |
 | `<fluid-map>` | Themed Leaflet map with markers, move/zoom events, and a labelled region for assistive tech. |
 
 ## Use
@@ -163,21 +172,21 @@ div.
 
 ### Properties
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `center` | - | `[number, number]` | `[51.505, -0.09]` | Map center as `[lat, lng]`. |
-| `zoom` | `zoom` | `number` | `13` | Zoom level. |
-| `markers` | - | `{ lat, lng, label?, tone?, icon? }[]` | `[]` | Markers to place. `label` becomes a popup + tooltip; `tone` renders a coloured Fluid pin; `icon` is a fully custom image or HTML / emoji marker (wins over `tone`). |
-| `tileUrl` | `tile-url` | `string` | OpenStreetMap tiles | Tile layer URL template; an empty string disables tiles. |
-| `attribution` | `attribution` | `string` | OpenStreetMap credit | Tile attribution (HTML allowed). |
-| `label` | `label` | `string` | `"Map"` | Accessible name for the map region. |
+| Property      | Attribute     | Type                                   | Default              | Description                                                                                                                                                         |
+| ------------- | ------------- | -------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `center`      | -             | `[number, number]`                     | `[51.505, -0.09]`    | Map center as `[lat, lng]`.                                                                                                                                         |
+| `zoom`        | `zoom`        | `number`                               | `13`                 | Zoom level.                                                                                                                                                         |
+| `markers`     | -             | `{ lat, lng, label?, tone?, icon? }[]` | `[]`                 | Markers to place. `label` becomes a popup + tooltip; `tone` renders a coloured Fluid pin; `icon` is a fully custom image or HTML / emoji marker (wins over `tone`). |
+| `tileUrl`     | `tile-url`    | `string`                               | OpenStreetMap tiles  | Tile layer URL template; an empty string disables tiles.                                                                                                            |
+| `attribution` | `attribution` | `string`                               | OpenStreetMap credit | Tile attribution (HTML allowed).                                                                                                                                    |
+| `label`       | `label`       | `string`                               | `"Map"`              | Accessible name for the map region.                                                                                                                                 |
 
 ### Events
 
-| Event | Detail | When |
-| --- | --- | --- |
-| `fluid-marker-click` | `{ marker }` | A marker is clicked or activated with Enter. |
-| `fluid-move` | `{ center, zoom }` | The view finishes moving or zooming. |
+| Event                | Detail             | When                                         |
+| -------------------- | ------------------ | -------------------------------------------- |
+| `fluid-marker-click` | `{ marker }`       | A marker is clicked or activated with Enter. |
+| `fluid-move`         | `{ center, zoom }` | The view finishes moving or zooming.         |
 
 ## Theming
 
@@ -185,11 +194,11 @@ div.
 system for its frame (border, radius, focus ring), so themes flow through
 without extra work. Component tokens layer on top for fine-grained control:
 
-| Token | Falls back to | Controls |
-| --- | --- | --- |
-| `--fluid-map-height` | `24rem` | Viewport height. |
-| `--fluid-map-radius` | `--fluid-radius-md` | Viewport corner radius. |
-| `--fluid-map-border` | `1px solid --fluid-border-default` | Viewport border. |
+| Token                | Falls back to                      | Controls                |
+| -------------------- | ---------------------------------- | ----------------------- |
+| `--fluid-map-height` | `24rem`                            | Viewport height.        |
+| `--fluid-map-radius` | `--fluid-radius-md`                | Viewport corner radius. |
+| `--fluid-map-border` | `1px solid --fluid-border-default` | Viewport border.        |
 
 The tiles themselves come from your tile provider, so map imagery is not
 themed by Fluid. Swap `tile-url` for a dark or styled tile set if you want the

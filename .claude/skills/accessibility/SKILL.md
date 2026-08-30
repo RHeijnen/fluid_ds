@@ -63,39 +63,47 @@ one of the others.
 Run this on every interactive component PR.
 
 **Semantics and roles**
+
 - Native element used where possible? If not, is the ARIA role from APG? (4.1.2 Name, Role, Value; APG patterns)
 - For a custom element, is the role exposed via `ElementInternals` / attribute, not just a class?
 
 **Keyboard** (2.1.1 Keyboard, 2.1.2 No Keyboard Trap)
+
 - Every action reachable without a mouse?
 - Tab order matches DOM order, no positive `tabindex`? (APG keyboard interface)
 - Composite widgets use roving tabindex or `aria-activedescendant`? Tab moves between widgets, arrows move within?
 - Escape closes popups/dialogs?
 
 **Focus** (2.4.7 Focus Visible, 2.4.11 Focus Not Obscured (Minimum) [NEW in 2.2])
+
 - Visible focus indicator on every focusable element: not removed without replacement (Failure F78).
 - Focused element is never fully hidden by sticky headers, toasts, or the component's own popup.
 - Focus is restored on dialog close.
 
 **Labels and names** (1.3.1 Info and Relationships, 4.1.2, 2.5.3 Label in Name)
+
 - Accessible name present and matches visible label text?
 - Icon-only controls have `aria-label` or visually-hidden text?
 - Errors/descriptions wired via `aria-describedby`?
 
 **Color and contrast** (1.4.3 Contrast (Minimum), 1.4.11 Non-text Contrast)
+
 - Text ≥ 4.5:1, large text ≥ 3:1.
 - Focus ring, field borders, identifiable state changes ≥ 3:1 against adjacent colors.
 - Information not conveyed by color alone (1.4.1).
 
 **Sizing and spacing** (2.5.8 Target Size (Minimum) [NEW in 2.2])
+
 - Pointer targets ≥ 24×24 CSS px, or the spacing/inline/equivalent/UA/essential exception applies.
 - Layout still works at 200% zoom and 400% reflow (1.4.10, 1.4.4).
 
 **States and live regions** (4.1.3 Status Messages, 1.3.1)
+
 - Loading, success, error, empty states announced: `role="status"` or `role="alert"` as appropriate?
 - Disabled vs read-only is the correct semantic choice.
 
 **Motion** (2.3.3 Animation from Interactions, prefers-reduced-motion)
+
 - Animations honor `@media (prefers-reduced-motion: reduce)`.
 - No flashing > 3× per second (2.3.1).
 

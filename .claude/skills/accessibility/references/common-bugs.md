@@ -3,6 +3,7 @@
 Flat catalog of frequent a11y defects in component-library code. Use it as a checklist when reviewing a PR or a component file. Each item maps to a primary success criterion and a verifiable code pattern. Numbers in brackets are WCAG 2.2 success criteria. `[NEW in 2.2]` marks criteria added since 2.1.
 
 Primary sources:
+
 - WCAG 2.2 normative text: https://www.w3.org/TR/WCAG22/
 - Understanding WCAG 2.2: https://www.w3.org/WAI/WCAG22/Understanding/
 - APG patterns: https://www.w3.org/WAI/ARIA/apg/patterns/
@@ -232,9 +233,9 @@ When a row points to a specific SC or APG pattern, fetch the primary URL before 
 
 - **Required indicated only by `*` glyph**
   - What it breaks: 3.3.2; 1.3.3 Sensory Characteristics.
-  - Spot: `<label>Email *</label>` with no `aria-required` / `required` and no legend explaining "*".
+  - Spot: `<label>Email *</label>` with no `aria-required` / `required` and no legend explaining "\*".
   - Fix: native `required` (and/or `aria-required="true"`), visible "required" wording or a documented legend, and contrast on the glyph.
-  - Why: not all SR settings announce "*"; users with low vision may miss the glyph entirely.
+  - Why: not all SR settings announce "\*"; users with low vision may miss the glyph entirely.
 
 - **Error text not linked via `aria-describedby`**
   - What it breaks: 3.3.1 Error Identification; 1.3.1.

@@ -3,9 +3,17 @@ title: "@fluid-ds/markdown"
 description: "Themable Markdown rendering web component. Inline text, value property, or remote src."
 ---
 
+import MarkdownDemo from "../../../components/MarkdownDemo.astro";
+
 `<fluid-markdown>` renders Markdown to a themed block in the page,
 backed by [marked](https://marked.js.org/). Headings, code, links,
 blockquotes, and tables all adopt your brand tokens. Expansion pack.
+
+The split view below is live: edit the Markdown on the left and
+`<fluid-markdown>` re-renders it on every keystroke, sanitized and themed by
+the same tokens as the rest of this site.
+
+<MarkdownDemo />
 
 ## Install
 
@@ -23,10 +31,7 @@ Three input paths:
 
 ```html
 <!-- Inline text -->
-<fluid-markdown>
-  ### Inline heading
-  Some **strong** copy.
-</fluid-markdown>
+<fluid-markdown> ### Inline heading Some **strong** copy. </fluid-markdown>
 
 <!-- value property -->
 <fluid-markdown value="### From a property"></fluid-markdown>

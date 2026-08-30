@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-button-group>` fuses two or more `<fluid-button>` elements into one
 shape, interior edges square off and outer corners round normally. It's the
 right wrapper for toolbars, split buttons (primary action + a dropdown
@@ -56,6 +55,7 @@ The group registers the `<fluid-button-group>` tag; you'll almost always load
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/dropdown/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -69,6 +69,7 @@ The group registers the `<fluid-button-group>` tag; you'll almost always load
     import "@fluid-ds/components/define/button";
     import "@fluid-ds/components/define/dropdown"; // only for split buttons
     ```
+
   </TabItem>
 </Tabs>
 
@@ -84,11 +85,13 @@ The group registers the `<fluid-button-group>` tag; you'll almost always load
   </fluid-button-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-button-group>
+<ConformanceCode
+  code={`<fluid-button-group>
   <fluid-button variant="secondary">Cut</fluid-button>
   <fluid-button variant="secondary">Copy</fluid-button>
   <fluid-button variant="secondary">Paste</fluid-button>
-</fluid-button-group>`} />
+</fluid-button-group>`}
+/>
 
 ### Split button
 
@@ -134,7 +137,9 @@ is open.
 
 <Demo>
   <fluid-dropdown>
-    <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
+    <fluid-button slot="trigger" variant="secondary" caret>
+      Actions
+    </fluid-button>
     <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
     <fluid-dropdown-item value="duplicate">Duplicate</fluid-dropdown-item>
     <fluid-dropdown-item type="separator"></fluid-dropdown-item>
@@ -142,11 +147,13 @@ is open.
   </fluid-dropdown>
 </Demo>
 
-<ConformanceCode code={`<fluid-dropdown>
+<ConformanceCode
+  code={`<fluid-dropdown>
   <fluid-button slot="trigger" variant="secondary" caret>Actions</fluid-button>
   <fluid-dropdown-item value="rename">Rename</fluid-dropdown-item>
   <fluid-dropdown-item value="delete">Delete</fluid-dropdown-item>
-</fluid-dropdown>`} />
+</fluid-dropdown>`}
+/>
 
 ### Vertical
 
@@ -158,11 +165,13 @@ is open.
   </fluid-button-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-button-group orientation="vertical">
+<ConformanceCode
+  code={`<fluid-button-group orientation="vertical">
   <fluid-button variant="secondary">Top</fluid-button>
   <fluid-button variant="secondary">Middle</fluid-button>
   <fluid-button variant="secondary">Bottom</fluid-button>
-</fluid-button-group>`} />
+</fluid-button-group>`}
+/>
 
 ### Mixed variants
 
@@ -175,10 +184,12 @@ The group fuses borders, not variants, you can mix as needed.
   </fluid-button-group>
 </Demo>
 
-<ConformanceCode code={`<fluid-button-group>
+<ConformanceCode
+  code={`<fluid-button-group>
   <fluid-button>Confirm</fluid-button>
   <fluid-button variant="ghost">Cancel</fluid-button>
-</fluid-button-group>`} />
+</fluid-button-group>`}
+/>
 
 ## Theming
 
@@ -199,8 +210,8 @@ corners:
 ```
 
 <Aside type="tip">
-  Tweak the underlying button + dropdown tokens visually in the
-  [Theme builder](/playground/) and export the CSS.
+  Tweak the underlying button + dropdown tokens visually in the [Theme builder](/playground/) and
+  export the CSS.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -212,7 +223,9 @@ anything not covered by a token is still reachable:
 
 ```css
 /* Custom gap between members, and a one-off radius on the action button. */
-fluid-button-group::part(base) { gap: 2px; }
+fluid-button-group::part(base) {
+  gap: 2px;
+}
 fluid-button-group > fluid-button:first-child::part(base) {
   border-radius: 12px 0 0 12px;
 }
@@ -225,7 +238,7 @@ fluid-button-group > fluid-button:first-child::part(base) {
 - Pairs of related actions like Confirm / Cancel where the visual fusion
   helps signal the relationship.
 
-### When *not* to use
+### When _not_ to use
 
 - **Mutually-exclusive options** ("Day | Week | Month"): use
   [`<fluid-segmented-control>`](/components/segmented-control/). Same shape, but
@@ -251,10 +264,10 @@ notes below are group-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
+| Key                                              | Action                                                   |
+| ------------------------------------------------ | -------------------------------------------------------- |
 | <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Move through the members, each stays an ordinary button. |
-| <kbd>Space</kbd> / <kbd>Enter</kbd> | Activate the focused button. |
+| <kbd>Space</kbd> / <kbd>Enter</kbd>              | Activate the focused button.                             |
 
 The group adds no roving-tabindex or arrow-key model, members are independent
 buttons. (For a single-selection arrow-key picker, that's

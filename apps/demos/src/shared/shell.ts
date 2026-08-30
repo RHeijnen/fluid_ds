@@ -22,8 +22,16 @@ import { mountThemePicker } from "./theme-picker.js";
 
 export interface ShellOptions {
   title: string;
-  /** One of `index`, `settings`, `admin`, `data-table`, drives sidebar `aria-current`. */
-  currentRoute: "index" | "settings" | "admin" | "data-table";
+  /** The active demo route, drives sidebar `aria-current`. */
+  currentRoute:
+    | "index"
+    | "settings"
+    | "admin"
+    | "data-table"
+    | "booking"
+    | "board"
+    | "analytics"
+    | "qr";
 }
 
 /** Vite substitutes this at build time: `/` in dev, `/demos/` in prod. */
@@ -34,7 +42,11 @@ const DEMO_ROUTES: { id: ShellOptions["currentRoute"]; href: string; label: stri
   { id: "index", href: BASE, label: "All demos" },
   { id: "settings", href: `${BASE}settings/`, label: "Settings dashboard" },
   { id: "admin", href: `${BASE}admin/`, label: "Admin / data" },
-  { id: "data-table", href: `${BASE}data-table/`, label: "Data table" }
+  { id: "data-table", href: `${BASE}data-table/`, label: "Data table" },
+  { id: "analytics", href: `${BASE}analytics/`, label: "Analytics" },
+  { id: "booking", href: `${BASE}booking/`, label: "Booking" },
+  { id: "board", href: `${BASE}board/`, label: "Sprint board" },
+  { id: "qr", href: `${BASE}qr/`, label: "QR studio" }
 ];
 
 /** Cross-surface nav (matches the landing's primary nav). */
@@ -51,8 +63,10 @@ export function mountShell(opts: ShellOptions): HTMLElement {
 
   // Header, same structural shape as the landing's `.site-nav` so
   // there's no layout jump when navigating between root and /demos/.
+  // `fluid-glass-panel` is inert outside the Glass brand; under it, the
+  // shell chrome frosts to the same material as the components.
   const header = document.createElement("header");
-  header.className = "site-nav";
+  header.className = "site-nav fluid-glass-panel";
   header.innerHTML = `
     <a class="brand" href="/">
       <svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true">
@@ -76,8 +90,7 @@ export function mountShell(opts: ShellOptions): HTMLElement {
     </a>
     <nav class="primary" aria-label="Primary">
       ${SURFACE_LINKS.map(
-        (s) =>
-          `<a href="${s.href}"${s.current ? ' aria-current="page"' : ""}>${s.label}</a>`
+        (s) => `<a href="${s.href}"${s.current ? ' aria-current="page"' : ""}>${s.label}</a>`
       ).join("")}
       <a class="cta" href="https://github.com/RHeijnen/fluid_ds" target="_blank" rel="noopener">
         <fluid-button size="sm" variant="secondary">
@@ -94,6 +107,7 @@ export function mountShell(opts: ShellOptions): HTMLElement {
   // Sidebar, demos picker only. (Cross-surface nav now lives in the
   // header above, matching the landing.)
   const aside = document.createElement("aside");
+  aside.className = "fluid-glass-panel";
   aside.innerHTML = `<div class="section-label">Demos</div>`;
   const nav = document.createElement("nav");
   for (const route of DEMO_ROUTES) {

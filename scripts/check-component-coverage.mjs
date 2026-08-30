@@ -33,32 +33,60 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const componentsRoot = join(root, "packages/components/src/components");
+const packagesRoot = join(root, "packages");
 const previewFile = join(root, "apps/playground/src/preview.ts");
 const docsComponentsDir = join(root, "apps/docs/src/content/docs/components");
 
 const DEFINE_RE = /customElements\.define\(\s*["']([\w-]+)["']/g;
 
 /**
- * Walk packages/components/src/components recursively for define.ts files.
- * Returns an array of { tag, defineFile, dir }.
+ * Walk a components tree recursively for define.ts files, collecting every
+ * custom element it registers.
  */
-async function discoverComponents() {
-  const components = [];
+async function discoverIn(rootDir, pkg, components) {
   async function walk(dir) {
-    const entries = await readdir(dir, { withFileTypes: true });
+    let entries;
+    try {
+      entries = await readdir(dir, { withFileTypes: true });
+    } catch {
+      return; // package without a components tree
+    }
     for (const entry of entries) {
       const full = join(dir, entry.name);
       if (entry.isDirectory()) {
         await walk(full);
-      } else if (entry.name === "define.ts") {
+        // A registration entry is either `define.ts` or any file inside a
+        // `define/` directory (animations ships `src/define/celebrate.ts`).
+      } else if (entry.name === "define.ts" || basename(dir) === "define") {
         const source = await readFile(full, "utf8");
         for (const match of source.matchAll(DEFINE_RE)) {
-          components.push({ tag: match[1], defineFile: full, dir: dirname(full) });
+          components.push({ tag: match[1], defineFile: full, dir: dirname(full), pkg });
         }
       }
     }
   }
-  await walk(componentsRoot);
+  await walk(rootDir);
+}
+
+/**
+ * Every published custom element, core AND expansion packs.
+ *
+ * Scanning only `packages/components` used to hide the expansion packs
+ * entirely: charts, table, parser, animations, map and friends could lose
+ * their playground demo without this check noticing (fluid-celebrate,
+ * fluid-chart and fluid-column-mapper all did exactly that).
+ */
+async function discoverComponents() {
+  const components = [];
+  await discoverIn(componentsRoot, "components", components);
+  const packageDirs = await readdir(packagesRoot, { withFileTypes: true });
+  for (const entry of packageDirs) {
+    if (!entry.isDirectory() || entry.name === "components") continue;
+    // Scan the whole `src`, not just `src/components`: some packs register
+    // from `src/define.ts` (markdown, qr) or `src/define/<name>.ts`
+    // (animations), and those elements would otherwise be invisible here.
+    await discoverIn(join(packagesRoot, entry.name, "src"), entry.name, components);
+  }
   return components;
 }
 
@@ -72,8 +100,16 @@ async function hasStorybookEntry(componentDir) {
   return files.some((f) => f.endsWith(".stories.ts") || f.endsWith(".stories.mdx"));
 }
 
+/**
+ * Is the tag actually authored in the preview?
+ *
+ * The match must end at a tag boundary. A plain `includes("<" + tag)` reports
+ * `fluid-tab` as present merely because `<fluid-table` or `<fluid-tabs`
+ * appears, so a genuinely missing element can pass. Only whitespace, `>` or
+ * `/` may follow the name.
+ */
 async function isInPreview(previewSource, tag) {
-  return previewSource.includes(`<${tag}`) || previewSource.includes(`'${tag}'`);
+  return new RegExp(`<${tag}(?=[\\s/>])`).test(previewSource);
 }
 
 /**
@@ -89,6 +125,45 @@ async function hasDocsPage(componentDir) {
   } catch {
     return false;
   }
+}
+
+/**
+ * Expansion packs document one page per PACK (docs/expansion/<pack>.mdx)
+ * rather than one page per element, and their stories may cover several
+ * elements from a single file. Check them at the level they are authored.
+ */
+async function hasPackDocsPage(pkg) {
+  // `<pack>.mdx`, or a suffixed page for packs whose docs are scoped to one
+  // aspect of the package (animations ships `animations-effects.mdx`).
+  try {
+    const pages = await readdir(join(root, "apps/docs/src/content/docs/expansion"));
+    return pages.some((page) => page === `${pkg}.mdx` || page.startsWith(`${pkg}-`));
+  } catch {
+    return false;
+  }
+}
+
+async function packHasAnyStory(pkg) {
+  // Whole `src`: flat packs (markdown, qr) keep stories beside the component.
+  const dir = join(packagesRoot, pkg, "src");
+  async function walk(current) {
+    let entries;
+    try {
+      entries = await readdir(current, { withFileTypes: true });
+    } catch {
+      return false;
+    }
+    for (const entry of entries) {
+      const full = join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (await walk(full)) return true;
+      } else if (entry.name.endsWith(".stories.ts") || entry.name.endsWith(".stories.mdx")) {
+        return true;
+      }
+    }
+    return false;
+  }
+  return walk(dir);
 }
 
 /**
@@ -163,18 +238,28 @@ async function main() {
   const missingPreview = [];
   const missingDocs = [];
 
-  for (const { tag, dir } of components) {
-    if (!(await hasStorybookEntry(dir))) {
-      missingStory.push({ tag, dir });
-    }
+  const core = components.filter((c) => c.pkg === "components");
+  const packs = [...new Set(components.filter((c) => c.pkg !== "components").map((c) => c.pkg))];
+
+  // EVERY published element must be demoed in the builder, core and expansion
+  // packs alike. Scanning core only used to let a pack element silently lose
+  // its demo (fluid-celebrate, fluid-chart and fluid-column-mapper all did).
+  for (const { tag } of components) {
     if (!PREVIEW_EXEMPT.has(tag) && !(await isInPreview(previewSource, tag))) {
       missingPreview.push({ tag });
     }
   }
 
-  // Docs are per-directory, not per-tag, dedupe the component dirs first
+  // Core: a story per component directory.
+  for (const { tag, dir } of core) {
+    if (!(await hasStorybookEntry(dir))) {
+      missingStory.push({ tag, dir });
+    }
+  }
+
+  // Core docs are per-directory, not per-tag, dedupe the component dirs first
   // so a family with several tags (dropdown + dropdown-item) is checked once.
-  const uniqueDirs = [...new Set(components.map((c) => c.dir))];
+  const uniqueDirs = [...new Set(core.map((c) => c.dir))];
   for (const dir of uniqueDirs) {
     const name = basename(dir);
     if (DOCS_EXEMPT.has(name)) continue;
@@ -183,9 +268,25 @@ async function main() {
     }
   }
 
+  // Expansion packs: one docs page and at least one story per pack.
+  for (const pkg of packs) {
+    if (!(await hasPackDocsPage(pkg))) {
+      missingDocs.push({
+        name: pkg,
+        dir: join(packagesRoot, pkg),
+        pack: true
+      });
+    }
+    if (!(await packHasAnyStory(pkg))) {
+      missingStory.push({ tag: `@fluid-ds/${pkg}`, dir: join(packagesRoot, pkg) });
+    }
+  }
+
   if (!missingStory.length && !missingPreview.length && !missingDocs.length) {
     console.log(
-      `✓ Coverage OK, ${components.length} components / ${uniqueDirs.length} families: all have stories, preview cards, and docs pages.`
+      `✓ Coverage OK, ${components.length} elements ` +
+        `(${core.length} core / ${uniqueDirs.length} families, ${packs.length} expansion packs): ` +
+        `every element is demoed in the playground, and stories and docs exist.`
     );
     return;
   }

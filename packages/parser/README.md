@@ -26,14 +26,29 @@ Install with `npm i @fluid-ds/parser@latest`.
 ## Headless quick start
 
 ```ts
-import { parseFile, applyBlueprint, type Blueprint } from "@fluid-ds/parser/core";
+import {
+  parseFile,
+  applyBlueprint,
+  type Blueprint
+} from "@fluid-ds/parser/core";
 
 const blueprint: Blueprint = {
   fields: [
-    { key: "name", label: "Full name", type: "string", required: true, aliases: ["name"] },
+    {
+      key: "name",
+      label: "Full name",
+      type: "string",
+      required: true,
+      aliases: ["name"]
+    },
     { key: "email", type: "email", required: true },
     { key: "age", type: "integer", min: 0, max: 120 },
-    { key: "role", type: "enum", options: ["engineer", "designer"], default: "engineer" }
+    {
+      key: "role",
+      type: "enum",
+      options: ["engineer", "designer"],
+      default: "engineer"
+    }
   ],
   dedupeBy: "email",
   maxRows: 5000
@@ -42,10 +57,10 @@ const blueprint: Blueprint = {
 const raw = await parseFile(file); // file: File from a drop / <input>
 const result = applyBlueprint(raw, blueprint);
 
-result.rows;    // cleaned, typed rows
-result.errors;  // [{ row, field, value, message }, …]
+result.rows; // cleaned, typed rows
+result.errors; // [{ row, field, value, message }, …]
 result.mapping; // { name: "Full Name", email: "E-mail", … }
-result.stats;   // { total, kept, duplicates, truncated, errorCount }
+result.stats; // { total, kept, duplicates, truncated, errorCount }
 ```
 
 `applyBlueprint` is pure: no DOM, no async. The XLSX path in `parseFile` only
@@ -80,18 +95,18 @@ small.
 
 A `FieldSpec` has a `key`, a `type`, and optional rules:
 
-| Option | Applies to | Notes |
-| --- | --- | --- |
-| `required` | all | Empty / missing value is an error. |
-| `aliases` | all | Extra source-column names to auto-map (fuzzy, case-insensitive). |
-| `default` | all | Used when the source cell is empty. |
-| `min` / `max` | number, integer, date, string | Numeric bound, date bound (ms), or string length. |
-| `options` | enum | Allowed values (case-insensitive for strings). |
-| `format` | date | `"iso"` (default), `"us"` (M/D/Y), `"eu"` (D/M/Y). |
-| `truthy` | boolean | Strings that coerce to `true`. |
-| `pattern` | string | RegExp the value must match. |
-| `transform(value)` | all | Reshape the coerced value before validation. |
-| `validate(value)` | all | Return `true` or a human error message. |
+| Option             | Applies to                    | Notes                                                            |
+| ------------------ | ----------------------------- | ---------------------------------------------------------------- |
+| `required`         | all                           | Empty / missing value is an error.                               |
+| `aliases`          | all                           | Extra source-column names to auto-map (fuzzy, case-insensitive). |
+| `default`          | all                           | Used when the source cell is empty.                              |
+| `min` / `max`      | number, integer, date, string | Numeric bound, date bound (ms), or string length.                |
+| `options`          | enum                          | Allowed values (case-insensitive for strings).                   |
+| `format`           | date                          | `"iso"` (default), `"us"` (M/D/Y), `"eu"` (D/M/Y).               |
+| `truthy`           | boolean                       | Strings that coerce to `true`.                                   |
+| `pattern`          | string                        | RegExp the value must match.                                     |
+| `transform(value)` | all                           | Reshape the coerced value before validation.                     |
+| `validate(value)`  | all                           | Return `true` or a human error message.                          |
 
 Types: `string`, `number`, `integer`, `boolean`, `date`, `email`, `url`,
 `enum`, `json`, `custom`. Blueprint-level: `fields`, `dedupeBy`, `maxRows`,

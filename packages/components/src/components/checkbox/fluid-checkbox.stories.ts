@@ -12,7 +12,7 @@ type Args = Pick<FluidCheckbox, "checked" | "indeterminate" | "disabled" | "requ
 const meta: Meta<Args> = {
   title: "Components/Forms/Checkbox",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },

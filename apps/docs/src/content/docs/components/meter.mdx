@@ -34,6 +34,7 @@ status is never carried by color alone.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/meter/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -45,6 +46,7 @@ status is never carried by color alone.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/meter";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,7 +59,9 @@ accent fill. Pair it with a label and `show-value` for context.
 
 <Demo>
   <div style="max-width: 320px;">
-    <fluid-meter value="64" show-value label="Relevance">Relevance</fluid-meter>
+    <fluid-meter value="64" show-value label="Relevance">
+      Relevance
+    </fluid-meter>
   </div>
 </Demo>
 
@@ -74,9 +78,15 @@ segment containing `optimum` is **good** (success), an adjacent segment is
 
 <Demo>
   <div style="display:flex; flex-direction:column; gap: 1rem; max-width:320px;">
-    <fluid-meter value="20" low="33" high="66" optimum="90" show-value label="Storage low">Low</fluid-meter>
-    <fluid-meter value="50" low="33" high="66" optimum="90" show-value label="Storage mid">Half</fluid-meter>
-    <fluid-meter value="85" low="33" high="66" optimum="90" show-value label="Storage high">Healthy</fluid-meter>
+    <fluid-meter value="20" low="33" high="66" optimum="90" show-value label="Storage low">
+      Low
+    </fluid-meter>
+    <fluid-meter value="50" low="33" high="66" optimum="90" show-value label="Storage mid">
+      Half
+    </fluid-meter>
+    <fluid-meter value="85" low="33" high="66" optimum="90" show-value label="Storage high">
+      Healthy
+    </fluid-meter>
   </div>
 </Demo>
 
@@ -91,8 +101,12 @@ values are good and high values are the worst band.
 
 <Demo>
   <div style="display:flex; flex-direction:column; gap: 1rem; max-width:320px;">
-    <fluid-meter value="15" low="40" high="75" optimum="10" show-value label="CPU 15">CPU 15%</fluid-meter>
-    <fluid-meter value="90" low="40" high="75" optimum="10" show-value label="CPU 90">CPU 90%</fluid-meter>
+    <fluid-meter value="15" low="40" high="75" optimum="10" show-value label="CPU 15">
+      CPU 15%
+    </fluid-meter>
+    <fluid-meter value="90" low="40" high="75" optimum="10" show-value label="CPU 90">
+      CPU 90%
+    </fluid-meter>
   </div>
 </Demo>
 
@@ -107,7 +121,16 @@ the value text and read out in `aria-valuetext`.
 
 <Demo>
   <div style="max-width: 320px;">
-    <fluid-meter value="6.2" min="0" max="8" low="2" high="6" optimum="3" show-value label="Battery voltage">
+    <fluid-meter
+      value="6.2"
+      min="0"
+      max="8"
+      low="2"
+      high="6"
+      optimum="3"
+      show-value
+      label="Battery voltage"
+    >
       Battery voltage
     </fluid-meter>
   </div>
@@ -143,9 +166,7 @@ theme-independent status tones (`--fluid-success-base` / `--fluid-warning-base`
 }
 ```
 
-<Aside type="tip">
-  Dial these in visually with the [Theme builder](/playground/).
-</Aside>
+<Aside type="tip">Dial these in visually with the [Theme builder](/playground/).</Aside>
 
 ### Beyond tokens: `::part()`
 
@@ -160,7 +181,7 @@ a token doesn't cover.
 - A reading that has "good" and "bad" zones you want to surface at a glance.
 - A relevance or quality indicator next to a result.
 
-### When *not* to use
+### When _not_ to use
 
 - For the completion of a task (uploading, installing), reach for
   [`<fluid-progress-bar>`](/components/progress-bar/) or
@@ -219,9 +240,25 @@ interactive target, so there is no target-size or conformance delta.
 ## Related
 
 <CardGrid>
-  <LinkCard title="Progress bar" href="/components/progress-bar/" description="Task completion, not a measured reading." />
-  <LinkCard title="Progress ring" href="/components/progress-ring/" description="Circular determinate / indeterminate progress." />
+  <LinkCard
+    title="Progress bar"
+    href="/components/progress-bar/"
+    description="Task completion, not a measured reading."
+  />
+  <LinkCard
+    title="Progress ring"
+    href="/components/progress-ring/"
+    description="Circular determinate / indeterminate progress."
+  />
   <LinkCard title="Badge" href="/components/badge/" description="Compact count or status label." />
-  <LinkCard title="Accessibility guide" href="/guides/accessibility/" description="The cross-component a11y contract." />
-  <LinkCard title="Framework integrations" href="/guides/frameworks/" description="Use Fluid in React, Vue, Angular, Svelte." />
+  <LinkCard
+    title="Accessibility guide"
+    href="/guides/accessibility/"
+    description="The cross-component a11y contract."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Use Fluid in React, Vue, Angular, Svelte."
+  />
 </CardGrid>

@@ -1,0 +1,265 @@
+/*
+ * Glass, a frosted translucent preset.
+ *
+ * Unlike a plain palette brand, this one also paints a colour wash on the
+ * themed element and frosts every surface, field and overlay component, so it
+ * is meant for a container (a section, a dashboard, a whole app) rather than
+ * for a single element. The frost needs saturated colour behind it, which the
+ * wash provides.
+ *
+ * Usage: load this stylesheet, then set `data-fluid-brand="glass"` on the
+ * container you want frosted.
+ *
+ *   <section data-fluid-brand="glass">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/glass.css">
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme).
+ */
+[data-fluid-brand="glass"] {
+  /* Brand palette, sky blue. */
+  --fluid-color-brand-50: #f0f9ff;
+  --fluid-color-brand-100: #e0f2fe;
+  --fluid-color-brand-200: #bae6fd;
+  --fluid-color-brand-300: #7dd3fc;
+  --fluid-color-brand-400: #38bdf8;
+  --fluid-color-brand-500: #0ea5e9;
+  --fluid-color-brand-600: #0284c7;
+  --fluid-color-brand-700: #0369a1;
+  --fluid-color-brand-800: #075985;
+  --fluid-color-brand-900: #0c4a6e;
+
+  /* Soft, rounded corners suit the frosted look. */
+  --fluid-radius-md: 1.25rem;
+  --fluid-radius-lg: 1.5rem;
+  --fluid-radius-xl: 1.75rem;
+
+  /* Re-derive the brand-driven semantics at this scope. A custom property that
+     reads the brand ramp is substituted where it is declared, so the base
+     :root accent keeps the default brand unless it is re-declared here. This
+     is what makes the brand work on a subtree, not only at :root. */
+  --fluid-accent-base: var(--fluid-color-brand-600);
+  --fluid-accent-hover: var(--fluid-color-brand-700);
+  --fluid-accent-active: var(--fluid-color-brand-800);
+  --fluid-focus-ring-color: var(--fluid-color-brand-500);
+
+  /* The frost material, as tokens so the dark scheme can invert it in one place
+     rather than re-listing every frosted selector. Light scheme: translucent
+     white panels over a light wash, so dark text keeps its contrast. */
+  --glass-frost: rgb(255 255 255 / 62%);
+  --glass-frost-strong: rgb(255 255 255 / 72%);
+  --glass-frost-border: rgb(255 255 255 / 70%);
+  --glass-affix-border: rgb(255 255 255 / 45%);
+  --glass-blur: blur(12px) saturate(1.4);
+
+  /* The colour wash the frosted surfaces sit over. Vivid on purpose: the frost
+     only reads as glass when there is saturated colour behind it to blur. The
+     panels stay light enough (60-65% white) that dark text keeps its contrast
+     over every stop. */
+  background:
+    radial-gradient(60% 60% at 12% 10%, #8b5cf6, transparent 60%),
+    radial-gradient(55% 55% at 88% 16%, #06b6d4, transparent 58%),
+    radial-gradient(65% 65% at 72% 98%, #f43f5e, transparent 60%),
+    linear-gradient(135deg, #c7d2fe, #a5f3fc);
+}
+
+/* Dark scheme re-derives the accent from lighter brand steps, the same way the
+   base tokens do, so a dark-mode subtree keeps the right contrast. */
+[data-fluid-theme="dark"] [data-fluid-brand="glass"],
+[data-fluid-brand="glass"][data-fluid-theme="dark"] {
+  --fluid-accent-base: var(--fluid-color-brand-500);
+  --fluid-accent-hover: var(--fluid-color-brand-400);
+  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-focus-ring-color: var(--fluid-color-brand-400);
+
+  /* Invert the frost for dark: translucent near-black panels with a faint light
+     rim, so the dark-scheme light text stays readable instead of washing out on
+     white glass. Overriding the four tokens re-frosts every surface, field and
+     overlay listed below at once. */
+  --glass-frost: rgb(15 18 28 / 55%);
+  --glass-frost-strong: rgb(15 18 28 / 68%);
+  --glass-frost-border: rgb(255 255 255 / 16%);
+  --glass-affix-border: rgb(255 255 255 / 14%);
+
+  /* A deep jewel-toned wash over a near-black base. Still saturated enough to
+     read as glass through the blur, but dark so the panels sit on darkness. */
+  background:
+    radial-gradient(60% 60% at 12% 10%, #5b21b6, transparent 60%),
+    radial-gradient(55% 55% at 88% 16%, #0e7490, transparent 58%),
+    radial-gradient(65% 65% at 72% 98%, #9f1239, transparent 60%),
+    linear-gradient(135deg, #0b1022, #08222b);
+}
+
+/*
+ * Frosted surfaces: translucent and blurred over the wash.
+ *
+ * Every component that renders a panel, a field or an overlay is listed here
+ * by its `base` part, so a glassed container reads as one cohesive material
+ * rather than frosted cards floating over solid chrome. The list is
+ * deliberately not "every component": three groups are left solid on purpose.
+ *
+ *   - Accent controls (button, button group): a primary action has to read as
+ *     a solid, tappable target, not as more glass.
+ *   - Status carriers (badge, tag, callout, banner, toast): their whole job is
+ *     to signal with colour, which frosting would wash out. Status tones are
+ *     theme-independent for the same reason.
+ *   - Functional and content surfaces (progress, meter, slider tracks,
+ *     spinner, skeleton, avatar, image, code block, and the inline widgets
+ *     whose base is transparent): frosting these adds a white box where there
+ *     was none, or hides what they exist to show.
+ */
+[data-fluid-brand="glass"] fluid-card::part(base),
+[data-fluid-brand="glass"] fluid-app-bar::part(base),
+[data-fluid-brand="glass"] fluid-sidebar::part(base),
+[data-fluid-brand="glass"] fluid-toolbar::part(base),
+[data-fluid-brand="glass"] fluid-accordion::part(base),
+[data-fluid-brand="glass"] fluid-fieldset::part(base),
+[data-fluid-brand="glass"] fluid-nav-list::part(base),
+[data-fluid-brand="glass"] fluid-list::part(base),
+[data-fluid-brand="glass"] fluid-tree::part(base),
+[data-fluid-brand="glass"] fluid-pricing-table::part(base),
+[data-fluid-brand="glass"] fluid-empty-state::part(base),
+[data-fluid-brand="glass"] fluid-result::part(base),
+[data-fluid-brand="glass"] fluid-calendar::part(base),
+[data-fluid-brand="glass"] fluid-transfer::part(base),
+[data-fluid-brand="glass"] fluid-command-palette::part(base),
+[data-fluid-brand="glass"] fluid-dialog::part(base),
+[data-fluid-brand="glass"] fluid-drawer::part(base),
+[data-fluid-brand="glass"] fluid-menu::part(base),
+[data-fluid-brand="glass"] fluid-context-menu::part(base),
+[data-fluid-brand="glass"] fluid-tour::part(base),
+[data-fluid-brand="glass"] fluid-speed-dial::part(base),
+[data-fluid-brand="glass"] fluid-loading-overlay::part(base),
+[data-fluid-brand="glass"] fluid-field::part(base),
+[data-fluid-brand="glass"] fluid-input::part(base),
+[data-fluid-brand="glass"] fluid-number-input::part(base),
+[data-fluid-brand="glass"] fluid-masked-input::part(base),
+[data-fluid-brand="glass"] fluid-textarea::part(base),
+[data-fluid-brand="glass"] fluid-select::part(trigger),
+[data-fluid-brand="glass"] fluid-tag-input::part(base),
+[data-fluid-brand="glass"] fluid-date-picker::part(base),
+[data-fluid-brand="glass"] fluid-date-range-picker::part(base),
+[data-fluid-brand="glass"] fluid-time-picker::part(base),
+[data-fluid-brand="glass"] fluid-otp::part(base),
+[data-fluid-brand="glass"] fluid-file-input::part(base),
+[data-fluid-brand="glass"] fluid-dropzone::part(base),
+[data-fluid-brand="glass"] fluid-segmented-control::part(base) {
+  background-color: var(--glass-frost);
+  border-color: var(--glass-frost-border);
+  backdrop-filter: var(--glass-blur);
+}
+
+/*
+ * Public helper for container chrome the component `::part` selectors cannot
+ * reach: a hand-rolled panel, a header strip, an app's own window frame. Add
+ * `class="fluid-glass-panel"` to any element inside a glass container and it
+ * gets exactly the same frosted material as the frosted components, in both
+ * light and dark, from this one definition. This is the supported way to frost
+ * non-Fluid markup, so a consuming app (or our own demo) never has to restate
+ * the frost recipe.
+ */
+[data-fluid-brand="glass"] .fluid-glass-panel {
+  background-color: var(--glass-frost);
+  /* Full border, not just colour: unlike the frosted components (which bring
+     their own border box), arbitrary chrome may have none, so the helper draws
+     the rim itself. */
+  border: 1px solid var(--glass-frost-border);
+  backdrop-filter: var(--glass-blur);
+}
+
+/*
+ * Data grids. The table components paint every surface through their own
+ * component tokens, so the brand retunes those (the frost automatically
+ * inverts for the dark scheme) and only adds the blur via parts. Sticky
+ * chrome (toolbar, header) takes the stronger frost so rows scrolling
+ * beneath it stay legible, and the row hover becomes a translucent brand
+ * tint instead of an opaque gray slab.
+ */
+[data-fluid-brand="glass"] fluid-infinite-table {
+  --fluid-infinite-table-bg: var(--glass-frost);
+  --fluid-infinite-table-toolbar-bg: var(--glass-frost-strong);
+  --fluid-infinite-table-header-bg: var(--glass-frost-strong);
+  --fluid-infinite-table-row-hover-bg: color-mix(
+    in srgb,
+    var(--fluid-color-brand-400) 18%,
+    transparent
+  );
+  --fluid-infinite-table-border: var(--glass-frost-border);
+}
+[data-fluid-brand="glass"] fluid-infinite-table::part(viewport) {
+  backdrop-filter: var(--glass-blur);
+}
+[data-fluid-brand="glass"] fluid-infinite-table::part(column-dialog) {
+  background: var(--glass-frost-strong);
+  border-color: var(--glass-frost-border);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+[data-fluid-brand="glass"] fluid-table {
+  --fluid-table-bg: var(--glass-frost);
+  --fluid-table-header-bg: var(--glass-frost-strong);
+  --fluid-table-row-hover-bg: color-mix(in srgb, var(--fluid-color-brand-400) 18%, transparent);
+}
+[data-fluid-brand="glass"] fluid-table::part(base) {
+  backdrop-filter: var(--glass-blur);
+}
+
+/*
+ * The floating popovers a field raises (a select's or typeahead's listbox, a
+ * picker's calendar dialog) render their own surface, addressed by a `listbox`
+ * or `dialog` part rather than `base`. Frost those too, so an open dropdown is
+ * glass like the field that opened it. Menu and context-menu surfaces are their
+ * own `base` part, already covered above.
+ */
+[data-fluid-brand="glass"] fluid-select::part(listbox),
+[data-fluid-brand="glass"] fluid-typeahead::part(listbox),
+[data-fluid-brand="glass"] fluid-time-picker::part(listbox),
+[data-fluid-brand="glass"] fluid-date-picker::part(dialog),
+[data-fluid-brand="glass"] fluid-date-range-picker::part(dialog) {
+  background-color: var(--glass-frost-strong);
+  border-color: var(--glass-frost-border);
+  backdrop-filter: blur(14px) saturate(1.4);
+}
+
+/*
+ * Select and typeahead wrap their visual field in a square positioning
+ * `base`, so frosting `base` painted a sharp-cornered sheet poking out
+ * behind the rounded field. Frost the field surface itself instead: the
+ * select's `trigger` part carries the field (covered in the list above),
+ * and the typeahead's field wrapper exposes no part, so it frosts through
+ * its component tokens (translucent fill; the blur is carried by the
+ * listbox part when it opens).
+ */
+[data-fluid-brand="glass"] fluid-typeahead {
+  --fluid-typeahead-bg: var(--glass-frost);
+  --fluid-typeahead-affix-bg: transparent;
+}
+
+/*
+ * A field's affix boxes (a prefix search icon, a suffix unit or calendar
+ * button) default to an opaque surface fill, which reads as a solid inset
+ * stuck onto the frosted field. Clear the fill so the icon floats on the glass,
+ * keeping only a faint divider for structure.
+ */
+[data-fluid-brand="glass"] fluid-input::part(prefix),
+[data-fluid-brand="glass"] fluid-input::part(suffix),
+[data-fluid-brand="glass"] fluid-number-input::part(prefix),
+[data-fluid-brand="glass"] fluid-number-input::part(suffix),
+[data-fluid-brand="glass"] fluid-masked-input::part(prefix),
+[data-fluid-brand="glass"] fluid-masked-input::part(suffix),
+[data-fluid-brand="glass"] fluid-select::part(prefix),
+[data-fluid-brand="glass"] fluid-select::part(suffix) {
+  background: transparent;
+  border-color: var(--glass-affix-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No motion is introduced by this brand; nothing to stand down here beyond
+     honoring the consumer's own transitions on the frosted parts. */
+  [data-fluid-brand="glass"] fluid-card::part(base),
+  [data-fluid-brand="glass"] fluid-app-bar::part(base),
+  [data-fluid-brand="glass"] fluid-segmented-control::part(base),
+  [data-fluid-brand="glass"] fluid-input::part(base),
+  [data-fluid-brand="glass"] fluid-select::part(trigger),
+  [data-fluid-brand="glass"] fluid-date-range-picker::part(base) {
+    transition: none;
+  }
+}

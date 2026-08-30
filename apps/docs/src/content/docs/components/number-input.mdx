@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-number-input>` is the numeric variant of
 [`<fluid-input>`](/components/input/), the same field shell plus dedicated
 increment/decrement buttons. It enforces `min` / `max` / `step`, formats the
@@ -17,7 +16,11 @@ native `<input type="number">`), and meets the WCAG 2.2 guarantees (focus ring,
 target size, validity conveyed beyond color).
 
 <Demo>
-  <fluid-number-input value="42" aria-label="Quantity" style="max-width: 12rem;"></fluid-number-input>
+  <fluid-number-input
+    value="42"
+    aria-label="Quantity"
+    style="max-width: 12rem;"
+  ></fluid-number-input>
 </Demo>
 
 ## Install
@@ -32,6 +35,7 @@ target size, validity conveyed beyond color).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/number-input/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +47,7 @@ target size, validity conveyed beyond color).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/number-input";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -54,7 +59,11 @@ The stepper buttons increment / decrement by `step`; the field also accepts
 typed input and native <kbd>↑</kbd>/<kbd>↓</kbd>.
 
 <Demo>
-  <fluid-number-input value="42" aria-label="Quantity" style="max-width: 12rem;"></fluid-number-input>
+  <fluid-number-input
+    value="42"
+    aria-label="Quantity"
+    style="max-width: 12rem;"
+  ></fluid-number-input>
 </Demo>
 
 <ConformanceCode code={`<fluid-number-input name="qty" value="42"></fluid-number-input>`} />
@@ -65,10 +74,19 @@ typed input and native <kbd>↑</kbd>/<kbd>↓</kbd>.
 `step` sets the increment.
 
 <Demo>
-  <fluid-number-input value="50" min="0" max="100" step="5" aria-label="Percent" style="max-width: 12rem;"></fluid-number-input>
+  <fluid-number-input
+    value="50"
+    min="0"
+    max="100"
+    step="5"
+    aria-label="Percent"
+    style="max-width: 12rem;"
+  ></fluid-number-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-number-input name="percent" value="50" min="0" max="100" step="5"></fluid-number-input>`} />
+<ConformanceCode
+  code={`<fluid-number-input name="percent" value="50" min="0" max="100" step="5"></fluid-number-input>`}
+/>
 
 ### Without stepper buttons
 
@@ -76,10 +94,18 @@ typed input and native <kbd>↑</kbd>/<kbd>↓</kbd>.
 useful in tight layouts or when you only want the typed field.
 
 <Demo>
-  <fluid-number-input value="3.14159" step="0.00001" no-steppers aria-label="Pi" style="max-width: 12rem;"></fluid-number-input>
+  <fluid-number-input
+    value="3.14159"
+    step="0.00001"
+    no-steppers
+    aria-label="Pi"
+    style="max-width: 12rem;"
+  ></fluid-number-input>
 </Demo>
 
-<ConformanceCode code={`<fluid-number-input value="3.14159" step="0.00001" no-steppers></fluid-number-input>`} />
+<ConformanceCode
+  code={`<fluid-number-input value="3.14159" step="0.00001" no-steppers></fluid-number-input>`}
+/>
 
 ## Listening for input
 
@@ -98,6 +124,7 @@ in `event.detail.value`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Quantity.tsx"
@@ -116,6 +143,7 @@ in `event.detail.value`.
       return <fluid-number-input ref={ref} value="1" aria-label="Quantity" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Quantity.vue"
@@ -128,6 +156,7 @@ in `event.detail.value`.
       <fluid-number-input value="1" aria-label="Quantity" @fluid-change="onChange" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="quantity.component.ts"
@@ -148,6 +177,7 @@ in `event.detail.value`.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Quantity.svelte"
@@ -160,6 +190,7 @@ in `event.detail.value`.
 
     <fluid-number-input value="1" aria-label="Quantity" on:fluid-change={onChange} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -180,7 +211,15 @@ constraints (`min` / `max` / `step` / `required`) participate in validation.
     style="display:flex; gap:0.5rem; align-items:center;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Qty: ' + new FormData(this).get('quantity');"
   >
-    <fluid-number-input name="quantity" value="1" min="1" max="99" required aria-label="Quantity" style="max-width: 10rem;"></fluid-number-input>
+    <fluid-number-input
+      name="quantity"
+      value="1"
+      min="1"
+      max="99"
+      required
+      aria-label="Quantity"
+      style="max-width: 10rem;"
+    ></fluid-number-input>
     <fluid-button type="submit">Add to cart</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -209,8 +248,7 @@ of both layers is in the [API tables below](#api).
 ```
 
 <Aside type="tip">
-  Select a number input in the [Theme builder](/playground/) to tweak these
-  tokens visually.
+  Select a number input in the [Theme builder](/playground/) to tweak these tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -222,8 +260,12 @@ for CSS not covered by a token:
 
 ```css
 /* Wider, pill-cornered steppers. */
-fluid-number-input::part(steppers) { width: 2.25rem; }
-fluid-number-input::part(base) { border-radius: 12px; }
+fluid-number-input::part(steppers) {
+  width: 2.25rem;
+}
+fluid-number-input::part(base) {
+  border-radius: 12px;
+}
 ```
 
 ## When to use
@@ -231,7 +273,7 @@ fluid-number-input::part(base) { border-radius: 12px; }
 - Quantities, ages, counts, percentages: anything with a numeric range where
   the exact value matters.
 
-### When *not* to use
+### When _not_ to use
 
 - **Relative position** matters more than the exact number: use
   [`<fluid-slider>`](/components/slider/).
@@ -247,11 +289,11 @@ number-input-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Move focus to/from the field. |
+| Key                         | Action                           |
+| --------------------------- | -------------------------------- |
+| <kbd>Tab</kbd>              | Move focus to/from the field.    |
 | <kbd>↑</kbd> / <kbd>↓</kbd> | Step the value up/down (native). |
-| Typing | Enter a value directly. |
+| Typing                      | Enter a value directly.          |
 
 The stepper buttons are **mouse/touch affordances**, they're `tabindex="-1"`
 (keyboard users step with the arrow keys on the field), so there's no redundant
@@ -283,10 +325,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA** and
 the field + snippets update. It reads conformance tokens, so it scales with no
 per-component branching:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

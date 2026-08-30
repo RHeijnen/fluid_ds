@@ -87,6 +87,37 @@ describe("<fluid-pagination>", () => {
     expect(prevButton(el).disabled).to.be.false;
   });
 
+  it("aligns the Previous/Next controls with the page numbers under an inherited line-height", async () => {
+    /* The ambient line-height matters: the buttons use `font: inherit`, so a
+       page that sets a roomy line-height used to hand it to the button text, so
+       a number button grew a font-size x line-height text box while the
+       icon-only Previous/Next stayed on the 24px target-size floor, leaving
+       them visibly off-centre. */
+    const holder = await fixture<HTMLDivElement>(html`
+      <div style="line-height: 1.8; font-size: 18px">
+        <fluid-pagination total-pages="5" page="3"></fluid-pagination>
+      </div>
+    `);
+    const el = holder.querySelector<FluidPagination>("fluid-pagination")!;
+    await elementUpdated(el);
+
+    const controls = [...el.shadowRoot!.querySelectorAll<HTMLElement>("button")];
+    expect(controls.length).to.be.greaterThan(2);
+
+    const heights = controls.map((c) => c.getBoundingClientRect().height);
+    const heightSpread = Math.max(...heights) - Math.min(...heights);
+    expect(heightSpread, `control heights differ by ${heightSpread.toFixed(2)}px`).to.be.at.most(
+      0.5
+    );
+
+    const centres = controls.map((c) => {
+      const r = c.getBoundingClientRect();
+      return r.top + r.height / 2;
+    });
+    const spread = Math.max(...centres) - Math.min(...centres);
+    expect(spread, `controls drift vertically by ${spread.toFixed(2)}px`).to.be.at.most(0.5);
+  });
+
   it("fires fluid-page-change with the target page on a number click", async () => {
     // Small list (no truncation), so page 4 is reliably rendered. Select it by
     // its stable accessible name rather than visible text.

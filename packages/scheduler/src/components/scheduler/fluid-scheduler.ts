@@ -177,7 +177,9 @@ export class FluidScheduler extends FluidFormAssociated {
       this.syncFormValue();
     }
     // Let the host fetch the initial month's bookings.
-    this.updateComplete.then(() => { if (this.isConnected) this.emitRangeChange(); });
+    this.updateComplete.then(() => {
+      if (this.isConnected) this.emitRangeChange();
+    });
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
@@ -241,8 +243,11 @@ export class FluidScheduler extends FluidFormAssociated {
 
   private availableSlot(start: string): Slot | undefined {
     const date = start.slice(0, 10);
-    if (!this.availability || date < this.minISO || (this.maxISO && date > this.maxISO)) return undefined;
-    return generateSlots(date, this.availability, this.bookings).find((slot) => slot.start === start && slot.state === "available");
+    if (!this.availability || date < this.minISO || (this.maxISO && date > this.maxISO))
+      return undefined;
+    return generateSlots(date, this.availability, this.bookings).find(
+      (slot) => slot.start === start && slot.state === "available"
+    );
   }
 
   override formResetCallback(): void {
@@ -257,7 +262,7 @@ export class FluidScheduler extends FluidFormAssociated {
 
   override formStateRestoreCallback(
     state: string | File | FormData | null,
-    _mode: "restore" | "autocomplete",
+    _mode: "restore" | "autocomplete"
   ): void {
     void _mode;
     if (typeof state !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(state)) return;
@@ -303,7 +308,11 @@ export class FluidScheduler extends FluidFormAssociated {
     if (key === this.lastRange) return;
     this.lastRange = key;
     this.dispatchEvent(
-      new CustomEvent("fluid-range-change", { detail: { start: first, end: last }, bubbles: true, composed: true })
+      new CustomEvent("fluid-range-change", {
+        detail: { start: first, end: last },
+        bubbles: true,
+        composed: true
+      })
     );
   }
 
@@ -319,10 +328,13 @@ export class FluidScheduler extends FluidFormAssociated {
   private onDateActivate = (e: Event): void => {
     if (this.disabled || this.readonly || this.loading) return;
     const iso = (e as CustomEvent).detail?.iso as string;
-    if (!iso || !fromISODate(iso) || iso < this.minISO || (this.maxISO && iso > this.maxISO)) return;
+    if (!iso || !fromISODate(iso) || iso < this.minISO || (this.maxISO && iso > this.maxISO))
+      return;
     this.selectedDate = iso;
     this.viewISO = iso;
-    this.dispatchEvent(new CustomEvent("fluid-day-select", { detail: { date: iso }, bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent("fluid-day-select", { detail: { date: iso }, bubbles: true, composed: true })
+    );
   };
 
   private onSlotChange = (e: Event): void => {
@@ -338,7 +350,13 @@ export class FluidScheduler extends FluidFormAssociated {
     const end = fromLocalISO(available.end);
     this.dispatchEvent(
       new CustomEvent("fluid-change", {
-        detail: { value: available.start, start: available.start, end: available.end, timestamp: fromLocalISO(available.start)?.getTime() ?? null, endTimestamp: end?.getTime() ?? null },
+        detail: {
+          value: available.start,
+          start: available.start,
+          end: available.end,
+          timestamp: fromLocalISO(available.start)?.getTime() ?? null,
+          endTimestamp: end?.getTime() ?? null
+        },
         bubbles: true,
         composed: true
       })
@@ -347,7 +365,12 @@ export class FluidScheduler extends FluidFormAssociated {
 
   override render(): TemplateResult {
     return html`
-      <div part="base" class="base" ?inert=${this.disabled} aria-busy=${this.loading ? "true" : "false"}>
+      <div
+        part="base"
+        class="base"
+        ?inert=${this.disabled}
+        aria-busy=${this.loading ? "true" : "false"}
+      >
         <fluid-calendar
           part="calendar"
           .value=${this.selectedDate}
@@ -380,7 +403,9 @@ export class FluidScheduler extends FluidFormAssociated {
               `
             : html`<p part="prompt" class="prompt">${this.term("selectDayAvailableTimes")}</p>`}
           ${this.loading
-            ? html`<div class="overlay"><fluid-spinner label=${this.term("loadingAvailability")}></fluid-spinner></div>`
+            ? html`<div class="overlay">
+                <fluid-spinner label=${this.term("loadingAvailability")}></fluid-spinner>
+              </div>`
             : ""}
         </div>
       </div>

@@ -456,4 +456,17 @@ describe("<fluid-radio-group>", () => {
     const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
     expect(base.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
   });
+
+  /* Regression: the label slot used to sit directly in the .base flex row, so
+     each fragment of a mixed label became its own flex item and the
+     control-to-label gap repeated between every fragment. */
+  it("mixed inline label content flows as one label", async () => {
+    const el = await fixture<FluidRadio>(
+      html`<fluid-radio value="tos">Accept the <b>terms</b> today</fluid-radio>`
+    );
+    await el.updateComplete;
+    const bold = el.querySelector("b")!;
+    expect(getComputedStyle(bold).display).to.equal("inline");
+    expect(el.shadowRoot!.querySelector("[part='label']")).to.exist;
+  });
 });

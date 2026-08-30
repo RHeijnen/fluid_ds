@@ -49,6 +49,11 @@ export class FluidVideoPlaylist extends FluidElement {
     }
 
     .list {
+      /* Hugs its entries rather than stretching to the player's height. As a
+         grid item it stretched by default, so a short playlist drew a tall
+         bordered box with the entries huddled at the top and dead space under
+         them. Long playlists still cap and scroll. */
+      align-self: start;
       max-height: 28rem;
       overflow-y: auto;
       border: 1px solid var(--fluid-video-playlist-list-border, var(--fluid-border-default));
@@ -100,6 +105,17 @@ export class FluidVideoPlaylist extends FluidElement {
   @property({ type: Boolean }) loop = false;
 
   @state() private activeIndex = 0;
+  /**
+   * Whether the viewer has actually asked for playback.
+   *
+   * The player autoplays a clip the viewer picked, and the next one when the
+   * current ends, but not on arrival. Autoplaying on mount meant a page
+   * carrying a playlist started moving on its own, and with auto-advance it
+   * then walked itself through the whole list, which reads as a fault rather
+   * than a feature. It is also the behaviour WCAG 2.2.2 is about: motion that
+   * starts without being asked for.
+   */
+  @state() private started = false;
 
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has("entries") && this.activeIndex >= this.entries.length) {
@@ -127,6 +143,8 @@ export class FluidVideoPlaylist extends FluidElement {
 
   private onEnded = () => {
     if (!this.isConnected || !this.autoAdvance || this.entries.length === 0) return;
+    // Reaching the end of a clip is itself engagement: the next one may play.
+    this.started = true;
     const next = this.activeIndex + 1;
     if (next < this.entries.length) {
       this.activeIndex = next;
@@ -138,6 +156,7 @@ export class FluidVideoPlaylist extends FluidElement {
   /** Jump to a specific entry. */
   goTo(index: number): void {
     if (!Number.isInteger(index) || index < 0 || index >= this.entries.length) return;
+    this.started = true;
     this.activeIndex = index;
   }
 
@@ -150,7 +169,7 @@ export class FluidVideoPlaylist extends FluidElement {
         poster=${active?.poster ?? ""}
         label=${active?.title ?? this.term("video")}
         controls
-        autoplay
+        ?autoplay=${this.started}
         muted
         plays-inline
         @fluid-ended=${this.onEnded}

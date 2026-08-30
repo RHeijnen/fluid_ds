@@ -8,16 +8,14 @@ type Args = Pick<FluidCopyButton, "value" | "disabled">;
 const meta: Meta<Args> = {
   title: "Components/Content/CopyButton",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "text" },
     disabled: { control: "boolean" }
   },
   args: { value: "Hello, clipboard!", disabled: false },
   render: (args) => html`
-    <fluid-copy-button value=${args.value} ?disabled=${args.disabled}>
-      Copy
-    </fluid-copy-button>
+    <fluid-copy-button value=${args.value} ?disabled=${args.disabled}> Copy </fluid-copy-button>
   `
 };
 

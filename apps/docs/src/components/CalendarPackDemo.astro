@@ -1,0 +1,142 @@
+---
+/**
+ * Live demo for the calendar expansion page: the real <fluid-event-calendar>
+ * populated with a recurring team schedule. Events are generated for the
+ * current month and its neighbors once at load, so the month navigation
+ * always has content to step through, one day overflows into "+N more", and
+ * the Today button jumps back to the anchored month. The demo is entirely
+ * user-driven: nothing auto-plays, so there is no motion to pause or reduce.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="cal-demo" data-cal-demo>
+    <div class="cal-hud">
+      <fluid-button size="sm" variant="secondary" data-cal-today>Today</fluid-button>
+      <span class="cal-status" data-cal-status>Click a chip, a day, or step the month</span>
+    </div>
+    <fluid-event-calendar class="cal-view" week-start="1"></fluid-event-calendar>
+  </div>
+</Demo>
+
+<style>
+  .cal-demo {
+    inline-size: 100%;
+  }
+  .cal-hud {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-end: 0.6rem;
+  }
+  .cal-status {
+    margin-inline-start: auto;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+  }
+  .cal-view {
+    display: block;
+    inline-size: 100%;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/calendar/define/event-calendar";
+
+  type Tone = "accent" | "success" | "warning" | "danger";
+
+  interface DemoEvent {
+    id: string;
+    date: string;
+    title: string;
+    tone?: Tone;
+  }
+
+  interface EventCalendarEl extends HTMLElement {
+    month: string;
+    events: DemoEvent[];
+  }
+
+  interface PatternItem {
+    day: number;
+    title: string;
+    tone?: Tone;
+  }
+
+  /* One release cycle, repeated each month. Day 12 stacks four events so the
+     "+N more" overflow is visible without hunting for it. */
+  const cycle: PatternItem[] = [
+    { day: 2, title: "Sprint planning" },
+    { day: 5, title: "Design review" },
+    { day: 12, title: "Release cut", tone: "warning" },
+    { day: 12, title: "Bug triage" },
+    { day: 12, title: "Docs freeze" },
+    { day: 12, title: "Perf sweep", tone: "danger" },
+    { day: 17, title: "Retro", tone: "success" },
+    { day: 24, title: "Maintenance window", tone: "danger" },
+    { day: 27, title: "Demo day", tone: "success" }
+  ];
+
+  const pad = (n: number): string => String(n).padStart(2, "0");
+
+  /* Anchored once at load, so navigation stays coherent for the session. */
+  const anchor = new Date();
+  const currentMonth = `${anchor.getFullYear()}-${pad(anchor.getMonth() + 1)}`;
+
+  /** The cycle stamped onto months around the anchor (clamped to month length). */
+  function seededEvents(): DemoEvent[] {
+    const events: DemoEvent[] = [];
+    for (let offset = -2; offset <= 3; offset++) {
+      const first = new Date(anchor.getFullYear(), anchor.getMonth() + offset, 1);
+      const year = first.getFullYear();
+      const month = first.getMonth();
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      const key = `${year}-${pad(month + 1)}`;
+      cycle.forEach((item, index) => {
+        events.push({
+          id: `${key}-${index}`,
+          date: `${key}-${pad(Math.min(item.day, lastDay))}`,
+          title: item.title,
+          tone: item.tone
+        });
+      });
+    }
+    return events;
+  }
+
+  function setup(root: HTMLElement): void {
+    const calendar = root.querySelector<EventCalendarEl>("fluid-event-calendar");
+    const status = root.querySelector<HTMLElement>("[data-cal-status]");
+    if (!calendar || !status) return;
+
+    const events = seededEvents();
+    calendar.month = currentMonth;
+    calendar.events = events;
+
+    calendar.addEventListener("fluid-month-change", (event) => {
+      const month = (event as CustomEvent<{ month: string }>).detail.month;
+      status.textContent = `Viewing ${month}`;
+    });
+
+    calendar.addEventListener("fluid-event-click", (event) => {
+      const detail = (event as CustomEvent<{ id: string; event: DemoEvent }>).detail;
+      status.textContent = `"${detail.event.title}" on ${detail.event.date}`;
+    });
+
+    calendar.addEventListener("fluid-day-click", (event) => {
+      const date = (event as CustomEvent<{ date: string }>).detail.date;
+      const count = events.filter((item) => item.date === date).length;
+      status.textContent = count === 1 ? `${date}: 1 event` : `${date}: ${count} events`;
+    });
+
+    root.querySelector("[data-cal-today]")?.addEventListener("click", () => {
+      calendar.month = currentMonth;
+      status.textContent = `Viewing ${currentMonth}`;
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-cal-demo]")) setup(root);
+</script>

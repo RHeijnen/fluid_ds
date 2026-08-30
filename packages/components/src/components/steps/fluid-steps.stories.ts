@@ -9,7 +9,7 @@ const meta: Meta<Args> = {
   title: "Components/Navigation/Steps",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     current: { control: { type: "number", min: 0, max: 3 } },

@@ -97,7 +97,11 @@ export class FluidMenuItem extends FluidElement {
       :host([active]) .base {
         background: var(
           --fluid-menu-item-active-bg,
-          color-mix(in srgb, var(--fluid-menu-item-accent, var(--fluid-accent-base)) 10%, transparent)
+          color-mix(
+            in srgb,
+            var(--fluid-menu-item-accent, var(--fluid-accent-base)) 10%,
+            transparent
+          )
         );
         color: var(--fluid-menu-item-active-fg, var(--fluid-text-primary));
       }

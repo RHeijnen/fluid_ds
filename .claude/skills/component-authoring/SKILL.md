@@ -76,12 +76,14 @@ component-scoped variable that falls back to a main semantic variable.**
 ```
 
 Why: the fallback chain gives three override levels for free:
+
 1. brand level: override `--fluid-accent-base` → every component reflows;
 2. component level: override `--fluid-button-bg` → all buttons change;
 3. instance level: set `--fluid-button-bg` inline / via `[data-fluid-id]` → one
    button changes.
 
 Rules:
+
 - Name component tokens `--fluid-<component>-<role>` (e.g. `--fluid-button-bg`).
 - **Every** styled property reads a `--fluid-<component>-*` token (not a main
   var directly) so it's overridable per-component, not only globally.
@@ -140,6 +142,7 @@ Rules:
 
 Run the 5-minute component review checklist in
 `.claude/skills/accessibility/SKILL.md` against the component. At minimum:
+
 - Keyboard: every action reachable; Tab/arrow contract matches the APG pattern;
   Esc closes popups.
 - Focus: visible indicator (never `outline: none` without a replacement);

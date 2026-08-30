@@ -18,17 +18,18 @@
 ## 0. Setup UX north star: "override-first" (per user)
 
 The wizard models **how a team actually adopts a design system**: start from a
-sensible default, then deliberately decide what to *override*. Overrides are
+sensible default, then deliberately decide what to _override_. Overrides are
 opt-in and always visible, never a wall of every token.
 
 Principles every step must follow:
+
 1. **Defaults are the happy path.** Each step opens showing the current resolved
    value (from the manifest) as the default. A user can hit **Next** and get a
    great result having changed nothing. "Most teams keep this" hints on the
    advanced steps (tones, mono font, motion, density).
 2. **Overriding is an explicit, reversible act.** The moment a control changes a
    token, the step shows a small **"Overriding default"** badge + the before→after
-   value, and a **"Reset to default"** affordance that clears *only* that step's
+   value, and a **"Reset to default"** affordance that clears _only_ that step's
    vars. The running diff is the user's mental model of "what I've changed."
 3. **One decision at a time, in adoption order:** start point → scheme → accent
    (the centerpiece) → status tones → type → shape/density → accessibility →
@@ -36,13 +37,14 @@ Principles every step must follow:
 4. **Show, don't assert.** Live preview rail re-themes on every change; accent &
    tone steps show real measured WCAG contrast verdicts, not promises.
 5. **Honor existing setups.** The export tells the user exactly what to override
-   in *their* app (the `[data-fluid-brand="custom"]` block + the wrapper
-   attributes), layered *after* the base tokens, never "replace everything."
+   in _their_ app (the `[data-fluid-brand="custom"]` block + the wrapper
+   attributes), layered _after_ the base tokens, never "replace everything."
    A resume link / `fluid.config.json` lets them come back and change their mind.
 6. **The diff is the product.** Output is only the deltas from default: the
    smallest override block that achieves their look, not a full token dump.
 
 ### §11 open questions: RESOLVED (so W1 isn't blocked)
+
 - **Ramp from seed:** hand-rolled OKLCH lightness sweep, no new dep; manual
   per-stop override as the escape hatch. ✅
 - **Fonts:** curated `fluid-select` + "Custom…" string; set the CSS var only,
@@ -77,35 +79,35 @@ consumer loads after the base tokens:
 ```
 
 That block is exactly what the playground's `themeStore.toCSS()` already emits.
-The wizard's job is to produce the **same kind of artifact** through a *guided*
+The wizard's job is to produce the **same kind of artifact** through a _guided_
 flow instead of a freeform sidebar of every token.
 
 The full override surface the wizard can touch (all confirmed present in
 `packages/tokens/src/tokens.ts` and `dist/manifest.json`):
 
-| Family | Tokens (CSS vars) | `$userFacing`? | Wizard step |
-|---|---|---|---|
-| Accent / brand ramp | `--fluid-color-brand-50 … -900` | ✅ all 10 stops | 3 |
-| Color scheme | `data-fluid-theme="light\|dark"` attribute | n/a (attr) | 2 |
-| Brand preset | `data-fluid-brand="midnight\|corporate"` attribute | n/a (attr) | 1 |
-| Semantic tones | `--fluid-{success,danger,warning,info}-{base,hover,active,text}` (semantic, **theme-dependent light/dark, brand-independent**) | exposed via `manifest.semantics` | 4 |
-| Typography | `--fluid-font-family-sans`, `--fluid-font-family-mono`, `--fluid-font-size-{xs…4xl}` | ✅ | 5 |
-| Shape | `--fluid-radius-{sm,md,lg,xl}` | ✅ | 6 |
-| Density / spacing | `--fluid-space-*` (currently **not** `$userFacing`; see §11 open question) | ❌ today | 6 |
-| Motion | `--fluid-duration-{fast,normal,slow}` | ✅ | 6 (optional) |
-| Conformance | `data-fluid-conformance="aaa"` → `--fluid-target-min` 24→44px, `--fluid-focus-ring-width` 2→3px | n/a (attr) | 7 |
-| Per-component tokens | `--fluid-<name>-*` (e.g. `--fluid-button-radius`) from CEM `@cssproperty` | from `custom-elements.json` | 8 |
+| Family               | Tokens (CSS vars)                                                                                                              | `$userFacing`?                   | Wizard step  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- | ------------ |
+| Accent / brand ramp  | `--fluid-color-brand-50 … -900`                                                                                                | ✅ all 10 stops                  | 3            |
+| Color scheme         | `data-fluid-theme="light\|dark"` attribute                                                                                     | n/a (attr)                       | 2            |
+| Brand preset         | `data-fluid-brand="midnight\|corporate"` attribute                                                                             | n/a (attr)                       | 1            |
+| Semantic tones       | `--fluid-{success,danger,warning,info}-{base,hover,active,text}` (semantic, **theme-dependent light/dark, brand-independent**) | exposed via `manifest.semantics` | 4            |
+| Typography           | `--fluid-font-family-sans`, `--fluid-font-family-mono`, `--fluid-font-size-{xs…4xl}`                                           | ✅                               | 5            |
+| Shape                | `--fluid-radius-{sm,md,lg,xl}`                                                                                                 | ✅                               | 6            |
+| Density / spacing    | `--fluid-space-*` (currently **not** `$userFacing`; see §11 open question)                                                     | ❌ today                         | 6            |
+| Motion               | `--fluid-duration-{fast,normal,slow}`                                                                                          | ✅                               | 6 (optional) |
+| Conformance          | `data-fluid-conformance="aaa"` → `--fluid-target-min` 24→44px, `--fluid-focus-ring-width` 2→3px                                | n/a (attr)                       | 7            |
+| Per-component tokens | `--fluid-<name>-*` (e.g. `--fluid-button-radius`) from CEM `@cssproperty`                                                      | from `custom-elements.json`      | 8            |
 
 ### Wizard vs. the existing Theme Builder (playground)
 
-| | Theme Builder (`apps/playground`) | Configuration Wizard (`apps/wizard`) |
-|---|---|---|
-| Mental model | Freeform: one big sidebar of every `$userFacing` token + a Design Mode inspector | Guided: ordered steps, one decision at a time, opinionated defaults |
-| Audience | Designers who already know the token system | New adopters who want a good result fast |
-| Entry | Blank `[data-fluid-brand="custom"]` | "Start from a preset or scratch" |
-| Color | Edit raw brand stops 50–900 individually | Pick **one seed**, derive the 10-stop ramp + show contrast verdicts |
-| Output | `fluid-custom-brand.css` via export dialog | Same CSS **plus** a JSON config, install snippets, and resume link |
-| State | `themeStore` + `elementOverridesStore` + URL hash | **Reuses both stores**, adds a thin `wizardStore` for step/seed/preset metadata |
+|              | Theme Builder (`apps/playground`)                                                | Configuration Wizard (`apps/wizard`)                                            |
+| ------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Mental model | Freeform: one big sidebar of every `$userFacing` token + a Design Mode inspector | Guided: ordered steps, one decision at a time, opinionated defaults             |
+| Audience     | Designers who already know the token system                                      | New adopters who want a good result fast                                        |
+| Entry        | Blank `[data-fluid-brand="custom"]`                                              | "Start from a preset or scratch"                                                |
+| Color        | Edit raw brand stops 50–900 individually                                         | Pick **one seed**, derive the 10-stop ramp + show contrast verdicts             |
+| Output       | `fluid-custom-brand.css` via export dialog                                       | Same CSS **plus** a JSON config, install snippets, and resume link              |
+| State        | `themeStore` + `elementOverridesStore` + URL hash                                | **Reuses both stores**, adds a thin `wizardStore` for step/seed/preset metadata |
 
 **Decision: the wizard is a guided front-end over the same stores.** It does not
 fork the theming engine. It writes into `themeStore` (brand-wide overrides) and
@@ -133,7 +135,7 @@ format).
 
 **Change of plan vs. the current 3-step scaffold:** the current steps are
 `select → theme → download` ("pick components / brand it / get setup"). That is a
-*package builder* framing. The user's ask is a *configuration* wizard. We will:
+_package builder_ framing. The user's ask is a _configuration_ wizard. We will:
 
 1. **Keep** `step-download.ts` (rename concept to "Export") as the terminal step.
 2. **Demote/defer** `step-select.ts` (component picking): it's orthogonal to
@@ -157,27 +159,28 @@ preset → scheme → accent → tones → type → shape → conformance → re
 
 (Optional `select` step gated behind a flag, inserted before `preset`.)
 
-| # | id | Title | One-liner | Writes |
-|---|---|---|---|---|
-| 1 | `preset` | Start point | Begin from a brand preset or scratch | `data-fluid-brand`, seeds `themeStore` |
-| 2 | `scheme` | Color scheme | Light, dark, or follow the OS | `data-fluid-theme` (preview only) + config flag |
-| 3 | `accent` | Accent color | Pick one seed → derive brand ramp; contrast checks | `--fluid-color-brand-50…900` |
-| 4 | `tones` | Status colors | success / danger / warning / info (theme-independent) | semantic tone vars (optional) |
-| 5 | `type` | Typography | Font family + type scale | `--fluid-font-family-sans/mono`, `--fluid-font-size-*` |
-| 6 | `shape` | Shape & density | Corner radius + (spacing) + motion | `--fluid-radius-*`, `--fluid-space-*`, `--fluid-duration-*` |
-| 7 | `conformance` | Accessibility | AA vs AAA | `data-fluid-conformance` + config flag |
-| 8 | `review` | Review | Full preview gallery + summary of every choice | nothing (read-only) |
-| 9 | `export` | Export | CSS / JSON / snippets / download / resume link | nothing (read-only) |
+| #   | id            | Title           | One-liner                                             | Writes                                                      |
+| --- | ------------- | --------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| 1   | `preset`      | Start point     | Begin from a brand preset or scratch                  | `data-fluid-brand`, seeds `themeStore`                      |
+| 2   | `scheme`      | Color scheme    | Light, dark, or follow the OS                         | `data-fluid-theme` (preview only) + config flag             |
+| 3   | `accent`      | Accent color    | Pick one seed → derive brand ramp; contrast checks    | `--fluid-color-brand-50…900`                                |
+| 4   | `tones`       | Status colors   | success / danger / warning / info (theme-independent) | semantic tone vars (optional)                               |
+| 5   | `type`        | Typography      | Font family + type scale                              | `--fluid-font-family-sans/mono`, `--fluid-font-size-*`      |
+| 6   | `shape`       | Shape & density | Corner radius + (spacing) + motion                    | `--fluid-radius-*`, `--fluid-space-*`, `--fluid-duration-*` |
+| 7   | `conformance` | Accessibility   | AA vs AAA                                             | `data-fluid-conformance` + config flag                      |
+| 8   | `review`      | Review          | Full preview gallery + summary of every choice        | nothing (read-only)                                         |
+| 9   | `export`      | Export          | CSS / JSON / snippets / download / resume link        | nothing (read-only)                                         |
 
 Per-component tweaks (the playground's Design Mode) are folded into the `review`
 step as an **optional "fine-tune a component" drawer**, not a mandatory step (see
 §3.8), keeps the happy path short.
 
 ### 3.1 Step `preset`: Start point
+
 - **UI:** 3 large radio cards (dogfood `fluid-radio-group` + custom card render,
   or a row of `fluid-card`s each with a mini swatch preview): **Default** (blue),
   **Midnight** (violet), **Corporate**, plus a 4th **"Start from scratch"** card.
-- **Action:** sets `data-fluid-brand` on the preview root. Choosing a *named*
+- **Action:** sets `data-fluid-brand` on the preview root. Choosing a _named_
   preset means the wizard's diff stays empty until the user changes something
   (the preset CSS already does the work). Choosing "scratch" keeps
   `data-fluid-brand="custom"` and an empty diff.
@@ -185,16 +188,18 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
 - **Preview:** the persistent right-rail preview re-themes instantly.
 
 ### 3.2 Step `scheme`: Color scheme
+
 - **UI:** `fluid-segmented-control` with `light` / `dark` / `auto`.
 - **Writes:** `data-fluid-theme` on `<html>` of the preview (light/dark). `auto`
   records a config flag and the consumer snippet emits a
   `@media (prefers-color-scheme: dark)` note + `data-fluid-theme` guidance.
-- **Note:** scheme is an *attribute*, not a token, so it does **not** enter the
+- **Note:** scheme is an _attribute_, not a token, so it does **not** enter the
   `themeStore` diff. It is stored in `wizardStore.config.scheme` and only affects
   the exported setup instructions + which `manifest.semantics[scheme]` the accent
   contrast check runs against.
 
 ### 3.3 Step `accent`: Accent color (the centerpiece)
+
 - **UI:** `fluid-color-picker` (seed) + a derived 10-swatch ramp strip + a
   contrast results panel.
 - **Algorithm (seed → ramp):** generate `brand-50 … brand-900` from one seed.
@@ -221,6 +226,7 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
 - **Preview:** buttons / links / focus rings in the right rail recolor live.
 
 ### 3.4 Step `tones`: Status colors
+
 - **Framing:** semantic tones are **theme-independent across brands** (the
   `tokens.ts` comment is explicit: switching brand does not recolor
   success/danger/warning/info). So this step is **optional / "advanced"** and
@@ -228,13 +234,14 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
 - **UI:** four `fluid-color-picker`s (one per tone base), each showing a live
   swatch with the tone's `text` color overlaid + a contrast badge.
 - **Writes:** semantic vars directly into `themeStore` (e.g.
-  `--fluid-success-base`). Note these are *semantic*, light/dark differ, write
+  `--fluid-success-base`). Note these are _semantic_, light/dark differ, write
   the value for the **currently-previewed scheme**; the export documents that the
   other scheme keeps defaults unless also overridden. (v1: override light only,
   warn that dark uses defaults, see §11.)
 - **Validation:** base vs text ≥ 4.5:1, same util as step 3.
 
 ### 3.5 Step `type`: Typography
+
 - **UI:**
   - Font family: a `fluid-select` of a **curated list** (system stack, Inter,
     Geist, IBM Plex, Roboto, Source Sans, + "Custom…" text input). Default value
@@ -252,6 +259,7 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
   malformed.
 
 ### 3.6 Step `shape`: Shape & density
+
 - **UI:**
   - Radius: a single "roundness" `fluid-slider` (0 → 1) mapping to the four
     `--fluid-radius-*` proportionally, or manual per-token sliders (manifest
@@ -265,16 +273,18 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
   `--fluid-duration-*`.
 
 ### 3.7 Step `conformance`: Accessibility level
+
 - **UI:** `fluid-segmented-control` **AA** (default) / **AAA**, with a plain-text
   explanation of the deltas: target size 24→44px, focus ring 2→3px (mirrors the
   docs' `ConformanceToggle`/`ConformanceCode` behavior).
-- **Writes:** sets `data-fluid-conformance` on the preview root (an *attribute*,
+- **Writes:** sets `data-fluid-conformance` on the preview root (an _attribute_,
   not a token, handled by the existing `base.css` AAA block). Stored as
   `wizardStore.config.conformance`. Export emits the attribute + a note.
 - **Preview:** buttons/fields visibly grow; this is the most dramatic live change
   and a good confidence-builder near the end.
 
 ### 3.8 (Within `review`) Optional per-component fine-tune
+
 - The `review` step renders the full preview gallery (reuse
   `<component-preview>` from the playground). A "Fine-tune a component" button
   opens a `fluid-drawer` that mounts the playground's **Design Mode** path:
@@ -285,6 +295,7 @@ step as an **optional "fine-tune a component" drawer**, not a mandatory step (se
   the brand-wide config is the core deliverable.
 
 ### 3.9 Step `export`
+
 See §6.
 
 ---
@@ -293,19 +304,20 @@ See §6.
 
 Every control is a Fluid component (the wizard is itself a showcase):
 
-| Need | Component | Event |
-|---|---|---|
-| One-of-N choice | `fluid-segmented-control` + `fluid-segment` | `fluid-change {value}` |
-| Card choice | `fluid-radio-group` / `fluid-card` | `fluid-change` |
-| Color | `fluid-color-picker` | `fluid-change {value}` |
-| Numeric token | `fluid-slider` (manifest `$range`) | `fluid-change {value}` |
-| Curated/custom list | `fluid-select` + `fluid-option` | `fluid-change` |
-| Free text (custom font) | `fluid-input` | `fluid-input` |
-| Status / contrast verdict | `fluid-callout variant=…` |, |
-| Code output | `fluid-code-block` |, |
-| Container | `fluid-card`, `fluid-drawer`, `fluid-tabs` |, |
+| Need                      | Component                                   | Event                  |
+| ------------------------- | ------------------------------------------- | ---------------------- |
+| One-of-N choice           | `fluid-segmented-control` + `fluid-segment` | `fluid-change {value}` |
+| Card choice               | `fluid-radio-group` / `fluid-card`          | `fluid-change`         |
+| Color                     | `fluid-color-picker`                        | `fluid-change {value}` |
+| Numeric token             | `fluid-slider` (manifest `$range`)          | `fluid-change {value}` |
+| Curated/custom list       | `fluid-select` + `fluid-option`             | `fluid-change`         |
+| Free text (custom font)   | `fluid-input`                               | `fluid-input`          |
+| Status / contrast verdict | `fluid-callout variant=…`                   | ,                      |
+| Code output               | `fluid-code-block`                          | ,                      |
+| Container                 | `fluid-card`, `fluid-drawer`, `fluid-tabs`  | ,                      |
 
 Each step element:
+
 - subscribes to `wizardStore` for its slice of config + to `themeStore` for the
   current resolved values,
 - writes via `themeStore.set(cssVar, value)` (brand-wide): which auto-applies to
@@ -325,19 +337,26 @@ Each step element:
 
 ```ts
 export const STEPS = [
-  "preset", "scheme", "accent", "tones",
-  "type", "shape", "conformance", "review", "export",
+  "preset",
+  "scheme",
+  "accent",
+  "tones",
+  "type",
+  "shape",
+  "conformance",
+  "review",
+  "export"
 ] as const;
 export type Step = (typeof STEPS)[number];
 
 export interface WizardConfig {
   preset: "default" | "midnight" | "corporate" | "custom";
   scheme: "light" | "dark" | "auto";
-  seed?: string;                 // accent seed hex (ramp is derived → themeStore)
+  seed?: string; // accent seed hex (ramp is derived → themeStore)
   conformance: "aa" | "aaa";
-  fontPreset?: string;           // curated key or "custom"
+  fontPreset?: string; // curated key or "custom"
   density?: "compact" | "cozy" | "comfortable";
-  completed: Partial<Record<Step, boolean>>;  // for stepper "done" ticks
+  completed: Partial<Record<Step, boolean>>; // for stepper "done" ticks
 }
 
 export interface WizardState {
@@ -348,10 +367,10 @@ export interface WizardState {
 
 **Token values themselves do NOT live in `wizardStore`.** They live in the
 existing `themeStore` (brand-wide) and `elementOverridesStore` (per-element).
-`wizardStore` only holds *navigation + non-token decisions* (preset/scheme/
+`wizardStore` only holds _navigation + non-token decisions_ (preset/scheme/
 conformance attributes, seed, chosen presets, completion). This is deliberate:
-it lets the wizard and the Theme Builder share the *exact* same token diff and
-the *same* URL-hash format.
+it lets the wizard and the Theme Builder share the _exact_ same token diff and
+the _same_ URL-hash format.
 
 The store keeps its current `subscribe/next/prev/setStep` API and gains
 `setConfig(partial)`, `reset()`, and `markComplete(step)`.
@@ -366,6 +385,7 @@ The store keeps its current `subscribe/next/prev/setStep` API and gains
 - All slider/select edits → `themeStore.set(cssVar, value)` directly.
 
 ### Persistence & resumability
+
 - **URL hash:** reuse `apps/playground/src/url-state.ts` verbatim for the token
   diff (`#theme=…`, `#elements=…`). **Add** a third key `#wizard=<b64>` carrying
   the `WizardConfig` (step + attributes). Factor the encode/decode helpers out of
@@ -384,6 +404,7 @@ The store keeps its current `subscribe/next/prev/setStep` API and gains
 Reuse the playground's export machinery; present it as a guided summary.
 
 ### What the user walks away with
+
 1. **`fluid-custom-brand.css`**: the brand-wide override block. Generated by
    `themeStore.toCSS('[data-fluid-brand="custom"]')` (already implemented). If
    the per-component drawer was used, append `elementOverridesStore.toCSS()`
@@ -406,6 +427,7 @@ Reuse the playground's export machinery; present it as a guided summary.
    (`/docs/guides/…`, the component-token-convention doc).
 
 ### Reuse vs. net-new
+
 - **Reuse:** `themeStore.toCSS`, `elementOverridesStore.toCSS`, the
   download-blob pattern, the 3-step snippet layout from `export-panel.ts`.
 - **Net-new:** the JSON config serializer, the font reminder, the attribute
@@ -445,6 +467,7 @@ apps/wizard/
 ```
 
 ### Reused from `apps/playground` (import directly across the workspace)
+
 The cleanest path is a small **shared internal package** so both apps import the
 engine instead of reaching across app boundaries:
 
@@ -463,11 +486,13 @@ engine instead of reaching across app boundaries:
 `packages/theme-engine`, repoint both apps). The plan's milestones reflect this.
 
 Reused **UI** components from the playground (only if the engine is shared):
+
 - `component-preview` / `preview-card` → the review-step gallery + right rail.
 - `design-inspector` (`inspector.ts`) + `token-control`/`token-form` → the
   optional fine-tune drawer.
 
 ### Framework
+
 Lit 3 + TypeScript + Vite (matches every other app). No new framework. No new
 runtime deps for v1 (ramp derivation is hand-rolled OKLCH math; JSZip only if/when
 the ZIP export lands).
@@ -490,7 +515,7 @@ the ZIP export lands).
   must be wrapped in `@media (prefers-reduced-motion: reduce)` no-ops (the
   playground already guards its pulse).
 - **Contrast:** the wizard chrome itself uses semantic tokens, so it inherits AA;
-  the contrast *of the user's chosen theme* is validated in-step (§3.3/3.4).
+  the contrast _of the user's chosen theme_ is validated in-step (§3.3/3.4).
 - **Conformance self-test:** the wizard should pass the same axe / open-wc audit
   the components do; add a smoke a11y test if the wizard gets a test target
   (today only `@fluid-ds/components` runs tests, see §10).
@@ -509,7 +534,7 @@ engine reads). These are **one-line edits in `tokens.ts`** + a tokens rebuild:
   manifest entry. **Decision: (b) for v1** (no token-source change, density is a
   wizard-side transform); promote to (a) if the Theme Builder wants it too.
 - **Semantic tones in dark scheme (step 4):** already in `manifest.semantics.dark`
-, no source change; just decide v1 scope (light-only override, see §11).
+  , no source change; just decide v1 scope (light-only override, see §11).
 - Everything else (brand, font family/size, radius, duration) is **already
   `$userFacing`**, confirmed in `tokens.ts`. No change needed.
 
@@ -551,7 +576,7 @@ Any token-source change ships in the **same commit** per `CLAUDE.md`, and
    "Custom…" free text. The wizard sets the CSS var only; it does **not** bundle
    the font, export emits a `<link>`/`@font-face` reminder. **Decide:** curated +
    custom-string, no font bundling in v1.
-3. **Semantic tones scope.** They're theme-independent across *brands* but differ
+3. **Semantic tones scope.** They're theme-independent across _brands_ but differ
    light/dark. **Decide:** v1 overrides the **previewed scheme only** and warns
    the other scheme keeps defaults; v2 offers per-scheme editing. Also confirm
    tones stay a collapsed "advanced" step (most users skip).
@@ -571,8 +596,10 @@ Any token-source change ships in the **same commit** per `CLAUDE.md`, and
 ## 12. Phased milestones (each independently shippable)
 
 ### W1: Flow skeleton + accent + export (the spine)
+
 **Goal:** a user can walk preset → scheme → accent → review → export and get a
 working `fluid-custom-brand.css`. Other steps stubbed but navigable.
+
 - `wizard-store.ts`: extend to the 9-step `STEPS` + `WizardConfig` + `setConfig`.
 - `wizard-app.ts`: render 9 steps, focus-to-heading + live-region announce,
   reduced-motion guard.
@@ -588,8 +615,10 @@ working `fluid-custom-brand.css`. Other steps stubbed but navigable.
   Browser-verified (Chrome DevTools MCP) per `verify-in-browser`.
 
 ### W2: Extract `packages/theme-engine` + remaining config steps
+
 **Goal:** real implementations of tones / type / shape / conformance, on a shared
 engine.
+
 - Create `packages/theme-engine` (private): move `store.ts`, `manifest.ts`,
   `element-overrides-store.ts`, url-codec, `component-tokens-map.ts`,
   `contrast.ts`, `derive-ramp.ts`. Repoint **playground + wizard** imports.
@@ -603,7 +632,9 @@ engine.
   `pnpm verify`. JSON config export added.
 
 ### W3: Fine-tune drawer, website wiring, polish, docs
+
 **Goal:** production-ready surface.
+
 - Optional per-component drawer in `step-review` reusing `design-inspector` +
   `component-tokens-map` + `elementOverridesStore` (flag-gated).
 - `scripts/build-website.mjs` + `_redirects` + `_headers`: stage `website/wizard/`.

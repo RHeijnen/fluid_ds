@@ -1,4 +1,5 @@
-import { expect, fixture, html, oneEvent } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, elementUpdated } from "@open-wc/testing";
+import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
 import type { FluidButton } from "./fluid-button.js";
 
@@ -231,6 +232,33 @@ describe("<fluid-button>", () => {
    * to the inner native <button>. Without it, host.focus() no-ops and
    * keyboard users land on nothing.
    */
+  it("lets --fluid-button-focus-ring-color recolor the focus ring", async () => {
+    const el = await fixture<FluidButton>(html`<fluid-button>Focus me</fluid-button>`);
+    const inner = el.shadowRoot!.querySelector<HTMLButtonElement>("button")!;
+
+    /* The token is published as a @cssproperty, so setting it has to actually
+       reach the outline. It was documented but never referenced: the rule hard
+       coded the shared --fluid-focus-ring-color, so overriding the button's own
+       token silently did nothing. */
+    /* The width comes along because this suite runs without the theme
+       stylesheet: with --fluid-focus-ring-width unresolved the whole `outline`
+       shorthand is invalid at computed-value time and every longhand falls
+       back to its initial, which would mask what the color token does. */
+    el.style.setProperty("--fluid-button-focus-ring-width", "2px");
+    el.style.setProperty("--fluid-button-focus-ring-color", "rgb(255, 0, 0)");
+    await elementUpdated(el);
+
+    // :focus-visible needs a keyboard-originated focus, not a .focus() call.
+    await sendKeys({ press: "Tab" });
+    await elementUpdated(el);
+
+    expect(el.shadowRoot!.activeElement).to.equal(inner);
+    expect(inner.matches(":focus-visible")).to.equal(true);
+    const outline = getComputedStyle(inner);
+    expect(outline.outlineStyle).to.equal("solid");
+    expect(outline.outlineColor).to.equal("rgb(255, 0, 0)");
+  });
+
   it("delegates focus from the host to the inner button", async () => {
     const el = await fixture<FluidButton>(html`<fluid-button>Hi</fluid-button>`);
     const inner = el.shadowRoot!.querySelector("button")!;

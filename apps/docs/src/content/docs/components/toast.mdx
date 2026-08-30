@@ -5,6 +5,7 @@ description: "Ephemeral status messages that fade after a few seconds. Stack-man
 
 import Demo from "../../../components/Demo.astro";
 import ComponentApi from "../../../components/ComponentApi.astro";
+import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 `<fluid-toast>` is the **container**, one per app (or per region). Call
@@ -12,11 +13,15 @@ import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/com
 auto-dismiss after a duration and the stack handles its own positioning. For
 persistent in-page status, reach for [`<fluid-callout>`](/components/callout/).
 
+Every button on this page pushes a real toast. The container it uses is the one
+declared in this first demo, exactly as you'd declare a single container for a
+whole app.
+
 <Demo>
-  <fluid-button onclick="document.querySelector('#hero-toaster').toast({ message: 'Saved ' + new Date().toLocaleTimeString(), variant: 'success' })">
+  <fluid-button onclick="document.querySelector('#page-toaster').toast({ message: 'Saved at ' + new Date().toLocaleTimeString(), variant: 'success' })">
     Show a toast
   </fluid-button>
-  <fluid-toast id="hero-toaster" placement="top-end"></fluid-toast>
+  <fluid-toast id="page-toaster" placement="top-end"></fluid-toast>
 </Demo>
 
 ## Install
@@ -31,6 +36,7 @@ persistent in-page status, reach for [`<fluid-callout>`](/components/callout/).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/toast/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +48,7 @@ persistent in-page status, reach for [`<fluid-callout>`](/components/callout/).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/toast"; // registers toast + toast-item
     ```
+
   </TabItem>
 </Tabs>
 
@@ -49,73 +56,320 @@ persistent in-page status, reach for [`<fluid-callout>`](/components/callout/).
 
 ### Container in your page
 
-Drop one `<fluid-toast>` container near the end of `<body>`. Choose
-where it anchors with `placement`. Six positions:
-`top-start` `top` `top-end` `bottom-start` `bottom` `bottom-end`.
+Drop one `<fluid-toast>` container near the end of `<body>` and keep a
+reference to it. It renders nothing until something is pushed onto it, and it
+sets `pointer-events: none` so an empty container never blocks a click.
 
-```html
-<fluid-toast id="toaster" placement="top-end"></fluid-toast>
+<ConformanceCode code={`<fluid-toast id="toaster" placement="top-end"></fluid-toast>`} />
+
+```js
+const toaster = document.querySelector("#toaster");
+toaster.toast({ message: "Saved!", variant: "success" });
 ```
 
 ### Push a toast
 
+`toast()` takes `message`, `variant`, and `duration`, and returns the
+`<fluid-toast-item>` it created so you can dismiss or update it later. Push a
+few in a row to watch them stack:
+
 <Demo>
-  <fluid-button onclick="document.querySelector('#demo-toaster').toast({ message: 'Saved at ' + new Date().toLocaleTimeString(), variant: 'success' })">
+  <fluid-button onclick="document.querySelector('#page-toaster').toast({ message: 'Saved at ' + new Date().toLocaleTimeString(), variant: 'success' })">
     Show success toast
   </fluid-button>
-  <fluid-button variant="secondary" onclick="document.querySelector('#demo-toaster').toast({ message: 'Heads up', variant: 'warning' })">
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Heads up, your session expires soon', variant: 'warning' })"
+  >
     Show warning
   </fluid-button>
-  <fluid-toast id="demo-toaster" placement="top-end"></fluid-toast>
+  <fluid-button variant="ghost" onclick="document.querySelector('#page-toaster').clear()">
+    Clear all
+  </fluid-button>
 </Demo>
 
-```ts
+```js
 const toaster = document.querySelector("#toaster");
 
-// Most usage: one line
+// Most usage: one line.
 toaster.toast({ message: "Saved!", variant: "success" });
 
-// Returns the underlying toast item, useful if you want to dismiss
-// programmatically or update later.
+// The return value is the toast item, keep it if you need to dismiss early.
 const t = toaster.toast({
   message: "Uploading…",
   variant: "neutral",
-  duration: 0  // 0 = sticky
+  duration: 0 // 0 = sticky
 });
 // later:
 t.dismiss();
+
+// Or wipe the whole stack.
+toaster.clear();
 ```
 
 ### Variants
 
-`neutral` (default), `info`, `success`, `warning`, `danger`. Pick the
-one that matches the urgency.
+`neutral` (the default), `info`, `success`, `warning`, and `danger`. Each one
+picks up the matching **theme-independent** tone token for its accent stripe and
+icon, so a brand switch never recolors a danger toast. Fire each one and compare
+them side by side:
 
-```ts
+<Demo>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Neutral: nothing special happened' })"
+  >
+    neutral
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Info: a new version is available', variant: 'info' })"
+  >
+    info
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Success: your changes are saved', variant: 'success' })"
+  >
+    success
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Warning: two fields still need review', variant: 'warning' })"
+  >
+    warning
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Danger: could not reach the server', variant: 'danger' })"
+  >
+    danger
+  </fluid-button>
+</Demo>
+
+```js
 toaster.toast({ message: "Saved!", variant: "success" });
 toaster.toast({ message: "Couldn't connect", variant: "danger" });
 ```
 
+The variant also picks the live-region role: `danger` becomes `role="alert"`
+(interrupting), everything else is `role="status"` (announced at the next
+opportunity). Pick the variant for the urgency, not for the color.
+
 ### Duration
 
-Defaults to ~5 seconds. Pass `duration: 0` for sticky (user must
-dismiss). Pass any number in milliseconds.
+`duration` is in milliseconds and defaults to **4000**. Pass `0` to make the
+toast sticky: it then stays until the user dismisses it, or until you call
+`dismiss()` on the item you got back. Try all three below, and hover a toast
+while it counts down, the timer pauses while the pointer or keyboard focus is
+inside it and resumes when you leave.
 
-```ts
-toaster.toast({ message: "Don't go anywhere", duration: 0 });
+<Demo>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Gone in 1.5 seconds', duration: 1500 })"
+  >
+    duration 1500
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'The default 4 seconds' })"
+  >
+    default
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#page-toaster').toast({ message: 'Sticky: dismiss me with the × button', variant: 'info', duration: 0 })"
+  >
+    duration 0 (sticky)
+  </fluid-button>
+</Demo>
+
+```js
 toaster.toast({ message: "Quick note", duration: 2000 });
+toaster.toast({ message: "Don't go anywhere", duration: 0 }); // sticky
 ```
 
-## When to use
+<Aside type="note">
+  Anything the user must actually read deserves `duration: 0`. Four seconds is fine for "Saved", and
+  far too short for "Import finished with 3 errors" ([SC 2.2.1 Timing
+  Adjustable](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable)).
+</Aside>
 
-- An action the user just took succeeded or failed (saved, copied,
-  network error).
-- A short notification that doesn't need to interrupt the user's flow.
+### Rich messages
 
-If the message must be acknowledged before the user continues,
-**don't use a toast**, use a [`<fluid-dialog>`](/components/dialog/).
-Toasts will be missed by users who aren't watching the corner of the
-screen.
+`message` accepts an `HTMLElement` as well as a string. Pass an element when the
+toast needs a bold lead-in, a second line, or a link back to what happened.
+Strings are inserted as text, never parsed as HTML, so untrusted content is safe
+by default.
+
+<Demo>
+  <fluid-button
+    variant="secondary"
+    onclick="const el = document.createElement('div'); const b = document.createElement('strong'); b.textContent = 'Upload complete'; el.append(b, document.createElement('br'), 'quarterly-report.csv, 2.4 MB'); document.querySelector('#page-toaster').toast({ message: el, variant: 'success', duration: 0 })"
+  >
+    Show a two-line toast
+  </fluid-button>
+</Demo>
+
+```js
+const body = document.createElement("div");
+body.innerHTML = "<strong>Upload complete</strong><br>quarterly-report.csv";
+
+toaster.toast({ message: body, variant: "success", duration: 0 });
+```
+
+### Placement
+
+`placement` anchors the stack to one of six spots: `top-start`, `top`,
+`top-end` (the default, used by every demo above), `bottom-start`, `bottom`,
+`bottom-end`. Top-anchored stacks grow downward and bottom-anchored ones grow
+upward: each new toast extends the stack away from its anchored edge, so toasts
+already on screen never jump. The five buttons below push into five more real
+containers:
+
+<Demo>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#toaster-top-start').toast({ message: 'At top-start', variant: 'info' })"
+  >
+    top-start
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#toaster-top').toast({ message: 'At top', variant: 'info' })"
+  >
+    top
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#toaster-bottom-start').toast({ message: 'At bottom-start', variant: 'info' })"
+  >
+    bottom-start
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#toaster-bottom').toast({ message: 'At bottom', variant: 'info' })"
+  >
+    bottom
+  </fluid-button>
+  <fluid-button
+    variant="secondary"
+    onclick="document.querySelector('#toaster-bottom-end').toast({ message: 'At bottom-end', variant: 'info' })"
+  >
+    bottom-end
+  </fluid-button>
+  <fluid-toast id="toaster-top-start" placement="top-start"></fluid-toast>
+  <fluid-toast id="toaster-top" placement="top"></fluid-toast>
+  <fluid-toast id="toaster-bottom-start" placement="bottom-start"></fluid-toast>
+  <fluid-toast id="toaster-bottom" placement="bottom"></fluid-toast>
+  <fluid-toast id="toaster-bottom-end" placement="bottom-end"></fluid-toast>
+</Demo>
+
+<ConformanceCode
+  code={`<fluid-toast id="global" placement="top-end"></fluid-toast>
+<fluid-toast id="in-content" placement="bottom"></fluid-toast>`}
+/>
+
+Several containers in one document is supported and sometimes the right answer:
+a `top-end` stack for global notifications and a `bottom` stack for prompts that
+belong to the content the user is looking at.
+
+## Listening for dismissal
+
+Each `<fluid-toast-item>` fires **`fluid-dismiss`** when it goes away for any
+reason (its timer ran out, the user hit the × button, or you called
+`dismiss()`). The event bubbles, so one listener on the container covers every
+toast it will ever create. Use it to undo optimistic UI, or to advance a queue
+of messages one at a time.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-toast id="toaster" placement="top-end"></fluid-toast>
+
+    <script type="module">
+      const toaster = document.getElementById("toaster");
+      toaster.addEventListener("fluid-dismiss", (e) => {
+        console.log("gone:", e.target.textContent);
+      });
+      toaster.toast({ message: "Saved!", variant: "success" });
+    </script>
+    ```
+
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="Toaster.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/toast";
+
+    export function Toaster() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onDismiss = () => console.log("gone");
+        el.addEventListener("fluid-dismiss", onDismiss);
+        return () => el.removeEventListener("fluid-dismiss", onDismiss);
+      }, []);
+      return <fluid-toast ref={ref} placement="top-end" />;
+    }
+    ```
+
+    <Aside type="note">
+      Keep the container in a layout component and pass the element (or a
+      `toast()` helper bound to it) down through context. Rendering one
+      container per screen is how you end up with three overlapping stacks.
+    </Aside>
+
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="Toaster.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/toast";
+    const onDismiss = () => console.log("gone");
+    </script>
+
+    <template>
+      <fluid-toast placement="top-end" @fluid-dismiss="onDismiss" />
+    </template>
+    ```
+
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="toaster.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/toast";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "app-toaster",
+      template: `
+        <fluid-toast placement="top-end" (fluid-dismiss)="onDismiss()"></fluid-toast>
+      `
+    })
+    export class Toaster {
+      onDismiss() {
+        console.log("gone");
+      }
+    }
+    ```
+
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="Toaster.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/toast";
+      function onDismiss() {
+        console.log("gone");
+      }
+    </script>
+
+    <fluid-toast placement="top-end" on:fluid-dismiss={onDismiss} />
+    ```
+
+  </TabItem>
+</Tabs>
 
 ## Theming
 
@@ -123,34 +377,60 @@ Every styled property of a toast reads a **component-scoped
 `--fluid-toast-item-*` token that falls back to a main semantic var** (the
 override ladder); the per-variant accents use the **theme-independent semantic
 tone tokens** (`--fluid-success-base`, `--fluid-danger-base`, …). The container
-exposes `--fluid-toast-gap`. The **complete list** is in the
-[API tables below](#api).
+itself only exposes `--fluid-toast-gap`, the space between stacked toasts. The
+**complete list** is in the [API tables below](#api).
 
 ```css title="brand.css"
+/* Every toast under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-toast-item-bg: var(--fluid-surface-base);
   --fluid-toast-item-border: var(--fluid-border-default);
   --fluid-toast-item-success-accent: var(--fluid-success-base);
 }
+
+/* One stack that sits tighter together. */
+[data-fluid-id="compact-stack"] {
+  --fluid-toast-gap: var(--fluid-space-1);
+}
 ```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a toast and tweak the surface, accent, and
+  close-button tokens visually, then exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The item is [`part="base"`](#api) with `part="icon"`, `part="body"`, and
 `part="close"`. Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
-not covered by a token.
+not covered by a token:
 
-## API
+```css
+/* Wider toasts for longer messages, no new token needed. */
+fluid-toast-item::part(base) {
+  max-width: 32rem;
+}
+```
 
-<ComponentApi tag="fluid-toast" />
+## When to use
 
-### `<fluid-toast-item>`
+- Confirming something the user just did succeeded (saved, copied, sent).
+- Reporting a failure they can retry, where blocking the page would be rude.
+- A short notification that doesn't need to interrupt the current task.
 
-The toast container creates these for you, you don't author them directly.
-Tokens it exposes:
+### When _not_ to use
 
-<ComponentApi tag="fluid-toast-item" />
+- **Anything that must be acknowledged** before continuing: use
+  [`<fluid-dialog>`](/components/dialog/). A toast can be missed entirely by
+  someone not watching that corner of the screen.
+- **Persistent, in-flow status** tied to a section of the page: use
+  [`<fluid-callout>`](/components/callout/).
+- **A page-wide announcement** (maintenance window, plan expiry): use
+  [`<fluid-banner>`](/components/banner/), which stays put.
+- **Progress on a long task**: show a
+  [`<fluid-progress-bar>`](/components/progress-bar/) while it runs, then toast
+  once when it finishes.
 
 ## Accessibility
 
@@ -178,27 +458,44 @@ Hydration limitation: an `aria-label` already present in server-rendered markup
 is preserved as authored. Automatic locale updates for a server-generated default
 need explicit ownership provenance and are not yet verified.
 
-### Timing & motion
+### Timing
 
-- Auto-dismiss honors `prefers-reduced-motion`. Per
+- The auto-dismiss countdown **pauses while the toast is hovered or contains
+  focus**, and resumes when the pointer or focus leaves. That is what makes a
+  timed toast reachable at all: a keyboard user tabbing to the × button stops
+  the clock by arriving.
+- Even so, per
   [SC 2.2.1](https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable),
-  prefer `duration: 0` (sticky) for any message that must be read or acted on.
+  prefer `duration: 0` for any message that must be read or acted on.
 - Don't use a toast for content that must be acknowledged before continuing:
   use a [`<fluid-dialog>`](/components/dialog/).
 
 ### Motion & target size
 
+- The entrance and exit animations honor `prefers-reduced-motion`.
 - The dismiss button floors its hit area to `--fluid-target-min`: ≥ **24×24**
   (AA) / **44×44** (AAA).
 
 ### AA vs AAA
 
-Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
+Ships **WCAG 2.2 AA**; the **Conformance** toggle at the top of this page (or an
+ancestor `[data-fluid-conformance="aaa"]`) lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+
+## API
+
+<ComponentApi tag="fluid-toast" />
+
+### `<fluid-toast-item>`
+
+The toast container creates these for you, you don't author them directly.
+Tokens it exposes:
+
+<ComponentApi tag="fluid-toast-item" />
 
 ## Related
 
@@ -207,6 +504,11 @@ Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
     title="Callout"
     href="/components/callout/"
     description="Persistent, in-flow status instead of transient."
+  />
+  <LinkCard
+    title="Banner"
+    href="/components/banner/"
+    description="A page-wide announcement that stays until dismissed."
   />
   <LinkCard
     title="Dialog"

@@ -18,7 +18,10 @@ function Shell() {
 
   const toggleTheme = () => {
     const el = document.documentElement;
-    el.setAttribute("data-fluid-theme", el.getAttribute("data-fluid-theme") === "dark" ? "light" : "dark");
+    el.setAttribute(
+      "data-fluid-theme",
+      el.getAttribute("data-fluid-theme") === "dark" ? "light" : "dark"
+    );
   };
 
   // Brand picker → data-fluid-brand on <html> (light/dark stays the scheme).
@@ -44,6 +47,9 @@ function Shell() {
             </NavLink>
           ))}
         </nav>
+        <a className="sidebar-back" href="../">
+          &larr; All demos
+        </a>
         <div className="sidebar-foot muted">React 19 · Vite</div>
       </aside>
 
@@ -56,13 +62,24 @@ function Shell() {
             </fluid-breadcrumb>
           </div>
           <div className="topbar-actions">
-            <fluid-select ref={brandRef} value="default" size="sm" aria-label="Brand theme" style={{ width: "9rem" }}>
+            <fluid-select
+              ref={brandRef}
+              value="default"
+              size="sm"
+              aria-label="Brand theme"
+              style={{ width: "9rem" }}
+            >
               <fluid-option value="default">Default</fluid-option>
               <fluid-option value="midnight">Midnight</fluid-option>
               <fluid-option value="corporate">Corporate</fluid-option>
             </fluid-select>
             <fluid-tooltip content="Toggle light / dark">
-              <FluidButton variant="ghost" size="sm" aria-label="Toggle theme" onClick={toggleTheme}>
+              <FluidButton
+                variant="ghost"
+                size="sm"
+                aria-label="Toggle theme"
+                onClick={toggleTheme}
+              >
                 <fluid-icon name="sun-moon" />
               </FluidButton>
             </fluid-tooltip>

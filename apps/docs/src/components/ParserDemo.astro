@@ -1,0 +1,198 @@
+---
+/**
+ * Live demo for the parser page: editable CSV on the left runs through the
+ * real headless core (sniffDelimiter, parseDelimited, gridToTable,
+ * applyBlueprint) on every keystroke, and the typed rows, stats, mapping and
+ * cell errors render on the right.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="pd-demo" data-pd-demo>
+    <fluid-textarea
+      class="pd-source"
+      data-pd-source
+      label="Sample CSV (edit me, semicolons and tabs work too)"
+      rows={12}
+      resize="vertical"
+      spellcheck="false"></fluid-textarea>
+    <div class="pd-output">
+      <span class="pd-label">Typed rows out of <code>applyBlueprint</code></span>
+      <p class="pd-stats" data-pd-stats role="status"></p>
+      <p class="pd-mapping" data-pd-mapping></p>
+      <div class="pd-table" data-pd-table></div>
+      <ul class="pd-errors" data-pd-errors></ul>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .pd-demo {
+    inline-size: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .pd-demo {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .pd-output {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-inline-size: 0;
+  }
+  .pd-label {
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--fluid-text-secondary);
+  }
+  .pd-stats,
+  .pd-mapping {
+    margin: 0;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-text-secondary);
+  }
+  .pd-table {
+    overflow-x: auto;
+  }
+  .pd-table :global(table) {
+    border-collapse: collapse;
+    inline-size: 100%;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    background: var(--fluid-parser-table-bg, var(--fluid-surface-base));
+  }
+  .pd-table :global(th) {
+    background: var(--fluid-parser-table-header-bg, var(--fluid-surface-muted));
+    text-align: start;
+  }
+  .pd-table :global(th),
+  .pd-table :global(td) {
+    border: 1px solid var(--fluid-parser-table-border, var(--fluid-border-default));
+    padding: 0.35rem 0.6rem;
+  }
+  .pd-errors {
+    margin: 0;
+    padding-inline-start: 1.1rem;
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    color: var(--fluid-danger-text, var(--fluid-danger-base));
+  }
+</style>
+
+<script>
+  import {
+    applyBlueprint,
+    gridToTable,
+    parseDelimited,
+    sniffDelimiter,
+    type Blueprint
+  } from "@fluid-ds/parser/core";
+
+  interface TextareaLike extends HTMLElement {
+    value: string;
+  }
+
+  const blueprint: Blueprint = {
+    fields: [
+      { key: "name", label: "Full name", type: "string", required: true, aliases: ["name"] },
+      { key: "email", label: "Email", type: "email", required: true, aliases: ["e-mail", "mail"] },
+      { key: "age", label: "Age", type: "integer", min: 0, max: 120 },
+      {
+        key: "role",
+        label: "Role",
+        type: "enum",
+        options: ["engineer", "designer", "manager"],
+        default: "engineer"
+      }
+    ],
+    dedupeBy: "email"
+  };
+
+  /* Deliberately imperfect input: a fuzzy-matched header row, one bad email,
+     one out-of-range age, one enum miss, and one duplicate row. */
+  const STARTER = [
+    "Full Name,E-mail,Age,Role",
+    "Ada Lovelace,ada@example.com,36,engineer",
+    "Grace Hopper,grace@example.com,45,manager",
+    "Mary Shelley,not-an-email,28,designer",
+    "Alan Turing,alan@example.com,150,engineer",
+    "Grace Hopper,grace@example.com,45,manager",
+    "Katherine Johnson,katherine@example.com,33,scientist"
+  ].join("\n");
+
+  function cellText(value: unknown): string {
+    if (value === null || value === undefined) return "";
+    if (value instanceof Date) return value.toISOString().slice(0, 10);
+    return String(value);
+  }
+
+  function setup(root: HTMLElement): void {
+    const source = root.querySelector<TextareaLike>("[data-pd-source]");
+    const stats = root.querySelector<HTMLElement>("[data-pd-stats]");
+    const mappingEl = root.querySelector<HTMLElement>("[data-pd-mapping]");
+    const tableWrap = root.querySelector<HTMLElement>("[data-pd-table]");
+    const errorsEl = root.querySelector<HTMLElement>("[data-pd-errors]");
+    if (!source || !stats || !mappingEl || !tableWrap || !errorsEl) return;
+
+    const render = (): void => {
+      const text = source.value;
+      errorsEl.replaceChildren();
+      tableWrap.replaceChildren();
+      mappingEl.textContent = "";
+      if (!text.trim()) {
+        stats.textContent = "Paste or type some CSV to parse it.";
+        return;
+      }
+
+      const grid = parseDelimited(text, sniffDelimiter(text));
+      const raw = gridToTable(grid, "auto");
+      const result = applyBlueprint(raw, blueprint);
+
+      const { total, kept, duplicates, errorCount } = result.stats;
+      stats.textContent = `${kept} of ${total} row(s) kept, ${duplicates} duplicate(s) removed, ${errorCount} cell error(s).`;
+
+      const mapped = Object.entries(result.mapping)
+        .filter((entry): entry is [string, string] => entry[1] !== null)
+        .map(([field, column]) => `${field} ← "${column}"`);
+      mappingEl.textContent = mapped.length
+        ? `Auto-mapped columns: ${mapped.join(", ")}`
+        : "No columns could be auto-mapped to the blueprint.";
+
+      if (result.rows.length) {
+        const table = document.createElement("table");
+        const head = table.createTHead().insertRow();
+        for (const field of blueprint.fields) {
+          const th = document.createElement("th");
+          th.scope = "col";
+          th.textContent = field.label ?? field.key;
+          head.append(th);
+        }
+        const body = table.createTBody();
+        for (const row of result.rows) {
+          const tr = body.insertRow();
+          for (const field of blueprint.fields) {
+            tr.insertCell().textContent = cellText(row[field.key]);
+          }
+        }
+        tableWrap.append(table);
+      }
+
+      for (const error of result.errors) {
+        /* CellError.row is a zero-based index into the kept output rows. */
+        const li = document.createElement("li");
+        li.textContent = `Row ${error.row + 1}, ${error.field}: ${error.message}`;
+        errorsEl.append(li);
+      }
+    };
+
+    source.value = STARTER;
+    source.addEventListener("fluid-input", render);
+    render();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-pd-demo]")) setup(root);
+</script>

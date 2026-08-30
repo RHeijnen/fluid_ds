@@ -254,4 +254,62 @@ describe("<fluid-segmented-control>", () => {
     const seg = el.querySelector<HTMLElement>("fluid-segment")!;
     expect(seg.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
   });
+
+  /* Regression: markup parsed into a CONNECTED container upgrades in tree
+     order, so the group used to reconcile against not-yet-upgraded segments
+     (no `value` accessor), find no match for a non-first authored value, and
+     stomp it with the first segment. `fixture()` renders through a template
+     and hides this; the test must assign innerHTML on a live element. */
+
+  it("keeps a non-first authored value when parsed into a connected container", async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    try {
+      host.innerHTML = `
+        <fluid-segmented-control value="rounded" aria-label="Module shape">
+          <fluid-segment value="square">Square</fluid-segment>
+          <fluid-segment value="dots">Dots</fluid-segment>
+          <fluid-segment value="rounded">Rounded</fluid-segment>
+        </fluid-segmented-control>
+      `;
+      const control = host.querySelector<FluidSegmentedControl>("fluid-segmented-control")!;
+      await control.updateComplete;
+      await aTimeout(0);
+      expect(control.value).to.equal("rounded");
+      const selected = [...host.querySelectorAll<FluidSegment>("fluid-segment")].map(
+        (segment) => segment.selected
+      );
+      expect(selected).to.deep.equal([false, false, true]);
+    } finally {
+      host.remove();
+    }
+  });
+
+  it("waits for a late-arriving segment instead of stomping the authored value", async () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    try {
+      host.innerHTML = `
+        <fluid-segmented-control value="late" aria-label="Late option">
+          <fluid-segment value="first">First</fluid-segment>
+        </fluid-segmented-control>
+      `;
+      const control = host.querySelector<FluidSegmentedControl>("fluid-segmented-control")!;
+      await control.updateComplete;
+      await aTimeout(0);
+      // The authored value has no segment yet; it must not fall back to
+      // "first" because the parser may still be streaming children in.
+      expect(control.value).to.equal("late");
+      const late = document.createElement("fluid-segment") as FluidSegment;
+      late.setAttribute("value", "late");
+      late.textContent = "Late";
+      control.appendChild(late);
+      await aTimeout(0);
+      await control.updateComplete;
+      expect(control.value).to.equal("late");
+      expect(late.selected).to.equal(true);
+    } finally {
+      host.remove();
+    }
+  });
 });

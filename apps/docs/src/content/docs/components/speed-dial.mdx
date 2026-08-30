@@ -17,9 +17,15 @@ focus to the trigger), on outside click, and after an action fires
 <Demo>
   <div style="display:flex; justify-content:center; padding: 6rem 2rem;">
     <fluid-speed-dial label="Quick actions" placement="up">
-      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
-      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
-      <fluid-button variant="ghost" aria-label="Delete">Delete</fluid-button>
+      <fluid-button variant="ghost" aria-label="Share">
+        Share
+      </fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">
+        Edit
+      </fluid-button>
+      <fluid-button variant="ghost" aria-label="Delete">
+        Delete
+      </fluid-button>
     </fluid-speed-dial>
   </div>
 </Demo>
@@ -36,6 +42,7 @@ focus to the trigger), on outside click, and after an action fires
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/speed-dial/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +54,7 @@ focus to the trigger), on outside click, and after an action fires
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/speed-dial";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -60,12 +68,20 @@ actions fan out from the trigger.
 <Demo>
   <div style="display:flex; gap:6rem; justify-content:center; padding: 6rem 2rem;">
     <fluid-speed-dial label="Fan up" placement="up" open>
-      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
-      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
+      <fluid-button variant="ghost" aria-label="Share">
+        Share
+      </fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">
+        Edit
+      </fluid-button>
     </fluid-speed-dial>
     <fluid-speed-dial label="Fan right" placement="right" open>
-      <fluid-button variant="ghost" aria-label="Share">Share</fluid-button>
-      <fluid-button variant="ghost" aria-label="Edit">Edit</fluid-button>
+      <fluid-button variant="ghost" aria-label="Share">
+        Share
+      </fluid-button>
+      <fluid-button variant="ghost" aria-label="Edit">
+        Edit
+      </fluid-button>
     </fluid-speed-dial>
   </div>
 </Demo>
@@ -97,6 +113,7 @@ element. The dial closes automatically afterward.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Toolbar.tsx"
@@ -115,6 +132,7 @@ element. The dial closes automatically afterward.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Toolbar.vue"
@@ -133,6 +151,7 @@ element. The dial closes automatically afterward.
       </fluid-speed-dial>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="toolbar.component.ts"
@@ -155,6 +174,7 @@ element. The dial closes automatically afterward.
       onAction(e: Event) { console.log((e as CustomEvent).detail.action); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Toolbar.svelte"
@@ -168,6 +188,7 @@ element. The dial closes automatically afterward.
       <fluid-button variant="ghost">Edit</fluid-button>
     </fluid-speed-dial>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -180,13 +201,26 @@ the `trigger-icon` slot.
   <div style="display:flex; justify-content:center; padding: 6rem 2rem;">
     <fluid-speed-dial label="Create">
       <span slot="trigger-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
           <path d="M12 20h9" />
           <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
         </svg>
       </span>
-      <fluid-button variant="ghost" aria-label="New document">Doc</fluid-button>
-      <fluid-button variant="ghost" aria-label="New folder">Folder</fluid-button>
+      <fluid-button variant="ghost" aria-label="New document">
+        Doc
+      </fluid-button>
+      <fluid-button variant="ghost" aria-label="New folder">
+        Folder
+      </fluid-button>
     </fluid-speed-dial>
   </div>
 </Demo>

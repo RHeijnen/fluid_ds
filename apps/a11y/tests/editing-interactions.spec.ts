@@ -2,18 +2,28 @@ import { test, expect } from "@playwright/test";
 import type { FluidRichTextEditor } from "../../../packages/editor/src/components/rich-text-editor/fluid-rich-text-editor.js";
 import type { FluidKanban } from "../../../packages/kanban/src/components/kanban/fluid-kanban.js";
 
-test("editor native typing, selection formatting, readonly and reconnect preserve the value contract", async ({ page }) => {
+test("editor native typing, selection formatting, readonly and reconnect preserve the value contract", async ({
+  page
+}) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/iframe.html?id=quality-editing-interaction-contracts--editor-keyboard-fixture&viewMode=story");
+  await page.goto(
+    "/iframe.html?id=quality-editing-interaction-contracts--editor-keyboard-fixture&viewMode=story"
+  );
   const editor = page.locator("fluid-rich-text-editor");
   const textbox = page.getByRole("textbox", { name: "Project note" });
   const bold = page.getByRole("button", { name: "Bold", exact: true });
   await expect(textbox).toBeVisible();
   await editor.evaluate((element) => {
     element.addEventListener("fluid-change", (event) => {
-      element.setAttribute("data-changes", String(Number(element.getAttribute("data-changes") ?? 0) + 1));
-      element.setAttribute("data-last-value", (event as CustomEvent<{ value: string }>).detail.value);
+      element.setAttribute(
+        "data-changes",
+        String(Number(element.getAttribute("data-changes") ?? 0) + 1)
+      );
+      element.setAttribute(
+        "data-last-value",
+        (event as CustomEvent<{ value: string }>).detail.value
+      );
     });
   });
   await page.getByRole("button", { name: "Before editor" }).focus();
@@ -43,7 +53,9 @@ test("editor native typing, selection formatting, readonly and reconnect preserv
   await expect(bold).toBeDisabled();
   await textbox.focus();
   await page.keyboard.type("Must not edit");
-  expect(await editor.evaluate((element) => (element as FluidRichTextEditor).value)).toBe(formatted);
+  expect(await editor.evaluate((element) => (element as FluidRichTextEditor).value)).toBe(
+    formatted
+  );
   await page.getByRole("button", { name: "Load untrusted HTML" }).click();
   await expect(textbox.locator("a")).not.toHaveAttribute("href");
   await expect(textbox.locator("a")).not.toHaveAttribute("onclick");
@@ -59,7 +71,9 @@ test("editor native typing, selection formatting, readonly and reconnect preserv
   await page.keyboard.type("After reconnect");
   await expect(textbox).toHaveText("After reconnect");
   const reconnectedHtml = await textbox.innerHTML();
-  expect(await editor.evaluate((element) => (element as FluidRichTextEditor).value)).toBe(reconnectedHtml);
+  expect(await editor.evaluate((element) => (element as FluidRichTextEditor).value)).toBe(
+    reconnectedHtml
+  );
   await expect(editor).toHaveAttribute("data-last-value", reconnectedHtml);
   expect(Number(await editor.getAttribute("data-changes"))).toBeGreaterThan(beforeReconnectEdit);
   await page.keyboard.press("Tab");
@@ -67,10 +81,14 @@ test("editor native typing, selection formatting, readonly and reconnect preserv
   expect(errors).toEqual([]);
 });
 
-test("kanban native keyboard cancellation and click move controls keep focus and event data", async ({ page }) => {
+test("kanban native keyboard cancellation and click move controls keep focus and event data", async ({
+  page
+}) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/iframe.html?id=quality-editing-interaction-contracts--kanban-keyboard-fixture&viewMode=story");
+  await page.goto(
+    "/iframe.html?id=quality-editing-interaction-contracts--kanban-keyboard-fixture&viewMode=story"
+  );
   const board = page.locator("fluid-kanban");
   const alpha = board.locator('[data-card-id="alpha"]');
   await expect(alpha).toBeVisible();
@@ -86,15 +104,21 @@ test("kanban native keyboard cancellation and click move controls keep focus and
   await expect(alpha).toBeFocused();
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowRight");
-  await expect(board.getByRole("group", { name: "In progress", exact: true }).locator('[data-card-id="alpha"]')).toBeVisible();
+  await expect(
+    board.getByRole("group", { name: "In progress", exact: true }).locator('[data-card-id="alpha"]')
+  ).toBeVisible();
   await expect(alpha).toBeFocused();
   await page.keyboard.press("Escape");
-  await expect(board.getByRole("group", { name: "To do", exact: true }).locator('[data-card-id="alpha"]')).toBeVisible();
+  await expect(
+    board.getByRole("group", { name: "To do", exact: true }).locator('[data-card-id="alpha"]')
+  ).toBeVisible();
   await expect(alpha).toBeFocused();
   await expect(alpha).toHaveAttribute("aria-grabbed", "false");
   await alpha.getByRole("button", { name: "Move to next column: Alpha", exact: true }).click();
   await expect(alpha).toBeFocused();
-  await expect(board.getByRole("status")).toContainText("Moved Alpha to In progress, position 1 of 2.");
+  await expect(board.getByRole("status")).toContainText(
+    "Moved Alpha to In progress, position 1 of 2."
+  );
   expect(JSON.parse((await board.getAttribute("data-moves"))!)).toEqual([
     { cardId: "alpha", fromColumn: "todo", toColumn: "doing", index: 0 },
     { cardId: "alpha", fromColumn: "doing", toColumn: "todo", index: 0 },
@@ -107,18 +131,28 @@ test("kanban native keyboard cancellation and click move controls keep focus and
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Space");
-  expect(await board.evaluate((element) => (element as FluidKanban).columns[1]!.cards.map((card) => card.id))).toEqual(["charlie", "alpha"]);
+  expect(
+    await board.evaluate((element) =>
+      (element as FluidKanban).columns[1]!.cards.map((card) => card.id)
+    )
+  ).toEqual(["charlie", "alpha"]);
   expect(errors).toEqual([]);
 });
 
 test("kanban actual pointer drag reorders before the target card", async ({ page }) => {
-  await page.goto("/iframe.html?id=quality-editing-interaction-contracts--kanban-keyboard-fixture&viewMode=story");
+  await page.goto(
+    "/iframe.html?id=quality-editing-interaction-contracts--kanban-keyboard-fixture&viewMode=story"
+  );
   const board = page.locator("fluid-kanban");
   const alpha = board.locator('[data-card-id="alpha"]');
   const bravo = board.locator('[data-card-id="bravo"]');
   await expect(alpha).toBeVisible();
   await bravo.dragTo(alpha, { sourcePosition: { x: 30, y: 16 }, targetPosition: { x: 30, y: 16 } });
-  await expect.poll(() => board.evaluate((element) => (element as FluidKanban).columns[0]!.cards.map((card) => card.id))).toEqual(["bravo", "alpha"]);
+  await expect
+    .poll(() =>
+      board.evaluate((element) => (element as FluidKanban).columns[0]!.cards.map((card) => card.id))
+    )
+    .toEqual(["bravo", "alpha"]);
   await expect(bravo).toBeFocused();
   await expect(board.getByRole("status")).toContainText("Moved Bravo to To do, position 1 of 2.");
 });

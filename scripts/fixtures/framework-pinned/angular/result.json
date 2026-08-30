@@ -8,11 +8,7 @@
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 72194,
@@ -26,11 +22,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 72206,
@@ -44,11 +36,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 72218,
@@ -62,11 +50,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 72230,
@@ -80,11 +64,7 @@
     },
     {
       "stage": "pack",
-      "args": [
-        "pack",
-        "--pack-destination",
-        "<TEMP>/packs"
-      ],
+      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
       "status": "passed",
       "reason": null,
       "pid": 72242,
@@ -98,12 +78,7 @@
     },
     {
       "stage": "install",
-      "args": [
-        "install",
-        "--no-frozen-lockfile",
-        "--ignore-scripts",
-        "--strict-peer-dependencies"
-      ],
+      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
       "status": "passed",
       "reason": null,
       "pid": 72254,
@@ -117,10 +92,7 @@
     },
     {
       "stage": "typecheck",
-      "args": [
-        "run",
-        "typecheck"
-      ],
+      "args": ["run", "typecheck"],
       "status": "passed",
       "reason": null,
       "pid": 72269,
@@ -134,10 +106,7 @@
     },
     {
       "stage": "build",
-      "args": [
-        "run",
-        "build"
-      ],
+      "args": ["run", "build"],
       "status": "passed",
       "reason": null,
       "pid": 72294,

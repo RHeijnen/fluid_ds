@@ -29,21 +29,23 @@ nothing in the surrounding CSS can accidentally break it (or be broken by it).
 ```html
 <style>
   /* Has NO effect on the button rendered inside fluid-button's shadow DOM. */
-  button { background: lime; }
+  button {
+    background: lime;
+  }
 </style>
 
 <fluid-button>Still themed by Fluid, not lime</fluid-button>
 ```
 
 <Aside>
-  There are two DOM trees in play. The **light DOM** is the markup you write
-  between the tags (`<fluid-card>…here…</fluid-card>`). The **shadow DOM** is
-  what the component renders internally. They're stitched together by slots.
+  There are two DOM trees in play. The **light DOM** is the markup you write between the tags (`
+  <fluid-card>…here…</fluid-card>`). The **shadow DOM** is what the component renders internally.
+  They're stitched together by slots.
 </Aside>
 
 ## Slots: projecting your content in
 
-A component decides *where* your light-DOM children appear by placing `<slot>`
+A component decides _where_ your light-DOM children appear by placing `<slot>`
 elements in its shadow tree. Your content stays in the light DOM, the slot is
 just a window the component renders it through.
 
@@ -69,7 +71,9 @@ A component with multiple regions exposes **named slots**. You target one with
 
 <Demo>
   <fluid-card style="max-width: 22rem;">
-    <h3 slot="header" style="margin: 0;">Project settings</h3>
+    <h3 slot="header" style="margin: 0;">
+      Project settings
+    </h3>
     <p style="margin: 0;">Body content goes in the default slot.</p>
     <div slot="footer" style="display: flex; gap: var(--fluid-space-2); justify-content: flex-end;">
       <fluid-button variant="ghost">Cancel</fluid-button>
@@ -94,7 +98,7 @@ Each component's docs page lists its slots in the **API table**, see
 
 ## Styling across the wall
 
-Because page CSS can't reach into the shadow tree, a component has to *opt in*
+Because page CSS can't reach into the shadow tree, a component has to _opt in_
 to the styling you're allowed to do. There are three sanctioned doors.
 
 ### `::part()`: styling exposed internals
@@ -126,12 +130,12 @@ fluid-card::part(header) {
 
 ### `::slotted()`: styling projected content from inside
 
-The mirror image: from *inside* the component's stylesheet,
+The mirror image: from _inside_ the component's stylesheet,
 [`::slotted()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::slotted)
 matches the light-DOM nodes that landed in a slot. You won't write this as a
 consumer, it's how a component author reaches the content you slotted in (for
 example, to reset stray margins on slotted text). It only matches the
-*top-level* projected node, not its descendants.
+_top-level_ projected node, not its descendants.
 
 ```css
 /* inside the component's styles */
@@ -144,7 +148,7 @@ example, to reset stray margins on slotted text). It only matches the
 
 Here's the door that makes Fluid theming work. **CSS custom properties
 (`--variables`) are inherited, and inheritance pierces the shadow boundary.**
-A custom property set on an ancestor in the light DOM flows *into* every shadow
+A custom property set on an ancestor in the light DOM flows _into_ every shadow
 tree underneath it.
 
 Regular properties (`color`, `background`) don't cross. Custom properties do.
@@ -171,9 +175,8 @@ internals the component reads it from. The full layered model is in
 [Theming basics](/theming/basics/).
 
 <Aside type="tip">
-  Rule of thumb: **`::part()` to change CSS the component didn't tokenize;
-  `--fluid-*` tokens for the styling it *did* intend you to change.** Tokens
-  for the knobs, parts for the long tail.
+  Rule of thumb: **`::part()` to change CSS the component didn't tokenize; `--fluid-*` tokens for
+  the styling it *did* intend you to change.** Tokens for the knobs, parts for the long tail.
 </Aside>
 
 ## Why this is worth the constraint
@@ -183,7 +186,7 @@ payoff:
 
 - A component looks identical in a marketing page, a dense dashboard, and a
   third-party embed, its styles are sealed.
-- You can't *accidentally* break it, and it can't break you.
+- You can't _accidentally_ break it, and it can't break you.
 - Theming is explicit and greppable: it only happens through `--fluid-*`
   tokens and `::part()`, never through ambient selector soup.
 

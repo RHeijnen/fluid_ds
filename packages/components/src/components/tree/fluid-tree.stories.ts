@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Navigation/Tree",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;

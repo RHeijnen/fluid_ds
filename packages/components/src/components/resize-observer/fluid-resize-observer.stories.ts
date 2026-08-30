@@ -5,7 +5,7 @@ import "./define.js";
 const meta: Meta = {
   title: "Components/Utilities/Resize observer",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } }
+  parameters: { status: { type: "stable" } }
 };
 
 export default meta;
@@ -18,7 +18,8 @@ export const Default: Story = {
         const entry = e.detail.entries[0] as ResizeObserverEntry;
         const out = (e.currentTarget as HTMLElement).nextElementSibling;
         const { width, height } = entry.contentRect;
-        if (out) out.textContent = `width: ${Math.round(width)}px · height: ${Math.round(height)}px`;
+        if (out)
+          out.textContent = `width: ${Math.round(width)}px · height: ${Math.round(height)}px`;
       }}
     >
       <div

@@ -19,7 +19,9 @@ is a single-level menu, submenus are out of scope.
     <fluid-menu-item value="new">New file</fluid-menu-item>
     <fluid-menu-item value="open">Open…</fluid-menu-item>
     <fluid-menu-item value="save">Save</fluid-menu-item>
-    <fluid-menu-item value="delete" disabled>Delete</fluid-menu-item>
+    <fluid-menu-item value="delete" disabled>
+      Delete
+    </fluid-menu-item>
   </fluid-menu>
 </Demo>
 
@@ -35,6 +37,7 @@ is a single-level menu, submenus are out of scope.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/menu/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -46,6 +49,7 @@ is a single-level menu, submenus are out of scope.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/menu";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -122,9 +126,13 @@ activation.
 <Demo>
   <fluid-menu aria-label="With disabled items">
     <fluid-menu-item value="undo">Undo</fluid-menu-item>
-    <fluid-menu-item value="redo" disabled>Redo</fluid-menu-item>
+    <fluid-menu-item value="redo" disabled>
+      Redo
+    </fluid-menu-item>
     <fluid-menu-item value="cut">Cut</fluid-menu-item>
-    <fluid-menu-item value="paste" disabled>Paste</fluid-menu-item>
+    <fluid-menu-item value="paste" disabled>
+      Paste
+    </fluid-menu-item>
   </fluid-menu>
 </Demo>
 
@@ -147,6 +155,7 @@ Enter, or Space. The event bubbles, so a listener on the menu hears every item.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Actions.tsx"
@@ -162,6 +171,7 @@ Enter, or Space. The event bubbles, so a listener on the menu hears every item.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Actions.vue"
@@ -179,6 +189,7 @@ Enter, or Space. The event bubbles, so a listener on the menu hears every item.
       </fluid-menu>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="actions.component.ts"
@@ -200,6 +211,7 @@ Enter, or Space. The event bubbles, so a listener on the menu hears every item.
       onSelect(e: any) { console.log(e.detail.value); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Actions.svelte"
@@ -213,6 +225,7 @@ Enter, or Space. The event bubbles, so a listener on the menu hears every item.
       <fluid-menu-item value="paste">Paste</fluid-menu-item>
     </fluid-menu>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -286,6 +299,14 @@ Level AAA), both flow through with no per-component branching. Motion honors
 ## Related
 
 <CardGrid>
-  <LinkCard title="Select" href="/components/select/" description="Pick and keep one value for a form." />
-  <LinkCard title="Dropdown" href="/components/dropdown/" description="A trigger plus a popover surface." />
+  <LinkCard
+    title="Select"
+    href="/components/select/"
+    description="Pick and keep one value for a form."
+  />
+  <LinkCard
+    title="Dropdown"
+    href="/components/dropdown/"
+    description="A trigger plus a popover surface."
+  />
 </CardGrid>

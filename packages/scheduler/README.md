@@ -28,7 +28,10 @@ import { generateSlots, type Availability } from "@fluid-ds/scheduler";
 
 const availability: Availability = {
   weekly: {
-    1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
+    1: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
     2: [{ start: "09:00", end: "17:00" }]
   },
   slotMinutes: 30,

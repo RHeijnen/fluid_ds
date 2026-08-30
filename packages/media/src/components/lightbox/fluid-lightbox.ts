@@ -6,7 +6,8 @@ import { formatMediaNumber } from "../../internal/format.js";
 /**
  * An image gallery with a full-screen lightbox. Slot in `<img>` thumbnails;
  * clicking (or pressing Enter / Space on) one opens it large in a modal
- * `<dialog>` (native top layer, focus trap, Escape to close, backdrop) with
+ * `<dialog>` (native top layer, focus trap, Escape to close, click the backdrop
+ * to dismiss, backdrop) with
  * previous / next navigation and a position counter.
  *
  * Each thumbnail becomes a focusable button; its `alt` is reused as the
@@ -176,6 +177,56 @@ export class FluidLightbox extends FluidElement {
   }
 
   /** Close the lightbox. */
+  /**
+   * Whether clicking the backdrop closes the viewer. Default true.
+   *
+   * PROPERTY ONLY, on purpose. A boolean attribute cannot express
+   * `false` (its mere presence means true), so a `light-dismiss`
+   * attribute could never turn a true-by-default behavior off and would
+   * only mislead. Use the `no-light-dismiss` attribute from markup, or
+   * set this property from JavaScript.
+   */
+  @property({ type: Boolean, attribute: false }) lightDismiss = true;
+
+  /** Prevent backdrop clicks from closing the viewer. */
+  @property({ type: Boolean, attribute: "no-light-dismiss" }) noLightDismiss = false;
+
+  /**
+   * Light-dismiss. A native modal `<dialog>` renders a backdrop and closes on
+   * Escape, but it does NOT close when the backdrop is clicked, so a viewer
+   * that people expect to dismiss by "clicking away" stays stuck open.
+   *
+   * A backdrop click reports the dialog itself as the target (the backdrop is
+   * the dialog's own pseudo-element), and the stage padding around the image
+   * reads as backdrop to anyone looking at it, so both dismiss. Clicks on the
+   * image or the controls never do.
+   *
+   * The pointerdown guard stops a drag that STARTS on the image and ends
+   * outside it (a common accidental swipe) from closing the viewer.
+   */
+  private dismissCandidate = false;
+
+  private isDismissSurface(target: EventTarget | null): boolean {
+    return (
+      target === this.dialog ||
+      (target instanceof HTMLElement && target.classList.contains("stage"))
+    );
+  }
+
+  private get lightDismissEnabled(): boolean {
+    return !this.noLightDismiss && this.lightDismiss;
+  }
+
+  private onDialogPointerDown = (event: PointerEvent): void => {
+    this.dismissCandidate = this.lightDismissEnabled && this.isDismissSurface(event.target);
+  };
+
+  private onDialogClick = (event: MouseEvent): void => {
+    if (!this.lightDismissEnabled || !this.dismissCandidate) return;
+    this.dismissCandidate = false;
+    if (this.isDismissSurface(event.target)) this.close();
+  };
+
   close(): void {
     this.dialog?.close();
   }
@@ -220,6 +271,8 @@ export class FluidLightbox extends FluidElement {
         part="dialog"
         aria-label=${this.term("imageViewer")}
         @keydown=${this.onKeydown}
+        @pointerdown=${this.onDialogPointerDown}
+        @click=${this.onDialogClick}
         @close=${() => {
           this.open = false;
           this.dispatchEvent(new CustomEvent("fluid-close", { bubbles: true, composed: true }));

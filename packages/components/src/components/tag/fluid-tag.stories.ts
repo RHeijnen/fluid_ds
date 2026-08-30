@@ -10,7 +10,7 @@ type Args = Pick<FluidTag, "variant" | "size" | "removable" | "disabled" | "remo
 const meta: Meta<Args> = {
   title: "Components/Content/Tag",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     variant: {
       control: "inline-radio",
@@ -82,12 +82,8 @@ export const CustomRemoveLabel: Story = {
   },
   render: () => html`
     <div style="display:flex; gap: var(--fluid-space-2); flex-wrap: wrap;">
-      <fluid-tag removable variant="info" remove-label="Back to CURO">
-        Domain: PAYTER
-      </fluid-tag>
-      <fluid-tag removable remove-label="Clear the date range">
-        Last 7 days
-      </fluid-tag>
+      <fluid-tag removable variant="info" remove-label="Back to CURO"> Domain: PAYTER </fluid-tag>
+      <fluid-tag removable remove-label="Clear the date range"> Last 7 days </fluid-tag>
     </div>
   `
 };

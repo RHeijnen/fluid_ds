@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-checkbox>` is the standard checkbox, on, off, or (optionally)
 indeterminate to indicate "partial selection" of a group. It wraps a native
 checkbox, is **form-associated** (submits / validates like the native element),
@@ -31,6 +30,7 @@ label). Drop your label as slotted text; the host wires the click target.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/checkbox/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +42,7 @@ label). Drop your label as slotted text; the host wires the click target.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/checkbox";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -57,12 +58,16 @@ initial state; `disabled` dims + removes it from the tab order.
     <fluid-checkbox>Subscribe to updates</fluid-checkbox>
     <fluid-checkbox checked>I agree to the terms</fluid-checkbox>
     <fluid-checkbox disabled>Unavailable</fluid-checkbox>
-    <fluid-checkbox checked disabled>Locked on</fluid-checkbox>
+    <fluid-checkbox checked disabled>
+      Locked on
+    </fluid-checkbox>
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-checkbox name="newsletter">Subscribe to updates</fluid-checkbox>
-<fluid-checkbox name="terms" required>I agree to the terms</fluid-checkbox>`} />
+<ConformanceCode
+  code={`<fluid-checkbox name="newsletter">Subscribe to updates</fluid-checkbox>
+<fluid-checkbox name="terms" required>I agree to the terms</fluid-checkbox>`}
+/>
 
 ### Indeterminate
 
@@ -102,6 +107,7 @@ Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="AgreeBox.tsx"
@@ -120,6 +126,7 @@ Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
       return <fluid-checkbox ref={ref}>Accept terms</fluid-checkbox>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="AgreeBox.vue"
@@ -132,6 +139,7 @@ Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
       <fluid-checkbox @fluid-change="onChange">Accept terms</fluid-checkbox>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="agree-box.component.ts"
@@ -152,6 +160,7 @@ Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="AgreeBox.svelte"
@@ -164,6 +173,7 @@ Fires **`fluid-change`** with `{ checked: boolean }` in `detail` on every toggle
 
     <fluid-checkbox on:fluid-change={onChange}>Accept terms</fluid-checkbox>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -177,7 +187,9 @@ Form-associated: when checked it submits `name=value` (default value `"on"`);
     style="display:flex; gap:0.75rem; align-items:center;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'agree=' + (new FormData(this).get('agree') ?? '(unchecked)');"
   >
-    <fluid-checkbox name="agree" value="yes" required>Accept terms</fluid-checkbox>
+    <fluid-checkbox name="agree" value="yes" required>
+      Accept terms
+    </fluid-checkbox>
     <fluid-button type="submit">Continue</fluid-button>
     <output style="font-size:0.875rem; color: var(--fluid-text-secondary);"></output>
   </form>
@@ -206,8 +218,8 @@ work like the rest of the system. The **complete list** is in the
 ```
 
 <Aside type="tip">
-  Select a checkbox in the [Theme builder](/playground/) to tweak the box,
-  check, and focus tokens visually.
+  Select a checkbox in the [Theme builder](/playground/) to tweak the box, check, and focus tokens
+  visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -217,7 +229,9 @@ with [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for
 CSS not covered by a token:
 
 ```css
-fluid-checkbox::part(control) { border-radius: 50%; } /* round checkbox */
+fluid-checkbox::part(control) {
+  border-radius: 50%;
+} /* round checkbox */
 ```
 
 ## When to use
@@ -226,7 +240,7 @@ fluid-checkbox::part(control) { border-radius: 50%; } /* round checkbox */
 - The **indeterminate** state for a parent checkbox summarizing a group of
   children.
 
-### When *not* to use
+### When _not_ to use
 
 - **One of many** mutually-exclusive options: use
   [`<fluid-radio>`](/components/radio/).
@@ -242,10 +256,10 @@ checkbox-specific; the cross-component contract is in the
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
-| <kbd>Tab</kbd> | Move focus to/from the checkbox. |
-| <kbd>Space</kbd> | Toggle checked / unchecked. |
+| Key              | Action                           |
+| ---------------- | -------------------------------- |
+| <kbd>Tab</kbd>   | Move focus to/from the checkbox. |
+| <kbd>Space</kbd> | Toggle checked / unchecked.      |
 
 The focus ring renders around the box and reads `--fluid-focus-ring-width`.
 
@@ -277,10 +291,10 @@ Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
 The checkbox reads both conformance tokens (target size matters most for a small
 control):
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

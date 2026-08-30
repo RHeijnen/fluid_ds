@@ -61,8 +61,11 @@ type Side = "source" | "target";
  * @cssproperty --fluid-transfer-radius - Listbox corner radius. Falls back to --fluid-field-border-radius.
  * @cssproperty --fluid-transfer-label-fg - Pane label text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-transfer-option-hover-bg - Option hover background. Falls back to --fluid-surface-muted.
- * @cssproperty --fluid-transfer-option-selected-bg - Selected option background. Falls back to --fluid-accent-base.
- * @cssproperty --fluid-transfer-option-selected-fg - Selected option text color. Falls back to --fluid-accent-text.
+ * @cssproperty --fluid-transfer-option-selected-bg - Selected option background. Falls back to a 16% --fluid-accent-base tint.
+ * @cssproperty --fluid-transfer-option-selected-fg - Selected option text color. Falls back to --fluid-text-primary.
+ * @cssproperty --fluid-transfer-option-selected-font-weight - Selected option font weight. Falls back to --fluid-font-weight-medium.
+ * @cssproperty --fluid-transfer-option-selected-hover-bg - Selected option background on hover. Falls back to a 24% --fluid-accent-base tint.
+ * @cssproperty --fluid-transfer-option-selected-ring - Active-row ring while selected. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-transfer-option-disabled-fg - Disabled option text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-transfer-button-bg - Move-button background. Falls back to --fluid-surface-base.
  * @cssproperty --fluid-transfer-button-fg - Move-button icon color. Falls back to --fluid-text-primary.
@@ -79,7 +82,6 @@ type Side = "source" | "target";
  * @uses-token --fluid-text-secondary - Pane label + disabled option text color.
  * @uses-token --fluid-border-default - Listbox + button border color.
  * @uses-token --fluid-accent-base - Selected option background.
- * @uses-token --fluid-accent-text - Selected option text color.
  * @uses-token --fluid-field-border-width - Default border width.
  * @uses-token --fluid-field-border-radius - Default corner radius.
  * @uses-token --fluid-radius-sm - Option corner radius.
@@ -94,6 +96,7 @@ type Side = "source" | "target";
  * @uses-token --fluid-font-size-md - Option text size.
  * @uses-token --fluid-duration-fast - Hover transition duration.
  * @uses-token --fluid-easing-standard - Hover transition easing.
+ * @uses-token --fluid-space-1 - Gap between the two transfer buttons.
  *
  * @fires fluid-change - Fired whenever items move between lists.
  *   `event.detail.value` is the current array of target ids.
@@ -148,15 +151,15 @@ export class FluidTransfer extends FluidFormAssociated {
         overflow-y: auto;
         background: var(--fluid-transfer-bg, var(--fluid-surface-base));
         color: var(--fluid-transfer-fg, var(--fluid-text-primary));
-        border: var(--fluid-transfer-border-width, var(--fluid-field-border-width))
-          solid var(--fluid-transfer-border, var(--fluid-border-default));
+        border: var(--fluid-transfer-border-width, var(--fluid-field-border-width)) solid
+          var(--fluid-transfer-border, var(--fluid-border-default));
         border-radius: var(--fluid-transfer-radius, var(--fluid-field-border-radius));
         box-sizing: border-box;
       }
 
       .listbox:focus-visible {
-        outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width))
-          solid var(--fluid-focus-ring-color);
+        outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-focus-ring-color);
         outline-offset: 2px;
       }
 
@@ -177,9 +180,35 @@ export class FluidTransfer extends FluidFormAssociated {
         background: var(--fluid-transfer-option-hover-bg, var(--fluid-surface-muted));
       }
 
+      /*
+       * Selection is an accent TINT with primary text, matching fluid-option
+       * (16%) and fluid-tree-item (15%). A solid accent fill made a
+       * multi-selection read as a stack of heavy blue blocks, unlike every
+       * other list surface in the system.
+       */
       .option[aria-selected="true"] {
-        background: var(--fluid-transfer-option-selected-bg, var(--fluid-accent-base));
-        color: var(--fluid-transfer-option-selected-fg, var(--fluid-accent-text));
+        background: var(
+          --fluid-transfer-option-selected-bg,
+          color-mix(in srgb, var(--fluid-accent-base) 16%, transparent)
+        );
+        color: var(--fluid-transfer-option-selected-fg, var(--fluid-text-primary));
+        font-weight: var(
+          --fluid-transfer-option-selected-font-weight,
+          var(--fluid-font-weight-medium)
+        );
+      }
+
+      /*
+       * Hovering a SELECTED row deepens the same tint. The plain hover rule
+       * above outranks the selected rule on specificity (0,3,0 vs 0,2,0), so
+       * without this the neutral hover fill replaced the accent tint and the
+       * row lost its selected reading entirely.
+       */
+      .option[aria-selected="true"]:hover:not(.option-disabled) {
+        background: var(
+          --fluid-transfer-option-selected-hover-bg,
+          color-mix(in srgb, var(--fluid-accent-base) 24%, transparent)
+        );
       }
 
       /*
@@ -190,6 +219,17 @@ export class FluidTransfer extends FluidFormAssociated {
       .option-active {
         box-shadow: inset 0 0 0 2px
           var(--fluid-transfer-focus-ring-color, var(--fluid-focus-ring-color));
+      }
+
+      /*
+       * On a tinted row the focus blue only reaches 2.94:1 (2.62:1 while also
+       * hovered), under the 3:1 SC 1.4.11 Non-text Contrast asks of a state
+       * indicator. Accent-base clears it on every background this row can
+       * have: 4.13:1 on the tint, 3.68:1 on the hover tint.
+       */
+      .option[aria-selected="true"].option-active {
+        box-shadow: inset 0 0 0 2px
+          var(--fluid-transfer-option-selected-ring, var(--fluid-accent-base));
       }
 
       .option-disabled {
@@ -217,8 +257,8 @@ export class FluidTransfer extends FluidFormAssociated {
         padding: var(--fluid-space-1);
         background: var(--fluid-transfer-button-bg, var(--fluid-surface-base));
         color: var(--fluid-transfer-button-fg, var(--fluid-text-primary));
-        border: var(--fluid-transfer-border-width, var(--fluid-field-border-width))
-          solid var(--fluid-transfer-button-border, var(--fluid-border-default));
+        border: var(--fluid-transfer-border-width, var(--fluid-field-border-width)) solid
+          var(--fluid-transfer-button-border, var(--fluid-border-default));
         border-radius: var(--fluid-transfer-radius, var(--fluid-field-border-radius));
         cursor: pointer;
         transition: background-color var(--fluid-duration-fast) var(--fluid-easing-standard);
@@ -229,8 +269,8 @@ export class FluidTransfer extends FluidFormAssociated {
       }
 
       .button:focus-visible {
-        outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width))
-          solid var(--fluid-focus-ring-color);
+        outline: var(--fluid-transfer-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-focus-ring-color);
         outline-offset: 2px;
       }
 
@@ -309,7 +349,10 @@ export class FluidTransfer extends FluidFormAssociated {
   override formResetCallback(): void {
     const attr = this.getAttribute("value");
     this.value = attr
-      ? attr.split(",").map((s) => s.trim()).filter(Boolean)
+      ? attr
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
       : [];
     this.sourceSelection = new Set();
     this.targetSelection = new Set();
@@ -324,7 +367,10 @@ export class FluidTransfer extends FluidFormAssociated {
     _mode: "restore" | "autocomplete"
   ): void {
     if (typeof state === "string") {
-      this.value = state.split(",").map((s) => s.trim()).filter(Boolean);
+      this.value = state
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
     }
   }
 

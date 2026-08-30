@@ -8,7 +8,7 @@ const img = (n: number) => html`<img src=${offlineLightboxImage(n)} alt="Sample 
 const meta: Meta = {
   title: "Media/Lightbox",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   render: () => html`
     <fluid-lightbox loop style="max-width: 32rem;">
       ${[1, 2, 3, 4, 5, 6].map((n) => img(n))}

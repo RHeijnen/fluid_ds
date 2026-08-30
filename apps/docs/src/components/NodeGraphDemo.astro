@@ -1,0 +1,212 @@
+---
+/**
+ * Live hero demo for the node-graph expansion page: a small deployment
+ * pipeline that animates a simulated run (run-state badges + marching-ants
+ * edges) on a loop, alternating the success and error paths. The graph is
+ * fully interactive while it plays: drag nodes, draw connections from the
+ * ports, or use the keyboard exactly as documented below the demo.
+ *
+ * The loop honours prefers-reduced-motion (paints one static finished run
+ * instead) and pauses while the demo is scrolled out of view.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="ng-demo" data-ng-demo>
+    <div class="ng-hud">
+      <fluid-button size="sm" variant="secondary" data-ng-fit>Fit view</fluid-button>
+      <fluid-button size="sm" variant="secondary" data-ng-replay>Replay run</fluid-button>
+      <span class="ng-status" data-ng-status></span>
+    </div>
+    <fluid-node-graph class="ng-canvas" label="Deployment pipeline demo"></fluid-node-graph>
+  </div>
+</Demo>
+
+<style>
+  .ng-demo {
+    inline-size: 100%;
+  }
+  .ng-hud {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-end: 0.6rem;
+  }
+  .ng-status {
+    margin-inline-start: auto;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .ng-canvas {
+    display: block;
+    block-size: 420px;
+    inline-size: 100%;
+    border-radius: var(--fluid-radius-md, 10px);
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/node-graph/define/node-graph";
+
+  type RunState = "idle" | "running" | "success" | "error";
+
+  interface GraphEl extends HTMLElement {
+    nodeTypes: Record<string, unknown>;
+    nodes: unknown[];
+    edges: { id: string; from: string; port: string; to: string }[];
+    runStates: Record<string, RunState>;
+    traversedEdges: string[];
+    fitView: () => void;
+  }
+
+  /* One run is a list of steps; each step paints a node state and lights
+     the edge that led into it. */
+  interface Step {
+    node: string;
+    state: RunState;
+    edge?: string;
+  }
+
+  const HAPPY: Step[] = [
+    { node: "trigger", state: "running" },
+    { node: "trigger", state: "success" },
+    { node: "build", state: "running", edge: "e1" },
+    { node: "build", state: "success" },
+    { node: "test", state: "running", edge: "e2" },
+    { node: "test", state: "success" },
+    { node: "deploy", state: "running", edge: "e3" },
+    { node: "deploy", state: "success" }
+  ];
+
+  const FAILING: Step[] = [
+    { node: "trigger", state: "running" },
+    { node: "trigger", state: "success" },
+    { node: "build", state: "running", edge: "e1" },
+    { node: "build", state: "error" },
+    { node: "notify", state: "running", edge: "e4" },
+    { node: "notify", state: "success" }
+  ];
+
+  const STEP_MS = 650;
+  const REST_MS = 2600;
+
+  function setup(root: HTMLElement): void {
+    const graph = root.querySelector<GraphEl>("fluid-node-graph");
+    const status = root.querySelector<HTMLElement>("[data-ng-status]");
+    if (!graph || !status) return;
+
+    graph.nodeTypes = {
+      trigger: { label: "Trigger", input: false, removable: false },
+      task: {
+        label: "Task",
+        height: 116,
+        outputs: [
+          { id: "success", label: "On success", tone: "success" },
+          { id: "error", label: "On error", tone: "danger" }
+        ]
+      },
+      sink: { label: "Step", outputs: [] }
+    };
+    graph.nodes = [
+      { id: "trigger", type: "trigger", x: 24, y: 170, label: "On push", summary: "main branch" },
+      { id: "build", type: "task", x: 320, y: 130, label: "Build", summary: "pnpm build" },
+      { id: "test", type: "task", x: 620, y: 24, label: "Test suite", summary: "unit + browser" },
+      { id: "deploy", type: "sink", x: 920, y: 46, label: "Deploy", summary: "production" },
+      { id: "notify", type: "sink", x: 620, y: 300, label: "Notify team", summary: "#releases" }
+    ];
+    graph.edges = [
+      { id: "e1", from: "trigger", port: "next", to: "build" },
+      { id: "e2", from: "build", port: "success", to: "test" },
+      { id: "e3", from: "test", port: "success", to: "deploy" },
+      { id: "e4", from: "build", port: "error", to: "notify" }
+    ];
+    /* Frame the whole pipeline once the first layout has happened. */
+    requestAnimationFrame(() => graph.fitView());
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let runNumber = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let visible = false;
+
+    const paintStatic = () => {
+      graph.runStates = { trigger: "success", build: "success", test: "success", deploy: "success" };
+      graph.traversedEdges = ["e1", "e2", "e3"];
+      status.textContent = "Finished run (static preview)";
+    };
+
+    const clearRun = () => {
+      graph.runStates = {};
+      graph.traversedEdges = [];
+    };
+
+    const playFrom = (steps: Step[], index: number) => {
+      if (index >= steps.length) {
+        timer = setTimeout(() => startRun(), REST_MS);
+        return;
+      }
+      const step = steps[index]!;
+      /* The user may have deleted the node mid-run; skip its steps. */
+      const nodeIds = new Set((graph.nodes as { id: string }[]).map((n) => n.id));
+      if (nodeIds.has(step.node)) {
+        graph.runStates = { ...graph.runStates, [step.node]: step.state };
+        if (step.edge && graph.edges.some((e) => e.id === step.edge)) {
+          graph.traversedEdges = [...graph.traversedEdges, step.edge];
+        }
+      }
+      timer = setTimeout(() => playFrom(steps, index + 1), STEP_MS);
+    };
+
+    const startRun = () => {
+      if (!visible || reduceMotion.matches) return;
+      runNumber += 1;
+      const failing = runNumber % 3 === 0;
+      status.textContent = `Simulated run #${runNumber}: ${failing ? "error path" : "success path"}`;
+      clearRun();
+      playFrom(failing ? FAILING : HAPPY, 0);
+    };
+
+    const stop = () => {
+      if (timer !== undefined) clearTimeout(timer);
+      timer = undefined;
+    };
+
+    /* Only animate while the demo is actually on screen. */
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          visible = entry.isIntersecting;
+          if (visible) {
+            if (reduceMotion.matches) paintStatic();
+            else if (timer === undefined) startRun();
+          } else {
+            stop();
+          }
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(root);
+
+    reduceMotion.addEventListener("change", () => {
+      stop();
+      if (reduceMotion.matches) paintStatic();
+      else if (visible) startRun();
+    });
+
+    root.querySelector("[data-ng-fit]")?.addEventListener("click", () => graph.fitView());
+    root.querySelector("[data-ng-replay]")?.addEventListener("click", () => {
+      stop();
+      if (reduceMotion.matches) paintStatic();
+      else {
+        visible = true;
+        startRun();
+      }
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-ng-demo]")) setup(root);
+</script>

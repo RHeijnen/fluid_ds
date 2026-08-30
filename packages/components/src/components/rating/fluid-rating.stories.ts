@@ -10,7 +10,7 @@ type Args = Pick<FluidRating, "value" | "max" | "precision" | "readonly" | "disa
 const meta: Meta<Args> = {
   title: "Components/Forms/Rating",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: "number" },
     max: { control: "number" },

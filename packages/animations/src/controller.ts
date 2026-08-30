@@ -34,6 +34,7 @@ const ATTR_EASING = "data-fluid-animation-easing";
 const ATTR_ITERATIONS = "data-fluid-animation-iterations";
 
 type Trigger = "mount" | "in-view" | "hover" | "click" | "manual";
+const TRIGGERS = new Set<Trigger>(["mount", "in-view", "hover", "click", "manual"]);
 
 /** Tracks the currently-running animation per element (so we can cancel/restart). */
 const running = new WeakMap<Element, Animation>();
@@ -42,7 +43,7 @@ let inViewObserver: IntersectionObserver | undefined;
 /** Elements that already played a one-shot trigger; don't re-play on attribute echo. */
 const settled = new WeakSet<Element>();
 
-let bootstrapped = false;
+const bootstrappedRoots = new WeakSet<Document | ShadowRoot>();
 
 /**
  * Boot the controller. Idempotent, calling it multiple times is fine
@@ -54,8 +55,8 @@ export function startAnimationController(root?: Document | ShadowRoot): void {
     if (typeof document === "undefined") return;
     root = document;
   }
-  if (bootstrapped) return;
-  bootstrapped = true;
+  if (bootstrappedRoots.has(root)) return;
+  bootstrappedRoots.add(root);
 
   // Initial pass over whatever's already in the DOM.
   for (const el of root.querySelectorAll<HTMLElement>(`[${ATTR}]`)) {
@@ -76,6 +77,14 @@ export function startAnimationController(root?: Document | ShadowRoot): void {
           handleElement(rec.target);
         }
       } else if (rec.type === "childList") {
+        for (const node of rec.removedNodes) {
+          if (node instanceof HTMLElement) {
+            cleanupElement(node);
+            for (const child of node.querySelectorAll<HTMLElement>(`[${ATTR}]`)) {
+              cleanupElement(child);
+            }
+          }
+        }
         for (const node of rec.addedNodes) {
           if (node instanceof HTMLElement) {
             if (node.hasAttribute(ATTR)) handleElement(node);
@@ -92,14 +101,7 @@ export function startAnimationController(root?: Document | ShadowRoot): void {
     subtree: true,
     attributes: true,
     attributeOldValue: true,
-    attributeFilter: [
-      ATTR,
-      ATTR_TRIGGER,
-      ATTR_DURATION,
-      ATTR_DELAY,
-      ATTR_EASING,
-      ATTR_ITERATIONS
-    ]
+    attributeFilter: [ATTR, ATTR_TRIGGER, ATTR_DURATION, ATTR_DELAY, ATTR_EASING, ATTR_ITERATIONS]
   });
 
   // Re-scan when a new animation gets registered, elements that asked
@@ -137,7 +139,12 @@ function handleElement(el: HTMLElement): void {
   }
   const def = getAnimation(name);
   if (!def) return; // animation not registered yet, wait for onAnimationRegistered
-  const trigger = (el.getAttribute(ATTR_TRIGGER) ?? "mount") as Trigger;
+  const requestedTrigger = el.getAttribute(ATTR_TRIGGER) ?? "mount";
+  const trigger: Trigger = TRIGGERS.has(requestedTrigger as Trigger)
+    ? (requestedTrigger as Trigger)
+    : "mount";
+
+  if (trigger !== "in-view") inViewObserver?.unobserve(el);
 
   switch (trigger) {
     case "manual":
@@ -161,13 +168,13 @@ function handleElement(el: HTMLElement): void {
     case "hover":
       // Resolve the current def at fire time: the listener is bound once, but
       // the animation name can change live, so we must not capture `def` here.
-      attachOnce(el, "pointerenter", () => {
+      attachOnce(el, "pointerenter", "hover", () => {
         const d = getAnimation(el.getAttribute(ATTR) ?? "");
         if (d) play(el, d);
       });
       return;
     case "click":
-      attachOnce(el, "click", () => {
+      attachOnce(el, "click", "click", () => {
         const d = getAnimation(el.getAttribute(ATTR) ?? "");
         if (d) play(el, d);
       });
@@ -186,6 +193,8 @@ function play(el: HTMLElement, def: AnimationDef): Animation {
   // element lands at the end state without motion.
   if (prefersReducedMotion()) {
     opts.duration = 0;
+    opts.delay = 0;
+    opts.endDelay = 0;
     opts.iterations = 1;
   }
 
@@ -214,10 +223,9 @@ function mergeOptions(
   if (easing) out.easing = easing;
   const iterations = el.getAttribute(ATTR_ITERATIONS);
   if (iterations) {
-    out.iterations =
-      iterations === "infinite" || iterations === "Infinity"
-        ? Infinity
-        : Number(iterations);
+    const parsed =
+      iterations === "infinite" || iterations === "Infinity" ? Infinity : Number(iterations);
+    if (parsed === Infinity || (Number.isFinite(parsed) && parsed >= 0)) out.iterations = parsed;
   }
   return out;
 }
@@ -226,12 +234,14 @@ function readNumber(el: HTMLElement, attr: string): number | undefined {
   const raw = el.getAttribute(attr);
   if (raw === null) return undefined;
   const n = Number(raw);
-  return Number.isFinite(n) ? n : undefined;
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
 function prefersReducedMotion(): boolean {
-  return typeof window !== "undefined" &&
-    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  return (
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
 // Tracks which (element, event-type) pairs already have a listener wired, so
@@ -241,7 +251,12 @@ function prefersReducedMotion(): boolean {
 // DOMStringMap property name).
 const boundEvents = new WeakMap<HTMLElement, Set<string>>();
 
-function attachOnce(el: HTMLElement, type: string, handler: () => void): void {
+function attachOnce(
+  el: HTMLElement,
+  type: string,
+  expectedTrigger: Trigger,
+  handler: () => void
+): void {
   let bound = boundEvents.get(el);
   if (!bound) {
     bound = new Set<string>();
@@ -249,7 +264,19 @@ function attachOnce(el: HTMLElement, type: string, handler: () => void): void {
   }
   if (bound.has(type)) return;
   bound.add(type);
-  el.addEventListener(type, () => handler(), { passive: true });
+  el.addEventListener(
+    type,
+    () => {
+      if ((el.getAttribute(ATTR_TRIGGER) ?? "mount") === expectedTrigger) handler();
+    },
+    { passive: true }
+  );
+}
+
+function cleanupElement(el: HTMLElement): void {
+  stopElementAnimation(el);
+  inViewObserver?.unobserve(el);
+  settled.delete(el);
 }
 
 function getInViewObserver(): IntersectionObserver | undefined {
@@ -260,6 +287,10 @@ function getInViewObserver(): IntersectionObserver | undefined {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
         const el = entry.target as HTMLElement;
+        if ((el.getAttribute(ATTR_TRIGGER) ?? "mount") !== "in-view") {
+          inViewObserver?.unobserve(el);
+          continue;
+        }
         if (settled.has(el)) continue;
         const name = el.getAttribute(ATTR);
         if (!name) continue;

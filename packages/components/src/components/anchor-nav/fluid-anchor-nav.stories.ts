@@ -13,24 +13,24 @@ const sampleItems: FluidAnchorNavItem[] = [
   { id: "config", label: "Configuration", level: 3 },
   { id: "plugins", label: "Plugins", level: 3 },
   { id: "usage", label: "Usage", level: 2 },
-  { id: "api", label: "API reference", level: 2 },
+  { id: "api", label: "API reference", level: 2 }
 ];
 
 const meta: Meta<Args> = {
   title: "Components/Navigation/Anchor nav",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     navLabel: { control: "text" },
     headingSelector: { control: "text" },
     topOffset: { control: "number" },
-    items: { control: "object" },
+    items: { control: "object" }
   },
   args: {
     navLabel: "On this page",
     headingSelector: "h2,h3",
     topOffset: 0,
-    items: sampleItems,
+    items: sampleItems
   },
   render: (args) => html`
     <fluid-anchor-nav
@@ -38,7 +38,7 @@ const meta: Meta<Args> = {
       .items=${args.items}
       offset-top=${args.topOffset}
     ></fluid-anchor-nav>
-  `,
+  `
 };
 
 export default meta;
@@ -47,8 +47,7 @@ type Story = StoryObj<Args>;
 export const Default: Story = {};
 
 export const NestedLevels: Story = {
-  render: () =>
-    html`<fluid-anchor-nav .items=${sampleItems}></fluid-anchor-nav>`,
+  render: () => html`<fluid-anchor-nav .items=${sampleItems}></fluid-anchor-nav>`
 };
 
 /**
@@ -74,5 +73,5 @@ export const ScrollSpy: Story = {
         <p style="min-height: 8rem;">Final section wrapping things up.</p>
       </div>
     </div>
-  `,
+  `
 };

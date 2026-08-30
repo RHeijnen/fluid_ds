@@ -4,12 +4,15 @@
  * Renders the brand-preset picker first, then forwards to the default
  * SocialIcons component so the existing GitHub link still appears.
  *
- * The picker uses a tiny <select> with the three brand presets, kept
+ * The picker uses a tiny <select> with the brand presets, kept
  * deliberately minimal so it sits cleanly next to Starlight's theme
  * toggle without taking visual weight. Its `change` handler writes
  * `data-fluid-brand` on <html> (and persists to localStorage), the
- * actual styling lives in @fluid-ds/themes/{midnight,corporate}.css
- * which are imported from custom.css.
+ * actual styling lives in the @fluid-ds/themes stylesheets imported
+ * from custom.css. Glass is deliberately NOT offered: it paints a
+ * full-page colour wash on the branded element, which on <html> would
+ * flood the Starlight chrome. It stays a per-container preset, shown
+ * live on /theming/brand/ instead.
  *
  * The default Brand value uses an empty string so the attribute is
  * cleared rather than set to "default", keeps the DOM clean and
@@ -41,6 +44,8 @@ const props = Astro.props as Props;
         <option value="">Default</option>
         <option value="midnight">Midnight</option>
         <option value="corporate">Corporate</option>
+        <option value="titanium">Titanium</option>
+        <option value="orchid">Orchid</option>
       </select>
     </label>
   </starlight-brand-select>

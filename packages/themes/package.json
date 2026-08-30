@@ -27,7 +27,10 @@
   },
   "exports": {
     "./midnight.css": "./src/midnight.css",
-    "./corporate.css": "./src/corporate.css"
+    "./corporate.css": "./src/corporate.css",
+    "./titanium.css": "./src/titanium.css",
+    "./glass.css": "./src/glass.css",
+    "./orchid.css": "./src/orchid.css"
   },
   "files": [
     "src",

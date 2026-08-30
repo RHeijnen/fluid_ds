@@ -9,13 +9,30 @@ import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/com
 
 `<fluid-tooltip>` is the small contextual hint, visible on hover or focus of
 its slotted child, dismissed when the pointer leaves or focus moves on.
-Positioning is floating-ui-powered, so it auto-flips when it would overflow the
-viewport. Use it for **short, supplementary** text; for anything more
+Positioning is handled by Fluid's own engine, so it auto-flips when it would
+overflow the viewport, and the popover renders in the top layer so no ancestor
+can clip it. Use it for **short, supplementary** text; for anything more
 substantial, reach for [`<fluid-popover>`](/components/popover/).
+
+Every tooltip on this page is live. Hover a trigger, or <kbd>Tab</kbd> to it,
+to see the real thing.
 
 <Demo>
   <fluid-tooltip content="Save your changes (⌘S)">
     <fluid-button>Save</fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip content="More options" placement="bottom">
+    <fluid-button variant="ghost" aria-label="More options">
+      <fluid-icon name="ellipsis"></fluid-icon>
+    </fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip placement="right">
+    <fluid-button variant="secondary">Rich hint</fluid-button>
+    <div slot="content">
+      <strong>Pro tip</strong>
+      <br />
+      Hold Shift to skip the confirmation.
+    </div>
   </fluid-tooltip>
 </Demo>
 
@@ -31,6 +48,7 @@ substantial, reach for [`<fluid-popover>`](/components/popover/).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/tooltip/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +60,7 @@ substantial, reach for [`<fluid-popover>`](/components/popover/).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/tooltip";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -49,9 +68,15 @@ substantial, reach for [`<fluid-popover>`](/components/popover/).
 
 ### Basic
 
+The first slotted element is the anchor. The tooltip wires `aria-describedby`
+onto it, so the hint is announced after the trigger's own name.
+
 <Demo>
   <fluid-tooltip content="Save your changes (⌘S)">
     <fluid-button>Save</fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip content="Discards everything since the last save">
+    <fluid-button variant="secondary">Revert</fluid-button>
   </fluid-tooltip>
 </Demo>
 
@@ -63,78 +88,327 @@ substantial, reach for [`<fluid-popover>`](/components/popover/).
 
 ### Placement
 
+`placement` takes a side (`top`, `right`, `bottom`, `left`) optionally suffixed
+with an alignment (`-start`, `-end`). Hover any button below: the tooltip opens
+on the named side, and flips to the opposite side by itself if there isn't room
+(scroll this demo to the edge of the window to watch it happen).
+
+<Demo>
+  <div style="display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--fluid-space-3); width:100%;">
+    <fluid-tooltip content="Placement: top" placement="top">
+      <fluid-button variant="secondary" style="width:100%;">
+        top
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: right" placement="right">
+      <fluid-button variant="secondary" style="width:100%;">
+        right
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: bottom" placement="bottom">
+      <fluid-button variant="secondary" style="width:100%;">
+        bottom
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: left" placement="left">
+      <fluid-button variant="secondary" style="width:100%;">
+        left
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: top-start" placement="top-start">
+      <fluid-button variant="ghost" style="width:100%;">
+        top-start
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: top-end" placement="top-end">
+      <fluid-button variant="ghost" style="width:100%;">
+        top-end
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: bottom-start" placement="bottom-start">
+      <fluid-button variant="ghost" style="width:100%;">
+        bottom-start
+      </fluid-button>
+    </fluid-tooltip>
+    <fluid-tooltip content="Placement: bottom-end" placement="bottom-end">
+      <fluid-button variant="ghost" style="width:100%;">
+        bottom-end
+      </fluid-button>
+    </fluid-tooltip>
+  </div>
+</Demo>
+
 ```html
 <fluid-tooltip content="Above" placement="top">…</fluid-tooltip>
 <fluid-tooltip content="Below" placement="bottom">…</fluid-tooltip>
-<fluid-tooltip content="Left" placement="left">…</fluid-tooltip>
-<fluid-tooltip content="Right" placement="right">…</fluid-tooltip>
+<fluid-tooltip content="Left-aligned above" placement="top-start">…</fluid-tooltip>
+<fluid-tooltip content="Right-aligned below" placement="bottom-end">…</fluid-tooltip>
 ```
 
 ### Rich content
 
-Slot anything into the `content` slot for richer tooltips. It overrides
-the `content` attribute.
+Slot anything into the `content` slot for a richer hint. It overrides the
+`content` attribute. Keep it short and non-interactive: the popover sets
+`pointer-events: none`, so a link or button inside it can never be clicked.
+
+<Demo>
+  <fluid-tooltip placement="bottom">
+    <fluid-button>Hover me</fluid-button>
+    <div slot="content">
+      <strong>Pro tip</strong>
+      <br />
+      Hold Shift to do it without confirmation.
+    </div>
+  </fluid-tooltip>
+  <fluid-tooltip placement="bottom">
+    <fluid-button variant="secondary">Keyboard shortcut</fluid-button>
+    <div slot="content">
+      <strong>Publish</strong>
+      <br />⌘ Enter
+    </div>
+  </fluid-tooltip>
+</Demo>
 
 ```html
 <fluid-tooltip>
   <fluid-button>Hover me</fluid-button>
   <div slot="content">
-    <strong>Pro tip</strong><br/>
-    Hold <kbd>Shift</kbd> to do it without confirmation.
+    <strong>Pro tip</strong><br />
+    Hold Shift to do it without confirmation.
   </div>
 </fluid-tooltip>
 ```
 
 ### Delays
 
-`show-delay` and `hide-delay` (ms) help avoid flashing tooltips during
-quick pointer passes.
+`show-delay` and `hide-delay` (both in ms) stop tooltips flashing while the
+pointer sweeps across a toolbar. `show-delay` defaults to 100, `hide-delay` to 0. Sweep the pointer across the three buttons below to feel the difference.
+
+<Demo>
+  <fluid-tooltip content="Opens instantly" show-delay="0">
+    <fluid-button variant="secondary">show-delay 0</fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip content="Opens after the default 100ms">
+    <fluid-button variant="secondary">default</fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip content="Waits 700ms, then lingers for 500ms" show-delay="700" hide-delay="500">
+    <fluid-button variant="secondary">slow in, slow out</fluid-button>
+  </fluid-tooltip>
+</Demo>
 
 ```html
-<fluid-tooltip content="…" show-delay="200" hide-delay="100">…</fluid-tooltip>
+<fluid-tooltip content="Opens instantly" show-delay="0">…</fluid-tooltip>
+<fluid-tooltip content="Deliberate" show-delay="700" hide-delay="500">…</fluid-tooltip>
+```
+
+### Disabled
+
+`disabled` turns the tooltip off without unwrapping the trigger, handy when the
+hint only applies in some states. The anchor keeps working; only the hint stops.
+Hover both buttons: the first one explains itself, the second stays quiet.
+
+<Demo>
+  <fluid-tooltip content="This hint is active">
+    <fluid-button variant="secondary">Enabled tooltip</fluid-button>
+  </fluid-tooltip>
+  <fluid-tooltip content="You will never see this" disabled>
+    <fluid-button variant="secondary">Disabled tooltip</fluid-button>
+  </fluid-tooltip>
+</Demo>
+
+```html
+<fluid-tooltip content="Only while the draft is unsaved" disabled>
+  <fluid-button variant="secondary">Publish</fluid-button>
+</fluid-tooltip>
 ```
 
 ### Programmatic open
 
+`open` pins the tooltip visible and keeps it there until you set it back to
+`false`; hover and focus are ignored while it is pinned, and <kbd>Escape</kbd>
+will not dismiss it. Use it for an onboarding hint you control, not for
+ordinary hover text. Click the button to pin and unpin the real tooltip:
+
+<Demo>
+  <fluid-tooltip id="tooltip-pinned" content="Pinned open until you toggle it back" placement="top">
+    <fluid-button variant="secondary">Anchor</fluid-button>
+  </fluid-tooltip>
+  <fluid-button onclick="const t = document.getElementById('tooltip-pinned'); t.open = !t.open; this.textContent = t.open ? 'Unpin the tooltip' : 'Pin the tooltip';">
+    Pin the tooltip
+  </fluid-button>
+</Demo>
+
 ```ts
 const tip = document.querySelector("fluid-tooltip");
-tip.open = true;     // forced visible
-tip.open = false;    // back to hover/focus
+tip.open = true; // forced visible
+tip.open = false; // back to hover/focus
 ```
 
-## When to use
+## Listening for show and hide
 
-- A short hint that explains an icon-only button, supplements a label,
-  or provides keyboard shortcuts.
-- **Don't** put critical information in a tooltip: touch-only users
-  can't hover, and screen readers can announce tooltips inconsistently.
-- For richer panels with form controls or links, use
-  [`<fluid-popover>`](/components/popover/).
+`<fluid-tooltip>` fires **`fluid-show`** when the hint becomes visible and
+**`fluid-hide`** when it is dismissed (pointer out, blur, <kbd>Escape</kbd>, or
+`open = false`). Neither carries a payload; the target tells you which tooltip
+it was. Use them for analytics on which hints people actually read, or to
+lazy-load the content of an expensive hint.
+
+<Tabs syncKey="framework">
+  <TabItem label="HTML">
+    ```html
+    <fluid-tooltip id="tip" content="Save your changes">
+      <fluid-button>Save</fluid-button>
+    </fluid-tooltip>
+
+    <script type="module">
+      document.getElementById("tip").addEventListener("fluid-show", (e) => {
+        console.log("shown", e.target.content);
+      });
+    </script>
+    ```
+
+  </TabItem>
+  <TabItem label="React">
+    ```tsx title="SaveHint.tsx"
+    import { useRef, useEffect } from "react";
+    import "@fluid-ds/components/define/tooltip";
+
+    export function SaveHint() {
+      const ref = useRef<HTMLElement>(null);
+      useEffect(() => {
+        const el = ref.current!;
+        const onShow = () => console.log("shown");
+        el.addEventListener("fluid-show", onShow);
+        return () => el.removeEventListener("fluid-show", onShow);
+      }, []);
+      return (
+        <fluid-tooltip ref={ref} content="Save your changes">
+          <fluid-button>Save</fluid-button>
+        </fluid-tooltip>
+      );
+    }
+    ```
+
+    <Aside type="note">
+      `fluid-show` is a custom event, so React 18 needs `ref + addEventListener`
+      (above); React 19 supports `onfluidShow`. See the
+      [framework guide](/guides/frameworks/#react).
+    </Aside>
+
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue title="SaveHint.vue"
+    <script setup lang="ts">
+    import "@fluid-ds/components/define/tooltip";
+    const onShow = () => console.log("shown");
+    </script>
+
+    <template>
+      <fluid-tooltip content="Save your changes" @fluid-show="onShow">
+        <fluid-button>Save</fluid-button>
+      </fluid-tooltip>
+    </template>
+    ```
+
+  </TabItem>
+  <TabItem label="Angular">
+    ```ts title="save-hint.component.ts"
+    import { Component, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+    import "@fluid-ds/components/define/tooltip";
+
+    @Component({
+      standalone: true,
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      selector: "save-hint",
+      template: `
+        <fluid-tooltip content="Save your changes" (fluid-show)="onShow()">
+          <fluid-button>Save</fluid-button>
+        </fluid-tooltip>
+      `
+    })
+    export class SaveHint {
+      onShow() {
+        console.log("shown");
+      }
+    }
+    ```
+
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte title="SaveHint.svelte"
+    <script lang="ts">
+      import "@fluid-ds/components/define/tooltip";
+      function onShow() {
+        console.log("shown");
+      }
+    </script>
+
+    <fluid-tooltip content="Save your changes" on:fluid-show={onShow}>
+      <fluid-button>Save</fluid-button>
+    </fluid-tooltip>
+    ```
+
+  </TabItem>
+</Tabs>
 
 ## Theming
 
 Every styled property reads a **component-scoped `--fluid-tooltip-*` token that
-falls back to a main semantic var** (the override ladder). The **complete list**
-is in the [API table below](#api).
+falls back to a main semantic var** (the override ladder), so you get three
+levels for free: override the main var to reskin the brand, the
+`--fluid-tooltip-*` token to change every tooltip, or the same token on one
+instance to change just that one. The **complete list** is in the
+[API table below](#api); the ones you'll reach for most are
+`--fluid-tooltip-bg`, `--fluid-tooltip-color`, and `--fluid-tooltip-max-width`.
 
 ```css title="brand.css"
+/* Every tooltip under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-tooltip-bg: var(--fluid-color-neutral-900);
   --fluid-tooltip-color: var(--fluid-color-white);
   --fluid-tooltip-radius: 8px;
 }
+
+/* One tooltip that needs more room for a longer hint. */
+[data-fluid-id="shortcut-hint"] {
+  --fluid-tooltip-max-width: 24rem;
+}
 ```
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a tooltip and tweak these tokens visually, then
+  exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The floating element is [`part="popover"`](#api) (and `part="base"` wraps the
 trigger). Reach them with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS
-not covered by a token.
+not covered by a token:
 
-## API
+```css
+/* A light tooltip with a hairline border, no new tokens needed. */
+fluid-tooltip.light::part(popover) {
+  border: 1px solid var(--fluid-border-default);
+}
+```
 
-<ComponentApi tag="fluid-tooltip" />
+## When to use
+
+- A short hint that explains an icon-only button or supplements a terse label.
+- Surfacing a keyboard shortcut next to the control it triggers.
+- Spelling out a truncated value the layout had to cut short.
+
+### When _not_ to use
+
+- **Critical information**: touch-only users can't hover, and screen readers
+  announce tooltips inconsistently. Put it in the visible copy instead.
+- **Anything interactive** (a link, a button, a form field): the popover sets
+  `pointer-events: none`, so nothing inside it is clickable. Use
+  [`<fluid-popover>`](/components/popover/).
+- **A list of actions**: use [`<fluid-dropdown>`](/components/dropdown/).
+- **A persistent marker** on a row or card: use
+  [`<fluid-badge>`](/components/badge/) or [`<fluid-tag>`](/components/tag/).
 
 ## Accessibility
 
@@ -151,7 +425,8 @@ tooltip-specific (WAI-ARIA tooltip pattern).
 ### Keyboard & pointer (SC 1.4.13)
 
 - Shows on **hover and focus**, so keyboard users see it on <kbd>Tab</kbd>.
-- <kbd>Escape</kbd> dismisses it (dismissible).
+- <kbd>Escape</kbd> dismisses it (dismissible). A tooltip pinned with `open` ignores Escape, which
+  is why `open` is for hints you control, not hover text.
 - It stays visible while hovered and doesn't steal pointer events
   (`pointer-events: none`), satisfying
   [SC 1.4.13 Content on Hover or Focus](https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus).
@@ -165,6 +440,10 @@ inside one.
 ### Motion
 
 The fade honors `prefers-reduced-motion`.
+
+## API
+
+<ComponentApi tag="fluid-tooltip" />
 
 ## Related
 

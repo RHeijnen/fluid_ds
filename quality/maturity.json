@@ -8,149 +8,149 @@
   },
   "components": {
     "fluid-accordion": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-anchor-nav": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-animated-image": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-animation": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-app-bar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-aspect-ratio": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-audio": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-availability-editor": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-avatar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-avatar-group": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-badge": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-banner": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-bar-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-breadcrumb": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-breadcrumb-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-bubble-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-button": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-button-group": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-calendar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-callout": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-card": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-carousel": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-carousel-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-celebrate": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-checkbox": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-code-block": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-col": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-color-picker": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-column-mapper": {
       "status": "experimental",
@@ -158,114 +158,114 @@
       "support": "best-effort"
     },
     "fluid-command-palette": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-comparison": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-context-menu": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-copy-button": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-countdown": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-date-picker": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-date-range-picker": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-description-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-description-list": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-details": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-dialog": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-divider": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-doughnut-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-drawer": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-dropdown": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-dropdown-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-dropzone": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-empty-state": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-event-calendar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-field": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-fieldset": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-file-input": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-file-parser": {
       "status": "experimental",
@@ -273,514 +273,514 @@
       "support": "best-effort"
     },
     "fluid-fold": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-form": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-format-bytes": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-format-date": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-format-number": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-grid": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-hero": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-hotkey": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-icon": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-image": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-include": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-infinite-table": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-input": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-intersection-observer": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-kanban": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-kbd": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-lightbox": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-line-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-list": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-list-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-loading-overlay": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-map": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-markdown": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-masked-input": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-menu": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-menu-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-menu-label": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-meter": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-mosaic": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-mosaic-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-mutation-observer": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-nav-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-nav-list": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-node-graph": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-number-input": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-option": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-otp": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-page": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-pagination": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-pie-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-polar-area-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-popconfirm": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-popover": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-popup": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-pricing-table": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-pricing-tier": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-progress-bar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-progress-ring": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-qr-code": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-radar-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-radio": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-radio-group": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-range-slider": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-rating": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-relative-time": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-resize-observer": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-result": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-rich-text-editor": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-scatter-chart": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-scheduler": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-scroller": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-segment": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-segmented-control": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-select": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-sidebar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-signature-pad": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-skeleton": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-slider": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-sparkline": {
-      "status": "beta",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-speed-dial": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-spinner": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-split-panel": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-stack": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-stat": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-step": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-steps": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-switch": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tab": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tab-panel": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-table": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tabs": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tag": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tag-input": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-textarea": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-theme-toggle": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-time-picker": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-time-slots": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-timeline": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-timeline-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-toast": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-toast-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-toolbar": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tooltip": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tour": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-transfer": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tree": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-tree-item": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-truncate": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-typeahead": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-video": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-video-playlist": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     },
     "fluid-zoomable-frame": {
-      "status": "experimental",
+      "status": "stable",
       "since": "0.4.0",
-      "support": "best-effort"
+      "support": "supported"
     }
   }
 }

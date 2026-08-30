@@ -18,8 +18,8 @@ const panel = html`
   >
     <h3 style="margin: 0 0 var(--fluid-space-2);">Account summary</h3>
     <p style="margin: 0 0 var(--fluid-space-3); color: var(--fluid-text-secondary);">
-      Your balance and recent activity load here. While the overlay is active
-      this content is dimmed and cannot be clicked.
+      Your balance and recent activity load here. While the overlay is active this content is dimmed
+      and cannot be clicked.
     </p>
     <button type="button">View details</button>
   </div>
@@ -28,7 +28,7 @@ const panel = html`
 const meta: Meta<Args> = {
   title: "Components/Feedback/Loading overlay",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     active: { control: "boolean" },
     label: { control: "text" }

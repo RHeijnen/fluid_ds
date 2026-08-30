@@ -1,4 +1,4 @@
-import { manifest } from "./manifest.js";
+import { manifest, resolveSemanticValue } from "./manifest.js";
 
 /** Turn `{color.brand.600}` into `--fluid-color-brand-600`. */
 function referenceToCssVar(value: string): string | null {
@@ -29,11 +29,33 @@ type Listener = (overrides: Overrides) => void;
 class ThemeStore {
   private overrides: Overrides = {};
   private listeners = new Set<Listener>();
+  /** Active color scheme; applyTo re-declares THIS scheme's semantics. */
+  private scheme: "light" | "dark" = "light";
 
-  /** Default value for a given cssVar, taken from the manifest. */
+  /** Follow the app's light/dark switch so the preview matches the shell. */
+  setScheme(scheme: "light" | "dark"): void {
+    if (this.scheme === scheme) return;
+    this.scheme = scheme;
+    this.notify();
+  }
+
+  /**
+   * Default value for a given cssVar, taken from the manifest.
+   *
+   * Semantics are searched as well as primitives, and for the ACTIVE scheme:
+   * `--fluid-accent-base` lives in `semantics`, not `primitives`, so looking
+   * only at primitives reported "no default" for every semantic token. That
+   * left the design-mode inspector showing empty fields for tokens the page
+   * plainly renders, and it made `set()` record a semantic assigned its own
+   * default as a genuine override, which then travelled into the diff and the
+   * exported theme.
+   */
   defaults(cssVar: string): string | undefined {
-    const found = manifest.primitives.find((t) => t.cssVar === cssVar);
-    return found?.value;
+    const primitive = manifest.primitives.find((t) => t.cssVar === cssVar);
+    if (primitive) return primitive.value;
+    const semantic = manifest.semantics[this.scheme].find((t) => t.cssVar === cssVar);
+    if (!semantic) return undefined;
+    return semantic.referencesPrimitive ? resolveSemanticValue(semantic.value) : semantic.value;
   }
 
   /** Current value (override > default). */
@@ -124,10 +146,10 @@ class ThemeStore {
       });
     el.setAttribute("style", surviving.join("; "));
 
-    // Re-declare every semantic token so it re-resolves at this scope.
-    // We use the "light" scheme as the source of references; dark scheme
-    // would need its own treatment if/when we expose multi-scheme overrides.
-    for (const sem of manifest.semantics.light) {
+    // Re-declare every semantic token so it re-resolves at this scope,
+    // using the ACTIVE scheme's references so the preview follows the
+    // shell's light/dark switch instead of being a hard-coded light island.
+    for (const sem of manifest.semantics[this.scheme]) {
       // If the user has overridden this semantic directly, use that.
       const override = this.overrides[sem.cssVar];
       if (override) {

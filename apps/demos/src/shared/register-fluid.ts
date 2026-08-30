@@ -16,8 +16,11 @@ import "@fluid-ds/tokens/dark.css";
 // the attribute on <html> and the right block wins by specificity.
 // Without these imports the `data-fluid-brand` attribute lands on the
 // page but has no styles to apply, so switching brands does nothing.
+import "@fluid-ds/themes/glass.css";
+import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
+import "@fluid-ds/themes/orchid.css";
 
 import "@fluid-ds/icons/register-defaults";
 

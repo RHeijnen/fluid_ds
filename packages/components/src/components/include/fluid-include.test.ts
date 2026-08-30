@@ -3,8 +3,7 @@ import "./define.js";
 import type { FluidInclude } from "./fluid-include.js";
 
 // Self-contained data: URLs so tests don't depend on the dev server.
-const fragment = (markup: string) =>
-  `data:text/html;charset=utf-8,${encodeURIComponent(markup)}`;
+const fragment = (markup: string) => `data:text/html;charset=utf-8,${encodeURIComponent(markup)}`;
 
 const okSrc = fragment(`<p class="frag">Hello from the include.</p>`);
 const scriptSrc = fragment(
@@ -53,7 +52,8 @@ describe("<fluid-include>", () => {
     const el = await fixture<FluidInclude>(html`<fluid-include src=${scriptSrc}></fluid-include>`);
     await oneEvent(el, "fluid-load");
     await aTimeout(20);
-    expect((window as unknown as { __fluidIncludeRan?: boolean }).__fluidIncludeRan).to.be.undefined;
+    expect((window as unknown as { __fluidIncludeRan?: boolean }).__fluidIncludeRan).to.be
+      .undefined;
   });
 
   it("executes scripts when allow-scripts is set", async () => {

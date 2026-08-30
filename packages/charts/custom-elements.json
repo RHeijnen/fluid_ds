@@ -98,6 +98,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -433,6 +449,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -774,6 +837,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -1116,6 +1195,53 @@
             },
             {
               "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "retheme",
               "privacy": "private",
               "return": {
@@ -1383,6 +1509,14 @@
               "name": "--fluid-chart-height"
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding"
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow"
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap"
             },
@@ -1603,6 +1737,41 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?"
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar."
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change."
             },
             {
               "kind": "method",
@@ -2017,6 +2186,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -2352,6 +2537,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -2693,6 +2925,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -3028,6 +3276,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -3369,6 +3664,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -3704,6 +4015,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -4045,6 +4403,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -4380,6 +4754,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -4721,6 +5142,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -5056,6 +5493,53 @@
               },
               "description": "Underlying Chart.js instance (after first render).",
               "readonly": true,
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -5397,6 +5881,22 @@
               }
             },
             {
+              "description": "Padding (px) around the drawing area. Doughnut, pie and polar charts default to 10 so the ring is not flush to the canvas; cartesian charts default to 0.",
+              "name": "--fluid-chart-padding",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Drop-shadow colour under a doughnut ring. Unset (default) draws no shadow; set a CSS color to enable it, and raise --fluid-chart-padding so it is not clipped.",
+              "name": "--fluid-chart-doughnut-shadow",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Space between legend controls.",
               "name": "--fluid-chart-legend-gap",
               "inheritedFrom": {
@@ -5739,6 +6239,53 @@
             },
             {
               "kind": "method",
+              "name": "isStacked",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "description": "Did the consumer ask for a stacked bar chart?",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "stackedBarRadius",
+              "privacy": "private",
+              "parameters": [
+                {
+                  "name": "radius",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "Scriptable `borderRadius` for stacked bars: round the top of the topmost\nvisible segment and the bottom of the bottommost one, leaving the joins\nbetween segments square so the column reads as a single rounded bar.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint.\n\nThe chart repaints itself when `data-fluid-theme` / `data-fluid-brand` /\n`data-fluid-conformance` change on the document element. Runtime theming\nthat instead writes CSS custom properties onto an ANCESTOR (a theme\nbuilder, a scoped brand wrapper, an animated token transition) produces no\nattribute mutation and therefore no repaint, because there is no way to\nobserve an inherited custom-property change. Call this after such a change.",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "kind": "method",
               "name": "retheme",
               "privacy": "private",
               "return": {
@@ -6056,6 +6603,16 @@
               },
               "privacy": "private",
               "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "refresh",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Re-read the Fluid tokens in scope and repaint. Needed when theming writes\nCSS custom properties onto an ancestor rather than flipping a document\nattribute; see `fluid-chart.refresh()`."
             },
             {
               "kind": "method",

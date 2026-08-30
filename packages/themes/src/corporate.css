@@ -26,7 +26,72 @@
   --fluid-radius-md: 0.125rem;
   --fluid-radius-lg: 0.25rem;
 
+  /* Dense density: scale the spacing ramp DOWN ~15%, so inner paddings on
+     buttons, fields and cards tighten and more data fits per screen, the way
+     serious operational software reads. This is Corporate's lane: Orchid owns
+     airy, Default owns neutral. Hit targets are unaffected: components floor
+     them with --fluid-target-min, never with the space scale. */
+  --fluid-space-1: 0.2rem;
+  --fluid-space-2: 0.4rem;
+  --fluid-space-3: 0.6rem;
+  --fluid-space-4: 0.85rem;
+  --fluid-space-5: 1.05rem;
+  --fluid-space-6: 1.25rem;
+  --fluid-space-8: 1.7rem;
+  --fluid-space-10: 2.1rem;
+  --fluid-space-12: 2.55rem;
+
+  /* Flat elevation: dense enterprise surfaces are ruled by borders, not
+     shadows, so the elevation ramp collapses to a hairline-and-tint look. */
+  --fluid-shadow-sm: 0 0 0 0 rgb(0 0 0 / 0);
+  --fluid-shadow-md: 0 1px 2px 0 rgb(15 23 42 / 0.06);
+  --fluid-shadow-lg: 0 2px 4px 0 rgb(15 23 42 / 0.08);
+
+  /* Visible structure: a step darker rule lines, since the flat surfaces
+     lean on borders to separate regions. */
+  --fluid-border-default: var(--fluid-color-neutral-300);
+  --fluid-border-strong: var(--fluid-color-neutral-400);
+
   /* Tighter motion */
   --fluid-duration-fast: 100ms;
   --fluid-duration-normal: 160ms;
+
+  /* Tabular figures everywhere: KPIs, tables and tickers align digit-for-digit.
+     font-variant-numeric inherits across shadow boundaries, so every component
+     picks this up without a hook. */
+  font-variant-numeric: tabular-nums;
+
+  /* Re-derive the brand-driven semantics at this scope, so the brand themes a
+     subtree and not only :root (a custom property that reads the brand ramp is
+     substituted where it is declared). */
+  --fluid-accent-base: var(--fluid-color-brand-600);
+  --fluid-accent-hover: var(--fluid-color-brand-700);
+  --fluid-accent-active: var(--fluid-color-brand-800);
+  --fluid-focus-ring-color: var(--fluid-color-brand-500);
+}
+
+/* Card headers become uppercase micro-labels, the classic dense-dashboard
+   register. Scoped to actual heading elements slotted into cards, so header
+   rows that carry controls or arbitrary content are left alone. */
+[data-fluid-brand="corporate"] fluid-card > :is(h1, h2, h3, h4, h5, h6)[slot="header"] {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fluid-text-secondary);
+}
+
+/* Dark scheme re-derives the accent from lighter brand steps, matching the
+   base tokens, so a dark-mode subtree keeps its contrast. */
+[data-fluid-theme="dark"] [data-fluid-brand="corporate"],
+[data-fluid-brand="corporate"][data-fluid-theme="dark"] {
+  --fluid-accent-base: var(--fluid-color-brand-500);
+  --fluid-accent-hover: var(--fluid-color-brand-400);
+  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-focus-ring-color: var(--fluid-color-brand-400);
+  /* The stronger rule lines re-derive for dark the same way the base border
+     tokens do: one step lighter than the dark defaults, never the light
+     grays, which would glare. */
+  --fluid-border-default: var(--fluid-color-neutral-700);
+  --fluid-border-strong: var(--fluid-color-neutral-600);
 }

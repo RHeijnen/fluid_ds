@@ -3,9 +3,21 @@ title: "@fluid-ds/charts"
 description: "Chart web components backed by Chart.js. Bar, line, pie, doughnut, scatter, bubble, radar, polar area, plus a sparkline."
 ---
 
+import ChartsDemo from "../../../components/ChartsDemo.astro";
+
 Themable chart web components for Fluid, backed by
 [Chart.js](https://www.chartjs.org/). Expansion pack, install on top of
 `@fluid-ds/components` when you need data viz.
+
+The dashboard below is live: the area chart streams a simulated metrics feed,
+the sparklines track the same numbers, and every legend entry is a real
+keyboard-operable toggle. Pause the stream, or hover the charts for tooltips.
+
+<ChartsDemo />
+
+See it running: the [analytics demo](/demos/analytics/) is a chart-heavy
+overview (bar, radar, polar area and sparklines) where every chart reads the
+same brand tokens as the rest of the page.
 
 ## Install
 
@@ -24,18 +36,18 @@ import "@fluid-ds/charts/define/sparkline";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
-| `<fluid-chart>` | Generic Chart.js wrapper. Pass `type` for any Chart.js chart type. |
-| `<fluid-bar-chart>` | Bar (horizontal via Chart.js options). |
-| `<fluid-line-chart>` | Line. |
-| `<fluid-pie-chart>` | Pie. |
-| `<fluid-doughnut-chart>` | Doughnut. |
-| `<fluid-scatter-chart>` | Scatter. |
-| `<fluid-bubble-chart>` | Bubble. |
-| `<fluid-radar-chart>` | Radar. |
-| `<fluid-polar-area-chart>` | Polar area. |
-| `<fluid-sparkline>` | Inline mini-line chart for metric callouts. |
+| Tag                        | Use                                                                |
+| -------------------------- | ------------------------------------------------------------------ |
+| `<fluid-chart>`            | Generic Chart.js wrapper. Pass `type` for any Chart.js chart type. |
+| `<fluid-bar-chart>`        | Bar (horizontal via Chart.js options).                             |
+| `<fluid-line-chart>`       | Line.                                                              |
+| `<fluid-pie-chart>`        | Pie.                                                               |
+| `<fluid-doughnut-chart>`   | Doughnut.                                                          |
+| `<fluid-scatter-chart>`    | Scatter.                                                           |
+| `<fluid-bubble-chart>`     | Bubble.                                                            |
+| `<fluid-radar-chart>`      | Radar.                                                             |
+| `<fluid-polar-area-chart>` | Polar area.                                                        |
+| `<fluid-sparkline>`        | Inline mini-line chart for metric callouts.                        |
 
 Each typed variant is a thin subclass that locks the chart type, pass
 `data` and `options` exactly as you would to Chart.js.

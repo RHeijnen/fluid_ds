@@ -318,9 +318,7 @@ export class FluidCommandPalette extends FluidElement {
   private get filteredItems(): FluidCommandItem[] {
     const q = this.query.trim().toLowerCase();
     if (!q) return this.items;
-    return this.items.filter(
-      (item) => item.pinned || item.label.toLowerCase().includes(q)
-    );
+    return this.items.filter((item) => item.pinned || item.label.toLowerCase().includes(q));
   }
 
   protected override willUpdate(changed: PropertyValues<this>): void {
@@ -338,8 +336,8 @@ export class FluidCommandPalette extends FluidElement {
   }
 
   private handleOpen(): void {
-    this.restoreFocusTo =
-      (this.getRootNode() as Document | ShadowRoot).activeElement as HTMLElement | null;
+    this.restoreFocusTo = (this.getRootNode() as Document | ShadowRoot)
+      .activeElement as HTMLElement | null;
     this.query = "";
     this.activeIndex = 0;
     // Wait for the panel + input to render, then move focus into the dialog.
@@ -475,7 +473,9 @@ export class FluidCommandPalette extends FluidElement {
   private renderResults(): TemplateResult {
     const items = this.filteredItems;
     if (items.length === 0) {
-      return html`<li part="empty" class="empty" role="presentation">${this.term("noResults")}</li>`;
+      return html`<li part="empty" class="empty" role="presentation">
+        ${this.term("noResults")}
+      </li>`;
     }
     let lastGroup: string | undefined;
     return html`

@@ -139,4 +139,11 @@ import "@fluid-ds/scheduler/define/time-slots";
 import "@fluid-ds/scheduler/define/scheduler";
 import "@fluid-ds/scheduler/define/availability-editor";
 
+/* Brand presets, so the "Base theme" picker can read their token values from a
+   probe and load them as an editable starting point. */
+import "@fluid-ds/themes/titanium.css";
+import "@fluid-ds/themes/glass.css";
+import "@fluid-ds/themes/midnight.css";
+import "@fluid-ds/themes/corporate.css";
+
 import "./playground.js";

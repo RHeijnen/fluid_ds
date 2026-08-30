@@ -6,7 +6,9 @@ import type { Availability } from "../../internal/availability.js";
 
 // Open every weekday 09:00-12:00 so any future date has slots.
 const ALL_DAYS: Availability = {
-  weekly: Object.fromEntries([0, 1, 2, 3, 4, 5, 6].map((d) => [d, [{ start: "09:00", end: "12:00" }]])) as Availability["weekly"],
+  weekly: Object.fromEntries(
+    [0, 1, 2, 3, 4, 5, 6].map((d) => [d, [{ start: "09:00", end: "12:00" }]])
+  ) as Availability["weekly"],
   slotMinutes: 60
 };
 
@@ -14,9 +16,14 @@ const ALL_DAYS: Availability = {
 const FUTURE_DATE = "2035-06-18";
 const FUTURE_SLOT = `${FUTURE_DATE}T10:00`;
 
-async function schedulerFixture(props: Partial<{ value: string | null }> = {}): Promise<FluidScheduler> {
+async function schedulerFixture(
+  props: Partial<{ value: string | null }> = {}
+): Promise<FluidScheduler> {
   const el = await fixture<FluidScheduler>(
-    html`<fluid-scheduler .availability=${ALL_DAYS} .value=${props.value ?? null}></fluid-scheduler>`
+    html`<fluid-scheduler
+      .availability=${ALL_DAYS}
+      .value=${props.value ?? null}
+    ></fluid-scheduler>`
   );
   await elementUpdated(el);
   return el;
@@ -50,7 +57,11 @@ describe("<fluid-scheduler>", () => {
     const NEXT_MONTH = "2035-07-15";
     setTimeout(() =>
       cal.dispatchEvent(
-        new CustomEvent("fluid-view-change", { detail: { view: NEXT_MONTH }, bubbles: true, composed: true })
+        new CustomEvent("fluid-view-change", {
+          detail: { view: NEXT_MONTH },
+          bubbles: true,
+          composed: true
+        })
       )
     );
     const ev = await oneEvent(el, "fluid-range-change");
@@ -61,14 +72,22 @@ describe("<fluid-scheduler>", () => {
 
   it("passes a day-state map to the inner calendar", async () => {
     const el = await schedulerFixture();
-    const cal = el.shadowRoot!.querySelector("fluid-calendar") as HTMLElement & { dayState: Record<string, string> | null };
+    const cal = el.shadowRoot!.querySelector("fluid-calendar") as HTMLElement & {
+      dayState: Record<string, string> | null;
+    };
     expect(cal.dayState).to.be.an("object");
     expect(Object.keys(cal.dayState!).length).to.be.greaterThan(0);
   });
 
   it("shows the slot panel and sets the form value when value is provided", async () => {
     const form = await fixture<HTMLFormElement>(html`
-      <form><fluid-scheduler name="appointment" .availability=${ALL_DAYS} value=${FUTURE_SLOT}></fluid-scheduler></form>
+      <form>
+        <fluid-scheduler
+          name="appointment"
+          .availability=${ALL_DAYS}
+          value=${FUTURE_SLOT}
+        ></fluid-scheduler>
+      </form>
     `);
     const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
     await elementUpdated(el);
@@ -82,7 +101,11 @@ describe("<fluid-scheduler>", () => {
     const cal = el.shadowRoot!.querySelector("fluid-calendar")!;
     setTimeout(() =>
       cal.dispatchEvent(
-        new CustomEvent("fluid-date-activate", { detail: { iso: FUTURE_DATE }, bubbles: true, composed: true })
+        new CustomEvent("fluid-date-activate", {
+          detail: { iso: FUTURE_DATE },
+          bubbles: true,
+          composed: true
+        })
       )
     );
     const ev = await oneEvent(el, "fluid-day-select");
@@ -94,9 +117,20 @@ describe("<fluid-scheduler>", () => {
   it("commits the slot and fires fluid-change when a slot is chosen", async () => {
     const el = await schedulerFixture({ value: FUTURE_SLOT });
     const slots = el.shadowRoot!.querySelector("fluid-time-slots")!;
-    const slot = { start: `${FUTURE_DATE}T11:00`, end: `${FUTURE_DATE}T12:00`, remaining: 1, state: "available" };
+    const slot = {
+      start: `${FUTURE_DATE}T11:00`,
+      end: `${FUTURE_DATE}T12:00`,
+      remaining: 1,
+      state: "available"
+    };
     setTimeout(() =>
-      slots.dispatchEvent(new CustomEvent("fluid-change", { detail: { value: slot.start, slot }, bubbles: true, composed: true }))
+      slots.dispatchEvent(
+        new CustomEvent("fluid-change", {
+          detail: { value: slot.start, slot },
+          bubbles: true,
+          composed: true
+        })
+      )
     );
     const ev = await oneEvent(el, "fluid-change");
     expect(ev.detail.start).to.equal(`${FUTURE_DATE}T11:00`);
@@ -169,9 +203,9 @@ describe("<fluid-scheduler>", () => {
       | (HTMLElement & { updateComplete: Promise<unknown> })
       | null;
     await slots?.updateComplete;
-    expect(slots?.shadowRoot?.querySelector('[role="radiogroup"]')?.getAttribute("aria-label")).to.contain(
-      "Tijdsloten voor"
-    );
+    expect(
+      slots?.shadowRoot?.querySelector('[role="radiogroup"]')?.getAttribute("aria-label")
+    ).to.contain("Tijdsloten voor");
   });
 
   it("focuses an enabled correction day when the roving day is unavailable", async () => {
@@ -192,8 +226,9 @@ describe("<fluid-scheduler>", () => {
     const calendar = el.shadowRoot!.querySelector<HTMLElement>("fluid-calendar")!;
     await (calendar as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete;
 
-    expect(calendar.shadowRoot!.querySelector("button.day[tabindex='0']")?.hasAttribute("disabled"))
-      .to.equal(true);
+    expect(
+      calendar.shadowRoot!.querySelector("button.day[tabindex='0']")?.hasAttribute("disabled")
+    ).to.equal(true);
     expect(el.reportValidity()).to.equal(false);
     await aTimeout(0);
     expect(calendar.shadowRoot!.activeElement).to.match("button.day:not(:disabled)");
@@ -242,13 +277,21 @@ describe("<fluid-scheduler>", () => {
           --fluid-motion: 0;
         "
       >
-        <fluid-scheduler .availability=${ALL_DAYS} value=${FUTURE_SLOT} aria-label="Book appointment"></fluid-scheduler>
+        <fluid-scheduler
+          .availability=${ALL_DAYS}
+          value=${FUTURE_SLOT}
+          aria-label="Book appointment"
+        ></fluid-scheduler>
       </div>
     `);
     const el = host.querySelector<FluidScheduler>("fluid-scheduler")!;
     await elementUpdated(el);
-    const cal = el.shadowRoot!.querySelector("fluid-calendar") as (Element & { updateComplete: Promise<unknown> }) | null;
-    const slots = el.shadowRoot!.querySelector("fluid-time-slots") as (Element & { updateComplete: Promise<unknown> }) | null;
+    const cal = el.shadowRoot!.querySelector("fluid-calendar") as
+      | (Element & { updateComplete: Promise<unknown> })
+      | null;
+    const slots = el.shadowRoot!.querySelector("fluid-time-slots") as
+      | (Element & { updateComplete: Promise<unknown> })
+      | null;
     if (cal) await cal.updateComplete;
     if (slots) await slots.updateComplete;
     await aTimeout(20);
@@ -263,13 +306,22 @@ describe("<fluid-scheduler>", () => {
     for (const state of ["disabled", "readonly", "loading"] as const) {
       el[state] = true;
       await elementUpdated(el);
-      el.shadowRoot!.querySelector("fluid-calendar")!.dispatchEvent(new CustomEvent("fluid-date-activate", {
-        detail: { iso: "2035-06-19" }, bubbles: true, composed: true
-      }));
-      el.shadowRoot!.querySelector("fluid-time-slots")!.dispatchEvent(new CustomEvent("fluid-change", {
-        detail: { slot: { start: `${FUTURE_DATE}T11:00`, end: `${FUTURE_DATE}T12:00`, state: "available" } },
-        bubbles: true, composed: true
-      }));
+      el.shadowRoot!.querySelector("fluid-calendar")!.dispatchEvent(
+        new CustomEvent("fluid-date-activate", {
+          detail: { iso: "2035-06-19" },
+          bubbles: true,
+          composed: true
+        })
+      );
+      el.shadowRoot!.querySelector("fluid-time-slots")!.dispatchEvent(
+        new CustomEvent("fluid-change", {
+          detail: {
+            slot: { start: `${FUTURE_DATE}T11:00`, end: `${FUTURE_DATE}T12:00`, state: "available" }
+          },
+          bubbles: true,
+          composed: true
+        })
+      );
       expect(el.value).to.equal(FUTURE_SLOT);
       el[state] = false;
     }
@@ -296,7 +348,13 @@ describe("<fluid-scheduler>", () => {
 
   it("retains the original form-reset default after reconnect", async () => {
     const form = await fixture<HTMLFormElement>(html`
-      <form><fluid-scheduler name="appointment" .availability=${ALL_DAYS} value=${FUTURE_SLOT}></fluid-scheduler></form>
+      <form>
+        <fluid-scheduler
+          name="appointment"
+          .availability=${ALL_DAYS}
+          value=${FUTURE_SLOT}
+        ></fluid-scheduler>
+      </form>
     `);
     const el = form.querySelector<FluidScheduler>("fluid-scheduler")!;
     el.value = `${FUTURE_DATE}T11:00`;

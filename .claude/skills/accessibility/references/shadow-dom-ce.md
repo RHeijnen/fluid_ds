@@ -207,7 +207,7 @@ This bit us on `fluid-button`: it looked perfect in Storybook but ballooned to
 **every component that slots text or arbitrary content** (button, badge, tag,
 callout, breadcrumb, chip, menu item, …).
 
-**The rule.** A slotted node lives in the light DOM. For *inherited* CSS
+**The rule.** A slotted node lives in the light DOM. For _inherited_ CSS
 properties (`line-height`, `font-family`, `font-size`, `color`,
 `letter-spacing`, `white-space`, …) it inherits from its **light-DOM ancestor
 chain, i.e. the host page, NOT from the shadow `<slot>` location.** Styles set
@@ -221,6 +221,7 @@ Two distinct leaks, both real, both seen on the button:
    `line-height` on the inner button did nothing.
    **Fix:** pin typography on `:host` with literal fallbacks (so it holds when
    token CSS isn't loaded, tests, bare pages):
+
    ```css
    :host {
      line-height: var(--fluid-font-line-height-tight, 1.2);
@@ -229,7 +230,9 @@ Two distinct leaks, both real, both seen on the button:
    }
    /* size-bearing font-size must be on :host([size]) (NOT the inner node) so
       the slotted label inherits the right size: */
-   :host([size="md"]) { font-size: var(--fluid-font-size-md, 0.875rem); }
+   :host([size="md"]) {
+     font-size: var(--fluid-font-size-md, 0.875rem);
+   }
    ```
 
 2. **Markdown wraps loose text in a paragraph → block margins leak in.**
@@ -237,11 +240,15 @@ Two distinct leaks, both real, both seen on the button:
    `margin: 1em 0`. As a flex item that margin grew the button to its
    margin-box. Storybook (raw text node) had no paragraph, hence the divergence.
    **Fix:** reset slotted margins, and it MUST be `!important`:
+
    ```css
-   ::slotted(*) { margin: 0 !important; }
+   ::slotted(*) {
+     margin: 0 !important;
+   }
    ```
+
    **Why `!important` is required, not lazy:** in the shadow cascade, for
-   *normal* declarations the **outer (page) tree wins** over a shadow
+   _normal_ declarations the **outer (page) tree wins** over a shadow
    `::slotted()` rule, so the page's paragraph margin (normal) beats
    `::slotted(*){margin:0}` (normal). A shadow-tree `!important` outranks
    author-normal page styles, which is exactly the encapsulation guarantee
@@ -256,7 +263,7 @@ Two distinct leaks, both real, both seen on the button:
    in the OUTER tree and zeroed the margin, so the overlap silently vanished
    and seams showed a 2px double border. Same cascade law as `::slotted`:
    a normal outer-tree declaration beats a normal `:host` declaration even
-   at *lower* specificity. **Fix:** make the structural margin `!important`.
+   at _lower_ specificity. **Fix:** make the structural margin `!important`.
    If a component's layout depends on a `:host` margin/position, assume a
    page reset will fight it and assert it with `!important`, and verify in
    a real prose/reset context, not just Storybook. Found via Chrome MCP:
@@ -289,12 +296,14 @@ elements themselves: Starlight gives every element after the first sibling a top
 margin (`* + *`), so in a centered flex demo row the first item sat ~8px above
 the rest. The component can't fix its own external margin, fix it at the
 embedding site:
+
 - add Starlight's `not-content` class to the demo wrapper to opt the subtree out
   of prose styling, and
 - reset `.<demo-wrapper> > * { margin: 0 !important }` as a backstop. Demo items
   are spaced by flex `gap`, never margins.
 
 **Review checks for any text-slotting component:**
+
 - Renders at the right height inside a prose context (line-height 1.75, 16px
   font)? Test in a large-line-height wrapper, not just Storybook.
 - `::slotted(*) { margin: 0 !important }` present so a markdown paragraph label

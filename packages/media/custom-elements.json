@@ -565,7 +565,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An image gallery with a full-screen lightbox. Slot in `<img>` thumbnails;\nclicking (or pressing Enter / Space on) one opens it large in a modal\n`<dialog>` (native top layer, focus trap, Escape to close, backdrop) with\nprevious / next navigation and a position counter.\n\nEach thumbnail becomes a focusable button; its `alt` is reused as the\naccessible name and the enlarged image's alt text. Set `data-full` on a\nthumbnail to load a higher-resolution source in the lightbox.",
+          "description": "An image gallery with a full-screen lightbox. Slot in `<img>` thumbnails;\nclicking (or pressing Enter / Space on) one opens it large in a modal\n`<dialog>` (native top layer, focus trap, Escape to close, click the backdrop\nto dismiss, backdrop) with\nprevious / next navigation and a position counter.\n\nEach thumbnail becomes a focusable button; its `alt` is reused as the\naccessible name and the enlarged image's alt text. Set `data-full` on a\nthumbnail to load a higher-resolution source in the lightbox.",
           "name": "FluidLightbox",
           "cssProperties": [
             {
@@ -712,14 +712,79 @@
               "description": "Open the lightbox at a given index."
             },
             {
+              "kind": "field",
+              "name": "lightDismiss",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "description": "Whether clicking the backdrop closes the viewer. Default true.\n\nPROPERTY ONLY, on purpose. A boolean attribute cannot express\n`false` (its mere presence means true), so a `light-dismiss`\nattribute could never turn a true-by-default behavior off and would\nonly mislead. Use the `no-light-dismiss` attribute from markup, or\nset this property from JavaScript."
+            },
+            {
+              "kind": "field",
+              "name": "noLightDismiss",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent backdrop clicks from closing the viewer.",
+              "attribute": "no-light-dismiss"
+            },
+            {
+              "kind": "field",
+              "name": "dismissCandidate",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Light-dismiss. A native modal `<dialog>` renders a backdrop and closes on\nEscape, but it does NOT close when the backdrop is clicked, so a viewer\nthat people expect to dismiss by \"clicking away\" stays stuck open.\n\nA backdrop click reports the dialog itself as the target (the backdrop is\nthe dialog's own pseudo-element), and the stage padding around the image\nreads as backdrop to anyone looking at it, so both dismiss. Clicks on the\nimage or the controls never do.\n\nThe pointerdown guard stops a drag that STARTS on the image and ends\noutside it (a common accidental swipe) from closing the viewer."
+            },
+            {
+              "kind": "method",
+              "name": "isDismissSurface",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "EventTarget | null"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "lightDismissEnabled",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "onDialogPointerDown",
+              "privacy": "private"
+            },
+            {
+              "kind": "field",
+              "name": "onDialogClick",
+              "privacy": "private"
+            },
+            {
               "kind": "method",
               "name": "close",
               "return": {
                 "type": {
                   "text": "void"
                 }
-              },
-              "description": "Close the lightbox."
+              }
             },
             {
               "kind": "method",
@@ -790,6 +855,15 @@
               "default": "false",
               "description": "Wrap navigation past the first / last image.",
               "fieldName": "loop"
+            },
+            {
+              "name": "no-light-dismiss",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Prevent backdrop clicks from closing the viewer.",
+              "fieldName": "noLightDismiss"
             }
           ],
           "superclass": {
@@ -961,6 +1035,16 @@
               },
               "privacy": "private",
               "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "started",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "false",
+              "description": "Whether the viewer has actually asked for playback.\n\nThe player autoplays a clip the viewer picked, and the next one when the\ncurrent ends, but not on arrival. Autoplaying on mount meant a page\ncarrying a playlist started moving on its own, and with auto-advance it\nthen walked itself through the whole list, which reads as a fault rather\nthan a feature. It is also the behaviour WCAG 2.2.2 is about: motion that\nstarts without being asked for."
             },
             {
               "kind": "field",

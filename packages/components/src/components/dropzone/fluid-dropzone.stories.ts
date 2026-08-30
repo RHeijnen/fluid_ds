@@ -8,7 +8,7 @@ type Args = Pick<FluidDropzone, "accept" | "multiple" | "maxSize" | "disabled" |
 const meta: Meta<Args> = {
   title: "Components/Forms/Dropzone",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     accept: { control: "text" },
     multiple: { control: "boolean" },

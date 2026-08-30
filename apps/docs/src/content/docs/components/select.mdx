@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-select>` is the dense single-select picker, a button trigger that opens
 a listbox of `<fluid-option>` children. It's form-associated and implements the
 WAI-ARIA combobox + listbox pattern, with arrow-key navigation, type-to-jump,
@@ -36,6 +35,7 @@ and roving-tabindex focus inside the listbox.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/select/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -47,6 +47,7 @@ and roving-tabindex focus inside the listbox.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/select"; // registers select + option
     ```
+
   </TabItem>
 </Tabs>
 
@@ -64,11 +65,13 @@ and roving-tabindex focus inside the listbox.
   </fluid-select>
 </Demo>
 
-<ConformanceCode code={`<fluid-select name="country" value="us">
+<ConformanceCode
+  code={`<fluid-select name="country" value="us">
   <fluid-option value="us">United States</fluid-option>
   <fluid-option value="ca">Canada</fluid-option>
   <fluid-option value="mx">Mexico</fluid-option>
-</fluid-select>`} />
+</fluid-select>`}
+/>
 
 ### Placeholder
 
@@ -82,10 +85,12 @@ With no value, the placeholder text shows until a choice is made.
   </fluid-select>
 </Demo>
 
-<ConformanceCode code={`<fluid-select placeholder="Select a country…">
+<ConformanceCode
+  code={`<fluid-select placeholder="Select a country…">
   <fluid-option value="us">United States</fluid-option>
   <fluid-option value="ca">Canada</fluid-option>
-</fluid-select>`} />
+</fluid-select>`}
+/>
 
 ### Label and help text
 
@@ -96,21 +101,28 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-select label="Country" help-text="Where the invoice is sent." placeholder="Select a country…" style="max-width: 18rem;">
+  <fluid-select
+    label="Country"
+    help-text="Where the invoice is sent."
+    placeholder="Select a country…"
+    style="max-width: 18rem;"
+  >
     <fluid-option value="us">United States</fluid-option>
     <fluid-option value="ca">Canada</fluid-option>
     <fluid-option value="mx">Mexico</fluid-option>
   </fluid-select>
 </Demo>
 
-<ConformanceCode code={`<fluid-select
+<ConformanceCode
+  code={`<fluid-select
   label="Country"
   help-text="Where the invoice is sent."
   placeholder="Select a country…"
 >
   <fluid-option value="us">United States</fluid-option>
   <fluid-option value="ca">Canada</fluid-option>
-</fluid-select>`} />
+</fluid-select>`}
+/>
 
 ### Sizes
 
@@ -133,9 +145,11 @@ in [Field](/components/field/) instead.
   </div>
 </Demo>
 
-<ConformanceCode code={`<fluid-select size="sm">…</fluid-select>
+<ConformanceCode
+  code={`<fluid-select size="sm">…</fluid-select>
 <fluid-select size="md">…</fluid-select>
-<fluid-select size="lg">…</fluid-select>`} />
+<fluid-select size="lg">…</fluid-select>`}
+/>
 
 ### Disabled option
 
@@ -143,14 +157,18 @@ in [Field](/components/field/) instead.
   <fluid-select value="us" aria-label="Country" style="max-width: 18rem;">
     <fluid-option value="us">United States</fluid-option>
     <fluid-option value="ca">Canada</fluid-option>
-    <fluid-option value="aq" disabled>Antarctica (closed)</fluid-option>
+    <fluid-option value="aq" disabled>
+      Antarctica (closed)
+    </fluid-option>
   </fluid-select>
 </Demo>
 
-<ConformanceCode code={`<fluid-select value="us">
+<ConformanceCode
+  code={`<fluid-select value="us">
   <fluid-option value="us">United States</fluid-option>
   <fluid-option value="aq" disabled>Antarctica (closed)</fluid-option>
-</fluid-select>`} />
+</fluid-select>`}
+/>
 
 ## Listening for changes
 
@@ -168,6 +186,7 @@ selection changes.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="CountryPicker.tsx"
@@ -191,6 +210,7 @@ selection changes.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="CountryPicker.vue"
@@ -206,6 +226,7 @@ selection changes.
       </fluid-select>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="country-picker.component.ts"
@@ -229,6 +250,7 @@ selection changes.
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="CountryPicker.svelte"
@@ -244,6 +266,7 @@ selection changes.
       <fluid-option value="ca">Canada</fluid-option>
     </fluid-select>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -298,8 +321,8 @@ inputs by default. The **complete list** is in the [API tables below](#api).
 ```
 
 <Aside type="tip">
-  Select a `fluid-select` in the [Theme builder](/playground/) to tweak the
-  trigger, listbox, and option tokens visually.
+  Select a `fluid-select` in the [Theme builder](/playground/) to tweak the trigger, listbox, and
+  option tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -312,7 +335,7 @@ for CSS not covered by a token.
 
 - **One-of-many** selection where the option set is finite and known in advance.
 
-### When *not* to use
+### When _not_ to use
 
 - **Free-form text plus suggestions**: use
   [`<fluid-typeahead>`](/components/typeahead/).
@@ -330,14 +353,14 @@ contract is in the [Accessibility guide](/guides/accessibility/).
 
 ### Keyboard
 
-| Key | Action |
-| --- | --- |
+| Key                                                | Action                                                  |
+| -------------------------------------------------- | ------------------------------------------------------- |
 | <kbd>Space</kbd> / <kbd>Enter</kbd> / <kbd>↓</kbd> | Open the listbox; focus the selected (or first) option. |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Move the active option (skips disabled). |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the first / last option. |
-| _type a character_ | Jump to the next option starting with it. |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the active option and close. |
-| <kbd>Escape</kbd> | Close without changing the value. |
+| <kbd>↑</kbd> / <kbd>↓</kbd>                        | Move the active option (skips disabled).                |
+| <kbd>Home</kbd> / <kbd>End</kbd>                   | Jump to the first / last option.                        |
+| _type a character_                                 | Jump to the next option starting with it.               |
+| <kbd>Enter</kbd> / <kbd>Space</kbd>                | Select the active option and close.                     |
+| <kbd>Escape</kbd>                                  | Close without changing the value.                       |
 
 Closing returns focus to the trigger.
 
@@ -369,10 +392,10 @@ Cross-browser and assistive-technology certification remains pending.
 
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle to **AAA**:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## API
 

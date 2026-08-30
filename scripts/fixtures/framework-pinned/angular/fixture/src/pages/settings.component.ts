@@ -9,9 +9,7 @@ import { toast } from "../lib";
     <fluid-card>
       <h3 slot="header">Workspace</h3>
       <div class="form-grid">
-        <label>
-          Workspace name <fluid-input value="Fluid Inc."></fluid-input>
-        </label>
+        <label> Workspace name <fluid-input value="Fluid Inc."></fluid-input> </label>
         <label>
           Support email <fluid-input type="email" value="support@fluid.dev"></fluid-input>
         </label>

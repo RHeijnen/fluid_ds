@@ -49,7 +49,7 @@ registerIcon(
  * @cssproperty --fluid-code-block-surface-subtle - Component override for the corresponding semantic token.
  * @cssproperty --fluid-code-block-text-primary - Component override for the corresponding semantic token.
  * @cssproperty --fluid-code-block-text-secondary - Component override for the corresponding semantic token.
-*/
+ */
 export class FluidCodeBlock extends FluidElement {
   static override styles = css`
     :host {
@@ -61,9 +61,16 @@ export class FluidCodeBlock extends FluidElement {
     }
 
     .base {
-      border: 1px solid var(--fluid-code-border, var(--fluid-code-block-border-default, var(--fluid-border-default)));
+      border: 1px solid
+        var(
+          --fluid-code-border,
+          var(--fluid-code-block-border-default, var(--fluid-border-default))
+        );
       border-radius: var(--fluid-radius-md);
-      background: var(--fluid-code-bg, var(--fluid-code-block-surface-subtle, var(--fluid-surface-subtle)));
+      background: var(
+        --fluid-code-bg,
+        var(--fluid-code-block-surface-subtle, var(--fluid-surface-subtle))
+      );
       color: var(--fluid-code-fg, var(--fluid-code-block-text-primary, var(--fluid-text-primary)));
       overflow: hidden;
       font-family: var(--fluid-font-family-mono);
@@ -77,8 +84,15 @@ export class FluidCodeBlock extends FluidElement {
       gap: var(--fluid-space-2);
       min-height: 2.25rem;
       padding-inline: var(--fluid-space-3) var(--fluid-space-1);
-      background: var(--fluid-code-header-bg, var(--fluid-code-block-surface-muted, var(--fluid-surface-muted)));
-      border-bottom: 1px solid var(--fluid-code-border, var(--fluid-code-block-border-default, var(--fluid-border-default)));
+      background: var(
+        --fluid-code-header-bg,
+        var(--fluid-code-block-surface-muted, var(--fluid-surface-muted))
+      );
+      border-bottom: 1px solid
+        var(
+          --fluid-code-border,
+          var(--fluid-code-block-border-default, var(--fluid-border-default))
+        );
       font-family: var(--fluid-font-family-sans);
       font-size: var(--fluid-font-size-xs, 0.75rem);
       color: var(--fluid-code-block-text-secondary, var(--fluid-text-secondary));
@@ -197,9 +211,7 @@ export class FluidCodeBlock extends FluidElement {
           ? html`
               <div part="header" class="header">
                 ${labelText
-                  ? html`<span class="label ${this.filename ? "" : "is-lang"}"
-                      >${labelText}</span
-                    >`
+                  ? html`<span class="label ${this.filename ? "" : "is-lang"}">${labelText}</span>`
                   : html`<span></span>`}
                 ${showCopy
                   ? html`
@@ -224,7 +236,11 @@ export class FluidCodeBlock extends FluidElement {
               </div>
             `
           : nothing}
-        <div part="body" class="body"><slot name="highlighted"><pre class="plain"><code><slot>${this.code}</slot></code></pre></slot></div>
+        <div part="body" class="body">
+          <slot name="highlighted">
+            <pre class="plain"><code><slot>${this.code}</slot></code></pre>
+          </slot>
+        </div>
       </div>
     `;
   }

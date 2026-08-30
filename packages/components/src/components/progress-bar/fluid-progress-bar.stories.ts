@@ -10,7 +10,7 @@ type Args = Pick<FluidProgressBar, "value" | "indeterminate" | "showValue"> & {
 const meta: Meta<Args> = {
   title: "Components/Feedback/ProgressBar",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     value: { control: { type: "range", min: 0, max: 100, step: 1 } },
     indeterminate: { control: "boolean" },

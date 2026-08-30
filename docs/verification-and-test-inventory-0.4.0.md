@@ -1,4 +1,4 @@
-# Fluid DS 0.4.0 verification and test inventory
+# Fluid 0.4.0 verification and test inventory
 
 This document is the evidence-backed source for engineering and marketing test
 claims. It deliberately separates unique test assertions from repeated browser
@@ -163,7 +163,7 @@ history rewriting is a separate, disruptive operation.
 
 Recommended concise claim:
 
-> Fluid DS 0.4.0 includes 2,719 browser-based unit and interaction assertions,
+> Fluid 0.4.0 includes 2,719 browser-based unit and interaction assertions,
 > run across Chromium, Firefox and WebKit for 8,157 passing cross-browser test
 > executions. Fresh measured runtime-source coverage is 96.48% for lines and
 > statements, 93.75% for functions and 86.45% for branches. All 155 public web

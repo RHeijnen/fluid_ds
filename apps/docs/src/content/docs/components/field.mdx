@@ -15,7 +15,12 @@ message. It owns the accessible plumbing: it generates ids and sets
 screen-reader-only "required" text.
 
 <Demo>
-  <fluid-field label="Email" description="We'll never share it." for="hero-email" style="max-width: 22rem;">
+  <fluid-field
+    label="Email"
+    description="We'll never share it."
+    for="hero-email"
+    style="max-width: 22rem;"
+  >
     <fluid-input id="hero-email" type="email" placeholder="you@example.com"></fluid-input>
   </fluid-field>
 </Demo>
@@ -32,6 +37,7 @@ screen-reader-only "required" text.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/field/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +49,7 @@ screen-reader-only "required" text.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/field";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -54,7 +61,12 @@ Pass `label` and `description` as attributes. The field links the description to
 the control with `aria-describedby` automatically.
 
 <Demo>
-  <fluid-field label="Display name" description="Shown next to your comments." for="ex-name" style="max-width: 22rem;">
+  <fluid-field
+    label="Display name"
+    description="Shown next to your comments."
+    for="ex-name"
+    style="max-width: 22rem;"
+  >
     <fluid-input id="ex-name"></fluid-input>
   </fluid-field>
 </Demo>
@@ -88,7 +100,12 @@ Set `error` to render a message with `role="alert"`. The control is flagged
 `aria-invalid="true"` and described by the error text.
 
 <Demo>
-  <fluid-field label="Email" error="Enter a valid email address." for="ex-err" style="max-width: 22rem;">
+  <fluid-field
+    label="Email"
+    error="Enter a valid email address."
+    for="ex-err"
+    style="max-width: 22rem;"
+  >
     <fluid-input id="ex-err" type="email" value="not-an-email"></fluid-input>
   </fluid-field>
 </Demo>
@@ -147,6 +164,7 @@ child. Pass `for` matching the control's id so the `<label>` associates with it.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="EmailField.vue"
@@ -162,6 +180,7 @@ child. Pass `for` matching the control's id so the `<label>` associates with it.
       </fluid-field>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="email-field.component.ts"
@@ -183,6 +202,7 @@ child. Pass `for` matching the control's id so the `<label>` associates with it.
       @Input() error = "";
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="EmailField.svelte"
@@ -196,6 +216,7 @@ child. Pass `for` matching the control's id so the `<label>` associates with it.
       <fluid-input id="email" type="email" required></fluid-input>
     </fluid-field>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -263,6 +284,14 @@ covered by a token.
   every brand and theme.
 
 <CardGrid>
-  <LinkCard title="Input" href="/components/input/" description="The text control this field most often wraps." />
-  <LinkCard title="Button" href="/components/button/" description="Submit the form the field belongs to." />
+  <LinkCard
+    title="Input"
+    href="/components/input/"
+    description="The text control this field most often wraps."
+  />
+  <LinkCard
+    title="Button"
+    href="/components/button/"
+    description="Submit the form the field belongs to."
+  />
 </CardGrid>

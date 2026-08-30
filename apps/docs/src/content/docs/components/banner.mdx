@@ -31,6 +31,7 @@ page, section, or app shell. Five variants signal severity: `neutral`, `info`,
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/banner/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +43,7 @@ page, section, or app shell. Five variants signal severity: `neutral`, `info`,
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/banner";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -50,23 +52,33 @@ page, section, or app shell. Five variants signal severity: `neutral`, `info`,
 ### Variants
 
 <Demo>
-  <fluid-banner variant="neutral" style="width: 100%;">A neutral announcement.</fluid-banner>
+  <fluid-banner variant="neutral" style="width: 100%;">
+    A neutral announcement.
+  </fluid-banner>
 </Demo>
 
 <Demo>
-  <fluid-banner variant="info" style="width: 100%;">Informational notice for everyone.</fluid-banner>
+  <fluid-banner variant="info" style="width: 100%;">
+    Informational notice for everyone.
+  </fluid-banner>
 </Demo>
 
 <Demo>
-  <fluid-banner variant="success" style="width: 100%;">Your changes were published.</fluid-banner>
+  <fluid-banner variant="success" style="width: 100%;">
+    Your changes were published.
+  </fluid-banner>
 </Demo>
 
 <Demo>
-  <fluid-banner variant="warning" style="width: 100%;">Your trial ends in three days.</fluid-banner>
+  <fluid-banner variant="warning" style="width: 100%;">
+    Your trial ends in three days.
+  </fluid-banner>
 </Demo>
 
 <Demo>
-  <fluid-banner variant="danger" style="width: 100%;">A service outage is affecting logins.</fluid-banner>
+  <fluid-banner variant="danger" style="width: 100%;">
+    A service outage is affecting logins.
+  </fluid-banner>
 </Demo>
 
 ```html
@@ -85,9 +97,7 @@ fires **`fluid-dismiss`**, so you can persist the dismissal.
 </Demo>
 
 ```html
-<fluid-banner variant="info" dismissible id="b">
-  We just shipped a new feature.
-</fluid-banner>
+<fluid-banner variant="info" dismissible id="b"> We just shipped a new feature. </fluid-banner>
 
 <script type="module">
   document.getElementById("b").addEventListener("fluid-dismiss", () => {
@@ -104,8 +114,12 @@ or "learn more" calls to action.
 <Demo>
   <fluid-banner variant="info" dismissible style="width: 100%;">
     We use cookies to improve your experience.
-    <fluid-button slot="actions" variant="ghost" size="sm">Settings</fluid-button>
-    <fluid-button slot="actions" variant="primary" size="sm">Accept</fluid-button>
+    <fluid-button slot="actions" variant="ghost" size="sm">
+      Settings
+    </fluid-button>
+    <fluid-button slot="actions" variant="primary" size="sm">
+      Accept
+    </fluid-button>
   </fluid-banner>
 </Demo>
 
@@ -153,6 +167,7 @@ does not reappear.
         .addEventListener("fluid-dismiss", () => localStorage.setItem("seen", "1"));
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Notice.tsx"
@@ -170,6 +185,7 @@ does not reappear.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Notice.vue"
@@ -183,6 +199,7 @@ does not reappear.
       <fluid-banner v-if="open" variant="info" dismissible @fluid-dismiss="open = false">…</fluid-banner>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="notice.component.ts"
@@ -199,6 +216,7 @@ does not reappear.
       open = true;
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Notice.svelte"
@@ -211,6 +229,7 @@ does not reappear.
       <fluid-banner variant="info" dismissible on:fluid-dismiss={() => (open = false)}>…</fluid-banner>
     {/if}
     ```
+
   </TabItem>
 </Tabs>
 
@@ -272,10 +291,10 @@ banner-specific.
 
 Ships **WCAG 2.2 AA**; an ancestor `[data-fluid-conformance="aaa"]` lifts:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-target-min` | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| Token                      | AA   | AAA      | Criterion                                                                                                |
+| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
 
 ## Related
 

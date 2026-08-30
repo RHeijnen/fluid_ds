@@ -206,8 +206,16 @@ export class FluidDialog extends FluidElement {
   /** Size variant. */
   @property({ reflect: true }) size: FluidDialogSize = "md";
 
-  /** Whether clicking the backdrop closes the dialog. Default true. */
-  @property({ type: Boolean, attribute: "light-dismiss" }) lightDismiss = true;
+  /**
+   * Whether clicking the backdrop closes the dialog. Default true.
+   *
+   * PROPERTY ONLY, on purpose. A boolean attribute cannot express
+   * `false` (its mere presence means true), so a `light-dismiss`
+   * attribute could never turn a true-by-default behavior off and would
+   * only mislead. Use the `no-light-dismiss` attribute from markup, or
+   * set this property from JavaScript.
+   */
+  @property({ type: Boolean, attribute: false }) lightDismiss = true;
 
   /** Prevent backdrop clicks from closing the dialog. */
   @property({ type: Boolean, attribute: "no-light-dismiss" }) noLightDismiss = false;
@@ -297,8 +305,22 @@ export class FluidDialog extends FluidElement {
     );
   }
 
+  /**
+   * A backdrop click reports the dialog element itself as the target. The
+   * pointerdown guard additionally requires the gesture to have STARTED on the
+   * backdrop, so a drag that begins inside the panel (selecting text, dragging
+   * a slider) and releases outside it does not dismiss.
+   */
+  private dismissCandidate = false;
+
+  private handleBackdropPointerDown(e: PointerEvent): void {
+    this.dismissCandidate = e.target === this.dialogEl;
+  }
+
   private handleBackdropClick(e: MouseEvent): void {
     if (this.noLightDismiss || !this.lightDismiss) return;
+    if (!this.dismissCandidate) return;
+    this.dismissCandidate = false;
     // The backdrop is the dialog element itself when clicked outside the panel.
     if (e.target === this.dialogEl) this.hide();
   }
@@ -311,6 +333,7 @@ export class FluidDialog extends FluidElement {
         aria-label=${accessibleLabel || nothing}
         aria-labelledby=${accessibleLabel ? nothing : "fluid-dialog-label"}
         @close=${this.handleDialogClose}
+        @pointerdown=${this.handleBackdropPointerDown}
         @click=${this.handleBackdropClick}
       >
         <div part="panel" class="panel">

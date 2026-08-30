@@ -16,7 +16,7 @@ const meta: Meta<Args> = {
   title: "Components/Navigation/Speed dial",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     open: { control: "boolean" },

@@ -34,12 +34,13 @@ on `Intl.NumberFormat` with `style: "unit"`, no extra dependencies.
     ```ts
     import "@fluid-ds/components/define/format-bytes";
     ```
+
   </TabItem>
 </Tabs>
 
 <Aside type="note">
-  Formatters render plain inline text and read no design tokens beyond the
-  inherited text color, so they need no `@fluid-ds/tokens` stylesheet.
+  Formatters render plain inline text and read no design tokens beyond the inherited text color, so
+  they need no `@fluid-ds/tokens` stylesheet.
 </Aside>
 
 ## Examples
@@ -47,15 +48,20 @@ on `Intl.NumberFormat` with `style: "unit"`, no extra dependencies.
 ### Basic
 
 <Demo>
-  <fluid-format-bytes value="1500"></fluid-format-bytes><br/>
-  <fluid-format-bytes value="1500000"></fluid-format-bytes><br/>
+  <fluid-format-bytes value="1500"></fluid-format-bytes>
+  <br />
+  <fluid-format-bytes value="1500000"></fluid-format-bytes>
+  <br />
   <fluid-format-bytes value="1500000000"></fluid-format-bytes>
 </Demo>
 
 ```html
-<fluid-format-bytes value="1500"></fluid-format-bytes>          <!-- 1.5 kB -->
-<fluid-format-bytes value="1500000"></fluid-format-bytes>       <!-- 1.5 MB -->
-<fluid-format-bytes value="1500000000"></fluid-format-bytes>    <!-- 1.5 GB -->
+<fluid-format-bytes value="1500"></fluid-format-bytes>
+<!-- 1.5 kB -->
+<fluid-format-bytes value="1500000"></fluid-format-bytes>
+<!-- 1.5 MB -->
+<fluid-format-bytes value="1500000000"></fluid-format-bytes>
+<!-- 1.5 GB -->
 ```
 
 ### Binary base
@@ -63,13 +69,16 @@ on `Intl.NumberFormat` with `style: "unit"`, no extra dependencies.
 Use `base="binary"` for IEC units (KiB, MiB).
 
 <Demo>
-  <fluid-format-bytes value="1024" base="binary"></fluid-format-bytes><br/>
+  <fluid-format-bytes value="1024" base="binary"></fluid-format-bytes>
+  <br />
   <fluid-format-bytes value="1048576" base="binary"></fluid-format-bytes>
 </Demo>
 
 ```html
-<fluid-format-bytes value="1024" base="binary"></fluid-format-bytes>       <!-- 1 KiB -->
-<fluid-format-bytes value="1048576" base="binary"></fluid-format-bytes>    <!-- 1 MiB -->
+<fluid-format-bytes value="1024" base="binary"></fluid-format-bytes>
+<!-- 1 KiB -->
+<fluid-format-bytes value="1048576" base="binary"></fluid-format-bytes>
+<!-- 1 MiB -->
 ```
 
 ### Long-form display
@@ -117,10 +126,10 @@ this component does not silently replace them with another language. Binary
 grammar. Decimal unit names use Intl; IEC symbols such as KiB remain unchanged.
 
 <Aside type="note">
-  Native ancestor language inheritance during SSR remains unverified and is not
-  provided by this formatter change. Pass an explicit `locale` for predictable
-  server output; without available context the server uses English. This does
-  not promise full locale hydration parity or request-scoped translation state.
+  Native ancestor language inheritance during SSR remains unverified and is not provided by this
+  formatter change. Pass an explicit `locale` for predictable server output; without available
+  context the server uses English. This does not promise full locale hydration parity or
+  request-scoped translation state.
 </Aside>
 
 <Demo>

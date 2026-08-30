@@ -12,6 +12,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @csspart base - The outer label wrapper.
  * @csspart control - The circular indicator.
+ * @csspart label - The label slot wrapper (matches checkbox and switch).
  *
  * Every styled property reads a component-scoped `--fluid-radio-*` token that
  * falls back to a main semantic var (the override ladder).
@@ -178,7 +179,7 @@ export class FluidRadio extends FluidElement {
         <span part="control" class="control">
           <span class="dot"></span>
         </span>
-        <slot></slot>
+        <span part="label"><slot></slot></span>
       </span>
     `;
   }

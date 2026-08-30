@@ -1,7 +1,8 @@
 import { FluidDropdown } from "./fluid-dropdown.js";
 import { FluidDropdownItem } from "./fluid-dropdown-item.js";
 
-if (typeof customElements !== "undefined" && !customElements.get("fluid-dropdown")) customElements.define("fluid-dropdown", FluidDropdown);
+if (typeof customElements !== "undefined" && !customElements.get("fluid-dropdown"))
+  customElements.define("fluid-dropdown", FluidDropdown);
 if (typeof customElements !== "undefined" && !customElements.get("fluid-dropdown-item"))
   customElements.define("fluid-dropdown-item", FluidDropdownItem);
 

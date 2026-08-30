@@ -14,7 +14,7 @@ control playback with `play` / `start()` / `pause()` / `cancel()`. It renders
 `display: contents`, so it adds nothing to layout.
 
 It's the app-level companion to the standard enter/exit animations already baked
-into the overlay components (dialog, drawer, toast, …), reach for it when *you*
+into the overlay components (dialog, drawer, toast, …), reach for it when _you_
 want to choreograph motion on arbitrary content.
 
 <Demo>
@@ -41,6 +41,7 @@ want to choreograph motion on arbitrary content.
     ```ts
     import "@fluid-ds/components/define/animation";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -83,7 +84,7 @@ anim.start();
 
 ```ts
 const anim = document.querySelector("fluid-animation");
-anim.start();   // (re)start
+anim.start(); // (re)start
 anim.pause();
 anim.resume();
 anim.cancel();
@@ -108,6 +109,7 @@ through to the underlying `Element.animate()` options.
       a.start();
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Reveal.tsx"
@@ -126,6 +128,7 @@ through to the underlying `Element.animate()` options.
       return <fluid-animation ref={ref} name="slideInUp"><div>hi</div></fluid-animation>;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Reveal.vue"
@@ -140,6 +143,7 @@ through to the underlying `Element.animate()` options.
       </fluid-animation>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="reveal.component.ts"
@@ -154,6 +158,7 @@ through to the underlying `Element.animate()` options.
     })
     export class Reveal { done() { console.log("done"); } }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Reveal.svelte"
@@ -164,6 +169,7 @@ through to the underlying `Element.animate()` options.
 
     <fluid-animation name="slideInUp" play on:fluid-finish={done}><div>hi</div></fluid-animation>
     ```
+
   </TabItem>
 </Tabs>
 
@@ -181,8 +187,12 @@ Timing comes from its attributes (`duration`, `easing`, `delay`). To stay
 consistent with the system, pass the motion tokens through:
 
 ```html
-<fluid-animation name="slideInUp" style="--d: var(--fluid-duration-slow);"
-  duration="320" easing="cubic-bezier(0.2,0,0,1)">
+<fluid-animation
+  name="slideInUp"
+  style="--d: var(--fluid-duration-slow);"
+  duration="320"
+  easing="cubic-bezier(0.2,0,0,1)"
+>
   <div>…</div>
 </fluid-animation>
 ```

@@ -3,6 +3,8 @@ title: "@fluid-ds/scheduler"
 description: "Accessible appointment scheduler: a calendar with bookable time slots, an owner-side hours editor, and a framework-free availability engine."
 ---
 
+import SchedulerDemo from "../../../components/SchedulerDemo.astro";
+
 An opt-in expansion pack for booking flows: a visitor picks a day on a calendar
 (with per-day availability dots) and then a time slot; the chosen slot is a real
 form value. An owner-side editor defines the open hours, and a pure availability
@@ -12,6 +14,16 @@ server-side too, with no DOM).
 Built on standard web components, so it drops into React, Vue, Angular, Svelte,
 or plain HTML. The components target WCAG 2.2 AA and expose conformance-aware
 controls; production accessibility certification remains pending.
+
+The picker below is live, running on a studio's weekly hours with a few slots
+already taken: pick a day with a dot, then a free slot, and the readout above
+mirrors the pack's real `fluid-change` event. The fully booked Saturday shows
+as a red dot.
+
+<SchedulerDemo />
+
+See it running: the [booking demo](/demos/booking/) puts the scheduler on a
+clinic's opening hours, so you can pick a day, pick a free slot, and confirm.
 
 ## Install
 
@@ -27,11 +39,11 @@ import "@fluid-ds/scheduler/define/availability-editor";
 
 ## Components
 
-| Tag | Use |
-| --- | --- |
-| `<fluid-scheduler>` | The visitor picker: calendar + time-slot panel, form-associated. |
-| `<fluid-time-slots>` | A single day's slots as a radiogroup, usable on its own. |
-| `<fluid-availability-editor>` | The owner-side weekly-hours + closed-dates editor. |
+| Tag                           | Use                                                              |
+| ----------------------------- | ---------------------------------------------------------------- |
+| `<fluid-scheduler>`           | The visitor picker: calendar + time-slot panel, form-associated. |
+| `<fluid-time-slots>`          | A single day's slots as a radiogroup, usable on its own.         |
+| `<fluid-availability-editor>` | The owner-side weekly-hours + closed-dates editor.               |
 
 ## The availability config
 
@@ -42,18 +54,21 @@ Everything is driven by one plain object. All times are local wall-clock
 const availability = {
   // Recurring weekly hours, keyed by weekday (0 = Sunday).
   weekly: {
-    1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
+    1: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
     2: [{ start: "09:00", end: "17:00" }],
     6: [{ start: "09:00", end: "12:00" }]
   },
   // Date-specific overrides (holidays / special hours).
   exceptions: [{ date: "2026-12-25", closed: true }],
-  slotMinutes: 30,        // appointment length
-  stepMinutes: 30,        // gap between slot starts (defaults to slotMinutes)
-  bufferMinutes: 0,       // padding reserved after each booking
-  capacity: 1,            // bookings per slot (> 1 = group slots)
-  minNoticeMinutes: 120,  // cannot book within the next 2 hours
-  maxAdvanceDays: 45      // cannot book more than 45 days out
+  slotMinutes: 30, // appointment length
+  stepMinutes: 30, // gap between slot starts (defaults to slotMinutes)
+  bufferMinutes: 0, // padding reserved after each booking
+  capacity: 1, // bookings per slot (> 1 = group slots)
+  minNoticeMinutes: 120, // cannot book within the next 2 hours
+  maxAdvanceDays: 45 // cannot book more than 45 days out
 };
 ```
 
@@ -63,7 +78,7 @@ const availability = {
 <fluid-scheduler id="booking" name="appointment"></fluid-scheduler>
 <script type="module">
   const el = document.getElementById("booking");
-  el.availability = availability;        // the config above
+  el.availability = availability; // the config above
   el.bookings = [{ start: "2026-06-15T09:00" }]; // already-taken slots
 
   el.addEventListener("fluid-change", (e) => {
@@ -81,28 +96,28 @@ const availability = {
 
 ### `<fluid-scheduler>` props
 
-| Prop | Default | Description |
-| --- | --- | --- |
-| `availability` | `null` | The config object (or a JSON attribute). |
-| `bookings` | `[]` | Known taken slots, `{ start, end? }[]`. |
-| `value` | `null` | Selected slot, ISO `YYYY-MM-DDTHH:MM` (the form value). |
-| `name` | `""` | Field name for form submission. |
-| `min` / `max` | today / today + `maxAdvanceDays` | Selectable day bounds, `YYYY-MM-DD`. |
-| `week-start` | `1` | First weekday (0 = Sunday). |
-| `locale` | document | BCP-47 locale for labels. |
-| `time-format` | `"24h"` | `"12h"` or `"24h"`. |
-| `size` | `"md"` | `sm` / `md` / `lg`. |
-| `loading` | `false` | Show a spinner, expose busy state, and block new day/slot interaction while availability is being fetched. |
-| `disabled` / `required` / `readonly` | `false` | Form control flags. |
+| Prop                                 | Default                          | Description                                                                                                |
+| ------------------------------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `availability`                       | `null`                           | The config object (or a JSON attribute).                                                                   |
+| `bookings`                           | `[]`                             | Known taken slots, `{ start, end? }[]`.                                                                    |
+| `value`                              | `null`                           | Selected slot, ISO `YYYY-MM-DDTHH:MM` (the form value).                                                    |
+| `name`                               | `""`                             | Field name for form submission.                                                                            |
+| `min` / `max`                        | today / today + `maxAdvanceDays` | Selectable day bounds, `YYYY-MM-DD`.                                                                       |
+| `week-start`                         | `1`                              | First weekday (0 = Sunday).                                                                                |
+| `locale`                             | document                         | BCP-47 locale for labels.                                                                                  |
+| `time-format`                        | `"24h"`                          | `"12h"` or `"24h"`.                                                                                        |
+| `size`                               | `"md"`                           | `sm` / `md` / `lg`.                                                                                        |
+| `loading`                            | `false`                          | Show a spinner, expose busy state, and block new day/slot interaction while availability is being fetched. |
+| `disabled` / `required` / `readonly` | `false`                          | Form control flags.                                                                                        |
 
 ### `<fluid-scheduler>` events + methods
 
-| Name | Detail / signature |
-| --- | --- |
+| Name                 | Detail / signature                                                 |
+| -------------------- | ------------------------------------------------------------------ |
 | `fluid-range-change` | `{ start, end }`: the visible month changed (fetch bookings here). |
-| `fluid-day-select` | `{ date }`: a day was chosen. |
-| `fluid-change` | `{ value, start, end }`: a slot was committed. |
-| `refresh()` | Re-generate slots + dots after an out-of-band change. |
+| `fluid-day-select`   | `{ date }`: a day was chosen.                                      |
+| `fluid-change`       | `{ value, start, end }`: a slot was committed.                     |
+| `refresh()`          | Re-generate slots + dots after an out-of-band change.              |
 
 `value` participates in native `FormData`; a form reset restores the original
 default even after disconnect/reconnect. Changing `value` updates the displayed

@@ -36,7 +36,9 @@ describe("<fluid-audio>", () => {
 
   it("passes the a11y audit", async () => {
     const el = await fixture<FluidAudio>(html`
-      <div style="--fluid-surface-muted:#f4f4f5; --fluid-text-primary:#18181b; --fluid-accent-base:#4f46e5; --fluid-border-default:#e4e4e7;">
+      <div
+        style="--fluid-surface-muted:#f4f4f5; --fluid-text-primary:#18181b; --fluid-accent-base:#4f46e5; --fluid-border-default:#e4e4e7;"
+      >
         <fluid-audio label="Sample"></fluid-audio>
       </div>
     `);

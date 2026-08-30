@@ -10,7 +10,7 @@ type Args = Pick<FluidOtp, "length" | "value" | "type" | "mask" | "disabled" | "
 const meta: Meta<Args> = {
   title: "Components/Forms/OTP input",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     length: { control: { type: "number", min: 2, max: 10 } },
     value: { control: "text" },

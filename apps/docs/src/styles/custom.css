@@ -4,8 +4,12 @@
  * Three passes:
  *   1. Load Fluid tokens so any embedded `<fluid-*>` component picks
  *      up its variables.
- *   2. Load the brand presets so the in-header brand picker (default /
- *      midnight / corporate) actually changes anything.
+ *   2. Load the brand presets. Midnight and Corporate back the in-header
+ *      brand picker; Titanium, Glass and Orchid are loaded so the live
+ *      preset demos on /theming/brand/ render the real stylesheets rather
+ *      than a hand-copied approximation. Each one is scoped to its own
+ *      `[data-fluid-brand="…"]` selector, so loading them costs nothing
+ *      until the attribute is set.
  *   3. Remap Starlight's own design tokens to ours so the docs chrome
  *      (sidebar, headings, code blocks, active states) looks like the
  *      same product as the components themselves.
@@ -27,6 +31,9 @@
 @import "@fluid-ds/tokens/dark.css";
 @import "@fluid-ds/themes/midnight.css";
 @import "@fluid-ds/themes/corporate.css";
+@import "@fluid-ds/themes/titanium.css";
+@import "@fluid-ds/themes/glass.css";
+@import "@fluid-ds/themes/orchid.css";
 
 /* ------------------------------------------------------------------ */
 /* Starlight token bridge                                              */
@@ -161,12 +168,16 @@ starlight-toc a[aria-current="true"] {
 /* Prose links + headings                                              */
 /* ------------------------------------------------------------------ */
 
-.sl-markdown-content a:not(:where(.not-content *)) {
+/* Exclude elements that ARE .not-content as well as their descendants:
+   Starlight marks its hero link-buttons with the class on the anchor itself,
+   and painting those accent-on-accent made the primary button's label
+   invisible. */
+.sl-markdown-content a:not(:where(.not-content, .not-content *)) {
   color: var(--fluid-accent-base);
   text-decoration-color: color-mix(in srgb, var(--fluid-accent-base) 40%, transparent);
   text-underline-offset: 3px;
 }
-.sl-markdown-content a:not(:where(.not-content *)):hover {
+.sl-markdown-content a:not(:where(.not-content, .not-content *)):hover {
   text-decoration-color: var(--fluid-accent-base);
 }
 

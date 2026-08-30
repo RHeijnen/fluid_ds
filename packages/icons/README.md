@@ -30,7 +30,7 @@ download, eye / eye-off, undo, plus, minus, alerts, common nouns
 ### Add more on demand
 
 ```ts
-import "@fluid-ds/icons/lucide/rocket";   // side-effect import
+import "@fluid-ds/icons/lucide/rocket"; // side-effect import
 import "@fluid-ds/icons/lucide/zap";
 ```
 
@@ -56,15 +56,15 @@ registerIcon(
 
 ## API
 
-| Function | Purpose |
-| --- | --- |
-| `registerIcon(name, svg)` | Register a single icon |
-| `registerIcons({name: svg, …})` | Batch-register |
-| `getIcon(name)` | Read the SVG string |
-| `hasIcon(name)` | Test for presence |
-| `listIcons()` | All registered names |
-| `loadIcon(name)` | Lazy-load from the bundled lucide set |
-| `onIconRegistered(fn)` | Subscribe to registration events |
+| Function                        | Purpose                               |
+| ------------------------------- | ------------------------------------- |
+| `registerIcon(name, svg)`       | Register a single icon                |
+| `registerIcons({name: svg, …})` | Batch-register                        |
+| `getIcon(name)`                 | Read the SVG string                   |
+| `hasIcon(name)`                 | Test for presence                     |
+| `listIcons()`                   | All registered names                  |
+| `loadIcon(name)`                | Lazy-load from the bundled lucide set |
+| `onIconRegistered(fn)`          | Subscribe to registration events      |
 
 ## License
 

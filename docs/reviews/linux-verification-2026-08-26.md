@@ -8,16 +8,16 @@ separately below.
 
 ## Latest completed local checkpoint
 
-| Gate | Verified result |
-| --- | --- |
-| Full `verify` | Pass; 6,888 unit executions across 42 package/engine runs, 18 builds, 1,903 cold imports, 155 renders and 24,224 local docs links |
-| Measured coverage | Pass; 2,296 cases, 14 unchanged package floors, all 202 required runtime files measured |
-| Rebuilt Storybook | 102 tagged contracts pass; 125 untagged stories are outside that count |
-| Browser accessibility | 621/621 pass, 207 per engine, one attempt each, including all 465 catalog axe audits |
-| Angular and Next | Typechecks and actual production builds pass after compatible patches and the Angular registry mapping repair |
-| Actual packed consumer | 18 archives installed with strict peers; all public-file targets and 16 runtime/type roots pass |
-| Packed manifests | 14 manifests / 155 tags pass, both freshly packed and in the exact consumer archives |
-| Performance | Eight measurement guards and all existing budgets pass; representative single-run evidence only |
+| Gate                   | Verified result                                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Full `verify`          | Pass; 6,888 unit executions across 42 package/engine runs, 18 builds, 1,903 cold imports, 155 renders and 24,224 local docs links |
+| Measured coverage      | Pass; 2,296 cases, 14 unchanged package floors, all 202 required runtime files measured                                           |
+| Rebuilt Storybook      | 102 tagged contracts pass; 125 untagged stories are outside that count                                                            |
+| Browser accessibility  | 621/621 pass, 207 per engine, one attempt each, including all 465 catalog axe audits                                              |
+| Angular and Next       | Typechecks and actual production builds pass after compatible patches and the Angular registry mapping repair                     |
+| Actual packed consumer | 18 archives installed with strict peers; all public-file targets and 16 runtime/type roots pass                                   |
+| Packed manifests       | 14 manifests / 155 tags pass, both freshly packed and in the exact consumer archives                                              |
+| Performance            | Eight measurement guards and all existing budgets pass; representative single-run evidence only                                   |
 
 The complete verification uses source `fa4e48a8...`. The separately checked
 package-evidence cleanup repair, coverage, rebuilt Storybook, accessibility,
@@ -56,11 +56,11 @@ Lock SHA-256:
 All three records below have unchanged before/after source fingerprints and
 normal zero exits. Failed historical Windows gates remain failed evidence.
 
-| Gate | Result | Retained record suffix |
-| --- | --- | --- |
-| All 18 package builds | Pass | `15-09-36-462Z-linux-build-baseline` |
-| Native ownership/lifecycle | 28 pass, one Windows-only test skipped | `15-10-03-085Z-linux-native-safety-baseline` |
-| Combined SSR browser gate | 90 pass: 30 per engine; normal shutdown in 273.482 seconds | `15-10-43-773Z-linux-ssr-90-integrated` |
+| Gate                       | Result                                                     | Retained record suffix                       |
+| -------------------------- | ---------------------------------------------------------- | -------------------------------------------- |
+| All 18 package builds      | Pass                                                       | `15-09-36-462Z-linux-build-baseline`         |
+| Native ownership/lifecycle | 28 pass, one Windows-only test skipped                     | `15-10-03-085Z-linux-native-safety-baseline` |
+| Combined SSR browser gate  | 90 pass: 30 per engine; normal shutdown in 273.482 seconds | `15-10-43-773Z-linux-ssr-90-integrated`      |
 
 The native run exercises actual Linux pidfd identity rejection and termination
 of a freshly spawned owned child, in addition to mock and lifecycle controls.
@@ -91,11 +91,11 @@ directory above. No test/browser processes remained in the container afterward.
 Two coverage batches then exercised all 14 component packages. All 2,254
 assertions passed, but coverage gates correctly failed for three packages:
 
-| Package | Measured | Unchanged requirement |
-| --- | --- | --- |
-| Editor | 75% branches (42/56) | 83% |
-| Map | 93.67% lines/statements; 94.73% functions | 99% each |
-| Parser | 94.86% lines/statements (1,386/1,461) | 95% |
+| Package | Measured                                  | Unchanged requirement |
+| ------- | ----------------------------------------- | --------------------- |
+| Editor  | 75% branches (42/56)                      | 83%                   |
+| Map     | 93.67% lines/statements; 94.73% functions | 99% each              |
+| Parser  | 94.86% lines/statements (1,386/1,461)     | 95%                   |
 
 The initial batch (`15-21-16-960Z-linux-runtime-coverage-integrated`) stopped
 after editor, with the queued kanban package also completing. A second explicit
@@ -119,10 +119,10 @@ the only additional change is three importer lines declaring editor's already
 resolved browser-command test helper, with no version upgrades.
 
 | Repaired package | Cases | Lines/statements | Branches | Functions |
-| --- | ---: | ---: | ---: | ---: |
-| Editor | 43 | 100% | 97.89% | 100% |
-| Map | 21 | 100% | 92.95% | 100% |
-| Parser | 106 | 97.6% | 85% | 97.77% |
+| ---------------- | ----: | ---------------: | -------: | --------: |
+| Editor           |    43 |             100% |   97.89% |      100% |
+| Map              |    21 |             100% |   92.95% |      100% |
+| Parser           |   106 |            97.6% |      85% |    97.77% |
 
 Raw coverage reports are retained in `frozen-coverage-reports/`; gate logs and
 the inventory are in `frozen-coverage-and-types-results/`. This is measured
@@ -241,12 +241,12 @@ remains outside this certification boundary and retains the upstream defect.
 The next complete verification drains all 14 packages in each engine, retaining
 one genuine failed assertion rather than stopping or overlapping engine phases:
 
-| Engine | Package runs | Passed cases | Failed cases |
-| --- | ---: | ---: | ---: |
-| Chromium | 14 | 2,296 | 0 |
-| Firefox | 14 | 2,295 | 1 |
-| WebKit | 14 | 2,296 | 0 |
-| Total | 42 | 6,887 | 1 |
+| Engine   | Package runs | Passed cases | Failed cases |
+| -------- | -----------: | -----------: | -----------: |
+| Chromium |           14 |        2,296 |            0 |
+| Firefox  |           14 |        2,295 |            1 |
+| WebKit   |           14 |        2,296 |            0 |
+| Total    |           42 |        6,887 |            1 |
 
 Record:
 `quality/evidence/2026-08-26T16-58-40-877Z-linux-complete-reconciled-verify/`.

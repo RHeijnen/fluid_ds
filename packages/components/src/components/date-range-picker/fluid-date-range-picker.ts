@@ -104,6 +104,15 @@ export class FluidDateRangePicker extends FluidFormAssociated {
     css`
       :host {
         display: inline-block;
+        /*
+         * Fill the field wrapper and, more importantly, be allowed to shrink
+         * inside it. Without max-width an inline-block host keeps its intrinsic
+         * width and spills out of a narrow grid track or flex item, colliding
+         * with whatever sits beside it. This matches fluid-input, fluid-select
+         * and the rest of the field family.
+         */
+        width: 100%;
+        max-width: 100%;
         font-family: var(--fluid-font-family-sans);
       }
       :host([disabled]) {
@@ -112,9 +121,12 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       }
       .base {
         display: inline-flex;
+        width: 100%;
+        /* width: 100% is the border box, so the padding and border sit inside
+           the field wrapper instead of adding 23px of overflow to it. */
+        box-sizing: border-box;
         align-items: center;
         gap: 0.25rem;
-        min-width: 16rem;
         height: var(--fluid-field-height-md, 2.5rem);
         padding-inline: var(--fluid-field-padding-x-md, 0.75rem);
         background: var(
@@ -164,7 +176,10 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       }
       input {
         flex: 1;
-        min-width: 10rem;
+        /* 0, not a rem floor: the host now takes its width from the field
+           wrapper, so a floor here only stops the control shrinking and pushes
+           it out of a narrow track. Long values scroll inside the input. */
+        min-width: 0;
         border: 0;
         outline: none;
         background: transparent;
@@ -400,6 +415,23 @@ export class FluidDateRangePicker extends FluidFormAssociated {
    * calendar selection; anything unparseable reverts to the committed range.
    */
   @property({ type: Boolean, reflect: true }) typeable = false;
+
+  /**
+   * Prevent clicking the field from opening the picker.
+   *
+   * Opening on click is the default so the text and the trigger button offer
+   * the same thing. Set this when the picker should only open from its
+   * trigger button or from ArrowDown.
+   */
+  @property({ type: Boolean, attribute: "no-auto-open" }) noAutoOpen = false;
+
+  /**
+   * Prevent focusing the field from selecting its current value.
+   *
+   * Selecting is the default so one click is enough to type or paste a
+   * replacement instead of having to clear the field first.
+   */
+  @property({ type: Boolean, attribute: "no-select-on-focus" }) noSelectOnFocus = false;
   /**
    * Fixed day/month/year pattern for the text side of the field, e.g.
    * `DD-MM-YY`. Governs display *and* typed parsing together, so what the
@@ -727,13 +759,28 @@ export class FluidDateRangePicker extends FluidFormAssociated {
    * Suppressed while returning focus after apply/cancel, which would otherwise
    * reopen the dialog the moment it closed.
    */
-  private onInputFocus = (): void => {
-    if (this.disabled || this.suppressFocusOpen) return;
+  /**
+   * Opening is driven by a click on the field rather than by focus. Focus also
+   * arrives from constraint validation, from an overlay above the field
+   * closing, and from any programmatic .focus(), none of which are a request
+   * to see the options, and opening there strands the user in a surface they
+   * never asked for. Keyboard users open with ArrowDown, per the APG combobox
+   * pattern.
+   */
+  private onInputClick = (): void => {
+    if (this.disabled || this.noAutoOpen) return;
     this.open = true;
-    if (!this.typeable) return;
-    /* Select the whole range so one click is enough to paste over it. Deferred
-       a frame because the browser places the caret after this event, which
-       would drop a selection made here. */
+  };
+
+  /**
+   * Focusing the field selects its current value, so one click is enough to
+   * type or paste a replacement instead of having to clear the field first.
+   *
+   * Deferred a frame because the browser places the caret after this event,
+   * which would otherwise drop a selection made here.
+   */
+  private onInputFocus = (): void => {
+    if (this.disabled || this.suppressFocusSelect || this.noSelectOnFocus) return;
     requestAnimationFrame(() => {
       if (
         this.inputEl &&
@@ -745,13 +792,18 @@ export class FluidDateRangePicker extends FluidFormAssociated {
     });
   };
 
-  private suppressFocusOpen = false;
+  private suppressFocusSelect = false;
 
-  /** Return focus to the field without the focus handler reopening it. */
+  /**
+   * Return focus to the field without re-selecting its text. Closing the
+   * popover hands focus back to the input, and that is a continuation of the
+   * interaction the user just finished rather than a fresh arrival at the
+   * field, so it should not grab the value again.
+   */
   private refocusInput(): void {
-    this.suppressFocusOpen = true;
+    this.suppressFocusSelect = true;
     this.inputEl?.focus();
-    this.suppressFocusOpen = false;
+    this.suppressFocusSelect = false;
   }
 
   private onTyped = (e: Event): void => {
@@ -934,7 +986,7 @@ export class FluidDateRangePicker extends FluidFormAssociated {
           aria-haspopup="dialog"
           aria-expanded=${this.open ? "true" : "false"}
           aria-controls=${this.dialogId}
-          @click=${() => !this.disabled && !this.typeable && (this.open = true)}
+          @click=${this.onInputClick}
           @focus=${this.onInputFocus}
           @input=${this.onTyped}
           @blur=${this.onTypedBlur}

@@ -18,8 +18,20 @@ import "@fluid-ds/node-graph/define/node-graph";
 
 const graph = document.querySelector("fluid-node-graph");
 graph.nodeTypes = {
-  start: { label: "Start", input: false, removable: false, outputs: [{ id: "next" }] },
-  task: { label: "Task", outputs: [{ id: "done", label: "Done", tone: "success" }, { id: "failed", label: "Failed", tone: "danger" }], height: 116 },
+  start: {
+    label: "Start",
+    input: false,
+    removable: false,
+    outputs: [{ id: "next" }]
+  },
+  task: {
+    label: "Task",
+    outputs: [
+      { id: "done", label: "Done", tone: "success" },
+      { id: "failed", label: "Failed", tone: "danger" }
+    ],
+    height: 116
+  },
   end: { label: "End", outputs: [] }
 };
 graph.nodes = [

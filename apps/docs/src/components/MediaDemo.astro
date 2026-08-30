@@ -1,0 +1,146 @@
+---
+/**
+ * Live demo for the media page, fully self-contained: `<fluid-audio>` plays a
+ * short chime that is synthesized in the browser (a WAV built in an
+ * ArrayBuffer and handed over as a blob URL, so no media file is shipped),
+ * and `<fluid-zoomable-frame>` pans and zooms an inline SVG illustration.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="me-demo" data-me-demo>
+    <div class="me-block">
+      <span class="me-label">
+        <code>&lt;fluid-audio&gt;</code>: a chime synthesized in your browser, nothing downloaded
+      </span>
+      <fluid-audio data-me-audio label="Synthesized chime"></fluid-audio>
+    </div>
+    <div class="me-block">
+      <span class="me-label">
+        <code>&lt;fluid-zoomable-frame&gt;</code>: wheel, drag, or use the buttons
+      </span>
+      <fluid-zoomable-frame class="me-frame">
+        <svg class="me-art" viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract wave illustration">
+          <defs>
+            <linearGradient id="me-sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="var(--fluid-surface-muted, #e2e8f0)"></stop>
+              <stop offset="1" stop-color="var(--fluid-surface-base, #f8fafc)"></stop>
+            </linearGradient>
+            <linearGradient id="me-wave" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="var(--fluid-accent-base, #6366f1)"></stop>
+              <stop offset="1" stop-color="var(--fluid-info-base, #0ea5e9)"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="640" height="300" fill="url(#me-sky)"></rect>
+          <circle cx="520" cy="70" r="34" fill="var(--fluid-warning-base, #f59e0b)" opacity="0.85"></circle>
+          <path d="M0 190 C 110 130 200 250 320 190 S 530 130 640 190 V 300 H 0 Z" fill="url(#me-wave)" opacity="0.45"></path>
+          <path d="M0 220 C 120 160 230 280 360 220 S 560 160 640 220 V 300 H 0 Z" fill="url(#me-wave)" opacity="0.7"></path>
+          <path d="M0 250 C 140 200 260 300 400 250 S 580 205 640 250 V 300 H 0 Z" fill="url(#me-wave)"></path>
+          <text x="32" y="64" font-family="var(--fluid-font-family-sans, sans-serif)" font-size="34" font-weight="700" fill="var(--fluid-text-primary, #0f172a)">Fluid</text>
+          <text x="32" y="92" font-family="var(--fluid-font-family-sans, sans-serif)" font-size="15" fill="var(--fluid-text-secondary, #475569)">Zoom in to inspect the curves</text>
+        </svg>
+      </fluid-zoomable-frame>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .me-demo {
+    inline-size: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .me-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-inline-size: 0;
+  }
+  .me-label {
+    font-size: var(--fluid-font-size-sm, 0.875rem);
+    font-weight: 500;
+    color: var(--fluid-text-secondary);
+  }
+  .me-frame {
+    display: block;
+    border: 1px solid var(--fluid-border-default);
+    border-radius: var(--fluid-radius-md, 8px);
+    overflow: hidden;
+    background: var(--fluid-surface-base);
+  }
+  .me-art {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/media/define/audio";
+  import "@fluid-ds/media/define/zoomable-frame";
+
+  interface AudioLike extends HTMLElement {
+    src: string;
+  }
+
+  /**
+   * Build a short two-second chime (a C major arpeggio with a soft decay)
+   * as a 16-bit mono WAV, entirely in memory.
+   */
+  function chimeWavUrl(): string {
+    const rate = 22050;
+    const seconds = 2.6;
+    const total = Math.floor(rate * seconds);
+    const samples = new Float32Array(total);
+    const notes = [
+      { freq: 523.25, at: 0 },
+      { freq: 659.25, at: 0.35 },
+      { freq: 783.99, at: 0.7 },
+      { freq: 1046.5, at: 1.05 }
+    ];
+    for (const note of notes) {
+      const start = Math.floor(note.at * rate);
+      for (let i = start; i < total; i += 1) {
+        const t = (i - start) / rate;
+        const envelope = Math.exp(-2.4 * t);
+        samples[i] =
+          (samples[i] ?? 0) +
+          Math.sin(2 * Math.PI * note.freq * t) * envelope * 0.2 +
+          Math.sin(2 * Math.PI * note.freq * 2 * t) * envelope * 0.045;
+      }
+    }
+    const buffer = new ArrayBuffer(44 + total * 2);
+    const view = new DataView(buffer);
+    const writeAscii = (offset: number, text: string): void => {
+      for (let i = 0; i < text.length; i += 1) view.setUint8(offset + i, text.charCodeAt(i));
+    };
+    writeAscii(0, "RIFF");
+    view.setUint32(4, 36 + total * 2, true);
+    writeAscii(8, "WAVE");
+    writeAscii(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, rate, true);
+    view.setUint32(28, rate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeAscii(36, "data");
+    view.setUint32(40, total * 2, true);
+    for (let i = 0; i < total; i += 1) {
+      const clamped = Math.max(-1, Math.min(1, samples[i] ?? 0));
+      view.setInt16(44 + i * 2, Math.round(clamped * 32767), true);
+    }
+    return URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
+  }
+
+  function setup(root: HTMLElement): void {
+    const player = root.querySelector<AudioLike>("[data-me-audio]");
+    if (!player) return;
+    player.src = chimeWavUrl();
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-me-demo]")) setup(root);
+</script>

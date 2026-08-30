@@ -10,21 +10,14 @@ import type { FluidField } from "../field/fluid-field.js";
 
 type Args = Pick<
   FluidMaskedInput,
-  | "mask"
-  | "size"
-  | "placeholder"
-  | "value"
-  | "disabled"
-  | "readonly"
-  | "required"
-  | "autocomplete"
+  "mask" | "size" | "placeholder" | "value" | "disabled" | "readonly" | "required" | "autocomplete"
 > & { label: string };
 
 const meta: Meta<Args> = {
   title: "Components/Forms/Masked input",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   argTypes: {
     mask: { control: "text" },

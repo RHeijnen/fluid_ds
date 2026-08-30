@@ -48,6 +48,19 @@ export class FluidSparkline extends LitElement {
     this.draw();
   }
 
+  /**
+   * Re-read the Fluid tokens in scope and repaint. Needed when theming writes
+   * CSS custom properties onto an ancestor rather than flipping a document
+   * attribute; see `fluid-chart.refresh()`.
+   */
+  refresh(): void {
+    // draw() constructs a new Chart on this canvas, so the existing instance
+    // must be released first; reusing an occupied canvas throws.
+    this.chart?.destroy();
+    this.chart = null;
+    this.draw();
+  }
+
   protected override updated(changed: PropertyValues<this>): void {
     if (changed.has("values") || changed.has("noFill")) {
       if (this.chart) {

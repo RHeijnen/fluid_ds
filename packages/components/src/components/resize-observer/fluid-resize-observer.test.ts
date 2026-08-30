@@ -9,8 +9,7 @@ type Internals = {
   box: ResizeObserverBoxOptions;
 };
 
-const peek = (el: FluidResizeObserver): Internals =>
-  el as unknown as Internals;
+const peek = (el: FluidResizeObserver): Internals => el as unknown as Internals;
 
 describe("<fluid-resize-observer>", () => {
   it("passes an a11y audit without changing slotted semantics", async () => {
@@ -115,12 +114,8 @@ describe("<fluid-resize-observer>", () => {
       await el.updateComplete;
       expect(captured).to.be.a("function");
 
-      const entries = [
-        { contentRect: { width: 100, height: 50 } } as ResizeObserverEntry
-      ];
-      setTimeout(() =>
-        captured!(entries, {} as ResizeObserver)
-      );
+      const entries = [{ contentRect: { width: 100, height: 50 } } as ResizeObserverEntry];
+      setTimeout(() => captured!(entries, {} as ResizeObserver));
 
       const ev = await oneEvent(el, "fluid-resize");
       expect(ev).to.exist;

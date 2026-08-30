@@ -30,7 +30,9 @@ describe("<fluid-truncate>", () => {
   ] as const) {
     it(`reactively translates both disclosure labels for ${locale}`, async () => {
       const wrapper = await fixture<HTMLDivElement>(html`
-        <div lang="en"><fluid-truncate expanded lines="1" style="width:120px">${long}</fluid-truncate></div>
+        <div lang="en">
+          <fluid-truncate expanded lines="1" style="width:120px">${long}</fluid-truncate>
+        </div>
       `);
       const control = wrapper.querySelector<FluidTruncate>("fluid-truncate")!;
       await settle(control);
@@ -55,7 +57,14 @@ describe("<fluid-truncate>", () => {
   it("preserves explicit label overrides and resumes translation after attributes are removed", async () => {
     const wrapper = await fixture<HTMLDivElement>(html`
       <div lang="nl">
-        <fluid-truncate expanded lines="1" style="width:120px" more-label="Expand story" less-label="Collapse story">${long}</fluid-truncate>
+        <fluid-truncate
+          expanded
+          lines="1"
+          style="width:120px"
+          more-label="Expand story"
+          less-label="Collapse story"
+          >${long}</fluid-truncate
+        >
       </div>
     `);
     const control = wrapper.querySelector<FluidTruncate>("fluid-truncate")!;
@@ -64,13 +73,17 @@ describe("<fluid-truncate>", () => {
     await settle(control);
     expect(control.moreLabel).to.equal("Expand story");
     expect(control.lessLabel).to.equal("Collapse story");
-    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Collapse story");
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal(
+      "Collapse story"
+    );
     control.removeAttribute("more-label");
     control.removeAttribute("less-label");
     await settle(control);
     expect(control.moreLabel).to.equal("Mehr anzeigen");
     expect(control.lessLabel).to.equal("Weniger anzeigen");
-    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Weniger anzeigen");
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal(
+      "Weniger anzeigen"
+    );
     control.moreLabel = "Show more";
     wrapper.lang = "ar";
     await settle(control);
@@ -89,7 +102,9 @@ describe("<fluid-truncate>", () => {
     wrapper.append(control);
     root.append(wrapper);
     await settle(control);
-    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("Minder tonen");
+    expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal(
+      "Minder tonen"
+    );
     wrapper.lang = "ar";
     await settle(control);
     expect(control.shadowRoot!.querySelector(".toggle")!.textContent?.trim()).to.equal("عرض أقل");

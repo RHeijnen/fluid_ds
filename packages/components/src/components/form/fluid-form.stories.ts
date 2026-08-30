@@ -22,7 +22,7 @@ const onInvalid = (e: Event) => {
 const meta: Meta<Args> = {
   title: "Components/Forms/Form",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     novalidate: { control: "boolean" }
   },

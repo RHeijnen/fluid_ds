@@ -200,7 +200,7 @@ export class FluidSegmentedControl extends FluidElement {
     const base = this.baseEl;
     const thumb = this.thumbEl;
     if (!base || !thumb) return;
-    const seg = this.getSegments().find((s) => s.value === this.value);
+    const seg = this.getSegments().find((s) => this.segmentValue(s) === this.value);
     if (!seg) {
       thumb.classList.remove("ready");
       return;
@@ -223,14 +223,51 @@ export class FluidSegmentedControl extends FluidElement {
     return Array.from(this.querySelectorAll("fluid-segment")) as FluidSegment[];
   }
 
+  /**
+   * Markup parsed into a CONNECTED container upgrades in tree order: the
+   * group's callbacks can run while its `fluid-segment` children exist but
+   * are not upgraded yet, so their Lit accessors (`value` / `disabled`) are
+   * still missing. Read through to the attributes in that window so a
+   * not-yet-upgraded segment still matches the authored value.
+   */
+  private segmentValue(segment: FluidSegment): string {
+    const value = (segment as { value?: unknown }).value;
+    return typeof value === "string" ? value : (segment.getAttribute("value") ?? "");
+  }
+
+  private segmentDisabled(segment: FluidSegment): boolean {
+    const disabled = (segment as { disabled?: unknown }).disabled;
+    return typeof disabled === "boolean" ? disabled : segment.hasAttribute("disabled");
+  }
+
+  /**
+   * The last `value` that actually resolved to a segment. A value that has
+   * never resolved is treated as "its segment has not arrived yet" (the
+   * document parser streams children in after the group upgrades) and is
+   * preserved, while a previously resolved value whose segment disappears
+   * falls back like before.
+   */
+  private lastResolvedValue?: string;
+
   private syncSelection(): void {
     const segments = this.getSegments();
-    const selected = segments.find((segment) => segment.value === this.value && !segment.disabled);
-    if (!selected) {
-      this.value = segments.find((segment) => !segment.disabled)?.value ?? "";
+    // The group can upgrade before its children are inserted; there is
+    // nothing to reconcile yet, and slotchange re-runs this once they land.
+    if (!segments.length) return;
+    const candidate = segments.find((segment) => this.segmentValue(segment) === this.value);
+    if (candidate && !this.segmentDisabled(candidate)) {
+      this.lastResolvedValue = this.value;
+    } else if (candidate || this.value === "" || this.lastResolvedValue === this.value) {
+      // The value points at a disabled segment, no value was authored, or the
+      // previously selected segment disappeared: fall back to the first
+      // enabled segment (auto-seeding stays silent via `userInitiated`).
+      const firstEnabled = segments.find((segment) => !this.segmentDisabled(segment));
+      this.value = firstEnabled ? this.segmentValue(firstEnabled) : "";
     }
+    // else: an authored value whose segment has not arrived yet; keep it and
+    // render no selection until the segment shows up.
     for (const seg of segments) {
-      seg.selected = !seg.disabled && seg.value === this.value;
+      seg.selected = !this.segmentDisabled(seg) && this.segmentValue(seg) === this.value;
     }
   }
 

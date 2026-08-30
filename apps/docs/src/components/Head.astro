@@ -30,8 +30,8 @@ const props = Astro.props as Props;
   Starlight chrome but every embedded <fluid-*> component stayed in
   light mode regardless.
 
-  Also restores the persisted brand preset (default / midnight /
-  corporate) before paint so the first frame matches the user's
+  Also restores the persisted brand preset (any value the header
+  picker offers) before paint so the first frame matches the user's
   last choice rather than flashing through the default brand.
 
   Inline + early so it runs before first paint, avoiding a visible

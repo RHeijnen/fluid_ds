@@ -29,6 +29,7 @@ export type FluidTimelineItemTone = "default" | "info" | "success" | "warning" |
  *
  * @csspart marker - The marker dot.
  * @csspart content - The text column (time + slotted content).
+ * @csspart body - The default-slot wrapper below the time row.
  *
  * @cssproperty --fluid-timeline-item-marker-size - Diameter of the marker dot. Falls back to 0.875rem.
  * @cssproperty --fluid-timeline-item-marker-bg - Marker fill color. Falls back to --fluid-accent-base.
@@ -161,6 +162,14 @@ export class FluidTimelineItem extends FluidElement {
       display: none;
     }
 
+    /* Block wrapper for the default slot. A slot is display:contents, so an
+       unwrapped slot would make every slotted node a flex item of .content,
+       and flex items blockify: inline links would each get their own line. */
+    .body {
+      display: block;
+      min-width: 0;
+    }
+
     ::slotted(*) {
       margin: 0 !important;
     }
@@ -207,7 +216,7 @@ export class FluidTimelineItem extends FluidElement {
           <span class="time ${this.hasTimeSlot ? "" : "empty"}">
             <slot name="time" @slotchange=${this.handleTimeSlotChange}></slot>
           </span>
-          <slot></slot>
+          <div part="body" class="body"><slot></slot></div>
         </div>
       </div>
     `;

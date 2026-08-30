@@ -32,6 +32,7 @@ jump, and keyboard control.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/comparison/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -43,6 +44,7 @@ jump, and keyboard control.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/comparison";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -59,15 +61,14 @@ jump, and keyboard control.
 
 ```html
 <fluid-comparison>
-  <img slot="before" src="/before.jpg" alt="…">
-  <img slot="after"  src="/after.jpg"  alt="…">
+  <img slot="before" src="/before.jpg" alt="…" />
+  <img slot="after" src="/after.jpg" alt="…" />
 </fluid-comparison>
 ```
 
 ### Initial position
 
-`position` is a percentage from the start side (0–100). The default is
-50.
+`position` is a percentage from the start side (0–100). The default is 50.
 
 <Demo>
   <fluid-comparison position="25" style="max-width: 32rem;">
@@ -87,8 +88,8 @@ Override the default chevron icon by slotting your own content into
 
 ```html
 <fluid-comparison>
-  <img slot="before" src="…" alt="…">
-  <img slot="after"  src="…" alt="…">
+  <img slot="before" src="…" alt="…" />
+  <img slot="after" src="…" alt="…" />
   <fluid-icon slot="handle" name="arrow-left-right"></fluid-icon>
 </fluid-comparison>
 ```
@@ -112,6 +113,7 @@ keyboard), with the new percentage on `event.detail.position`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Compare.tsx"
@@ -134,6 +136,7 @@ keyboard), with the new percentage on `event.detail.position`.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Compare.vue"
@@ -149,6 +152,7 @@ keyboard), with the new percentage on `event.detail.position`.
       </fluid-comparison>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="compare.component.ts"
@@ -170,6 +174,7 @@ keyboard), with the new percentage on `event.detail.position`.
       onMove(e: any) { console.log(e.detail.position); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Compare.svelte"
@@ -183,6 +188,7 @@ keyboard), with the new percentage on `event.detail.position`.
       <img slot="after" src="/after.jpg" alt="…" />
     </fluid-comparison>
     ```
+
   </TabItem>
 </Tabs>
 

@@ -6,14 +6,15 @@ description: "Form-associated web components: how Fluid inputs work with <form>,
 import Demo from "../../../components/Demo.astro";
 import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
-Every Fluid form control, `<fluid-input>`, `<fluid-textarea>`,
-`<fluid-checkbox>`, `<fluid-radio>`, `<fluid-switch>`,
-`<fluid-select>`, `<fluid-typeahead>`, `<fluid-slider>`,
-`<fluid-number-input>`, `<fluid-color-picker>`,
-`<fluid-rating>`, `<fluid-file-input>`, is a **form-associated custom
-element**. That means they participate in `<form>` submission, `FormData`,
-`form.elements`, and the browser's validation pipeline the same way
-native `<input>` does. No special wiring, no synthetic form library.
+Every Fluid form control is a **form-associated custom element**: the basics
+(`<fluid-input>`, `<fluid-textarea>`, `<fluid-checkbox>`, `<fluid-radio>`,
+`<fluid-switch>`, `<fluid-select>`), the pickers (date, date range, time,
+color), and the specialised ones (typeahead, slider, range slider, number
+input, masked input, rating, file input, dropzone, tag input, OTP, transfer,
+signature pad). That means they participate in `<form>`
+submission, `FormData`, `form.elements`, and the browser's validation pipeline
+the same way native `<input>` does. No special wiring, no synthetic form
+library.
 
 ## A complete form
 
@@ -23,8 +24,20 @@ as native inputs.
 
 ```html
 <form id="signup">
-  <fluid-input name="email" type="email" required placeholder="you@example.com" aria-label="Email"></fluid-input>
-  <fluid-input name="password" type="password" required minlength="8" aria-label="Password"></fluid-input>
+  <fluid-input
+    name="email"
+    type="email"
+    required
+    placeholder="you@example.com"
+    aria-label="Email"
+  ></fluid-input>
+  <fluid-input
+    name="password"
+    type="password"
+    required
+    minlength="8"
+    aria-label="Password"
+  ></fluid-input>
   <fluid-checkbox name="terms" required>I accept the terms</fluid-checkbox>
   <fluid-button type="submit">Sign up</fluid-button>
 </form>
@@ -49,13 +62,13 @@ because they're forwarded to the inner native input.
 Form controls support every native validation attribute. The DS just
 forwards them, no Fluid-specific syntax to learn.
 
-| Attribute | Works on | Effect |
-| --- | --- | --- |
-| `required` | every input | Empty value fails submission |
-| `minlength` / `maxlength` | text-like inputs | Length bounds |
-| `pattern` | text-like inputs | Regex match |
-| `min` / `max` / `step` | number / slider | Numeric bounds |
-| `type` | `<fluid-input>` | `email`, `url`, `tel`, etc. |
+| Attribute                 | Works on         | Effect                       |
+| ------------------------- | ---------------- | ---------------------------- |
+| `required`                | every input      | Empty value fails submission |
+| `minlength` / `maxlength` | text-like inputs | Length bounds                |
+| `pattern`                 | text-like inputs | Regex match                  |
+| `min` / `max` / `step`    | number / slider  | Numeric bounds               |
+| `type`                    | `<fluid-input>`  | `email`, `url`, `tel`, etc.  |
 
 ### Inline error messages
 
@@ -73,7 +86,7 @@ form.addEventListener(
     const msg = control.validationMessage;
     showInlineError(control, msg);
   },
-  true   // capture, invalid doesn't bubble
+  true // capture, invalid doesn't bubble
 );
 ```
 
@@ -127,6 +140,7 @@ that build on top of `FormData` or controlled inputs:
       </form>
     );
     ```
+
   </TabItem>
   <TabItem label="VeeValidate (Vue)">
     ```vue
@@ -138,17 +152,32 @@ that build on top of `FormData` or controlled inputs:
     ```
   </TabItem>
   <TabItem label="Angular Reactive Forms">
+    Angular binds through a `ControlValueAccessor`, and it ships those only for
+    native controls. Install `@fluid-ds/angular` and import
+    `FLUID_FORM_DIRECTIVES`, then `formControlName` works on Fluid controls
+    directly:
+
     ```ts
+    import { FLUID_FORM_DIRECTIVES } from "@fluid-ds/angular";
+
     @Component({
+      imports: [ReactiveFormsModule, FLUID_FORM_DIRECTIVES],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       template: `
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
           <fluid-input formControlName="email" type="email"></fluid-input>
+          <fluid-switch formControlName="notifications">Notify me</fluid-switch>
           <fluid-button type="submit">Submit</fluid-button>
         </form>
       `
     })
     ```
+
+    Each control's own value type survives the trip, `disabled` follows the
+    form state, and blur marks the control touched. Full setup and the covered
+    element list live in the
+    [Angular section of the framework guide](/guides/frameworks/).
+
   </TabItem>
 </Tabs>
 

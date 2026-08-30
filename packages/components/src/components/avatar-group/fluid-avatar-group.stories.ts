@@ -9,7 +9,7 @@ type Args = Pick<FluidAvatarGroup, "size" | "max" | "label">;
 const meta: Meta<Args> = {
   title: "Components/Content/Avatar group",
   tags: ["autodocs"],
-  parameters: { status: { type: "experimental" } },
+  parameters: { status: { type: "stable" } },
   argTypes: {
     size: {
       control: "inline-radio",
@@ -71,18 +71,9 @@ export const WithImages: Story = {
   args: { max: 4 },
   render: (args) => html`
     <fluid-avatar-group size=${args.size} max=${args.max}>
-      <fluid-avatar
-        label="Ada Lovelace"
-        image="https://i.pravatar.cc/80?img=1"
-      ></fluid-avatar>
-      <fluid-avatar
-        label="Grace Hopper"
-        image="https://i.pravatar.cc/80?img=5"
-      ></fluid-avatar>
-      <fluid-avatar
-        label="Alan Turing"
-        image="https://i.pravatar.cc/80?img=12"
-      ></fluid-avatar>
+      <fluid-avatar label="Ada Lovelace" image="https://i.pravatar.cc/80?img=1"></fluid-avatar>
+      <fluid-avatar label="Grace Hopper" image="https://i.pravatar.cc/80?img=5"></fluid-avatar>
+      <fluid-avatar label="Alan Turing" image="https://i.pravatar.cc/80?img=12"></fluid-avatar>
       <fluid-avatar
         label="Katherine Johnson"
         image="https://i.pravatar.cc/80?img=20"

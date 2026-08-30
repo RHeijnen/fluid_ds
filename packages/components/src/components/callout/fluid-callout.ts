@@ -26,6 +26,7 @@ export type FluidCalloutDismissEvent = CustomEvent<null>;
  * @csspart base - The outer container.
  * @csspart icon - The leading icon wrapper.
  * @csspart body - The body content wrapper.
+ * @csspart content - The default-slot wrapper below the header.
  * @csspart close - The dismiss button.
  *
  * Every styled property reads a component-scoped `--fluid-callout-*` token that
@@ -103,6 +104,15 @@ export class FluidCallout extends FluidElement {
       min-width: 0;
     }
 
+    /* The default slot gets a block wrapper of its own. A slot is
+       display:contents, so an unwrapped slot would make every slotted node a
+       flex item of .body, and flex items blockify: "text <a>link</a> text"
+       would render each link on its own line instead of flowing inline. */
+    .content {
+      display: block;
+      min-width: 0;
+    }
+
     .header {
       font-weight: var(--fluid-font-weight-semibold);
       color: inherit;
@@ -153,7 +163,10 @@ export class FluidCallout extends FluidElement {
     .variant-success {
       background-color: var(--fluid-callout-success-bg, var(--fluid-color-emerald-50));
       color: var(--fluid-callout-success-fg, var(--fluid-color-emerald-900));
-      border-inline-start-color: var(--fluid-callout-success-border, var(--fluid-color-emerald-500));
+      border-inline-start-color: var(
+        --fluid-callout-success-border,
+        var(--fluid-color-emerald-500)
+      );
     }
     .variant-success .icon-slot {
       color: var(--fluid-callout-success-border, var(--fluid-color-emerald-700));
@@ -188,6 +201,24 @@ export class FluidCallout extends FluidElement {
     );
   };
 
+  /* Hide the header row when nothing is slotted into it, otherwise the empty
+     div still occupies a flex row and its gap pushes the body down. */
+  private handleHeaderSlotChange = (event: Event) => {
+    this.updateHeaderEmpty(event.target as HTMLSlotElement);
+  };
+
+  private updateHeaderEmpty(slot: HTMLSlotElement): void {
+    const hasContent = slot
+      .assignedNodes({ flatten: true })
+      .some((node) => node instanceof Element || Boolean(node.textContent?.trim()));
+    slot.parentElement?.classList.toggle("empty", !hasContent);
+  }
+
+  protected override firstUpdated(): void {
+    const slot = this.shadowRoot!.querySelector<HTMLSlotElement>('slot[name="header"]');
+    if (slot) this.updateHeaderEmpty(slot);
+  }
+
   /** Default icon for the variant (used when no slot content is provided). */
   private defaultIconName(): string | null {
     switch (this.variant) {
@@ -217,8 +248,10 @@ export class FluidCallout extends FluidElement {
           </slot>
         </span>
         <div part="body" class="body">
-          <div class="header"><slot name="header"></slot></div>
-          <slot></slot>
+          <div class="header">
+            <slot name="header" @slotchange=${this.handleHeaderSlotChange}></slot>
+          </div>
+          <div part="content" class="content"><slot></slot></div>
         </div>
         ${this.dismissible
           ? html`

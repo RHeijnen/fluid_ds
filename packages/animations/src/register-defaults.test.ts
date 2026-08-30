@@ -15,6 +15,11 @@ const names = [
   "shake",
   "bounce",
   "flash",
+  "wobble",
+  "jello",
+  "heartbeat",
+  "rubber-band",
+  "tada",
   "spin"
 ];
 const registrations: string[] = [];
@@ -29,7 +34,7 @@ before(async () => {
 });
 
 describe("curated animation entry points", () => {
-  it("registers the exact thirteen defaults once, including repeated module imports", async () => {
+  it("registers the exact eighteen defaults once, including repeated module imports", async () => {
     expect(registrations).to.deep.equal(names);
     expect(listAnimations()).to.deep.equal(names);
     await import("./register-defaults.js");

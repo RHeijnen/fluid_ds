@@ -41,7 +41,9 @@ describe("<fluid-animation>", () => {
 
   it("cancels the running animation when removed from the DOM", async () => {
     const el = await fixture<FluidAnimation>(html`
-      <fluid-animation name="spin" duration="1000" iterations="Infinity"><div>hi</div></fluid-animation>
+      <fluid-animation name="spin" duration="1000" iterations="Infinity"
+        ><div>hi</div></fluid-animation
+      >
     `);
     await el.updateComplete;
     const target = el.firstElementChild as HTMLElement;
@@ -80,7 +82,9 @@ describe("<fluid-animation>", () => {
 
     it("does not start an indefinite animation under reduced motion", async () => {
       const el = await fixture<FluidAnimation>(html`
-        <fluid-animation name="spin" duration="1000" iterations="Infinity"><div>hi</div></fluid-animation>
+        <fluid-animation name="spin" duration="1000" iterations="Infinity"
+          ><div>hi</div></fluid-animation
+        >
       `);
       await el.updateComplete;
       const target = el.firstElementChild as HTMLElement;

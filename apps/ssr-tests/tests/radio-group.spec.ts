@@ -92,7 +92,10 @@ for (const mode of ["client", "dsd"] as const) {
       await expect(express).toBeFocused();
       expect(
         await field.evaluate((host) => {
-          const group = host as HTMLElement & { validity: ValidityState; validationMessage: string };
+          const group = host as HTMLElement & {
+            validity: ValidityState;
+            validationMessage: string;
+          };
           return [group.validity.customError, group.validationMessage];
         })
       ).toEqual([true, "Application correction"]);
@@ -145,7 +148,9 @@ for (const mode of ["client", "dsd"] as const) {
       await page.evaluate(() => window.formFocusFixture.assertServerNodes());
       await express.click();
       await express.evaluate((radio) => radio.setAttribute("disabled", ""));
-      await expect.poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value)).toBe("");
+      await expect
+        .poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value))
+        .toBe("");
       expect(
         await page
           .locator("#native-form")
@@ -154,7 +159,9 @@ for (const mode of ["client", "dsd"] as const) {
       await expect(standard).toHaveAttribute("tabindex", "0");
       await standard.click();
       await standard.evaluate((radio) => radio.remove());
-      await expect.poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value)).toBe("");
+      await expect
+        .poll(() => field.evaluate((host) => (host as HTMLElement & { value: string }).value))
+        .toBe("");
       await page.locator("#field-shell").evaluate((fieldset) => {
         (fieldset as HTMLFieldSetElement).disabled = true;
       });

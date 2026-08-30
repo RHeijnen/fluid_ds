@@ -1,0 +1,235 @@
+---
+/**
+ * Live demo for the table expansion page: a fluid-infinite-table over a
+ * deterministic generated fleet of 500 deployments. It demonstrates
+ * container-scroll windowing (only a small window of rows exists in the
+ * DOM), header sorting, the column manager, and the infinite-load
+ * sentinel appending further pages of generated data.
+ *
+ * There is no looping animation: everything moves only when the visitor
+ * scrolls, sorts, or loads more. The DOM-row readout refreshes on a
+ * cheap timer that runs only while the demo is on screen.
+ */
+import Demo from "./Demo.astro";
+---
+
+<Demo>
+  <div class="tbl-demo" data-table-demo>
+    <fluid-infinite-table
+      caption="Simulated deployment fleet"
+      hide-caption
+      configurable
+      scroll-mode="container"
+      row-height="64"
+      row-key="id"
+      style="--fluid-infinite-table-height: 26rem;"></fluid-infinite-table>
+    <p class="tbl-status" data-tbl-status></p>
+  </div>
+</Demo>
+
+<style>
+  .tbl-demo {
+    inline-size: 100%;
+  }
+  .tbl-status {
+    margin: 0.5rem 0 0;
+    font-size: var(--fluid-font-size-xs, 0.75rem);
+    color: var(--fluid-text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  import "@fluid-ds/table/define/infinite-table";
+
+  interface DeployRow {
+    [key: string]: string | number;
+    id: number;
+    service: string;
+    env: string;
+    status: string;
+    latency: number;
+    uptime: number;
+    region: string;
+  }
+
+  interface CellContext {
+    row: DeployRow;
+  }
+
+  interface Column {
+    key: string;
+    label: string;
+    width?: string;
+    sortable?: boolean;
+    align?: "start" | "center" | "end";
+    renderCell?: (context: CellContext) => unknown;
+  }
+
+  interface TableEl extends HTMLElement {
+    columns: Column[];
+    rows: DeployRow[];
+    total: number;
+    hasMore: boolean;
+    loading: boolean;
+  }
+
+  const TOTAL = 500;
+  const FIRST_PAGE = 160;
+  const PAGE = 80;
+  const LOAD_DELAY_MS = 450;
+
+  const SERVICES = [
+    "checkout-api",
+    "search-index",
+    "auth-service",
+    "billing-worker",
+    "cdn-edge",
+    "docs-site",
+    "image-resizer",
+    "webhook-relay"
+  ];
+  const ENVS = ["Production", "Staging", "Preview"];
+  const REGIONS = ["eu-west-1", "us-east-1", "ap-south-1", "us-west-2"];
+
+  /** Deterministic per-row PRNG: the same index always yields the same row. */
+  function mulberry32(seed: number): () => number {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeRow(index: number): DeployRow {
+    const rand = mulberry32(0x51ab1e ^ (index * 7919));
+    const roll = rand();
+    const status = roll < 0.78 ? "Healthy" : roll < 0.93 ? "Degraded" : "Failed";
+    return {
+      id: index + 1,
+      service: `${SERVICES[index % SERVICES.length]}-${String(1 + (index % 9))}`,
+      env: ENVS[Math.floor(rand() * ENVS.length)] ?? "Production",
+      status,
+      latency: Math.round(40 + rand() * 440),
+      uptime: Math.round((97.5 + rand() * 2.5) * 100) / 100,
+      region: REGIONS[Math.floor(rand() * REGIONS.length)] ?? "eu-west-1"
+    };
+  }
+
+  function statusBadge(status: string): HTMLElement {
+    const badge = document.createElement("fluid-badge");
+    const tone = status === "Healthy" ? "success" : status === "Degraded" ? "warning" : "danger";
+    badge.setAttribute("tone", tone);
+    badge.textContent = status;
+    return badge;
+  }
+
+  function setup(root: HTMLElement): void {
+    const table = root.querySelector<TableEl>("fluid-infinite-table");
+    const status = root.querySelector<HTMLElement>("[data-tbl-status]");
+    if (!table || !status) return;
+
+    table.columns = [
+      { key: "service", label: "Service", width: "13rem", sortable: true },
+      { key: "env", label: "Environment", width: "9rem", sortable: true },
+      {
+        key: "status",
+        label: "Status",
+        width: "8.5rem",
+        sortable: true,
+        renderCell: ({ row }: CellContext) => statusBadge(row.status as string)
+      },
+      {
+        key: "latency",
+        label: "P95",
+        width: "6.5rem",
+        sortable: true,
+        align: "end",
+        renderCell: ({ row }: CellContext) => `${row.latency} ms`
+      },
+      {
+        key: "uptime",
+        label: "Uptime",
+        width: "7rem",
+        sortable: true,
+        align: "end",
+        renderCell: ({ row }: CellContext) => `${Number(row.uptime).toFixed(2)}%`
+      },
+      { key: "region", label: "Region", width: "8.5rem", sortable: true }
+    ];
+
+    const loaded: DeployRow[] = [];
+    for (let i = 0; i < FIRST_PAGE; i += 1) loaded.push(makeRow(i));
+    let generated = FIRST_PAGE;
+    let currentSort: { key: string; dir: "asc" | "desc" } | null = null;
+
+    const publish = () => {
+      if (currentSort) {
+        const { key, dir } = currentSort;
+        const sign = dir === "asc" ? 1 : -1;
+        loaded.sort((a, b) => {
+          const av = a[key];
+          const bv = b[key];
+          if (typeof av === "number" && typeof bv === "number") return (av - bv) * sign;
+          return String(av).localeCompare(String(bv)) * sign;
+        });
+      }
+      table.rows = [...loaded];
+      table.total = TOTAL;
+      table.hasMore = generated < TOTAL;
+    };
+
+    publish();
+
+    table.addEventListener("fluid-sort", (event) => {
+      currentSort = (event as CustomEvent<{ key: string; dir: "asc" | "desc" }>).detail;
+      publish();
+    });
+
+    let loadTimer: ReturnType<typeof setTimeout> | undefined;
+    table.addEventListener("fluid-load-more", () => {
+      if (table.loading || generated >= TOTAL) return;
+      table.loading = true;
+      /* A short fake latency so the built-in loading state is visible. */
+      loadTimer = setTimeout(() => {
+        const next = Math.min(TOTAL, generated + PAGE);
+        for (let i = generated; i < next; i += 1) loaded.push(makeRow(i));
+        generated = next;
+        table.loading = false;
+        publish();
+        report();
+      }, LOAD_DELAY_MS);
+    });
+
+    /* Windowing readout: count the rows that actually exist in the DOM. */
+    const report = () => {
+      const rendered = table.shadowRoot?.querySelectorAll('tr[part~="row"]').length ?? 0;
+      status.textContent = `${loaded.length} of ${TOTAL} records loaded, ${rendered} rows in the DOM right now`;
+    };
+
+    let reportTimer: ReturnType<typeof setInterval> | undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((entry) => entry.isIntersecting);
+        if (visible && reportTimer === undefined) {
+          report();
+          reportTimer = setInterval(report, 900);
+        } else if (!visible && reportTimer !== undefined) {
+          clearInterval(reportTimer);
+          reportTimer = undefined;
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(root);
+
+    window.addEventListener("pagehide", () => {
+      if (loadTimer !== undefined) clearTimeout(loadTimer);
+      if (reportTimer !== undefined) clearInterval(reportTimer);
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-table-demo]")) setup(root);
+</script>

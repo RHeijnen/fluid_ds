@@ -132,13 +132,30 @@ describe("controller: imperative play/stop", () => {
         "data-fluid-animation-iterations": value
       });
       try {
-        expect(playElementAnimation(el)!.effect!.getTiming().iterations).to.equal(
-          Infinity
-        );
+        expect(playElementAnimation(el)!.effect!.getTiming().iterations).to.equal(Infinity);
       } finally {
         stopElementAnimation(el);
         el.remove();
       }
+    }
+  });
+
+  it("ignores negative numeric overrides", () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "manual",
+      "data-fluid-animation-duration": "-1",
+      "data-fluid-animation-delay": "-20",
+      "data-fluid-animation-iterations": "-3"
+    });
+    try {
+      const timing = playElementAnimation(el)!.effect!.getTiming();
+      expect(timing.duration).to.equal(200);
+      expect(timing.delay).to.equal(0);
+      expect(timing.iterations).to.equal(1);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
     }
   });
 });
@@ -168,10 +185,7 @@ describe("controller: triggers", () => {
     const el = makeEl({ [ATTR]: FADE }); // default trigger is mount
     try {
       // The MutationObserver picks the element up; wait for the first play.
-      await waitUntil(
-        () => el.getAnimations().length > 0,
-        "mount animation never started"
-      );
+      await waitUntil(() => el.getAnimations().length > 0, "mount animation never started");
       const first = el.getAnimations()[0];
       // Echo the same attribute value: settled guard must prevent a replay.
       el.setAttribute(ATTR, FADE);
@@ -214,6 +228,45 @@ describe("controller: triggers", () => {
     } finally {
       stopElementAnimation(el);
       el.remove();
+    }
+  });
+
+  it("does not keep a stale hover trigger after switching to manual", async () => {
+    const el = makeEl({ [ATTR]: FADE, "data-fluid-animation-trigger": "hover" });
+    try {
+      await aTimeout(0);
+      el.setAttribute("data-fluid-animation-trigger", "manual");
+      await aTimeout(0);
+      el.dispatchEvent(new PointerEvent("pointerenter"));
+      expect(el.getAnimations()).to.have.length(0);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("cancels an infinite animation when its element is removed", async () => {
+    const el = makeEl({ [ATTR]: SPIN });
+    await waitUntil(() => el.getAnimations().length > 0, "spin animation never started");
+    const animation = el.getAnimations()[0]!;
+    el.remove();
+    await aTimeout(0);
+    expect(animation.playState).to.equal("idle");
+  });
+
+  it("can boot an independent shadow root", async () => {
+    const host = document.createElement("div");
+    const shadow = host.attachShadow({ mode: "open" });
+    const el = document.createElement("div");
+    el.setAttribute(ATTR, FADE);
+    shadow.append(el);
+    document.body.append(host);
+    try {
+      startAnimationController(shadow);
+      await waitUntil(() => el.getAnimations().length > 0, "shadow animation never started");
+    } finally {
+      stopElementAnimation(el);
+      host.remove();
     }
   });
 });

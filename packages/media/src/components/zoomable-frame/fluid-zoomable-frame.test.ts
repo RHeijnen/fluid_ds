@@ -83,9 +83,7 @@ describe("<fluid-zoomable-frame>", () => {
     // After removal the listeners must be gone: dispatching does nothing.
     el.dispatchEvent(new WheelEvent("wheel", { deltaY: -100, cancelable: true }));
     el.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 1 }));
-    el.dispatchEvent(
-      new PointerEvent("pointermove", { pointerId: 1, clientX: 50, clientY: 50 })
-    );
+    el.dispatchEvent(new PointerEvent("pointermove", { pointerId: 1, clientX: 50, clientY: 50 }));
     await elementUpdated(el);
 
     expect(el.scale).to.equal(afterRemove);
@@ -96,7 +94,10 @@ describe("<fluid-zoomable-frame>", () => {
     const el = await frame();
     const icon = el.shadowRoot!.querySelector("button svg path")!;
     const event = new PointerEvent("pointerdown", {
-      pointerId: 1, bubbles: true, composed: true, cancelable: true
+      pointerId: 1,
+      bubbles: true,
+      composed: true,
+      cancelable: true
     });
     icon.dispatchEvent(event);
     expect(event.defaultPrevented).to.be.false;
@@ -176,6 +177,8 @@ describe("<fluid-zoomable-frame>", () => {
     el.scale = NaN;
     await elementUpdated(el);
     expect(el.scale).to.equal(2);
-    expect(el.shadowRoot!.querySelector<HTMLElement>(".content")!.style.transform).not.to.contain("NaN");
+    expect(el.shadowRoot!.querySelector<HTMLElement>(".content")!.style.transform).not.to.contain(
+      "NaN"
+    );
   });
 });

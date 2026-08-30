@@ -8,7 +8,6 @@ import ComponentApi from "../../../components/ComponentApi.astro";
 import ConformanceCode from "../../../components/ConformanceCode.astro";
 import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-
 `<fluid-textarea>` is the multi-line companion to
 [`<fluid-input>`](/components/input/), same field shell and focus behavior,
 plus an auto-resize mode that grows the box to fit its content and an inline
@@ -16,7 +15,12 @@ character counter when `maxlength` is set. It's **form-associated** (submits +
 validates like a native `<textarea>`).
 
 <Demo>
-  <fluid-textarea placeholder="Tell us more…" rows="4" aria-label="Notes" style="width:100%;"></fluid-textarea>
+  <fluid-textarea
+    placeholder="Tell us more…"
+    rows="4"
+    aria-label="Notes"
+    style="width:100%;"
+  ></fluid-textarea>
 </Demo>
 
 ## Install
@@ -31,6 +35,7 @@ validates like a native `<textarea>`).
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/textarea/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +47,7 @@ validates like a native `<textarea>`).
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/textarea";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -50,10 +56,17 @@ validates like a native `<textarea>`).
 ### Basic
 
 <Demo>
-  <fluid-textarea placeholder="Tell us more…" rows="4" aria-label="Notes" style="width:100%;"></fluid-textarea>
+  <fluid-textarea
+    placeholder="Tell us more…"
+    rows="4"
+    aria-label="Notes"
+    style="width:100%;"
+  ></fluid-textarea>
 </Demo>
 
-<ConformanceCode code={`<fluid-textarea name="notes" rows="4" placeholder="Tell us more…"></fluid-textarea>`} />
+<ConformanceCode
+  code={`<fluid-textarea name="notes" rows="4" placeholder="Tell us more…"></fluid-textarea>`}
+/>
 
 ### Label and help text
 
@@ -64,14 +77,21 @@ rich label content, error messages, or a required indicator, wrap the control
 in [Field](/components/field/) instead.
 
 <Demo>
-  <fluid-textarea label="Delivery notes" help-text="Anything the courier should know." rows="3" style="width:100%;"></fluid-textarea>
+  <fluid-textarea
+    label="Delivery notes"
+    help-text="Anything the courier should know."
+    rows="3"
+    style="width:100%;"
+  ></fluid-textarea>
 </Demo>
 
-<ConformanceCode code={`<fluid-textarea
+<ConformanceCode
+  code={`<fluid-textarea
   label="Delivery notes"
   help-text="Anything the courier should know."
   rows="3"
-></fluid-textarea>`} />
+></fluid-textarea>`}
+/>
 
 ### Auto-resize
 
@@ -79,10 +99,17 @@ in [Field](/components/field/) instead.
 for chat composers and comment fields.
 
 <Demo>
-  <fluid-textarea resize="auto" placeholder="Type to grow…" aria-label="Auto" style="width:100%;"></fluid-textarea>
+  <fluid-textarea
+    resize="auto"
+    placeholder="Type to grow…"
+    aria-label="Auto"
+    style="width:100%;"
+  ></fluid-textarea>
 </Demo>
 
-<ConformanceCode code={`<fluid-textarea resize="auto" placeholder="Type to grow…"></fluid-textarea>`} />
+<ConformanceCode
+  code={`<fluid-textarea resize="auto" placeholder="Type to grow…"></fluid-textarea>`}
+/>
 
 ### Character counter
 
@@ -91,7 +118,12 @@ Set `maxlength` and the counter appears automatically. It shifts to the
 theme-independent tokens).
 
 <Demo>
-  <fluid-textarea maxlength="140" value="The counter tracks how close you are to the limit." aria-label="Bio" style="width:100%;"></fluid-textarea>
+  <fluid-textarea
+    maxlength="140"
+    value="The counter tracks how close you are to the limit."
+    aria-label="Bio"
+    style="width:100%;"
+  ></fluid-textarea>
 </Demo>
 
 <ConformanceCode code={`<fluid-textarea name="bio" maxlength="140"></fluid-textarea>`} />
@@ -99,12 +131,24 @@ theme-independent tokens).
 ### Disabled & read-only
 
 <Demo>
-  <fluid-textarea disabled value="Disabled" aria-label="Disabled" style="width:100%;"></fluid-textarea>
-  <fluid-textarea readonly value="Read-only content" aria-label="Read-only" style="width:100%; margin-top: var(--fluid-space-3);"></fluid-textarea>
+  <fluid-textarea
+    disabled
+    value="Disabled"
+    aria-label="Disabled"
+    style="width:100%;"
+  ></fluid-textarea>
+  <fluid-textarea
+    readonly
+    value="Read-only content"
+    aria-label="Read-only"
+    style="width:100%; margin-top: var(--fluid-space-3);"
+  ></fluid-textarea>
 </Demo>
 
-<ConformanceCode code={`<fluid-textarea disabled value="Disabled"></fluid-textarea>
-<fluid-textarea readonly value="Read-only content"></fluid-textarea>`} />
+<ConformanceCode
+  code={`<fluid-textarea disabled value="Disabled"></fluid-textarea>
+<fluid-textarea readonly value="Read-only content"></fluid-textarea>`}
+/>
 
 ## Listening for input
 
@@ -122,6 +166,7 @@ Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="MessageField.tsx"
@@ -140,6 +185,7 @@ Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
       return <fluid-textarea ref={ref} aria-label="Message" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="MessageField.vue"
@@ -152,6 +198,7 @@ Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
       <fluid-textarea aria-label="Message" @fluid-input="onInput" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="message-field.component.ts"
@@ -172,6 +219,7 @@ Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
       }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="MessageField.svelte"
@@ -184,6 +232,7 @@ Fires **`fluid-input`** on every keystroke and **`fluid-change`** on commit
 
     <fluid-textarea aria-label="Message" on:fluid-input={onInput} />
     ```
+
   </TabItem>
 </Tabs>
 
@@ -203,7 +252,14 @@ Form-associated: `name` + `value` submit with the form, and native constraints
     style="display:flex; flex-direction:column; gap:0.5rem; max-width: 28rem;"
     onsubmit="event.preventDefault(); this.querySelector('output').textContent = 'Sent ' + (new FormData(this).get('message')||'').length + ' chars';"
   >
-    <fluid-textarea name="message" required minlength="10" rows="4" placeholder="At least 10 characters" aria-label="Message"></fluid-textarea>
+    <fluid-textarea
+      name="message"
+      required
+      minlength="10"
+      rows="4"
+      placeholder="At least 10 characters"
+      aria-label="Message"
+    ></fluid-textarea>
     <div>
       <fluid-button type="submit">Send</fluid-button>
       <output style="font-size:0.875rem; color: var(--fluid-text-secondary); margin-left: 0.5rem;"></output>
@@ -236,8 +292,7 @@ is in the [API tables below](#api).
 ```
 
 <Aside type="tip">
-  Select a textarea in the [Theme builder](/playground/) to tweak these tokens
-  visually.
+  Select a textarea in the [Theme builder](/playground/) to tweak these tokens visually.
 </Aside>
 
 ### Beyond tokens: `::part()`
@@ -248,15 +303,19 @@ counter is `part="counter"`. Reach any of them with
 not covered by a token:
 
 ```css
-fluid-textarea::part(textarea) { min-height: 8rem; }
-fluid-textarea::part(counter) { font-style: italic; }
+fluid-textarea::part(textarea) {
+  min-height: 8rem;
+}
+fluid-textarea::part(counter) {
+  font-style: italic;
+}
 ```
 
 ## When to use
 
 - Multi-line free-form text: comments, messages, descriptions, bios.
 
-### When *not* to use
+### When _not_ to use
 
 - **Single-line text**: use [`<fluid-input>`](/components/input/).
 - **Code editing**: this is a textarea, not a Monaco/CodeMirror replacement;
@@ -303,10 +362,10 @@ Provide an accessible name with `aria-label` or a paired `<label>`
 Ships **WCAG 2.2 AA**; flip the **Conformance** toggle at the top to **AAA**.
 The focus ring reads the conformance token:
 
-| Token | AA | AAA | Criterion |
-| --- | --- | --- | --- |
-| `--fluid-focus-ring-width` | 2px | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
-| `--fluid-target-min` | 24px | 44px | 2.5.8 → 2.5.5 (already satisfied, the field is multi-line) |
+| Token                      | AA   | AAA     | Criterion                                                                                       |
+| -------------------------- | ---- | ------- | ----------------------------------------------------------------------------------------------- |
+| `--fluid-focus-ring-width` | 2px  | **3px** | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) |
+| `--fluid-target-min`       | 24px | 44px    | 2.5.8 → 2.5.5 (already satisfied, the field is multi-line)                                      |
 
 ## API
 

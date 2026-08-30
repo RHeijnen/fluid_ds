@@ -116,7 +116,7 @@ async function main() {
   // read --fluid-target-min / --fluid-focus-ring-width and never branch on
   // conformance themselves. See accessibility/references/conformance-levels.md.
   const aaaOverride =
-    "\n/* Opt-in AAA conformance (data-fluid-conformance=\"aaa\"), deltas only. */\n" +
+    '\n/* Opt-in AAA conformance (data-fluid-conformance="aaa"), deltas only. */\n' +
     '[data-fluid-conformance="aaa"] {\n' +
     "  --fluid-target-min: 44px;\n" +
     "  --fluid-focus-ring-width: 3px;\n" +

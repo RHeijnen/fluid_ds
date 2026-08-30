@@ -27,7 +27,7 @@ const meta: Meta<Args> = {
   title: "Components/Forms/Button",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" },
+    status: { type: "stable" },
     docs: {
       description: {
         component: `Primary interactive element. Wraps a native \`<button>\` inside shadow DOM and adds variants, sizes, icon slots, and the WCAG 2.2 AA guarantees (24×24 minimum target size, focus delegation, aria-label forwarding, reduced-motion honoring).`
@@ -114,6 +114,36 @@ export const Sizes: Story = {
       <fluid-button size="sm">Small</fluid-button>
       <fluid-button size="md">Medium</fluid-button>
       <fluid-button size="lg">Large</fluid-button>
+    </div>
+  `
+};
+
+export const PaddingTokens: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: `\`size\` picks a preset; the padding knobs re-tune whichever preset is active. \`--fluid-button-padding-block\` / \`--fluid-button-padding-inline\` apply to every size, and \`--fluid-button-padding-inline-icon\` covers the icon side of prefix/suffix and icon-only buttons. Set them on any scope (brand wrapper, section, single instance) to grow or shrink all buttons inside without touching \`size\`. Shrinking never defeats the \`--fluid-target-min\` hit-target floor.`
+      }
+    }
+  },
+  render: () => html`
+    <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3);">
+      <div style="display:flex; gap: var(--fluid-space-3); align-items:center;">
+        <fluid-button size="sm">Default sm</fluid-button>
+        <fluid-button size="md">Default md</fluid-button>
+      </div>
+      <div
+        style="display:flex; gap: var(--fluid-space-3); align-items:center; --fluid-button-padding-block: 0.5rem; --fluid-button-padding-inline: 1.5rem;"
+      >
+        <fluid-button size="sm">Roomy sm</fluid-button>
+        <fluid-button size="md">Roomy md</fluid-button>
+      </div>
+      <div
+        style="display:flex; gap: var(--fluid-space-3); align-items:center; --fluid-button-padding-block: 0.1rem; --fluid-button-padding-inline: 0.5rem;"
+      >
+        <fluid-button size="sm">Compact sm</fluid-button>
+        <fluid-button size="md">Compact md</fluid-button>
+      </div>
     </div>
   `
 };
@@ -208,13 +238,15 @@ export const IconOnlyWithoutLabel: Story = {
     }
   },
   render: () => html`
-    <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); align-items:flex-start;">
+    <div
+      style="display:flex; flex-direction:column; gap: var(--fluid-space-3); align-items:flex-start;"
+    >
       <fluid-button>
         <fluid-icon name="plus"></fluid-icon>
       </fluid-button>
       <p style="font-size: 0.85rem; color: var(--fluid-text-secondary); margin: 0;">
-        ↑ Open DevTools console, Fluid warns at dev time when an icon-only
-        button has no accessible name.
+        ↑ Open DevTools console, Fluid warns at dev time when an icon-only button has no accessible
+        name.
       </p>
     </div>
   `
@@ -337,7 +369,9 @@ export const ActionExamples: Story = {
     }
   },
   render: () => html`
-    <div style="display:flex; flex-direction:column; gap: var(--fluid-space-4); align-items:flex-start;">
+    <div
+      style="display:flex; flex-direction:column; gap: var(--fluid-space-4); align-items:flex-start;"
+    >
       <div style="display:flex; gap: var(--fluid-space-2);">
         <fluid-button tone="danger">
           <fluid-icon slot="prefix" name="trash-2"></fluid-icon>
@@ -447,12 +481,16 @@ export const ReducedMotionNote: Story = {
     }
   },
   render: () => html`
-    <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); align-items:flex-start;">
+    <div
+      style="display:flex; flex-direction:column; gap: var(--fluid-space-3); align-items:flex-start;"
+    >
       <fluid-button>Default</fluid-button>
       <fluid-button variant="secondary">Secondary</fluid-button>
-      <p style="font-size: 0.85rem; color: var(--fluid-text-secondary); margin: 0; max-width: 36rem;">
-        Toggle the OS-level "Reduce motion" setting and refresh this story.
-        Animation tokens (durations, easings) collapse to instant via
+      <p
+        style="font-size: 0.85rem; color: var(--fluid-text-secondary); margin: 0; max-width: 36rem;"
+      >
+        Toggle the OS-level "Reduce motion" setting and refresh this story. Animation tokens
+        (durations, easings) collapse to instant via
         <code>@media (prefers-reduced-motion: reduce)</code>.
       </p>
     </div>

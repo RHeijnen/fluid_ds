@@ -58,72 +58,74 @@ export class FluidDetails extends FluidElement {
     motionStyles,
     reducedMotion,
     css`
-    :host {
-      display: block;
-      border-bottom: var(--fluid-details-border-width, 1px) solid
-        var(--fluid-details-border, var(--fluid-border-default));
-    }
+      :host {
+        display: block;
+        border-bottom: var(--fluid-details-border-width, 1px) solid
+          var(--fluid-details-border, var(--fluid-border-default));
+      }
 
-    :host([hidden]) {
-      display: none;
-    }
+      :host([hidden]) {
+        display: none;
+      }
 
-    .summary {
-      all: unset;
-      box-sizing: border-box;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--fluid-space-3);
-      width: 100%;
-      /* SC 2.5.8 Target Size, floor the disclosure button to --fluid-target-min. */
-      min-height: var(--fluid-target-min, 0px);
-      padding: var(--fluid-space-3) 0;
-      cursor: pointer;
-      font-family: var(--fluid-details-font-family, var(--fluid-font-family-sans));
-      font-size: var(--fluid-details-font-size, var(--fluid-font-size-md));
-      font-weight: var(--fluid-font-weight-medium);
-      color: var(--fluid-details-summary-fg, var(--fluid-text-primary));
-    }
+      .summary {
+        all: unset;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--fluid-space-3);
+        width: 100%;
+        /* SC 2.5.8 Target Size, floor the disclosure button to --fluid-target-min. */
+        min-height: var(--fluid-target-min, 0px);
+        padding: var(--fluid-space-3) 0;
+        cursor: pointer;
+        font-family: var(--fluid-details-font-family, var(--fluid-font-family-sans));
+        font-size: var(--fluid-details-font-size, var(--fluid-font-size-md));
+        font-weight: var(--fluid-font-weight-medium);
+        color: var(--fluid-details-summary-fg, var(--fluid-text-primary));
+      }
 
-    .summary:focus-visible {
-      outline: var(--fluid-details-focus-ring-width, var(--fluid-focus-ring-width)) solid
-        var(--fluid-details-focus-ring, var(--fluid-focus-ring-color));
-      outline-offset: var(--fluid-focus-ring-offset);
-      border-radius: var(--fluid-details-radius, var(--fluid-radius-sm));
-    }
+      .summary:focus-visible {
+        outline: var(--fluid-details-focus-ring-width, var(--fluid-focus-ring-width)) solid
+          var(--fluid-details-focus-ring, var(--fluid-focus-ring-color));
+        outline-offset: var(--fluid-focus-ring-offset);
+        border-radius: var(--fluid-details-radius, var(--fluid-radius-sm));
+      }
 
-    :host([disabled]) .summary {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+      :host([disabled]) .summary {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
 
-    .chevron {
-      transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);
-    }
+      .chevron {
+        transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);
+      }
 
-    :host([open]) .chevron {
-      transform: rotate(180deg);
-    }
+      :host([open]) .chevron {
+        transform: rotate(180deg);
+      }
 
-    .body {
-      padding-bottom: var(--fluid-space-4);
-      color: var(--fluid-details-body-fg, var(--fluid-text-secondary));
-    }
+      .body {
+        padding-bottom: var(--fluid-space-4);
+        color: var(--fluid-details-body-fg, var(--fluid-text-secondary));
+      }
 
-    /* Reveal animation when the body is shown. Collapsed content keeps the
+      /* Reveal animation when the body is shown. Collapsed content keeps the
        hidden attribute (display:none) so it stays out of the a11y tree and
        isn't focusable, the animation only plays on expand. */
-    .body:not([hidden]) {
-      animation: var(--fluid-details-enter-animation, fluid-slide-in-down)
-        calc(var(--fluid-details-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1))
-        var(--fluid-easing-decelerate) both;
-    }
+      .body:not([hidden]) {
+        animation: var(--fluid-details-enter-animation, fluid-slide-in-down)
+          calc(
+            var(--fluid-details-enter-duration, var(--fluid-duration-fast)) * var(--fluid-motion, 1)
+          )
+          var(--fluid-easing-decelerate) both;
+      }
 
-    .body[hidden] {
-      display: none;
-    }
-  `
+      .body[hidden] {
+        display: none;
+      }
+    `
   ];
 
   @query(".body") private bodyEl!: HTMLElement;

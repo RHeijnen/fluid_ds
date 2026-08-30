@@ -51,6 +51,7 @@ The 52 remaining exclusions comprise 29 presentational elements and 23 helpers.
 Re-audit if any of these elements adds a native control, actionable role, or
 library-owned user gesture. This audit does not certify the correctness of their
 semantics or the completeness of existing tests.
+
 # Follow-up correction: mosaic
 
 The Section 2 implementation audit found that `fluid-mosaic` has no input

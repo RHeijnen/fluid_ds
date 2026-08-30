@@ -12,7 +12,7 @@ const meta: Meta<Args> = {
   title: "Components/Forms/ButtonGroup",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" },
+    status: { type: "stable" },
     docs: {
       description: {
         component: `Visually fuses a row (or column) of buttons into one shape, toolbars, segmented actions, and **split buttons**. The group only does layout + fusion; it stamps position data-attributes onto its member buttons, and each \`<fluid-button>\` flattens its own interior corners. That indirection is what lets a split button's caret trigger fuse even though it lives inside a \`<fluid-dropdown>\`.`
@@ -95,7 +95,12 @@ export const SplitButtonTones: Story = {
       <fluid-button-group aria-label="Approve options">
         <fluid-button tone="success">Approve</fluid-button>
         <fluid-dropdown placement="bottom-end">
-          <fluid-button slot="trigger" tone="success" caret aria-label="More approve options"></fluid-button>
+          <fluid-button
+            slot="trigger"
+            tone="success"
+            caret
+            aria-label="More approve options"
+          ></fluid-button>
           <fluid-dropdown-item value="approve-comment">Approve with comment…</fluid-dropdown-item>
           <fluid-dropdown-item value="approve-all">Approve all</fluid-dropdown-item>
         </fluid-dropdown>
@@ -104,7 +109,13 @@ export const SplitButtonTones: Story = {
       <fluid-button-group aria-label="Delete options">
         <fluid-button variant="secondary" tone="danger">Delete</fluid-button>
         <fluid-dropdown placement="bottom-end">
-          <fluid-button slot="trigger" variant="secondary" tone="danger" caret aria-label="More delete options"></fluid-button>
+          <fluid-button
+            slot="trigger"
+            variant="secondary"
+            tone="danger"
+            caret
+            aria-label="More delete options"
+          ></fluid-button>
           <fluid-dropdown-item value="delete-archive">Delete &amp; archive</fluid-dropdown-item>
           <fluid-dropdown-item value="delete-permanent">Delete permanently</fluid-dropdown-item>
         </fluid-dropdown>

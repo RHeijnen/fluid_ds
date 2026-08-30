@@ -32,7 +32,9 @@ export function checkDocumentLinks(
     base = "/",
     origin = "https://fluid-web.dev",
     // These routes belong to other outputs of build-website.mjs, not docs/dist.
-    externalAppPrefixes = ["/demos", "/storybook", "/playground", "/wizard"]
+    // /animations.html is the landing's second Vite page (the standalone
+    // animation showcase), emitted at the site root next to the landing.
+    externalAppPrefixes = ["/demos", "/storybook", "/playground", "/wizard", "/animations.html"]
   } = {}
 ) {
   if (!base.startsWith("/") || !base.endsWith("/"))

@@ -13,12 +13,19 @@ elements rendered by any framework.
 ### CDN
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/define/controller.js"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/register-defaults.js"></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/define/controller.js"
+></script>
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/animations@latest/dist/register-defaults.js"
+></script>
 
 <fluid-card
   data-fluid-animation="fade-in"
-  data-fluid-animation-trigger="in-view">
+  data-fluid-animation-trigger="in-view"
+>
   Fades in when scrolled into view.
 </fluid-card>
 ```
@@ -31,7 +38,7 @@ pnpm add @fluid-ds/animations
 
 ```ts
 import "@fluid-ds/animations/define/controller"; // boot the controller
-import "@fluid-ds/animations/register-defaults"; // ~12 common animations
+import "@fluid-ds/animations/register-defaults"; // 18 common animations
 ```
 
 To stay tree-shaken, register only what you use:
@@ -44,20 +51,20 @@ import "@fluid-ds/animations/animations/slide-up";
 
 ## Attributes
 
-| Attribute                            | Purpose                                              | Default      |
-| ------------------------------------ | ---------------------------------------------------- | ------------ |
-| `data-fluid-animation`               | Animation name from the registry                     | required     |
-| `data-fluid-animation-trigger`       | `mount` / `in-view` / `hover` / `click` / `manual`   | `mount`      |
-| `data-fluid-animation-duration`      | Milliseconds                                         | per-anim     |
-| `data-fluid-animation-delay`         | Milliseconds                                         | `0`          |
-| `data-fluid-animation-easing`        | Any CSS easing function                              | per-anim     |
-| `data-fluid-animation-iterations`    | Integer or `infinite`                                | per-anim     |
+| Attribute                         | Purpose                                            | Default  |
+| --------------------------------- | -------------------------------------------------- | -------- |
+| `data-fluid-animation`            | Animation name from the registry                   | required |
+| `data-fluid-animation-trigger`    | `mount` / `in-view` / `hover` / `click` / `manual` | `mount`  |
+| `data-fluid-animation-duration`   | Milliseconds                                       | per-anim |
+| `data-fluid-animation-delay`      | Milliseconds                                       | `0`      |
+| `data-fluid-animation-easing`     | Any CSS easing function                            | per-anim |
+| `data-fluid-animation-iterations` | Integer or `infinite`                              | per-anim |
 
 ## Included defaults
 
 `fade-in`, `fade-out`, `slide-up`, `slide-down`, `slide-left`,
 `slide-right`, `scale-in`, `zoom-in`, `pulse`, `shake`, `bounce`,
-`flash`, `spin`.
+`flash`, `wobble`, `jello`, `heartbeat`, `rubber-band`, `tada`, `spin`.
 
 ## Custom animations
 
@@ -87,34 +94,62 @@ shared by every active burst and driven by a single
 effect is running.
 
 ```ts
-import { confetti, fireworks } from "@fluid-ds/animations/effects";
+import {
+  confetti,
+  fireworks,
+  EFFECT_ORIGIN_PRESETS
+} from "@fluid-ds/animations/effects";
 
 // Fire from the clicked button
 buyButton.addEventListener("click", () => confetti({ origin: buyButton }));
 
-// Two-sided cannons
-confetti({ cannons: true, count: 160 });
+// Launch inward from a reusable pair of corners
+confetti({ sources: EFFECT_ORIGIN_PRESETS["bottom-corners"], count: 160 });
 
 // Fireworks return a handle with a finished promise
 const show = fireworks({ shells: 8 });
 await show.finished;
 ```
 
-Every effect returns `{ stop(): void; finished: Promise<void> }`.
+Every effect returns `{ stop(): void; fizzle(): void; finished: Promise<void> }`.
+
+Every named effect is tree-shakeable from the main entrypoint. Dedicated
+subpath entrypoints are also available when you want import-level isolation to
+be explicit:
+
+```ts
+import { pride } from "@fluid-ds/animations/effects/pride";
+import { EFFECT_ORIGIN_PRESETS } from "@fluid-ds/animations/effects/origins";
+
+pride({ sources: EFFECT_ORIGIN_PRESETS.bottom });
+```
+
+Production-bundle tests cover both import styles for every effect and fail if
+an unrelated effect implementation, gallery catalog, or particle renderer is
+retained.
+
+Burst effects accept either one `origin` or multiple directed `sources`.
+`EFFECT_ORIGIN_PRESETS` includes every individual edge/corner plus
+`top-corners`, `bottom-corners`, and `all-corners`. The older
+`confetti({ cannons: true })` remains as a compatibility alias for
+`bottom-corners`.
 
 ### Effect functions
 
-`confetti`, `fireworks`, `emojiBurst`, `emojiRain`, `snow`, `sparkles`,
-`streamers`, `pulse`, `stars`, `hearts`, `pride`.
+`confetti`, `fireworks`, `emojiBurst`, `emojiRain`, `rain`, `emojiFountain`, `snow`,
+`sparkles`, `streamers`, `pulse`, `stars`, `hearts`, `pride`, `ribbons`,
+`glitter`, `bubbles`, `balloons`, `leaves`, `petals`, `coins`,
+`shootingStars`, `fireflies`, `embers`, `magicTrail`, `dustMotes`, `fog`,
+`butterflies`, `hailstorm`, `shockwaveDebris`, `fireworkFinale`, `successCheck`.
 
 `emojiBurst` / `emojiRain` accept a custom `emojis` array OR `images`
 (an array of loaded `HTMLImageElement` / rasterized SVG) to use as
-particles. `snow`, `sparkles`, and `emojiRain` are ambient: they run
-until you call `stop()` (or pass a `duration`).
+particles. Ambient effects—including `rain`, `snow`, `sparkles`, leaves,
+petals, fireflies, embers, and magic trails—run until you call `stop()` (or
+pass a `duration`).
 
-Colors default to the live Fluid brand accent plus the semantic status
-tones (read from CSS custom properties on the document) and are fully
-overridable via an `colors` array.
+Each effect has a purpose-tuned, brand-independent palette. Pass an explicit
+`colors` array, or `colors: brandColors()`, to follow the live Fluid brand.
 
 ### `<fluid-celebrate>`
 

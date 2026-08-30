@@ -7,8 +7,7 @@ type Internals = {
   observer: MutationObserver | null;
 };
 
-const peek = (el: FluidMutationObserver): Internals =>
-  el as unknown as Internals;
+const peek = (el: FluidMutationObserver): Internals => el as unknown as Internals;
 
 describe("<fluid-mutation-observer>", () => {
   it("passes an a11y audit without changing slotted semantics", async () => {

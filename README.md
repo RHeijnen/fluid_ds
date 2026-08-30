@@ -271,8 +271,8 @@ file is the source of truth for "what's queued next."
 
 - **npm:** [`@fluid-ds/components`][npm] and the rest of the `@fluid-ds/*` scope.
 - **Source:** [github.com/RHeijnen/fluid_ds](https://github.com/RHeijnen/fluid_ds)
-- **Author:** [René Heijnen — rheijnen.github.io][portfolio]
-- **Website:** [fluid-web.dev](https://fluid-web.dev) — docs + theme builder +
+- **Author:** [René Heijnen (rheijnen.github.io)][portfolio]
+- **Website:** [fluid-web.dev](https://fluid-web.dev): docs + theme builder +
   Storybook + demos, one deploy.
 
 ---

@@ -299,7 +299,8 @@ export class FluidContextMenu extends FluidElement {
     this.setTriggerAttribute("aria-expanded", "false");
     // Return focus to the trigger (or whatever held it) on close.
     const wasOpen = this.surfaceWasOpen;
-    const restore = wasOpen && this.restoreFocusOnClose ? this.previouslyFocused ?? this.trigger : null;
+    const restore =
+      wasOpen && this.restoreFocusOnClose ? (this.previouslyFocused ?? this.trigger) : null;
     this.surfaceWasOpen = false;
     restore?.focus();
     this.previouslyFocused = null;
@@ -369,9 +370,7 @@ export class FluidContextMenu extends FluidElement {
         ${this.items.map((item) =>
           item.divider
             ? html`<fluid-menu-label></fluid-menu-label>`
-            : html`<fluid-menu-item
-                value=${item.value}
-                ?disabled=${item.disabled ?? false}
+            : html`<fluid-menu-item value=${item.value} ?disabled=${item.disabled ?? false}
                 >${item.label}</fluid-menu-item
               >`
         )}
@@ -382,12 +381,7 @@ export class FluidContextMenu extends FluidElement {
   override render(): TemplateResult {
     return html`
       <slot name="trigger" @slotchange=${() => this.attachTrigger()}></slot>
-      <div
-        part="base"
-        class="surface"
-        popover="manual"
-        @fluid-select=${this.handleSelect}
-      >
+      <div part="base" class="surface" popover="manual" @fluid-select=${this.handleSelect}>
         <slot name="menu" @slotchange=${this.handleMenuSlotChange}></slot>
         ${this.hasCustomMenu ? "" : this.renderItems()}
       </div>

@@ -6,11 +6,26 @@ import type { Availability } from "../../internal/availability.js";
 /** A vet clinic: open Mon-Fri (split for lunch), Sat mornings, closed Sun. */
 const vetClinic: Availability = {
   weekly: {
-    1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
-    2: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
-    3: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
-    4: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
-    5: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "16:00" }],
+    1: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
+    2: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
+    3: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
+    4: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
+    5: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "16:00" }
+    ],
     6: [{ start: "09:00", end: "12:00" }]
   },
   slotMinutes: 20,
@@ -22,7 +37,7 @@ const meta: Meta = {
   title: "Scheduler/Scheduler",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   render: () => html`
     <fluid-scheduler
@@ -41,7 +56,11 @@ export const VetClinic: Story = {};
 
 export const TwelveHour: Story = {
   render: () => html`
-    <fluid-scheduler .availability=${vetClinic} time-format="12h" style="max-width: 40rem;"></fluid-scheduler>
+    <fluid-scheduler
+      .availability=${vetClinic}
+      time-format="12h"
+      style="max-width: 40rem;"
+    ></fluid-scheduler>
   `
 };
 
@@ -71,6 +90,10 @@ export const Loading: Story = {
 
 export const Compact: Story = {
   render: () => html`
-    <fluid-scheduler .availability=${vetClinic} size="sm" style="max-width: 34rem;"></fluid-scheduler>
+    <fluid-scheduler
+      .availability=${vetClinic}
+      size="sm"
+      style="max-width: 34rem;"
+    ></fluid-scheduler>
   `
 };

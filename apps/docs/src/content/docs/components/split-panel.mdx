@@ -14,8 +14,15 @@ from the start edge, so it scales as the parent resizes.
 
 <Demo>
   <fluid-split-panel position="40" style="height: 12rem; width: 100%;">
-    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;">Left pane</div>
-    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">Right pane</div>
+    <div
+      slot="start"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;"
+    >
+      Left pane
+    </div>
+    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">
+      Right pane
+    </div>
   </fluid-split-panel>
 </Demo>
 
@@ -31,6 +38,7 @@ from the start edge, so it scales as the parent resizes.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/split-panel/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -42,6 +50,7 @@ from the start edge, so it scales as the parent resizes.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/split-panel";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -51,8 +60,15 @@ from the start edge, so it scales as the parent resizes.
 
 <Demo>
   <fluid-split-panel position="40" style="height: 12rem; width: 100%;">
-    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;">Left pane</div>
-    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">Right pane</div>
+    <div
+      slot="start"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted); height: 100%;"
+    >
+      Left pane
+    </div>
+    <div slot="end" style="padding: var(--fluid-space-3); height: 100%;">
+      Right pane
+    </div>
   </fluid-split-panel>
 </Demo>
 
@@ -67,8 +83,15 @@ from the start edge, so it scales as the parent resizes.
 
 <Demo>
   <fluid-split-panel orientation="vertical" position="50" style="height: 14rem; width: 100%;">
-    <div slot="start" style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);">Top pane</div>
-    <div slot="end" style="padding: var(--fluid-space-3);">Bottom pane</div>
+    <div
+      slot="start"
+      style="padding: var(--fluid-space-3); background: var(--fluid-surface-muted);"
+    >
+      Top pane
+    </div>
+    <div slot="end" style="padding: var(--fluid-space-3);">
+      Bottom pane
+    </div>
   </fluid-split-panel>
 </Demo>
 
@@ -98,6 +121,7 @@ keyboard), with the new percentage on `event.detail.position`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Editor.tsx"
@@ -120,6 +144,7 @@ keyboard), with the new percentage on `event.detail.position`.
       );
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Editor.vue"
@@ -135,6 +160,7 @@ keyboard), with the new percentage on `event.detail.position`.
       </fluid-split-panel>
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="editor.component.ts"
@@ -156,6 +182,7 @@ keyboard), with the new percentage on `event.detail.position`.
       onMove(e: any) { console.log(e.detail.position); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Editor.svelte"
@@ -169,6 +196,7 @@ keyboard), with the new percentage on `event.detail.position`.
       <div slot="end">B</div>
     </fluid-split-panel>
     ```
+
   </TabItem>
 </Tabs>
 

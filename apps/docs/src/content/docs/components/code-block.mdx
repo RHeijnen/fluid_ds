@@ -14,7 +14,10 @@ the HTML with your tool of choice (Shiki, Prism, etc.) and drop it into
 the `highlighted` slot.
 
 <Demo>
-  <fluid-code-block style="width: 100%;" code={`const greet = (name) => \`Hello, \${name}\`;`}></fluid-code-block>
+  <fluid-code-block
+    style="width: 100%;"
+    code={`const greet = (name) => \`Hello, \${name}\`;`}
+  ></fluid-code-block>
 </Demo>
 
 ## Install
@@ -29,6 +32,7 @@ the `highlighted` slot.
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/code-block/define.js">
     </script>
     ```
+
   </TabItem>
   <TabItem label="npm">
     ```bash
@@ -40,6 +44,7 @@ the `highlighted` slot.
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/code-block";
     ```
+
   </TabItem>
 </Tabs>
 
@@ -48,7 +53,10 @@ the `highlighted` slot.
 ### Basic
 
 <Demo>
-  <fluid-code-block style="width: 100%;" code={`const greet = (name) => \`Hello, \${name}\`;`}></fluid-code-block>
+  <fluid-code-block
+    style="width: 100%;"
+    code={`const greet = (name) => \`Hello, \${name}\`;`}
+  ></fluid-code-block>
 </Demo>
 
 ```html
@@ -59,11 +67,7 @@ You can also place the code as slotted text, useful for multi-line
 content that's awkward in an attribute:
 
 ```html
-<fluid-code-block>{`
-  body {
-    color: var(--fluid-text-primary);
-  }
-`}</fluid-code-block>
+<fluid-code-block>{` body { color: var(--fluid-text-primary); } `}</fluid-code-block>
 ```
 
 ### With a language hint
@@ -109,6 +113,7 @@ string on `event.detail.text`.
       });
     </script>
     ```
+
   </TabItem>
   <TabItem label="React">
     ```tsx title="Snippet.tsx"
@@ -126,6 +131,7 @@ string on `event.detail.text`.
       return <fluid-code-block ref={ref} code="npm i @fluid-ds/components" />;
     }
     ```
+
   </TabItem>
   <TabItem label="Vue">
     ```vue title="Snippet.vue"
@@ -138,6 +144,7 @@ string on `event.detail.text`.
       <fluid-code-block code="npm i @fluid-ds/components" @fluid-copy="onCopy" />
     </template>
     ```
+
   </TabItem>
   <TabItem label="Angular">
     ```ts title="snippet.component.ts"
@@ -154,6 +161,7 @@ string on `event.detail.text`.
       onCopy(e: any) { console.log(e.detail.text); }
     }
     ```
+
   </TabItem>
   <TabItem label="Svelte">
     ```svelte title="Snippet.svelte"
@@ -164,6 +172,7 @@ string on `event.detail.text`.
 
     <fluid-code-block code="npm i @fluid-ds/components" on:fluid-copy={onCopy} />
     ```
+
   </TabItem>
 </Tabs>
 

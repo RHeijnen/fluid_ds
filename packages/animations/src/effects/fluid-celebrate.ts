@@ -1,7 +1,7 @@
 /**
  * `<fluid-celebrate>`: a declarative wrapper around the imperative effects
- * API. It renders nothing visible itself (`display: contents`); the effect
- * paints on the shared overlay canvas owned by the engine.
+ * API. It renders as a zero-size transparent inline anchor; the effect paints
+ * on the shared overlay canvas owned by the engine.
  *
  * To keep `@fluid-ds/animations` a zero-dependency package this extends the
  * platform `HTMLElement` rather than `LitElement` / `FluidElement`.
@@ -18,52 +18,38 @@
  * Attributes / properties:
  *   - `effect`     one of the preset names (default `confetti`)
  *   - `auto`       boolean: fire once on connect
- *   - `count`      number, forwarded to the preset
+ *   - numeric tuning attributes such as `count`, `size`, `duration`,
+ *                  `velocity`, `gravity`, `spread`, `rate`, and effect-specific
+ *                  controls (`shells`, `interval`, `particles-per-shell`,
+ *                  `rings`, `radius`)
  *   - `colors`     space- or comma-separated color list, OR set the
  *                  `.colors` JS property to an array
- *   - `origin`     `"self"` (this element), `"x,y"`, or `"rx,ry"` relative
- *   - `cannons`    boolean (confetti / pride)
+ *   - `origin`     `"self"`, `"x,y"`, `"rx,ry"`, or a named edge/corner preset
+ *   - `cannons`    legacy boolean alias for bottom-corner confetti
+ *   - `originTarget` JS-only Element override used by `origin="self"`
  *
  * Emits `fluid-celebrate-end` (bubbles, composed) when the burst finishes.
  */
 
 import {
-  confetti,
-  fireworks,
-  emojiBurst,
-  emojiRain,
-  emojiFountain,
-  bubbles,
-  snow,
-  sparkles,
-  streamers,
-  pulse,
-  stars,
-  hearts,
-  pride,
+  EFFECTS,
+  EFFECT_ORIGIN_PRESETS,
   type EffectHandle,
+  type EffectName,
+  type EffectOriginPreset,
   type Origin
 } from "./index.js";
 
-type EffectFn = (opts: Record<string, unknown>) => EffectHandle;
-
-const PRESETS: Record<string, EffectFn> = {
-  confetti: confetti as EffectFn,
-  fireworks: fireworks as EffectFn,
-  emojiBurst: emojiBurst as EffectFn,
-  "emoji-burst": emojiBurst as EffectFn,
-  emojiRain: emojiRain as EffectFn,
-  "emoji-rain": emojiRain as EffectFn,
-  emojiFountain: emojiFountain as EffectFn,
-  "emoji-fountain": emojiFountain as EffectFn,
-  bubbles: bubbles as EffectFn,
-  snow: snow as EffectFn,
-  sparkles: sparkles as EffectFn,
-  streamers: streamers as EffectFn,
-  pulse: pulse as EffectFn,
-  stars: stars as EffectFn,
-  hearts: hearts as EffectFn,
-  pride: pride as EffectFn
+const EFFECT_ALIASES: Readonly<Record<string, EffectName>> = {
+  "emoji-burst": "emojiBurst",
+  "emoji-rain": "emojiRain",
+  "emoji-fountain": "emojiFountain",
+  "shooting-stars": "shootingStars",
+  "magic-trail": "magicTrail",
+  "dust-motes": "dustMotes",
+  "shockwave-debris": "shockwaveDebris",
+  "firework-finale": "fireworkFinale",
+  "success-check": "successCheck"
 };
 
 // Lit's server shim intentionally does not install a global HTMLElement. The
@@ -84,12 +70,24 @@ export class FluidCelebrate extends HTMLElementBase {
       "shells",
       "rate",
       "duration",
-      "spread"
+      "spread",
+      "velocity",
+      "gravity",
+      "size",
+      "angle",
+      "interval",
+      "particles-per-shell",
+      "rings",
+      "radius"
     ];
   }
 
   /** Color override, settable as a JS property (array) or `colors` attr. */
   colors?: string[];
+
+  /** Optional element used by `origin="self"`. Useful when the transparent
+   * controller sits next to, rather than around, the element being celebrated. */
+  originTarget?: Element;
 
   /** Emoji glyph override (array), settable as a property or the `emojis` attr. */
   #emojis?: string[];
@@ -110,7 +108,13 @@ export class FluidCelebrate extends HTMLElementBase {
   }
 
   connectedCallback(): void {
-    this.style.display = this.style.display || "contents";
+    // A zero-size inline box remains visually transparent but has a meaningful
+    // viewport position. `display: contents` produced a permanent 0,0 rect,
+    // which made `origin="self"` fire from the top-left corner.
+    this.style.display = this.style.display || "inline-block";
+    this.style.inlineSize = this.style.inlineSize || "0";
+    this.style.blockSize = this.style.blockSize || "0";
+    this.style.pointerEvents = this.style.pointerEvents || "none";
     if (this.hasAttribute("auto")) {
       // Defer so layout has settled and any `origin="self"` rect is real.
       requestAnimationFrame(() => {
@@ -168,20 +172,25 @@ export class FluidCelebrate extends HTMLElementBase {
    * the end event is suppressed because it could not reach delegated listeners.
    */
   async fire(): Promise<void> {
-    const fn = PRESETS[this.effect] ?? confetti;
+    const alias = EFFECT_ALIASES[this.effect];
+    const name = alias ?? this.effect;
+    const fn = Object.prototype.hasOwnProperty.call(EFFECTS, name)
+      ? EFFECTS[name as EffectName]
+      : EFFECTS.confetti;
     const opts = this.#readOptions();
     this.stop();
     const handle = fn(opts);
     this.#handle = handle;
     await handle.finished;
-    if (this.#handle === handle) this.#handle = undefined;
+    // A later fire() or stop() superseded this run. Its promise resolves when
+    // canceled, but it must not announce a successful completion.
+    if (this.#handle !== handle) return;
+    this.#handle = undefined;
     // If the element was removed mid-burst (disconnectedCallback -> stop()
     // resolves handle.finished), don't dispatch on a detached node: the event
     // wouldn't bubble to the document and delegated listeners would miss it.
     if (!this.isConnected) return;
-    this.dispatchEvent(
-      new CustomEvent("fluid-celebrate-end", { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent("fluid-celebrate-end", { bubbles: true, composed: true }));
   }
 
   /** Stop the current effect, if any. */
@@ -207,11 +216,34 @@ export class FluidCelebrate extends HTMLElementBase {
     if (duration !== undefined) opts["duration"] = duration;
     const spread = this.#num("spread");
     if (spread !== undefined) opts["spread"] = spread;
+    const velocity = this.#num("velocity");
+    if (velocity !== undefined) opts["velocity"] = velocity;
+    const gravity = this.#num("gravity");
+    if (gravity !== undefined) opts["gravity"] = gravity;
+    const size = this.#num("size");
+    if (size !== undefined) opts["size"] = size;
+    const angle = this.#num("angle");
+    if (angle !== undefined) opts["angle"] = angle;
+    const interval = this.#num("interval");
+    if (interval !== undefined) opts["interval"] = interval;
+    const particlesPerShell = this.#num("particles-per-shell");
+    if (particlesPerShell !== undefined) opts["particlesPerShell"] = particlesPerShell;
+    const rings = this.#num("rings");
+    if (rings !== undefined) opts["rings"] = rings;
+    const radius = this.#num("radius");
+    if (radius !== undefined) opts["radius"] = radius;
 
     if (this.hasAttribute("cannons")) opts["cannons"] = true;
 
-    const origin = this.#readOrigin();
-    if (origin !== undefined) opts["origin"] = origin;
+    const originRaw = this.getAttribute("origin");
+    if (originRaw && Object.prototype.hasOwnProperty.call(EFFECT_ORIGIN_PRESETS, originRaw)) {
+      const sources = EFFECT_ORIGIN_PRESETS[originRaw as EffectOriginPreset];
+      opts["sources"] = sources;
+      if (sources[0]) opts["origin"] = sources[0].origin;
+    } else {
+      const origin = this.#readOrigin();
+      if (origin !== undefined) opts["origin"] = origin;
+    }
 
     return opts;
   }
@@ -219,7 +251,7 @@ export class FluidCelebrate extends HTMLElementBase {
   #readOrigin(): Origin | undefined {
     const raw = this.getAttribute("origin");
     if (raw === null) return undefined;
-    if (raw === "self") return this;
+    if (raw === "self") return this.originTarget ?? this;
     const parts = raw.split(",").map((s) => Number(s.trim()));
     if (parts.length === 2 && parts.every((n) => Number.isFinite(n))) {
       const [a, b] = parts as [number, number];
@@ -232,10 +264,20 @@ export class FluidCelebrate extends HTMLElementBase {
 
   #parseColors(raw: string | null): string[] | undefined {
     if (!raw) return undefined;
-    const list = raw
-      .split(/[,\s]+/)
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const list: string[] = [];
+    let token = "";
+    let depth = 0;
+    for (const char of raw.trim()) {
+      if (char === "(") depth += 1;
+      else if (char === ")") depth = Math.max(0, depth - 1);
+      if ((char === "," || /\s/.test(char)) && depth === 0) {
+        if (token.trim()) list.push(token.trim());
+        token = "";
+      } else {
+        token += char;
+      }
+    }
+    if (token.trim()) list.push(token.trim());
     return list.length ? list : undefined;
   }
 

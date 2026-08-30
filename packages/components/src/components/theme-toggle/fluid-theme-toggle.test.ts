@@ -86,9 +86,7 @@ describe("<fluid-theme-toggle>", () => {
 
   it("passes a11y audit", async () => {
     const el = await fixture(html`
-      <div
-        style="${A11Y_VARS}"
-      >
+      <div style="${A11Y_VARS}">
         <fluid-theme-toggle .brands=${["", "midnight"]}></fluid-theme-toggle>
       </div>
     `);

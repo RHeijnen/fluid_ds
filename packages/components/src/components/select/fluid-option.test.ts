@@ -97,9 +97,7 @@ describe("<fluid-option>", () => {
 
   it("isolates the keyboard-active background", async () => {
     const el = await fixture<FluidOption>(html`
-      <fluid-option active style="--fluid-option-active-bg: rgb(9, 8, 7);"
-        >Apple</fluid-option
-      >
+      <fluid-option active style="--fluid-option-active-bg: rgb(9, 8, 7);">Apple</fluid-option>
     `);
     expect(getComputedStyle(el).backgroundColor).to.equal("rgb(9, 8, 7)");
   });

@@ -6,7 +6,10 @@ import type { Availability } from "../../internal/availability.js";
 
 const seed: Availability = {
   weekly: {
-    1: [{ start: "09:00", end: "12:00" }, { start: "13:00", end: "17:00" }],
+    1: [
+      { start: "09:00", end: "12:00" },
+      { start: "13:00", end: "17:00" }
+    ],
     2: [{ start: "09:00", end: "17:00" }],
     3: [{ start: "09:00", end: "17:00" }],
     4: [{ start: "09:00", end: "17:00" }],
@@ -21,13 +24,14 @@ const meta: Meta = {
   title: "Scheduler/Availability editor",
   tags: ["autodocs"],
   parameters: {
-    status: { type: "experimental" }
+    status: { type: "stable" }
   },
   render: () => html`
     <fluid-availability-editor
       .availability=${seed}
       style="max-width: 40rem;"
-      @fluid-change=${(e: Event) => console.log("availability", (e as CustomEvent).detail.availability)}
+      @fluid-change=${(e: Event) =>
+        console.log("availability", (e as CustomEvent).detail.availability)}
     ></fluid-availability-editor>
   `
 };
@@ -38,7 +42,8 @@ type Story = StoryObj;
 export const Default: Story = {};
 
 export const Empty: Story = {
-  render: () => html`<fluid-availability-editor style="max-width: 40rem;"></fluid-availability-editor>`
+  render: () =>
+    html`<fluid-availability-editor style="max-width: 40rem;"></fluid-availability-editor>`
 };
 
 /** The owner editor wired live to the visitor scheduler: edit hours on the left,
@@ -49,7 +54,9 @@ export const OwnerAndVisitor: Story = {
       <fluid-availability-editor
         .availability=${seed}
         @fluid-change=${(e: Event) => {
-          const sched = document.querySelector<HTMLElement & { availability: Availability }>("#wired-scheduler");
+          const sched = document.querySelector<HTMLElement & { availability: Availability }>(
+            "#wired-scheduler"
+          );
           if (sched) sched.availability = (e as CustomEvent).detail.availability;
         }}
       ></fluid-availability-editor>

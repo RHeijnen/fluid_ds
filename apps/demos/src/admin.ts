@@ -28,14 +28,70 @@ interface User {
 }
 
 const USERS: User[] = [
-  { id: "u1", name: "Iris Chen", email: "iris@example.com", role: "Owner", status: "Active", joined: "2023-04-12" },
-  { id: "u2", name: "Marco Diaz", email: "marco@example.com", role: "Admin", status: "Active", joined: "2023-06-30" },
-  { id: "u3", name: "Aisha Khan", email: "aisha@example.com", role: "Member", status: "Active", joined: "2024-01-14" },
-  { id: "u4", name: "Oliver Pratt", email: "oliver@example.com", role: "Member", status: "Invited", joined: "2024-08-02" },
-  { id: "u5", name: "Soraya Lopes", email: "soraya@example.com", role: "Member", status: "Active", joined: "2024-09-19" },
-  { id: "u6", name: "Henrik Berg", email: "henrik@example.com", role: "Guest", status: "Suspended", joined: "2024-11-03" },
-  { id: "u7", name: "Yuki Tanaka", email: "yuki@example.com", role: "Member", status: "Active", joined: "2025-02-21" },
-  { id: "u8", name: "Daria Ivanov", email: "daria@example.com", role: "Admin", status: "Active", joined: "2025-03-10" }
+  {
+    id: "u1",
+    name: "Iris Chen",
+    email: "iris@example.com",
+    role: "Owner",
+    status: "Active",
+    joined: "2023-04-12"
+  },
+  {
+    id: "u2",
+    name: "Marco Diaz",
+    email: "marco@example.com",
+    role: "Admin",
+    status: "Active",
+    joined: "2023-06-30"
+  },
+  {
+    id: "u3",
+    name: "Aisha Khan",
+    email: "aisha@example.com",
+    role: "Member",
+    status: "Active",
+    joined: "2024-01-14"
+  },
+  {
+    id: "u4",
+    name: "Oliver Pratt",
+    email: "oliver@example.com",
+    role: "Member",
+    status: "Invited",
+    joined: "2024-08-02"
+  },
+  {
+    id: "u5",
+    name: "Soraya Lopes",
+    email: "soraya@example.com",
+    role: "Member",
+    status: "Active",
+    joined: "2024-09-19"
+  },
+  {
+    id: "u6",
+    name: "Henrik Berg",
+    email: "henrik@example.com",
+    role: "Guest",
+    status: "Suspended",
+    joined: "2024-11-03"
+  },
+  {
+    id: "u7",
+    name: "Yuki Tanaka",
+    email: "yuki@example.com",
+    role: "Member",
+    status: "Active",
+    joined: "2025-02-21"
+  },
+  {
+    id: "u8",
+    name: "Daria Ivanov",
+    email: "daria@example.com",
+    role: "Admin",
+    status: "Active",
+    joined: "2025-03-10"
+  }
 ];
 
 const statusVariant: Record<User["status"], string> = {
@@ -216,8 +272,7 @@ main.innerHTML = `
 
 // Wire interactions
 
-const $ = <T extends Element>(sel: string): T | null =>
-  document.querySelector<T>(sel);
+const $ = <T extends Element>(sel: string): T | null => document.querySelector<T>(sel);
 
 const toaster = $<HTMLElement & { toast: (o: { message: string; variant: string }) => void }>(
   "#toaster"
@@ -252,13 +307,10 @@ $<HTMLElement>("#select-all")?.addEventListener("fluid-change", (e) => {
 
 // Live filter, also flips the empty-state visibility.
 function applyFilter(): void {
-  const q = (
-    ($<HTMLElement>("#filter-input") as unknown as { value?: string })?.value ?? ""
-  )
+  const q = (($<HTMLElement>("#filter-input") as unknown as { value?: string })?.value ?? "")
     .toLowerCase()
     .trim();
-  const role =
-    ($<HTMLElement>("#role-filter") as unknown as { value?: string })?.value ?? "";
+  const role = ($<HTMLElement>("#role-filter") as unknown as { value?: string })?.value ?? "";
   let visible = 0;
   document.querySelectorAll<HTMLTableRowElement>("#rows tr").forEach((tr) => {
     const name = (tr.getAttribute("data-name") ?? "").toLowerCase();

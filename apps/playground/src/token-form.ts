@@ -1,13 +1,9 @@
 import { LitElement, html, css, type TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import {
-  groupSemanticTokens,
-  groupUserFacingPrimitives,
-  type TokenEntry
-} from "./manifest.js";
+import { groupSemanticTokens, groupUserFacingPrimitives, type TokenEntry } from "./manifest.js";
 import { themeStore } from "./store.js";
-import { selectionStore, type SelectionState, generateFluidId } from "./selection-store.js";
-import { elementOverridesStore } from "./element-overrides-store.js";
+import { selectionStore, type SelectionState } from "./selection-store.js";
+import { componentOverridesStore } from "./component-overrides-store.js";
 import { entriesFor } from "./component-tokens-map.js";
 import "./controls.js";
 
@@ -211,22 +207,6 @@ export class TokenForm extends LitElement {
       color: var(--fluid-text-secondary);
       background: var(--fluid-surface-muted);
     }
-
-    .isolate-id-row {
-      display: flex;
-      align-items: center;
-      gap: var(--fluid-space-2);
-      margin-top: var(--fluid-space-2);
-    }
-    .isolate-id-label {
-      font-family: var(--fluid-font-family-mono);
-      font-size: var(--fluid-font-size-xs);
-      color: var(--fluid-text-secondary);
-      white-space: nowrap;
-    }
-    .isolate-id-row fluid-input {
-      flex: 1 1 auto;
-    }
   `;
 
   @state() private query = "";
@@ -237,6 +217,13 @@ export class TokenForm extends LitElement {
   private unsubscribeTheme?: () => void;
   private unsubscribeSelection?: () => void;
 
+  /**
+   * Shared-theme diff as it stood when the current element was selected.
+   * Pressing "Isolate" compares against this to find the edits made while
+   * inspecting, and retroactively confines exactly those to the element.
+   */
+  private themeAtSelection: Record<string, string> = themeStore.diff();
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.seedDefaultOpenGroup();
@@ -244,7 +231,9 @@ export class TokenForm extends LitElement {
       this.changeCount = Object.keys(overrides).length;
     });
     this.unsubscribeSelection = selectionStore.subscribe((s) => {
+      const anchoredElChanged = s.selectedEl !== this.selection.selectedEl;
       this.selection = s;
+      if (anchoredElChanged) this.themeAtSelection = themeStore.diff();
       // Selection changed, the list of groups changes too. Prune any open
       // entries that no longer exist, and if nothing's left open, seed the
       // first group of the new view so the user sees something instead of
@@ -304,75 +293,44 @@ export class TokenForm extends LitElement {
 
   private applyIsolate(on: boolean): void {
     const el = this.selection.selectedEl;
-    if (on && el) {
-      // Stamp the element with a stable `data-fluid-id` if it doesn't have
-      // one yet. The id is what the exported CSS rule selects on, so a
-      // friendly slug (e.g. "button-1") is more discoverable than a random
-      // GUID. The user can rename it from the sidebar later.
-      if (!el.hasAttribute("data-fluid-id")) {
-        el.setAttribute("data-fluid-id", generateFluidId(this.selection.selectedTag));
+    const tag = el?.tagName.toLowerCase() ?? this.selection.selectedTag;
+    if (on && tag) {
+      /*
+       * Retroactively confine the session's pending edits to this component:
+       * every shared-theme change made SINCE this component was selected moves
+       * into a `fluid-x { ... }` rule, and the shared theme reverts to its
+       * at-selection value. Visually the rest of the page snaps back and only
+       * this component keeps the change, which is the promise of the button.
+       */
+      const now = themeStore.diff();
+      for (const [cssVar, value] of Object.entries(now)) {
+        if (this.themeAtSelection[cssVar] === value) continue;
+        componentOverridesStore.set(tag, cssVar, value);
+        themeStore.set(cssVar, this.themeAtSelection[cssVar] ?? "");
       }
+      this.themeAtSelection = themeStore.diff();
     }
-    if (!on && el) {
-      // Turning isolate OFF: drop inline overrides, remove the id, and
-      // clear the persistent store entry so the element fully reverts to
-      // the shared theme.
-      const id = el.getAttribute("data-fluid-id");
-      clearElementTokenOverrides(el);
-      if (id) {
-        elementOverridesStore.clearId(id);
-        el.removeAttribute("data-fluid-id");
-      }
+    if (!on && tag) {
+      // Turning isolate OFF: drop the component rule so every instance goes
+      // back to the shared theme.
+      componentOverridesStore.clearTag(tag);
     }
     selectionStore.setIsolate(on);
   }
 
   /**
-   * Rename the data-fluid-id of the selected element. Moves its overrides
-   * in the store and updates the inline attribute so the export selector
-   * keeps matching.
-   */
-  private renameSelectedId = (e: CustomEvent) => {
-    const el = this.selection.selectedEl;
-    if (!el) return;
-    const raw = String(e.detail.value);
-    // The id lands inside a CSS attribute selector, spaces / quotes /
-    // slashes would break it. Slugify before we touch state, then mirror
-    // the sanitized form back into the input so the user sees what's
-    // really being exported.
-    const next = slugifyId(raw);
-    if (!next) return;
-    const prev = el.getAttribute("data-fluid-id");
-    if (!prev || prev === next) {
-      el.setAttribute("data-fluid-id", next);
-      if (raw !== next) this.requestUpdate();
-      return;
-    }
-    // Move overrides in the store under the new key.
-    const map = elementOverridesStore.forId(prev);
-    elementOverridesStore.clearId(prev);
-    for (const [k, v] of Object.entries(map)) elementOverridesStore.set(next, k, v);
-    el.setAttribute("data-fluid-id", next);
-    this.requestUpdate();
-  };
-
-  /**
-   * Build the list of groups to show.
+   * Which token groups the sidebar shows.
    *
-   * The mental model is `$button-color: $primary`:
-   *  - When NOT isolated, editing is supposed to flow through the shared
-   *    palette: `$primary` is the right knob, not `$button-color`. So we
-   *    show **only** the semantic tokens this component reads. Hiding the
-   *    component-own tokens here is intentional, editing them while not
-   *    isolated would write to the shared theme too, which is rarely what
-   *    the user means in this mode.
-   *  - When isolated, the whole point is to give this one instance unique
-   *    values, exactly what the component-own tokens are for. So we show
-   *    **only** the component's own tokens. Editing semantics in isolate
-   *    mode would still cascade globally and miss the point.
+   * No selection: the full primitive + semantic catalog, so the page still
+   * works as a palette editor.
    *
-   * No selection: fall back to the full primitive + semantic catalog so
-   * the page is still useful as a palette editor.
+   * Selected, not isolated: only the semantics this component actually reads.
+   * Editing one of those is a shared-theme change and will move everything
+   * else that reads the same token, which is the intent at this level.
+   *
+   * Selected and isolated: the component's own tokens, plus those same
+   * semantics. Both are written into the component's own rule, so a change
+   * reaches every instance of this component and stops there.
    */
   private buildGroups(): ReturnType<typeof groupUserFacingPrimitives> {
     const tag = this.selection.selectedTag;
@@ -381,34 +339,32 @@ export class TokenForm extends LitElement {
     }
     const entry = entriesFor(tag);
     if (!entry) {
-      // Tag selected but we have no metadata, show everything so the user
-      // isn't stuck.
+      // Tag selected but no metadata for it: show everything rather than
+      // leave the user with an empty panel.
       return [...groupUserFacingPrimitives(), groupSemanticTokens("light")];
     }
     const groups: ReturnType<typeof groupUserFacingPrimitives> = [];
-    if (this.selection.isolate) {
-      // Isolated → component-own only. Each token writes to the element's
-      // inline styles via `<token-control scope="element">`.
-      if (entry.ownTokens.length) {
-        groups.push({
-          key: "component-tokens",
-          label: "This component",
-          tokens: entry.ownTokens.map((ref) => ({
-            path: ref.cssVar.replace(/^--fluid-/, "").split("-"),
-            cssVar: ref.cssVar,
-            type: ref.type as TokenEntry["type"],
-            value: themeStore.get(ref.cssVar) ?? "",
-            userFacing: true,
-            range: ref.range
-          }))
-        });
-      }
-    } else if (entry.usesSemantics.length) {
-      // Not isolated → semantics only, filtered to what this component reads.
+    if (this.selection.isolate && entry.ownTokens.length) {
+      groups.push({
+        key: "component-tokens",
+        label: "This component",
+        tokens: entry.ownTokens.map((ref) => ({
+          path: ref.cssVar.replace(/^--fluid-/, "").split("-"),
+          cssVar: ref.cssVar,
+          type: ref.type as TokenEntry["type"],
+          value: themeStore.get(ref.cssVar) ?? "",
+          userFacing: true,
+          range: ref.range
+        }))
+      });
+    }
+    if (entry.usesSemantics.length) {
       const allSemantic = groupSemanticTokens("light");
       const filteredSemantic = {
         ...allSemantic,
-        label: "Shared tokens this component uses",
+        label: this.selection.isolate
+          ? "Shared tokens, scoped to this component"
+          : "Shared tokens this component uses",
         tokens: allSemantic.tokens.filter((t) => entry.usesSemantics.includes(t.cssVar))
       };
       if (filteredSemantic.tokens.length) groups.push(filteredSemantic);
@@ -426,7 +382,7 @@ export class TokenForm extends LitElement {
     const designModeActive = this.selection.mode === "design";
     const hasSelection = !!this.selection.selectedTag;
     const isolate = this.selection.isolate;
-    const scope = isolate ? "element" : "global";
+    const scope = isolate ? "component" : "global";
 
     return html`
       <div class="search">
@@ -435,31 +391,18 @@ export class TokenForm extends LitElement {
               <div class="selection-banner">
                 <div class="selection-banner-row">
                   <span class="selection-tag">${this.selection.selectedTag}</span>
-                  <button class="clear-selection" @click=${this.clearSelection}>
-                    Show all
-                  </button>
+                  <button class="clear-selection" @click=${this.clearSelection}>Show all</button>
                 </div>
                 ${isolate
                   ? html`
                       <fluid-callout variant="success">
-                        <span slot="header">Isolated to this element</span>
-                        Edits below are written to this one
-                        <strong>${this.selection.selectedTag}</strong> only, every
-                        other instance keeps the shared theme. The export rules
-                        below target <code>data-fluid-id</code>, so drop the same
-                        attribute on the matching element in your app.
+                        <span slot="header"> Scoped to every ${this.selection.selectedTag} </span>
+                        Edits below are written to a
+                        <code>${this.selection.selectedTag}</code> rule, so they reach every
+                        instance of this component and nothing else. The rest of the page keeps the
+                        shared theme. Paste the exported rule into your app and it behaves the same
+                        way.
                       </fluid-callout>
-                      <div class="isolate-id-row">
-                        <span class="isolate-id-label">data-fluid-id</span>
-                        <fluid-input
-                          size="sm"
-                          .value=${this.selection.selectedEl?.getAttribute(
-                            "data-fluid-id"
-                          ) ?? ""}
-                          aria-label="Element id used for the per-instance CSS selector"
-                          @fluid-change=${this.renameSelectedId}
-                        ></fluid-input>
-                      </div>
                       <fluid-button
                         class="isolate-cta"
                         variant="ghost"
@@ -474,9 +417,8 @@ export class TokenForm extends LitElement {
                       <fluid-callout variant="info">
                         <span slot="header">You're editing the shared theme</span>
                         Changes apply to
-                        <strong>every ${this.selection.selectedTag}</strong> and
-                        anything else using these tokens. Want to restyle just this
-                        one instance? Isolate it.
+                        <strong>every ${this.selection.selectedTag}</strong> and anything else using
+                        these tokens. Want to restyle just this one instance? Isolate it.
                       </fluid-callout>
                       <fluid-button
                         class="isolate-cta"
@@ -484,7 +426,7 @@ export class TokenForm extends LitElement {
                         size="sm"
                         @fluid-click=${this.enableIsolate}
                       >
-                        Isolate to this element
+                        Scope changes to this component
                       </fluid-button>
                     `}
               </div>
@@ -504,7 +446,7 @@ export class TokenForm extends LitElement {
             ? html`${total} match${total === 1 ? "" : "es"}`
             : hasSelection
               ? html`${total} token${total === 1 ? "" : "s"} for
-                  ${isolate ? "this element" : "this component"}`
+                ${isolate ? "this element" : "this component"}`
               : designModeActive
                 ? html`Click a component on the right to inspect it.`
                 : html`<strong>${this.changeCount}</strong> override${this.changeCount === 1
@@ -539,7 +481,7 @@ export class TokenForm extends LitElement {
               !hasSelection || !groupRole
                 ? null
                 : isolate
-                  ? { cls: "scope-component", text: "this element only" }
+                  ? { cls: "scope-component", text: "this component only" }
                   : groupRole === "component"
                     ? { cls: "scope-component", text: "this component only" }
                     : { cls: "scope-global", text: "global" };
@@ -553,9 +495,7 @@ export class TokenForm extends LitElement {
                   <span class="group-header-left">
                     <span>${group.label}</span>
                     <span class="count">${group.tokens.length}</span>
-                    ${chip
-                      ? html`<span class="scope-chip ${chip.cls}">${chip.text}</span>`
-                      : ""}
+                    ${chip ? html`<span class="scope-chip ${chip.cls}">${chip.text}</span>` : ""}
                   </span>
                   <fluid-icon class="chevron" name="chevron-down"></fluid-icon>
                 </button>
@@ -563,22 +503,23 @@ export class TokenForm extends LitElement {
                   ? isolate
                     ? html`<div class="scope-note">
                         While isolated, these are written to
-                        <code>${this.selection.selectedTag}</code> only, not other
-                        components.
+                        <code>${this.selection.selectedTag}</code> only, not other components.
                       </div>`
                     : html`<div class="scope-note">
-                        ⚠ These tokens are shared. Editing one will affect every component that reads it.
-                        To scope a change to <code>${this.selection.selectedTag}</code> only, turn on
+                        ⚠ These tokens are shared. Editing one will affect every component that
+                        reads it. To scope a change to
+                        <code>${this.selection.selectedTag}</code> only, turn on
                         <strong>Isolate</strong> above.
                       </div>`
                   : ""}
                 <div class="group-body">
                   ${group.tokens.map(
-                    (token) => html`<token-control
-                      .token=${token}
-                      .scope=${scope}
-                      .element=${this.selection.selectedEl}
-                    ></token-control>`
+                    (token) =>
+                      html`<token-control
+                        .token=${token}
+                        .scope=${scope}
+                        .element=${this.selection.selectedEl}
+                      ></token-control>`
                   )}
                 </div>
               </div>
@@ -586,33 +527,6 @@ export class TokenForm extends LitElement {
           })}
     `;
   }
-}
-
-/** Remove every inline --fluid-* override this tool may have set on an element. */
-function clearElementTokenOverrides(el: HTMLElement): void {
-  const props: string[] = [];
-  for (let i = 0; i < el.style.length; i++) {
-    const prop = el.style[i];
-    if (prop && prop.startsWith("--fluid-")) props.push(prop);
-  }
-  for (const prop of props) el.style.removeProperty(prop);
-}
-
-/**
- * Turn arbitrary user input into a value that is safe inside a CSS
- * attribute selector. Mirrors the conventions designers expect for ids:
- * lowercase, ascii letters/digits/underscore/hyphen, no leading or trailing
- * separator, accents stripped. If the user types "Primary CTA / Mobile"
- * they get back "primary-cta-mobile".
- */
-function slugifyId(raw: string): string {
-  return raw
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // strip diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 declare global {
