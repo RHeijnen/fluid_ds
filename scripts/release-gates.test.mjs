@@ -6,12 +6,13 @@ import { test } from "node:test";
 // Reuse the YAML parser shipped with the declared, pinned ESLint toolchain.
 const require = createRequire(import.meta.url);
 const { load } = createRequire(require.resolve("eslint"))("js-yaml");
-// visual-regression.yml and ssr-hydration.yml are deliberately absent: they
-// run on push through their own triggers but do not gate publishing until
-// they hold a green baseline (see the comment in release.yml).
+// visual-regression.yml is deliberately absent: it runs on push through its
+// own trigger but does not gate publishing until it holds a green baseline
+// (see the comment in release.yml). ssr-hydration rejoined 2026-08-31.
 const lanes = {
   verify: "verify.yml",
   coverage: "coverage.yml",
+  ssr: "ssr-hydration.yml",
   accessibility: "accessibility.yml",
   interactions: "storybook-interactions.yml",
   performance: "performance.yml",
