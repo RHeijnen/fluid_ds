@@ -7,8 +7,10 @@
 # expected / diff images) is uploaded as an artifact and a comment is
 # posted on the PR with the link + instructions to refresh baselines.
 #
-# Baselines are generated on a developer machine via
-# `pnpm test:visual:update` and committed alongside the change.
+# Baselines are captured with `pnpm test:update` inside the same pinned
+# Playwright container this job runs in, clean-verified there, reviewed by
+# the owner, and committed. A capture from any other environment is not
+# comparable and must not be committed.
 
 name: Visual regression
 
@@ -43,6 +45,13 @@ jobs:
   visual:
     name: Snapshot diff
     runs-on: ubuntu-latest
+    # The canonical rendering environment. Baselines are captured and
+    # clean-verified in this exact image (see visual-platform.ts's
+    # attestation); running the diff on the bare runner instead produced
+    # font/raster deltas the baselines can never satisfy. Digest-pinned
+    # like every action; matches the workspace's @playwright/test 1.60.0.
+    container:
+      image: mcr.microsoft.com/playwright@sha256:9bd26ad900bb5e0f4dee75839e957a89ae89c2b7ab1e76050e559790e946b948 # v1.60.0-noble
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -66,10 +75,8 @@ jobs:
       - name: Build Storybook
         run: corepack pnpm --filter @fluid-ds/storybook build
 
-      - name: Install Playwright browsers
-        working-directory: apps/visual-regression
-        run: corepack pnpm exec playwright install --with-deps chromium firefox webkit
-
+      # No browser install step: the pinned Playwright image ships the
+      # browsers for the exact @playwright/test version the lockfile resolves.
       - name: Check visual fixture selection
         working-directory: apps/visual-regression
         run: corepack pnpm run test:fixtures
