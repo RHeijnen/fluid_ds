@@ -33,6 +33,7 @@ import {
   snow,
   butterflies
 } from "@fluid-ds/animations/effects";
+import { gradientArtwork } from "./artwork.js";
 
 const GH = "https://github.com/RHeijnen/fluid_ds";
 
@@ -751,20 +752,21 @@ confetti();</code></pre>
   </section>
 
   <!-- ====================== OPEN SOURCE CTA ====================== -->
+  <!-- Dogfoods fluid-hero: background media with the component's own scrim. -->
   <section class="row cta-row">
-    <fluid-card variant="outline">
-      <div class="cta-inner">
-        <h2 style="margin:0;">Free, open source, and staying that way</h2>
-        <p class="subhead" style="margin:0.5rem auto 1.5rem;">Fluid is MIT licensed: no license fees, no seat pricing, no paid tier. Free for personal and commercial use, now and in the future. Credit is appreciated, never required. Stars, issues, and PRs are welcome.</p>
-        <div class="hero-actions">
-          <a href="${GH}" target="_blank" rel="noopener" class="landing-button">
-            <fluid-icon name="github"></fluid-icon>View on GitHub</a>
-          <a href="https://www.npmjs.com/package/@fluid-ds/components" target="_blank" rel="noopener" class="landing-button secondary">
-            View on npm</a>
-          <a href="/docs/" class="landing-button ghost">Read the docs</a>
-        </div>
+    <fluid-hero align="center" media-position="background" size="lg" class="cta-hero">
+      <span slot="eyebrow">MIT licensed</span>
+      <h2>Free, open source, and staying that way</h2>
+      <p slot="description">Fluid is MIT licensed: no license fees, no seat pricing, no paid tier. Free for personal and commercial use, now and in the future. Credit is appreciated, never required. Stars, issues, and PRs are welcome.</p>
+      <div slot="actions" class="hero-actions">
+        <a href="${GH}" target="_blank" rel="noopener" class="landing-button">
+          <fluid-icon name="github"></fluid-icon>View on GitHub</a>
+        <a href="https://www.npmjs.com/package/@fluid-ds/components" target="_blank" rel="noopener" class="landing-button secondary">
+          View on npm</a>
+        <a href="/docs/" class="landing-button ghost">Read the docs</a>
       </div>
-    </fluid-card>
+      <div slot="media"><img src="${gradientArtwork}" alt=""></div>
+    </fluid-hero>
   </section>
 
   <!-- Guided tour overlay (steps set + opened from JS). -->

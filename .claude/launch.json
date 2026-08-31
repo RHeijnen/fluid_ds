@@ -8,6 +8,12 @@
       "port": 5175
     },
     {
+      "name": "landing-vite",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@fluid-ds/landing", "exec", "vite"],
+      "port": 5175
+    },
+    {
       "name": "playground",
       "runtimeExecutable": "corepack",
       "runtimeArgs": ["pnpm", "--filter", "@fluid-ds/playground", "dev"],

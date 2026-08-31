@@ -1869,11 +1869,13 @@ footer.site-footer a {
 /* ------------------------------------------------------------------ */
 /* CTA + footer */
 
-.cta-row .cta-inner {
-  text-align: center;
-  padding: 1.5rem 1rem;
+/* The closing band: fluid-hero over the gradient artwork, rounded like the
+   page's cards. The component supplies the readable scrim over the media. */
+.cta-hero {
+  border-radius: var(--fluid-radius-lg, 16px);
+  overflow: hidden;
 }
-/* .hero-actions is left-aligned for the hero; the closing card centers it. */
+/* .hero-actions is left-aligned for the hero; the closing band centers it. */
 .cta-row .hero-actions {
   justify-content: center;
 }

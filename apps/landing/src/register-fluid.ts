@@ -45,6 +45,7 @@ import "@fluid-ds/components/define/description-list";
 import "@fluid-ds/components/define/divider";
 import "@fluid-ds/components/define/dropdown";
 import "@fluid-ds/components/define/fold";
+import "@fluid-ds/components/define/hero";
 import "@fluid-ds/components/define/icon";
 import "@fluid-ds/components/define/input";
 import "@fluid-ds/components/define/pagination";
