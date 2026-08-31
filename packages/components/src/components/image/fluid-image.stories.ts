@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/web-components";
 import { html } from "lit";
 import "./define.js";
 import type { FluidImage } from "./fluid-image.js";
+import { offlineLandscapeImage } from "../aspect-ratio/offline-story-fixture.js";
 
 type Args = Pick<
   FluidImage,
@@ -16,8 +17,9 @@ type Args = Pick<
   | "fallback"
 >;
 
-const sample = "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=640&q=80";
-const broken = "https://example.com/this-image-does-not-exist.jpg";
+const sample = offlineLandscapeImage;
+// Invalid image bytes: fails to decode immediately, with no network request.
+const broken = "data:image/png;base64,not-an-image";
 
 const meta: Meta<Args> = {
   title: "Components/Content/Image",

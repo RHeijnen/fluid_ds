@@ -3,6 +3,7 @@ import { html } from "lit";
 import "./define.js";
 import "../button/define.js";
 import "../badge/define.js";
+import { offlineGradientArtwork } from "./offline-story-fixture.js";
 
 const meta: Meta = {
   title: "Components/Layout/Hero",
@@ -32,12 +33,7 @@ export default meta;
 
 type Story = StoryObj;
 
-const media = html`
-  <img
-    src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900"
-    alt="Abstract gradient artwork"
-  />
-`;
+const media = html` <img src=${offlineGradientArtwork} alt="Abstract gradient artwork" /> `;
 
 export const Default: Story = {
   render: (args) => html`
