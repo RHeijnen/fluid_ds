@@ -692,7 +692,19 @@ export class FluidNodeGraph extends FluidElement {
 
   private msg(key: keyof NodeGraphMessages, vars: Record<string, string | number> = {}): string {
     const override = this.messages[this.pluralVariant(key, vars)];
-    if (override !== undefined) return format(override, vars);
+    if (override !== undefined) {
+      // The messages contract promises "numbers arrive already formatted for
+      // the active locale"; interpolate numeric vars through the same
+      // formatter the built-in dictionary path uses, so an override template
+      // renders the same digits (for example Arabic-Indic) as the defaults.
+      const localized = Object.fromEntries(
+        Object.entries(vars).map(([name, value]) => [
+          name,
+          typeof value === "number" ? this.formatNumber(value) : value
+        ])
+      );
+      return format(override, localized);
+    }
     const text = (name: string): string => String(vars[name] ?? "");
     const number = (name: string): string => this.formatNumber(Number(vars[name] ?? 0));
     const count = (): number => Number(vars["count"] ?? 0);
