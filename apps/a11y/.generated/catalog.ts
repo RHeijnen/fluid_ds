@@ -530,8 +530,8 @@ export const catalog = [
   },
   {
     "tag": "fluid-option",
-    "storyId": "components-forms-select--default",
-    "source": "packages/components/src/components/select/fluid-select.stories.ts",
+    "storyId": "components-forms-option--default",
+    "source": "packages/components/src/components/select/fluid-option.stories.ts",
     "setupButtons": []
   },
   {

@@ -626,11 +626,20 @@ describe("fluid-node-graph", () => {
         edgeCountOne: "اتصال واحد"
       };
       await el.updateComplete;
-      const arabicThree = new Intl.NumberFormat("ar", { useGrouping: false }).format(3);
-      expect(hudSegments(el)[0], "3 is not the one category in Arabic").to.equal(
-        `${arabicThree} عقد`
+      // The invariant is "the One key answers exactly when the RUNTIME's
+      // plural rules classify the count as one", so the expectation must be
+      // derived from the same Intl data the component consults. Hardcoding
+      // CLDR ("3 is few in Arabic") breaks on engines shipping reduced ICU:
+      // CI's Linux WebKit classifies 3 as one and the test lied red.
+      const rules = new Intl.PluralRules("ar");
+      const format = (count: number) =>
+        new Intl.NumberFormat("ar", { useGrouping: false }).format(count);
+      expect(hudSegments(el)[0], "node tally must follow the runtime plural category").to.equal(
+        rules.select(3) === "one" ? "عقدة واحدة" : `${format(3)} عقد`
       );
-      expect(hudSegments(el)[2]).to.equal("اتصال واحد");
+      expect(hudSegments(el)[2], "edge tally must follow the runtime plural category").to.equal(
+        rules.select(1) === "one" ? "اتصال واحد" : `${format(1)} اتصالات`
+      );
     });
 
     it("honours intentional empty overrides for the role description and separator", async () => {

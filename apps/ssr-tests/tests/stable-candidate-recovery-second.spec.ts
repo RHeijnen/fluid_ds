@@ -165,7 +165,10 @@ test("Dialog closes with focus return and restores an open modal after reconnect
   await host.locator(".close").click();
   await expect(native).toHaveJSProperty("open", false);
   await expect(opener).toBeFocused();
-  expect(await page.evaluate(() => window.dialogEvents)).toEqual(["show", "hide"]);
+  // dialog.close() flips `open` synchronously but the close event that
+  // produces "hide" is fired from a QUEUED task (HTML spec), so the
+  // event log must be polled, never one-shot read.
+  await expect.poll(() => page.evaluate(() => window.dialogEvents)).toEqual(["show", "hide"]);
 
   await opener.click();
   await expect(native).toHaveJSProperty("open", true);
@@ -180,10 +183,14 @@ test("Dialog closes with focus return and restores an open modal after reconnect
   await expect(native).toHaveJSProperty("open", true);
   expect(await native.evaluate((element) => element.matches(":modal"))).toBe(true);
   await expect(host.locator("#inside-action")).toBeFocused();
-  expect(await page.evaluate(() => window.dialogEvents)).toEqual(["show", "hide", "show"]);
+  await expect
+    .poll(() => page.evaluate(() => window.dialogEvents))
+    .toEqual(["show", "hide", "show"]);
   await host.locator(".close").click();
   await expect(native).toHaveJSProperty("open", false);
-  expect(await page.evaluate(() => window.dialogEvents)).toEqual(["show", "hide", "show", "hide"]);
+  await expect
+    .poll(() => page.evaluate(() => window.dialogEvents))
+    .toEqual(["show", "hide", "show", "hide"]);
   expect(errors).toEqual([]);
 });
 
