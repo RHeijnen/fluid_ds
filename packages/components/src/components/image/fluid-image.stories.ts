@@ -18,8 +18,9 @@ type Args = Pick<
 >;
 
 const sample = offlineLandscapeImage;
-// Invalid image bytes: fails to decode immediately, with no network request.
-const broken = "data:image/png;base64,not-an-image";
+// An image URI with no bytes: fires the error event immediately, with no
+// network request and no console error entry.
+const broken = "data:image/png;base64,";
 
 const meta: Meta<Args> = {
   title: "Components/Content/Image",
