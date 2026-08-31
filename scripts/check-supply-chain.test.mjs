@@ -112,10 +112,10 @@ test("current workflows and locked deployment dependencies pass the audit", asyn
   const result = await auditSupplyChain();
   assert.equal(result.workflowCount, 11);
   assert.equal(result.actionCount, 46);
-  // 8, not 9: visual-regression deliberately left the release graph until
-  // it holds a green baseline (see release.yml). ssr-hydration rejoined
-  // 2026-08-31 after its first green CI run.
-  assert.equal(result.reusableWorkflowCount, 8);
+  // All nine lanes gate the release graph: ssr-hydration and
+  // visual-regression both rejoined 2026-08-31 (visual after the owner
+  // approved the regenerated canonical baseline set).
+  assert.equal(result.reusableWorkflowCount, 9);
   assert.equal(result.packageManager, "pnpm@9.15.0");
   assert.deepEqual(result.failures, []);
 });

@@ -427,18 +427,17 @@ Kept out of the core so the base bundle stays lean:
 
 - ✅ Cross-engine component tests (Chromium / Firefox / WebKit via Playwright +
   web-test-runner).
-- 🔨 Visual-regression infrastructure with real-fixture guards and five modes.
-  The active inventory has 1,009 accepted images and 60 generated candidates;
-  candidate human approval remains unfinished. The old exact-hash history retains
-  1 flaky execution in 86 (1.163%), but the replacement full-catalog machine
-  window passes 50/50 exact runs under the fail-closed, process-attested
-  `--num-raster-threads=1` policy, with zero flaky executions and zero
-  fresh-capture variance. That retained window covers the 60 candidates plus five
-  accepted-smoke images, not the entire accepted set. A partial normal run later
-  observed 18 accepted-baseline diffs before cancellation on a changing tree;
-  human review must reconcile the candidates, stale Chart captures, and accepted
-  AspectRatio/Lightbox/Map pixels changed by hermetic story assets.
-  Story attribution is not a passing screenshot comparison.
+- ✅ Visual regression across the whole catalog, gating releases. The accepted
+  inventory is 1,138 owner-approved baselines (2026-08-31) covering every
+  catalog story in five modes (light, dark, RTL, forced-colors,
+  reduced-motion), captured in the canonical attested Linux environment
+  (fail-closed `--num-raster-threads=1`, fixed clock, seeded random, hermetic
+  local story assets). The approved capture reproduced 1,231/1,231 tests
+  byte-identically on a clean verification rerun, and 946 of the 1,009
+  previously accepted images carried over byte-identical. The
+  `visual-regression` lane rejoined the release graph the same day; all nine
+  lanes now block publishing. Baseline refreshes still require owner
+  approval; a machine capture alone accepts nothing.
 - ✅ `pnpm verify` checks workspace and browser-test types, lint, formatting,
   catalog/presence, generated-output and command-ownership guards, tokens, unit
   tests, packages, Node SSR and built documentation links. Browser coverage is a

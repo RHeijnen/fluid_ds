@@ -6,9 +6,8 @@ import { test } from "node:test";
 // Reuse the YAML parser shipped with the declared, pinned ESLint toolchain.
 const require = createRequire(import.meta.url);
 const { load } = createRequire(require.resolve("eslint"))("js-yaml");
-// visual-regression.yml is deliberately absent: it runs on push through its
-// own trigger but does not gate publishing until it holds a green baseline
-// (see the comment in release.yml). ssr-hydration rejoined 2026-08-31.
+// ssr-hydration rejoined 2026-08-31; visual-regression rejoined 2026-08-31
+// after the owner approved the regenerated canonical baseline set.
 const lanes = {
   verify: "verify.yml",
   coverage: "coverage.yml",
@@ -17,7 +16,8 @@ const lanes = {
   interactions: "storybook-interactions.yml",
   performance: "performance.yml",
   packages: "package-contracts.yml",
-  frameworks: "framework-contracts.yml"
+  frameworks: "framework-contracts.yml",
+  visual: "visual-regression.yml"
 };
 const readWorkflow = async (name) =>
   load(await readFile(new URL(`../.github/workflows/${name}`, import.meta.url), "utf8"));
@@ -41,7 +41,13 @@ function assertReleaseGraph(workflow) {
     assert.equal(job.if, undefined);
     assert.equal(job.secrets, undefined);
     assert.ok(!job["continue-on-error"]);
-    assert.equal(job.permissions, undefined);
+    if (id === "visual") {
+      // The visual lane declares a PR-comment job, so its call site must
+      // grant exactly that; the job itself is push-inert (pull_request only).
+      assert.deepEqual(job.permissions, { contents: "read", "pull-requests": "write" });
+    } else {
+      assert.equal(job.permissions, undefined);
+    }
   }
   const publishIndex = release.steps.findIndex((step) =>
     step.uses?.startsWith("changesets/action@")
@@ -82,7 +88,7 @@ function assertReleaseGraph(workflow) {
   );
 }
 
-test("release requires all nine same-commit lanes before publication, including manual dispatch", async () => {
+test("release requires every same-commit lane before publication, including manual dispatch", async () => {
   assertReleaseGraph(await readWorkflow("release.yml"));
 });
 

@@ -25,15 +25,12 @@ jobs:
 
   # Local reusable references and default checkout use this event's exact commit.
   # Manual dispatch runs the same gates; missing push events cannot bypass them.
-  # One suite intentionally does NOT gate publishing yet. It still runs on
-  # every push through its own workflow trigger, so its signal stays
-  # visible; it rejoins this needs-list once it holds a green baseline:
-  #   - visual-regression.yml: the accepted-baseline diff backlog awaits the
-  #     owner's canonical-environment review (baseline refresh policy
-  #     requires human approval; an unreviewable backlog vetoes releases
-  #     without informing them).
   # ssr-hydration.yml rejoined 2026-08-31 after its first-ever green CI run
   # (browser matrix 231/231 on three engines plus the request-time gate).
+  # visual-regression.yml rejoined 2026-08-31 after the owner approved the
+  # full regenerated canonical baseline set (1,138 images, byte-stable on a
+  # clean verification rerun). Its call site grants pull-requests: write for
+  # the PR-comment job it declares; that job never runs on push events.
   verify:
     needs: release-context
     uses: ./.github/workflows/verify.yml
@@ -58,10 +55,27 @@ jobs:
   frameworks:
     needs: release-context
     uses: ./.github/workflows/framework-contracts.yml
+  visual:
+    needs: release-context
+    uses: ./.github/workflows/visual-regression.yml
+    permissions:
+      contents: read
+      pull-requests: write
 
   release:
     name: Changesets, version + publish
-    needs: [verify, coverage, ssr, accessibility, interactions, performance, packages, frameworks]
+    needs:
+      [
+        verify,
+        coverage,
+        ssr,
+        accessibility,
+        interactions,
+        performance,
+        packages,
+        frameworks,
+        visual
+      ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20

@@ -22,14 +22,24 @@ to hand off context when you switch machines.
 >
 > Release-blocking, in order:
 >
-> 1. **Visual regression back into the gate.** Owner reviews the 175
->    accepted-baseline diffs in the canonical environment (policy requires
->    human approval), refreshes baselines, then restores the `visual` lane
->    to release.yml's needs-list (and its entries in the release-graph
->    guard's `lanes` map and the supply-chain `reusableWorkflowCount`).
-> 2. **SSR hydration stabilized and re-gated.** Fix the engine-specific
->    specs: otp focus timing on Chromium, date-range-picker validation and
->    Cancel/Apply on Firefox; then restore the `ssr` lane the same way.
+> 1. **Visual regression back into the gate: DONE (2026-08-31).** The owner
+>    approved a full regenerated canonical capture: 1,138 baselines, whole
+>    catalog, five modes, byte-stable on a clean verification rerun (946 of
+>    1,009 prior images carried over byte-identical; 63 changed from the AA
+>    contrast fixes and hermetic asset swaps; 129 added by the catalog
+>    regeneration; 142 legacy win32 images deleted). Root causes fixed on
+>    the way: `test:update` now regenerates the catalog via `pretest:update`
+>    (it silently used a stale committed catalog before); hero/image/
+>    avatar-group stories now use offline data-URI assets (hero's Unsplash
+>    image caused layout-shift flakes); the broken-image story uses
+>    `data:image/png;base64,` (fires error with no console entry); the
+>    fixture-presence guard now waits for story mount like catalog.spec.
+>    The `visual` lane is back in release.yml (with the pull-requests grant
+>    its comment job declares), the release-graph guard's `lanes` map, and
+>    the supply-chain count/allowlist. All nine lanes now gate publishing.
+> 2. **SSR hydration stabilized and re-gated: DONE (2026-08-31).** First-ever
+>    green CI run (231/231 browser matrix on three engines plus the
+>    request-time gate); `ssr` lane restored the same way.
 > 3. **Prerelease plumbing: DONE (2026-08-31).** The publish step now goes
 >    through `scripts/changeset-publish.mjs`: in changesets pre-mode it
 >    passes no `--tag` (changesets routes to the pre tag itself; an
@@ -62,12 +72,11 @@ to hand off context when you switch machines.
 > 9. AAA contrast track (SC 1.4.6, 7:1): DONE (2026-08-31). Scheme-anchored
 >    `[data-fluid-conformance="aaa"]` overrides per brand and scheme, all
 >    computed (1728 measured pairs, 0 below 7:1, live-browser verified);
->    permanent validator at scripts/token-contrast.test.mjs. THE VALIDATOR
->    ALSO RATCHETS 43 PRE-EXISTING AA GAPS (KNOWN_AA_GAPS): worst is a real
->    bug, titanium dark's grayed tones resolve light-scheme steps
->    (success-active 1.09:1, invisible). Fix those AA gaps in ONE change
->    batched with the visual-baseline review (item 1), since both move
->    pixels; the ratchet fails closed on new gaps and on stale entries.
+>    permanent validator at scripts/token-contrast.test.mjs. The 43
+>    pre-existing AA gaps are ALSO FIXED (2026-08-31, "aa contrast fixes"):
+>    KNOWN_AA_GAPS is now empty and the ratchet fails closed on any new gap
+>    or stale entry. The pixel fallout landed inside the approved visual
+>    baselines (item 1).
 > 10. node-graph localization audit (canvas role description strings) and
 >     representative assistive-technology signoff, flagged in its own docs
 >     as release gates.
@@ -1171,6 +1180,22 @@ Things true across machines (machine-specific quirks go in private memory):
 ---
 
 ## Log
+
+### 2026-08-31: nine-lane gate complete, visual baselines approved
+
+1.0 groundwork landed (test-race fixes, localized node-graph digits,
+release-tag wrapper, verify:release parity). SSR hydration went green in CI
+for the first time and rejoined the release graph. All 43 AA contrast gaps
+fixed (KNOWN_AA_GAPS empty; worst was titanium dark success-active at
+1.09:1, now 14.46:1). The full visual baseline set was regenerated in the
+canonical Docker environment, byte-stable on a clean rerun, owner-reviewed
+side-by-side (63 changed, 129 added, 946 identical, 142 legacy win32
+deleted) and approved; the visual lane rejoined the release graph. Fixture
+root causes fixed en route: stale generated catalog on `test:update`,
+network-loaded hero/image/avatar story assets (now offline data URIs), a
+console-noisy broken-image fixture, and a cold-load race in the
+fixture-presence guard. Release publishing now requires all nine lanes.
+Next: cut 1.0.0-rc.0 (item 4), then the RC-window quality debt.
 
 ### 2026-08-30 (evening): docs pass with parallel agents
 

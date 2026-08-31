@@ -60,6 +60,9 @@ export function auditWorkflowSecurity(filename, workflow, packageManager) {
     const reviewedWrites = {
       "deploy.yml/deploy": ["deployments"],
       "release.yml/release": ["contents", "id-token", "pull-requests"],
+      // The visual lane's call site forwards the grant its declared
+      // PR-comment job requires; the job itself never runs on push events.
+      "release.yml/visual": ["pull-requests"],
       "visual-regression.yml/comment": ["pull-requests"]
     }[`${filename}/${jobName}`];
     if (
