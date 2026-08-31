@@ -13,7 +13,9 @@
     "pretest": "pnpm run generate",
     "test": "playwright test",
     "test:visual": "playwright test",
+    "pretest:visual:update": "pnpm run generate",
     "test:visual:update": "playwright test --update-snapshots",
+    "pretest:update": "pnpm run generate",
     "test:update": "playwright test --update-snapshots",
     "typecheck": "tsc --noEmit",
     "install-browsers": "playwright install --with-deps chromium"
