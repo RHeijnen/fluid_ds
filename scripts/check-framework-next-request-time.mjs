@@ -170,7 +170,16 @@ async function main() {
         outcomes: commandOutcomes,
         logPath: join(evidenceDirectory, `${stage}.log`)
       });
-    await run(["install", "--frozen-lockfile", "--offline", "--ignore-scripts"], "install");
+    // Frozen + integrity-pinned, matching replay-framework-fixture.mjs. The
+    // former --offline flag additionally required every retained-lock tarball
+    // to already sit in the runner's store, which only held while the root
+    // lock and the lane's latest-compatible resolution happened to agree; the
+    // first drift (types/node 22.20.1 vs the root's 22.19.19) broke the gate
+    // with ERR_PNPM_NO_OFFLINE_TARBALL despite a fully valid frozen graph.
+    await run(
+      ["install", "--frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
+      "install"
+    );
     await run(["run", "typecheck"], "typecheck");
     await run(["run", "build"], "build");
     server = await startNextServer(consumer, join(evidenceDirectory, "server.log"));
