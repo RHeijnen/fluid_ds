@@ -42,14 +42,14 @@ to a real version so a future release doesn't change behaviour under you.
 | -------------- | ---------------------------- | ------------------------------------- |
 | `@latest`      | The latest published version | Demos, sandboxes, CodePens            |
 | `@0` or `@0.x` | The latest 0.x release       | Production, accept patches + features |
-| `@0.3`         | The latest 0.3.x release     | Production, accept patches only       |
-| `@0.3.8`       | Exactly 0.3.8                | Reproducible builds, archival         |
+| `@0.4`         | The latest 0.4.x release     | Production, accept patches only       |
+| `@0.4.0`       | Exactly 0.4.0                | Reproducible builds, archival         |
 
 ```html
 <!-- Pin to a specific version in production -->
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.3.8/dist/components/button/define.js"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.4.0/dist/components/button/define.js"
 ></script>
 ```
 
@@ -196,7 +196,7 @@ script/link tag. jsDelivr publishes SRI hashes for every file; replace
 `{file}` in the URL pattern:
 
 ```
-https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.3.8/dist/components/button/define.js?meta
+https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.4.0/dist/components/button/define.js?meta
 ```
 
 The response includes a `sri` field you can paste into the tag:
@@ -204,7 +204,7 @@ The response includes a `sri` field you can paste into the tag:
 ```html
 <script
   type="module"
-  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.3.8/dist/components/button/define.js"
+  src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@0.4.0/dist/components/button/define.js"
   integrity="sha384-..."
   crossorigin="anonymous"
 ></script>

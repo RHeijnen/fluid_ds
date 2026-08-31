@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@fluid-ds/charts@0.4.0>@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz
   '@fluid-ds/components@0.4.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
   '@fluid-ds/components@0.4.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
-  '@fluid-ds/charts@0.4.0>@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz
 
 importers:
 
@@ -31,6 +31,9 @@ importers:
       '@angular/router':
         specifier: ^20.3.27
         version: 20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+      '@fluid-ds/angular':
+        specifier: file:../packs/fluid-ds-angular-0.4.0.tgz
+        version: file:../packs/fluid-ds-angular-0.4.0.tgz(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))
       '@fluid-ds/charts':
         specifier: file:../packs/fluid-ds-charts-0.4.0.tgz
         version: file:../packs/fluid-ds-charts-0.4.0.tgz(lit@3.3.3)
@@ -500,30 +503,37 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fluid-ds/angular@file:../packs/fluid-ds-angular-0.4.0.tgz':
+    resolution: {integrity: sha512-gHcU+XDrIcvhTXDxoXYhJREbwDfM7Ke5GMAak0PJcMjxt8U6ERG78XhdzgwsS9lxqDxRedKD3LgLbKBTtpsneQ==, tarball: file:../packs/fluid-ds-angular-0.4.0.tgz}
+    version: 0.4.0
+    peerDependencies:
+      '@angular/core': ^20.0.0
+      '@angular/forms': ^20.0.0
+
   '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz':
-    resolution: {integrity: sha512-ysa/oyj0Chb470Q+t51/u6wc03O+5Yj4m/Q79u7AZQy+7jahy4llVZgxyio9xsBut25fGLiSCiJ/kz/8fWzBhA==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
+    resolution: {integrity: sha512-gg9dnF6VK4X7JYciKHbfnYR8tkXe74v6x26YgcneYauZ+tVFn4BrpqZl1RCuvc0rzLKAgYG8rOTR0NODQbx1yQ==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz':
-    resolution: {integrity: sha512-9BnpS6QwAyDo3F9qzoTvUzR+IJWZC0MC7Uweq1dnBOT6emjftj2hj5M2jDBsm1ocX1quHcIxXy1+v1Suj6kiMw==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
+    resolution: {integrity: sha512-adCbEdr5BpYmXv7yBBkm35HHBC3nbpm08mrccMVvu8nHMzrOevP9myrv6lDVtH7Cnf8qC27V69eNpES2nTxxVw==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
-    resolution: {integrity: sha512-QKnuGuwvUsEaHAHfoGYVJxdw8gQGr2PagAldbQu2naxA1dysHgKGsb5WYcRF4mdvpDZU+63QaLp2n4Rd+6yCqA==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
+    resolution: {integrity: sha512-t28zqrYr7/M1PDjV2O1uFU87KvJkccrCLGjyDfmT0xBOx+/chG203+Mb24vzyFR198CwwGhtc14Mc017PqqgMw==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
     version: 0.4.0
 
   '@fluid-ds/themes@file:../packs/fluid-ds-themes-0.4.0.tgz':
-    resolution: {integrity: sha512-vo4P53srfEXksgNhMS7PJvjIQnCPfwuetk6Dm97eCQpFv8vkb3IQjssETdUGsYjz8JsDSGfRHsDDMnIgQAdAzQ==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
+    resolution: {integrity: sha512-jXjRKPIheYBn7I2K92gxuQkJYpARGIZuXHf1HazMQeK5oIo3PhPM6wNeD61e1Y7KjcXuu1I2+VHIlSW+Hj6gWw==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       '@fluid-ds/tokens': 0.4.0
 
   '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz':
-    resolution: {integrity: sha512-UV/OKtR1/tX+VGqahHxE3X2XMO/0z4AvIFnbPiQCw8YATOu46f1gSH7jUWXtOYLl0iCFonVGDjRKhTsBmvdjog==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
+    resolution: {integrity: sha512-CFEDFIOvu3D2Sik+Ay6Rdg33QXY+qIN8C6yvmJNJPdoT0SWEBiPk9zV8CJGN0UuZO/0rl/U3U0O+pOobr6cFww==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
     version: 0.4.0
 
   '@gar/promise-retry@1.0.3':
@@ -697,8 +707,8 @@ packages:
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
     engines: {node: '>=6.0.0'}
 
-  '@jridgewell/sourcemap-codec@1.5.5':
-    resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+  '@jridgewell/sourcemap-codec@1.6.0':
+    resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
@@ -1258,8 +1268,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.11.19:
-    resolution: {integrity: sha512-Grytf1xOxOEMTGRwx6rLGKkTabd4vMg3VrKdj/7joCmV0qgh4QwMMO6xh34YEXQqirAuUdgQGa5orJQQ+69RBw==}
+  baseline-browser-mapping@2.11.20:
+    resolution: {integrity: sha512-H0ulySigv6icDJ1F7SjtdCD6PrhTpdYCmP0CactWy1+ekh0AFd0o1Wn5T8b+hnTmdBx19u9yhL6wvCylXMY7zw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -1436,8 +1446,8 @@ packages:
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
-  electron-to-chromium@1.5.415:
-    resolution: {integrity: sha512-958V+Kbhtgz+SxXeEVKBjrlKRBIDAYvUJfwhjxMZ5S6ut9jAl7l9ZKBkBrvjyjZE36PabLUo2L8kEeV5O4vgJg==}
+  electron-to-chromium@1.5.416:
+    resolution: {integrity: sha512-K6bvB2BjnNrugtIih6ewlbBI9DXa976jIdiIlRLHhBoEI9a4JaQjjHyF+A1IQI543aQYR4LnmOrT/K5fZj0aPA==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -1519,8 +1529,8 @@ packages:
   exponential-backoff@3.1.3:
     resolution: {integrity: sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==}
 
-  express-rate-limit@8.6.2:
-    resolution: {integrity: sha512-YH4ru+eOJxQABscKFfRCy9R7x9QFGdezclVMwwgFFndzS2Xnm0uo6B0ABZsLhcpeptGv2qvuJVWlQr9gQZoC3A==}
+  express-rate-limit@8.7.0:
+    resolution: {integrity: sha512-hOwV7WOxXfjRpAM1DSJWZDXx3GhplwD8IfwuwvogD8i1Qnkgosw/H45s4ZnFAUHDAhPjlY9hLBvJhKmGMyY26g==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -1666,8 +1676,8 @@ packages:
     resolution: {integrity: sha512-IBTdIkzZNOpqm7q3dRqJvMaldXjDHWkEDfrwGEQTs5eaQMWV+djAhR+wahyNNMAa+qpbDUhBMVt4ZKNwpPm7xQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
-  ip-address@10.5.0:
-    resolution: {integrity: sha512-R5SnVLJmgYYvf2F2ZgwSBnelz5G4q5AxIC277GDfUaNbrZKNANcBC7RHqYYePlszf4kBolVkJauG0ZjHHFh55g==}
+  ip-address@10.7.0:
+    resolution: {integrity: sha512-BGFsyJd5mpXp3rK6jIdADLNgpJUK1jnjzvYF8lK+VyDab9JAmqN0YOKDdP17HlgKb2+ehPgDc8EtnRLbGCAMhA==}
     engines: {node: '>= 12'}
 
   ipaddr.js@1.9.1:
@@ -1980,8 +1990,8 @@ packages:
   ordered-binary@1.6.1:
     resolution: {integrity: sha512-QkCdPooczexPLiXIrbVOPYkR3VO3T6v2OyKRkR1Xbhpy7/LAVXwahnRCgRp78Oe/Ehf0C/HATAxfSr6eA1oX+w==}
 
-  p-map@7.0.6:
-    resolution: {integrity: sha512-I4Prw6ivkd6p8PiYR1tXASOAOBzIJwu0TB7fqaX0c/8c3QAehNYmX57EijyGGGBt3c/BIowGwV03RVBtXvHEVg==}
+  p-map@7.0.7:
+    resolution: {integrity: sha512-VaWRu2i4FJNRtiRWCuuQRgfQ1B7a6+gMSrO+3j0EQi/k0ULfS9kosRxGoiqwzIjZTDI02tGfk5mXXltLg6QtfQ==}
     engines: {node: '>=18'}
 
   pacote@21.5.1:
@@ -2053,8 +2063,8 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
-  qs@6.15.3:
-    resolution: {integrity: sha512-O9gl3zCl5h5blw1KGUzQKhA5oUXSl8rwUIM5o0S3nCXMliSvy5Dzx7/DJcI+SwgICv+IneSZwhBh1oSyEHA71A==}
+  qs@6.16.0:
+    resolution: {integrity: sha512-h6fhOIaRrID2CbEY2fqs+7t+UXZo+MLAnU5gRIq85uFtdiUPCdsApMlHhXogKVM4HM2DVbIjGNTTYH2OcmP1vA==}
     engines: {node: '>=0.6'}
 
   range-parser@1.3.0:
@@ -2289,8 +2299,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  update-browserslist-db@1.3.1:
-    resolution: {integrity: sha512-ZZ61DsRsOnakl74HAmp3oSN4aXUmEWXf+i/yv0h7tIBfICc3VdrFErQKUUKPgu3AMsTUMbcongALEN4l6GSUrQ==}
+  update-browserslist-db@1.3.2:
+    resolution: {integrity: sha512-UQ+MSxlhRm1bzjhU+DcuXfjFO1FzNtqhK5+9Yvlp90ItDLk5vT932A0rFu619nf7RVS+Y/VeaUW1jaRDqZ8VJw==}
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
@@ -2621,7 +2631,7 @@ snapshots:
     dependencies:
       '@angular/compiler': 20.3.30
       '@babel/core': 7.29.7
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       chokidar: 4.0.3
       convert-source-map: 1.9.0
       reflect-metadata: 0.2.2
@@ -2853,6 +2863,11 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
+  '@fluid-ds/angular@file:../packs/fluid-ds-angular-0.4.0.tgz(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))':
+    dependencies:
+      '@angular/core': 20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@angular/forms': 20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.30(@angular/common@20.3.30(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.30(@angular/compiler@20.3.30)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
+
   '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(lit@3.3.3)':
     dependencies:
       '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)
@@ -2998,7 +3013,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
@@ -3008,12 +3023,12 @@ snapshots:
 
   '@jridgewell/resolve-uri@3.1.2': {}
 
-  '@jridgewell/sourcemap-codec@1.5.5': {}
+  '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@jridgewell/trace-mapping@0.3.31':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   '@kurkle/color@0.3.4': {}
 
@@ -3082,7 +3097,7 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.1
       express: 5.2.1
-      express-rate-limit: 8.6.2(express@5.2.1)
+      express-rate-limit: 8.7.0(express@5.2.1)
       hono: 4.13.5
       jose: 6.2.10
       json-schema-typed: 8.0.2
@@ -3496,7 +3511,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.11.19: {}
+  baseline-browser-mapping@2.11.20: {}
 
   beasties@0.3.5:
     dependencies:
@@ -3517,7 +3532,7 @@ snapshots:
       http-errors: 2.0.1
       iconv-lite: 0.7.3
       on-finished: 2.4.1
-      qs: 6.15.3
+      qs: 6.16.0
       raw-body: 3.0.2
       type-is: 2.1.0
     transitivePeerDependencies:
@@ -3531,11 +3546,11 @@ snapshots:
 
   browserslist@4.28.8:
     dependencies:
-      baseline-browser-mapping: 2.11.19
+      baseline-browser-mapping: 2.11.20
       caniuse-lite: 1.0.30001810
-      electron-to-chromium: 1.5.415
+      electron-to-chromium: 1.5.416
       node-releases: 2.0.54
-      update-browserslist-db: 1.3.1(browserslist@4.28.8)
+      update-browserslist-db: 1.3.2(browserslist@4.28.8)
 
   buffer-from@1.1.2: {}
 
@@ -3551,7 +3566,7 @@ snapshots:
       minipass-collect: 2.0.1
       minipass-flush: 1.0.7
       minipass-pipeline: 1.2.4
-      p-map: 7.0.6
+      p-map: 7.0.7
       ssri: 13.0.1
 
   call-bind-apply-helpers@1.0.2:
@@ -3679,7 +3694,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  electron-to-chromium@1.5.415: {}
+  electron-to-chromium@1.5.416: {}
 
   emoji-regex@10.6.0: {}
 
@@ -3757,11 +3772,11 @@ snapshots:
 
   exponential-backoff@3.1.3: {}
 
-  express-rate-limit@8.6.2(express@5.2.1):
+  express-rate-limit@8.7.0(express@5.2.1):
     dependencies:
       debug: 4.4.3
       express: 5.2.1
-      ip-address: 10.5.0
+      ip-address: 10.7.0
     transitivePeerDependencies:
       - supports-color
 
@@ -3787,7 +3802,7 @@ snapshots:
       once: 1.4.0
       parseurl: 1.3.3
       proxy-addr: 2.0.7
-      qs: 6.15.3
+      qs: 6.16.0
       range-parser: 1.3.0
       router: 2.2.0
       send: 1.2.1
@@ -3934,7 +3949,7 @@ snapshots:
 
   ini@6.0.0: {}
 
-  ip-address@10.5.0: {}
+  ip-address@10.7.0: {}
 
   ipaddr.js@1.9.1: {}
 
@@ -4065,7 +4080,7 @@ snapshots:
 
   magic-string@0.30.17:
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
 
   make-fetch-happen@15.0.6:
     dependencies:
@@ -4280,7 +4295,7 @@ snapshots:
   ordered-binary@1.6.1:
     optional: true
 
-  p-map@7.0.6: {}
+  p-map@7.0.7: {}
 
   pacote@21.5.1:
     dependencies:
@@ -4362,7 +4377,7 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
-  qs@6.15.3:
+  qs@6.16.0:
     dependencies:
       es-define-property: 1.0.1
       side-channel: 1.1.1
@@ -4552,7 +4567,7 @@ snapshots:
 
   socks@2.8.9:
     dependencies:
-      ip-address: 10.5.0
+      ip-address: 10.7.0
       smart-buffer: 4.2.0
 
   source-map-js@1.2.1: {}
@@ -4654,7 +4669,7 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  update-browserslist-db@1.3.1(browserslist@4.28.8):
+  update-browserslist-db@1.3.2(browserslist@4.28.8):
     dependencies:
       browserslist: 4.28.8
       escalade: 3.2.0

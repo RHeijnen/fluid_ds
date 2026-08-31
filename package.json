@@ -54,6 +54,8 @@
     "check:ssr": "pnpm test:ssr-node && node scripts/check-ssr.mjs",
     "test:ssr-node": "node --test scripts/ssr-cold-imports.test.mjs scripts/ssr-entry-inventory.test.mjs && node --experimental-test-coverage --test-coverage-include=packages/components/dist/ssr.js --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 --test scripts/ssr-renderer.test.mjs",
     "verify": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm check:coverage && pnpm check:quality && pnpm check:cem && pnpm test:release-gates && pnpm test:package-artifacts && pnpm test:framework:isolation && pnpm test:framework:guards && pnpm test:browser-selection && pnpm test:browser-command-ownership && pnpm test:browser-policy && pnpm test:browser-lifecycle && pnpm test:coverage-inventory && pnpm check:tokens && pnpm test:matrix && pnpm build && pnpm check:ssr && pnpm check:docs",
+    "test:interactions": "pnpm --filter @fluid-ds/storybook build && concurrently -k -s first \"pnpm --filter @fluid-ds/storybook exec http-server storybook-static -p 6006 --silent\" \"pnpm --filter @fluid-ds/storybook exec wait-on http://127.0.0.1:6006 && pnpm --filter @fluid-ds/storybook test:runner && pnpm --filter @fluid-ds/storybook exec test-storybook --url http://127.0.0.1:6006 --includeTags interaction-contract --failOnConsole\"",
+    "verify:release": "pnpm verify && pnpm test:ssr-node && pnpm test:coverage && pnpm test:packed && pnpm check:cem:packed && pnpm check:performance && pnpm test:interactions",
     "publish:dry": "node scripts/dry-run-publish.mjs",
     "check:packages": "node scripts/check-package-artifacts.mjs",
     "test:packed": "pnpm test:package-artifacts && pnpm build && node scripts/check-package-artifacts.mjs --install",

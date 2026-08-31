@@ -734,7 +734,7 @@ export const CopyButtonClipboard: Story = {
 
 export const ThemeToggleSelection: Story = {
   parameters: { quality: { componentTag: "fluid-theme-toggle" } },
-  render: () => html`<fluid-theme-toggle></fluid-theme-toggle>`,
+  render: () => html`<fluid-theme-toggle no-persist></fluid-theme-toggle>`,
   play: async ({ canvasElement }) => {
     document.documentElement.setAttribute("data-fluid-theme", "light");
     const host = canvasElement.querySelector("fluid-theme-toggle") as HTMLElement & {

@@ -98,7 +98,9 @@ export const RichTextEditorContract: Story = {
       await waitFor(() => expect(textbox.querySelector("b,strong")).not.toBeNull());
       await expect(events.length).toBe(beforeFormatting + 1);
       await expect(events.at(-1)!.detail.value).toBe(editor.value);
-      await userEvent.click(controls.find((control) => control.textContent === "Make readonly")!);
+      await userEvent.click(
+        controls.find((control) => control.textContent?.trim() === "Make readonly")!
+      );
       await waitFor(() => expect(textbox.getAttribute("aria-readonly")).toBe("true"));
       await expect(textbox.getAttribute("contenteditable")).toBe("false");
       await expect(
@@ -106,7 +108,7 @@ export const RichTextEditorContract: Story = {
       ).toBe(true);
       const beforeAssignment = events.length;
       await userEvent.click(
-        controls.find((control) => control.textContent === "Load untrusted HTML")!
+        controls.find((control) => control.textContent?.trim() === "Load untrusted HTML")!
       );
       await waitFor(() => expect(editor.value).toContain("Safe content"));
       await expect(textbox.querySelector("a")!.hasAttribute("href")).toBe(false);

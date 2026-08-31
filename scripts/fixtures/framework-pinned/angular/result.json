@@ -1,101 +1,47 @@
 {
+  "fixture": "@fluid-ds/admin-angular",
   "status": "passed",
-  "framework": "Angular",
-  "lane": "latest-compatible-packed-production-runtime",
+  "lane": "latest-compatible",
   "node": "v22.22.2",
-  "platform": "linux",
+  "platform": "win32",
   "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "not-requested"
+  },
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72194,
+      "pid": 20972,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 398
+      "elapsedMs": 619
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72206,
-      "exitCode": 0,
-      "signal": null,
-      "directChildExitObserved": true,
-      "terminationRequested": false,
-      "terminationAccepted": null,
-      "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 399
-    },
-    {
-      "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
-      "status": "passed",
-      "reason": null,
-      "pid": 72218,
-      "exitCode": 0,
-      "signal": null,
-      "directChildExitObserved": true,
-      "terminationRequested": false,
-      "terminationAccepted": null,
-      "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3419
-    },
-    {
-      "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
-      "status": "passed",
-      "reason": null,
-      "pid": 72230,
-      "exitCode": 0,
-      "signal": null,
-      "directChildExitObserved": true,
-      "terminationRequested": false,
-      "terminationAccepted": null,
-      "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1331
-    },
-    {
-      "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
-      "status": "passed",
-      "reason": null,
-      "pid": 72242,
-      "exitCode": 0,
-      "signal": null,
-      "directChildExitObserved": true,
-      "terminationRequested": false,
-      "terminationAccepted": null,
-      "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 474
-    },
-    {
-      "stage": "install",
-      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
-      "status": "passed",
-      "reason": null,
-      "pid": 72254,
-      "exitCode": 0,
-      "signal": null,
-      "directChildExitObserved": true,
-      "terminationRequested": false,
-      "terminationAccepted": null,
-      "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 4934
-    },
-    {
-      "stage": "typecheck",
-      "args": ["run", "typecheck"],
-      "status": "passed",
-      "reason": null,
-      "pid": 72269,
+      "pid": 22276,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
@@ -105,30 +51,134 @@
       "elapsedMs": 1512
     },
     {
-      "stage": "build",
-      "args": ["run", "build"],
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72294,
+      "pid": 25040,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 5788
+      "elapsedMs": 3808
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 25304,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 603
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 24808,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 552
+    },
+    {
+      "stage": "pack",
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 25480,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 582
+    },
+    {
+      "stage": "install",
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 18752,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 59416
+    },
+    {
+      "stage": "typecheck",
+      "args": [
+        "run",
+        "typecheck"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 24708,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 5327
+    },
+    {
+      "stage": "build",
+      "args": [
+        "run",
+        "build"
+      ],
+      "status": "passed",
+      "reason": null,
+      "pid": 20708,
+      "exitCode": 0,
+      "signal": null,
+      "directChildExitObserved": true,
+      "terminationRequested": false,
+      "terminationAccepted": null,
+      "descendantCleanup": "unknown-not-inspected",
+      "elapsedMs": 50870
     }
   ],
-  "runtimeStatus": "passed",
-  "commands": [
-    "pnpm --filter @fluid-ds/admin-angular exec tsc --noEmit -p tsconfig.contract-typecheck.json",
-    "pnpm --filter @fluid-ds/admin-angular exec ng build --configuration contract",
-    "node scripts/check-framework-angular-runtime.mjs"
-  ],
-  "limitations": [
-    "This Angular browser-builder fixture is client-side rendered; it has no server entry or hydration contract.",
-    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
-    "Four representative core elements do not certify the full component catalog or other frameworks.",
-    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
-  ]
+  "browserRuntimeTested": false,
+  "browserRuntimeRequested": false,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": null
 }

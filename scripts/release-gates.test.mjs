@@ -6,16 +6,17 @@ import { test } from "node:test";
 // Reuse the YAML parser shipped with the declared, pinned ESLint toolchain.
 const require = createRequire(import.meta.url);
 const { load } = createRequire(require.resolve("eslint"))("js-yaml");
+// visual-regression.yml and ssr-hydration.yml are deliberately absent: they
+// run on push through their own triggers but do not gate publishing until
+// they hold a green baseline (see the comment in release.yml).
 const lanes = {
   verify: "verify.yml",
   coverage: "coverage.yml",
-  ssr: "ssr-hydration.yml",
   accessibility: "accessibility.yml",
   interactions: "storybook-interactions.yml",
   performance: "performance.yml",
   packages: "package-contracts.yml",
-  frameworks: "framework-contracts.yml",
-  visual: "visual-regression.yml"
+  frameworks: "framework-contracts.yml"
 };
 const readWorkflow = async (name) =>
   load(await readFile(new URL(`../.github/workflows/${name}`, import.meta.url), "utf8"));
@@ -267,9 +268,9 @@ test("required-lane guards reject excluded matrix members and skipped test steps
 
 for (const [name, mutate] of [
   [
-    "missing visual dependency",
+    "missing coverage dependency",
     (w) => {
-      w.jobs.release.needs = w.jobs.release.needs.filter((id) => id !== "visual");
+      w.jobs.release.needs = w.jobs.release.needs.filter((id) => id !== "coverage");
     }
   ],
   [

@@ -1,106 +1,130 @@
 {
+  "fixture": "@fluid-ds/framework-vue",
   "status": "passed",
-  "framework": "Vue",
-  "lane": "latest-compatible-packed-production-runtime",
+  "lane": "latest-compatible",
   "node": "v22.22.2",
-  "platform": "linux",
+  "platform": "win32",
   "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "not-requested"
+  },
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71741,
+      "pid": 25076,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 393
+      "elapsedMs": 1511
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71753,
+      "pid": 7312,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3414
+      "elapsedMs": 564
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71765,
+      "pid": 22280,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1313
+      "elapsedMs": 3677
     },
     {
       "stage": "install",
-      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71777,
+      "pid": 16928,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 2071
+      "elapsedMs": 22399
     },
     {
       "stage": "typecheck",
-      "args": ["run", "typecheck"],
+      "args": [
+        "run",
+        "typecheck"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71792,
+      "pid": 6092,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 2135
+      "elapsedMs": 6121
     },
     {
       "stage": "build",
-      "args": ["run", "build"],
+      "args": [
+        "run",
+        "build"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71817,
+      "pid": 11104,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3446
+      "elapsedMs": 6589
     }
   ],
-  "runtimeStatus": "passed",
-  "commands": [
-    "pnpm --filter @fluid-ds/framework-vue typecheck",
-    "pnpm --filter @fluid-ds/framework-vue build",
-    "node scripts/check-framework-vue-runtime.mjs"
-  ],
-  "limitations": [
-    "This Vite fixture is client-side rendered; it provides no SSR HTML or framework hydration contract.",
-    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
-    "Four representative core elements do not certify the full component catalog or other frameworks.",
-    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
-  ]
+  "browserRuntimeTested": false,
+  "browserRuntimeRequested": false,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": null
 }

@@ -1002,7 +1002,10 @@ export class ComponentPreview extends LitElement {
                       { id: "copy", label: "Copy", hint: "⌘C", group: "Edit" }
                     ]}
                   ></fluid-command-palette>
-                  <fluid-theme-toggle .brands=${["", "midnight", "corporate"]}></fluid-theme-toggle>
+                  <fluid-theme-toggle
+                    no-persist
+                    .brands=${["", "midnight", "corporate"]}
+                  ></fluid-theme-toggle>
                 </div>
 
                 <div class="editor-doc">

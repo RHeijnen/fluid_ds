@@ -112,7 +112,9 @@ test("current workflows and locked deployment dependencies pass the audit", asyn
   const result = await auditSupplyChain();
   assert.equal(result.workflowCount, 11);
   assert.equal(result.actionCount, 46);
-  assert.equal(result.reusableWorkflowCount, 9);
+  // 7, not 9: visual-regression and ssr-hydration deliberately left the
+  // release graph until they hold a green baseline (see release.yml).
+  assert.equal(result.reusableWorkflowCount, 7);
   assert.equal(result.packageManager, "pnpm@9.15.0");
   assert.deepEqual(result.failures, []);
 });

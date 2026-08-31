@@ -1,106 +1,130 @@
 {
+  "fixture": "@fluid-ds/framework-sveltekit",
   "status": "passed",
-  "framework": "SvelteKit",
-  "lane": "latest-compatible-packed-production-runtime",
+  "lane": "latest-compatible",
   "node": "v22.22.2",
-  "platform": "linux",
+  "platform": "win32",
   "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "not-requested"
+  },
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71260,
+      "pid": 17608,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 400
+      "elapsedMs": 1729
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71272,
+      "pid": 25408,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3631
+      "elapsedMs": 620
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71284,
+      "pid": 24776,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1319
+      "elapsedMs": 4001
     },
     {
       "stage": "install",
-      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71296,
+      "pid": 25276,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 2402
+      "elapsedMs": 22342
     },
     {
       "stage": "typecheck",
-      "args": ["run", "typecheck"],
+      "args": [
+        "run",
+        "typecheck"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71311,
+      "pid": 4608,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3675
+      "elapsedMs": 12577
     },
     {
       "stage": "build",
-      "args": ["run", "build"],
+      "args": [
+        "run",
+        "build"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 71371,
+      "pid": 25220,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 5704
+      "elapsedMs": 12784
     }
   ],
-  "runtimeStatus": "passed",
-  "commands": [
-    "pnpm --filter @fluid-ds/framework-sveltekit typecheck",
-    "pnpm --filter @fluid-ds/framework-sveltekit build",
-    "node scripts/check-framework-sveltekit-ssr.mjs"
-  ],
-  "limitations": [
-    "The fixture uses adapter-static with prerender=true; DSD is generated during the production build, not by a request-time SvelteKit server.",
-    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
-    "Four representative core elements do not certify the full component catalog or other frameworks.",
-    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
-  ]
+  "browserRuntimeTested": false,
+  "browserRuntimeRequested": false,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": null
 }

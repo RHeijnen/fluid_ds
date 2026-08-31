@@ -362,6 +362,46 @@ describe("<fluid-map>", () => {
     expect((el as unknown as { map: unknown }).map, "map nulled on disconnect").to.be.undefined;
   });
 
+  it("mirrors the Leaflet stylesheet into a containing shadow root, once", async () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = host.attachShadow({ mode: "open" });
+    try {
+      const el = document.createElement("fluid-map") as FluidMap;
+      el.setAttribute("tile-url", "");
+      el.setAttribute("label", "Shadow map");
+      el.style.width = "300px";
+      root.append(el);
+      await waitUntil(
+        () => !!root.querySelector("link[data-fluid-map-leaflet-css]"),
+        "Leaflet stylesheet was not mirrored into the shadow root"
+      );
+      const second = document.createElement("fluid-map") as FluidMap;
+      second.setAttribute("tile-url", "");
+      second.setAttribute("label", "Second shadow map");
+      root.append(second);
+      await waitUntil(() => !!second.querySelector(".leaflet-container"), "second map init");
+      expect(root.querySelectorAll("link[data-fluid-map-leaflet-css]").length).to.equal(1);
+    } finally {
+      host.remove();
+    }
+  });
+
+  it("re-measures on real viewport resizes and ignores zero-size boxes", async () => {
+    const el = await map();
+    // Collapse to zero: the observer callback must take the zero-size guard
+    // and leave the map alone.
+    el.style.width = "0px";
+    await aTimeout(80);
+    // A real resize re-measures; identical follow-up boxes take the
+    // same-size guard.
+    el.style.width = "480px";
+    await aTimeout(80);
+    el.style.width = "480px";
+    await aTimeout(60);
+    expect(el.querySelector(".leaflet-container")).to.exist;
+  });
+
   it("passes the a11y audit", async () => {
     const wrapper = await fixture<HTMLElement>(html`
       <div

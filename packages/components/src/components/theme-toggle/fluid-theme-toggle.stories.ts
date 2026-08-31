@@ -15,7 +15,7 @@ const meta: Meta<Args> = {
   },
   args: { theme: "light", brands: [] },
   render: (args) => html`
-    <fluid-theme-toggle theme=${args.theme} .brands=${args.brands}></fluid-theme-toggle>
+    <fluid-theme-toggle no-persist theme=${args.theme} .brands=${args.brands}></fluid-theme-toggle>
   `
 };
 
@@ -38,7 +38,7 @@ export const InAppBar: Story = {
       style="display:flex; align-items:center; justify-content:space-between; gap: var(--fluid-space-3); padding: var(--fluid-space-3); border: 1px solid var(--fluid-border-default); border-radius: var(--fluid-radius-md);"
     >
       <strong>My app</strong>
-      <fluid-theme-toggle .brands=${["", "midnight", "corporate"]}></fluid-theme-toggle>
+      <fluid-theme-toggle no-persist .brands=${["", "midnight", "corporate"]}></fluid-theme-toggle>
     </div>
   `
 };

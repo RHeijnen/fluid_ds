@@ -68831,6 +68831,16 @@
             },
             {
               "kind": "field",
+              "name": "noPersist",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disconnect the toggle from `localStorage` entirely: nothing stored is\nreplayed onto the document on connect, and clicks flip the document\nattributes live without persisting. Set this on every instance that is a\nDEMO of the component (docs pages, the Theme Builder preview, stories):\nwithout it, a stored site-wide choice silently rebrands whatever page the\ndemo is embedded in the moment the element connects.",
+              "attribute": "no-persist"
+            },
+            {
+              "kind": "field",
               "name": "brandIndex",
               "type": {
                 "text": "number"
@@ -68963,6 +68973,15 @@
               "default": "\"light\"",
               "description": "Current color scheme. Reflects to `theme` for styling hooks.",
               "fieldName": "theme"
+            },
+            {
+              "name": "no-persist",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Disconnect the toggle from `localStorage` entirely: nothing stored is\nreplayed onto the document on connect, and clicks flip the document\nattributes live without persisting. Set this on every instance that is a\nDEMO of the component (docs pages, the Theme Builder preview, stories):\nwithout it, a stored site-wide choice silently rebrands whatever page the\ndemo is embedded in the moment the element connects.",
+              "fieldName": "noPersist"
             }
           ],
           "superclass": {

@@ -462,7 +462,13 @@ async function main() {
         record.manifest.publishConfig?.exports?.["."] ?? record.manifest.exports?.["."];
       const importTarget = typeof rootExport === "string" ? rootExport : rootExport?.import;
       const typeTarget = typeof rootExport === "object" ? rootExport?.types : record.manifest.types;
-      if (importTarget?.endsWith(".js")) runtimeImports.push(record.manifest.name);
+      // Angular partial-Ivy output requires the Angular linker (a consumer
+      // CLI build step), so a bare cold Node import throws by design; the
+      // packed Angular runtime is exercised by the admin-angular lane
+      // instead. Mirrors the same principled exemption in check-ssr.mjs.
+      const coldImportExempt = record.manifest.fluidIntegration === "angular";
+      if (importTarget?.endsWith(".js") && !coldImportExempt)
+        runtimeImports.push(record.manifest.name);
       if (typeTarget?.endsWith(".d.ts")) typeImports.push(record.manifest.name);
     }
 

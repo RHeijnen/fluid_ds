@@ -41,6 +41,7 @@ const NAV: NavItem[] = [
             </a>
           }
         </nav>
+        <a class="sidebar-back" href="../">&larr; All demos</a>
         <div class="sidebar-foot muted">Angular 20 · standalone</div>
       </aside>
 

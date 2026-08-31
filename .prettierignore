@@ -30,3 +30,8 @@ quality/component-quality.json
 packages/react/src/jsx
 packages/react/src/jsx.ts
 packages/react/src/generated
+# The pinned framework corpus is written by
+# scripts/prepare-framework-pinned-corpus.mjs and each file's bytes are
+# sha256-bound in framework-pinned-profile.json; reformatting breaks the
+# binding.
+scripts/fixtures/framework-pinned

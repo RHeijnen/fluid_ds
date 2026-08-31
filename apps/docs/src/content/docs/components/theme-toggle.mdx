@@ -16,8 +16,11 @@ survives a reload; on first load it falls back to the OS `prefers-color-scheme`
 when nothing is stored. Each flip emits **`fluid-theme-change`**.
 
 <Demo>
-  <fluid-theme-toggle></fluid-theme-toggle>
+  <fluid-theme-toggle no-persist></fluid-theme-toggle>
 </Demo>
+
+(The live demos on this page carry `no-persist`, so playing with them flips
+this page without writing your choice to storage.)
 
 ## Install
 
@@ -55,7 +58,7 @@ Drop it into a header or toolbar. No configuration needed: it restores the saved
 theme (or the system preference) the moment it connects.
 
 <Demo>
-  <fluid-theme-toggle></fluid-theme-toggle>
+  <fluid-theme-toggle no-persist></fluid-theme-toggle>
 </Demo>
 
 ```html
@@ -69,7 +72,7 @@ on the document root through your presets, letting people sample palettes. An
 empty string in the list maps to the unset (default) brand.
 
 <Demo>
-  <fluid-theme-toggle id="brand-toggle"></fluid-theme-toggle>
+  <fluid-theme-toggle id="brand-toggle" no-persist></fluid-theme-toggle>
   <script type="module">
     document.getElementById("brand-toggle").brands = ["", "midnight", "corporate"];
   </script>

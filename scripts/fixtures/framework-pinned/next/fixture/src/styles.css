@@ -82,8 +82,19 @@ fluid-card [slot="header"] {
   background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
   color: var(--fluid-accent-base);
 }
-.sidebar-foot {
+.sidebar-back {
   margin-top: auto;
+  display: block;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+  text-decoration: none;
+}
+.sidebar-back:hover {
+  color: var(--fluid-accent-base);
+}
+.sidebar-foot {
+  margin-top: 0.25rem;
 }
 
 .main-col {

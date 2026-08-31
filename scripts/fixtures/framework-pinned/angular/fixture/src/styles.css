@@ -82,8 +82,19 @@ fluid-card [slot="header"] {
   background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
   color: var(--fluid-accent-base);
 }
-.sidebar-foot {
+.sidebar-back {
   margin-top: auto;
+  display: block;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+  text-decoration: none;
+}
+.sidebar-back:hover {
+  color: var(--fluid-accent-base);
+}
+.sidebar-foot {
+  margin-top: 0.25rem;
 }
 
 .main-col {
@@ -126,6 +137,13 @@ router-outlet,
 app-dashboard,
 app-users,
 app-settings {
+  display: contents;
+}
+/* The settings page wraps its cards in a real <form> for the reactive-form
+   demo; dissolve that box too so the cards stay direct grid children of
+   .view and keep its row gap. A display:contents form still submits and
+   still hosts [formGroup]. */
+app-settings form {
   display: contents;
 }
 

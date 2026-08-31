@@ -1,106 +1,130 @@
 {
+  "fixture": "@fluid-ds/framework-vanilla",
   "status": "passed",
-  "framework": "Plain TypeScript/HTML",
-  "lane": "latest-compatible-packed-production-runtime",
+  "lane": "latest-compatible",
   "node": "v22.22.2",
-  "platform": "linux",
+  "platform": "win32",
   "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "not-requested"
+  },
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72689,
+      "pid": 22872,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 397
+      "elapsedMs": 1640
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72701,
+      "pid": 10340,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3457
+      "elapsedMs": 641
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72713,
+      "pid": 19964,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1286
+      "elapsedMs": 5593
     },
     {
       "stage": "install",
-      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72725,
+      "pid": 15156,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 2032
+      "elapsedMs": 27528
     },
     {
       "stage": "typecheck",
-      "args": ["run", "typecheck"],
+      "args": [
+        "run",
+        "typecheck"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72740,
+      "pid": 15028,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1199
+      "elapsedMs": 2177
     },
     {
       "stage": "build",
-      "args": ["run", "build"],
+      "args": [
+        "run",
+        "build"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 72765,
+      "pid": 24976,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1731
+      "elapsedMs": 3579
     }
   ],
-  "runtimeStatus": "passed",
-  "commands": [
-    "pnpm --filter @fluid-ds/framework-vanilla typecheck",
-    "pnpm --filter @fluid-ds/framework-vanilla build",
-    "node scripts/check-framework-vanilla-runtime.mjs"
-  ],
-  "limitations": [
-    "This fixture ships authored static light DOM and client JavaScript; it has no server renderer, DSD, or hydration contract.",
-    "This latest-compatible lane retains a portable lock and tarballs but does not perform a second frozen replay.",
-    "Four representative core elements do not certify the full component catalog or framework integrations.",
-    "Tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
-  ]
+  "browserRuntimeTested": false,
+  "browserRuntimeRequested": false,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": null
 }

@@ -11,13 +11,15 @@ const profilePath = join(root, "scripts/framework-pinned-profile.json");
 const corpusRoot = join(root, "scripts/fixtures/framework-pinned");
 
 const sourceEvidence = Object.freeze({
-  react: "quality/evidence/framework-fixtures/2026-08-27T17-32-28-943Z--fluid-ds-admin-react",
-  astro: "quality/evidence/framework-astro/2026-08-27T17-33-24-065Z",
-  next: "quality/evidence/framework-next/2026-08-27T17-33-48-123Z",
-  sveltekit: "quality/evidence/framework-sveltekit/2026-08-27T17-34-34-613Z",
-  vue: "quality/evidence/framework-vue/2026-08-27T17-34-59-087Z",
-  angular: "quality/evidence/framework-angular/2026-08-27T17-35-18-830Z",
-  vanilla: "quality/evidence/framework-vanilla/2026-08-27T17-35-44-996Z"
+  react: "quality/evidence/framework-fixtures/2026-08-30T19-40-16-868Z--fluid-ds-admin-react",
+  astro: "quality/evidence/framework-fixtures/2026-08-30T19-41-54-976Z--fluid-ds-framework-astro",
+  next: "quality/evidence/framework-fixtures/2026-08-30T19-43-20-927Z--fluid-ds-admin-next",
+  sveltekit:
+    "quality/evidence/framework-fixtures/2026-08-30T19-45-19-901Z--fluid-ds-framework-sveltekit",
+  vue: "quality/evidence/framework-fixtures/2026-08-30T19-46-16-677Z--fluid-ds-framework-vue",
+  angular: "quality/evidence/framework-fixtures/2026-08-30T19-47-00-085Z--fluid-ds-admin-angular",
+  vanilla:
+    "quality/evidence/framework-fixtures/2026-08-30T19-49-09-622Z--fluid-ds-framework-vanilla"
 });
 
 function sha256(value) {

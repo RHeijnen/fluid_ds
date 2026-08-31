@@ -47,6 +47,9 @@ function Shell() {
             </NavLink>
           ))}
         </nav>
+        <a className="sidebar-back" href="../">
+          &larr; All demos
+        </a>
         <div className="sidebar-foot muted">React 19 · Vite</div>
       </aside>
 

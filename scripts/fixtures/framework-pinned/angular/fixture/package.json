@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "ng serve --port 5391",
     "start": "ng serve --port 5391",
-    "build": "ng build --configuration contract",
-    "typecheck": "tsc --noEmit -p tsconfig.contract-typecheck.json"
+    "build": "ng build",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
     "@angular/common": "^20.3.27",
@@ -25,7 +25,8 @@
     "lit": "^3.2.1",
     "rxjs": "^7.8.0",
     "tslib": "^2.8.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@fluid-ds/angular": "file:../packs/fluid-ds-angular-0.4.0.tgz"
   },
   "devDependencies": {
     "@angular/build": "^20.3.34",
@@ -36,9 +37,9 @@
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
+      "@fluid-ds/charts@0.4.0>@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
       "@fluid-ds/components@0.4.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
-      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz",
-      "@fluid-ds/charts@0.4.0>@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz"
+      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz"
     }
   }
 }

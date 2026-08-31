@@ -145,6 +145,16 @@ export class FluidThemeToggle extends FluidElement {
   /** Current color scheme. Reflects to `theme` for styling hooks. */
   @property({ reflect: true }) theme: FluidThemeToggleTheme = "light";
 
+  /**
+   * Disconnect the toggle from `localStorage` entirely: nothing stored is
+   * replayed onto the document on connect, and clicks flip the document
+   * attributes live without persisting. Set this on every instance that is a
+   * DEMO of the component (docs pages, the Theme Builder preview, stories):
+   * without it, a stored site-wide choice silently rebrands whatever page the
+   * demo is embedded in the moment the element connects.
+   */
+  @property({ type: Boolean, attribute: "no-persist" }) noPersist = false;
+
   @state() private brandIndex = 0;
 
   override connectedCallback(): void {
@@ -155,6 +165,13 @@ export class FluidThemeToggle extends FluidElement {
   /** Resolve the stored or system-preferred theme and apply it without firing an event. */
   private restore(): void {
     const root = this.documentRoot();
+    if (this.noPersist) {
+      // Adopt whatever the page already shows; never stamp the document or
+      // read storage from a non-persisting (demo) instance.
+      const current = root?.getAttribute("data-fluid-theme");
+      this.theme = current === "dark" ? "dark" : "light";
+      return;
+    }
     let next: FluidThemeToggleTheme;
     const stored = this.readStorage(STORAGE_KEY);
     if (stored === "light" || stored === "dark") {
@@ -212,7 +229,7 @@ export class FluidThemeToggle extends FluidElement {
     this.theme = next;
     const root = this.documentRoot();
     if (root) root.setAttribute("data-fluid-theme", next);
-    this.writeStorage(STORAGE_KEY, next);
+    if (!this.noPersist) this.writeStorage(STORAGE_KEY, next);
     this.dispatchEvent(
       new CustomEvent("fluid-theme-change", {
         detail: { theme: next },
@@ -228,7 +245,7 @@ export class FluidThemeToggle extends FluidElement {
     const root = this.documentRoot();
     const brand = this.brands[this.brandIndex];
     if (root) this.applyBrand(root, brand);
-    if (brand) this.writeStorage(BRAND_STORAGE_KEY, brand);
+    if (brand && !this.noPersist) this.writeStorage(BRAND_STORAGE_KEY, brand);
   };
 
   override render(): TemplateResult {

@@ -114,14 +114,18 @@ async function exerciseChart(canvas: HTMLElement, tag: string) {
     await waitFor(() => expect(button().getAttribute("aria-pressed")).toBe("false"));
     const prior = chart.instance;
     const controls = [...canvas.querySelectorAll("section > button")];
-    await userEvent.click(controls.find((control) => control.textContent === "Reconnect chart")!);
+    await userEvent.click(
+      controls.find((control) => control.textContent?.trim() === "Reconnect chart")!
+    );
     await waitFor(() => expect(chart.instance).not.toBe(prior));
     await expect(chart.instance).not.toBeNull();
     await expect(visible()).toBe(false);
     await expect(button().getAttribute("aria-pressed")).toBe("false");
     await userEvent.click(button());
     await waitFor(() => expect(visible()).toBe(true));
-    await userEvent.click(controls.find((control) => control.textContent === "Update chart data")!);
+    await userEvent.click(
+      controls.find((control) => control.textContent?.trim() === "Update chart data")!
+    );
     await waitFor(() =>
       expect(button().textContent?.trim()).toBe(
         isArc(chart.type) ? "Updated North" : "Updated revenue"

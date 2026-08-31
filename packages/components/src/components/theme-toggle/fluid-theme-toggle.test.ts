@@ -57,6 +57,34 @@ describe("<fluid-theme-toggle>", () => {
     expect(document.documentElement.getAttribute("data-fluid-theme")).to.equal("dark");
   });
 
+  it("no-persist skips restoring stored values on connect", async () => {
+    localStorage.setItem("fluid-theme", "dark");
+    localStorage.setItem("fluid-brand", "corporate");
+    const el = await fixture<FluidThemeToggle>(
+      html`<fluid-theme-toggle
+        no-persist
+        .brands=${["", "midnight", "corporate"]}
+      ></fluid-theme-toggle>`
+    );
+    expect(el.theme).to.equal("light");
+    expect(document.documentElement.getAttribute("data-fluid-theme")).to.be.null;
+    expect(document.documentElement.getAttribute("data-fluid-brand")).to.be.null;
+  });
+
+  it("no-persist flips the document live without writing storage", async () => {
+    const el = await fixture<FluidThemeToggle>(
+      html`<fluid-theme-toggle no-persist .brands=${["", "midnight"]}></fluid-theme-toggle>`
+    );
+    el.shadowRoot!.querySelector<HTMLButtonElement>('[part="theme-button"]')!.click();
+    await elementUpdated(el);
+    expect(document.documentElement.getAttribute("data-fluid-theme")).to.equal("dark");
+    expect(localStorage.getItem("fluid-theme")).to.be.null;
+    el.shadowRoot!.querySelector<HTMLButtonElement>('[part="brand-button"]')!.click();
+    await elementUpdated(el);
+    expect(document.documentElement.getAttribute("data-fluid-brand")).to.equal("midnight");
+    expect(localStorage.getItem("fluid-brand")).to.be.null;
+  });
+
   it("fires fluid-theme-change with the new theme", async () => {
     const el = await fixture<FluidThemeToggle>(html`<fluid-theme-toggle></fluid-theme-toggle>`);
     const button = el.shadowRoot!.querySelector<HTMLButtonElement>('[part="theme-button"]')!;

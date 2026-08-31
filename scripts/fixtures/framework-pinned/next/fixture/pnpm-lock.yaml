@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  '@fluid-ds/charts@0.4.0>@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz
   '@fluid-ds/components@0.4.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
   '@fluid-ds/components@0.4.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
-  '@fluid-ds/charts@0.4.0>@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz
 
 importers:
 
@@ -63,23 +63,23 @@ packages:
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
   '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz':
-    resolution: {integrity: sha512-ysa/oyj0Chb470Q+t51/u6wc03O+5Yj4m/Q79u7AZQy+7jahy4llVZgxyio9xsBut25fGLiSCiJ/kz/8fWzBhA==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
+    resolution: {integrity: sha512-gg9dnF6VK4X7JYciKHbfnYR8tkXe74v6x26YgcneYauZ+tVFn4BrpqZl1RCuvc0rzLKAgYG8rOTR0NODQbx1yQ==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz':
-    resolution: {integrity: sha512-9BnpS6QwAyDo3F9qzoTvUzR+IJWZC0MC7Uweq1dnBOT6emjftj2hj5M2jDBsm1ocX1quHcIxXy1+v1Suj6kiMw==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
+    resolution: {integrity: sha512-SFcsDRCElZFdv59roDKLbEI9vdMS6x5t8BKMa4FzpYK9jtoVsL0RNNi+0jmBIEPnkei0na8S2xJuqlggqNCLGw==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
-    resolution: {integrity: sha512-QKnuGuwvUsEaHAHfoGYVJxdw8gQGr2PagAldbQu2naxA1dysHgKGsb5WYcRF4mdvpDZU+63QaLp2n4Rd+6yCqA==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
+    resolution: {integrity: sha512-t28zqrYr7/M1PDjV2O1uFU87KvJkccrCLGjyDfmT0xBOx+/chG203+Mb24vzyFR198CwwGhtc14Mc017PqqgMw==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
     version: 0.4.0
 
   '@fluid-ds/react@file:../packs/fluid-ds-react-0.4.0.tgz':
-    resolution: {integrity: sha512-BevAx5gnYxPcvpby52sIMtVVmCk0Uo95T4ppPdSioo1YT7Ph7sMkzeIAMgdhA6RiO/OWc8JS2lOEb17NBhxH3g==, tarball: file:../packs/fluid-ds-react-0.4.0.tgz}
+    resolution: {integrity: sha512-KYapxCCvLrbRiyjq6dWxbBWIc8TVUlzT2MKpsceV6qKA8mXGuG8s6+frVpGP0Dzbg0jN+KKBhD7CUtp+F+K0Nw==, tarball: file:../packs/fluid-ds-react-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       '@fluid-ds/animations': ^0.4.0
@@ -128,13 +128,13 @@ packages:
         optional: true
 
   '@fluid-ds/themes@file:../packs/fluid-ds-themes-0.4.0.tgz':
-    resolution: {integrity: sha512-vo4P53srfEXksgNhMS7PJvjIQnCPfwuetk6Dm97eCQpFv8vkb3IQjssETdUGsYjz8JsDSGfRHsDDMnIgQAdAzQ==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
+    resolution: {integrity: sha512-jXjRKPIheYBn7I2K92gxuQkJYpARGIZuXHf1HazMQeK5oIo3PhPM6wNeD61e1Y7KjcXuu1I2+VHIlSW+Hj6gWw==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       '@fluid-ds/tokens': 0.4.0
 
   '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz':
-    resolution: {integrity: sha512-UV/OKtR1/tX+VGqahHxE3X2XMO/0z4AvIFnbPiQCw8YATOu46f1gSH7jUWXtOYLl0iCFonVGDjRKhTsBmvdjog==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
+    resolution: {integrity: sha512-CFEDFIOvu3D2Sik+Ay6Rdg33QXY+qIN8C6yvmJNJPdoT0SWEBiPk9zV8CJGN0UuZO/0rl/U3U0O+pOobr6cFww==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
     version: 0.4.0
 
   '@img/colour@1.1.0':

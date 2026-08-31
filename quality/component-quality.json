@@ -3539,7 +3539,7 @@
         "docs": "apps/docs/src/content/docs/expansion/map.mdx"
       },
       "unit": {
-        "cases": 20,
+        "cases": 22,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },
@@ -6500,7 +6500,7 @@
         "docs": "apps/docs/src/content/docs/components/theme-toggle.mdx"
       },
       "unit": {
-        "cases": 8,
+        "cases": 10,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },

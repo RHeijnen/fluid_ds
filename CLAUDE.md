@@ -59,6 +59,12 @@ regenerate it from this list.
   root `package.json` for exact ordering. Browser SSR, accessibility, visual,
   packed-framework runtime and measured coverage have additional dedicated gates;
   a passing `verify` alone is not production certification.
+- `pnpm verify:release`: `verify` plus the locally runnable release-gate suites
+  (measured coverage thresholds, packed consumer contracts, performance
+  budgets, the Storybook interaction runner). **Run this, not bare `verify`,
+  before pushing anything meant to publish**: the release workflow requires
+  these gates and bare `verify` does not exercise them (the 0.4.0 release
+  learned this the hard way).
 - Supervised unit-test cleanup currently has Windows native-handle and Linux
   pidfd implementations. Linux requires Python with `os.pidfd_open` and
   `signal.pidfd_send_signal`; CI configures Python 3.13. The baseline native Linux

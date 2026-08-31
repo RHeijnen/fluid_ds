@@ -1,148 +1,184 @@
 {
+  "fixture": "@fluid-ds/admin-next",
   "status": "passed",
-  "framework": "Next.js",
-  "lane": "latest-compatible-packed-production-runtime",
+  "lane": "latest-compatible",
   "node": "v22.22.2",
-  "platform": "linux",
+  "platform": "win32",
   "packageManager": "pnpm@9.15.0",
+  "compilerConfiguration": "isolated",
+  "outcomes": {
+    "install": "passed",
+    "portableLock": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "runtime": "not-requested"
+  },
   "commandOutcomes": [
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70647,
+      "pid": 16656,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 408
+      "elapsedMs": 701
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70659,
+      "pid": 11372,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 388
+      "elapsedMs": 1707
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70671,
+      "pid": 7152,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3388
+      "elapsedMs": 4017
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70683,
+      "pid": 23848,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1292
+      "elapsedMs": 1210
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70695,
+      "pid": 22672,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 468
+      "elapsedMs": 619
     },
     {
       "stage": "pack",
-      "args": ["pack", "--pack-destination", "<TEMP>/packs"],
+      "args": [
+        "pack",
+        "--pack-destination",
+        "<TEMP>\\packs"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70707,
+      "pid": 5020,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 773
+      "elapsedMs": 579
     },
     {
       "stage": "install",
-      "args": ["install", "--no-frozen-lockfile", "--ignore-scripts", "--strict-peer-dependencies"],
+      "args": [
+        "install",
+        "--no-frozen-lockfile",
+        "--ignore-scripts",
+        "--strict-peer-dependencies"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70719,
+      "pid": 19432,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3311
+      "elapsedMs": 31464
     },
     {
       "stage": "typecheck",
-      "args": ["run", "typecheck"],
+      "args": [
+        "run",
+        "typecheck"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70734,
+      "pid": 19960,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 2793
+      "elapsedMs": 12032
     },
     {
       "stage": "build",
-      "args": ["run", "build"],
+      "args": [
+        "run",
+        "build"
+      ],
       "status": "passed",
       "reason": null,
-      "pid": 70759,
+      "pid": 23520,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 25540
+      "elapsedMs": 62707
     }
   ],
-  "runtimeStatus": "passed",
-  "commands": [
-    "pnpm --filter @fluid-ds/admin-next typecheck",
-    "pnpm --filter @fluid-ds/admin-next build",
-    "node scripts/check-framework-next-ssr.mjs"
-  ],
-  "limitations": [
-    "The designated Next fixture uses output: export; DSD is server-rendered during next build and served as production static HTML, not generated by an adapter on each request.",
-    "This is a latest-compatible install lane; the retained lock and tarballs permit a later frozen replay but this script does not perform that replay.",
-    "Four representative core elements do not certify the full component catalog or other frameworks.",
-    "Package tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by separate package build and artifact gates."
-  ]
+  "browserRuntimeTested": false,
+  "browserRuntimeRequested": false,
+  "frozenReplayRequested": false,
+  "replay": "Run node scripts/replay-framework-fixture.mjs <this-evidence-directory> [--browser] from the toolchain checkout. Replay copies the exact graph to a new temporary directory and uses frozen strict-peer installation.",
+  "runtimeReplay": null
 }
