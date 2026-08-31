@@ -88,72 +88,24 @@ const AA_MIN = 4.5;
 const AAA_MIN = 7;
 
 /**
- * Contrast pairs that already fail SC 1.4.3 at the default AA conformance
- * level, frozen so the gate can run without hiding them. Each is a real defect
- * to fix in its own change, not an accepted value; the opt-in AAA track above
- * already corrects every one of them. The assertion below requires this list
- * to match the measured failures EXACTLY, so fixing one without pruning its
- * entry fails just as loudly as introducing a new one.
+ * Contrast pairs allowed to sit under SC 1.4.3 at the default AA conformance
+ * level, each recorded with its measured ratio.
  *
- *   - `info-base` (light): white on sky.600 is 4.10:1, in every brand that
- *     does not regrade the sky ramp.
- *   - `warning-active` (light): neutral.950 on amber.700 is 3.96:1.
- *   - corporate `accent-base` (dark): neutral.950 on slate.500 is 4.18:1.
- *   - titanium light `warning-*`: the gunmetal ramp it borrows for amber is
- *     far too dark for the dark warning text.
- *   - titanium dark `accent/success/warning/info`: the brand block declares
- *     the grayed tones without a dark-scheme re-derivation, so light-scheme
- *     steps apply in dark and land near-black text on a near-black fill. This
- *     is the worst of the set (down to 1.09:1) and wants a dedicated fix. The
- *     system-dark path escapes most of it, because the automatic dark block
- *     out-ranks the brand block there, which is why the two dark contexts
- *     carry different entries.
+ * **This map is empty, and should stay that way.** It exists as a ratchet, not
+ * as a place to park a failure: the assertion below requires it to match the
+ * measured failures EXACTLY, so adding an entry to make a build pass is a
+ * visible, reviewable act, and fixing a pair without pruning its entry fails
+ * just as loudly as introducing a new one.
+ *
+ * It held 43 entries when the AAA track was built and was emptied in the pass
+ * that followed. What was in it, for the record: light `info-base` at 4.10:1
+ * and light `warning-active` at 3.96:1 across every brand that inherits the
+ * default ramps, corporate's dark accent at 4.18:1, titanium's light warning at
+ * 3.55:1, and titanium's dark tones down to 1.09:1, where the brand block's
+ * light-scheme steps followed a dark subtree down and put near-black text on a
+ * near-black fill.
  */
-const KNOWN_AA_GAPS = new Map([
-  ["default/light: warning-text on warning-active", 3.96],
-  ["default/light: info-text on info-base", 4.1],
-  ["default/light (system): warning-text on warning-active", 3.96],
-  ["default/light (system): info-text on info-base", 4.1],
-  ["midnight/light: warning-text on warning-active", 3.96],
-  ["midnight/light: info-text on info-base", 4.1],
-  ["midnight/light (system): warning-text on warning-active", 3.96],
-  ["midnight/light (system): info-text on info-base", 4.1],
-  ["corporate/light: warning-text on warning-active", 3.96],
-  ["corporate/light: info-text on info-base", 4.1],
-  ["corporate/light (system): warning-text on warning-active", 3.96],
-  ["corporate/light (system): info-text on info-base", 4.1],
-  ["corporate/dark: accent-text on accent-base", 4.18],
-  ["corporate/dark (system): accent-text on accent-base", 4.18],
-  ["titanium/light: warning-text on warning-base", 3.55],
-  ["titanium/light: warning-text on warning-hover", 1.94],
-  ["titanium/light: warning-text on warning-active", 1.52],
-  ["titanium/light (system): warning-text on warning-base", 3.55],
-  ["titanium/light (system): warning-text on warning-hover", 1.94],
-  ["titanium/light (system): warning-text on warning-active", 1.52],
-  ["titanium/dark: accent-text on accent-base", 3.55],
-  ["titanium/dark: success-text on success-base", 1.52],
-  ["titanium/dark: success-text on success-hover", 1.25],
-  ["titanium/dark: success-text on success-active", 1.09],
-  ["titanium/dark: warning-text on warning-base", 3.55],
-  ["titanium/dark: warning-text on warning-hover", 1.94],
-  ["titanium/dark: warning-text on warning-active", 1.52],
-  ["titanium/dark: info-text on info-base", 1.94],
-  ["titanium/dark: info-text on info-hover", 1.52],
-  ["titanium/dark: info-text on info-active", 1.25],
-  ["titanium/dark (system): accent-text on accent-base", 3.55],
-  ["titanium/dark (system): success-text on success-base", 3.55],
-  ["titanium/dark (system): info-text on info-base", 3.55],
-  ["glass/light: accent-text on accent-base", 4.1],
-  ["glass/light: warning-text on warning-active", 3.96],
-  ["glass/light: info-text on info-base", 4.1],
-  ["glass/light (system): accent-text on accent-base", 4.1],
-  ["glass/light (system): warning-text on warning-active", 3.96],
-  ["glass/light (system): info-text on info-base", 4.1],
-  ["orchid/light: warning-text on warning-active", 3.96],
-  ["orchid/light: info-text on info-base", 4.1],
-  ["orchid/light (system): warning-text on warning-active", 3.96],
-  ["orchid/light (system): info-text on info-base", 4.1]
-]);
+const KNOWN_AA_GAPS = new Map([]);
 
 /* ── CSS reading ────────────────────────────────────────────────────────── */
 

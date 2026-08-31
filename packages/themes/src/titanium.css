@@ -67,12 +67,15 @@
 }
 
 /* Dark scheme re-derives the accent from lighter brand steps, the same way the
-   base tokens do, so a dark-mode subtree keeps the right contrast. */
+   base tokens do, so a dark-mode subtree keeps the right contrast. Gunmetal is
+   a dark ramp, so it starts two steps higher than the default brand does:
+   against the dark scheme's near-black accent text, brand.500 (#5f6879) reads
+   3.55:1 and brand.400 6.51:1, so 400 is the first step over the AA floor. */
 [data-fluid-theme="dark"] [data-fluid-brand="titanium"],
 [data-fluid-brand="titanium"][data-fluid-theme="dark"] {
-  --fluid-accent-base: var(--fluid-color-brand-500);
-  --fluid-accent-hover: var(--fluid-color-brand-400);
-  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-accent-base: var(--fluid-color-brand-400); /* #8b94a4, 6.51:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300); /* #b7bfca, 10.72:1 */
+  --fluid-accent-active: var(--fluid-color-brand-200); /* #d8dce3, 14.46:1 */
   --fluid-focus-ring-color: var(--fluid-color-brand-400);
 }
 
@@ -129,16 +132,73 @@
   --fluid-color-sky-900: #12151b;
 
   /* Re-derive the semantic tones from the grayed scales at this scope, so
-     tone-based components (timelines, tone buttons) go gray too. */
-  --fluid-success-base: var(--fluid-color-emerald-700);
-  --fluid-success-hover: var(--fluid-color-emerald-800);
-  --fluid-success-active: var(--fluid-color-emerald-900);
-  --fluid-warning-base: var(--fluid-color-amber-500);
-  --fluid-warning-hover: var(--fluid-color-amber-600);
-  --fluid-warning-active: var(--fluid-color-amber-700);
-  --fluid-info-base: var(--fluid-color-sky-600);
-  --fluid-info-hover: var(--fluid-color-sky-700);
-  --fluid-info-active: var(--fluid-color-sky-800);
+     tone-based components (timelines, tone buttons) go gray too. These are the
+     LIGHT-scheme steps; the dark block below restates all of them, because a
+     declaration made here would otherwise out-rank the dark scheme block in
+     @fluid-ds/tokens and follow a dark subtree down.
+
+     Success and info carry white text, so they take the deep end of the ramp.
+     Warning is the one tone with DARK text, and gunmetal is far darker than
+     the amber it replaces, so its ladder runs UP the ramp instead: the old
+     500/600/700 steps read 3.55 / 1.94 / 1.52:1, nowhere near the AA floor. */
+  --fluid-success-base: var(--fluid-color-emerald-700); /* white, 13.07:1 */
+  --fluid-success-hover: var(--fluid-color-emerald-800); /* 15.92:1 */
+  --fluid-success-active: var(--fluid-color-emerald-900); /* 18.28:1 */
+  --fluid-warning-base: var(--fluid-color-amber-400); /* #8b94a4, 6.51:1 */
+  --fluid-warning-hover: var(--fluid-color-amber-300); /* #b7bfca, 10.72:1 */
+  --fluid-warning-active: var(--fluid-color-amber-200); /* #d8dce3, 14.46:1 */
+  --fluid-info-base: var(--fluid-color-sky-600); /* white, 10.23:1 */
+  --fluid-info-hover: var(--fluid-color-sky-700); /* 13.07:1 */
+  --fluid-info-active: var(--fluid-color-sky-800); /* 15.92:1 */
+}
+
+/*
+ * The grayed tones, re-derived for dark.
+ *
+ * This is not optional tidiness. The tone declarations above are made at brand
+ * scope, which out-ranks the dark scheme block in @fluid-ds/tokens, so without
+ * this block the LIGHT steps follow a dark subtree down and land the dark
+ * scheme's near-black tone text on a near-black fill: success-active measured
+ * 1.09:1, which is text you cannot see at all.
+ *
+ * In dark every tone carries near-black text, so all three tracks run up the
+ * light end of the gunmetal ramp together, starting at 400, the first step
+ * that clears the AA floor.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="titanium"],
+[data-fluid-brand="titanium"][data-fluid-theme="dark"] {
+  --fluid-success-base: var(--fluid-color-emerald-400); /* #8b94a4, 6.51:1 */
+  --fluid-success-hover: var(--fluid-color-emerald-300); /* #b7bfca, 10.72:1 */
+  --fluid-success-active: var(--fluid-color-emerald-200); /* #d8dce3, 14.46:1 */
+  --fluid-warning-base: var(--fluid-color-amber-400); /* 6.51:1 */
+  --fluid-warning-hover: var(--fluid-color-amber-300); /* 10.72:1 */
+  --fluid-warning-active: var(--fluid-color-amber-200); /* 14.46:1 */
+  --fluid-info-base: var(--fluid-color-sky-400); /* 6.51:1 */
+  --fluid-info-hover: var(--fluid-color-sky-300); /* 10.72:1 */
+  --fluid-info-active: var(--fluid-color-sky-200); /* 14.46:1 */
+}
+
+/* Both dark blocks above only match when a scheme is named. When the reader's
+   operating system asks for dark and nothing sets the attribute, the automatic
+   dark block in @fluid-ds/tokens out-ranks this file's plain brand block and
+   hands back the default steps, which the gunmetal ramp cannot carry. Restating
+   accent and the tones under the same media query settles that. */
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="titanium"]:not([data-fluid-theme="light"]) {
+    --fluid-accent-base: var(--fluid-color-brand-400); /* 6.51:1 */
+    --fluid-accent-hover: var(--fluid-color-brand-300); /* 10.72:1 */
+    --fluid-accent-active: var(--fluid-color-brand-200); /* 14.46:1 */
+    --fluid-focus-ring-color: var(--fluid-color-brand-400);
+    --fluid-success-base: var(--fluid-color-emerald-400); /* 6.51:1 */
+    --fluid-success-hover: var(--fluid-color-emerald-300); /* 10.72:1 */
+    --fluid-success-active: var(--fluid-color-emerald-200); /* 14.46:1 */
+    --fluid-warning-base: var(--fluid-color-amber-400); /* 6.51:1 */
+    --fluid-warning-hover: var(--fluid-color-amber-300); /* 10.72:1 */
+    --fluid-warning-active: var(--fluid-color-amber-200); /* 14.46:1 */
+    --fluid-info-base: var(--fluid-color-sky-400); /* 6.51:1 */
+    --fluid-info-hover: var(--fluid-color-sky-300); /* 10.72:1 */
+    --fluid-info-active: var(--fluid-color-sky-200); /* 14.46:1 */
+  }
 }
 
 /*
@@ -146,24 +206,18 @@
  *
  * Titanium is already a high-contrast theme, so most of it passes untouched:
  * white on the light accent (brand.600 #3a4150) is 10.23:1, and the grayed
- * success and info tones read 13.07:1 and 10.23:1. Two things do move.
- *
- * 1. Warning. It is the one tone that carries DARK text, and the gunmetal ramp
- *    it borrows is far darker than amber, so the light-scheme warning ladder
- *    has to run UP the ramp instead of down.
- * 2. The dark scheme. The grayed tones above are declared at the brand scope,
- *    which out-ranks the dark scheme block in @fluid-ds/tokens, so they apply
- *    in dark too and land dark text on a dark fill. The AAA blocks below
- *    re-derive accent and every grayed tone from the light end of the ramp,
- *    the way a dark scheme should. Danger keeps its red and is handled by the
- *    AAA block in @fluid-ds/tokens.
+ * success and info tones read 13.07:1 and 10.23:1. What moves is every track
+ * that carries the near-black tone text against the gunmetal ramp, since the
+ * baseline puts those at 6.51:1: the light warning tone, and in dark the accent
+ * plus all three grayed tones. Each one steps once further up the ramp. Danger
+ * keeps its red and is handled by the AAA block in @fluid-ds/tokens.
  *
  * Ratios are the computed WCAG 2 values against each tone's text token (white
  * in light, neutral.950 in dark), asserted by the token-contrast test.
  */
 [data-fluid-brand="titanium"][data-fluid-conformance="aaa"],
 [data-fluid-brand="titanium"]:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"] {
-  /* neutral.950 on gunmetal 500/600/700 is only 3.55 / 1.94 / 1.52:1. */
+  /* The baseline warning ladder starts at gunmetal 400, which is 6.51:1. */
   --fluid-warning-base: var(--fluid-color-amber-300); /* #b7bfca, 10.72:1 */
   --fluid-warning-hover: var(--fluid-color-amber-200); /* #d8dce3, 14.46:1 */
   --fluid-warning-active: var(--fluid-color-amber-100); /* #eceef2, 17.13:1 */
@@ -179,7 +233,8 @@
 [data-fluid-theme="dark"] [data-fluid-brand="titanium"][data-fluid-conformance="aaa"],
 [data-fluid-brand="titanium"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
 [data-fluid-brand="titanium"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
-  /* Gunmetal 500 is 3.55:1 and 400 is 6.51:1 against neutral.950; 300 clears 7. */
+  /* The baseline dark ladder starts at gunmetal 400, which is 6.51:1 against
+     neutral.950; 300 is the first step that clears 7. */
   --fluid-accent-base: var(--fluid-color-brand-300); /* #b7bfca, 10.72:1 */
   --fluid-accent-hover: var(--fluid-color-brand-200); /* #d8dce3, 14.46:1 */
   --fluid-accent-active: var(--fluid-color-brand-100); /* #eceef2, 17.13:1 */

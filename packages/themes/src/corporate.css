@@ -82,12 +82,15 @@
 }
 
 /* Dark scheme re-derives the accent from lighter brand steps, matching the
-   base tokens, so a dark-mode subtree keeps its contrast. */
+   base tokens, so a dark-mode subtree keeps its contrast. Slate is a muted
+   ramp, so it starts a step higher than the default brand does: brand.500
+   (#64748b) leaves the dark accent text at 4.18:1, under the AA floor, while
+   brand.400 reads 7.76:1. */
 [data-fluid-theme="dark"] [data-fluid-brand="corporate"],
 [data-fluid-brand="corporate"][data-fluid-theme="dark"] {
-  --fluid-accent-base: var(--fluid-color-brand-500);
-  --fluid-accent-hover: var(--fluid-color-brand-400);
-  --fluid-accent-active: var(--fluid-color-brand-300);
+  --fluid-accent-base: var(--fluid-color-brand-400); /* #94a3b8, 7.76:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300); /* #cbd5e1, 13.40:1 */
+  --fluid-accent-active: var(--fluid-color-brand-200); /* #e2e8f0, 16.14:1 */
   --fluid-focus-ring-color: var(--fluid-color-brand-400);
   /* The stronger rule lines re-derive for dark the same way the base border
      tokens do: one step lighter than the dark defaults, never the light
@@ -96,34 +99,27 @@
   --fluid-border-strong: var(--fluid-color-neutral-600);
 }
 
-/*
- * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
- *
- * The light accent already clears 7:1 (white on brand.600 #475569 is 7.58:1,
- * hover 10.35:1, active 14.63:1), so light needs no override: slate is a dark
- * enough accent to begin with. Only the dark scheme moves, and it has to be
- * stated on every dark path because this file's own dark block out-ranks the
- * AAA block shipped in @fluid-ds/tokens. The trailing descendant form is the
- * region case, where the conformance attribute sits on a section rather than
- * beside the brand on <html>.
- *
- * Ratios are computed against --fluid-accent-text (neutral.950 in dark) and
- * asserted by the token-contrast test.
- */
-[data-fluid-theme="dark"] [data-fluid-brand="corporate"][data-fluid-conformance="aaa"],
-[data-fluid-brand="corporate"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
-[data-fluid-brand="corporate"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
-  /* brand.500 reads 4.18:1 against neutral.950 text; brand.400 clears 7. */
-  --fluid-accent-base: var(--fluid-color-brand-400); /* #94a3b8, 7.76:1 */
-  --fluid-accent-hover: var(--fluid-color-brand-300); /* #cbd5e1, 13.40:1 */
-  --fluid-accent-active: var(--fluid-color-brand-200); /* #e2e8f0, 16.14:1 */
-}
-
+/* The block above only matches when a scheme is named. When the reader's
+   operating system asks for dark and nothing sets the attribute, the automatic
+   dark block in @fluid-ds/tokens out-ranks this file's plain brand block, and
+   would hand back the default brand.500 accent step, which slate cannot carry.
+   Restating it here under the same media query settles that. */
 @media (prefers-color-scheme: dark) {
-  [data-fluid-brand="corporate"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
-  [data-fluid-brand="corporate"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+  [data-fluid-brand="corporate"]:not([data-fluid-theme="light"]) {
     --fluid-accent-base: var(--fluid-color-brand-400); /* 7.76:1 */
     --fluid-accent-hover: var(--fluid-color-brand-300); /* 13.40:1 */
     --fluid-accent-active: var(--fluid-color-brand-200); /* 16.14:1 */
+    --fluid-focus-ring-color: var(--fluid-color-brand-400);
+    --fluid-border-default: var(--fluid-color-neutral-700);
+    --fluid-border-strong: var(--fluid-color-neutral-600);
   }
 }
+
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text): nothing to
+ * do. Corporate is a muted ramp that already sits well clear of 7:1 at the
+ * baseline, in both schemes (white on brand.600 #475569 is 7.58:1 in light,
+ * neutral.950 on brand.400 #94a3b8 is 7.76:1 in dark), and the remaining tones
+ * come from the AAA block in @fluid-ds/tokens. An override here would only
+ * restate values this file already declares.
+ */

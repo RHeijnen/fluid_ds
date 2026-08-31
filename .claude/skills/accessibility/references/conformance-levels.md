@@ -181,8 +181,9 @@ combination, and asserts:
 - every normal-text pair reaches **7.0:1** under `data-fluid-conformance="aaa"`
   (verified across 6 brands × 4 scheme paths, including the interaction states,
   since a hovered control still carries its label);
-- the AA baseline holds at **4.5:1**, against a frozen and exact list of
-  pre-existing gaps, so both a new regression and a stale entry fail the gate.
+- the AA baseline holds at **4.5:1** everywhere, with an empty allow-list. The
+  list is a ratchet asserted to be exact, so parking a failure in it is a
+  visible act and fixing one without pruning its entry fails just as loudly.
 
 Both placements of the attribute work: on `<html>` beside the theme and brand
 attributes (what the docs toggle does), and on a region that inherits its scheme
@@ -244,7 +245,18 @@ Two shapes of the problem showed up while building it, both worth remembering:
 - **The ladder, not just the resting fill.** Hover and active states carry the
   label too. In the light scheme the warning tone is the one that carries dark
   text, so its ladder has to run the opposite way from every other tone: it
-  gets _lighter_ on hover, because darkening amber drops contrast.
+  gets _lighter_ on hover, because darkening amber drops contrast. Checking
+  only resting fills is what let the old light `warning-active` sit at 3.96:1,
+  under the AA floor, unnoticed. The same shape appears in any brand that
+  regrades a ramp: titanium borrows gunmetal for amber, which is far darker
+  than the amber it replaces, so its warning ladder inverts too.
+- **A muted or luminous ramp does not start where the default one does.** The
+  scheme blocks derive the accent from a fixed step (brand.600 in light,
+  brand.500 in dark), which only holds if a brand's ramp has roughly the
+  default's lightness at those stops. Slate and gunmetal are darker, so their
+  dark accents start one and two steps higher; sky is lighter, so glass starts
+  one step lower in light. A new preset has to re-check the step, not inherit
+  the number.
 - **Exhaustive re-declaration.** A custom property declared for one scheme
   applies in the other unless something out-ranks it on the same element. The
   AAA blocks therefore restate the union of both schemes' deltas, and each

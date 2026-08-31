@@ -36,10 +36,14 @@
   /* Re-derive the brand-driven semantics at this scope. A custom property that
      reads the brand ramp is substituted where it is declared, so the base
      :root accent keeps the default brand unless it is re-declared here. This
-     is what makes the brand work on a subtree, not only at :root. */
-  --fluid-accent-base: var(--fluid-color-brand-600);
-  --fluid-accent-hover: var(--fluid-color-brand-700);
-  --fluid-accent-active: var(--fluid-color-brand-800);
+     is what makes the brand work on a subtree, not only at :root.
+
+     Sky is a light, luminous ramp, so the accent starts a step lower than the
+     default brand does: white on brand.600 (#0284c7) is only 4.10:1, under the
+     AA floor, while brand.700 reads 5.93:1. */
+  --fluid-accent-base: var(--fluid-color-brand-700); /* #0369a1, 5.93:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-800); /* #075985, 7.56:1 */
+  --fluid-accent-active: var(--fluid-color-brand-900); /* #0c4a6e, 9.46:1 */
   --fluid-focus-ring-color: var(--fluid-color-brand-500);
 
   /* The frost material, as tokens so the dark scheme can invert it in one place

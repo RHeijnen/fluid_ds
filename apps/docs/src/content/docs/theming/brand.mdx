@@ -175,10 +175,12 @@ attribute value:
   --fluid-color-brand-600: #0284c7;
   --fluid-color-brand-700: #0369a1;
 
-  /* what components actually read */
-  --fluid-accent-base: #0284c7;
-  --fluid-accent-hover: #0369a1;
-  --fluid-accent-active: #075985;
+  /* what components actually read. Check the fill against the text you pair
+     it with, at every step: white on #0284c7 is only 4.10:1, under the 4.5:1
+     floor, so this ladder starts one step deeper. */
+  --fluid-accent-base: #0369a1; /* white, 5.93:1 */
+  --fluid-accent-hover: #075985; /* 7.56:1 */
+  --fluid-accent-active: #0c4a6e; /* 9.46:1 */
   --fluid-accent-text: #ffffff;
 }
 ```

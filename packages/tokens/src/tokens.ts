@@ -372,13 +372,13 @@ export const semantics = {
     },
     /*
      * Semantic tones, `tone="..."` on interactive components reaches
-     * these. Each base+text pair audited to meet WCAG 2.1 SC 1.4.3 AA
-     * (4.5:1 contrast minimum) for normal text. Warning uses dark text
-     * because amber-on-white drops below 4.5:1.
+     * these. Every base / hover / active step is audited against its text
+     * token for WCAG 2.2 SC 1.4.3 AA (4.5:1 for normal text), not just the
+     * resting fill: a hovered or pressed control still carries its label.
+     * Warning uses dark text because amber-on-white drops below 4.5:1.
      *
-     * See `.claude/skills/accessibility/references/tokens.md` for the
-     * contrast-validator script outline that should fail the build on
-     * any regression here.
+     * `scripts/token-contrast.test.mjs` asserts all of it, per brand and
+     * scheme, and fails the build on a regression.
      */
     neutral: {
       base: t("{color.neutral.700}", "color"),
@@ -398,16 +398,23 @@ export const semantics = {
       active: t("{color.red.800}", "color"),
       text: t("{color.white}", "color")
     },
+    /*
+     * Warning is the only light-scheme tone with DARK text, so its ladder
+     * runs the opposite way from the others: darkening amber moves the fill
+     * TOWARD the label instead of away from it. The old 500/600/700 ladder
+     * ended at 3.96:1, under the AA floor, so the states brighten instead.
+     */
     warning: {
-      base: t("{color.amber.500}", "color"),
-      hover: t("{color.amber.600}", "color"),
-      active: t("{color.amber.700}", "color"),
+      base: t("{color.amber.500}", "color"), // neutral.950 on #f59e0b, 9.26:1
+      hover: t("{color.amber.400}", "color"), // #fbbf24, 11.92:1
+      active: t("{color.amber.300}", "color"), // #fcd34d, 13.80:1
       text: t("{color.neutral.950}", "color")
     },
+    // sky.600 leaves white text at 4.10:1, so the whole ladder shifts down one.
     info: {
-      base: t("{color.sky.600}", "color"),
-      hover: t("{color.sky.700}", "color"),
-      active: t("{color.sky.800}", "color"),
+      base: t("{color.sky.700}", "color"), // white on #0369a1, 5.93:1
+      hover: t("{color.sky.800}", "color"), // #075985, 7.56:1
+      active: t("{color.sky.900}", "color"), // #0c4a6e, 9.46:1
       text: t("{color.white}", "color")
     },
     focus: {
@@ -529,18 +536,14 @@ export const conformance = {
         hover: t("{color.red.900}", "color"), // white on #7f1d1d, 10.02:1
         active: t("color-mix(in srgb, {color.red.900} 85%, {color.neutral.950})", "color") // #6d1a1a, 11.58:1
       },
-      warning: {
-        /*
-         * Warning is the one light-scheme tone that carries DARK text, so its
-         * ladder inverts at AAA: darkening amber drops contrast (amber.600 is
-         * 6.24:1 and amber.700 only 3.96:1, which does not even clear AA).
-         * The base already passes at 9.26:1, so only the states move, upward.
-         */
-        hover: t("{color.amber.400}", "color"), // neutral.950 on #fbbf24, 11.92:1
-        active: t("{color.amber.300}", "color") // neutral.950 on #fcd34d, 13.80:1
-      },
+      /*
+       * Warning carries no AAA delta. Its light ladder already brightens
+       * (9.26 / 11.92 / 13.80:1) because dark text forces that direction, and
+       * the dark ladder starts brighter still, so every step clears 7:1 at the
+       * baseline.
+       */
       info: {
-        // white on sky.600 is 4.10:1 (an AA gap too), on sky.700 5.93:1.
+        // white on the baseline sky.700 is 5.93:1.
         base: t("{color.sky.800}", "color"), // white on #075985, 7.56:1
         hover: t("{color.sky.900}", "color"), // white on #0c4a6e, 9.46:1
         active: t("color-mix(in srgb, {color.sky.900} 85%, {color.neutral.950})", "color") // #0c405f, 10.97:1
