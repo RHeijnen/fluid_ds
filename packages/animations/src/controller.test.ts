@@ -269,4 +269,218 @@ describe("controller: triggers", () => {
       host.remove();
     }
   });
+
+  it("treats an unrecognized trigger as mount rather than never playing", async () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "sideways",
+      "data-fluid-animation-duration": "5000"
+    });
+    try {
+      await waitUntil(
+        () => el.getAnimations().length > 0,
+        "an unknown trigger must fall back to mount"
+      );
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("stops the animation when the animation attribute is removed", async () => {
+    const el = makeEl({ [ATTR]: SPIN });
+    try {
+      await waitUntil(() => el.getAnimations().length > 0, "spin never started");
+      const animation = el.getAnimations()[0]!;
+      el.removeAttribute(ATTR);
+      await aTimeout(0);
+      expect(animation.playState, "dropping the name must cancel the run").to.equal("idle");
+    } finally {
+      el.remove();
+    }
+  });
+
+  it("picks up and tears down animated elements nested inside a subtree", async () => {
+    const wrapper = document.createElement("div");
+    const child = document.createElement("div");
+    child.setAttribute(ATTR, SPIN);
+    wrapper.append(child);
+    // Appending the WRAPPER, not the animated node: the controller has to walk
+    // into added subtrees, and back out of removed ones.
+    document.body.append(wrapper);
+    await waitUntil(() => child.getAnimations().length > 0, "a nested element never played");
+    const animation = child.getAnimations()[0]!;
+    wrapper.remove();
+    await aTimeout(0);
+    expect(animation.playState, "a removed subtree must not keep animating").to.equal("idle");
+  });
+
+  it("plays an element whose animation is registered after it mounts", async () => {
+    const late = `test-late-${Math.random().toString(36).slice(2)}`;
+    const el = makeEl({ [ATTR]: late });
+    try {
+      await aTimeout(0);
+      expect(el.getAnimations(), "nothing to play yet").to.have.length(0);
+      registerAnimation(late, {
+        keyframes: [{ opacity: 0 }, { opacity: 1 }],
+        defaults: { duration: 5000 }
+      });
+      await waitUntil(
+        () => el.getAnimations().length > 0,
+        "a late registration never reached the waiting element"
+      );
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("plays an in-view element once it intersects the viewport", async () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "in-view",
+      "data-fluid-animation-duration": "5000"
+    });
+    el.style.cssText = "position:fixed;top:10px;left:10px;width:60px;height:60px";
+    try {
+      await waitUntil(() => el.getAnimations().length > 0, "in-view animation never started", {
+        timeout: 3000
+      });
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("does not re-bind a trigger listener when other attributes change", async () => {
+    const el = makeEl({ [ATTR]: FADE, "data-fluid-animation-trigger": "click" });
+    try {
+      await aTimeout(0);
+      el.setAttribute("data-fluid-animation-duration", "300");
+      el.setAttribute("data-fluid-animation-easing", "linear");
+      await aTimeout(0);
+      el.dispatchEvent(new MouseEvent("click"));
+      // A second listener would start a second animation on the one click.
+      expect(el.getAnimations(), "the click listener must be bound exactly once").to.have.length(1);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("a trigger listener goes quiet once the element falls back to mount", async () => {
+    // SPIN is infinite, so the assertion cannot race the animation finishing.
+    const el = makeEl({ [ATTR]: SPIN, "data-fluid-animation-trigger": "click" });
+    try {
+      await aTimeout(0);
+      // Removing the trigger attribute means "mount", which plays once now; the
+      // already-bound click listener must not fire a second run afterwards.
+      el.removeAttribute("data-fluid-animation-trigger");
+      await waitUntil(() => el.getAnimations().length > 0, "the mount fallback never played");
+      el.dispatchEvent(new MouseEvent("click"));
+      expect(el.getAnimations()).to.have.length(1);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("a hover or click trigger does nothing while its animation is unregistered", async () => {
+    for (const [trigger, event] of [
+      ["hover", new PointerEvent("pointerenter")],
+      ["click", new MouseEvent("click")]
+    ] as const) {
+      const el = makeEl({ [ATTR]: FADE, "data-fluid-animation-trigger": trigger });
+      try {
+        await aTimeout(0); // bind the listener while the name still resolves
+        el.setAttribute(ATTR, "not-registered-anywhere");
+        await aTimeout(0);
+        el.dispatchEvent(event);
+        expect(el.getAnimations(), `${trigger} played an unregistered animation`).to.have.length(0);
+      } finally {
+        stopElementAnimation(el);
+        el.remove();
+      }
+    }
+  });
+});
+
+describe("controller: booting", () => {
+  it("is idempotent: a second boot of the same root does not double-play", async () => {
+    startAnimationController();
+    startAnimationController(document);
+    const el = makeEl({ [ATTR]: FADE, "data-fluid-animation-duration": "5000" });
+    try {
+      await waitUntil(() => el.getAnimations().length > 0, "mount animation never started");
+      await aTimeout(0);
+      expect(el.getAnimations(), "a re-boot must not stack a second run").to.have.length(1);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+});
+
+describe("controller: option parsing", () => {
+  it("ignores non-numeric duration and delay overrides", () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "manual",
+      "data-fluid-animation-duration": "soon",
+      "data-fluid-animation-delay": "later"
+    });
+    try {
+      const timing = playElementAnimation(el)!.effect!.getTiming();
+      expect(timing.duration).to.equal(200);
+      expect(timing.delay).to.equal(0);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("ignores an unparseable iterations override", () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "manual",
+      "data-fluid-animation-iterations": "loads"
+    });
+    try {
+      expect(playElementAnimation(el)!.effect!.getTiming().iterations).to.equal(1);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("accepts a fractional iteration count", () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "manual",
+      "data-fluid-animation-iterations": "2.5"
+    });
+    try {
+      expect(playElementAnimation(el)!.effect!.getTiming().iterations).to.equal(2.5);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
+  it("restarting cancels the in-flight run and tracks only the newest", async () => {
+    const el = makeEl({ [ATTR]: SPIN, "data-fluid-animation-trigger": "manual" });
+    try {
+      const first = playElementAnimation(el)!;
+      const second = playElementAnimation(el)!;
+      expect(first.playState, "the superseded run must be canceled").to.equal("idle");
+      expect(second.playState).to.not.equal("idle");
+      // Let the canceled run's rejected `finished` settle; it must not evict the
+      // live animation from the controller's bookkeeping.
+      await aTimeout(0);
+      stopElementAnimation(el);
+      expect(second.playState, "the live run is still the tracked one").to.equal("idle");
+    } finally {
+      el.remove();
+    }
+  });
 });

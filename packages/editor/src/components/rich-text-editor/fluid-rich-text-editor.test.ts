@@ -1,4 +1,12 @@
-import { expect, fixture, html, elementUpdated, oneEvent, aTimeout } from "@open-wc/testing";
+import {
+  expect,
+  fixture,
+  fixtureSync,
+  html,
+  elementUpdated,
+  oneEvent,
+  aTimeout
+} from "@open-wc/testing";
 import { sendKeys } from "@web/test-runner-commands";
 import "./define.js";
 import "@fluid-ds/components/locales/nl";
@@ -758,6 +766,62 @@ describe("<fluid-rich-text-editor> behavioral branch regressions", () => {
       expect(changes[0]!.detail.value).to.equal(el.value);
     });
   }
+
+  it("survives a document selection change dispatched before the editable region renders", async () => {
+    // connectedCallback subscribes to document selectionchange, but the query
+    // for the editable region resolves to null until the first render commits.
+    // A caret move during that window must be ignored, not throw.
+    const el = fixtureSync<FluidRichTextEditor>(
+      html`<fluid-rich-text-editor
+        .value=${"<p>Content assigned before render</p>"}
+      ></fluid-rich-text-editor>`
+    );
+    expect(el.shadowRoot?.querySelector('[part="editable"]') ?? null).to.equal(null);
+    const changes = observeChanges(el);
+    document.dispatchEvent(new Event("selectionchange"));
+
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(editable(el).innerHTML).to.equal("<p>Content assigned before render</p>");
+    expect(el.value).to.equal("<p>Content assigned before render</p>");
+    expect(toolbarButtons(el)[0]!.getAttribute("aria-pressed")).to.equal("false");
+    expect(changes).to.deep.equal([]);
+
+    // The subscription is still live once the region exists: a real selection
+    // now updates the toggle state the pre-render notification could not.
+    await selectEditorText(el, 0, "Content assigned before render".length);
+    toolbarButtons(el)[0]!.click();
+    await elementUpdated(el);
+    expect(editable(el).querySelector("b,strong")?.textContent).to.equal(
+      "Content assigned before render"
+    );
+    expect(toolbarButtons(el)[0]!.getAttribute("aria-pressed")).to.equal("true");
+    expect(changes.length).to.equal(1);
+  });
+
+  it("keeps the captured range when the document selection reports no range", async () => {
+    const el = await editor();
+    el.value = "<p>Alpha Beta Gamma</p>";
+    const selection = await selectEditorText(el, 6, 10);
+    const bold = toolbarButtons(el)[0]!;
+    bold.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true }));
+    bold.focus();
+
+    // An emptied selection carries no range to capture. Discarding the captured
+    // one here would silently drop the user's selection before the command runs.
+    selection.removeAllRanges();
+    expect(selection.rangeCount).to.equal(0);
+    document.dispatchEvent(new Event("selectionchange"));
+    await aTimeout(0);
+
+    const changes = observeChanges(el);
+    bold.click();
+    await elementUpdated(el);
+    expect(editable(el).querySelector("b,strong")?.textContent).to.equal("Beta");
+    expect(editable(el).textContent).to.equal("Alpha Beta Gamma");
+    expect(changes.length).to.equal(1);
+    expect(changes[0]!.detail.value).to.equal(el.value);
+  });
 
   it("keeps other toggle states usable when one native queryCommandState throws", async () => {
     const el = await editor();
