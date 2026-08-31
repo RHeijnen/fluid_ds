@@ -1869,11 +1869,24 @@ footer.site-footer a {
 /* ------------------------------------------------------------------ */
 /* CTA + footer */
 
-/* The closing band: fluid-hero over the gradient artwork, rounded like the
-   page's cards. The component supplies the readable scrim over the media. */
+/* The closing band: fluid-hero over the silk-wave artwork, rounded like the
+   page's cards. The scrim fades from a strong surface tint behind the text
+   to nothing at the bottom, so the waves stay vivid below the copy (and it
+   rides surface-base, so dark mode inverts it automatically). */
 .cta-hero {
   border-radius: var(--fluid-radius-lg, 16px);
   overflow: hidden;
+  min-height: 38rem;
+  --fluid-hero-overlay: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--fluid-surface-base) 85%, transparent) 0%,
+    color-mix(in srgb, var(--fluid-surface-base) 62%, transparent) 52%,
+    color-mix(in srgb, var(--fluid-surface-base) 5%, transparent) 100%
+  );
+}
+/* Show the wave-rich lower part of the artwork; cover crops the haze top. */
+.cta-hero [slot="media"] img {
+  object-position: 50% 100%;
 }
 /* .hero-actions is left-aligned for the hero; the closing band centers it. */
 .cta-row .hero-actions {
