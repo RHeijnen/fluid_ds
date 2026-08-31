@@ -128,21 +128,21 @@ animation is disabled under reduced motion.
 
 ### Properties
 
-| Property              | Attribute               | Type                                | Default                   | Description                                                        |
-| --------------------- | ----------------------- | ----------------------------------- | ------------------------- | ------------------------------------------------------------------ |
-| `nodes`               | –                       | `NodeGraphNode[]`                   | `[]`                      | The nodes: `{ id, type, x, y, label?, summary? }` in world pixels. |
-| `edges`               | –                       | `NodeGraphEdge[]`                   | `[]`                      | The connections: `{ id, from, port, to }`.                         |
-| `nodeTypes`           | –                       | `Record<string, NodeGraphNodeType>` | `{}`                      | The type registry (see above).                                     |
-| `renderNode`          | –                       | `(node) => unknown`                 | –                         | Optional renderer for a node's body.                               |
-| `runStates`           | –                       | `Record<string, NodeGraphRunState>` | `{}`                      | Traversal paint state per node.                                    |
-| `traversedEdges`      | –                       | `string[]`                          | `[]`                      | Edges painted with the traversed style.                            |
-| `messages`            | –                       | `Partial<NodeGraphMessages>`        | `{}`                      | Overrides for the announcement strings (localization).             |
-| `label`               | `label`                 | `string`                            | `"Node graph"`            | Accessible name of the editor.                                     |
-| `grid`                | `grid`                  | `number`                            | `8`                       | Snap step in world pixels; `0` disables snapping.                  |
-| `nodeWidth`           | `node-width`            | `number`                            | `230`                     | Shared node width in world pixels.                                 |
-| `minZoom` / `maxZoom` | `min-zoom` / `max-zoom` | `number`                            | `0.4` / `2`               | Zoom clamp.                                                        |
-| `readonly`            | `readonly`              | `boolean`                           | `false`                   | Blocks every mutation; pan, zoom and selection stay live.          |
-| `dropFormat`          | `drop-format`           | `string`                            | `"text/fluid-node-graph"` | The dataTransfer type accepted on drop.                            |
+| Property              | Attribute               | Type                                | Default                   | Description                                                                        |
+| --------------------- | ----------------------- | ----------------------------------- | ------------------------- | ---------------------------------------------------------------------------------- |
+| `nodes`               | –                       | `NodeGraphNode[]`                   | `[]`                      | The nodes: `{ id, type, x, y, label?, summary? }` in world pixels.                 |
+| `edges`               | –                       | `NodeGraphEdge[]`                   | `[]`                      | The connections: `{ id, from, port, to }`.                                         |
+| `nodeTypes`           | –                       | `Record<string, NodeGraphNodeType>` | `{}`                      | The type registry (see above).                                                     |
+| `renderNode`          | –                       | `(node) => unknown`                 | –                         | Optional renderer for a node's body.                                               |
+| `runStates`           | –                       | `Record<string, NodeGraphRunState>` | `{}`                      | Traversal paint state per node.                                                    |
+| `traversedEdges`      | –                       | `string[]`                          | `[]`                      | Edges painted with the traversed style.                                            |
+| `messages`            | –                       | `Partial<NodeGraphMessages>`        | `{}`                      | Overrides for every string the component owns (see [Localization](#localization)). |
+| `label`               | `label`                 | `string`                            | `"Node graph"`            | Accessible name of the editor.                                                     |
+| `grid`                | `grid`                  | `number`                            | `8`                       | Snap step in world pixels; `0` disables snapping.                                  |
+| `nodeWidth`           | `node-width`            | `number`                            | `230`                     | Shared node width in world pixels.                                                 |
+| `minZoom` / `maxZoom` | `min-zoom` / `max-zoom` | `number`                            | `0.4` / `2`               | Zoom clamp.                                                                        |
+| `readonly`            | `readonly`              | `boolean`                           | `false`                   | Blocks every mutation; pan, zoom and selection stay live.                          |
+| `dropFormat`          | `drop-format`           | `string`                            | `"text/fluid-node-graph"` | The dataTransfer type accepted on drop.                                            |
 
 ### Methods
 
@@ -168,6 +168,86 @@ All events bubble and are composed.
 | `fluid-viewport-change`  | `{ x, y, zoom }`         | Pan or zoom settles.                                     |
 | `fluid-node-drop`        | `{ data, x, y }`         | A matching drag is dropped, in world coordinates.        |
 
+## Localization
+
+Every word the component renders is either translated for you or replaceable
+by you. Prose resolves from the built-in dictionary for the nearest `lang`, so
+a graph inside `<html lang="fr">` speaks French and the canvas mirrors its
+`dir` without moving any coordinate. The editor's accessible name comes from
+the `label` property instead (default `"Node graph"`, itself localized).
+
+Three defaults are punctuation rather than prose, and are the same in every
+shipped dictionary: the comma in `nodeName`, the percent sign in `zoomLevel`,
+and the `hudSeparator` middot. Override them where a locale wants different
+punctuation.
+
+Node titles, node-type labels and port labels are your data. The component
+places them into its templates but never translates them.
+
+`messages` replaces individual strings on one editor. Each value is a
+template: a `{name}` placeholder is substituted with the variable listed
+below, a placeholder with no matching variable is left verbatim, and numbers
+arrive already formatted for the active locale. An unset key keeps its
+dictionary default, and an empty string is honored as a deliberate override.
+
+```ts
+graph.messages = {
+  editorRole: "knooppuntgrafiek-editor",
+  nodeRole: "knooppunt",
+  nodeCount: "{count} knopen",
+  nodeCountOne: "{count} knoop"
+};
+```
+
+### Announcements
+
+Spoken through the polite live region.
+
+| Key                | Placeholders             | English default                                                                                          |
+| ------------------ | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `nodeMoved`        | `node`, `x`, `y`         | `{node} moved to {x}, {y}`                                                                               |
+| `nodeRemoved`      | `node`                   | `{node} removed`                                                                                         |
+| `nodeSelected`     | `node`                   | `{node} selected`                                                                                        |
+| `edgeSelected`     | `from`, `to`             | `Connection from {from} to {to} selected. Press Delete to remove it.`                                    |
+| `edgeRemoved`      | `from`, `to`             | `Connection from {from} to {to} removed`                                                                 |
+| `connectStart`     | `node`, `port`           | `Connecting from {node}, {port}. Use arrow keys to choose a target, Enter to connect, Escape to cancel.` |
+| `connectCandidate` | `node`, `index`, `count` | `{node}, {index} of {count}`                                                                             |
+| `connected`        | `from`, `to`             | `Connected {from} to {to}`                                                                               |
+| `connectCancelled` | –                        | `Connection cancelled`                                                                                   |
+| `connectFailed`    | –                        | `Could not connect`                                                                                      |
+| `connectNoTargets` | –                        | `No available targets to connect to`                                                                     |
+| `zoomChanged`      | `percent`                | `Zoom {percent} percent`                                                                                 |
+
+### Names and role descriptions
+
+| Key          | Placeholders   | English default            | Applied to                                                           |
+| ------------ | -------------- | -------------------------- | -------------------------------------------------------------------- |
+| `editorRole` | –              | `node graph editor`        | The canvas `aria-roledescription`.                                   |
+| `nodeRole`   | –              | `node`                     | Each node's `aria-roledescription`.                                  |
+| `nodeName`   | `node`, `type` | `{node}, {type}`           | A node's accessible name when its type label differs from its title. |
+| `inputPort`  | `node`         | `Input of {node}`          | The input port button.                                               |
+| `outputPort` | `port`, `node` | `{port}, output of {node}` | Each output port button.                                             |
+
+### Summary chip
+
+The `hud` part, the visual `3 nodes · 1 edge · 100%` readout. It is
+`aria-hidden`, so it repeats what the live region and the accessible names
+already carry.
+
+| Key            | Placeholders | English default | Notes                                                                         |
+| -------------- | ------------ | --------------- | ----------------------------------------------------------------------------- |
+| `nodeCount`    | `count`      | `{count} nodes` | The general tally form.                                                       |
+| `nodeCountOne` | `count`      | `{count} node`  | Used only when the active locale puts the count in the `one` plural category. |
+| `edgeCount`    | `count`      | `{count} edges` | The general tally form.                                                       |
+| `edgeCountOne` | `count`      | `{count} edge`  | The `one` plural category.                                                    |
+| `zoomLevel`    | `percent`    | `{percent}%`    | The zoom readout.                                                             |
+| `hudSeparator` | –            | `·`             | Drawn between the segments.                                                   |
+
+A tally with no `…One` override uses the general key for every count, matching
+the dictionary's own fallback form. The built-in dictionaries carry each
+locale's full plural rules, so Arabic renders its zero, one, two, few and many
+forms without any override at all.
+
 ## Keyboard
 
 The keyboard path is a first-class peer of the pointer gestures, not a
@@ -187,8 +267,8 @@ fallback.
 Nodes live in a `list` with focusable `listitem` children; ports are real
 buttons whose targets meet the minimum size (scaling to 44px under AAA
 conformance); and every move, connection, removal, selection, and zoom change
-is announced through a polite `aria-live` region. The announcement strings are
-overridable through the `messages` property for localization.
+is announced through a polite `aria-live` region, in the page's language and
+overridable through [`messages`](#localization).
 
 ### Verification and remaining limits
 
@@ -200,11 +280,21 @@ These checks do not replace screen-reader review of the application-mode
 editor. Provide an application-level list or form for essential graph data
 where appropriate, and an accessible add-node action beside any drag palette.
 
-`messages` overrides announcements and port/node names, but the canvas role
-description and visual summary labels are still English. A complete
-localization audit and representative assistive-technology signoff remain
-release gates; the presence of keyboard tests is not a claim of complete
-accessibility conformance.
+Localization is now complete at the string level. Every string the component
+owns has a locale-aware default and a `messages` key: both role descriptions,
+every accessible name, all twelve announcements, and each segment of the
+visual summary chip including its separator. Browser tests assert that each
+key replaces the string it renders, that the summary chip follows the active
+locale's plural rules, that the canvas role description and chip relocalize
+when the language changes, and that the accessibility audit still passes with
+every owned string overridden.
+
+What remains open is human, not mechanical. Representative
+assistive-technology signoff is still a release gate: no screen-reader pass
+over the application-mode canvas, in a left-to-right or a right-to-left
+locale, has been recorded, and translation review by native speakers of the
+shipped dictionaries is a separate gate. The presence of keyboard and string
+tests is not a claim of complete accessibility conformance.
 
 ## Theming
 

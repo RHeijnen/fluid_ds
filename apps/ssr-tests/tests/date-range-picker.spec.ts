@@ -78,17 +78,26 @@ async function deepActivePart(page: Page): Promise<string | null> {
 
 for (const mode of ["client", "dsd"] as const) {
   test(
-    `date-range-picker ${mode}: native validation reveals and focuses the non-typeable chooser`,
+    `date-range-picker ${mode}: native validation focuses the non-typeable field and ArrowDown reveals the chooser`,
     { tag: "@date-range-focus" },
     async ({ page }) => {
       const { errors, field } = await openRange(page, mode);
       for (const [index, action] of actions.entries()) {
         await activate(page, action);
-        await expect(field).toHaveAttribute("open");
-        await expect.poll(() => deepActivePart(page)).toMatch(/dialog|preset/);
+        // Constraint validation focuses the field's own anchor. It must not
+        // fling the popover open: that focus comes from the form, not from a
+        // request to see the chooser, and opening there strands the user in a
+        // surface they never asked for.
+        await expect.poll(() => deepActivePart(page)).toBe("input");
+        await expect(field).not.toHaveAttribute("open");
         expect(await page.evaluate(() => window.formFocusFixture.invalidEvents)).toBe(index + 1);
         expect(await page.evaluate(() => window.formFocusFixture.submissions)).toEqual([]);
+        // ArrowDown is the way in from there, per the APG combobox pattern.
+        await page.keyboard.press("ArrowDown");
+        await expect(field).toHaveAttribute("open");
+        await expect.poll(() => deepActivePart(page)).toMatch(/dialog|preset/);
         await page.keyboard.press("Escape");
+        await expect(field).not.toHaveAttribute("open");
       }
       await field.evaluate((host) =>
         (host as HTMLElement & { setCustomValidity(message: string): void }).setCustomValidity(
@@ -96,7 +105,8 @@ for (const mode of ["client", "dsd"] as const) {
         )
       );
       await activate(page, actions[0]);
-      await expect.poll(() => deepActivePart(page)).toMatch(/dialog|preset/);
+      await expect.poll(() => deepActivePart(page)).toBe("input");
+      await expect(field).not.toHaveAttribute("open");
       expect(
         await field.evaluate((host) => {
           const picker = host as HTMLElement & {
@@ -116,7 +126,9 @@ for (const mode of ["client", "dsd"] as const) {
     { tag: "@date-range-focus" },
     async ({ page }) => {
       const { errors, field } = await openRange(page, mode);
-      await field.locator("input").focus();
+      // Clicking the field is what opens the chooser; focus alone deliberately
+      // does not.
+      await field.locator("input").click();
       await expect(field).toHaveAttribute("open");
       await field
         .locator("fluid-calendar")

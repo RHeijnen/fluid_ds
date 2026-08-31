@@ -43216,12 +43216,13 @@
             },
             {
               "kind": "field",
-              "name": "invalid",
+              "name": "showInvalid",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
-              "default": "false"
+              "default": "false",
+              "description": "Whether a failed constraint should be painted. Flipped on once the user\nleaves the group or a validation attempt reports the control, so an\nuntouched field stays neutral.\n\nThe painted `invalid` state derives from this instead of being assigned\nfrom `updated()`: writing reactive state after an update completes\nschedules a second render pass and trips Lit's change-in-update warning\n(it did, the moment a revealed error was resolved by finishing the code)."
             },
             {
               "kind": "field",
@@ -43231,6 +43232,26 @@
               },
               "privacy": "private",
               "description": "The per-box characters, length-normalized from `value`.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "missing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the code is required but still incomplete.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the failed constraint is currently painted.",
               "readonly": true
             },
             {
@@ -43274,19 +43295,25 @@
             },
             {
               "kind": "method",
-              "name": "refreshValidity",
+              "name": "publishValidity",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "parameters": [
-                {
-                  "name": "showInvalid",
-                  "default": "this.invalid"
+              "description": "Push the current constraint state into ElementInternals."
+            },
+            {
+              "kind": "method",
+              "name": "revealInvalid",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
                 }
-              ]
+              },
+              "description": "Start painting a failed constraint (blur, or a validation attempt)."
             },
             {
               "kind": "field",
@@ -55991,12 +56018,13 @@
             },
             {
               "kind": "field",
-              "name": "invalid",
+              "name": "showInvalid",
               "type": {
                 "text": "boolean"
               },
               "privacy": "private",
-              "default": "false"
+              "default": "false",
+              "description": "Whether a failed constraint should be painted. Flipped on once the trigger\nis blurred or a validation attempt reports the control, so an untouched\nselect stays neutral.\n\nThe painted `invalid` state derives from this instead of being assigned\nfrom `updated()`: writing reactive state after an update completes\nschedules a second render pass and trips Lit's change-in-update warning\n(it did, the moment a revealed error was resolved by picking an option)."
             },
             {
               "kind": "field",
@@ -56118,20 +56146,46 @@
               "description": "Get all option children, regardless of slot."
             },
             {
+              "kind": "field",
+              "name": "valueMissing",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether an option is required but none is selected.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "invalid",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "description": "Whether the failed constraint is currently painted.",
+              "readonly": true
+            },
+            {
               "kind": "method",
-              "name": "refreshValidity",
+              "name": "publishValidity",
               "privacy": "private",
               "return": {
                 "type": {
                   "text": "void"
                 }
               },
-              "parameters": [
-                {
-                  "name": "showInvalid",
-                  "default": "this.invalid"
+              "description": "Push the current constraint state into ElementInternals."
+            },
+            {
+              "kind": "method",
+              "name": "revealInvalid",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
                 }
-              ]
+              },
+              "description": "Start painting a failed constraint (blur, or a validation attempt)."
             },
             {
               "kind": "method",

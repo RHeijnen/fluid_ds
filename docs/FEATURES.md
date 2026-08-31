@@ -240,7 +240,7 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
   registry under the stable `latest` channel. Install with
   `npm i @fluid-ds/components@latest`.
 
-### Accessibility: WCAG 2.2 ✅ AA / 🔨 AAA
+### Accessibility: WCAG 2.2 ✅ AA / ✅ AAA conformance switch
 
 - ✅ Every component built to **WCAG 2.2 Level AA**: semantics from the WAI-ARIA
   APG, keyboard contracts, focus management, 24×24 target sizes, 4.5:1 contrast,
@@ -259,15 +259,21 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
 - ✅ Internal standard enforced by a committed **accessibility skill** (cited to
   W3C primary sources) + a **component-authoring skill** + a build-time coverage
   gate.
-- 🔨 **Switchable AA ↔ AAA conformance** via a `data-fluid-conformance`
-  attribute. The **structural deltas ship today**: `--fluid-target-min`
-  (24→44px, SC 2.5.5 Target Size Enhanced) and `--fluid-focus-ring-width`
-  (2→3px, SC 2.4.13 Focus Appearance) are real tokens in `base.css`;
-  components read them and never branch on conformance. Flip the toggle at the
-  top of the [button docs](/components/button/#aa-vs-aaa) and every live
-  example resizes in place. The 7:1 contrast track (SC 1.4.6), a brand-palette
-  concern, is the remaining piece. No mainstream design system is known to
-  offer a switchable conformance axis; likely novel ground.
+- ✅ **Switchable AA ↔ AAA conformance** via a `data-fluid-conformance`
+  attribute, on all three axes a design system can own. The **structural
+  deltas**: `--fluid-target-min` (24→44px, SC 2.5.5 Target Size Enhanced) and
+  `--fluid-focus-ring-width` (2→3px, SC 2.4.13 Focus Appearance) are real
+  tokens in `base.css`; components read them and never branch on conformance.
+  Flip the toggle at the top of the
+  [button docs](/components/button/#aa-vs-aaa) and every live example resizes
+  in place. The **7:1 contrast track** (SC 1.4.6) now ships too: every
+  text-bearing color pair steps to the nearest stop on its own brand ramp that
+  clears 7:1, for the default palette and all five presets, in light and dark,
+  including hover and pressed states. A build-time test parses the shipped CSS,
+  replays the cascade per brand and scheme, and fails on any pair under 7:1
+  (and on any AA regression below 4.5:1). Custom brand palettes stay the
+  consumer's to validate. No mainstream design system is known to offer a
+  switchable conformance axis; likely novel ground.
 - ✅ a11y is part of the test gate: `@open-wc/testing` axe audits per component.
 
 ### Theming ✅

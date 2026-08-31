@@ -95,3 +95,35 @@
   --fluid-border-default: var(--fluid-color-neutral-700);
   --fluid-border-strong: var(--fluid-color-neutral-600);
 }
+
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
+ *
+ * The light accent already clears 7:1 (white on brand.600 #475569 is 7.58:1,
+ * hover 10.35:1, active 14.63:1), so light needs no override: slate is a dark
+ * enough accent to begin with. Only the dark scheme moves, and it has to be
+ * stated on every dark path because this file's own dark block out-ranks the
+ * AAA block shipped in @fluid-ds/tokens. The trailing descendant form is the
+ * region case, where the conformance attribute sits on a section rather than
+ * beside the brand on <html>.
+ *
+ * Ratios are computed against --fluid-accent-text (neutral.950 in dark) and
+ * asserted by the token-contrast test.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="corporate"][data-fluid-conformance="aaa"],
+[data-fluid-brand="corporate"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
+[data-fluid-brand="corporate"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
+  /* brand.500 reads 4.18:1 against neutral.950 text; brand.400 clears 7. */
+  --fluid-accent-base: var(--fluid-color-brand-400); /* #94a3b8, 7.76:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300); /* #cbd5e1, 13.40:1 */
+  --fluid-accent-active: var(--fluid-color-brand-200); /* #e2e8f0, 16.14:1 */
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="corporate"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
+  [data-fluid-brand="corporate"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+    --fluid-accent-base: var(--fluid-color-brand-400); /* 7.76:1 */
+    --fluid-accent-hover: var(--fluid-color-brand-300); /* 13.40:1 */
+    --fluid-accent-active: var(--fluid-color-brand-200); /* 16.14:1 */
+  }
+}

@@ -221,7 +221,17 @@ export class FluidOtp extends FluidFormAssociated {
   /** Accessible name for the group. */
   @property({ attribute: "aria-label" }) override ariaLabel: string | null = null;
 
-  @state() private invalid = false;
+  /**
+   * Whether a failed constraint should be painted. Flipped on once the user
+   * leaves the group or a validation attempt reports the control, so an
+   * untouched field stays neutral.
+   *
+   * The painted `invalid` state derives from this instead of being assigned
+   * from `updated()`: writing reactive state after an update completes
+   * schedules a second render pass and trips Lit's change-in-update warning
+   * (it did, the moment a revealed error was resolved by finishing the code).
+   */
+  @state() private showInvalid = false;
 
   constructor() {
     super();
@@ -239,9 +249,19 @@ export class FluidOtp extends FluidFormAssociated {
     return out;
   }
 
+  /** Whether the code is required but still incomplete. */
+  private get missing(): boolean {
+    return this.required && this.value.length < this.length;
+  }
+
+  /** Whether the failed constraint is currently painted. */
+  private get invalid(): boolean {
+    return this.showInvalid && this.missing;
+  }
+
   override formResetCallback(): void {
     this.value = this.getAttribute("value") ?? "";
-    this.invalid = false;
+    this.showInvalid = false;
   }
 
   override formDisabledCallback(disabled: boolean): void {
@@ -283,34 +303,44 @@ export class FluidOtp extends FluidFormAssociated {
       if (clamped !== this.value) this.value = clamped;
       this.syncFormValue();
     }
-    if (changed.has("required") && !this.required) this.invalid = false;
+    // Satisfying the constraint (finishing the code, or dropping `required`)
+    // retires the revealed error. Derived here, before the render, so the same
+    // update paints it away instead of a follow-up one.
+    if (!this.missing) this.showInvalid = false;
   }
 
   protected override updated(_changed: PropertyValues<this>): void {
-    // Keep an already-invalid message current after an inherited locale change.
-    this.refreshValidity();
+    // The validation anchor is a rendered box, so validity is published after
+    // the render. This also keeps an already-invalid message current after an
+    // inherited locale change. It must never assign reactive state.
+    this.publishValidity();
   }
 
-  private refreshValidity(showInvalid = this.invalid): void {
-    const list = Array.from(this.boxes ?? []);
-    if (this.required && this.value.length < this.length) {
-      const firstMissing = list.find((box) => box.value === "") ?? list[0];
-      this.setValidity({ valueMissing: true }, this.term("completeCode"), firstMissing);
-      this.invalid = showInvalid;
-    } else {
+  /** Push the current constraint state into ElementInternals. */
+  private publishValidity(): void {
+    if (!this.missing) {
       this.setValidity({});
-      this.invalid = false;
+      return;
     }
+    const list = Array.from(this.boxes ?? []);
+    const firstMissing = list.find((box) => box.value === "") ?? list[0];
+    this.setValidity({ valueMissing: true }, this.term("completeCode"), firstMissing);
+  }
+
+  /** Start painting a failed constraint (blur, or a validation attempt). */
+  private revealInvalid(): void {
+    this.showInvalid = this.missing;
+    this.publishValidity();
   }
 
   private handleInvalid = (): void => {
-    this.refreshValidity(true);
+    this.revealInvalid();
   };
 
   private handleFocusOut = (event: FocusEvent): void => {
     const next = event.relatedTarget as Node | null;
     if (next && this.shadowRoot?.contains(next)) return;
-    this.refreshValidity(true);
+    this.revealInvalid();
   };
 
   /** Sanitize a candidate character for the current `type`. */

@@ -462,7 +462,17 @@ export class FluidSelect extends FluidFormAssociated {
   @property({ attribute: "help-text" }) helpText = "";
 
   @state() private focused = false;
-  @state() private invalid = false;
+  /**
+   * Whether a failed constraint should be painted. Flipped on once the trigger
+   * is blurred or a validation attempt reports the control, so an untouched
+   * select stays neutral.
+   *
+   * The painted `invalid` state derives from this instead of being assigned
+   * from `updated()`: writing reactive state after an update completes
+   * schedules a second render pass and trips Lit's change-in-update warning
+   * (it did, the moment a revealed error was resolved by picking an option).
+   */
+  @state() private showInvalid = false;
   @state() private activeIndex = -1;
   @state() private hasPrefix = false;
   @state() private hasSuffix = false;
@@ -505,7 +515,7 @@ export class FluidSelect extends FluidFormAssociated {
 
   override formResetCallback(): void {
     this.value = this.getAttribute("value") ?? "";
-    this.invalid = false;
+    this.showInvalid = false;
     this.applySelection();
   }
 
@@ -531,11 +541,25 @@ export class FluidSelect extends FluidFormAssociated {
     return Array.from(this.querySelectorAll<FluidOptionElement>("fluid-option"));
   }
 
+  /** Whether an option is required but none is selected. */
+  private get valueMissing(): boolean {
+    return this.required && !this.value;
+  }
+
+  /** Whether the failed constraint is currently painted. */
+  private get invalid(): boolean {
+    return this.showInvalid && this.valueMissing;
+  }
+
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has("value")) {
       this.syncFormValue();
       this.applySelection();
     }
+    // Satisfying the constraint (picking an option, or dropping `required`)
+    // retires the revealed error. Derived here, before the render, so the same
+    // update paints it away instead of a follow-up one.
+    if (!this.valueMissing) this.showInvalid = false;
     if (changed.has("open")) {
       // Derive active state before render. The post-render popup work should
       // position the existing DOM, not schedule another reactive update.
@@ -551,8 +575,9 @@ export class FluidSelect extends FluidFormAssociated {
 
   protected override updated(changed: PropertyValues<this>): void {
     // The native validation anchor exists only after the first render. Refresh
-    // on inherited locale updates too, while preserving custom validity.
-    this.refreshValidity();
+    // on inherited locale updates too, while preserving custom validity. It
+    // must never assign reactive state.
+    this.publishValidity();
     if (changed.has("open")) {
       if (this.open) this.openListbox();
       else this.closeListbox();
@@ -560,14 +585,19 @@ export class FluidSelect extends FluidFormAssociated {
     this.applyActive();
   }
 
-  private refreshValidity(showInvalid = this.invalid): void {
-    if (this.required && !this.value) {
+  /** Push the current constraint state into ElementInternals. */
+  private publishValidity(): void {
+    if (this.valueMissing) {
       this.setValidity({ valueMissing: true }, this.term("pickAnOption"), this.triggerEl);
-      this.invalid = showInvalid;
     } else {
       this.setValidity({});
-      this.invalid = false;
     }
+  }
+
+  /** Start painting a failed constraint (blur, or a validation attempt). */
+  private revealInvalid(): void {
+    this.showInvalid = this.valueMissing;
+    this.publishValidity();
   }
 
   private applySelection(): void {
@@ -829,10 +859,10 @@ export class FluidSelect extends FluidFormAssociated {
 
   private handleTriggerBlur = () => {
     this.focused = false;
-    this.refreshValidity(true);
+    this.revealInvalid();
   };
 
-  private handleInvalid = () => this.refreshValidity(true);
+  private handleInvalid = () => this.revealInvalid();
 
   private handleOptionClick = (e: Event) => {
     const opt = (e.target as HTMLElement).closest("fluid-option") as FluidOptionElement | null;

@@ -12,13 +12,23 @@ import { Tabs, TabItem, Aside, CardGrid, LinkCard } from "@astrojs/starlight/com
 signal severity: `neutral` (default), `info`, `success`, `warning`, `danger`.
 Set `dot` for a tiny circular indicator with no text.
 
+Every badge on this page is live: the counter really counts, and the presence
+dot really changes state.
+
 <Demo>
   <fluid-badge variant="success">Active</fluid-badge>
+  <fluid-badge variant="info">Beta</fluid-badge>
   <fluid-badge variant="danger">3</fluid-badge>
-  <fluid-badge variant="warning" dot></fluid-badge>
+  <fluid-badge variant="warning" dot aria-label="Degraded"></fluid-badge>
+  <fluid-avatar label="Ada Lovelace">
+    <fluid-badge slot="badge" variant="success" dot aria-label="Online"></fluid-badge>
+  </fluid-avatar>
 </Demo>
 
 ## Install
+
+The badge registers `<fluid-badge>`. The anchored-status pattern below also
+needs [`<fluid-avatar>`](/components/avatar/), so register both when you use it.
 
 <Tabs syncKey="install">
   <TabItem label="CDN">
@@ -28,6 +38,9 @@ Set `dot` for a tiny circular indicator with no text.
 
     <script type="module"
       src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/badge/define.js">
+    </script>
+    <script type="module"
+      src="https://cdn.jsdelivr.net/npm/@fluid-ds/components@latest/dist/components/avatar/define.js">
     </script>
     ```
 
@@ -41,6 +54,7 @@ Set `dot` for a tiny circular indicator with no text.
     import "@fluid-ds/tokens/base.css";
     import "@fluid-ds/tokens/light.css";
     import "@fluid-ds/components/define/badge";
+    import "@fluid-ds/components/define/avatar"; // only for the anchored example
     ```
 
   </TabItem>
@@ -49,6 +63,11 @@ Set `dot` for a tiny circular indicator with no text.
 ## Examples
 
 ### Variants
+
+`variant` picks the severity tint. **neutral** (the default) is the quiet one
+for counts and tags; `info`, `success`, `warning`, and `danger` carry meaning.
+All five are rendered live below, so you can compare them in the current theme
+(flip the site's dark mode to see how each pair holds up).
 
 <Demo>
   <fluid-badge>Neutral</fluid-badge>
@@ -59,71 +78,237 @@ Set `dot` for a tiny circular indicator with no text.
 </Demo>
 
 ```html
+<fluid-badge>Neutral</fluid-badge>
+<fluid-badge variant="info">Info</fluid-badge>
 <fluid-badge variant="success">Active</fluid-badge>
+<fluid-badge variant="warning">Degraded</fluid-badge>
 <fluid-badge variant="danger">Failed</fluid-badge>
 ```
 
+The four status tones are **theme-independent**: switching brands retunes the
+accent track, not `success` / `warning` / `danger` / `info`, so a red badge
+still reads as trouble in every brand. Only `neutral` and `info` follow the
+brand palette.
+
 ### Sizes
 
-Two sizes, `sm` for dense rows and `md` (default) for general use.
+Two sizes, `sm` for dense rows and `md` (the default) for general use. `sm`
+drops to 11px with tighter padding, which keeps a badge from stretching a table
+row's line height.
 
 <Demo>
-  <fluid-badge size="sm">Small</fluid-badge>
-  <fluid-badge size="md">Medium</fluid-badge>
+  <div style="display:flex; flex-direction:column; gap: var(--fluid-space-3); width:100%;">
+    <div style="display:flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge size="sm">Small</fluid-badge>
+      <fluid-badge size="md">Medium</fluid-badge>
+    </div>
+    <div style="display:flex; align-items:center; gap: var(--fluid-space-2); font-size: 0.875rem;">
+      <span>api-gateway</span>
+      <fluid-badge size="sm" variant="success">
+        healthy
+      </fluid-badge>
+      <span style="color: var(--fluid-text-secondary);">deployed 4m ago</span>
+    </div>
+  </div>
 </Demo>
+
+```html
+<fluid-badge size="sm">Small</fluid-badge> <fluid-badge size="md">Medium</fluid-badge>
+```
 
 ### Counts
 
+A badge is the usual home for an unread count. The button below is live: **Add
+one** increments the real badge (it starts at 97 so you can watch it clamp to
+`99+`), and **Mark all read** sets the count to zero and hides the pill with the
+native `hidden` attribute, which collapses it to nothing instead of leaving a
+`0`.
+
 <Demo>
-  <fluid-badge variant="danger">3</fluid-badge>
-  <fluid-badge variant="info">42</fluid-badge>
-  <fluid-badge>99+</fluid-badge>
+  <div style="display:flex; align-items:center; gap: var(--fluid-space-3); flex-wrap:wrap;">
+    <fluid-button variant="secondary">
+      <fluid-icon name="bell"></fluid-icon>
+      Notifications{" "}
+      <fluid-badge id="badge-count" data-count="97" variant="danger" size="sm">
+        97
+      </fluid-badge>
+    </fluid-button>
+    <fluid-button
+      size="sm"
+      onclick="const b = document.getElementById('badge-count'); const n = Math.min(Number(b.dataset.count) + 1, 100); b.dataset.count = String(n); b.textContent = n === 100 ? '99+' : String(n); b.hidden = false;"
+    >
+      Add one
+    </fluid-button>
+    <fluid-button
+      size="sm"
+      variant="ghost"
+      onclick="const b = document.getElementById('badge-count'); b.dataset.count = '0'; b.textContent = '0'; b.hidden = true;"
+    >
+      Mark all read
+    </fluid-button>
+  </div>
 </Demo>
+
+```html
+<fluid-button variant="secondary">
+  <fluid-icon name="bell"></fluid-icon>
+  Notifications <fluid-badge variant="danger" size="sm">97</fluid-badge>
+</fluid-button>
+```
+
+```ts
+const badge = document.querySelector("fluid-badge")!;
+
+function setUnread(count: number) {
+  badge.textContent = count > 99 ? "99+" : String(count);
+  // :host([hidden]) collapses the pill, so zero leaves no empty circle behind.
+  badge.hidden = count === 0;
+}
+```
+
+Cap the rendered value (`99+` is the convention) rather than letting the pill
+grow: it sits inside a button label, and a five-digit count reflows the control.
 
 ### Dot only
 
-Set `dot` to render a single colored circle, perfect when you just need
-to signal a state next to an item.
+Set `dot` to render a single colored circle and no text, perfect when the state
+sits next to a label that already says what it is. Every dot below is a real
+badge; the text beside it is ordinary markup.
 
 <Demo>
-  <fluid-badge variant="success" dot></fluid-badge>
-  <fluid-badge variant="warning" dot></fluid-badge>
-  <fluid-badge variant="danger" dot></fluid-badge>
+  <div style="display:flex; align-items:center; gap: var(--fluid-space-4); flex-wrap:wrap; font-size:0.875rem;">
+    <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge variant="success" dot></fluid-badge> Operational
+    </span>
+    <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge variant="warning" dot></fluid-badge> Degraded
+    </span>
+    <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge variant="danger" dot></fluid-badge> Outage
+    </span>
+    <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge variant="info" dot></fluid-badge> Maintenance
+    </span>
+    <span style="display:inline-flex; align-items:center; gap: var(--fluid-space-2);">
+      <fluid-badge dot></fluid-badge> Unknown
+    </span>
+  </div>
 </Demo>
 
 ```html
-<fluid-badge variant="success" dot></fluid-badge>
+<span class="row">
+  <fluid-badge variant="success" dot></fluid-badge>
+  Operational
+</span>
+
+<!-- No visible label next to it? Name the dot instead. -->
+<fluid-badge variant="success" dot aria-label="Operational"></fluid-badge>
 ```
+
+<Aside type="note">
+  A dot with no text is color-only information. Either keep a visible label beside it (as above) or
+  give the badge an `aria-label`, which the component forwards onto the pill along with
+  `role="status"`. See [Accessibility](#accessibility).
+</Aside>
 
 ### Anchored to an avatar
 
-Pair with [`<fluid-avatar>`](/components/avatar/) by slotting into its
-`badge` slot.
+[`<fluid-avatar>`](/components/avatar/) exposes a `badge` slot pinned to its
+bottom-right corner, so a badge dropped into it becomes a presence dot or an
+unread count without any positioning CSS of your own. All three avatars below
+are live, including the icon-fallback one.
+
+<Demo>
+  <div style="display:flex; align-items:center; gap: var(--fluid-space-5); flex-wrap:wrap;">
+    <fluid-avatar size="lg" label="Ada Lovelace">
+      <fluid-badge slot="badge" variant="success" dot aria-label="Online"></fluid-badge>
+    </fluid-avatar>
+    <fluid-avatar size="lg" label="Grace Hopper">
+      <fluid-badge slot="badge" variant="danger" size="sm">
+        7
+      </fluid-badge>
+    </fluid-avatar>
+    <fluid-avatar size="lg" shape="rounded">
+      <fluid-icon slot="icon" name="user"></fluid-icon>
+      <fluid-badge slot="badge" variant="warning" dot aria-label="Away"></fluid-badge>
+    </fluid-avatar>
+  </div>
+</Demo>
 
 ```html
 <fluid-avatar label="Ada Lovelace">
-  <fluid-badge slot="badge" variant="success" dot></fluid-badge>
+  <fluid-badge slot="badge" variant="success" dot aria-label="Online"></fluid-badge>
+</fluid-avatar>
+
+<fluid-avatar label="Grace Hopper">
+  <fluid-badge slot="badge" variant="danger" size="sm">7</fluid-badge>
 </fluid-avatar>
 ```
 
-## When to use
+Presence is state, so it changes: set `variant` for the color and `aria-label`
+for the name, together. Click through the four states below and watch the real
+dot on Ada's avatar follow along.
 
-- Status labels: "Active", "Pending", "Failed".
-- Counts next to icons or labels.
-- Tiny inline indicators (the dot mode).
+<Demo>
+  <div style="display:flex; align-items:center; gap: var(--fluid-space-4); flex-wrap:wrap;">
+    <fluid-avatar size="lg" label="Ada Lovelace">
+      <fluid-badge
+        id="badge-presence"
+        slot="badge"
+        data-state="0"
+        variant="success"
+        dot
+        aria-label="Online"
+      ></fluid-badge>
+    </fluid-avatar>
+    <output
+      id="badge-presence-label"
+      style="font-size:0.875rem; color: var(--fluid-text-secondary);"
+    >
+      Online
+    </output>
+    <fluid-button
+      size="sm"
+      variant="secondary"
+      onclick="const states = [['success','Online'],['warning','Away'],['danger','Do not disturb'],['neutral','Offline']]; const b = document.getElementById('badge-presence'); const i = (Number(b.dataset.state) + 1) % states.length; b.dataset.state = String(i); b.variant = states[i][0]; b.setAttribute('aria-label', states[i][1]); document.getElementById('badge-presence-label').textContent = states[i][1];"
+    >
+      Cycle presence
+    </fluid-button>
+  </div>
+</Demo>
 
-Reach for [`<fluid-tag>`](/components/tag/) when the label is a piece of
-user-supplied data the user can remove (a filter chip, a recipient pill).
-Tags are interactive; badges are not.
+```ts
+const dot = document.querySelector("fluid-badge")!;
+
+// Color and name move together, never one without the other.
+dot.variant = "warning";
+dot.setAttribute("aria-label", "Away");
+```
+
+<Aside type="tip">
+  Anchoring several of these in a row (a team list, a set of reviewers) is what
+  [`<fluid-avatar-group>`](/components/avatar-group/) is for: it handles the
+  overlap and collapses everything past `max` into a "+N" circle.
+</Aside>
 
 ## Theming
 
 Every styled property reads a **component-scoped `--fluid-badge-*` token that
-falls back to a main semantic var or color primitive** (the override ladder);
-each variant has its own `bg` / `fg` pair. The **complete list** is in the
-[API table below](#api).
+falls back to a color primitive** (the override ladder), and each variant has
+its own `bg` / `fg` pair, so you get three levels for free:
+
+1. **Brand**: override the primitive track (`--fluid-color-neutral-200`,
+   `--fluid-color-brand-100`, …) and every component reflows with it.
+2. **Component**: override a `--fluid-badge-*` token and every badge changes.
+3. **Instance**: set the same token on one `[data-fluid-id]` and one badge
+   changes.
+
+The **complete list** is in the [API table below](#api). The pair you'll reach
+for most is `--fluid-badge-bg` / `--fluid-badge-fg`, which sets the neutral
+default that counts and tags use.
 
 ```css title="brand.css"
+/* Every badge under a brand wrapper. */
 [data-fluid-brand="custom"] {
   --fluid-badge-bg: var(--fluid-color-neutral-200);
   --fluid-badge-fg: var(--fluid-color-neutral-800);
@@ -132,27 +317,109 @@ each variant has its own `bg` / `fg` pair. The **complete list** is in the
   --fluid-badge-danger-bg: var(--fluid-color-red-100);
   --fluid-badge-danger-fg: var(--fluid-color-red-800);
 }
+
+/* One louder badge in the top bar. */
+[data-fluid-id="unread-count"] {
+  --fluid-badge-danger-bg: var(--fluid-color-red-600);
+  --fluid-badge-danger-fg: var(--fluid-color-white);
+}
 ```
+
+Re-check contrast after any override: the pill's text sits on the pill's own
+background, so a darker `bg` needs a lighter `fg` to stay at 4.5:1.
+
+<Aside type="tip">
+  The [Theme builder](/playground/) lets you select a badge and tweak these tokens visually, then
+  exports the CSS.
+</Aside>
 
 ### Beyond tokens: `::part()`
 
 The pill is [`part="base"`](#api). Reach it with
 [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for CSS not
-covered by a token.
+covered by a token:
+
+```css
+/* An outlined badge: hairline ring in the current variant's color. */
+fluid-badge.outlined::part(base) {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+```
+
+## When to use
+
+- Status labels: "Active", "Pending", "Failed".
+- Counts next to icons or labels (unread, results, queue depth).
+- Tiny inline indicators where the dot mode carries the state.
+- Presence anchored to an [avatar](/components/avatar/)'s `badge` slot.
+
+### When _not_ to use
+
+- **Something the user can remove**: use [`<fluid-tag>`](/components/tag/) for
+  filter chips and recipient pills. Tags are interactive; badges are not.
+- **Something clickable**: a badge has no role, no focus, and no keyboard
+  activation. Put a real [`<fluid-button>`](/components/button/) around or
+  beside it instead of attaching a handler to the pill.
+- **A message in the flow of the page**: use
+  [`<fluid-callout>`](/components/callout/), a full-width block with a tone and
+  an icon, rather than stretching a pill.
+- **Progress or an ongoing operation**: use
+  [`<fluid-progress-bar>`](/components/progress-bar/) or
+  [`<fluid-spinner>`](/components/spinner/); a static pill can't convey either.
+
+## Accessibility
+
+A badge renders a plain `<span>` with **no implicit ARIA role**: it takes no
+focus, and its text is announced as part of the surrounding content. The
+cross-component contract is in the
+[Accessibility guide](/guides/accessibility/); the notes below are
+badge-specific.
+
+### Names
+
+A badge with text needs nothing extra: "Active" beside a row title reads as part
+of that row. A `dot` badge renders no text at all, so it needs a name from you.
+Set `aria-label` on the host and the component forwards it onto the pill and
+adds `role="status"`, which turns a color-only mark into a named one
+([SC 4.1.2 Name, Role, Value](https://www.w3.org/WAI/WCAG22/Understanding/name-role-value)):
+
+```html
+<!-- Named: announced as "Online". -->
+<fluid-badge dot variant="success" aria-label="Online"></fluid-badge>
+
+<!-- Decorative: fine only because the visible text says it. -->
+<fluid-badge dot variant="success"></fluid-badge> Online
+```
+
+Without `aria-label`, a `dot` badge stays decorative on purpose (no role, no
+name), so it doesn't add noise next to a label that already reads correctly.
+
+### Color is never the only signal
+
+The five variants differ only in hue, so a pill whose tint is the sole carrier
+of the meaning fails
+[SC 1.4.1 Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color).
+Always pair the tint with text, either inside the badge or immediately beside
+it, and keep the wording meaningful ("Failed", not "Red").
+
+### Counts that change
+
+If the badge conveys a state critical to the surrounding content (an unread
+count, a "live" marker), give the enclosing control a name that spells it out,
+for example `aria-label="Notifications, 7 unread"` on the button that wraps the
+badge, and update that name when the count changes. A bare number swapped into
+a passive pill is not announced.
+
+### Motion and target size
+
+The badge has no motion and no interactive target of its own, so
+`prefers-reduced-motion` and the pointer-target minimum don't apply to it. When
+a badge sits inside a control, the control's own target size governs.
 
 ## API
 
 <ComponentApi tag="fluid-badge" />
-
-## Accessibility
-
-- The badge is a passive label: no implicit ARIA role. If the badge
-  conveys a state critical to surrounding content (an unread count,
-  a "live" indicator), wrap it in a parent with an `aria-label` that
-  spells it out, or include explanatory text alongside it.
-- The `dot` mode is purely decorative: the colored circle has no text
-  alternative. Don't rely on color alone; pair it with a visible label
-  or `aria-label` on the enclosing element.
 
 ## Related
 
@@ -165,7 +432,7 @@ covered by a token.
   <LinkCard
     title="Avatar"
     href="/components/avatar/"
-    description="Anchor a status dot in its badge slot."
+    description="Anchor a status dot or count in its badge slot."
   />
   <LinkCard
     title="Callout"
@@ -175,6 +442,11 @@ covered by a token.
   <LinkCard
     title="Icon"
     href="/components/icon/"
-    description="Pair with a leading symbol inside the badge."
+    description="Pair with a leading symbol inside or beside the badge."
+  />
+  <LinkCard
+    title="Framework integrations"
+    href="/guides/frameworks/"
+    description="Setup and custom-element hints per framework."
   />
 </CardGrid>

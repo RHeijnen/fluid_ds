@@ -12,7 +12,7 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { isLeaf, primitives, semantics, type TokenLeaf } from "../src/tokens.js";
+import { conformance, isLeaf, primitives, semantics, type TokenLeaf } from "../src/tokens.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(here, "../dist");
@@ -43,12 +43,18 @@ function walk(node: unknown, path: string[] = [], out: Entry[] = []): Entry[] {
 }
 
 const REF_RE = /^\{([^}]+)\}$/;
+const REF_ALL_RE = /\{([^}]+)\}/g;
 
-/** Turn `{color.brand.500}` into `var(--fluid-color-brand-500)`. */
+/**
+ * Turn `{color.brand.500}` into `var(--fluid-color-brand-500)`. References may
+ * also be embedded in a larger expression (a `color-mix()`, for instance), so
+ * every `{…}` in the value is substituted, not just a whole-string reference.
+ */
 function resolveValue(value: string): string {
-  const match = REF_RE.exec(value.trim());
-  if (!match || !match[1]) return value;
-  return `var(${VAR_PREFIX}-${match[1].split(".").map(kebab).join("-")})`;
+  return value.replace(
+    REF_ALL_RE,
+    (_, path: string) => `var(${VAR_PREFIX}-${path.split(".").map(kebab).join("-")})`
+  );
 }
 
 function emitBlock(
@@ -71,10 +77,37 @@ function emitBlock(
   return lines.join("\n");
 }
 
+/**
+ * The AAA contrast block for one scheme.
+ *
+ * `conformance.aaa.<scheme>` lists only the tokens that miss 7:1, but the
+ * emitted block declares the UNION of both schemes' deltas, filling the gaps
+ * from that scheme's own semantics. Without that, a light-scheme AAA value (a
+ * deep emerald success fill, say) would still apply inside a dark AAA subtree
+ * that had no delta of its own, and paint dark text on a dark fill. The main
+ * light / dark blocks dodge the same trap by declaring every semantic token.
+ */
+function aaaEntries(scheme: "light" | "dark"): Entry[] {
+  const union = new Set(
+    [...walk(conformance.aaa.light), ...walk(conformance.aaa.dark)].map((e) => e.cssVar)
+  );
+  const deltas = new Map(walk(conformance.aaa[scheme]).map((e) => [e.cssVar, e]));
+  return walk(semantics[scheme])
+    .filter((e) => union.has(e.cssVar))
+    .map((e) => deltas.get(e.cssVar) ?? e);
+}
+
 function buildManifest() {
   const primEntries = walk(primitives);
   const lightEntries = walk(semantics.light);
   const darkEntries = walk(semantics.dark);
+  const describe = ({ path, cssVar, leaf }: Entry) => ({
+    path,
+    cssVar,
+    type: leaf.$type,
+    value: leaf.$value,
+    referencesPrimitive: REF_RE.test(leaf.$value)
+  });
 
   return {
     version: 1,
@@ -88,20 +121,15 @@ function buildManifest() {
       range: leaf.$range
     })),
     semantics: {
-      light: lightEntries.map(({ path, cssVar, leaf }) => ({
-        path,
-        cssVar,
-        type: leaf.$type,
-        value: leaf.$value,
-        referencesPrimitive: REF_RE.test(leaf.$value)
-      })),
-      dark: darkEntries.map(({ path, cssVar, leaf }) => ({
-        path,
-        cssVar,
-        type: leaf.$type,
-        value: leaf.$value,
-        referencesPrimitive: REF_RE.test(leaf.$value)
-      }))
+      light: lightEntries.map(describe),
+      dark: darkEntries.map(describe)
+    },
+    /** Opt-in AAA (SC 1.4.6) deltas, the tokens that move at 7:1. */
+    conformance: {
+      aaa: {
+        light: walk(conformance.aaa.light).map(describe),
+        dark: walk(conformance.aaa.dark).map(describe)
+      }
     }
   };
 }
@@ -141,6 +169,28 @@ async function main() {
   );
 
   const lightEntries = walk(semantics.light);
+  /*
+   * The AAA contrast track (SC 1.4.6) rides along with the scheme it retunes,
+   * so every selector here names a scheme. That matters because
+   * `data-fluid-conformance` can sit on a region rather than on <html>: a bare
+   * `[data-fluid-conformance="aaa"]` block would paint light-scheme fills onto
+   * an AAA region inside a dark page, under text that inherited the dark
+   * scheme, which is the one outcome worse than not upgrading at all. The
+   * descendant form covers a region that inherits its scheme from an ancestor;
+   * the `:root:not([data-fluid-theme="dark"])` form is the "nobody named a
+   * scheme, so it is light" case, which the dark media block below out-ranks
+   * when the reader prefers dark.
+   */
+  const lightAaa = emitBlock(
+    [
+      `:root[data-fluid-conformance="aaa"]`,
+      `[data-fluid-theme="light"][data-fluid-conformance="aaa"]`,
+      `[data-fluid-theme="light"] [data-fluid-conformance="aaa"]`,
+      `:root:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"]`
+    ].join(",\n"),
+    aaaEntries("light"),
+    "Fluid, opt-in AAA contrast (SC 1.4.6, 7:1 normal text), light scheme."
+  );
   await writeFile(
     resolve(dist, "light.css"),
     emitBlock(
@@ -148,7 +198,9 @@ async function main() {
       lightEntries,
       "Fluid, light scheme semantic tokens.",
       ["color-scheme: light;"]
-    )
+    ) +
+      "\n" +
+      lightAaa
   );
 
   const darkEntries = walk(semantics.dark);
@@ -164,9 +216,35 @@ async function main() {
     "Fluid, explicit dark scheme semantic tokens.",
     ["color-scheme: dark;"]
   );
+  /*
+   * The dark AAA blocks mirror the light one selector for selector, and have to
+   * out-rank it wherever dark is in force. Explicit dark wins on source order at
+   * equal specificity; the automatic pair carries a third attribute selector so
+   * it also beats the light block's "nobody named a scheme" rule, while its
+   * `:not([data-fluid-theme="light"])` anchor keeps it away from a region that
+   * sits inside an explicitly light subtree.
+   */
+  const darkAaaSelectors = [
+    `[data-fluid-theme="dark"][data-fluid-conformance="aaa"]`,
+    `[data-fluid-theme="dark"] [data-fluid-conformance="aaa"]`
+  ].join(",\n");
+  const automaticDarkAaa = emitBlock(
+    [
+      `:root:not([data-fluid-theme="light"])[data-fluid-conformance="aaa"]`,
+      `:root:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"]`
+    ].join(",\n"),
+    aaaEntries("dark"),
+    "Fluid, AAA contrast under the automatic dark scheme."
+  );
+  const explicitDarkAaa = emitBlock(
+    darkAaaSelectors,
+    aaaEntries("dark"),
+    "Fluid, AAA contrast, explicit dark scheme."
+  );
   await writeFile(
     resolve(dist, "dark.css"),
-    `@media (prefers-color-scheme: dark) {\n${automaticDark}}\n\n${explicitDark}`
+    `@media (prefers-color-scheme: dark) {\n${automaticDark}\n${automaticDarkAaa}}\n\n` +
+      `${explicitDark}\n${explicitDarkAaa}`
   );
 
   const manifest = buildManifest();
@@ -174,7 +252,8 @@ async function main() {
 
   console.log(
     `tokens: built ${primEntries.length} primitives, ` +
-      `${lightEntries.length} light + ${darkEntries.length} dark semantics → dist/`
+      `${lightEntries.length} light + ${darkEntries.length} dark semantics, ` +
+      `${aaaEntries("light").length} AAA contrast overrides per scheme → dist/`
   );
 }
 

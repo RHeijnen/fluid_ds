@@ -108,8 +108,11 @@ jobs:
       #   2. If the merge that triggered this run was the Version Packages
       #      PR, run `publish` to push the bumped packages to npm.
       #
-      # Stable packages are published to npm's default `latest` dist-tag.
-      # Prerelease versions remain identifiable by their semver suffix.
+      # The dist-tag is never hardcoded here. `scripts/changeset-publish.mjs`
+      # reads `.changeset/pre.json` and resolves it at run time: a stable
+      # release publishes `--tag latest`, while changesets pre-mode publishes
+      # under the prerelease tag that `changeset pre enter` recorded. A release
+      # candidate can therefore never take npm's `latest` dist-tag.
       - name: Reject an unverified or superseded release checkout
         run: |
           test "$GITHUB_REF" = "refs/heads/main"
@@ -123,7 +126,7 @@ jobs:
       - name: Create release PR or publish
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
         with:
-          publish: pnpm exec changeset publish --tag latest
+          publish: node scripts/changeset-publish.mjs
           version: pnpm exec changeset version
           commit: "chore(release): version packages"
           title: "chore(release): version packages"

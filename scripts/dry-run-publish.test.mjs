@@ -11,6 +11,7 @@ import {
   auditReleaseWorkflow,
   auditArtifactFreshness,
   auditPackageMetadata,
+  auditPublishWrapper,
   expectedPackageNames,
   readPublishablePackages,
   releaseOrder,
@@ -137,16 +138,56 @@ test("release workflow requires the offline rehearsal and OIDC assumptions befor
         step.uses?.startsWith("changesets/action@")
       ).env.NPM_TOKEN = "forbidden";
     },
+    // Publishing directly, bypassing the wrapper that resolves the dist-tag from
+    // changesets pre-state, would pin latest onto a release candidate.
     (copy) => {
       copy.jobs.release.steps.find((step) =>
         step.uses?.startsWith("changesets/action@")
-      ).with.publish = "pnpm exec changeset publish --tag next";
+      ).with.publish = "pnpm exec changeset publish --tag latest";
     }
   ]) {
     const changed = structuredClone(workflow);
     mutate(changed);
     assert.ok(auditReleaseWorkflow(changed).length > 0);
   }
+});
+
+test("the audited wrapper resolves the dist-tag from changesets pre-state", async () => {
+  const source = await readFile(new URL("./changeset-publish.mjs", import.meta.url), "utf8");
+  assert.deepEqual(auditPublishWrapper(source), []);
+
+  const stable = { mode: "none", tag: "latest", args: ["exec", "changeset", "publish"] };
+  for (const [name, resolver] of [
+    ["latest for every state", () => stable],
+    [
+      "an explicit --tag in pre mode, which changesets refuses",
+      (preState) =>
+        preState?.mode === "pre"
+          ? { mode: "pre", tag: "next", args: ["exec", "changeset", "publish", "--tag", "next"] }
+          : { ...stable, args: [...stable.args, "--tag", "latest"] }
+    ],
+    [
+      "a stable release with no explicit tag, which would inherit the prerelease tag",
+      (preState) => (preState?.mode === "pre" ? { mode: "pre", tag: "next", args: [] } : stable)
+    ],
+    [
+      "a prerelease that claims latest",
+      (preState) =>
+        preState?.mode === "pre"
+          ? { mode: "pre", tag: "latest", args: ["exec", "changeset", "publish"] }
+          : { ...stable, args: [...stable.args, "--tag", "latest"] }
+    ]
+  ])
+    assert.ok(auditPublishWrapper(source, resolver).length > 0, name);
+
+  for (const [name, tamper] of [
+    ["unread pre-state", (text) => text.replaceAll('".changeset/pre.json"', '"pre-state.json"')],
+    ["no pre-mode branch", (text) => text.replaceAll('mode === "pre"', 'mode === "prerelease"')],
+    ["resolver bypassed", (text) => text.replaceAll("resolvePublishPlan", "publishPlan")],
+    ["no stable dist-tag", (text) => text.replaceAll('"--tag", "latest"', '"--no-git-tag"')],
+    ["a hardcoded prerelease tag", (text) => `${text}\nconst extra = ["--tag", "next"];\n`]
+  ])
+    assert.ok(auditPublishWrapper(tamper(source)).length > 0, name);
 });
 
 test("offline rehearsal cannot claim network or publish work", async () => {

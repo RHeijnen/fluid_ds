@@ -140,3 +140,74 @@
   --fluid-info-hover: var(--fluid-color-sky-700);
   --fluid-info-active: var(--fluid-color-sky-800);
 }
+
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
+ *
+ * Titanium is already a high-contrast theme, so most of it passes untouched:
+ * white on the light accent (brand.600 #3a4150) is 10.23:1, and the grayed
+ * success and info tones read 13.07:1 and 10.23:1. Two things do move.
+ *
+ * 1. Warning. It is the one tone that carries DARK text, and the gunmetal ramp
+ *    it borrows is far darker than amber, so the light-scheme warning ladder
+ *    has to run UP the ramp instead of down.
+ * 2. The dark scheme. The grayed tones above are declared at the brand scope,
+ *    which out-ranks the dark scheme block in @fluid-ds/tokens, so they apply
+ *    in dark too and land dark text on a dark fill. The AAA blocks below
+ *    re-derive accent and every grayed tone from the light end of the ramp,
+ *    the way a dark scheme should. Danger keeps its red and is handled by the
+ *    AAA block in @fluid-ds/tokens.
+ *
+ * Ratios are the computed WCAG 2 values against each tone's text token (white
+ * in light, neutral.950 in dark), asserted by the token-contrast test.
+ */
+[data-fluid-brand="titanium"][data-fluid-conformance="aaa"],
+[data-fluid-brand="titanium"]:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"] {
+  /* neutral.950 on gunmetal 500/600/700 is only 3.55 / 1.94 / 1.52:1. */
+  --fluid-warning-base: var(--fluid-color-amber-300); /* #b7bfca, 10.72:1 */
+  --fluid-warning-hover: var(--fluid-color-amber-200); /* #d8dce3, 14.46:1 */
+  --fluid-warning-active: var(--fluid-color-amber-100); /* #eceef2, 17.13:1 */
+}
+
+/*
+ * The dark AAA values have to be stated on every dark path, because the light
+ * blocks above match a dark subtree too and would otherwise win on source
+ * order. Same reason the scheme blocks in @fluid-ds/tokens restate themselves.
+ * The trailing descendant form is the region case, where the conformance
+ * attribute sits on a section rather than beside the brand on <html>.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="titanium"][data-fluid-conformance="aaa"],
+[data-fluid-brand="titanium"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
+[data-fluid-brand="titanium"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
+  /* Gunmetal 500 is 3.55:1 and 400 is 6.51:1 against neutral.950; 300 clears 7. */
+  --fluid-accent-base: var(--fluid-color-brand-300); /* #b7bfca, 10.72:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-200); /* #d8dce3, 14.46:1 */
+  --fluid-accent-active: var(--fluid-color-brand-100); /* #eceef2, 17.13:1 */
+  --fluid-success-base: var(--fluid-color-emerald-300); /* 10.72:1 */
+  --fluid-success-hover: var(--fluid-color-emerald-200); /* 14.46:1 */
+  --fluid-success-active: var(--fluid-color-emerald-100); /* 17.13:1 */
+  --fluid-warning-base: var(--fluid-color-amber-300); /* 10.72:1 */
+  --fluid-warning-hover: var(--fluid-color-amber-200); /* 14.46:1 */
+  --fluid-warning-active: var(--fluid-color-amber-100); /* 17.13:1 */
+  --fluid-info-base: var(--fluid-color-sky-300); /* 10.72:1 */
+  --fluid-info-hover: var(--fluid-color-sky-200); /* 14.46:1 */
+  --fluid-info-active: var(--fluid-color-sky-100); /* 17.13:1 */
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="titanium"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
+  [data-fluid-brand="titanium"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+    --fluid-accent-base: var(--fluid-color-brand-300); /* 10.72:1 */
+    --fluid-accent-hover: var(--fluid-color-brand-200); /* 14.46:1 */
+    --fluid-accent-active: var(--fluid-color-brand-100); /* 17.13:1 */
+    --fluid-success-base: var(--fluid-color-emerald-300); /* 10.72:1 */
+    --fluid-success-hover: var(--fluid-color-emerald-200); /* 14.46:1 */
+    --fluid-success-active: var(--fluid-color-emerald-100); /* 17.13:1 */
+    --fluid-warning-base: var(--fluid-color-amber-300); /* 10.72:1 */
+    --fluid-warning-hover: var(--fluid-color-amber-200); /* 14.46:1 */
+    --fluid-warning-active: var(--fluid-color-amber-100); /* 17.13:1 */
+    --fluid-info-base: var(--fluid-color-sky-300); /* 10.72:1 */
+    --fluid-info-hover: var(--fluid-color-sky-200); /* 14.46:1 */
+    --fluid-info-active: var(--fluid-color-sky-100); /* 17.13:1 */
+  }
+}

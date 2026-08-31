@@ -214,6 +214,29 @@ describe("<fluid-select>", () => {
     expect(trigger.getAttribute("aria-invalid")).to.equal("true");
   });
 
+  it("retires a revealed error inside the same update that selects an option", async () => {
+    const el = await fixture<FluidSelect>(html`
+      <fluid-select required aria-label="Country">${sampleOptions}</fluid-select>
+    `);
+    const trigger = el.shadowRoot!.querySelector<HTMLButtonElement>(".trigger")!;
+    trigger.dispatchEvent(new Event("blur"));
+    await el.updateComplete;
+    expect(trigger.classList.contains("invalid")).to.equal(true);
+
+    el.value = "apple";
+    /*
+     * `updateComplete` resolves false when the update scheduled another one.
+     * Un-painting the resolved error used to happen in `updated()`, so it did
+     * exactly that, and Lit logged its change-in-update warning: an error the
+     * SSR browser suite fails on. The state now derives in `willUpdate`, so the
+     * one pass both records the selection and clears the error.
+     */
+    expect(await el.updateComplete).to.equal(true);
+    expect(trigger.classList.contains("invalid")).to.equal(false);
+    expect(trigger.getAttribute("aria-invalid")).to.equal("false");
+    expect(el.validity.valueMissing).to.equal(false);
+  });
+
   it("seeds and clears the active option in the popup's opening and closing update", async () => {
     const el = await fixture<FluidSelect>(html`
       <fluid-select value="banana" aria-label="Fruit">

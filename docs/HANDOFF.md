@@ -30,12 +30,17 @@ to hand off context when you switch machines.
 > 2. **SSR hydration stabilized and re-gated.** Fix the engine-specific
 >    specs: otp focus timing on Chromium, date-range-picker validation and
 >    Cancel/Apply on Firefox; then restore the `ssr` lane the same way.
-> 3. **Prerelease plumbing.** Enter changesets pre-mode
->    (`changeset pre enter rc` -> 1.0.0-rc.N) and make the publish dist-tag
->    conditional: an RC must publish under `next`, never `latest` (the
->    workflow currently hardcodes `--tag latest` and
->    `dry-run-publish.mjs` asserts that exact command; both change
->    together, deliberately).
+> 3. **Prerelease plumbing: DONE (2026-08-31).** The publish step now goes
+>    through `scripts/changeset-publish.mjs`: in changesets pre-mode it
+>    passes no `--tag` (changesets routes to the pre tag itself; an
+>    explicit tag is a hard upstream refusal in pre-mode) and refuses to
+>    run if the pre tag is missing or "latest"; outside pre-mode it passes
+>    `--tag latest` explicitly (load-bearing: a leftover `mode: "exit"`
+>    pre.json would otherwise route the promoting stable release to the rc
+>    tag). Guards audit the wrapper behaviorally. DECISION ENCODED HERE:
+>    the prerelease line is `changeset pre enter rc` -> versions
+>    `1.0.0-rc.N` published under the npm dist-tag `rc` (the suffix and
+>    dist-tag are inseparable in pre-mode).
 > 4. **The 1.0.0-rc.0 release itself** via the changesets version-PR flow,
 >    now fully hands-off (trusted publishing covers all 19 packages).
 >
@@ -54,8 +59,15 @@ to hand off context when you switch machines.
 >
 > Product polish before the 1.0.0 stamp:
 >
-> 9. AAA contrast track (SC 1.4.6, 7:1) for the brand palettes (the one
->    open item FEATURES flags on the conformance story).
+> 9. AAA contrast track (SC 1.4.6, 7:1): DONE (2026-08-31). Scheme-anchored
+>    `[data-fluid-conformance="aaa"]` overrides per brand and scheme, all
+>    computed (1728 measured pairs, 0 below 7:1, live-browser verified);
+>    permanent validator at scripts/token-contrast.test.mjs. THE VALIDATOR
+>    ALSO RATCHETS 43 PRE-EXISTING AA GAPS (KNOWN_AA_GAPS): worst is a real
+>    bug, titanium dark's grayed tones resolve light-scheme steps
+>    (success-active 1.09:1, invisible). Fix those AA gaps in ONE change
+>    batched with the visual-baseline review (item 1), since both move
+>    pixels; the ratchet fails closed on new gaps and on stale entries.
 > 10. node-graph localization audit (canvas role description strings) and
 >     representative assistive-technology signoff, flagged in its own docs
 >     as release gates.

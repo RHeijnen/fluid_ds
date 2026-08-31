@@ -251,6 +251,59 @@
   border-color: var(--glass-affix-border);
 }
 
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
+ *
+ * A brand re-declares the accent track at its own scope, which out-ranks the
+ * AAA block shipped in @fluid-ds/tokens, so every preset carries its own. The
+ * accent deepens two steps along the sky ramp it already owns; the frost
+ * material, the wash and the radii are untouched.
+ *
+ * Caveat worth knowing: solid accent controls (button, button group) are
+ * deliberately NOT frosted, so these ratios describe what a reader actually
+ * sees. Text on a frosted panel sits on a translucent layer over the wash, and
+ * a token-level ratio cannot describe a composited surface: an app that puts
+ * long-form text directly on the glass should verify that text itself.
+ */
+[data-fluid-brand="glass"][data-fluid-conformance="aaa"],
+[data-fluid-brand="glass"]:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"] {
+  /* brand.600 reads 4.10:1 on white and brand.700 5.93:1, both under 7. */
+  --fluid-accent-base: var(--fluid-color-brand-800); /* #075985, 7.56:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-900); /* #0c4a6e, 9.46:1 */
+  /* One step past the end of the ramp, so pressing still reads as a change. */
+  --fluid-accent-active: color-mix(
+    in srgb,
+    var(--fluid-color-brand-900) 85%,
+    var(--fluid-color-neutral-950)
+  ); /* #0c405f, 10.97:1 */
+}
+
+/*
+ * The dark ladder already clears 7:1 (neutral.950 on brand.500 #0ea5e9 is
+ * 7.18:1, hover 9.29:1, active 11.93:1), but it still has to be restated on
+ * every dark path: the light AAA block above matches a dark subtree too and
+ * would otherwise win on source order and paint a deep sky fill under dark
+ * text. Same reason the scheme blocks in @fluid-ds/tokens restate themselves.
+ * The trailing descendant form is the region case, where the conformance
+ * attribute sits on a section rather than beside the brand on the container.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="glass"][data-fluid-conformance="aaa"],
+[data-fluid-brand="glass"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
+[data-fluid-brand="glass"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
+  --fluid-accent-base: var(--fluid-color-brand-500); /* #0ea5e9, 7.18:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-400); /* #38bdf8, 9.29:1 */
+  --fluid-accent-active: var(--fluid-color-brand-300); /* #7dd3fc, 11.93:1 */
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="glass"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
+  [data-fluid-brand="glass"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+    --fluid-accent-base: var(--fluid-color-brand-500); /* 7.18:1 */
+    --fluid-accent-hover: var(--fluid-color-brand-400); /* 9.29:1 */
+    --fluid-accent-active: var(--fluid-color-brand-300); /* 11.93:1 */
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   /* No motion is introduced by this brand; nothing to stand down here beyond
      honoring the consumer's own transitions on the frosted parts. */

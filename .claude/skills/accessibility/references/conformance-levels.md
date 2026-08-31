@@ -48,8 +48,9 @@ Primary sources:
 - **2.4.12 Focus Not Obscured (Enhanced)**: don't let sticky chrome / popovers
   cover a focused element at all (vs "not entirely" for AA).
 - **2.4.13 Focus Appearance**: focus indicator meets the area + contrast math.
-- **1.4.6 Contrast (Enhanced)**: 7:1 text; needs an AAA-validated palette
-  (the hard one, see "the contrast problem").
+- **1.4.6 Contrast (Enhanced)**: 7:1 text; needs an AAA-validated palette.
+  Shipped for the built-in brands, gated by a token-contrast test (see
+  "the contrast problem").
 - **1.4.8 Visual Presentation**: only for text-block components; mostly
   author-owned (line length, justification, resize).
 
@@ -122,10 +123,12 @@ or any subtree:
 
 Because CSS custom properties inherit and re-resolve at their declaration scope,
 an attribute-scoped block re-defines the conformance tokens for that subtree
-only, leaving the rest of the page at AA. **[unverified, confirm the exact
-cascade/inheritance wording at MDN CSS custom properties before citing it
-normatively; note the project's existing semantic-token-resolution gotcha in
-memory applies here too.]**
+only, leaving the rest of the page at AA. Measured in a browser while building
+the contrast track: a declaration on a descendant beats an inherited value
+whatever the ancestor's specificity, so the useful unit of reasoning is "which
+rule wins on THIS element". **[unverified, confirm the exact cascade/inheritance
+wording at MDN CSS custom properties before citing it normatively; note the
+project's existing semantic-token-resolution gotcha in memory applies here too.]**
 
 ### The conformance token spec (what the axis swaps)
 
@@ -160,8 +163,39 @@ and never branch on conformance themselves.
 its min target and the focus-ring tokens for its ring, so it scales AA→AAA with
 no per-component branching, the button + button-group docs pages carry a live
 AA⇄AAA toggle that proves it. When you bring a new component to standard, read
-these tokens the same way (don't hard-code 24/44 or 2/3). The 7:1 contrast
-track (1.4.6) is a brand-palette concern and is not yet built.
+these tokens the same way (don't hard-code 24/44 or 2/3).
+
+**Status of the 7:1 contrast track (1.4.6): implemented for the built-in
+brands.** The color deltas live in `conformance.aaa` in
+`packages/tokens/src/tokens.ts` and are emitted into `light.css` / `dark.css`
+under `[data-fluid-conformance="aaa"]`, scoped per scheme the same way the
+scheme blocks are. Each of the five brand presets carries its own AAA block,
+because a brand re-declares the accent track at its own scope and would
+otherwise out-rank the token-level override. Every token moves to the nearest
+step of its own ramp that clears 7:1, so brands keep their hue.
+
+`scripts/token-contrast.test.mjs` (run by `pnpm check:tokens`) parses the
+shipped CSS, replays the cascade for every brand × scheme × conformance
+combination, and asserts:
+
+- every normal-text pair reaches **7.0:1** under `data-fluid-conformance="aaa"`
+  (verified across 6 brands × 4 scheme paths, including the interaction states,
+  since a hovered control still carries its label);
+- the AA baseline holds at **4.5:1**, against a frozen and exact list of
+  pre-existing gaps, so both a new regression and a stale entry fail the gate.
+
+Both placements of the attribute work: on `<html>` beside the theme and brand
+attributes (what the docs toggle does), and on a region that inherits its scheme
+and brand from an ancestor. The region case is the reason every selector in the
+contrast track names a scheme. A bare `[data-fluid-conformance="aaa"]` block
+would paint light-scheme fills into an AAA region inside a dark page, under text
+that inherited the dark scheme, which is worse than not upgrading at all. Both
+placements are covered by the test and were measured in a browser.
+
+Two things this does NOT cover. Consumer-supplied brand colors are still the
+consumer's to validate (see below), and the `glass` preset's frosted panels
+composite text over a translucent layer, which a token-level ratio cannot
+describe: only its solid accent controls are covered.
 
 ### The hit-area technique (icon buttons reach 44 without bloating)
 
@@ -198,11 +232,26 @@ Level 5 before relying on it.]**
 
 7:1 (1.4.6) can be guaranteed for the **built-in brands** by choosing
 AAA-passing stops, but **cannot** be guaranteed for **consumer-supplied custom
-brand colors**, we don't control those values. Honest stance: ship AAA-valid
-stops for default/midnight/corporate, and document that a custom brand under
-`data-fluid-conformance="aaa"` must self-validate its pairs at 7:1. A build-time
-token-contrast validator (sketched in `tokens.md`) should check both the 4.5:1
-(AA) and 7:1 (AAA) thresholds per pair.
+brand colors**, we don't control those values. What shipped: AAA-valid stops for
+the default ramp and all five presets (midnight, corporate, titanium, glass,
+orchid), plus the build-time token-contrast validator sketched in `tokens.md`,
+which checks both the 4.5:1 (AA) and 7:1 (AAA) thresholds per pair. A custom
+brand under `data-fluid-conformance="aaa"` must still self-validate its pairs at
+7:1; point consumers at the same test.
+
+Two shapes of the problem showed up while building it, both worth remembering:
+
+- **The ladder, not just the resting fill.** Hover and active states carry the
+  label too. In the light scheme the warning tone is the one that carries dark
+  text, so its ladder has to run the opposite way from every other tone: it
+  gets _lighter_ on hover, because darkening amber drops contrast.
+- **Exhaustive re-declaration.** A custom property declared for one scheme
+  applies in the other unless something out-ranks it on the same element. The
+  AAA blocks therefore restate the union of both schemes' deltas, and each
+  brand restates its dark values on all three dark paths (descendant theme,
+  compound theme, and the `prefers-color-scheme` block). Skipping one leaks a
+  light fill under dark text, which is exactly the class of bug the validator
+  now catches.
 
 ### prefers-contrast / forced-colors interaction
 

@@ -46,6 +46,13 @@ function assertReleaseGraph(workflow) {
     step.uses?.startsWith("changesets/action@")
   );
   assert.ok(publishIndex > 0);
+  // The dist-tag must be resolved at run time from `.changeset/pre.json`, never
+  // hardcoded here, so a release candidate cannot take npm's latest dist-tag.
+  assert.equal(
+    release.steps[publishIndex].with.publish,
+    "node scripts/changeset-publish.mjs",
+    "publishing must go through the audited dist-tag wrapper"
+  );
   const buildIndex = release.steps.findIndex((step) => step.run === "pnpm build");
   const supplyChainIndex = release.steps.findIndex(
     (step) => step.run === "pnpm check:supply-chain"
@@ -307,6 +314,12 @@ for (const [name, mutate] of [
     "ignored exact-commit failure",
     (w) => {
       w.jobs.release.steps.at(-2)["continue-on-error"] = true;
+    }
+  ],
+  [
+    "a hardcoded publish dist-tag",
+    (w) => {
+      w.jobs.release.steps.at(-1).with.publish = "pnpm exec changeset publish --tag latest";
     }
   ]
 ]) {

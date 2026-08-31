@@ -65,3 +65,47 @@
   --fluid-accent-active: var(--fluid-color-brand-300);
   --fluid-focus-ring-color: var(--fluid-color-brand-400);
 }
+
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
+ *
+ * A brand re-declares the accent track at its own scope, which out-ranks the
+ * AAA block shipped in @fluid-ds/tokens, so every preset carries its own. The
+ * accent moves one step along the violet ramp it already owns; the airy
+ * spacing and soft radii are untouched.
+ *
+ * Ratios below are the computed WCAG 2 values against --fluid-accent-text
+ * (white in light, neutral.950 in dark), asserted by the token-contrast test.
+ */
+[data-fluid-brand="orchid"][data-fluid-conformance="aaa"],
+[data-fluid-brand="orchid"]:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"] {
+  /* brand.600 reads 5.70:1 on white, one step down clears 7. */
+  --fluid-accent-base: var(--fluid-color-brand-700); /* #6d28d9, 7.10:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-800); /* #5b21b6, 8.98:1 */
+  --fluid-accent-active: var(--fluid-color-brand-900); /* #4c1d95, 10.95:1 */
+}
+
+/*
+ * The dark AAA values have to be stated on every dark path, because the light
+ * AAA block above matches a dark subtree too and would otherwise win on source
+ * order. Same reason the scheme blocks in @fluid-ds/tokens restate themselves.
+ * The trailing descendant form is the region case, where the conformance
+ * attribute sits on a section rather than beside the brand on <html>.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="orchid"][data-fluid-conformance="aaa"],
+[data-fluid-brand="orchid"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
+[data-fluid-brand="orchid"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
+  /* brand.500 reads 4.70:1 against neutral.950 text; brand.400 clears 7. */
+  --fluid-accent-base: var(--fluid-color-brand-400); /* #a78bfa, 7.31:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300); /* #c4b5fd, 10.78:1 */
+  --fluid-accent-active: var(--fluid-color-brand-200); /* #ddd6fe, 14.33:1 */
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="orchid"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
+  [data-fluid-brand="orchid"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+    --fluid-accent-base: var(--fluid-color-brand-400); /* 7.31:1 */
+    --fluid-accent-hover: var(--fluid-color-brand-300); /* 10.78:1 */
+    --fluid-accent-active: var(--fluid-color-brand-200); /* 14.33:1 */
+  }
+}

@@ -481,5 +481,93 @@ export const semantics = {
   }
 } as const satisfies { light: TokenGroup; dark: TokenGroup };
 
+/* ────────────────────────────────────────────────────────────────────────── */
+/* Conformance deltas. Opt-in AAA text-contrast track (SC 1.4.6).             */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Enhanced-contrast (WCAG 2.2 SC 1.4.6, AAA) color deltas.
+ *
+ * The AA baseline aims at 4.5:1 for normal text; AAA needs 7:1. Only the
+ * tokens whose text pair falls under 7:1 are listed here: each moves to the
+ * NEAREST step of its own ramp that clears 7:1, so a brand keeps its hue and
+ * only deepens (light scheme) or brightens (dark scheme). Every ratio in the
+ * comments is the computed WCAG 2 value for the pair named, and is asserted
+ * by `scripts/token-contrast.test.mjs`.
+ *
+ * Interaction states carry text too, so hover/active move with the base. Where
+ * the ramp runs out (a light-scheme active step below the 900 stop), the value
+ * is mixed toward `neutral.950` rather than inventing an off-ramp hue.
+ *
+ * The build emits these under `[data-fluid-conformance="aaa"]`, scoped per
+ * scheme exactly the way `light.css` / `dark.css` are, and re-declares the
+ * union of both schemes' deltas in BOTH blocks so a light value can never
+ * leak into a dark subtree (the same exhaustive-redeclaration discipline the
+ * main scheme blocks use). Brand presets in `@fluid-ds/themes` re-declare the
+ * accent track at their own scope, so each preset ships its own AAA block.
+ */
+export const conformance = {
+  aaa: {
+    light: {
+      $label: "AAA deltas, light scheme",
+      accent: {
+        // white on brand.600 is 5.17:1, on brand.700 6.70:1, both under 7.
+        base: t("{color.brand.800}", "color"), // white on #1e40af, 8.72:1
+        hover: t("{color.brand.900}", "color"), // white on #1e3a8a, 10.36:1
+        // One step past the ramp so pressing still reads as a change.
+        active: t("color-mix(in srgb, {color.brand.900} 85%, {color.neutral.950})", "color") // #1b3377, 11.75:1
+      },
+      success: {
+        // white on emerald.700 is 5.48:1.
+        base: t("{color.emerald.800}", "color"), // white on #065f46, 7.68:1
+        hover: t("{color.emerald.900}", "color"), // white on #064e3b, 9.72:1
+        active: t("color-mix(in srgb, {color.emerald.900} 85%, {color.neutral.950})", "color") // #064434, 11.15:1
+      },
+      danger: {
+        // white on red.600 is 4.83:1, on red.700 6.47:1.
+        base: t("{color.red.800}", "color"), // white on #991b1b, 8.31:1
+        hover: t("{color.red.900}", "color"), // white on #7f1d1d, 10.02:1
+        active: t("color-mix(in srgb, {color.red.900} 85%, {color.neutral.950})", "color") // #6d1a1a, 11.58:1
+      },
+      warning: {
+        /*
+         * Warning is the one light-scheme tone that carries DARK text, so its
+         * ladder inverts at AAA: darkening amber drops contrast (amber.600 is
+         * 6.24:1 and amber.700 only 3.96:1, which does not even clear AA).
+         * The base already passes at 9.26:1, so only the states move, upward.
+         */
+        hover: t("{color.amber.400}", "color"), // neutral.950 on #fbbf24, 11.92:1
+        active: t("{color.amber.300}", "color") // neutral.950 on #fcd34d, 13.80:1
+      },
+      info: {
+        // white on sky.600 is 4.10:1 (an AA gap too), on sky.700 5.93:1.
+        base: t("{color.sky.800}", "color"), // white on #075985, 7.56:1
+        hover: t("{color.sky.900}", "color"), // white on #0c4a6e, 9.46:1
+        active: t("color-mix(in srgb, {color.sky.900} 85%, {color.neutral.950})", "color") // #0c405f, 10.97:1
+      }
+    },
+    dark: {
+      $label: "AAA deltas, dark scheme",
+      text: {
+        // neutral.400 reads 7.76:1 on surface-base but only 6.91:1 on
+        // surface-subtle and 5.81:1 on surface-muted.
+        secondary: t("{color.neutral.300}", "color") // 13.46 / 11.99 / 10.08:1
+      },
+      accent: {
+        // neutral.950 on brand.500 is 5.41:1.
+        base: t("{color.brand.400}", "color"), // #09090b on #60a5fa, 7.83:1
+        hover: t("{color.brand.300}", "color"), // 11.03:1
+        active: t("{color.brand.200}", "color") // 14.00:1
+      },
+      danger: {
+        // neutral.950 on red.500 is 5.29:1.
+        base: t("{color.red.400}", "color"), // #09090b on #f87171, 7.19:1
+        hover: t("{color.red.300}", "color"), // 10.48:1
+        active: t("{color.red.200}", "color") // 13.75:1
+      }
+    }
+  }
+} as const satisfies { aaa: { light: TokenGroup; dark: TokenGroup } };
+
 export const isLeaf = (node: unknown): node is TokenLeaf =>
   typeof node === "object" && node !== null && "$value" in node && "$type" in node;

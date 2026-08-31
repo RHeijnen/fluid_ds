@@ -542,6 +542,136 @@ describe("fluid-node-graph", () => {
     expect(nodeEl(el, "b").getAttribute("aria-roledescription")).to.equal("custom node");
   });
 
+  describe("owned strings", () => {
+    const hudSegments = (el: FluidNodeGraph): (string | null)[] =>
+      [...el.shadowRoot!.querySelectorAll(".hud span")].map((span) => span.textContent);
+
+    it("names the canvas role and the summary chip from the active dictionary", async () => {
+      const el = await graphFixture();
+      expect(
+        el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-roledescription")
+      ).to.equal("node graph editor");
+      expect(hudSegments(el)).to.deep.equal(["3 nodes", "·", "1 edge", "·", "100%"]);
+    });
+
+    it("localizes the summary chip through the built-in plural rules", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="ar">
+          <fluid-node-graph style="width: 800px; height: 500px"></fluid-node-graph>
+        </div>
+      `);
+      const el = wrapper.querySelector<FluidNodeGraph>("fluid-node-graph")!;
+      el.nodeTypes = TYPES;
+      el.nodes = NODES.map((node) => ({ ...node }));
+      el.edges = EDGES.map((edge) => ({ ...edge }));
+      await el.updateComplete;
+      // Arabic puts 3 in "few" and 1 in "one": both forms come from the dictionary.
+      expect(hudSegments(el)).to.deep.equal([
+        `${new Intl.NumberFormat("ar", { useGrouping: false }).format(3)} عقد`,
+        "·",
+        "اتصال واحد",
+        "·",
+        `${new Intl.NumberFormat("ar", { useGrouping: false }).format(100)}%`
+      ]);
+    });
+
+    it("overrides the canvas role description, node name and every summary segment", async () => {
+      const el = await graphFixture();
+      el.messages = {
+        editorRole: "knooppuntgrafiek-editor",
+        nodeName: "{node} ({type})",
+        nodeCount: "{count} knopen",
+        nodeCountOne: "{count} knoop",
+        edgeCount: "{count} verbindingen",
+        edgeCountOne: "{count} verbinding",
+        zoomLevel: "zoom {percent} procent",
+        hudSeparator: "|"
+      };
+      await el.updateComplete;
+      expect(
+        el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-roledescription")
+      ).to.equal("knooppuntgrafiek-editor");
+      expect(nodeEl(el, "b").getAttribute("aria-label")).to.equal("Sync data (Task)");
+      // Three nodes take the general form; the single edge takes the singular.
+      expect(hudSegments(el)).to.deep.equal([
+        "3 knopen",
+        "|",
+        "1 verbinding",
+        "|",
+        "zoom 100 procent"
+      ]);
+    });
+
+    it("falls back to the general tally when no singular override is supplied", async () => {
+      const el = await graphFixture();
+      el.messages = { nodeCount: "{count} knopen", edgeCount: "{count} verbindingen" };
+      await el.updateComplete;
+      expect(hudSegments(el)).to.deep.equal(["3 knopen", "·", "1 verbindingen", "·", "100%"]);
+    });
+
+    it("selects the singular tally by the active locale's plural rules", async () => {
+      const wrapper = await fixture<HTMLDivElement>(html`
+        <div lang="ar">
+          <fluid-node-graph style="width: 800px; height: 500px"></fluid-node-graph>
+        </div>
+      `);
+      const el = wrapper.querySelector<FluidNodeGraph>("fluid-node-graph")!;
+      el.nodeTypes = TYPES;
+      el.nodes = NODES.map((node) => ({ ...node }));
+      el.edges = EDGES.map((edge) => ({ ...edge }));
+      el.messages = {
+        nodeCount: "{count} عقد",
+        nodeCountOne: "عقدة واحدة",
+        edgeCount: "{count} اتصالات",
+        edgeCountOne: "اتصال واحد"
+      };
+      await el.updateComplete;
+      const arabicThree = new Intl.NumberFormat("ar", { useGrouping: false }).format(3);
+      expect(hudSegments(el)[0], "3 is not the one category in Arabic").to.equal(
+        `${arabicThree} عقد`
+      );
+      expect(hudSegments(el)[2]).to.equal("اتصال واحد");
+    });
+
+    it("honours intentional empty overrides for the role description and separator", async () => {
+      const el = await graphFixture();
+      el.messages = { editorRole: "", hudSeparator: "", zoomLevel: "" };
+      await el.updateComplete;
+      expect(
+        el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-roledescription")
+      ).to.equal("");
+      expect(hudSegments(el)).to.deep.equal(["3 nodes", "", "1 edge", "", ""]);
+    });
+
+    it("relocalizes the canvas role and summary chip when the language changes", async () => {
+      const el = await graphFixture();
+      el.lang = "fr";
+      await aTimeout(0);
+      await el.updateComplete;
+      expect(
+        el.shadowRoot!.querySelector('[part="base"]')!.getAttribute("aria-roledescription")
+      ).to.equal("éditeur de graphe de nœuds");
+      expect(hudSegments(el)).to.deep.equal(["3 nœuds", "·", "1 connexion", "·", "100%"]);
+    });
+
+    it("stays accessible with every owned string overridden", async () => {
+      const el = await graphFixture();
+      el.messages = {
+        editorRole: "knooppuntgrafiek-editor",
+        nodeRole: "knooppunt",
+        nodeName: "{node} ({type})",
+        inputPort: "ingang van {node}",
+        outputPort: "{port}, uitgang van {node}",
+        nodeCount: "{count} knopen",
+        edgeCount: "{count} verbindingen",
+        zoomLevel: "zoom {percent}%",
+        hudSeparator: "|"
+      };
+      await el.updateComplete;
+      await expect(el).to.be.accessible();
+    });
+  });
+
   it("localizes numeric announcements while keeping physical coordinates and payloads canonical", async () => {
     const wrapper = await fixture<HTMLDivElement>(html`
       <div lang="ar">

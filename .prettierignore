@@ -35,3 +35,8 @@ packages/react/src/generated
 # sha256-bound in framework-pinned-profile.json; reformatting breaks the
 # binding.
 scripts/fixtures/framework-pinned
+# SSR fixtures are gitignored test-run output (server-rendered DSD markup
+# compared byte-for-byte during hydration); they only exist after a local
+# run and must never be reformatted.
+apps/ssr-tests/generated
+apps/ssr-tests/index.html

@@ -23,7 +23,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "An editable node graph: draggable nodes with typed connection ports, joined\nby Bezier edges. The graph knows nothing about what a node MEANS; a\n`nodeTypes` registry supplies each type's label, accent, height and port\ntopology, and a `renderNode` callback can take over the node body entirely.\nEverything domain-shaped stays in the consumer.\n\nPointer: drag a node by its body to move it (grid-snapped), drag empty\ncanvas to pan, wheel to zoom at the pointer, drag from an output port to a\nnode to connect, grab a connected input port to pick the connection up again\n(drop on empty canvas to remove it). Click a node or an edge to select it;\nDelete removes the selection.\n\nKeyboard, at full parity: Tab reaches every node and port. On a node, arrow\nkeys nudge by one grid step (Shift for four), Enter or Space selects, Delete\nremoves. On an output port, Enter starts a connection, ArrowUp / ArrowDown\ncycle through valid targets (previewed on the canvas), Enter connects and\nEscape cancels. On an input port, Enter selects the newest incoming\nconnection so Delete can remove it. On the canvas itself, arrows pan, plus\nand minus zoom, and Home fits the graph. Arrow movement, panning, ports and\ngraph coordinates are physical and remain unchanged in RTL. Every mutation\nis announced through a polite live region.\n\nThe component applies mutations to its own `nodes` / `edges` state and\nemits an event for each one, so a consumer can either treat it as the owner\nof the drawing or mirror every event into an external store.\n\nTraversal display is data, not behavior: paint per-node badges via\n`runStates` and dashed marching-ants edges via `traversedEdges`; the\ncomponent never runs a traversal itself.",
+          "description": "An editable node graph: draggable nodes with typed connection ports, joined\nby Bezier edges. The graph knows nothing about what a node MEANS; a\n`nodeTypes` registry supplies each type's label, accent, height and port\ntopology, and a `renderNode` callback can take over the node body entirely.\nEverything domain-shaped stays in the consumer.\n\nPointer: drag a node by its body to move it (grid-snapped), drag empty\ncanvas to pan, wheel to zoom at the pointer, drag from an output port to a\nnode to connect, grab a connected input port to pick the connection up again\n(drop on empty canvas to remove it). Click a node or an edge to select it;\nDelete removes the selection.\n\nKeyboard, at full parity: Tab reaches every node and port. On a node, arrow\nkeys nudge by one grid step (Shift for four), Enter or Space selects, Delete\nremoves. On an output port, Enter starts a connection, ArrowUp / ArrowDown\ncycle through valid targets (previewed on the canvas), Enter connects and\nEscape cancels. On an input port, Enter selects the newest incoming\nconnection so Delete can remove it. On the canvas itself, arrows pan, plus\nand minus zoom, and Home fits the graph. Arrow movement, panning, ports and\ngraph coordinates are physical and remain unchanged in RTL. Every mutation\nis announced through a polite live region.\n\nEvery string the component owns (announcements, accessible names, both role\ndescriptions and the visual summary chip) resolves from the dictionary for\nthe nearest `lang` and can be replaced per instance through `messages`.\nNode, type and port labels stay application data.\n\nThe component applies mutations to its own `nodes` / `edges` state and\nemits an event for each one, so a consumer can either treat it as the owner\nof the drawing or mirror every event into an external store.\n\nTraversal display is data, not behavior: paint per-node badges via\n`runStates` and dashed marching-ants edges via `traversedEdges`; the\ncomponent never runs a traversal itself.",
           "name": "FluidNodeGraph",
           "cssProperties": [
             {
@@ -146,7 +146,7 @@
                 "text": "Partial<NodeGraphMessages>"
               },
               "default": "{}",
-              "description": "Overrides for the announcement strings (localization)."
+              "description": "Overrides for every string the graph owns: announcements, accessible\nnames, role descriptions and the visual summary chip. See\n`NodeGraphMessages` for the keys, their variables and their defaults."
             },
             {
               "kind": "field",
@@ -511,6 +511,49 @@
               "return": {
                 "type": {
                   "text": "number"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "value",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "pluralVariant",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "keyof NodeGraphMessages"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "key",
+                  "type": {
+                    "text": "keyof NodeGraphMessages"
+                  }
+                },
+                {
+                  "name": "vars",
+                  "type": {
+                    "text": "Record<string, string | number>"
+                  }
+                }
+              ],
+              "description": "A tally message carries an optional singular companion. It answers only\nwhen the consumer supplied it AND the active locale puts the count in the\n`one` plural category; every other category takes the general key, which\nis how the built-in dictionaries phrase their own fallback form."
+            },
+            {
+              "kind": "method",
+              "name": "pluralCategory",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "Intl.LDMLPluralRule"
                 }
               },
               "parameters": [

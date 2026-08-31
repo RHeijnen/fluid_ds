@@ -197,6 +197,29 @@ describe("<fluid-otp>", () => {
     expect(boxes(el).every((box) => box.getAttribute("aria-invalid") === "true")).to.equal(true);
   });
 
+  it("retires a revealed error inside the same update that completes the code", async () => {
+    const el = await fixture<FluidOtp>(
+      html`<fluid-otp length="4" required aria-label="Code"></fluid-otp>`
+    );
+    await el.updateComplete;
+    expect(el.checkValidity()).to.equal(false);
+    await el.updateComplete;
+    expect(el.shadowRoot!.querySelector(".base")!.classList.contains("invalid")).to.equal(true);
+
+    el.value = "1234";
+    /*
+     * `updateComplete` resolves false when the update scheduled another one.
+     * Un-painting the resolved error used to happen in `updated()`, so it did
+     * exactly that, and Lit logged its change-in-update warning: an error the
+     * SSR browser suite fails on. The state now derives in `willUpdate`, so the
+     * one pass both fills the boxes and clears the error.
+     */
+    expect(await el.updateComplete).to.equal(true);
+    expect(el.shadowRoot!.querySelector(".base")!.classList.contains("invalid")).to.equal(false);
+    expect(boxes(el).every((box) => box.getAttribute("aria-invalid") === "false")).to.equal(true);
+    expect(el.validity.valueMissing).to.equal(false);
+  });
+
   it("Backspace on an empty box steps back and clears the previous", async () => {
     const el = await fixture<FluidOtp>(html`<fluid-otp length="4" value="12"></fluid-otp>`);
     const bs = boxes(el);

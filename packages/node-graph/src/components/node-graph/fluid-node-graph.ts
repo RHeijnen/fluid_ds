@@ -54,23 +54,78 @@ export interface NodeGraphEdge {
   to: string;
 }
 
-/** Announcement strings, overridable for localization via the `messages` property. */
+/**
+ * Every string the graph itself owns: live-region announcements, accessible
+ * names, role descriptions and the visual summary chip. All of them are
+ * overridable for localization through the `messages` property.
+ *
+ * Values are templates. A `{name}` placeholder is replaced with the variable
+ * documented for that key, and a placeholder with no matching variable is left
+ * verbatim. Numbers arrive already formatted for the active locale. A key left
+ * unset resolves against the built-in dictionary for the nearest `lang`, so
+ * `messages` refines one editor rather than standing in for a locale.
+ *
+ * Node titles, node-type labels and port labels are application data: the
+ * component places them into these templates but never translates them.
+ */
 export interface NodeGraphMessages {
+  /** A node moved. Vars: `node`, `x`, `y`. */
   nodeMoved: string;
+  /** A node and its connections were removed. Vars: `node`. */
   nodeRemoved: string;
+  /** A node was selected. Vars: `node`. */
   nodeSelected: string;
+  /** An incoming connection was selected. Vars: `from`, `to`. */
   edgeSelected: string;
+  /** A connection was removed. Vars: `from`, `to`. */
   edgeRemoved: string;
+  /** A keyboard connection started from an output port. Vars: `node`, `port`. */
   connectStart: string;
+  /** The previewed connection target changed. Vars: `node`, `index`, `count`. */
   connectCandidate: string;
+  /** A connection was made. Vars: `from`, `to`. */
   connected: string;
+  /** A keyboard connection was cancelled. No vars. */
   connectCancelled: string;
+  /** A connection was refused by the validity guards. No vars. */
   connectFailed: string;
+  /** An output port has no valid target left. No vars. */
   connectNoTargets: string;
+  /** The zoom changed. Vars: `percent`. */
   zoomChanged: string;
+  /** Accessible name of a node's input port. Vars: `node`. */
   inputPort: string;
+  /** Accessible name of an output port. Vars: `port`, `node`. */
   outputPort: string;
+  /** `aria-roledescription` of a node. No vars. */
   nodeRole: string;
+  /** `aria-roledescription` of the canvas. No vars. */
+  editorRole: string;
+  /**
+   * Accessible name of a node whose type label differs from its own title, so
+   * the type is spoken after the title. Vars: `node`, `type`. A node with no
+   * distinct type label is named by its title alone and never reaches this
+   * template.
+   */
+  nodeName: string;
+  /**
+   * Node tally in the visual summary chip. Vars: `count`. Answers for every
+   * plural category except `one`, which prefers `nodeCountOne` when it is set.
+   */
+  nodeCount: string;
+  /**
+   * Node tally when the active locale puts the count in the `one` plural
+   * category. Unset, the count falls back to `nodeCount`. Vars: `count`.
+   */
+  nodeCountOne: string;
+  /** Connection tally in the visual summary chip. Vars: `count`. */
+  edgeCount: string;
+  /** Connection tally for the `one` plural category. Vars: `count`. */
+  edgeCountOne: string;
+  /** Zoom readout in the visual summary chip. Vars: `percent`. */
+  zoomLevel: string;
+  /** Separator drawn between the summary chip's segments. No vars. */
+  hudSeparator: string;
 }
 
 const format = (template: string, vars: Record<string, string | number>): string =>
@@ -135,6 +190,11 @@ interface KeyboardLink {
  * and minus zoom, and Home fits the graph. Arrow movement, panning, ports and
  * graph coordinates are physical and remain unchanged in RTL. Every mutation
  * is announced through a polite live region.
+ *
+ * Every string the component owns (announcements, accessible names, both role
+ * descriptions and the visual summary chip) resolves from the dictionary for
+ * the nearest `lang` and can be replaced per instance through `messages`.
+ * Node, type and port labels stay application data.
  *
  * The component applies mutations to its own `nodes` / `edges` state and
  * emits an event for each one, so a consumer can either treat it as the owner
@@ -493,7 +553,11 @@ export class FluidNodeGraph extends FluidElement {
   /** Ids of edges to paint with the traversed (marching ants) style. */
   @property({ attribute: false }) traversedEdges: string[] = [];
 
-  /** Overrides for the announcement strings (localization). */
+  /**
+   * Overrides for every string the graph owns: announcements, accessible
+   * names, role descriptions and the visual summary chip. See
+   * `NodeGraphMessages` for the keys, their variables and their defaults.
+   */
   @property({ attribute: false }) messages: Partial<NodeGraphMessages> = {};
 
   /** Accessible name of the editor. */
@@ -602,11 +666,36 @@ export class FluidNodeGraph extends FluidElement {
     return this.grid > 0 ? Math.round(value / this.grid) * this.grid : Math.round(value);
   }
 
+  /**
+   * A tally message carries an optional singular companion. It answers only
+   * when the consumer supplied it AND the active locale puts the count in the
+   * `one` plural category; every other category takes the general key, which
+   * is how the built-in dictionaries phrase their own fallback form.
+   */
+  private pluralVariant(
+    key: keyof NodeGraphMessages,
+    vars: Record<string, string | number>
+  ): keyof NodeGraphMessages {
+    if (key !== "nodeCount" && key !== "edgeCount") return key;
+    const singular = key === "nodeCount" ? "nodeCountOne" : "edgeCountOne";
+    if (this.messages[singular] === undefined) return key;
+    return this.pluralCategory(Number(vars["count"] ?? 0)) === "one" ? singular : key;
+  }
+
+  private pluralCategory(value: number): Intl.LDMLPluralRule {
+    try {
+      return new Intl.PluralRules(this.localize.locale || undefined).select(value);
+    } catch {
+      return new Intl.PluralRules("en").select(value);
+    }
+  }
+
   private msg(key: keyof NodeGraphMessages, vars: Record<string, string | number> = {}): string {
-    const override = this.messages[key];
+    const override = this.messages[this.pluralVariant(key, vars)];
     if (override !== undefined) return format(override, vars);
     const text = (name: string): string => String(vars[name] ?? "");
     const number = (name: string): string => this.formatNumber(Number(vars[name] ?? 0));
+    const count = (): number => Number(vars["count"] ?? 0);
     switch (key) {
       case "nodeMoved":
         return this.term("nodeGraphNodeMoved", text("node"), number("x"), number("y"));
@@ -643,6 +732,20 @@ export class FluidNodeGraph extends FluidElement {
         return this.term("nodeGraphOutputPort", text("port"), text("node"));
       case "nodeRole":
         return this.term("nodeGraphNodeRole");
+      case "editorRole":
+        return this.term("nodeGraphEditorRole");
+      case "nodeName":
+        return `${text("node")}, ${text("type")}`;
+      case "nodeCount":
+      case "nodeCountOne":
+        return this.term("nodeGraphNodeCount", count(), number("count"));
+      case "edgeCount":
+      case "edgeCountOne":
+        return this.term("nodeGraphEdgeCount", count(), number("count"));
+      case "zoomLevel":
+        return `${number("percent")}%`;
+      case "hudSeparator":
+        return "·";
     }
   }
 
@@ -1230,7 +1333,9 @@ export class FluidNodeGraph extends FluidElement {
       role="listitem"
       tabindex="0"
       aria-roledescription=${this.msg("nodeRole")}
-      aria-label=${type.label && type.label !== title ? `${title}, ${type.label}` : title}
+      aria-label=${type.label && type.label !== title
+        ? this.msg("nodeName", { node: title, type: type.label })
+        : title}
       style="left:${node.x}px;top:${node.y}px;width:${this.nodeWidth}px;height:${this.nodeHeight(
         node
       )}px;--node-accent:${type.accent ?? "var(--fluid-accent-base, #4f46e5)"}"
@@ -1295,7 +1400,7 @@ export class FluidNodeGraph extends FluidElement {
         part="base"
         class="canvas ${this.drag?.mode === "link" || this.keyboardLink ? "linking" : ""}"
         role="application"
-        aria-roledescription=${this.term("nodeGraphEditorRole")}
+        aria-roledescription=${this.msg("editorRole")}
         aria-label=${this.label}
         dir=${this.localize.dir}
         tabindex="0"
@@ -1318,21 +1423,11 @@ export class FluidNodeGraph extends FluidElement {
           </div>
         </div>
         <div part="hud" class="hud" aria-hidden="true">
-          <span
-            >${this.term(
-              "nodeGraphNodeCount",
-              this.nodes.length,
-              this.formatNumber(this.nodes.length)
-            )}</span
-          ><span>·</span>
-          <span
-            >${this.term(
-              "nodeGraphEdgeCount",
-              this.edges.length,
-              this.formatNumber(this.edges.length)
-            )}</span
-          ><span>·</span>
-          <span>${this.formatNumber(Math.round(this.zoom * 100))}%</span>
+          <span>${this.msg("nodeCount", { count: this.nodes.length })}</span
+          ><span>${this.msg("hudSeparator")}</span>
+          <span>${this.msg("edgeCount", { count: this.edges.length })}</span
+          ><span>${this.msg("hudSeparator")}</span>
+          <span>${this.msg("zoomLevel", { percent: Math.round(this.zoom * 100) })}</span>
         </div>
       </div>
       <div

@@ -7,6 +7,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import { validateTargets } from "./check-package-artifacts.mjs";
+import { resolvePublishPlan } from "./changeset-publish.mjs";
 import {
   checkManifestOutputs,
   expectedManifestOutputs,
@@ -191,8 +192,10 @@ export function auditReleaseWorkflow(workflow) {
   if (!steps.some((step) => /npm install --global npm@11\./.test(step.run ?? "")))
     failures.push("release job does not pin an OIDC-capable npm 11 client");
   const action = steps[publish];
-  if (!/^pnpm exec changeset publish --tag latest$/.test(action?.with?.publish ?? ""))
-    failures.push("changesets publish command or dist-tag changed");
+  // The dist-tag is resolved at run time from `.changeset/pre.json`, never pinned in
+  // the workflow. auditPublishWrapper below owns the resolution itself.
+  if (!/^node scripts\/changeset-publish\.mjs$/.test(action?.with?.publish ?? ""))
+    failures.push("changesets publish command no longer runs the audited dist-tag wrapper");
   if (
     [workflow.env, release.env, action?.env].some(
       (environment) => environment?.NODE_AUTH_TOKEN || environment?.NPM_TOKEN
@@ -200,6 +203,73 @@ export function auditReleaseWorkflow(workflow) {
   )
     failures.push("static npm tokens are forbidden; trusted publishing must use OIDC");
   if (!action?.env?.GITHUB_TOKEN) failures.push("changesets action lacks its scoped GitHub token");
+  return failures;
+}
+
+/**
+ * Audit the dist-tag wrapper the release workflow delegates to, behaviourally and
+ * statically, so a tampered wrapper fails the rehearsal instead of the release.
+ *
+ * `changeset publish --tag <name>` is refused outright while `.changeset/pre.json`
+ * carries `mode: "pre"`, so the prerelease branch passes no `--tag` and lets
+ * changesets route to the recorded prerelease tag. `mode: "exit"` and an absent file
+ * are both stable states and must pin `--tag latest` explicitly, because changesets
+ * prefers the recorded tag over latest whenever pre.json exists at all.
+ */
+export function auditPublishWrapper(source, resolvePlan = resolvePublishPlan) {
+  const failures = [];
+  for (const [label, preState, tag, tagged] of [
+    ["an absent pre.json", undefined, "latest", true],
+    ["an exited pre-mode", { mode: "exit", tag: "next" }, "latest", true],
+    ["an active pre-mode", { mode: "pre", tag: "next" }, "next", false]
+  ]) {
+    let plan;
+    try {
+      plan = resolvePlan(preState);
+    } catch (error) {
+      failures.push(`publish wrapper refuses ${label}: ${error.message}`);
+      continue;
+    }
+    if (plan?.tag !== tag)
+      failures.push(
+        `publish wrapper resolves ${label} to dist-tag ${JSON.stringify(plan?.tag)}, expected ${tag}`
+      );
+    const args = plan?.args ?? [];
+    if (args.includes("--tag") !== tagged)
+      failures.push(
+        tagged
+          ? `publish wrapper does not pin an explicit dist-tag for ${label}`
+          : `publish wrapper passes an explicit --tag for ${label}, which changesets refuses in pre mode`
+      );
+    if (tagged && args.at(-1) !== tag)
+      failures.push(`publish wrapper does not pass ${tag} as the explicit dist-tag for ${label}`);
+  }
+  for (const [label, preState] of [
+    ["a prerelease that claims the stable latest tag", { mode: "pre", tag: "latest" }],
+    ["a prerelease with no recorded tag", { mode: "pre" }],
+    ["an unrecognized pre-mode", { mode: "released" }]
+  ]) {
+    let resolved;
+    try {
+      resolved = resolvePlan(preState);
+    } catch {
+      continue; // Failing closed is the required behaviour.
+    }
+    failures.push(
+      `publish wrapper accepts ${label} and would publish ${JSON.stringify(resolved?.tag)}`
+    );
+  }
+  if (!source.includes('".changeset/pre.json"'))
+    failures.push("publish wrapper no longer reads .changeset/pre.json");
+  if (!source.includes('mode === "pre"'))
+    failures.push("publish wrapper no longer branches on changesets pre-mode");
+  if (!source.includes("resolvePublishPlan"))
+    failures.push("publish wrapper no longer publishes through the audited resolver");
+  const literalTags = [...source.matchAll(/"--tag",\s*"([^"]*)"/g)].map((match) => match[1]);
+  if (!literalTags.includes("latest"))
+    failures.push("publish wrapper no longer pins the stable latest dist-tag");
+  for (const literal of literalTags.filter((value) => value !== "latest"))
+    failures.push(`publish wrapper hardcodes the dist-tag ${JSON.stringify(literal)}`);
   return failures;
 }
 
@@ -251,6 +321,9 @@ export async function auditReleaseDryRun(root = repositoryRoot, dependencies = {
   }
   const workflow = parseYaml(await readFile(join(root, ".github/workflows/release.yml"), "utf8"));
   failures.push(...auditReleaseWorkflow(workflow));
+  failures.push(
+    ...auditPublishWrapper(await readFile(join(root, "scripts/changeset-publish.mjs"), "utf8"))
+  );
   const changesets = JSON.parse(await readFile(join(root, ".changeset/config.json"), "utf8"));
   if (JSON.stringify(changesets.fixed) !== JSON.stringify([["@fluid-ds/*"]]))
     failures.push(
@@ -272,7 +345,7 @@ export async function auditReleaseDryRun(root = repositoryRoot, dependencies = {
     version: records[0]?.manifest.version ?? null,
     failures,
     ownerDecisions: [
-      "Resolve the policy mismatch: SECURITY.md says pre-1.0 fixes use 0.x.x-alpha.*, while the workflow unconditionally publishes the latest tag and all packages are currently stable 0.4.0.",
+      "Resolve the policy mismatch: SECURITY.md says pre-1.0 fixes use 0.x.x-alpha.*, while all packages are currently stable 0.4.0. The workflow now resolves the dist-tag from changesets pre-state, so entering pre mode is the owner action that switches releases off the latest tag.",
       "Confirm npm trusted-publisher configuration, OIDC provenance receipt, and organization signing policy remotely.",
       "Approve rollback policy: deprecate a bad immutable npm version, restore the last known-good graph, and publish a new patch; never unpublish or reuse a version."
     ]

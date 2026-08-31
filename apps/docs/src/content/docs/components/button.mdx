@@ -622,25 +622,35 @@ the toggle sets the real attribute on `<html>`, the same switch you'd throw
 app-wide. The button reads conformance tokens, so it scales with zero
 per-component branching:
 
-| Token                      | AA   | AAA      | Criterion                                                                                                |
-| -------------------------- | ---- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `--fluid-target-min`       | 24px | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
-| `--fluid-focus-ring-width` | 2px  | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+| Token                       | AA          | AAA      | Criterion                                                                                                |
+| --------------------------- | ----------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `--fluid-target-min`        | 24px        | **44px** | 2.5.8 → [2.5.5 Target Size (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) |
+| `--fluid-focus-ring-width`  | 2px         | **3px**  | 2.4.7 → [2.4.13 Focus Appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance)          |
+| accent + status color track | 4.5:1 pairs | **7:1**  | 1.4.3 → [1.4.6 Contrast (Enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced)       |
 
 ```html
 <!-- Opt the whole app (or one region) into AAA, once, on an ancestor. -->
 <html data-fluid-conformance="aaa">
   …
-  <fluid-button>44×44 target, 3px focus ring</fluid-button>
+  <fluid-button>44×44 target, 3px focus ring, 7:1 label</fluid-button>
 </html>
 ```
 
+The color track moves with the toggle too. A primary button's fill steps to the
+nearest stop on its own brand ramp that puts its label at 7:1 or better: in the
+default brand it deepens from `brand.600` (5.17:1 against white) to `brand.800`
+(8.72:1), and the hover and pressed fills move with it, because a hovered
+button still carries its label. Every built-in brand ships its own AAA stops in
+[`@fluid-ds/themes`](/theming/brand/), so the hue is preserved and only the
+step changes.
+
 <Aside type="note">
-  Text-contrast enhancement ([SC
-  1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced), 7:1) is a property of the
-  brand color track, not these structural tokens: the default palette targets the AA 4.5:1 floor.
-  Target size and focus appearance are the deltas a component itself owns, and the two this toggle
-  demonstrates.
+  The 7:1 stops are validated for the built-in brands only: a token-contrast test parses the shipped
+  CSS and asserts every text pair, per brand and scheme. **A custom brand palette transfers that
+  responsibility to you** ([SC 1.4.6](https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced)
+  is about the colors you supply, and we cannot see them). The `glass` preset is covered for its
+  solid controls; text placed directly on its frosted panels composites over a translucent layer,
+  which no token-level ratio can describe.
 </Aside>
 
 ## API
