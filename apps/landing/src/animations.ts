@@ -150,6 +150,12 @@ document.body.innerHTML = `
           ><fluid-switch id="ctl-brand" aria-label="Tint effects to the active brand"></fluid-switch
         ></span>
       </label>
+      <label class="anim-control anim-control--switch">
+        <span class="anim-control-label">Document space</span>
+        <span class="anim-switch-slot"
+          ><fluid-switch id="ctl-document-space" aria-label="Anchor particles to the full document"></fluid-switch
+        ></span>
+      </label>
       <fluid-button id="effect-fire"><fluid-icon slot="prefix" name="sparkles"></fluid-icon>Play Confetti</fluid-button>
     </div>
     <pre class="motion-code"><code id="effect-code">import { confetti } from "@fluid-ds/animations/effects";
@@ -266,6 +272,15 @@ function effectColors(): readonly string[] | undefined {
   return sw?.checked ? brandColors() : undefined;
 }
 
+/** Opt into page-anchored coordinates. Omitted means the backwards-compatible
+ * viewport default. */
+function effectSpace(): "document" | undefined {
+  const sw = document.getElementById("ctl-document-space") as
+    | (HTMLElement & { checked?: boolean })
+    | null;
+  return sw?.checked ? "document" : undefined;
+}
+
 let selectedEffect: EffectCatalogEntry = VISIBLE_EFFECTS[0]!;
 
 function updateEffectCode(): void {
@@ -275,6 +290,7 @@ function updateEffectCode(): void {
   const options = selectedEffect.controls.map(
     (setting) => `${setting.key}: ${sliderVal(`ctl-${setting.key}`, setting.value)}`
   );
+  if (effectSpace()) options.push('space: "document"');
   if (selectedEffect.origin) {
     const preset = chosenOriginPreset();
     if (preset && selectedEffect.multiOrigin) {
@@ -356,6 +372,8 @@ function playEffect(effect: EffectCatalogEntry, originElement: Element): void {
   }
   const colors = effectColors();
   if (colors) options["colors"] = colors;
+  const space = effectSpace();
+  if (space) options["space"] = space;
   EFFECTS[effect.name as EffectName](options);
 }
 
@@ -373,11 +391,12 @@ document.getElementById("effect-fire")?.addEventListener("click", () => {
 });
 document.getElementById("ctl-origin")?.addEventListener("fluid-change", updateEffectCode);
 document.getElementById("ctl-brand")?.addEventListener("fluid-change", updateEffectCode);
+document.getElementById("ctl-document-space")?.addEventListener("fluid-change", updateEffectCode);
 renderEffectControls(selectedEffect);
 
-// A short ambient welcome on first load. It remains decorative, honors the
-// package's reduced-motion handling, and winds itself down automatically.
-EFFECTS.butterflies({ rate: 2, size: 11, duration: 6000 });
+// A document-wide ambient welcome on first load. It remains decorative,
+// honors reduced motion, and winds itself down automatically.
+EFFECTS.butterflies({ space: "document", rate: 5.25, size: 13, duration: 6_000 });
 
 // Attribute-driven preview: show every registered preset with its real default
 // timing. A replay button keeps one-shot entrance animations easy to inspect.

@@ -51,8 +51,11 @@ to hand off context when you switch machines.
 >    the prerelease line is `changeset pre enter rc` -> versions
 >    `1.0.0-rc.N` published under the npm dist-tag `rc` (the suffix and
 >    dist-tag are inseparable in pre-mode).
-> 4. **The 1.0.0-rc.0 release itself** via the changesets version-PR flow,
->    now fully hands-off (trusted publishing covers all 19 packages).
+> 4. **The 1.0.0-rc.0 release is prepared locally (2026-09-02).** Changesets
+>    prerelease mode is `rc`; the major animations changeset includes the new
+>    opt-in document-space effects engine. The owner will push the single local
+>    `main` commit, which opens the automated version PR; merging that PR
+>    publishes all 19 packages as `1.0.0-rc.0` under the `rc` dist-tag.
 >
 > Quality debt to burn down during the RC window:
 >
@@ -1215,6 +1218,14 @@ read the `background` shorthand, which Firefox serializes as "" once the
 engine overwrites position/size longhands (they read `backgroundImage`
 now). Client and DSD scheduler SSR specs verified green on chromium and
 webkit locally; firefox only runs in CI on this repo.
+
+MILESTONE: `a972ec4` produced the FIRST FULLY GREEN nine-lane release graph
+in the project's history (attempt 2; the re-roll replayed only the two known
+flakes, the packed-React frozen replay and the webkit media-interaction
+test, and both passed). The release job ran green end to end and correctly
+published nothing (no pending changesets). The gate you must clear to
+publish now demonstrably closes. Next per the roadmap: cut 1.0.0-rc.0
+(changeset pre enter rc; dist-tag rc, never latest).
 
 ### 2026-08-31 (later): node-graph live-region fix, both connect lines announced
 

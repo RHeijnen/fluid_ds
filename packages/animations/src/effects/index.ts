@@ -24,8 +24,11 @@ import {
   addEmitter,
   stopEmitter,
   windDownEmitter,
+  effectSpace,
   viewport,
+  withEffectSpace,
   type Emitter,
+  type EffectSpace,
   type Particle,
   type ParticleRenderer,
   type ParticleShape
@@ -62,7 +65,13 @@ export {
   isCanvasMounted
 } from "./engine.js";
 export { defaultColors, brandColors, RAINBOW } from "./colors.js";
-export type { ParticleShape } from "./engine.js";
+export type { EffectSpace, ParticleShape } from "./engine.js";
+
+/** Options shared by every canvas effect. */
+export interface EffectOptions {
+  /** Coordinate system for particles. Defaults to `viewport`. */
+  space?: EffectSpace;
+}
 
 /** The handle every effect returns. */
 export interface EffectHandle {
@@ -82,7 +91,8 @@ export interface EffectHandle {
 
 /**
  * Where an effect originates. Accepts an element (uses its center), an
- * absolute viewport point, or a relative point in [0, 1] on each axis.
+ * absolute point in the selected effect space, or a relative point in [0, 1]
+ * on each axis.
  */
 export type Origin = Element | { x: number; y: number } | { rx: number; ry: number };
 
@@ -112,7 +122,8 @@ const TOP_RIGHT: EffectSource = { origin: { rx: 1, ry: 0 }, angle: -135 };
 const BOTTOM_LEFT: EffectSource = { origin: { rx: 0, ry: 1 }, angle: 45 };
 const BOTTOM_RIGHT: EffectSource = { origin: { rx: 1, ry: 1 }, angle: 135 };
 
-/** Reusable launch presets with inward-facing directions at viewport edges. */
+/** Reusable launch presets with inward-facing directions at the selected
+ * effect-space edges. */
 export const EFFECT_ORIGIN_PRESETS: Readonly<Record<EffectOriginPreset, readonly EffectSource[]>> =
   {
     center: [{ origin: { rx: 0.5, ry: 0.5 }, angle: 90 }],
@@ -130,7 +141,7 @@ export const EFFECT_ORIGIN_PRESETS: Readonly<Record<EffectOriginPreset, readonly
   };
 
 /** Options shared by most point-burst effects. */
-export interface BurstOptions {
+export interface BurstOptions extends EffectOptions {
   /** Origin of the burst. Defaults to the horizontal center, near the top. */
   origin?: Origin;
   /** One or more launch points. Overrides `origin` when non-empty. */
@@ -185,7 +196,11 @@ function toPoint(origin: Origin | undefined): { x: number; y: number } {
   if (!origin) return { x: width / 2, y: height * 0.35 };
   if (origin instanceof Element) {
     const r = origin.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    const documentSpace = effectSpace() === "document";
+    return {
+      x: r.left + r.width / 2 + (documentSpace ? window.scrollX : 0),
+      y: r.top + r.height / 2 + (documentSpace ? window.scrollY : 0)
+    };
   }
   if ("rx" in origin) {
     return { x: origin.rx * width, y: origin.ry * height };
@@ -199,7 +214,10 @@ function toPoint(origin: Origin | undefined): { x: number; y: number } {
  * each emitter's `resolve`; the handle's `finished` resolves once every
  * emitter has finished (or `stop()` is called).
  */
-function run(make: (onDone: () => void) => Emitter[]): EffectHandle {
+function run(
+  make: (onDone: () => void) => Emitter[],
+  space: EffectSpace = "viewport"
+): EffectHandle {
   let settle: () => void = () => undefined;
   const finished = new Promise<void>((res) => {
     settle = res;
@@ -216,7 +234,14 @@ function run(make: (onDone: () => void) => Emitter[]): EffectHandle {
     if (outstanding <= 0) done();
   };
 
-  const made = make(one);
+  const made = withEffectSpace(space, () => make(one));
+  for (const emitter of made) {
+    emitter.space = space;
+    if (emitter.update) {
+      const update = emitter.update;
+      emitter.update = (dt, current) => withEffectSpace(space, () => update(dt, current));
+    }
+  }
   outstanding = made.length;
   if (outstanding === 0) {
     done();
@@ -236,6 +261,10 @@ function run(make: (onDone: () => void) => Emitter[]): EffectHandle {
       for (const e of made) windDownEmitter(e);
     }
   };
+}
+
+function runInSpace(opts: EffectOptions, make: (onDone: () => void) => Emitter[]): EffectHandle {
+  return run(make, opts.space);
 }
 
 /** A brief static center flash used as the reduced-motion fallback. */
@@ -367,7 +396,7 @@ export function confetti(opts: ConfettiOptions = {}): EffectHandle {
   const size = bounded(opts.size, 6, 0.5, 128);
   const velocity = bounded(opts.velocity, 900, 0, 5000);
 
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const configured =
       opts.cannons && !opts.sources?.length
         ? { ...opts, sources: EFFECT_ORIGIN_PRESETS["bottom-corners"] }
@@ -403,8 +432,8 @@ export function pride(opts: PrideOptions = {}): EffectHandle {
     !opts.sources?.length && opts.origin === undefined
       ? { ...opts, sources: EFFECT_ORIGIN_PRESETS.bottom }
       : opts;
-  const sources = effectSources(configured);
-  return run((onDone) => {
+  const sources = withEffectSpace(opts.space ?? "viewport", () => effectSources(configured));
+  return runInSpace(opts, (onDone) => {
     const emitters: Emitter[] = [];
     for (const [sourceIndex, source] of sources.entries()) {
       for (let stripe = 0; stripe < RAINBOW.length; stripe += 1) {
@@ -468,7 +497,7 @@ export function fireworks(opts: FireworksOptions = {}): EffectHandle {
   const gravity = bounded(opts.gravity, 500, -2000, 5000);
   const size = bounded(opts.size, 3, 0.5, 128);
 
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width, height } = viewport();
     let launched = 0;
     let sinceLast = interval / 1000;
@@ -575,7 +604,7 @@ function emojiPointBurst(opts: EmojiBurstOptions): EffectHandle {
   const images = opts.images;
   const useImages = !!images && images.length > 0;
   const count = bounded(opts.count, 40, 0, 2000);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts);
     return sources.map((source, index) =>
       burstEmitter(
@@ -606,7 +635,7 @@ export function emojiBurst(opts: EmojiBurstOptions = {}): EffectHandle {
 }
 
 /** Ambient emoji (or image) rain falling from above. Runs until stopped. */
-export interface EmojiRainOptions {
+export interface EmojiRainOptions extends EffectOptions {
   emojis?: string[];
   images?: CanvasImageSource[];
   colors?: readonly string[];
@@ -626,7 +655,7 @@ export function emojiRain(opts: EmojiRainOptions = {}): EffectHandle {
   const rate = bounded(opts.rate, 24, 0, 500);
   const size = bounded(opts.size, 14, 0.5, 128);
 
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -671,7 +700,7 @@ export function emojiRain(opts: EmojiRainOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Natural cool-blue rain streaks falling across the viewport. */
-export interface RainOptions {
+export interface RainOptions extends EffectOptions {
   colors?: readonly string[];
   /** Drops spawned per second. */
   rate?: number;
@@ -685,7 +714,7 @@ export function rain(opts: RainOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#7dd3fc", "#38bdf8", "#60a5fa", "#bfdbfe"]);
   const rate = bounded(opts.rate, 72, 0, 500);
   const size = bounded(opts.size, 10, 1, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width } = viewport();
     let acc = 1;
     let elapsed = 0;
@@ -728,7 +757,7 @@ export function rain(opts: RainOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Ambient snow falling gently. Runs until stopped. */
-export interface SnowOptions {
+export interface SnowOptions extends EffectOptions {
   colors?: readonly string[];
   /** Flakes per second. */
   rate?: number;
@@ -741,7 +770,7 @@ export function snow(opts: SnowOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#ffffff", "#e0f2fe", "#dbeafe"]);
   const rate = bounded(opts.rate, 18, 0, 500);
   const size = bounded(opts.size, 4, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -789,7 +818,7 @@ export function snow(opts: SnowOptions = {}): EffectHandle {
  * Subtle shimmer of sparkles around an element (e.g. a premium CTA).
  * Runs until stopped, or for `duration` ms.
  */
-export interface SparklesOptions {
+export interface SparklesOptions extends EffectOptions {
   origin?: Origin;
   colors?: readonly string[];
   rate?: number;
@@ -801,8 +830,16 @@ export function sparkles(opts: SparklesOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#fde68a", "#fef9c3", "#ffffff"]);
   const rate = bounded(opts.rate, 14, 0, 500);
   const size = bounded(opts.size, 3, 0.5, 128);
-  return run((onDone) => {
-    const target = opts.origin instanceof Element ? opts.origin.getBoundingClientRect() : undefined;
+  return runInSpace(opts, (onDone) => {
+    const rect = opts.origin instanceof Element ? opts.origin.getBoundingClientRect() : undefined;
+    const target = rect
+      ? {
+          left: rect.left + (effectSpace() === "document" ? window.scrollX : 0),
+          right: rect.right + (effectSpace() === "document" ? window.scrollX : 0),
+          top: rect.top + (effectSpace() === "document" ? window.scrollY : 0),
+          bottom: rect.bottom + (effectSpace() === "document" ? window.scrollY : 0)
+        }
+      : undefined;
     const point = toPoint(opts.origin);
     let acc = 0;
     let elapsed = 0;
@@ -855,7 +892,7 @@ export function streamers(opts: StreamersOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors);
   const count = bounded(opts.count, 30, 0, 2000);
   const gravity = bounded(opts.gravity, 300, -2000, 5000);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts);
     const emitters = sources.map((source, index) =>
       burstEmitter(
@@ -907,7 +944,7 @@ export function ribbons(opts: RibbonsOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors);
   const count = bounded(opts.count, 16, 0, 2000);
   const gravity = bounded(opts.gravity, 200, -2000, 5000);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts);
     const emitters = sources.map((source, index) =>
       burstEmitter(
@@ -959,7 +996,7 @@ export interface GlitterOptions extends BurstOptions {
 export function glitter(opts: GlitterOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors);
   const count = bounded(opts.count, 140, 0, 2000);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts);
     const emitters = sources.map((source, index) =>
       burstEmitter(
@@ -1000,7 +1037,7 @@ export function glitter(opts: GlitterOptions = {}): EffectHandle {
  * A success ripple: one or more concentric discs expanding outward from
  * an element (or point), like a "saved!" confirmation pulse.
  */
-export interface PulseOptions {
+export interface PulseOptions extends EffectOptions {
   origin?: Origin;
   colors?: readonly string[];
   /** Number of concentric rings. */
@@ -1018,7 +1055,7 @@ export function pulse(opts: PulseOptions = {}): EffectHandle {
   const maxR = bounded(opts.radius, 90, 1, 1000);
   const life = bounded(opts.duration, 900, 16, 60_000) / 1000;
 
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const p = toPoint(opts.origin);
     const ringsState: { delay: number; t: number }[] = [];
     for (let i = 0; i < rings; i += 1) ringsState.push({ delay: i * 0.18, t: 0 });
@@ -1094,7 +1131,7 @@ export function hearts(opts: BurstOptions = {}): EffectHandle {
 }
 
 /** A continuous fountain of emoji shooting up from a point and arcing back. */
-export interface EmojiFountainOptions {
+export interface EmojiFountainOptions extends EffectOptions {
   /** Emoji glyphs to spray (one is picked at random per particle). */
   emojis?: string[];
   colors?: readonly string[];
@@ -1113,7 +1150,7 @@ export function emojiFountain(opts: EmojiFountainOptions = {}): EffectHandle {
   const emojis = opts.emojis ?? ["🎉", "✨", "⭐", "🎈"];
   const rate = bounded(opts.rate, 22, 0, 500);
   const size = bounded(opts.size, 14, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const origin = toPoint(opts.origin ?? { rx: 0.5, ry: 1 });
     let acc = 0;
     let elapsed = 0;
@@ -1153,7 +1190,7 @@ export function emojiFountain(opts: EmojiFountainOptions = {}): EffectHandle {
 }
 
 /** Ambient translucent bubbles drifting up and gently popping. */
-export interface BubbleOptions {
+export interface BubbleOptions extends EffectOptions {
   colors?: readonly string[];
   /** Bubbles per second. */
   rate?: number;
@@ -1166,7 +1203,7 @@ export function bubbles(opts: BubbleOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors);
   const rate = bounded(opts.rate, 14, 0, 500);
   const size = bounded(opts.size, 10, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width, height } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -1207,7 +1244,7 @@ export function bubbles(opts: BubbleOptions = {}): EffectHandle {
 }
 
 /** A few balloons released from below, rising and gently swaying. */
-export interface BalloonOptions {
+export interface BalloonOptions extends EffectOptions {
   colors?: readonly string[];
   /** Balloons released per second. */
   rate?: number;
@@ -1220,7 +1257,7 @@ export function balloons(opts: BalloonOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors);
   const rate = bounded(opts.rate, 2, 0, 500);
   const size = bounded(opts.size, 16, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width, height } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -1261,7 +1298,7 @@ export function balloons(opts: BalloonOptions = {}): EffectHandle {
 }
 
 /** Ambient leaves (or petals, via `colors`) tumbling down from above. */
-export interface LeafOptions {
+export interface LeafOptions extends EffectOptions {
   colors?: readonly string[];
   /** Leaves per second. */
   rate?: number;
@@ -1276,7 +1313,7 @@ export function leaves(opts: LeafOptions = {}): EffectHandle {
   );
   const rate = bounded(opts.rate, 8, 0, 500);
   const size = bounded(opts.size, 12, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -1329,7 +1366,7 @@ export function petals(opts: PetalOptions = {}): EffectHandle {
   );
   const rate = bounded(opts.rate, 9, 0, 500);
   const size = bounded(opts.size, 12, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const { width } = viewport();
     let acc = 0;
     let elapsed = 0;
@@ -1379,7 +1416,7 @@ export interface CoinOptions extends BurstOptions {
 export function coins(opts: CoinOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#fbbf24", "#f59e0b", "#fde68a"]);
   const count = Math.floor(bounded(opts.count, 44, 0, 2000));
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts);
     return sources.map((source, index) =>
       burstEmitter(
@@ -1408,7 +1445,7 @@ export function coins(opts: CoinOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Fast diagonal comets crossing the viewport for a bounded duration. */
-export interface ShootingStarsOptions {
+export interface ShootingStarsOptions extends EffectOptions {
   colors?: readonly string[];
   rate?: number;
   size?: number;
@@ -1419,7 +1456,7 @@ export function shootingStars(opts: ShootingStarsOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#ffffff", "#bfdbfe", "#fde68a"]);
   const rate = bounded(opts.rate, 4, 0, 500);
   const size = bounded(opts.size, 12, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let elapsed = 0;
     let acc = 1;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1462,7 +1499,7 @@ export function shootingStars(opts: ShootingStarsOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Warm wandering glow points that slowly appear and fade. */
-export interface FireflyOptions {
+export interface FireflyOptions extends EffectOptions {
   colors?: readonly string[];
   rate?: number;
   size?: number;
@@ -1473,7 +1510,7 @@ export function fireflies(opts: FireflyOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#fef08a", "#fde047", "#bef264"]);
   const rate = bounded(opts.rate, 7, 0, 500);
   const size = bounded(opts.size, 3, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let acc = 1;
     let elapsed = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1516,7 +1553,7 @@ export function fireflies(opts: FireflyOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Glowing orange sparks rising and drifting from below. */
-export interface EmberOptions {
+export interface EmberOptions extends EffectOptions {
   colors?: readonly string[];
   rate?: number;
   size?: number;
@@ -1527,7 +1564,7 @@ export function embers(opts: EmberOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#fef08a", "#fb923c", "#f97316", "#ef4444"]);
   const rate = bounded(opts.rate, 24, 0, 500);
   const size = bounded(opts.size, 3, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let acc = 2;
     let elapsed = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1570,7 +1607,7 @@ export function embers(opts: EmberOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** A short-lived iridescent sparkle trail following an element or point. */
-export interface MagicTrailOptions {
+export interface MagicTrailOptions extends EffectOptions {
   origin?: Origin;
   colors?: readonly string[];
   rate?: number;
@@ -1582,7 +1619,7 @@ export function magicTrail(opts: MagicTrailOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#c4b5fd", "#f0abfc", "#67e8f9", "#ffffff"]);
   const rate = bounded(opts.rate, 42, 0, 500);
   const size = bounded(opts.size, 5, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let acc = 2;
     let elapsed = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1625,7 +1662,7 @@ export function magicTrail(opts: MagicTrailOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Slow, low-contrast ambient depth for large quiet surfaces. */
-export interface DustMoteOptions {
+export interface DustMoteOptions extends EffectOptions {
   colors?: readonly string[];
   rate?: number;
   size?: number;
@@ -1636,7 +1673,7 @@ export function dustMotes(opts: DustMoteOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#fde68a", "#e2e8f0", "#ffffff"]);
   const rate = bounded(opts.rate, 10, 0, 500);
   const size = bounded(opts.size, 3, 0.5, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let acc = 3;
     let elapsed = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1679,7 +1716,7 @@ export function dustMotes(opts: DustMoteOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Dense, rolling fog that temporarily obscures the viewport before dissipating. */
-export interface FogOptions {
+export interface FogOptions extends EffectOptions {
   colors?: readonly string[];
   /** New fog banks added per second while the fog builds. */
   rate?: number;
@@ -1696,7 +1733,7 @@ export function fog(opts: FogOptions = {}): EffectHandle {
   const rate = bounded(opts.rate, 4, 0, 40);
   const size = bounded(opts.size, 240, 40, 480);
   const duration = bounded(opts.duration, 4200, 400, 30000) / 1000;
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let elapsed = 0;
     const fadeSpan = Math.min(1.2, duration * 0.3);
     const colorWithOpacity = (color: string, opacity: number): string => {
@@ -1750,7 +1787,7 @@ export function fog(opts: FogOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Colorful butterflies drifting in from the sides on wandering flight paths. */
-export interface ButterflyOptions {
+export interface ButterflyOptions extends EffectOptions {
   colors?: readonly string[];
   /** New butterflies entering per second. */
   rate?: number;
@@ -1790,7 +1827,7 @@ export function butterflies(opts: ButterflyOptions = {}): EffectHandle {
   );
   const rate = bounded(opts.rate, 3, 0, 100);
   const size = bounded(opts.size, 10, 1, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const flights = new WeakMap<Particle, ButterflyFlight>();
     let acc = 2;
     let elapsed = 0;
@@ -1803,7 +1840,7 @@ export function butterflies(opts: ButterflyOptions = {}): EffectHandle {
     ): void => {
       const dir: 1 | -1 = leader ? leader.f.dir : Math.random() < 0.5 ? 1 : -1;
       // Smaller reads as further away: slower, dimmer, faster wingbeat.
-      const depth = rand(0.55, 1.3);
+      const depth = rand(0.5, 1.55);
       const cruise = leader
         ? leader.f.cruise * rand(0.92, 1.08)
         : rand(85, 165) * (0.55 + 0.45 * depth);
@@ -1910,7 +1947,7 @@ export function butterflies(opts: ButterflyOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Fast icy pellets driven diagonally by a strong gust. */
-export interface HailstormOptions {
+export interface HailstormOptions extends EffectOptions {
   colors?: readonly string[];
   rate?: number;
   size?: number;
@@ -1921,7 +1958,7 @@ export function hailstorm(opts: HailstormOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#dbeafe", "#bfdbfe", "#93c5fd"]);
   const rate = bounded(opts.rate, 72, 0, 500);
   const size = bounded(opts.size, 6, 1, 128);
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let acc = 2;
     let elapsed = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -1972,7 +2009,7 @@ export function shockwaveDebris(opts: ShockwaveDebrisOptions = {}): EffectHandle
   const count = bounded(opts.count, 42, 0, 1000);
   const radius = bounded(opts.radius, 130, 10, 1000);
   const life = bounded(opts.duration, 700, 100, 10_000) / 1000;
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     const sources = effectSources(opts, 0);
     const emitters: Emitter[] = [];
     for (const [index, source] of sources.entries()) {
@@ -2035,7 +2072,7 @@ export function fireworkFinale(opts: FireworkFinaleOptions = {}): EffectHandle {
   const gravity = bounded(opts.gravity, 430, -2000, 5000);
   const size = bounded(opts.size, 4, 0.5, 128);
   const positions = [0.18, 0.5, 0.82, 0.34, 0.66];
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let elapsed = 0;
     let launched = 0;
     const update = (dt: number, em: Emitter): boolean => {
@@ -2062,7 +2099,7 @@ export function fireworkFinale(opts: FireworkFinaleOptions = {}): EffectHandle {
 /* ------------------------------------------------------------------ */
 
 /** Particles draw a checkmark, then release into a short confirmation burst. */
-export interface SuccessCheckOptions {
+export interface SuccessCheckOptions extends EffectOptions {
   origin?: Origin;
   colors?: readonly string[];
   count?: number;
@@ -2073,7 +2110,7 @@ export interface SuccessCheckOptions {
 
 export function successCheck(opts: SuccessCheckOptions = {}): EffectHandle {
   const palette = resolvePalette(opts.colors ?? ["#22c55e", "#4ade80", "#bbf7d0", "#ffffff"]);
-  const origin = toPoint(opts.origin);
+  const origin = withEffectSpace(opts.space ?? "viewport", () => toPoint(opts.origin));
   const count = Math.floor(bounded(opts.count, 18, 8, 500));
   const size = bounded(opts.size, 9, 0.5, 128);
   const radius = bounded(opts.radius, 160, 10, 500);
@@ -2089,7 +2126,7 @@ export function successCheck(opts: SuccessCheckOptions = {}): EffectHandle {
     const t = (progress - 0.36) / 0.64;
     return { x: b.x + (c.x - b.x) * t, y: b.y + (c.y - b.y) * t };
   };
-  return run((onDone) => {
+  return runInSpace(opts, (onDone) => {
     let elapsed = 0;
     let spawned = 0;
     const update = (dt: number, em: Emitter): boolean => {

@@ -114,6 +114,20 @@ describe("engine: environment probes", () => {
     });
   });
 
+  it("reports full document bounds on explicit document space", () => {
+    const marker = document.createElement("div");
+    marker.style.cssText =
+      "position:absolute;left:0;top:0;width:1px;height:2400px;pointer-events:none";
+    document.body.append(marker);
+    try {
+      const bounds = viewport("document");
+      expect(bounds.width).to.be.at.least(window.innerWidth);
+      expect(bounds.height).to.be.at.least(2400);
+    } finally {
+      marker.remove();
+    }
+  });
+
   it("follows the prefers-reduced-motion media query", () => {
     setReducedMotion(false);
     expect(prefersReducedMotion()).to.equal(false);

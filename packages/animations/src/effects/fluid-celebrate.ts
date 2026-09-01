@@ -24,6 +24,7 @@
  *                  `rings`, `radius`)
  *   - `colors`     space- or comma-separated color list, OR set the
  *                  `.colors` JS property to an array
+ *   - `space`      `"viewport"` (default) or `"document"`
  *   - `origin`     `"self"`, `"x,y"`, `"rx,ry"`, or a named edge/corner preset
  *   - `cannons`    legacy boolean alias for bottom-corner confetti
  *   - `originTarget` JS-only Element override used by `origin="self"`
@@ -64,6 +65,7 @@ export class FluidCelebrate extends HTMLElementBase {
       "auto",
       "emojis",
       "colors",
+      "space",
       "count",
       "origin",
       "cannons",
@@ -205,6 +207,9 @@ export class FluidCelebrate extends HTMLElementBase {
     const colors = this.colors ?? this.#parseColors(this.getAttribute("colors"));
     if (colors && colors.length) opts["colors"] = colors;
     if (this.emojis && this.emojis.length) opts["emojis"] = this.emojis;
+
+    const space = this.getAttribute("space");
+    if (space === "viewport" || space === "document") opts["space"] = space;
 
     const count = this.#num("count");
     if (count !== undefined) opts["count"] = count;

@@ -195,6 +195,18 @@ describe("<fluid-celebrate>: option plumbing", () => {
     expect(await optionsFor(el)).to.deep.equal({ cannons: true });
   });
 
+  it("forwards a valid effect space and ignores unknown values", async () => {
+    const documentSpace = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate space="document"></fluid-celebrate>`
+    );
+    expect(await optionsFor(documentSpace)).to.deep.equal({ space: "document" });
+
+    const unknownSpace = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate space="page-ish"></fluid-celebrate>`
+    );
+    expect(await optionsFor(unknownSpace)).to.deep.equal({});
+  });
+
   it("splits a colors attribute without breaking functional color notations", async () => {
     const el = await fixture<FluidCelebrate>(
       html`<fluid-celebrate
@@ -270,7 +282,7 @@ describe("<fluid-celebrate>: origins", () => {
     expect((await optionsFor(el))["origin"]).to.deep.equal({ rx: 0.25, ry: 0.75 });
   });
 
-  it("reads a pair outside the unit square as absolute viewport pixels", async () => {
+  it("reads a pair outside the unit square as absolute effect-space pixels", async () => {
     const el = await fixture<FluidCelebrate>(
       html`<fluid-celebrate origin="120,240"></fluid-celebrate>`
     );

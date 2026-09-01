@@ -50,6 +50,10 @@ export type ParticleShape =
   | "emoji"
   | "image";
 
+/** Coordinate system used by an effect. Document-space particles stay
+ * anchored to page content while the viewport scrolls over them. */
+export type EffectSpace = "viewport" | "document";
+
 /** Draw a particle after the engine has applied opacity, position, and rotation. */
 export type ParticleRenderer = (context: CanvasRenderingContext2D, particle: Particle) => void;
 
@@ -101,6 +105,8 @@ export interface Particle {
 export interface Emitter {
   /** Live particles. The engine mutates this in place. */
   particles: Particle[];
+  /** Coordinate system for this emitter. Defaults to the viewport. */
+  space?: EffectSpace;
   /**
    * Called once per frame with the seconds since the last frame. May push
    * new particles onto {@link Emitter.particles}. Return `false` to signal
@@ -138,6 +144,7 @@ let ctx: CanvasRenderingContext2D | undefined;
 let rafId = 0;
 let lastTime = 0;
 let dpr = 1;
+let activeSpace: EffectSpace = "viewport";
 const emitters = new Set<Emitter>();
 /**
  * Emitters whose `update` has returned `false` at least once. Per the
@@ -213,10 +220,35 @@ function teardownCanvas(): void {
   ctx = undefined;
 }
 
-/** Current viewport size in CSS px. */
-export function viewport(): { width: number; height: number } {
+/** Current effect bounds in CSS px. The no-argument form follows the active
+ * emitter and remains viewport-based outside an effect callback. */
+export function viewport(space: EffectSpace = activeSpace): { width: number; height: number } {
   if (typeof window === "undefined") return { width: 0, height: 0 };
+  if (space === "document" && typeof document !== "undefined") {
+    const root = document.documentElement;
+    const body = document.body;
+    return {
+      width: Math.max(window.innerWidth, root?.scrollWidth ?? 0, body?.scrollWidth ?? 0),
+      height: Math.max(window.innerHeight, root?.scrollHeight ?? 0, body?.scrollHeight ?? 0)
+    };
+  }
   return { width: window.innerWidth, height: window.innerHeight };
+}
+
+/** Run synchronous effect setup/update code in its selected coordinate space. */
+export function withEffectSpace<T>(space: EffectSpace, callback: () => T): T {
+  const previous = activeSpace;
+  activeSpace = space;
+  try {
+    return callback();
+  } finally {
+    activeSpace = previous;
+  }
+}
+
+/** Active coordinate space while an effect is being constructed or updated. */
+export function effectSpace(): EffectSpace {
+  return activeSpace;
 }
 
 /**
@@ -297,9 +329,9 @@ function tick(now: number): void {
   ctx.save();
   ctx.scale(dpr, dpr);
 
-  const height = canvas.height / dpr;
-
   for (const emitter of emitters) {
+    const space = emitter.space ?? "viewport";
+    const height = viewport(space).height;
     // Once `update` has returned false, it is done spawning for good: never
     // call it again, just let the remaining particles play out.
     let stillSpawning = !spawnEnded.has(emitter);
@@ -311,13 +343,16 @@ function tick(now: number): void {
     }
 
     const next: Particle[] = [];
+    ctx.save();
+    if (space === "document") ctx.translate(-window.scrollX, -window.scrollY);
     for (const p of emitter.particles) {
       stepParticle(p, dt);
       if (isAlive(p, height)) {
-        drawParticle(ctx, p);
+        if (isVisible(p, space)) drawParticle(ctx, p);
         next.push(p);
       }
     }
+    ctx.restore();
     emitter.particles = next;
 
     const finished = emitter.done || (!stillSpawning && emitter.particles.length === 0);
@@ -369,6 +404,13 @@ function stepParticle(p: Particle, dt: number): void {
 
 function isAlive(p: Particle, height: number): boolean {
   return p.opacity > 0.02 && p.life < p.maxLife && p.y < height + 80;
+}
+
+function isVisible(p: Particle, space: EffectSpace): boolean {
+  const x = space === "document" ? p.x - window.scrollX : p.x;
+  const y = space === "document" ? p.y - window.scrollY : p.y;
+  const pad = Math.max(80, p.size * 3);
+  return x > -pad && x < window.innerWidth + pad && y > -pad && y < window.innerHeight + pad;
 }
 
 /*

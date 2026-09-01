@@ -113,6 +113,15 @@ await show.finished;
 
 Every effect returns `{ stop(): void; fizzle(): void; finished: Promise<void> }`.
 
+Effects use viewport coordinates by default. Pass `space: "document"` to anchor
+particles to page content instead: the engine still renders through its small
+viewport canvas, but particles may be created anywhere in the full document and
+scroll into or out of view with the content.
+
+```ts
+butterflies({ space: "document", duration: 12_000 });
+```
+
 Every named effect is tree-shakeable from the main entrypoint. Dedicated
 subpath entrypoints are also available when you want import-level isolation to
 be explicit:
