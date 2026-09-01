@@ -234,6 +234,32 @@ describe("<fluid-scheduler>", () => {
     expect(calendar.shadowRoot!.activeElement).to.match("button.day:not(:disabled)");
   });
 
+  it("feeds day states for the grid's leading and trailing cells, not only the month", async () => {
+    const el = await schedulerFixture();
+    const calendar = el.shadowRoot!.querySelector("fluid-calendar") as HTMLElement & {
+      dayState: Record<string, string>;
+    };
+    const today = new Date();
+    const iso = (d: Date) =>
+      [
+        d.getFullYear(),
+        String(d.getMonth() + 1).padStart(2, "0"),
+        String(d.getDate()).padStart(2, "0")
+      ].join("-");
+    const nextMonthFirst = iso(new Date(today.getFullYear(), today.getMonth() + 1, 1));
+    const previousMonthLast = iso(new Date(today.getFullYear(), today.getMonth(), 0));
+    // The calendar disables closed/unavailable days from this map, so cells
+    // outside the month need entries too: at the booking horizon a trailing
+    // next-month cell can pass the date-level max while every slot in it is
+    // already beyond the moment-level horizon, and without a state it would
+    // render as a bookable day with nothing to book.
+    expect(calendar.dayState).to.have.property(nextMonthFirst);
+    expect(calendar.dayState).to.have.property(previousMonthLast);
+    expect(["closed", "unavailable", "open", "some", "full"]).to.include(
+      calendar.dayState[nextMonthFirst]
+    );
+  });
+
   it("exposes a refresh() method", async () => {
     const el = await schedulerFixture();
     expect(el.refresh).to.be.a("function");

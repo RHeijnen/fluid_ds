@@ -291,12 +291,26 @@ export class FluidScheduler extends FluidFormAssociated {
     return toISODate(new Date(d.getFullYear(), d.getMonth(), d.getDate() + adv));
   }
 
-  /** Per-day availability states for the visible month (drives the calendar dots). */
+  /**
+   * Per-day availability states for every cell the visible month's grid can
+   * show: the month itself plus a week of leading and trailing cells. The
+   * calendar disables `closed` / `unavailable` days from this map, so the
+   * padding matters at the booking horizon: a trailing next-month cell can
+   * sit inside the date-level `max` while every one of its slots is already
+   * beyond the moment-level horizon, and without a state it would render as
+   * a bookable day with nothing to book.
+   */
   private get dayStateMap(): Record<string, string> {
     if (!this.availability) return {};
     const now = new Date();
     const map: Record<string, string> = {};
-    for (const iso of monthBounds(this.viewISO).days) {
+    const { first, last } = monthBounds(this.viewISO);
+    const day = fromISODate(first)!;
+    const end = fromISODate(last)!;
+    day.setDate(day.getDate() - 7);
+    end.setDate(end.getDate() + 7);
+    for (; day <= end; day.setDate(day.getDate() + 1)) {
+      const iso = toISODate(day);
       map[iso] = dayState(iso, this.availability, this.bookings, now);
     }
     return map;

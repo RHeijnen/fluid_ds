@@ -5325,7 +5325,7 @@
         "docs": "apps/docs/src/content/docs/expansion/scheduler.mdx"
       },
       "unit": {
-        "cases": 18,
+        "cases": 19,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },

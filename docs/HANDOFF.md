@@ -1206,6 +1206,16 @@ inventory gate is satisfied by contract tests for the offline story
 fixtures. Retained noise: the Windows PID-reuse teardown flake still fails
 local full gates intermittently with all tests green (item 5).
 
+Post-push repairs the September 1st rollover exposed: the scheduler let a
+trailing next-month grid cell pass the date-level `maxAdvanceDays` bound
+while every slot in it was beyond the moment-level horizon (an enabled day
+with nothing to book; dayStateMap now also covers a week of leading and
+trailing grid cells so the calendar can disable it), and the new fog tests
+read the `background` shorthand, which Firefox serializes as "" once the
+engine overwrites position/size longhands (they read `backgroundImage`
+now). Client and DSD scheduler SSR specs verified green on chromium and
+webkit locally; firefox only runs in CI on this repo.
+
 ### 2026-08-31 (later): node-graph live-region fix, both connect lines announced
 
 Fixed an accessibility regression in `fluid-node-graph`: `startKeyboardLink()`

@@ -957,7 +957,7 @@
                 "text": "Record<string, string>"
               },
               "privacy": "private",
-              "description": "Per-day availability states for the visible month (drives the calendar dots).",
+              "description": "Per-day availability states for every cell the visible month's grid can\nshow: the month itself plus a week of leading and trailing cells. The\ncalendar disables `closed` / `unavailable` days from this map, so the\npadding matters at the booking horizon: a trailing next-month cell can\nsit inside the date-level `max` while every one of its slots is already\nbeyond the moment-level horizon, and without a state it would render as\na bookable day with nothing to book.",
               "readonly": true
             },
             {

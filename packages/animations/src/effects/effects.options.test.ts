@@ -375,8 +375,11 @@ describe("effects: fog", () => {
   afterEach(restoreMatchMedia);
 
   function overlayBackground(): string {
+    // Read the backgroundImage longhand, not the background shorthand: the
+    // engine assigns the shorthand and then overwrites backgroundPosition and
+    // backgroundSize, after which Firefox serializes the shorthand as "".
     const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-fluid-effects-canvas]");
-    return canvas?.style.background ?? "";
+    return canvas?.style.backgroundImage ?? "";
   }
 
   it("blends an alpha-carrying palette straight into the overlay", async () => {
