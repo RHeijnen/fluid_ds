@@ -3479,6 +3479,31 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/components/avatar-group/offline-story-fixture.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "offlinePortraits",
+          "type": {
+            "text": "object"
+          },
+          "default": "{ ada: portrait(\"#2563eb\"), grace: portrait(\"#db2777\"), alan: portrait(\"#059669\"), margaret: portrait(\"#d97706\") }",
+          "description": "Story-only portraits with intrinsic dimensions and no external request."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "offlinePortraits",
+          "declaration": {
+            "name": "offlinePortraits",
+            "module": "src/components/avatar-group/offline-story-fixture.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/components/avatar/define.ts",
       "declarations": [],
       "exports": [
@@ -29904,6 +29929,28 @@
           "declaration": {
             "name": "FluidHero",
             "module": "src/components/hero/fluid-hero.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/components/hero/offline-story-fixture.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "offlineGradientArtwork",
+          "default": "`data:image/svg+xml,${encodeURIComponent(artwork)}`",
+          "description": "Story-only artwork with intrinsic dimensions and no external request."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "offlineGradientArtwork",
+          "declaration": {
+            "name": "offlineGradientArtwork",
+            "module": "src/components/hero/offline-story-fixture.ts"
           }
         }
       ]

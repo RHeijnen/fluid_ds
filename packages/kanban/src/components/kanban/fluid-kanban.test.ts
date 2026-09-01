@@ -43,6 +43,24 @@ function column(el: FluidKanban, index: number): HTMLElement {
   return el.shadowRoot!.querySelectorAll<HTMLElement>('[part="column"]')[index]!;
 }
 
+function moveControl(el: FluidKanban, id: string, name: string): HTMLButtonElement {
+  return card(el, id).querySelector<HTMLButtonElement>(`[data-move="${name}"]`)!;
+}
+
+/** The trimmed text of the polite live region. */
+function announced(el: FluidKanban): string {
+  return el.shadowRoot!.querySelector<HTMLElement>('[role="status"]')!.textContent!.trim();
+}
+
+function press(target: HTMLElement, key: string): void {
+  target.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }));
+}
+
+/** The board data with one card removed, as a live refresh would deliver it. */
+function without(cardId: string): KanbanColumn[] {
+  return clone().map((col) => ({ ...col, cards: col.cards.filter((c) => c.id !== cardId) }));
+}
+
 /** Minimal DataTransfer stub backed by an in-memory string store. */
 function dataTransfer(): DataTransfer {
   const store: Record<string, string> = {};
@@ -430,5 +448,325 @@ describe("<fluid-kanban>", () => {
     expect(el.columns.map((entry) => entry.id)).to.deep.equal(["todo", "doing"]);
     expect(el.columns[1]!.cards.map((entry) => entry.id)).to.deep.equal(["c1", "c3"]);
     expect(el.shadowRoot!.querySelector('[role="status"]')!.textContent).to.contain("Alpha");
+  });
+
+  it("rejects moves for unknown cards and out-of-range columns", async () => {
+    const el = await board();
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    expect(el.moveCard("ghost", 0, 0)).to.equal(null);
+    expect(el.moveCard("c1", 5, 0)).to.equal(null);
+    expect(el.moveCard("c1", -1, 0)).to.equal(null);
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns).to.deep.equal(clone());
+    expect(announced(el)).to.equal("");
+  });
+
+  it("clamps an over-large target index to the end of the destination column", async () => {
+    const el = await board();
+    setTimeout(() => el.moveCard("c1", 1, 99));
+    const ev = await oneEvent(el, "fluid-move");
+    expect(ev.detail.index).to.equal(1);
+    await elementUpdated(el);
+    expect(el.columns[1]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1"]);
+    expect(announced(el)).to.equal("Moved Alpha to In progress, position 2 of 2.");
+  });
+
+  it("skips gaps in a sparse columns array", async () => {
+    const el = await fixture<FluidKanban>(html`<fluid-kanban></fluid-kanban>`);
+    const sparse: KanbanColumn[] = [];
+    sparse[1] = { id: "later", title: "Later", cards: [{ id: "s1", title: "Solo" }] };
+    sparse[2] = { id: "done", title: "Done", cards: [] };
+    el.columns = sparse;
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelectorAll('[part="column"]').length).to.equal(2);
+    // Index 0 is a hole: it is neither a source nor a usable destination.
+    expect(el.moveCard("s1", 0, 0)).to.equal(null);
+    expect(el.moveCard("s1", 2, 0)).to.deep.equal({ columnIndex: 2, cardIndex: 0 });
+    await elementUpdated(el);
+    expect(el.columns[1]!.cards).to.deep.equal([]);
+    expect(el.columns[2]!.cards.map((c) => c.id)).to.deep.equal(["s1"]);
+    expect(announced(el)).to.equal("Moved Solo to Done, position 1 of 1.");
+  });
+
+  it("Space twice drops a card and announces the column it landed in", async () => {
+    const el = await board();
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    press(card(el, "c1"), " ");
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("true");
+    press(card(el, "c1"), " ");
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
+    expect(announced(el)).to.equal("Dropped in To do.");
+    // A pick up and drop in place is not a move, so no business event fires.
+    expect(moves).to.deep.equal([]);
+    expect(el.columns).to.deep.equal(clone());
+  });
+
+  it("Enter picks up and drops a card like Space", async () => {
+    const el = await board();
+    press(card(el, "c1"), "Enter");
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("true");
+    press(card(el, "c1"), "Enter");
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
+    expect(announced(el)).to.equal("Dropped in To do.");
+  });
+
+  it("announces a bare drop when the card left the board mid-pickup", async () => {
+    const el = await board();
+    press(card(el, "c1"), " ");
+    await elementUpdated(el);
+    const grabbed = card(el, "c1");
+    // A live refresh removes the card in the same task as the drop keypress, so
+    // the still-rendered card is dropped against data that no longer has it.
+    el.columns = without("c1");
+    press(grabbed, " ");
+    await elementUpdated(el);
+    expect(announced(el)).to.equal("Dropped.");
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2"]);
+  });
+
+  it("announces a bare pickup and ignores arrows for a card missing from the data", async () => {
+    const el = await board();
+    const stale = card(el, "c1");
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    el.columns = without("c1");
+    press(stale, " ");
+    press(stale, "ArrowDown");
+    await elementUpdated(el);
+    expect(announced(el)).to.equal("Picked up.");
+    expect(moves).to.deep.equal([]);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2"]);
+  });
+
+  it("Escape after a pickup with no recorded origin just cancels", async () => {
+    const el = await board();
+    const stale = card(el, "c1");
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    el.columns = without("c1");
+    press(stale, " ");
+    press(stale, "Escape");
+    await elementUpdated(el);
+    await aTimeout(0);
+    expect(announced(el)).to.equal("Move cancelled.");
+    expect(moves).to.deep.equal([]);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2"]);
+  });
+
+  it("arrow keys and Escape do nothing until a card is picked up", async () => {
+    const el = await board();
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    press(card(el, "c1"), "ArrowDown");
+    press(card(el, "c1"), "ArrowRight");
+    press(card(el, "c1"), "Escape");
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns).to.deep.equal(clone());
+    expect(announced(el)).to.equal("");
+  });
+
+  it("ArrowUp reorders a grabbed card toward the top and stops at the first slot", async () => {
+    const el = await board();
+    press(card(el, "c2"), " ");
+    await elementUpdated(el);
+    press(card(el, "c2"), "ArrowUp");
+    await elementUpdated(el);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2", "c1"]);
+    expect(announced(el)).to.equal("Moved Bravo to To do, position 1 of 2.");
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    press(card(el, "c2"), "ArrowUp");
+    // An unhandled key leaves the pickup untouched.
+    press(card(el, "c2"), "a");
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c2", "c1"]);
+    expect(card(el, "c2").getAttribute("aria-grabbed")).to.equal("true");
+  });
+
+  it("ArrowLeft in LTR walks a grabbed card back along the column track", async () => {
+    const el = await board();
+    press(card(el, "c3"), " ");
+    await elementUpdated(el);
+    press(card(el, "c3"), "ArrowLeft");
+    await elementUpdated(el);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1", "c2"]);
+    expect(el.columns[1]!.cards).to.deep.equal([]);
+    // The track ends here, so a further ArrowLeft leaves the board alone.
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    press(card(el, "c3"), "ArrowLeft");
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1", "c2"]);
+  });
+
+  it("ArrowRight in RTL walks a grabbed card back along the column track", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div dir="rtl"><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    el.columns = clone();
+    await elementUpdated(el);
+    press(card(el, "c3"), " ");
+    await elementUpdated(el);
+    press(card(el, "c3"), "ArrowRight");
+    await elementUpdated(el);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1", "c2"]);
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    press(card(el, "c3"), "ArrowRight");
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c3", "c1", "c2"]);
+  });
+
+  it("ignores keys typed on a card's own move controls", async () => {
+    const el = await board();
+    press(moveControl(el, "c1", "next"), " ");
+    press(moveControl(el, "c1", "down"), "Enter");
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
+    expect(announced(el)).to.equal("");
+    expect(el.columns).to.deep.equal(clone());
+  });
+
+  it("dropping a card onto a card in another column inserts it at that position", async () => {
+    const el = await board();
+    const dt = dataTransfer();
+    card(el, "c1").dispatchEvent(dragEvent("dragstart", dt));
+    setTimeout(() => card(el, "c3").dispatchEvent(dragEvent("drop", dt)));
+    const ev = await oneEvent(el, "fluid-move");
+    expect(ev.detail).to.deep.equal({
+      cardId: "c1",
+      fromColumn: "todo",
+      toColumn: "doing",
+      index: 0
+    });
+    await elementUpdated(el);
+    expect(el.columns[1]!.cards.map((c) => c.id)).to.deep.equal(["c1", "c3"]);
+  });
+
+  it("reordering inside a column accounts for the card leaving its old slot", async () => {
+    const el = await fixture<FluidKanban>(html`<fluid-kanban></fluid-kanban>`);
+    el.columns = [
+      {
+        id: "todo",
+        title: "To do",
+        cards: [
+          { id: "a", title: "A" },
+          { id: "b", title: "B" },
+          { id: "c", title: "C" }
+        ]
+      }
+    ];
+    await elementUpdated(el);
+
+    // Downwards: the target index shifts back by one once the card is lifted out.
+    const down = dataTransfer();
+    card(el, "a").dispatchEvent(dragEvent("dragstart", down));
+    setTimeout(() => card(el, "c").dispatchEvent(dragEvent("drop", down)));
+    const first = await oneEvent(el, "fluid-move");
+    expect(first.detail.index).to.equal(1);
+    await elementUpdated(el);
+    expect(el.columns[0]!.cards.map((x) => x.id)).to.deep.equal(["b", "a", "c"]);
+
+    // Upwards: the target index is already correct and is used as is.
+    const up = dataTransfer();
+    card(el, "c").dispatchEvent(dragEvent("dragstart", up));
+    setTimeout(() => card(el, "b").dispatchEvent(dragEvent("drop", up)));
+    const second = await oneEvent(el, "fluid-move");
+    expect(second.detail.index).to.equal(0);
+    await elementUpdated(el);
+    expect(el.columns[0]!.cards.map((x) => x.id)).to.deep.equal(["c", "b", "a"]);
+  });
+
+  it("ignores a drop that carries no card this board owns", async () => {
+    const el = await board();
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+
+    const empty = dataTransfer();
+    column(el, 1).dispatchEvent(dragEvent("dragover", empty));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(true);
+    column(el, 1).dispatchEvent(dragEvent("drop", empty));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(false);
+
+    // A drop with no dataTransfer at all, e.g. a synthesized or stripped event.
+    column(el, 1).dispatchEvent(new Event("drop", { bubbles: true, cancelable: true }));
+    // A drag that started elsewhere carries an id this board cannot resolve.
+    const foreign = dataTransfer();
+    foreign.setData("text/plain", "ghost");
+    card(el, "c3").dispatchEvent(dragEvent("drop", foreign));
+    await elementUpdated(el);
+
+    expect(moves).to.deep.equal([]);
+    expect(el.columns).to.deep.equal(clone());
+  });
+
+  it("ignores a drop on a column the data no longer has", async () => {
+    const el = await board();
+    const moves: Event[] = [];
+    el.addEventListener("fluid-move", (event) => moves.push(event));
+    const dt = dataTransfer();
+    card(el, "c1").dispatchEvent(dragEvent("dragstart", dt));
+    const stale = column(el, 1);
+    // The second column disappears in the same task as the drop, before re-render.
+    el.columns = [clone()[0]!];
+    stale.dispatchEvent(dragEvent("drop", dt));
+    await elementUpdated(el);
+    expect(moves).to.deep.equal([]);
+    expect(el.columns.length).to.equal(1);
+    expect(el.columns[0]!.cards.map((c) => c.id)).to.deep.equal(["c1", "c2"]);
+  });
+
+  it("dragend clears the highlight and dragleave only clears its own column", async () => {
+    const el = await board();
+    const dt = dataTransfer();
+    card(el, "c1").dispatchEvent(dragEvent("dragstart", dt));
+    column(el, 1).dispatchEvent(dragEvent("dragover", dt));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(true);
+
+    column(el, 0).dispatchEvent(new Event("dragleave", { bubbles: true }));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(true);
+
+    card(el, "c1").dispatchEvent(new Event("dragend", { bubbles: true }));
+    await elementUpdated(el);
+    expect(column(el, 1).classList.contains("drop-target")).to.equal(false);
+  });
+
+  it("skips refocus when the board is removed mid-move", async () => {
+    const wrapper = await fixture<HTMLDivElement>(html`
+      <div><button id="outside">Outside</button><fluid-kanban></fluid-kanban></div>
+    `);
+    const el = wrapper.querySelector<FluidKanban>("fluid-kanban")!;
+    const outside = wrapper.querySelector<HTMLButtonElement>("#outside")!;
+    el.columns = clone();
+    await elementUpdated(el);
+    press(card(el, "c1"), " ");
+    await elementUpdated(el);
+    press(card(el, "c1"), "ArrowRight");
+    el.remove();
+    outside.focus();
+    await el.updateComplete;
+    await aTimeout(0);
+
+    expect(el.columns[1]!.cards.map((c) => c.id)).to.deep.equal(["c1", "c3"]);
+    expect(document.activeElement).to.equal(outside);
+    wrapper.append(el);
+    await elementUpdated(el);
+    expect(card(el, "c1").getAttribute("aria-grabbed")).to.equal("false");
   });
 });

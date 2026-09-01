@@ -584,7 +584,7 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
       })
     );
     await elementUpdated(element);
-    // The preview is the real order, on screen before anything is released —
+    // The preview is the real order, on screen before anything is released,
     // and it is only a preview: nothing has been reported yet.
     expect(order(element)).to.eql(["domain", "status", "name"]);
     expect(changed).to.have.length(0);
@@ -858,6 +858,475 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
     ]);
   });
 
+  it("sizes a column a step at a time, and a larger step while Shift is held", async () => {
+    const element = await arrangeable();
+    const grip = grips(element)[0]!;
+    const header = element.shadowRoot!.querySelector<HTMLElement>("th[data-column]")!;
+    const widthOf = (detail: { layout: { key: string; width?: string }[] }) =>
+      parseFloat(detail.layout.find((item) => item.key === "name")!.width!);
+
+    const start = header.getBoundingClientRect().width;
+    setTimeout(() =>
+      grip.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }))
+    );
+    const stepped = await oneEvent(element, "fluid-column-layout-change");
+    expect(widthOf(stepped.detail) - start).to.be.closeTo(16, 1);
+    await elementUpdated(element);
+
+    const wide = header.getBoundingClientRect().width;
+    setTimeout(() =>
+      grip.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true, shiftKey: true })
+      )
+    );
+    const shifted = await oneEvent(element, "fluid-column-layout-change");
+    // The same key narrows in the other direction, and Shift makes the step
+    // four times the size.
+    expect(wide - widthOf(shifted.detail)).to.be.closeTo(64, 1);
+  });
+
+  it("fits a column to its contents when Enter is pressed on the grip", async () => {
+    const element = await arrangeable();
+    const grip = grips(element)[0]!;
+    const pressed = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true
+    });
+    setTimeout(() => grip.dispatchEvent(pressed));
+    const event = await oneEvent(element, "fluid-column-layout-change");
+    const item = event.detail.layout.find((entry: { key: string }) => entry.key === "name");
+    expect(pressed.defaultPrevented).to.equal(true);
+    expect(parseFloat(item.width)).to.be.within(56, 640);
+  });
+
+  it("leaves a column alone when there is nothing to measure it against", async () => {
+    const element = await arrangeable();
+    const grip = grips(element)[0]!;
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    // A table nobody is showing reports no content width, and a column fitted
+    // to nothing would collapse.
+    element.style.display = "none";
+    grip.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+    await aTimeout(20);
+    expect(changed).to.have.length(0);
+  });
+
+  it("ignores an auto-fit for a column that has just been hidden", async () => {
+    const element = await arrangeable();
+    const box = element.shadowRoot!.querySelector<HTMLInputElement>(".column-option input")!;
+    const grip = grips(element)[0]!;
+    const changed: CustomEvent[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) =>
+      changed.push(event as CustomEvent)
+    );
+    box.checked = false;
+    box.dispatchEvent(new Event("change"));
+    // The header is still on screen for this one frame; the layout already
+    // says the column is gone, and a width for it would be a width for
+    // nothing.
+    grip.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+    await elementUpdated(element);
+    expect(changed).to.have.length(1);
+    const name = changed[0]!.detail.layout.find((item: { key: string }) => item.key === "name");
+    expect(name).to.include({ visible: false });
+    expect(name.width).to.equal(undefined);
+  });
+
+  it("freezes a column that has no cell yet at the minimum width", async () => {
+    const element = await arrangeable();
+    element.layout = [
+      { key: "name", visible: true, order: 0 },
+      { key: "domain", visible: false, order: 1 },
+      { key: "status", visible: true, order: 2 }
+    ];
+    await elementUpdated(element);
+    const changed: CustomEvent[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) =>
+      changed.push(event as CustomEvent)
+    );
+    const box = [
+      ...element.shadowRoot!.querySelectorAll<HTMLInputElement>(".column-option input")
+    ][1]!;
+    box.checked = true;
+    box.dispatchEvent(new Event("change"));
+    // Shown in the layout, not yet rendered: pinning the other columns must
+    // still produce a usable number for it rather than NaN.
+    grips(element)[0]!.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+    );
+    await aTimeout(500);
+    const last = changed[changed.length - 1]!;
+    expect(
+      last.detail.layout.find((item: { key: string }) => item.key === "domain").width
+    ).to.equal("56px");
+  });
+
+  it("stops measuring column widths when resizing is switched off mid-flight", async () => {
+    const element = await arrangeable();
+    element.columns = [...columns];
+    await element.updateComplete;
+    element.resizableColumns = false;
+    await element.updateComplete;
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(grips(element)).to.have.length(0);
+
+    // Re-enabling resizing re-measures by itself: the grips must report real
+    // widths without waiting for the next layout or column change.
+    element.resizableColumns = true;
+    await elementUpdated(element);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await elementUpdated(element);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await elementUpdated(element);
+    expect(Number(grips(element)[0]!.getAttribute("aria-valuenow"))).to.be.greaterThan(56);
+  });
+
+  it("leaves a column declared without a key unmeasured", async () => {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table
+        resizable-columns
+        .columns=${[
+          { key: "", label: "Unnamed" },
+          { key: "name", label: "Name" }
+        ] as FluidInfiniteTableColumn[]}
+        .rows=${[{ id: 1, name: "Apollo" }]}
+      ></fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await elementUpdated(element);
+    const [unnamed, named] = [...grips(element)];
+    expect(unnamed!.getAttribute("aria-valuenow")).to.equal("56");
+    expect(Number(named!.getAttribute("aria-valuenow"))).to.be.greaterThan(56);
+  });
+
+  it("ignores a secondary-button press on the resize grip", async () => {
+    const element = await arrangeable();
+    const grip = grips(element)[0]!;
+    const col = element.shadowRoot!.querySelector<HTMLElement>("col")!;
+    grip.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        button: 2,
+        pointerId: 5,
+        clientX: 100
+      })
+    );
+    grip.dispatchEvent(
+      new PointerEvent("pointermove", { bubbles: true, pointerId: 5, clientX: 220 })
+    );
+    await elementUpdated(element);
+    expect(grip.hasAttribute("data-dragging")).to.equal(false);
+    expect(col.style.width).to.equal("");
+  });
+
+  it("ignores pointer events that belong to another pointer", async () => {
+    const element = await arrangeable();
+    const grip = grips(element)[0]!;
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    // A move or a release with no press behind it has nothing to resize.
+    grip.dispatchEvent(
+      new PointerEvent("pointermove", { bubbles: true, pointerId: 9, clientX: 220 })
+    );
+    grip.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, pointerId: 9, clientX: 220 })
+    );
+    expect(changed).to.have.length(0);
+
+    grip.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        button: 0,
+        pointerId: 3,
+        clientX: 100
+      })
+    );
+    const col = element.shadowRoot!.querySelector<HTMLElement>("col")!;
+    const held = col.style.width;
+    // A second finger somewhere else must not drive this drag.
+    grip.dispatchEvent(
+      new PointerEvent("pointermove", { bubbles: true, pointerId: 4, clientX: 400 })
+    );
+    expect(col.style.width).to.equal(held);
+    grip.dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, pointerId: 4, clientX: 400 })
+    );
+    expect(changed).to.have.length(0);
+
+    setTimeout(() =>
+      grip.dispatchEvent(
+        new PointerEvent("pointerup", { bubbles: true, pointerId: 3, clientX: 100 })
+      )
+    );
+    const event = await oneEvent(element, "fluid-column-layout-change");
+    expect(event.detail.layout[0].width).to.match(/px$/);
+  });
+
+  it("ignores a drop that carries a column the table does not know", async () => {
+    const element = await arrangeable();
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    const header = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='domain']")!;
+    const transfer = new DataTransfer();
+    transfer.setData("text/plain", "not-a-column");
+    header.dispatchEvent(
+      new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer })
+    );
+    await elementUpdated(element);
+    expect(changed).to.have.length(0);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("ignores a drop that carries nothing at all", async () => {
+    const element = await arrangeable();
+    const header = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='domain']")!;
+    const dropped = new DragEvent("drop", {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: new DataTransfer()
+    });
+    header.dispatchEvent(dropped);
+    await elementUpdated(element);
+    // Nothing was in hand, so the table does not claim the drop.
+    expect(dropped.defaultPrevented).to.equal(false);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("refuses a drop that would move a column which must stay put", async () => {
+    const element = await arrangeable();
+    element.columns = [
+      { key: "name", label: "Name", sortable: true },
+      { key: "domain", label: "Domain", configurable: false },
+      { key: "status", label: "Status" }
+    ];
+    await elementUpdated(element);
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    const header = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='name']")!;
+    const transfer = new DataTransfer();
+    transfer.setData("text/plain", "domain");
+    header.dispatchEvent(
+      new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer })
+    );
+    await elementUpdated(element);
+    expect(changed).to.have.length(0);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("treats a drag onto the near edge of the next column as no move at all", async () => {
+    const element = await arrangeable();
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    const from = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='name']")!;
+    const onto = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='domain']")!;
+    const transfer = new DataTransfer();
+    from.dispatchEvent(new DragEvent("dragstart", { bubbles: true, dataTransfer: transfer }));
+    const rect = onto.getBoundingClientRect();
+    onto.dispatchEvent(
+      new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        clientX: rect.left + 2,
+        dataTransfer: transfer
+      })
+    );
+    await elementUpdated(element);
+    // Landing before its own neighbour is where the column already is.
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+    onto.dispatchEvent(
+      new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer })
+    );
+    onto.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+    await elementUpdated(element);
+    expect(changed).to.have.length(0);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("mirrors the drop side for a right-to-left reader", async () => {
+    const element = await arrangeable();
+    element.lang = "ar";
+    await aTimeout(0);
+    await element.updateComplete;
+    const from = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='name']")!;
+    const onto = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='domain']")!;
+    const transfer = new DataTransfer();
+    from.dispatchEvent(new DragEvent("dragstart", { bubbles: true, dataTransfer: transfer }));
+    const rect = onto.getBoundingClientRect();
+    onto.dispatchEvent(
+      new DragEvent("dragover", {
+        bubbles: true,
+        cancelable: true,
+        clientX: rect.left + 2,
+        dataTransfer: transfer
+      })
+    );
+    await elementUpdated(element);
+    // The same pixel that means "before" for a left-to-right reader means
+    // "after" here, so the gesture reads the same way round.
+    expect(order(element)).to.eql(["domain", "name", "status"]);
+  });
+
+  it("ignores a dragover when no column is in hand", async () => {
+    const element = await arrangeable();
+    const onto = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='domain']")!;
+    const over = new DragEvent("dragover", {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: new DataTransfer()
+    });
+    onto.dispatchEvent(over);
+    await elementUpdated(element);
+    expect(over.defaultPrevented).to.equal(false);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("rests while the pointer is over the column it is already carrying", async () => {
+    const element = await arrangeable();
+    const header = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='name']")!;
+    const transfer = new DataTransfer();
+    header.dispatchEvent(new DragEvent("dragstart", { bubbles: true, dataTransfer: transfer }));
+    const rect = header.getBoundingClientRect();
+    const over = new DragEvent("dragover", {
+      bubbles: true,
+      cancelable: true,
+      clientX: rect.right - 2,
+      dataTransfer: transfer
+    });
+    header.dispatchEvent(over);
+    await elementUpdated(element);
+    // The drop is still accepted, it simply changes nothing.
+    expect(over.defaultPrevented).to.equal(true);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+    header.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+  });
+
+  it("refuses a dragover over a column that cannot be reordered", async () => {
+    const element = await arrangeable();
+    element.columns = [
+      { key: "name", label: "Name", sortable: true },
+      { key: "domain", label: "Domain" },
+      { key: "status", label: "Status", configurable: false }
+    ];
+    await elementUpdated(element);
+    const from = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='name']")!;
+    const onto = element.shadowRoot!.querySelector<HTMLElement>("th[data-column='status']")!;
+    const transfer = new DataTransfer();
+    from.dispatchEvent(new DragEvent("dragstart", { bubbles: true, dataTransfer: transfer }));
+    const rect = onto.getBoundingClientRect();
+    const over = new DragEvent("dragover", {
+      bubbles: true,
+      cancelable: true,
+      clientX: rect.right - 2,
+      dataTransfer: transfer
+    });
+    onto.dispatchEvent(over);
+    await elementUpdated(element);
+    expect(over.defaultPrevented).to.equal(false);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+    onto.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+  });
+
+  it("puts a grabbed column back down when the handle is pressed again", async () => {
+    const element = await arrangeable();
+    const handle = handles(element)[0]!;
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    expect(handle.getAttribute("aria-pressed")).to.equal("true");
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    await elementUpdated(element);
+    expect(handle.getAttribute("aria-pressed")).to.equal("false");
+
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    // Put down, the arrows belong to the page again.
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await elementUpdated(element);
+    expect(changed).to.have.length(0);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+  });
+
+  it("keeps hold of a column through keys that are not a move", async () => {
+    const element = await arrangeable();
+    const handle = handles(element)[0]!;
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    const changed: Event[] = [];
+    element.addEventListener("fluid-column-layout-change", (event) => changed.push(event));
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+    await elementUpdated(element);
+    expect(changed).to.have.length(0);
+    expect(order(element)).to.eql(["name", "domain", "status"]);
+    expect(handle.getAttribute("aria-pressed")).to.equal("true");
+  });
+
+  it("moves a held column backwards with the arrow that points back", async () => {
+    const element = await arrangeable();
+    const handle = handles(element)[1]!;
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    setTimeout(() =>
+      handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }))
+    );
+    const moved = await oneEvent(element, "fluid-column-layout-change");
+    expect(moved.detail.layout.map((item: { key: string }) => item.key)).to.eql([
+      "domain",
+      "name",
+      "status"
+    ]);
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector("[aria-live]")!.textContent!.trim()).to.equal(
+      "Domain, column 1 of 3"
+    );
+  });
+
+  it("clears the position announcement when the announced column is hidden", async () => {
+    const element = await arrangeable();
+    const handle = handles(element)[0]!;
+    handle.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    const status = element.shadowRoot!.querySelector<HTMLElement>("[aria-live]")!;
+    expect(status.textContent!.trim()).to.equal("Name, column 1 of 3");
+    const box = element.shadowRoot!.querySelector<HTMLInputElement>(".column-option input")!;
+    box.checked = false;
+    box.dispatchEvent(new Event("change"));
+    await elementUpdated(element);
+    // A column nobody can see has no position to read out.
+    expect(status.textContent!.trim()).to.equal("");
+  });
+
+  it("moves a column later and earlier from the column manager", async () => {
+    const element = await arrangeable();
+    const options = () => [...element.shadowRoot!.querySelectorAll(".column-option")];
+    const buttons = (index: number) => [
+      ...options()[index]!.querySelectorAll<HTMLButtonElement>("button")
+    ];
+    expect(buttons(0)[0]!.disabled).to.equal(true);
+    expect(buttons(2)[1]!.disabled).to.equal(true);
+
+    setTimeout(() => buttons(0)[1]!.click());
+    const later = await oneEvent(element, "fluid-column-layout-change");
+    expect(later.detail.layout.map((item: { key: string }) => item.key)).to.eql([
+      "domain",
+      "name",
+      "status"
+    ]);
+    await elementUpdated(element);
+    expect(order(element)).to.eql(["domain", "name", "status"]);
+
+    setTimeout(() => buttons(1)[0]!.click());
+    const earlier = await oneEvent(element, "fluid-column-layout-change");
+    expect(earlier.detail.layout.map((item: { key: string }) => item.key)).to.eql([
+      "name",
+      "domain",
+      "status"
+    ]);
+  });
+
   describe("column scrolling", () => {
     async function overflowing(): Promise<FluidInfiniteTable> {
       const element = await fixture<FluidInfiniteTable>(html`
@@ -875,7 +1344,7 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
       `).then((wrapper) => wrapper.querySelector("fluid-infinite-table")!);
       await elementUpdated(element);
       // Geometry lands via a ResizeObserver tick and a deferred frame, not the
-      // render — so the fixture is ready when the table says so, not after a
+      // render, so the fixture is ready when the table says so, not after a
       // guessed number of frames.
       for (let i = 0; i < 40 && !element.hasAttribute("data-columns-overflow"); i += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve));
@@ -883,6 +1352,16 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
       await new Promise((resolve) => requestAnimationFrame(resolve));
       return element;
     }
+
+    it("clears the overflow marker when column scrolling is switched off", async () => {
+      const element = await overflowing();
+      expect(element.hasAttribute("data-columns-overflow")).to.equal(true);
+      element.columnScroll = false;
+      await elementUpdated(element);
+      // Only the resize observer measures otherwise, so the property flip
+      // itself must remove the stale marker from the host.
+      expect(element.hasAttribute("data-columns-overflow")).to.equal(false);
+    });
 
     it("offers the strip between header and rows only while columns overflow", async () => {
       const element = await overflowing();
@@ -923,6 +1402,83 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
       expect(Math.round(cellBefore - cellAfter)).to.equal(shift);
     });
 
+    it("carries a sideways wheel gesture over the rows to the columns", async () => {
+      const element = await overflowing();
+      const viewport = element.shadowRoot!.querySelector<HTMLElement>(".viewport")!;
+      const strip = element.shadowRoot!.querySelector<HTMLElement>(".column-scroll")!;
+      const wheel = new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 80,
+        deltaY: 0
+      });
+      viewport.dispatchEvent(wheel);
+      await elementUpdated(element);
+      // The clip box is not a scroll container, so the gesture is handed to
+      // the strip that owns the position.
+      expect(strip.scrollLeft).to.be.greaterThan(0);
+      expect(wheel.defaultPrevented).to.equal(true);
+
+      strip.scrollLeft = strip.scrollWidth;
+      const overshoot = new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 400,
+        deltaY: 0
+      });
+      viewport.dispatchEvent(overshoot);
+      // Pinned at the far end there is nothing left to take, so the page keeps
+      // the gesture.
+      expect(overshoot.defaultPrevented).to.equal(false);
+    });
+
+    it("leaves a vertical wheel to the page", async () => {
+      const element = await overflowing();
+      const viewport = element.shadowRoot!.querySelector<HTMLElement>(".viewport")!;
+      const strip = element.shadowRoot!.querySelector<HTMLElement>(".column-scroll")!;
+      const wheel = new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 0,
+        deltaY: 120
+      });
+      viewport.dispatchEvent(wheel);
+      await elementUpdated(element);
+      expect(strip.scrollLeft).to.equal(0);
+      expect(wheel.defaultPrevented).to.equal(false);
+    });
+
+    it("keeps its hands off a sideways wheel it has no scrollbar for", async () => {
+      const fitting = await fixture<FluidInfiniteTable>(html`
+        <fluid-infinite-table
+          column-scroll
+          .columns=${[{ key: "a", label: "A" }] as FluidInfiniteTableColumn[]}
+          .rows=${[{ id: 1, a: "1" }]}
+        ></fluid-infinite-table>
+      `);
+      await elementUpdated(fitting);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      const wide = new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 80,
+        deltaY: 0
+      });
+      fitting.shadowRoot!.querySelector<HTMLElement>(".viewport")!.dispatchEvent(wide);
+      expect(wide.defaultPrevented).to.equal(false);
+
+      // And a table that never opted in leaves the gesture alone entirely.
+      const plain = await setup();
+      const untouched = new WheelEvent("wheel", {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 80,
+        deltaY: 0
+      });
+      plain.shadowRoot!.querySelector<HTMLElement>(".viewport")!.dispatchEvent(untouched);
+      expect(untouched.defaultPrevented).to.equal(false);
+    });
+
     it("stays out of the way when the columns fit", async () => {
       const element = await fixture<FluidInfiniteTable>(html`
         <fluid-infinite-table
@@ -937,5 +1493,270 @@ describe("<fluid-infinite-table> columns a reader can arrange", () => {
       const row = element.shadowRoot!.querySelector(".column-scroll-row")!;
       expect(getComputedStyle(row).display).to.equal("none");
     });
+  });
+});
+
+describe("<fluid-infinite-table> rows a reader can activate", () => {
+  const activatable: FluidInfiniteTableColumn[] = [
+    { key: "name", label: "Name" },
+    {
+      key: "open",
+      label: "Open",
+      renderCell: () => litHtml`<button type="button">Open</button>`
+    }
+  ];
+
+  async function clickable(): Promise<FluidInfiniteTable> {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table
+        clickable
+        .columns=${activatable}
+        .rows=${[
+          { id: 1, name: "Apollo" },
+          { id: 2, name: "Polar" }
+        ]}
+      ></fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    return element;
+  }
+
+  it("reports a click on the plain part of a row", async () => {
+    const element = await clickable();
+    const cell = element.shadowRoot!.querySelector<HTMLElement>("tbody tr[data-row] td")!;
+    setTimeout(() => cell.click());
+    const event = await oneEvent(element, "fluid-row-click");
+    expect(event.detail.row["name"]).to.equal("Apollo");
+    expect(event.detail.rowIndex).to.equal(0);
+    expect(event.detail.originalEvent).to.be.instanceOf(MouseEvent);
+  });
+
+  it("leaves a control inside a row to do its own job", async () => {
+    const element = await clickable();
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>("tbody button")!;
+    const events: Event[] = [];
+    element.addEventListener("fluid-row-click", (event) => events.push(event));
+    button.click();
+    button.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    expect(events).to.have.length(0);
+  });
+
+  it("activates a row from the space bar", async () => {
+    const element = await clickable();
+    const row = element.shadowRoot!.querySelectorAll<HTMLElement>("tbody tr[data-row]")[1]!;
+    const pressed = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+      cancelable: true
+    });
+    setTimeout(() => row.dispatchEvent(pressed));
+    const event = await oneEvent(element, "fluid-row-click");
+    expect(event.detail.rowIndex).to.equal(1);
+    // The page must not scroll out from under the reader who just chose a row.
+    expect(pressed.defaultPrevented).to.equal(true);
+  });
+
+  it("stays inert while the rows are not clickable", async () => {
+    const element = await clickable();
+    element.clickable = false;
+    await elementUpdated(element);
+    const row = element.shadowRoot!.querySelector<HTMLElement>("tbody tr[data-row]")!;
+    const events: Event[] = [];
+    element.addEventListener("fluid-row-click", (event) => events.push(event));
+    row.querySelector("td")!.click();
+    row.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await elementUpdated(element);
+    expect(events).to.have.length(0);
+    expect(row.hasAttribute("tabindex")).to.equal(false);
+  });
+});
+
+describe("<fluid-infinite-table> loading the next page", () => {
+  it("asks for the next page once the sentinel comes into view", async () => {
+    const element = await setup();
+    element.hasMore = true;
+    const event = await oneEvent(element, "fluid-load-more");
+    expect(event.detail.offset).to.equal(2);
+  });
+
+  it("asks for the next page from a container-scrolled table too", async () => {
+    const element = await setup();
+    element.scrollMode = "container";
+    await elementUpdated(element);
+    element.hasMore = true;
+    const event = await oneEvent(element, "fluid-load-more");
+    expect(event.detail.offset).to.equal(2);
+  });
+
+  it("does not ask again while a page is already on its way", async () => {
+    const element = await setup();
+    const events: Event[] = [];
+    element.addEventListener("fluid-load-more", (event) => events.push(event));
+    element.loading = true;
+    element.hasMore = true;
+    await elementUpdated(element);
+    await aTimeout(150);
+    expect(events).to.have.length(0);
+    expect(element.shadowRoot!.querySelector('[part="sentinel"]')!.textContent?.trim()).to.equal(
+      "Loading more results"
+    );
+  });
+});
+
+describe("<fluid-infinite-table> counts, keys and windows", () => {
+  it("reports the loaded rows against both the matching and the overall total", async () => {
+    const element = await setup();
+    element.availableTotal = 5;
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector('[part="progress"]')!.textContent?.trim()).to.equal(
+      "2 loaded of 10 matching · 5 total"
+    );
+  });
+
+  it("reports the matching total on its own when no overall total is known", async () => {
+    const element = await setup();
+    element.total = 0;
+    element.availableTotal = 7;
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector('[part="progress"]')!.textContent?.trim()).to.equal(
+      "2 loaded matching · 7 total"
+    );
+  });
+
+  it("falls back to the row index when the key field is missing", async () => {
+    const element = await setup();
+    element.rows = [{ name: "Nameless" }, { name: "Second" }];
+    await elementUpdated(element);
+    expect(
+      [...element.shadowRoot!.querySelectorAll<HTMLElement>("tbody tr[data-row]")].map(
+        (row) => row.dataset["rowKey"]
+      )
+    ).to.deep.equal(["0", "1"]);
+  });
+
+  it("keeps an unusable total out of aria-rowcount", async () => {
+    const element = await setup();
+    element.total = Number.NaN;
+    await elementUpdated(element);
+    // Two rows plus the header row, and no NaN anywhere near the count.
+    expect(element.shadowRoot!.querySelector("table")!.getAttribute("aria-rowcount")).to.equal("3");
+  });
+
+  it("falls back to the default overscan when it is not a number", async () => {
+    const element = await setup();
+    element.rows = Array.from({ length: 400 }, (_, id) => ({ id, name: `Row ${id}` }));
+    element.overscan = Number.NaN;
+    await elementUpdated(element);
+    const fallback = element.shadowRoot!.querySelectorAll("tbody tr[data-row]").length;
+    expect(fallback).to.be.greaterThan(0);
+    element.overscan = 6;
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelectorAll("tbody tr[data-row]").length).to.equal(fallback);
+  });
+
+  it("ignores a container scroll while the page is the scroller", async () => {
+    const element = await setup();
+    element.rows = Array.from({ length: 200 }, (_, id) => ({ id, name: `Row ${id}` }));
+    await elementUpdated(element);
+    const firstKey = () =>
+      element.shadowRoot!.querySelector<HTMLElement>("tbody tr[data-row]")!.dataset["rowKey"];
+    const before = firstKey();
+    const viewport = element.shadowRoot!.querySelector<HTMLElement>(".viewport")!;
+    viewport.scrollTop = 4000;
+    viewport.dispatchEvent(new Event("scroll"));
+    await aTimeout(40);
+    expect(firstKey()).to.equal(before);
+  });
+
+  it("ignores a page scroll while the container is the scroller", async () => {
+    const element = await setup();
+    element.scrollMode = "container";
+    element.style.setProperty("--fluid-infinite-table-height", "160px");
+    element.rows = Array.from({ length: 400 }, (_, id) => ({ id, name: `Row ${id}` }));
+    await elementUpdated(element);
+    await aTimeout(40);
+    const windowed = element.shadowRoot!.querySelectorAll("tbody tr[data-row]").length;
+    // A container-scrolled table is windowed against its own box; the page
+    // height must not creep back into that arithmetic.
+    window.dispatchEvent(new Event("scroll"));
+    window.dispatchEvent(new Event("resize"));
+    await aTimeout(60);
+    expect(element.shadowRoot!.querySelectorAll("tbody tr[data-row]").length).to.equal(windowed);
+  });
+
+  it("turns a sorted column around on the next press", async () => {
+    const element = await setup();
+    const button = element.shadowRoot!.querySelector<HTMLButtonElement>(".sort")!;
+    const mark = () => element.shadowRoot!.querySelector(".sort-mark")!.textContent?.trim();
+    button.click();
+    await elementUpdated(element);
+    expect(mark()).to.equal("↑");
+    setTimeout(() => button.click());
+    const event = await oneEvent(element, "fluid-sort");
+    expect(event.detail).to.deep.equal({ key: "name", dir: "desc" });
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector("th")!.getAttribute("aria-sort")).to.equal(
+      "descending"
+    );
+    expect(mark()).to.equal("↓");
+    button.click();
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector("th")!.getAttribute("aria-sort")).to.equal(
+      "ascending"
+    );
+  });
+
+  it("renders a header template a column brought with it", async () => {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table
+        .columns=${[
+          {
+            key: "name",
+            label: "Name",
+            renderHeader: (column) => litHtml`<em>${column.label} today</em>`
+          },
+          { key: "domain", label: "Domain" }
+        ] as FluidInfiniteTableColumn[]}
+        .rows=${[{ id: 1, name: "Apollo", domain: "CURO" }]}
+      ></fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    expect(element.shadowRoot!.querySelector("th em")!.textContent?.trim()).to.equal("Name today");
+  });
+
+  it("keeps a hidden caption available to assistive technology", async () => {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table
+        caption="Terminals"
+        hide-caption
+        .columns=${columns}
+        .rows=${[{ id: 1, name: "Apollo" }]}
+      ></fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    const caption = element.shadowRoot!.querySelector("caption")!;
+    expect(caption.classList.contains("sr-only")).to.equal(true);
+    expect(caption.textContent?.trim()).to.equal("Terminals");
+  });
+
+  it("shows the second toolbar line only while something is slotted into it", async () => {
+    const element = await fixture<FluidInfiniteTable>(html`
+      <fluid-infinite-table .columns=${columns} .rows=${[{ id: 1, name: "Apollo" }]}>
+        <div slot="toolbar-secondary">Bulk actions</div>
+      </fluid-infinite-table>
+    `);
+    await elementUpdated(element);
+    const line = element.shadowRoot!.querySelector<HTMLElement>(".toolbar-secondary")!;
+    expect(line.hasAttribute("hidden")).to.equal(false);
+    expect(getComputedStyle(line).display).to.not.equal("none");
+
+    element.querySelector('[slot="toolbar-secondary"]')!.remove();
+    await aTimeout(0);
+    await elementUpdated(element);
+    // An empty second line would still reserve a visible band, so it leaves
+    // the layout entirely.
+    expect(line.hasAttribute("hidden")).to.equal(true);
+    expect(getComputedStyle(line).display).to.equal("none");
   });
 });

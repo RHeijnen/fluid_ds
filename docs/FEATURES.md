@@ -442,6 +442,16 @@ Kept out of the core so the base bundle stays lean:
   catalog/presence, generated-output and command-ownership guards, tokens, unit
   tests, packages, Node SSR and built documentation links. Browser coverage is a
   separate gate; presence checks are not line/function/branch coverage.
+- ✅ **Measured coverage floors, ratcheted to reality (2026-09-01).** Every
+  one of the 14 component packages is measured in-browser and gated per
+  metric: statements and lines sit at 97-100 in every package (five packages
+  at a flat 100), functions at 93-100, branches at 85-100. The floors in
+  `quality/coverage-thresholds.json` equal the measured actuals rounded
+  down, so any regression fails the build; a companion inventory gate
+  requires every runtime module to appear in the measured denominator, so a
+  file cannot silently drop out of coverage. The remaining uncovered
+  branches are individually documented unreachable defensive guards, not
+  untested behavior.
 - ✅ The catalog/presence gate covers **all 155 published elements across every
   package**, core and expansion packs alike, and matches tags exactly. It
   previously scanned only `packages/components` with a substring match, which

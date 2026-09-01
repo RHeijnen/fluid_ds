@@ -164,6 +164,127 @@ describe("<fluid-zoomable-frame>", () => {
     expect(transform(el)).to.deep.equal({ x: 0, y: 0, scale: 1 });
   });
 
+  it("takes a caller-supplied name for every control and falls back to the translated one", async () => {
+    const el = await frame();
+    el.zoomOutLabel = "Uitzoomen";
+    el.resetLabel = "Herstellen";
+    el.zoomInLabel = "Inzoomen";
+    el.panLeftLabel = "Naar links";
+    el.panRightLabel = "Naar rechts";
+    el.panUpLabel = "Omhoog";
+    el.panDownLabel = "Omlaag";
+    await elementUpdated(el);
+    const labels = () =>
+      [...el.shadowRoot!.querySelectorAll("button")].map((button) =>
+        button.getAttribute("aria-label")
+      );
+    expect(labels()).to.deep.equal([
+      "Uitzoomen",
+      "Herstellen",
+      "Inzoomen",
+      "Naar links",
+      "Naar rechts",
+      "Omhoog",
+      "Omlaag"
+    ]);
+
+    // Clearing an override hands the name back to the built-in dictionary.
+    el.zoomOutLabel = null;
+    el.resetLabel = null;
+    el.zoomInLabel = null;
+    el.panLeftLabel = null;
+    el.panRightLabel = null;
+    el.panUpLabel = null;
+    el.panDownLabel = null;
+    await elementUpdated(el);
+    expect(labels()).to.deep.equal([
+      "Zoom out",
+      "Reset zoom",
+      "Zoom in",
+      "Pan left",
+      "Pan right",
+      "Pan up",
+      "Pan down"
+    ]);
+  });
+
+  it("falls back to safe defaults when zoom and pan settings are unusable", async () => {
+    const el = await frame();
+    el.minScale = Number.NaN;
+    el.maxScale = Number.NaN;
+    el.step = 0;
+    el.panStep = -10;
+    await elementUpdated(el);
+
+    el.zoomIn();
+    await elementUpdated(el);
+    expect(el.scale).to.equal(1.25); // default step
+
+    el.reset();
+    await elementUpdated(el);
+    el.shadowRoot!.querySelectorAll<HTMLButtonElement>(".button")[4]!.click();
+    expect(transform(el).x).to.equal(40); // default pan distance
+
+    el.scale = -5;
+    await elementUpdated(el);
+    expect(el.scale).to.equal(0.5); // default minimum
+
+    el.scale = 99;
+    await elementUpdated(el);
+    expect(el.scale).to.equal(5); // default maximum
+  });
+
+  it("ignores a pan request that is not a finite distance", async () => {
+    const el = await frame();
+    el.panBy(30, 0);
+    el.panBy(Number.NaN, 10);
+    el.panBy(10, Number.POSITIVE_INFINITY);
+    expect(transform(el)).to.deep.equal({ x: 30, y: 0, scale: 1 });
+  });
+
+  it("hides the control strip when no-controls is set and still zooms", async () => {
+    const el = await fixture<FluidZoomableFrame>(html`
+      <fluid-zoomable-frame no-controls style="width: 200px; height: 200px;">
+        <img src="a.png" alt="Alpha" />
+      </fluid-zoomable-frame>
+    `);
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector('[part="controls"]')).to.not.exist;
+    expect(el.shadowRoot!.querySelectorAll("button")).to.have.length(0);
+    expect(el.shadowRoot!.querySelector('[part="content"]')).to.exist;
+
+    el.dispatchEvent(new WheelEvent("wheel", { deltaY: -100, cancelable: true }));
+    await elementUpdated(el);
+    expect(el.scale).to.be.greaterThan(1);
+  });
+
+  it("releases the captured pointer when a drag ends", async () => {
+    const el = await frame();
+    // Synthetic pointer events never acquire a real capture, so the platform
+    // side of the contract is stubbed to observe what the component asks for.
+    const released: number[] = [];
+    el.hasPointerCapture = () => true;
+    el.releasePointerCapture = (pointerId: number) => released.push(pointerId);
+
+    el.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 7 }));
+    el.dispatchEvent(new PointerEvent("pointerup", { pointerId: 7 }));
+    expect(released).to.deep.equal([7]);
+    expect(el.hasAttribute("data-dragging")).to.be.false;
+  });
+
+  it("clears drag state on disconnect even when the capture id is already stale", async () => {
+    const el = await frame();
+    el.hasPointerCapture = () => true;
+    el.releasePointerCapture = () => {
+      throw new DOMException("No active pointer", "NotFoundError");
+    };
+
+    el.dispatchEvent(new PointerEvent("pointerdown", { pointerId: 3 }));
+    expect(el.hasAttribute("data-dragging")).to.be.true;
+    el.remove();
+    expect(el.hasAttribute("data-dragging")).to.be.false;
+  });
+
   it("normalizes direct scale changes and keeps reset inside valid configured bounds", async () => {
     const el = await frame();
     el.minScale = 2;

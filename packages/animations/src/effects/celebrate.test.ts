@@ -54,6 +54,15 @@ async function optionsFor(
   }
 }
 
+describe("<fluid-celebrate>: accessibility", () => {
+  it("passes the accessibility audit", async () => {
+    const el = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate effect="confetti"></fluid-celebrate>`
+    );
+    await expect(el).to.be.accessible();
+  });
+});
+
 describe("<fluid-celebrate>: effect resolution", () => {
   it("maps a dash-case alias onto its camelCase effect", async () => {
     const el = await fixture<FluidCelebrate>(
@@ -89,6 +98,26 @@ describe("<fluid-celebrate>: effect resolution", () => {
     try {
       await el.fire();
       expect(recorder.calls).to.have.lengthOf(1);
+    } finally {
+      recorder.restore();
+    }
+  });
+
+  it("does not announce a run fired while detached", async () => {
+    // A detached controller has nothing to bubble through, so the end event
+    // would never reach a delegated listener.
+    const el = document.createElement("fluid-celebrate") as FluidCelebrate;
+    el.setAttribute("effect", "confetti");
+    let ended = false;
+    el.addEventListener("fluid-celebrate-end", () => {
+      ended = true;
+    });
+    const recorder = recordEffect("confetti");
+    try {
+      await el.fire();
+      expect(recorder.calls, "the effect still runs").to.have.lengthOf(1);
+      expect(el.isConnected).to.equal(false);
+      expect(ended, "a detached element must stay quiet").to.equal(false);
     } finally {
       recorder.restore();
     }
@@ -183,6 +212,14 @@ describe("<fluid-celebrate>: option plumbing", () => {
     );
     el.colors = ["#abcdef", "#fedcba"];
     expect(await optionsFor(el)).to.deep.equal({ colors: ["#abcdef", "#fedcba"] });
+  });
+
+  it("treats a blank colors or emojis attribute as no override at all", async () => {
+    const el = await fixture<FluidCelebrate>(
+      html`<fluid-celebrate effect="emojiBurst" colors="  " emojis="  "></fluid-celebrate>`
+    );
+    expect(el.emojis, "whitespace is not a glyph list").to.equal(undefined);
+    expect(await optionsFor(el, "emojiBurst")).to.deep.equal({});
   });
 
   it("forwards a parsed emojis attribute", async () => {

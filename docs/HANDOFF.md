@@ -1181,6 +1181,45 @@ Things true across machines (machine-specific quirks go in private memory):
 
 ## Log
 
+### 2026-09-01: coverage maximization campaign, visual lane green in CI
+
+The measured-coverage push the owner ordered ("I want coverage to reach the
+max we can get it"). Seven Opus agents (editor, node-graph, animations, then
+kanban, media, table, charts) wrote real behavioral tests, reviewed one by
+one; roughly 470 tests were added across the workspace. Actuals now: every
+package at 97-100 statements/lines, functions 93-100, branches 85-100; all
+floors in quality/coverage-thresholds.json ratcheted up to the measured
+actuals (69 floors raised in two passes; the editor lesson was that the old
+floors were stale by 10-20 points against reality). Real bugs found by the
+audits and fixed in-session: the sparkline built Chart.js instances while
+detached (leaked in the module registry; isConnected guard + reconnect
+redraw), re-enabling resizable table columns never re-measured, a stale
+data-columns-overflow marker survived turning column-scroll off, and the
+table's toolbar-secondary slot was missing from the manifest. Dead code and
+unreachable-guard inventories from each agent are in this session's reports;
+the tree-shaking-pinned drawLegacyParticle in animations is the standout
+removal candidate for the next major. Also this arc: the visual-regression
+lane went green in CI for the FIRST TIME EVER once the job ran in the same
+digest-pinned Playwright container the baselines were captured in (plus
+HOME=/root for Firefox in Actions containers), and the coverage lane's
+inventory gate is satisfied by contract tests for the offline story
+fixtures. Retained noise: the Windows PID-reuse teardown flake still fails
+local full gates intermittently with all tests green (item 5).
+
+### 2026-08-31 (later): node-graph live-region fix, both connect lines announced
+
+Fixed an accessibility regression in `fluid-node-graph`: `startKeyboardLink()`
+raised "connectStart" and the first candidate in the same tick, and the plain
+overwrite in `announce()` dropped the instructions line ("Connecting from X,
+port. Use arrow keys...") before the render assistive technology observes, so
+keyboard users only ever heard the candidate. `announce()` now composes
+same-tick announcements into one live-region update (a repeat of the same key
+still replaces its pending line, so four zoom presses in one tick read once).
+Regression test added; three assertions that had encoded the bug updated; CEM
+manifests regenerated (also picked up pre-existing drift from the offline
+story fixtures in `packages/components`). 108/108 node-graph tests green on
+chromium + webkit; behavior confirmed live in Storybook.
+
 ### 2026-08-31: nine-lane gate complete, visual baselines approved
 
 1.0 groundwork landed (test-race fixes, localized node-graph digits,

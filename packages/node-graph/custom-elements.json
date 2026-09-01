@@ -290,12 +290,22 @@
             },
             {
               "kind": "field",
-              "name": "liveAnnouncement",
+              "name": "liveAnnouncements",
               "type": {
-                "text": "NodeGraphAnnouncement | null"
+                "text": "NodeGraphAnnouncement[]"
               },
               "privacy": "private",
-              "default": "null"
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "liveAnnouncementsFlushed",
+              "type": {
+                "text": "boolean"
+              },
+              "privacy": "private",
+              "default": "true",
+              "description": "False while `liveAnnouncements` holds lines the live region has not rendered yet."
             },
             {
               "kind": "field",

@@ -1,4 +1,4 @@
-import { expect, fixture, html, oneEvent, aTimeout } from "@open-wc/testing";
+import { expect, fixture, html, oneEvent, aTimeout, waitUntil } from "@open-wc/testing";
 import "./define.js";
 import "@fluid-ds/components/locales/nl";
 import "@fluid-ds/components/locales/de";
@@ -313,6 +313,26 @@ describe("fluid-node-graph", () => {
       const event = await oneEvent(el, "fluid-connect");
       expect(event.detail.to).to.equal("c");
       expect(el.edges.length).to.equal(2);
+    });
+
+    it("delivers the connect instructions and the first candidate in one announcement", async () => {
+      const el = await graphFixture();
+      el.edges = [];
+      await el.updateComplete;
+      const port = outPort(el, "a", "next");
+      key(port, "Enter");
+      await el.updateComplete;
+      // Starting a link announces twice in the same tick. Both lines must land
+      // in the single live-region update the screen reader observes; writing
+      // them as two synchronous replacements drops the instructions.
+      expect(live(el)).to.equal(
+        "Connecting from Start, next. Use arrow keys to choose a target, " +
+          "Enter to connect, Escape to cancel. Sync data, 1 of 2"
+      );
+
+      key(port, "ArrowDown");
+      await el.updateComplete;
+      expect(live(el), "the instructions do not repeat when cycling").to.equal("End, 2 of 2");
     });
 
     it("Escape cancels without connecting", async () => {
@@ -1207,7 +1227,9 @@ describe("fluid-node-graph", () => {
       expect(seen[2]).to.be.closeTo(1.2, 1e-9);
       expect(seen[3]).to.be.closeTo(1, 1e-9);
       expect(el.shadowRoot!.querySelector(".hud")!.textContent).to.contain("100%");
-      expect(live(el)).to.equal("Zoom 100 percent");
+      // Same-key announcements replace their pending line, so the region
+      // settles to exactly the newest zoom; poll only for render timing.
+      await waitUntil(() => live(el) === "Zoom 100 percent");
     });
 
     it("Home fits every node into view", async () => {
@@ -1400,7 +1422,10 @@ describe("fluid-node-graph", () => {
       await el.updateComplete;
       // Candidates are ordered by distance from the source: b (296px) then c (600px).
       expect(candidate()).to.equal("b");
-      expect(live(el)).to.equal("Sync data, 1 of 2");
+      expect(live(el)).to.equal(
+        "Connecting from Start, next. Use arrow keys to choose a target, " +
+          "Enter to connect, Escape to cancel. Sync data, 1 of 2"
+      );
 
       key(port, "ArrowDown");
       await el.updateComplete;
@@ -1479,7 +1504,8 @@ describe("fluid-node-graph", () => {
         "an abandoned link does not linger"
       ).to.equal(null);
       expect(live(el), "a silent cancel does not interrupt the reader").to.equal(
-        "Sync data, 1 of 2"
+        "Connecting from Start, next. Use arrow keys to choose a target, " +
+          "Enter to connect, Escape to cancel. Sync data, 1 of 2"
       );
     });
 
@@ -1761,7 +1787,10 @@ describe("fluid-node-graph", () => {
     };
     key(port, "Enter");
     await el.updateComplete;
-    expect(live(el)).to.equal("End, 1 of 1");
+    expect(live(el)).to.equal(
+      "Connecting from Sync data, done. Use arrow keys to choose a target, " +
+        "Enter to connect, Escape to cancel. End, 1 of 1"
+    );
     expect(el.shadowRoot!.querySelector(".edge-preview")).to.exist;
   });
 

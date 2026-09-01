@@ -183,6 +183,10 @@
               "name": "toolbar-actions"
             },
             {
+              "description": "A second toolbar row rendered below the main one, shown only while it has slotted content.",
+              "name": "toolbar-secondary"
+            },
+            {
               "description": "Empty-result content.",
               "name": "empty"
             },

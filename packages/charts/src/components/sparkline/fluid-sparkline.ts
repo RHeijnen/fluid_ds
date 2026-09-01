@@ -61,7 +61,17 @@ export class FluidSparkline extends LitElement {
     this.draw();
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    // disconnectedCallback destroyed the chart, so a re-attached sparkline
+    // repaints from its latest values here. Drawing while detached instead
+    // would leak the instance: Chart.js registers every chart in a
+    // module-level map that only destroy() removes.
+    if (this.hasUpdated && !this.chart) this.draw();
+  }
+
   protected override updated(changed: PropertyValues<this>): void {
+    if (!this.isConnected) return;
     if (changed.has("values") || changed.has("noFill")) {
       if (this.chart) {
         const ds = this.chart.data.datasets[0] as ChartDataset<"line">;

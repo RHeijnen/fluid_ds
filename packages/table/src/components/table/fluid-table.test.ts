@@ -62,6 +62,22 @@ describe("<fluid-table>", () => {
     expect(boxes[2]!.getAttribute("aria-label")).to.equal("Select row 3");
   });
 
+  it("leaves two empty values in the order they arrived", async () => {
+    const el = await table({
+      rows: [
+        { id: "a", name: "Anna", age: null },
+        { id: "b", name: "Bo", age: 5 },
+        { id: "c", name: "Cleo", age: "" }
+      ],
+      sort: { key: "age", dir: "asc" }
+    });
+    const names = [...el.shadowRoot!.querySelectorAll("tbody tr")].map((row) =>
+      row.querySelector("td")!.textContent!.trim()
+    );
+    // Both empties sort last, and neither jumps the other on the way there.
+    expect(names).to.deep.equal(["Bo", "Anna", "Cleo"]);
+  });
+
   it("renders a semantic table with caption, scoped headers, and a row per datum", async () => {
     const el = await table();
     const root = el.shadowRoot!;
@@ -78,6 +94,15 @@ describe("<fluid-table>", () => {
     expect(cap.textContent?.trim()).to.equal("People");
   });
 
+  it("renders no caption at all when the table was given none", async () => {
+    const el = await fixture<FluidTable>(html`<fluid-table></fluid-table>`);
+    el.columns = columns;
+    el.rows = rows;
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector("caption")).to.equal(null);
+    expect(el.shadowRoot!.querySelectorAll("tbody tr")).to.have.length(3);
+  });
+
   it("toggles aria-sort and emits fluid-sort on a sortable header", async () => {
     const el = await table();
     const btn = el.shadowRoot!.querySelector<HTMLButtonElement>("thead th button")!;
@@ -87,6 +112,24 @@ describe("<fluid-table>", () => {
     await elementUpdated(el);
     const th = el.shadowRoot!.querySelector("thead th")!;
     expect(th.getAttribute("aria-sort")).to.equal("ascending");
+  });
+
+  it("cycles the same header from ascending to descending and back", async () => {
+    const el = await table();
+    const button = el.shadowRoot!.querySelector<HTMLButtonElement>("thead th button")!;
+    const directions: string[] = [];
+    el.addEventListener("fluid-sort", (event) =>
+      directions.push((event as CustomEvent).detail.dir as string)
+    );
+    const ariaSort = () => el.shadowRoot!.querySelector("thead th")!.getAttribute("aria-sort");
+    for (const expected of ["ascending", "descending", "ascending"]) {
+      button.click();
+      await elementUpdated(el);
+      expect(ariaSort()).to.equal(expected);
+    }
+    expect(directions).to.deep.equal(["asc", "desc", "asc"]);
+    const first = el.shadowRoot!.querySelectorAll("tbody tr")[0]!.querySelector("td")!;
+    expect(first.textContent?.trim()).to.equal("Alice");
   });
 
   it("sorts numerically when the column is numeric", async () => {
@@ -128,6 +171,35 @@ describe("<fluid-table>", () => {
     const ev = await oneEvent(el, "fluid-selection-change");
     expect(ev.detail.selected).to.have.members(["a", "b", "c"]);
     expect(el.selectedKeys).to.have.length(3);
+  });
+
+  it("drops a row from the selection when its checkbox is cleared again", async () => {
+    const el = await table({ selectable: true });
+    const box = el.shadowRoot!.querySelector<HTMLInputElement>("tbody [part='select-row']")!;
+    box.click();
+    await elementUpdated(el);
+    expect(el.selectedKeys).to.deep.equal(["a"]);
+    setTimeout(() => box.click());
+    const event = await oneEvent(el, "fluid-selection-change");
+    expect(event.detail.selected).to.deep.equal([]);
+    expect(el.selectedKeys).to.deep.equal([]);
+    await elementUpdated(el);
+    expect(el.shadowRoot!.querySelector("tbody tr")!.hasAttribute("data-selected")).to.be.false;
+  });
+
+  it("clears every row when select-all is unchecked again", async () => {
+    const el = await table({ selectable: true });
+    const all = el.shadowRoot!.querySelector<HTMLInputElement>("[part='select-all']")!;
+    all.click();
+    await elementUpdated(el);
+    expect(el.selectedKeys).to.have.length(3);
+    expect(all.checked).to.be.true;
+    setTimeout(() => all.click());
+    const event = await oneEvent(el, "fluid-selection-change");
+    expect(event.detail.selected).to.deep.equal([]);
+    await elementUpdated(el);
+    expect(all.indeterminate).to.be.false;
+    expect(el.shadowRoot!.querySelectorAll("tbody tr[data-selected]")).to.have.length(0);
   });
 
   it("falls back to the row index as the key when no id field is present", async () => {

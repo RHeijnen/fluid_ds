@@ -87,6 +87,8 @@ export interface FluidInfiniteTableSort {
  * @slot toolbar-actions - Host controls placed at the end of the toolbar, after
  * the row count and the built-in Columns button. Pair with `configurable=false`
  * and {@link openColumnManager} to replace that button with your own.
+ * @slot toolbar-secondary - A second toolbar row rendered below the main one,
+ * shown only while it has slotted content.
  * @slot empty - Empty-result content.
  * @slot error - Error content, shown when `error` is set.
  *
@@ -794,8 +796,20 @@ export class FluidInfiniteTable extends FluidElement {
     ) {
       this.observeSentinel();
     }
-    if (changed.has("internalLayout") || changed.has("columns")) {
+    // resizableColumns re-measures too: the grips render with the minimum
+    // width until real measurements land, so re-enabling resizing must not
+    // wait for the next layout or column change.
+    if (
+      changed.has("internalLayout") ||
+      changed.has("columns") ||
+      changed.has("resizableColumns")
+    ) {
       this.scheduleMeasure();
+    }
+    // Only the resize observer measures overflow otherwise, so flipping the
+    // property must clear (off) or re-derive (on) the overflow marker itself.
+    if (changed.has("columnScroll")) {
+      this.measureColumnOverflow();
     }
   }
 
@@ -873,7 +887,13 @@ export class FluidInfiniteTable extends FluidElement {
    * to move a scrollbar.
    */
   private measureColumnOverflow(): void {
-    if (!this.columnScroll || !this.table || !this.tableScroll) return;
+    if (!this.columnScroll || !this.table || !this.tableScroll) {
+      // Leaving the marker behind would misreport overflow to anything
+      // reading the host after column scrolling is switched off.
+      this.removeAttribute("data-columns-overflow");
+      this.columnOverflowMeasured = "";
+      return;
+    }
     const clipWidth = this.tableScroll.clientWidth;
     const tableWidth = Math.ceil(this.table.getBoundingClientRect().width);
     const headerHeight = Math.round(

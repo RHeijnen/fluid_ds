@@ -1,4 +1,4 @@
-import { css, html, nothing, svg, type TemplateResult } from "lit";
+import { css, html, nothing, svg, type PropertyValues, type TemplateResult } from "lit";
 import { property, state } from "lit/decorators.js";
 import { FluidElement } from "@fluid-ds/components/internal/base-element";
 
@@ -593,7 +593,10 @@ export class FluidNodeGraph extends FluidElement {
   @state() private selectedEdgeId = "";
   @state() private linkPointer: { x: number; y: number } | null = null;
   @state() private keyboardLink: KeyboardLink | null = null;
-  @state() private liveAnnouncement: NodeGraphAnnouncement | null = null;
+  @state() private liveAnnouncements: NodeGraphAnnouncement[] = [];
+
+  /** False while `liveAnnouncements` holds lines the live region has not rendered yet. */
+  private liveAnnouncementsFlushed = true;
 
   private drag: DragState | null = null;
 
@@ -772,7 +775,22 @@ export class FluidNodeGraph extends FluidElement {
   }
 
   private announce(key: keyof NodeGraphMessages, vars: Record<string, string | number> = {}): void {
-    this.liveAnnouncement = { key, vars };
+    // Announcements raised in the same tick compose into one live-region
+    // update. Overwriting instead would drop every line but the last before
+    // the render assistive technology observes: keyboard linking raises
+    // "connectStart" and the first candidate back to back. A repeat of the
+    // same key does replace its pending line, though: of one fact (say the
+    // zoom level), only the newest value is worth hearing.
+    const pending = this.liveAnnouncementsFlushed
+      ? []
+      : this.liveAnnouncements.filter((entry) => entry.key !== key);
+    this.liveAnnouncements = [...pending, { key, vars }];
+    this.liveAnnouncementsFlushed = false;
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed);
+    this.liveAnnouncementsFlushed = true;
   }
 
   private emit(name: string, detail: unknown): void {
@@ -1449,9 +1467,7 @@ export class FluidNodeGraph extends FluidElement {
         aria-atomic="true"
         dir=${this.localize.dir}
       >
-        ${this.liveAnnouncement
-          ? this.msg(this.liveAnnouncement.key, this.liveAnnouncement.vars)
-          : ""}
+        ${this.liveAnnouncements.map((entry) => this.msg(entry.key, entry.vars)).join(" ")}
       </div>
     `;
   }

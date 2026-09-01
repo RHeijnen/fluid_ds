@@ -352,6 +352,24 @@ describe("controller: triggers", () => {
     }
   });
 
+  it("leaves an in-view element alone while it is below the fold", async () => {
+    // The observer reports every target it is handed, intersecting or not, so a
+    // long page must not fire everything the moment the controller boots.
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "in-view",
+      "data-fluid-animation-duration": "5000"
+    });
+    el.style.cssText = "position:absolute;top:5000px;left:0;width:60px;height:60px";
+    try {
+      await aTimeout(200);
+      expect(el.getAnimations(), "an element below the fold must wait").to.have.length(0);
+    } finally {
+      stopElementAnimation(el);
+      el.remove();
+    }
+  });
+
   it("does not re-bind a trigger listener when other attributes change", async () => {
     const el = makeEl({ [ATTR]: FADE, "data-fluid-animation-trigger": "click" });
     try {
@@ -397,6 +415,27 @@ describe("controller: triggers", () => {
         await aTimeout(0);
         el.dispatchEvent(event);
         expect(el.getAnimations(), `${trigger} played an unregistered animation`).to.have.length(0);
+      } finally {
+        stopElementAnimation(el);
+        el.remove();
+      }
+    }
+  });
+
+  it("a hover or click trigger goes quiet once the animation name is removed", async () => {
+    // The listener is bound once and never detached, so it has to cope with the
+    // element losing its animation name entirely.
+    for (const [trigger, event] of [
+      ["hover", new PointerEvent("pointerenter")],
+      ["click", new MouseEvent("click")]
+    ] as const) {
+      const el = makeEl({ [ATTR]: SPIN, "data-fluid-animation-trigger": trigger });
+      try {
+        await aTimeout(0); // bind the listener while the name is still there
+        el.removeAttribute(ATTR);
+        await aTimeout(0);
+        el.dispatchEvent(event);
+        expect(el.getAnimations(), `${trigger} played a nameless element`).to.have.length(0);
       } finally {
         stopElementAnimation(el);
         el.remove();
@@ -467,6 +506,26 @@ describe("controller: option parsing", () => {
     }
   });
 
+  it("releases an animation that runs to completion", async () => {
+    const el = makeEl({
+      [ATTR]: FADE,
+      "data-fluid-animation-trigger": "manual",
+      "data-fluid-animation-duration": "30"
+    });
+    try {
+      const animation = playElementAnimation(el)!;
+      await animation.finished;
+      await aTimeout(0); // let the controller drop its bookkeeping entry
+      expect(animation.playState).to.equal("finished");
+      // Having let go, a later stop must not reach back and cancel a run that
+      // already landed on its final frame.
+      stopElementAnimation(el);
+      expect(animation.playState, "a finished run must stay finished").to.equal("finished");
+    } finally {
+      el.remove();
+    }
+  });
+
   it("restarting cancels the in-flight run and tracks only the newest", async () => {
     const el = makeEl({ [ATTR]: SPIN, "data-fluid-animation-trigger": "manual" });
     try {
@@ -476,7 +535,7 @@ describe("controller: option parsing", () => {
       expect(second.playState).to.not.equal("idle");
       // Let the canceled run's rejected `finished` settle; it must not evict the
       // live animation from the controller's bookkeeping.
-      await aTimeout(0);
+      await aTimeout(120);
       stopElementAnimation(el);
       expect(second.playState, "the live run is still the tracked one").to.equal("idle");
     } finally {

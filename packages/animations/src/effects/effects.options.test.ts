@@ -247,6 +247,23 @@ describe("effects: origins", () => {
     }
   });
 
+  it("spreads an uneven particle count across every source", async () => {
+    // 10 particles over 4 corners: the remainder has to be handed out rather
+    // than rounded away, or a burst quietly loses particles.
+    const handle = confetti({
+      sources: EFFECT_ORIGIN_PRESETS["all-corners"],
+      count: 10,
+      velocity: 0,
+      gravity: 0
+    });
+    try {
+      expect(activeEmitterCount()).to.equal(4);
+      expect(activeParticleCount(), "no particle may be lost to rounding").to.equal(10);
+    } finally {
+      await settle(handle);
+    }
+  });
+
   it("keeps the six pride stripes when an explicit origin is given", async () => {
     const handle = pride({ origin: { rx: 0.5, ry: 0.5 }, count: 24 });
     try {
@@ -384,6 +401,24 @@ describe("effects: fog", () => {
       await waitUntil(
         () => overlayBackground().includes("color-mix("),
         "an opaque palette was not mixed down",
+        { timeout: 2000 }
+      );
+    } finally {
+      await settle(handle);
+    }
+  });
+
+  it("fills in the missing bank tones from a single-color palette", async () => {
+    // One opaque `rgb()` entry: the fog derives its own alpha from it and
+    // supplies its default secondary and highlight tones for the other layers.
+    const handle = fog({ colors: ["rgb(226, 232, 240)"], duration: 1500 });
+    try {
+      await waitUntil(
+        () => {
+          const background = overlayBackground();
+          return background.includes("rgba(226, 232, 240") && background.includes("color-mix(");
+        },
+        "a single-color palette did not fill out the fog",
         { timeout: 2000 }
       );
     } finally {
