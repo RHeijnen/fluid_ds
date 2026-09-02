@@ -1,9 +1,3 @@
-/*
- * Landing-only styles. Everything `<fluid-*>` related comes from the
- * tokens + components packages; this file is just the page chrome:
- * nav bar, hero spacing, footer, and the styling-comparison strip.
- */
-
 * {
   box-sizing: border-box;
 }
@@ -24,9 +18,6 @@ body {
 a {
   color: var(--fluid-accent-base);
 }
-
-/* ------------------------------------------------------------------ */
-/* Top bar */
 
 header.site-nav {
   position: sticky;
@@ -136,18 +127,12 @@ nav.primary a:focus-visible,
   outline-offset: var(--fluid-focus-ring-offset, 2px);
 }
 
-/* ------------------------------------------------------------------ */
-/* Hero */
-
-/* Two columns: the claim and its numbers on the left, the components that back
-   them up on the right. Collapses to one column (copy first) under 60rem. */
 .hero {
   max-width: 76rem;
   margin: 3.5rem auto 5rem;
   padding: 0 1.25rem;
   display: grid;
-  /* The right track is exactly the stage width so the absolutely placed
-     collage is never squeezed. The copy takes whatever is left. */
+
   grid-template-columns: minmax(0, 1fr) 30rem;
   gap: 3rem;
   align-items: center;
@@ -159,8 +144,6 @@ nav.primary a:focus-visible,
   margin: 1.25rem 0 1rem;
 }
 .hero h1 .accent {
-  /* Ends at cyan-700, not cyan-400: every stop keeps >= 3:1 on white, the
-     large-text AA floor, so no part of the wordmark washes out. */
   background: linear-gradient(135deg, var(--fluid-accent-base, #2563eb), #0e7490);
   -webkit-background-clip: text;
   background-clip: text;
@@ -186,8 +169,7 @@ nav.primary a:focus-visible,
 .hero-name {
   font-size: clamp(2.75rem, 6vw, 4.25rem);
   line-height: 1;
-  /* The gradient clips to the glyphs; a hair of bottom padding keeps
-     descender-free capitals from shaving the "d". */
+
   padding-block-end: 0.05em;
 }
 .hero-tagline {
@@ -207,11 +189,12 @@ nav.primary a:focus-visible,
   gap: 0.75rem;
 }
 
-/* One-liner install command with a real copy button, width hugs content. */
 .hero-install {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  max-inline-size: 100%;
+  box-sizing: border-box;
   margin-block-start: 1.25rem;
   padding: 0.45rem 0.5rem 0.45rem 0.9rem;
   border: 1px solid var(--fluid-border-default);
@@ -219,17 +202,18 @@ nav.primary a:focus-visible,
   background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
 }
 .hero-install code {
+  min-inline-size: 0;
+  overflow: hidden;
   font-family: var(--fluid-font-family-mono);
   font-size: 0.85rem;
   color: var(--fluid-text-primary);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Hero stat trio: components and tests, straight from the verification
-   inventory. `dt` is the label so the value reads as its description. */
 .hero-stats {
   display: grid;
-  /* Three across when there is room, then 2, then 1. Matches `.stat-band`. */
+
   grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: 1.25rem;
   margin: 0 0 2rem;
@@ -242,8 +226,7 @@ nav.primary a:focus-visible,
   gap: 0.1rem;
   min-width: 0;
 }
-/* A short accent tick above each value gives the row hierarchy without
-   turning the stats into cards. */
+
 .hero-stat::before {
   content: "";
   inline-size: 1.5rem;
@@ -274,16 +257,6 @@ nav.primary a:focus-visible,
   color: var(--fluid-text-secondary);
 }
 
-/* ---------------------------------------------------------------- */
-/* Hero stage: a scattered collage of real components                 */
-
-/* Registered token types so the stage's theme cycling interpolates instead of
-   snapping. Registration is global but behavior-neutral: every one of these is
-   a semantic/primitive token that base.css and light/dark.css always declare,
-   so the registered initial value never wins. Component knobs (for example
-   --fluid-card-padding) must NOT be registered: they are undeclared by design,
-   and a registered initial value would replace every inline var() fallback
-   across the site. */
 @property --fluid-accent-base {
   syntax: "<color>";
   inherits: true;
@@ -314,7 +287,7 @@ nav.primary a:focus-visible,
   inherits: true;
   initial-value: #1e40af;
 }
-/* @property initial values must be computationally independent, so px, not rem. */
+
 @property --fluid-radius-sm {
   syntax: "<length>";
   inherits: true;
@@ -340,8 +313,7 @@ nav.primary a:focus-visible,
   inherits: true;
   initial-value: 8px;
 }
-/* Spacing steps the collage's buttons (and friends) read for their inner
-   padding: sm buttons use space-1 block / space-3 inline. */
+
 @property --fluid-space-1 {
   syntax: "<length>";
   inherits: true;
@@ -353,26 +325,16 @@ nav.primary a:focus-visible,
   initial-value: 12px;
 }
 
-/* The stage is a fixed 34rem x 33rem canvas and every piece is placed on it
-   absolutely, which is what gives the hand-scattered look. The hero grid
-   reserves exactly 34rem for this column so the canvas is never squeezed;
-   below the two-column breakpoint the stage releases every position and the
-   pieces fall into a plain wrapped row instead. */
 .hero-stage {
   position: relative;
   inline-size: 30rem;
-  /* Room for the roomiest padding step plus float slack. */
+
   block-size: 21rem;
-  /* A framed canvas, so the space around the pieces reads as an intentional
-     surface rather than a gap. The frame's fill, border and radius are themed
-     by the cycler too, so it restyles along with what sits inside it. */
+
   border: 1px solid var(--fluid-color-brand-200, var(--fluid-border-default));
   border-radius: var(--fluid-radius-xl, 1.5rem);
   background: var(--fluid-surface-subtle);
-  /* The cycler writes token overrides onto this element's inline style, so
-     only the collage re-themes. Colours and radii interpolate here; card
-     padding is discrete (an unregistered knob) and is tweened on the card
-     parts instead. */
+
   transition-property:
     --fluid-accent-base, --fluid-accent-hover, --fluid-accent-active, --fluid-color-brand-50,
     --fluid-color-brand-200, --fluid-color-brand-800, --fluid-radius-sm, --fluid-radius-md,
@@ -382,17 +344,12 @@ nav.primary a:focus-visible,
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* The colour wash the frosted cards sit over. Painted behind the pieces and
-   faded in only for the glass step, so entering and leaving glass stays smooth
-   (opacity interpolates where a gradient cannot). */
 .hero-stage::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  /* Vivid on purpose: the frost only reads as glass when there is saturated
-     colour behind it to blur. The panels stay light enough (55-60% white) that
-     dark text keeps its contrast over every stop. */
+
   background:
     radial-gradient(70% 70% at 16% 18%, #8b5cf6, transparent 60%),
     radial-gradient(70% 70% at 84% 24%, #06b6d4, transparent 58%),
@@ -406,16 +363,11 @@ nav.primary a:focus-visible,
 .hero-stage[data-fluid-brand="glass"]::before {
   opacity: 1;
 }
-/* The real Glass preset paints its wash straight onto the branded element,
-   which cannot crossfade (gradients do not interpolate). Keep the stage's own
-   surface and let the ::before wash above carry the fade instead; the frost
-   on the pieces still comes from the real theme's part selectors. */
+
 .hero-stage[data-fluid-brand="glass"] {
   background: var(--fluid-surface-subtle);
 }
 
-/* A small live-theming label in the corner. Decorative marketing, hidden on
-   narrow screens by the media query at the foot of this file. */
 .hero-stage-tag {
   position: absolute;
   z-index: 3;
@@ -442,17 +394,15 @@ nav.primary a:focus-visible,
   font-size: 0.85rem;
 }
 
-/* Each piece is placed individually, scattered rather than stacked. */
 .hero-stage .pin {
   position: absolute;
   z-index: 2;
   margin: 0;
-  /* Idle drift. Each piece has its own duration and a negative delay below,
-     so the two curves never line up. */
+
   animation: hero-pin-float calc(var(--hero-float-dur, 6s) * 1.6) ease-in-out
     var(--hero-float-delay, 0s) infinite;
 }
-/* Pause the drift under the cursor so clicks and focus have a still target. */
+
 .hero-stage .pin:hover {
   animation-play-state: paused;
 }
@@ -466,17 +416,12 @@ nav.primary a:focus-visible,
   }
 }
 
-/* Card padding is discrete at the token, so the visible padding is tweened on
-   the card's inner parts. Contained to the card: nothing else depends on its
-   size now, so this no longer reflows the collage the way the old flow layout
-   did. */
 .hero-stage fluid-card::part(header),
 .hero-stage fluid-card::part(body),
 .hero-stage fluid-card::part(footer) {
   transition: padding 1100ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* Frosted surfaces: translucent and blurred over the wash. blur(0) in the base
-   state so the blur interpolates in and out rather than snapping. */
+
 .hero-stage fluid-card::part(base),
 .hero-stage fluid-input::part(base) {
   backdrop-filter: blur(0);
@@ -485,9 +430,7 @@ nav.primary a:focus-visible,
     border-color 1100ms ease,
     backdrop-filter 1100ms ease;
 }
-/* The pieces' frost comes from the REAL Glass preset now (its part selectors
-   match under the stage's data-fluid-brand). Only the stage's own label chip
-   is landing chrome, so it carries its frost here. */
+
 .hero-stage[data-fluid-brand="glass"] .hero-stage-tag {
   background-color: rgb(255 255 255 / 60%);
   border-color: rgb(255 255 255 / 70%);
@@ -509,13 +452,11 @@ nav.primary a:focus-visible,
     animation: none;
   }
 }
-/* Cards on the stage float above the page rather than sitting in it. */
+
 .hero-stage fluid-card {
   --fluid-card-shadow: 0 12px 32px -12px rgb(0 0 0 / 22%);
 }
 
-/* Scattered placement inside the frame. Distinct float durations plus negative
-   delays start each piece mid-cycle at a different phase. */
 .pin-search {
   display: flex;
   align-items: center;
@@ -537,9 +478,7 @@ nav.primary a:focus-visible,
   --hero-float-dur: 8.2s;
   --hero-float-delay: -0.7s;
 }
-/* The description item stacks term over detail by default. Its flex container
-   is the inner `base` part, not the host, so the row layout has to go through
-   ::part rather than a host rule. */
+
 .pin-profile fluid-description-item::part(base) {
   flex-direction: row;
   align-items: baseline;
@@ -547,7 +486,6 @@ nav.primary a:focus-visible,
   gap: 1rem;
 }
 
-/* Small pieces of composition inside the collage cards. */
 .profile-head {
   display: flex;
   align-items: center;
@@ -570,8 +508,6 @@ nav.primary a:focus-visible,
   gap: 0.5rem;
   margin-block-start: 0.85rem;
 }
-/* ------------------------------------------------------------------ */
-/* Demo portal: a framed application built from live components        */
 
 .portal-section {
   max-width: 72rem;
@@ -582,19 +518,12 @@ nav.primary a:focus-visible,
   overflow: hidden;
   box-shadow: 0 24px 48px -24px rgb(0 0 0 / 25%);
   background: var(--fluid-surface-base);
-  /* Re-anchor the base text colour at this scope. The page sets `color:
-     var(--fluid-text-primary)` higher up, where the token is substituted to the
-     light value and then inherited into here as a fixed computed colour, so a
-     dark toggle on this frame would leave inherited text (like the untinted
-     .portal-title) black-on-black. Re-declaring it re-substitutes the token
-     where the dark value is in effect. */
+
   color: var(--fluid-text-primary);
-  /* Re-anchor the font too, so a brand that swaps the sans family (Titanium)
-     reaches the demo's hand-rolled chrome text, not only the Fluid components
-     that set their own font-family. */
+
   font-family: var(--fluid-font-family-sans);
 }
-/* Browser-window chrome: three dots, purely decorative. */
+
 .portal-chrome {
   display: flex;
   gap: 0.4rem;
@@ -612,12 +541,8 @@ nav.primary a:focus-visible,
 .portal {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  /* Canvas-gray content so the white cards float, PrimeNG style. */
   background: var(--fluid-surface-subtle, var(--fluid-surface-muted));
 }
-/* Compact icon-only rail, PrimeNG style: a floating card detached from the
-   frame edges, nav icons on top, settings + user at the bottom. Labels live
-   in tooltips + aria-labels. */
 .portal-side {
   display: flex;
   flex-direction: column;
@@ -629,7 +554,7 @@ nav.primary a:focus-visible,
   border-radius: 0.9rem;
   background: var(--fluid-surface-base);
 }
-/* Squared-off icon buttons like the reference; the filled one is current. */
+
 .portal-rail fluid-button,
 .portal-rail-foot fluid-button {
   --fluid-button-radius: 0.65rem;
@@ -662,8 +587,6 @@ nav.primary a:focus-visible,
   flex-direction: column;
   min-inline-size: 0;
 }
-/* PrimeNG-style menubar inside the app-bar's nav region: plain links for
-   leaf destinations, fluid-dropdowns for sections with submenus. */
 .portal-menubar {
   display: flex;
   align-items: center;
@@ -684,11 +607,7 @@ nav.primary a:focus-visible,
   color: var(--fluid-accent-base);
   font-weight: 600;
 }
-/* The two dropdown triggers are fluid-buttons, not plain <a> links, so they
-   carried the button's own smaller type and taller box. Match them to the
-   anchor items: same font size, weight, colour and padding, so the whole
-   menubar reads as one row of equal nav items. The ghost variant keeps its own
-   transparent fill and hover. */
+
 .portal-menubar fluid-button::part(base) {
   font-size: 0.9rem;
   font-weight: 400;
@@ -708,7 +627,7 @@ nav.primary a:focus-visible,
   gap: 1.25rem;
   padding: 1.25rem;
 }
-/* KPI cards: small label + icon chip, large value, change badge. */
+
 .kpi-top {
   display: flex;
   align-items: center;
@@ -724,9 +643,7 @@ nav.primary a:focus-visible,
   inline-size: 2.1rem;
   block-size: 2.1rem;
   border-radius: 0.65rem;
-  /* A translucent accent wash, not the fixed near-white brand-50: it reads as a
-     soft tint over a light card and a subtle dark tint in dark mode, and tracks
-     whatever brand accent is active instead of pinning to blue. */
+
   background: color-mix(in srgb, var(--fluid-accent-base) 12%, transparent);
   color: var(--fluid-accent-base);
 }
@@ -742,7 +659,7 @@ nav.primary a:focus-visible,
   display: flex;
   justify-content: flex-end;
 }
-/* Controls row: range picker left, download + dates right. */
+
 .portal-controls {
   display: flex;
   flex-wrap: wrap;
@@ -755,7 +672,7 @@ nav.primary a:focus-visible,
   align-items: center;
   gap: 0.6rem;
 }
-/* Donut breakdown list (replaces the chart's default legend). */
+
 .portal-mix {
   list-style: none;
   margin: 0.75rem 0 0;
@@ -781,41 +698,16 @@ nav.primary a:focus-visible,
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-/*
- * The demo's own chrome under the glass brand.
- *
- * The shipped glass brand frosts every Fluid component, but the portal is also
- * built from landing-local elements (the frame, the icon rail, the KPI chips,
- * the browser-chrome bar) that the brand cannot reach. Give them the same
- * treatment so the whole surface reads as one material. A real app applying
- * the glass brand to a container it owns would not need this: it exists only
- * because the demo mixes Fluid components with hand-rolled chrome.
- */
+
 .portal-frame[data-fluid-brand="glass"] .portal {
-  /* Transparent so the frame's colour wash shows through the main area. */
   background: transparent;
 }
-/*
- * The page header on glass.
- *
- * A bare title floating on the wash next to frosted cards reads as unfinished:
- * on glass the standard is a frosted "toolbar" strip for the header, the way
- * Windows Acrylic and macOS materials treat a window's title bar. Housing the
- * title (and its search) in a frosted panel makes the header part of the same
- * material as everything below it.
- */
-/* Layout only. The frost itself comes from the theme's .fluid-glass-panel
-   helper (added to these elements in markup), so glass lives in one place. */
+
 .portal-frame[data-fluid-brand="glass"] .portal-head {
   padding: 0.85rem 1.1rem;
   border-radius: var(--fluid-radius-lg);
 }
 
-/* The active rail item is a primary button (solid accent). A solid fill reads
-   as "stuck on" against the frosted rail, so under glass it becomes a frosted
-   highlight with an accent icon instead: still clearly the active item, but the
-   same material as everything around it. Uses the button's own tokens rather
-   than overriding its parts. */
 .portal-frame[data-fluid-brand="glass"] .portal-rail fluid-button[variant="primary"] {
   --fluid-button-bg: var(--glass-frost);
   --fluid-button-hover-bg: var(--glass-frost-strong);
@@ -825,8 +717,6 @@ nav.primary a:focus-visible,
   backdrop-filter: var(--glass-blur);
 }
 
-/* The demo theme switcher: a small toolbar above the portal frame. Each choice
-   flips data-fluid-brand on the frame, so only the demo re-themes. */
 .portal-theme-switch {
   display: flex;
   flex-wrap: wrap;
@@ -856,18 +746,14 @@ nav.primary a:focus-visible,
   border-radius: var(--fluid-radius-sm);
   background: var(--fluid-surface-muted);
 }
-/* The light/dark toggle sits at the far end of the same toolbar. margin auto
-   pushes it right of the brand switcher; it drops below on narrow widths where
-   the row wraps. */
+
 .portal-appearance {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-inline-start: auto;
 }
-/* The Measurements switch sits after Appearance. Flex + center so the switch
-   and its text label line up on one baseline (a plain <label> would leave the
-   text riding high against the switch). */
+
 .portal-measure {
   display: inline-flex;
   align-items: center;
@@ -875,13 +761,6 @@ nav.primary a:focus-visible,
   cursor: pointer;
 }
 
-/*
- * Live token measurements overlay (PrimeNG-designer style).
- *
- * The stage is the positioning context for the frame; the overlay is a sibling
- * of the frame (not a child), so the frame's `overflow: hidden` does not clip
- * the pills that overhang its edges. The overlay never eats pointer events.
- */
 .portal-stage {
   position: relative;
 }
@@ -903,9 +782,7 @@ nav.primary a:focus-visible,
 .portal-stage.annotations-off .portal-annotations {
   display: none;
 }
-/* The SVG draws the geometry (radius circles, padding + font calipers) in the
-   stage's own pixel space; overflow visible so a circle or cap near an edge is
-   not clipped. */
+
 .portal-measure-svg {
   position: absolute;
   inset: 0;
@@ -934,9 +811,7 @@ nav.primary a:focus-visible,
   stroke: #d97706;
   stroke-width: 2;
 }
-/* Dashed leader from a value chip to the geometry it measures, plus the
-   anchor dot at the measured point. Thinner and softer than the geometry so
-   the marks stay the loudest ink. */
+
 .mm-lead {
   stroke-width: 1.25;
   stroke-dasharray: 4 4;
@@ -960,7 +835,7 @@ nav.primary a:focus-visible,
 .mm-dot.mm-surface {
   fill: #d97706;
 }
-/* Value labels float over the SVG, centred on the point they are handed. */
+
 .portal-measure-labels {
   position: absolute;
   inset: 0;
@@ -979,7 +854,7 @@ nav.primary a:focus-visible,
   border: 1px solid;
   box-shadow: 0 2px 10px rgb(15 23 42 / 16%);
 }
-/* Callout alignment: chips grow away from the frame edge they sit against. */
+
 .mm-label.mm-align-end {
   transform: translate(-100%, -50%);
 }
@@ -1012,13 +887,11 @@ nav.primary a:focus-visible,
   border-color: #fcd34d;
 }
 @media (max-width: 720px) {
-  /* The pills crowd a narrow portal; hide them there rather than overlap the UI. */
   .portal-annotations {
     display: none;
   }
 }
-/* The frame animates its re-theme so a switch reads as a smooth transition
-   rather than a hard cut. Paint-only tokens interpolate; nothing here reflows. */
+
 .portal-frame,
 .portal-frame fluid-card::part(base),
 .portal-frame fluid-input::part(base) {
@@ -1031,9 +904,7 @@ nav.primary a:focus-visible,
 .portal-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.15fr;
-  /* Two KPIs and the revenue line share the left two columns; the traffic
-     card spans both rows on the right, its donut reading as the top and its
-     breakdown list as the bottom. */
+
   grid-template-areas:
     "balance netflow traffic"
     "revenue revenue traffic";
@@ -1052,11 +923,7 @@ nav.primary a:focus-visible,
 .portal-donut-card {
   grid-area: traffic;
 }
-/* Fill the tall traffic card: let its body grow and pin the footer to the
-   bottom, so the card reads as full instead of floating with an empty base. */
-/* Fill the tall traffic card: the base spans the full card height and the body
-   grows inside it, so the footer (margin-top:auto) reaches the very bottom and
-   the card sits flush with the revenue card beside it. */
+
 .portal-donut-card::part(base) {
   block-size: 100%;
 }
@@ -1078,7 +945,7 @@ nav.primary a:focus-visible,
   font-size: 0.78rem;
   color: var(--fluid-text-secondary);
 }
-/* Page-title block + range tools above the stats. */
+
 .portal-head {
   display: flex;
   flex-wrap: wrap;
@@ -1124,7 +991,6 @@ nav.primary a:focus-visible,
   margin-block-end: 0.6rem;
 }
 
-/* Narrow: the sidebar folds away and the content grid stacks. */
 @media (max-width: 56rem) {
   .portal {
     grid-template-columns: minmax(0, 1fr);
@@ -1140,9 +1006,6 @@ nav.primary a:focus-visible,
       "traffic traffic";
   }
 }
-
-/* ------------------------------------------------------------------ */
-/* Section spacing */
 
 section.row {
   max-width: 64rem;
@@ -1163,17 +1026,11 @@ section.row > p.subhead {
   margin: 0 auto 2rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* Feature grid */
-
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 1rem;
 }
-
-/* ------------------------------------------------------------------ */
-/* Footer */
 
 footer.site-footer {
   border-top: 1px solid var(--fluid-border-default);
@@ -1187,38 +1044,31 @@ footer.site-footer a {
   text-decoration: underline;
 }
 
-/* ------------------------------------------------------------------ */
-/* Mobile tweaks */
-
 @media (max-width: 640px) {
   header.site-nav {
     flex-wrap: wrap;
     gap: 0.5rem;
+    max-inline-size: 100%;
+    box-sizing: border-box;
   }
   nav.primary {
     width: 100%;
-    /* Without this the flex item's `min-width: auto` floors it at its
-       min-content width, so `overflow-x` never engages and the whole
-       document scrolls sideways instead of just this row. */
     min-width: 0;
-    overflow-x: auto;
-    padding-block-end: 0.25rem;
+    max-inline-size: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
   }
   nav.primary a {
     flex: none;
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Hero extras: badges. The live theme switcher lives in the nav.     */
-
 .hero-badges {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-/* Nav theme switcher: brand select + dark toggle, separated from the
-   page links by a hairline so it reads as a control, not a destination. */
+
 .nav-theme {
   display: inline-flex;
   align-items: center;
@@ -1233,40 +1083,39 @@ footer.site-footer a {
   }
 }
 
-/* One column below 72rem: copy first, then the collage. The stage stops being
-   a fixed canvas; its two columns sit side by side in normal flow and wrap
-   under each other when even that is too wide. */
 @media (max-width: 72rem) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
     max-width: 44rem;
   }
+  .hero-showcase {
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 36rem) {
   .hero-stage {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: 2rem;
-    inline-size: auto;
+    gap: 1rem;
+    inline-size: 100%;
     block-size: auto;
-    /* Drop the framed-canvas chrome on narrow screens: the frame and its
-       caption are decorative, and the two pieces read fine on their own. */
-    border: 0;
-    background: none;
-    padding: 0;
-  }
-  .hero-stage::before,
-  .hero-stage-tag {
-    display: none;
+    box-sizing: border-box;
+    padding: 4rem 1rem 1rem;
   }
   .hero-stage .pin {
     position: static;
     inset: auto;
   }
+  .pin-profile,
+  .pin-search {
+    inline-size: 100%;
+  }
 }
-
-/* ------------------------------------------------------------------ */
-/* Stat band */
 
 .stat-band {
   display: grid;
@@ -1299,9 +1148,6 @@ footer.site-footer a {
   color: var(--fluid-text-secondary);
 }
 
-/* ------------------------------------------------------------------ */
-/* Feature cards */
-
 .feature-head {
   display: flex;
   align-items: center;
@@ -1312,9 +1158,6 @@ footer.site-footer a {
 .feature-head strong {
   color: var(--fluid-text-primary);
 }
-
-/* ------------------------------------------------------------------ */
-/* Component wall */
 
 .wall {
   display: grid;
@@ -1332,13 +1175,9 @@ footer.site-footer a {
   grid-column: 1 / -1;
 }
 
-/* ------------------------------------------------------------------ */
-/* Charts */
-
 .chart-grid {
   display: grid;
-  /* minmax(0, …) lets the columns shrink below the charts' intrinsic canvas
-     width, otherwise the doughnut card overflows the viewport around 1000px. */
+
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: 1.25rem;
 }
@@ -1352,12 +1191,6 @@ footer.site-footer a {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Motion / animation demo */
-
-/* A full-bleed band so the animation moment reads as its own section, not just
-   another centred row. Body has no padding, so a non-.row section spans the
-   viewport; the inner wrapper re-centres the content to the row width. */
 .motion-band {
   margin: 0 0 4.5rem;
   padding: 3.5rem 1.25rem 4rem;
@@ -1448,11 +1281,6 @@ footer.site-footer a {
   overflow-x: auto;
 }
 
-/* ------------------------------------------------------------------ */
-/* Standalone animations page (/animations.html) */
-
-/* Token-painted so the header's brand + dark toggle actually reskins the whole
-   page (the shared body rule stays token-free for the always-light main page). */
 .anim-page {
   background: var(--fluid-surface-base);
   color: var(--fluid-text-primary);
@@ -1653,11 +1481,7 @@ footer.site-footer a {
   font-weight: 600;
   color: var(--fluid-text-secondary);
 }
-/* The switch is shorter than the select and sliders. Keep its label on top like
-   every other control, then drop the toggle into a slot the same height as the
-   select so the toggle's center lines up with the dropdown beside it, instead of
-   floating up toward the labels. This does not depend on the grid row height, so
-   it holds at any viewport width. */
+
 .anim-control--switch .anim-switch-slot {
   display: flex;
   align-items: center;
@@ -1731,9 +1555,6 @@ footer.site-footer a {
   font-size: 0.9rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* "New in v0.4" showcase */
-
 .whatsnew-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -1748,8 +1569,7 @@ footer.site-footer a {
   color: var(--fluid-text-secondary);
   font-size: 0.95rem;
 }
-/* A consistent stage at the bottom of each card so the live demos and the
-   table mock all align to the same baseline regardless of content height. */
+
 .wn-stage {
   margin-top: 1.1rem;
   min-height: 12rem;
@@ -1788,7 +1608,7 @@ footer.site-footer a {
   color: var(--fluid-text-secondary);
   text-align: center;
 }
-/* Vertical stack used by the typeahead and fold demo stages. */
+
 .wn-stack {
   display: flex;
   flex-direction: column;
@@ -1796,7 +1616,7 @@ footer.site-footer a {
   width: 100%;
   max-width: 16rem;
 }
-/* Tags collected by the keep-open typeahead demo. */
+
 .wn-picks {
   display: flex;
   flex-wrap: wrap;
@@ -1808,7 +1628,7 @@ footer.site-footer a {
   font-size: 0.85rem;
   color: var(--fluid-text-secondary);
 }
-/* Mock column headers for the infinite-table column-management card. */
+
 .wn-columns {
   display: flex;
   gap: 3px;
@@ -1839,9 +1659,6 @@ footer.site-footer a {
   opacity: 0.55;
 }
 
-/* ------------------------------------------------------------------ */
-/* Expansion packs + surface/framework cards */
-
 .pack-name {
   font-family: var(--fluid-font-family-mono);
   font-size: 0.9rem;
@@ -1866,13 +1683,6 @@ footer.site-footer a {
   gap: 0.35rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* CTA + footer */
-
-/* The closing band: fluid-hero over the silk-wave artwork, rounded like the
-   page's cards. The scrim fades from a strong surface tint behind the text
-   to nothing at the bottom, so the waves stay vivid below the copy (and it
-   rides surface-base, so dark mode inverts it automatically). */
 .cta-hero {
   border-radius: var(--fluid-radius-lg, 16px);
   overflow: hidden;
@@ -1883,14 +1693,11 @@ footer.site-footer a {
     color-mix(in srgb, var(--fluid-surface-base) 5%, transparent) 100%
   );
 }
-/* The media stretches to the hero's inner base, so the extra height for the
-   wave area goes on the exposed part, not the host. */
+
 .cta-hero::part(base) {
   min-height: 38rem;
 }
-/* Window onto the photo matching the reference: haze behind the text, the
-   cyan and violet waves below it. The hero sizes its slotted wrapper, not
-   the img inside it, so the cover behavior is pinned here. */
+
 .cta-hero [slot="media"] {
   height: 100%;
 }
@@ -1900,7 +1707,7 @@ footer.site-footer a {
   object-fit: cover;
   object-position: 50% 30%;
 }
-/* .hero-actions is left-aligned for the hero; the closing band centers it. */
+
 .cta-row .hero-actions {
   justify-content: center;
 }
@@ -1912,12 +1719,6 @@ footer.site-footer a {
   margin-bottom: 0.75rem;
 }
 
-/* ------------------------------------------------------------------ */
-/* "Neon" brand for the live switcher (the presets ship the others).   */
-/* Retunes the accent track + the whole canvas, on purpose loud.       */
-
-/* `html[...]` (0,1,1) beats the tokens' `:root` (0,1,0) regardless of load
-   order, since styles.css is linked before the JS-injected token sheets. */
 html[data-fluid-brand="neon"] {
   --fluid-accent-base: #ff00e5;
   --fluid-accent-hover: #ff57ee;

@@ -1,11 +1,3 @@
-/**
- * Standalone marketing + demo page for @fluid-ds/animations, served at
- * /animations.html. Shareable on its own: it showcases the whole animation
- * system (attribute-driven keyframes, the imperative effects engine, and the
- * declarative <fluid-celebrate> element) without depending on the rest of the
- * landing page. It registers only the handful of components it uses, to keep
- * the "lean, standalone" story honest.
- */
 import "@fluid-ds/tokens/base.css";
 import "@fluid-ds/tokens/light.css";
 import "@fluid-ds/tokens/dark.css";
@@ -13,8 +5,6 @@ import "@fluid-ds/icons/register-defaults";
 import "@fluid-ds/icons/lucide/github";
 import "@fluid-ds/icons/lucide/sparkles";
 import "@fluid-ds/icons/lucide/sun-moon";
-// Brand presets, so the page (and the effect colors, which read the live brand
-// ramp) can be reskinned from the header, the same way a consuming app would.
 import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
@@ -45,13 +35,10 @@ import {
   type Origin
 } from "@fluid-ds/animations/effects";
 import "./styles.css";
-
 const VISIBLE_EFFECTS: readonly EffectCatalogEntry[] = EFFECT_CATALOG.filter(
   (effect: EffectCatalogEntry) => !effect.hidden
 );
-
 const GH = "https://github.com/RHeijnen/fluid_ds";
-
 const LOGO = `
   <svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true">
     <defs>
@@ -69,15 +56,12 @@ const LOGO = `
       </g>
     </g>
   </svg>`;
-
 const ANIMS = listAnimations();
-
 const EFFECT_DEMO_OPTIONS: Partial<Record<EffectName, Record<string, unknown>>> = {
   emojiBurst: { emojis: ["🥳", "🎈", "🎁", "🍾"] },
   emojiRain: { emojis: ["🎉", "⭐", "✨", "💧"] },
   emojiFountain: { emojis: ["🎉", "✨", "⭐", "🎈"] }
 };
-
 document.body.innerHTML = `
   <header class="site-nav">
     <a class="brand" href="/">${LOGO}<span>Fluid</span></a>
@@ -114,10 +98,7 @@ document.body.innerHTML = `
     <h2>Effects engine</h2>
     <p class="subhead">Canvas effects with zero third-party dependencies, tuned live. Pick an effect to reveal the settings it actually supports; ambient effects stop spawning after their duration and fizzle out naturally.</p>
     <div class="anim-effects" role="list" aria-label="Effects">
-      ${VISIBLE_EFFECTS.map(
-        (effect, index) =>
-          `<button class="anim-tile" role="listitem" data-effect="${effect.name}" aria-pressed="${index === 0 ? "true" : "false"}"><span class="anim-tile-emoji" aria-hidden="true">${effect.emoji}</span><span class="anim-tile-label">${effect.label}</span><span class="anim-tile-kind">${effect.kind}</span></button>`
-      ).join("")}
+      ${VISIBLE_EFFECTS.map((effect, index) => `<button class="anim-tile" role="listitem" data-effect="${effect.name}" aria-pressed="${index === 0 ? "true" : "false"}"><span class="anim-tile-emoji" aria-hidden="true">${effect.emoji}</span><span class="anim-tile-label">${effect.label}</span><span class="anim-tile-kind">${effect.kind}</span></button>`).join("")}
     </div>
     <div class="anim-controls" role="group" aria-label="Effect settings">
       <div class="anim-control-heading">
@@ -160,7 +141,7 @@ document.body.innerHTML = `
     </div>
     <pre class="motion-code"><code id="effect-code">import { confetti } from "@fluid-ds/animations/effects";
 
-confetti(); // colorful paper burst
+confetti();
 confetti({ count: 200, velocity: 1200, gravity: 700, size: 8, origin: el });</code></pre>
     <div class="anim-origin-demo">
       <span>Origin can be any element, so a button can throw its own little burst:</span>
@@ -236,53 +217,52 @@ import { confetti } from "@fluid-ds/animations/effects";</code></pre>
     <p class="anim-footer-fine">MIT licensed. Motion stands down under reduced-motion.</p>
   </footer>
 `;
-// Paint the page from tokens so the dark toggle actually reskins it.
 document.body.classList.add("anim-page");
-
-/* ---- Handlers ---- */
-/** Read a fluid-slider's numeric value. */
 function sliderVal(id: string, fallback: number): number {
-  const el = document.getElementById(id) as (HTMLElement & { value?: number | string }) | null;
+  const el = document.getElementById(id) as
+    | (HTMLElement & {
+        value?: number | string;
+      })
+    | null;
   const v = el ? Number(el.value) : NaN;
   return Number.isFinite(v) ? v : fallback;
 }
-/** Resolve the chosen origin: "click" uses the clicked tile, the rest are
- *  relative viewport points. */
 const MULTI_ORIGIN_PRESETS = new Set<EffectOriginPreset>([
   "top-corners",
   "bottom-corners",
   "all-corners"
 ]);
-
 function chosenOriginPreset(): EffectOriginPreset | undefined {
-  const sel = document.getElementById("ctl-origin") as (HTMLElement & { value?: string }) | null;
+  const sel = document.getElementById("ctl-origin") as
+    | (HTMLElement & {
+        value?: string;
+      })
+    | null;
   const value = sel?.value;
   if (!value || value === "click" || !(value in EFFECT_ORIGIN_PRESETS)) return undefined;
   return value as EffectOriginPreset;
 }
-
 function chosenOrigin(clicked: Element): Origin {
   const preset = chosenOriginPreset();
   return preset ? (EFFECT_ORIGIN_PRESETS[preset][0]?.origin ?? clicked) : clicked;
 }
-/** The opt-in palette: brand ramp when the "Brand colors" switch is on, else
- *  undefined so the effect uses its purpose-tuned default. */
 function effectColors(): readonly string[] | undefined {
-  const sw = document.getElementById("ctl-brand") as (HTMLElement & { checked?: boolean }) | null;
+  const sw = document.getElementById("ctl-brand") as
+    | (HTMLElement & {
+        checked?: boolean;
+      })
+    | null;
   return sw?.checked ? brandColors() : undefined;
 }
-
-/** Opt into page-anchored coordinates. Omitted means the backwards-compatible
- * viewport default. */
 function effectSpace(): "document" | undefined {
   const sw = document.getElementById("ctl-document-space") as
-    | (HTMLElement & { checked?: boolean })
+    | (HTMLElement & {
+        checked?: boolean;
+      })
     | null;
   return sw?.checked ? "document" : undefined;
 }
-
 let selectedEffect: EffectCatalogEntry = VISIBLE_EFFECTS[0]!;
-
 function updateEffectCode(): void {
   const code = document.getElementById("effect-code");
   if (!code) return;
@@ -306,13 +286,11 @@ function updateEffectCode(): void {
   const imports: string[] = [selectedEffect.name];
   if (branded) imports.push("brandColors");
   if (selectedEffect.multiOrigin && chosenOriginPreset()) imports.push("EFFECT_ORIGIN_PRESETS");
-  const description = `${selectedEffect.description.charAt(0).toLowerCase()}${selectedEffect.description.slice(1)}`;
   code.textContent = `import { ${imports.join(", ")} } from "@fluid-ds/animations/effects";
 
-${selectedEffect.name}(); // ${description}
+${selectedEffect.name}();
 ${selectedEffect.name}({ ${options.join(", ")} });`;
 }
-
 function renderEffectControls(effect: EffectCatalogEntry): void {
   selectedEffect = effect;
   document.querySelectorAll<HTMLElement>("[data-effect]").forEach((tile) => {
@@ -327,7 +305,9 @@ function renderEffectControls(effect: EffectCatalogEntry): void {
   const originControl = document.getElementById("origin-control");
   if (originControl) originControl.hidden = !effect.origin;
   const originSelect = document.getElementById("ctl-origin") as
-    | (HTMLElement & { value?: string })
+    | (HTMLElement & {
+        value?: string;
+      })
     | null;
   document.querySelectorAll<HTMLElement>("[data-multi-origin]").forEach((option) => {
     option.hidden = !effect.multiOrigin;
@@ -338,7 +318,6 @@ function renderEffectControls(effect: EffectCatalogEntry): void {
   const fire = document.getElementById("effect-fire");
   if (fire)
     fire.innerHTML = `<fluid-icon slot="prefix" name="sparkles"></fluid-icon>Play ${effect.label}`;
-
   const fields = document.getElementById("effect-control-fields");
   if (!fields) return;
   fields.innerHTML = effect.controls
@@ -359,7 +338,6 @@ function renderEffectControls(effect: EffectCatalogEntry): void {
   }
   updateEffectCode();
 }
-
 function playEffect(effect: EffectCatalogEntry, originElement: Element): void {
   const options: Record<string, unknown> = { ...EFFECT_DEMO_OPTIONS[effect.name as EffectName] };
   for (const setting of effect.controls) {
@@ -376,7 +354,6 @@ function playEffect(effect: EffectCatalogEntry, originElement: Element): void {
   if (space) options["space"] = space;
   EFFECTS[effect.name as EffectName](options);
 }
-
 document.querySelectorAll<HTMLElement>("[data-effect]").forEach((tile) => {
   tile.addEventListener("click", () => {
     const effect = VISIBLE_EFFECTS.find((item) => item.name === tile.dataset.effect);
@@ -393,13 +370,7 @@ document.getElementById("ctl-origin")?.addEventListener("fluid-change", updateEf
 document.getElementById("ctl-brand")?.addEventListener("fluid-change", updateEffectCode);
 document.getElementById("ctl-document-space")?.addEventListener("fluid-change", updateEffectCode);
 renderEffectControls(selectedEffect);
-
-// A document-wide ambient welcome on first load. It remains decorative,
-// honors reduced motion, and winds itself down automatically.
-EFFECTS.butterflies({ space: "document", rate: 5.25, size: 13, duration: 6_000 });
-
-// Attribute-driven preview: show every registered preset with its real default
-// timing. A replay button keeps one-shot entrance animations easy to inspect.
+EFFECTS.butterflies({ space: "document", rate: 5.25, size: 13, duration: 6000 });
 const animPreview = document.getElementById("anim-preview");
 let previewAnim: Animation | undefined;
 let selectedAnimationName = ANIMS[0] ?? "fade-in";
@@ -422,29 +393,21 @@ function selectPreviewAnimation(name: string, chip: Element): void {
 document.querySelectorAll<HTMLElement>("[data-anim]").forEach((chip) => {
   chip.addEventListener("click", () => selectPreviewAnimation(chip.dataset.anim ?? "", chip));
 });
-// Start with the first chip so the card is already alive on load.
 const firstChip = document.querySelector<HTMLElement>(".anim-chip");
 if (firstChip) selectPreviewAnimation(firstChip.dataset.anim ?? "fade-in", firstChip);
 document.getElementById("anim-replay")?.addEventListener("click", () => {
   const chip = document.querySelector<HTMLElement>(`[data-anim="${selectedAnimationName}"]`);
   if (chip) selectPreviewAnimation(selectedAnimationName, chip);
 });
-
-// Origin can be a real element: this button throws a small burst from itself.
 document.getElementById("confetti-btn")?.addEventListener("click", (e) => {
   confetti({ origin: e.currentTarget as Element, count: 45, velocity: 650, size: 6, spread: 55 });
 });
-
 document
   .getElementById("hero-celebrate")
   ?.addEventListener("click", () => confetti({ sources: EFFECT_ORIGIN_PRESETS["bottom-corners"] }));
 document.getElementById("celebrate-fire")?.addEventListener("click", () => {
   (document.getElementById("celebrate-demo") as FluidCelebrate | null)?.fire();
 });
-
-// Header theme controls. Reskinning the document (brand + light/dark on <html>)
-// also reskins the effects, since each burst reads the live brand ramp at draw
-// time. These are exactly the attributes a consuming app sets.
 document.getElementById("brand-picker")?.addEventListener("fluid-change", (e) => {
   const value = String((e as CustomEvent).detail?.value ?? "default");
   if (value === "default") document.documentElement.removeAttribute("data-fluid-brand");

@@ -1,25 +1,9 @@
-/**
- * Landing page for Fluid, mounted at the root of the unified website (`/`).
- *
- * The page is intentionally framework-free and component-heavy: it dogfoods
- * the library by building the marketing page out of `fluid-*` elements, and a
- * live theme switcher in the hero re-themes the WHOLE page by flipping
- * `data-fluid-brand` / `data-fluid-theme` on <html>. Charts, the comparison
- * viewer, inputs, every control below recolor together, which is the entire
- * pitch in one interaction.
- */
 import "./register-fluid.js";
-/* Installable brand presets from @fluid-ds/themes, used by the demo portal's
-   theme switcher. Each is a self-contained CSS file applied via
-   data-fluid-brand, so what the demo shows is exactly what a consumer installs. */
 import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/glass.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
 import "@fluid-ds/themes/orchid.css";
-/* The standalone animation system: boot the attribute controller + its default
-   keyframes, and pull in the imperative effects for the motion demo. Nothing
-   here depends on any fluid-* component; it drives plain elements too. */
 import "@fluid-ds/animations/define/controller";
 import "@fluid-ds/animations/register-defaults";
 import { playElementAnimation } from "@fluid-ds/animations";
@@ -34,9 +18,7 @@ import {
   butterflies
 } from "@fluid-ds/animations/effects";
 import { gradientArtwork } from "./artwork.js";
-
 const GH = "https://github.com/RHeijnen/fluid_ds";
-
 const LOGO = `
   <svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true">
     <defs>
@@ -54,7 +36,6 @@ const LOGO = `
       </g>
     </g>
   </svg>`;
-
 const features = [
   [
     "blocks",
@@ -77,20 +58,11 @@ const features = [
     "The core stays lean. Charts, data grids, calendars, a scheduler, a rich-text editor, Markdown, kanban, maps, a node-graph editor, QR codes, a file parser, media players, and animations ship as separate packages you add only when you need them."
   ]
 ];
-
-/**
- * Hero figures. Every number here is sourced from
- * `docs/verification-and-test-inventory-0.4.0.md`, which deliberately separates
- * unique assertions from repeated three-engine executions. Do not merge these
- * populations into one "tests" total, and do not restate them from memory:
- * re-read the inventory when a number changes.
- */
 const heroStats = [
   ["155", "custom elements", "103 families across 14 packages"],
   ["2,719", "browser assertions", "per engine, 8,157 across three engines"],
   ["96.5%", "statement coverage", "measured on browser-loaded source"]
 ];
-
 const stats = [
   ["124", "core elements"],
   ["13", "expansion packs"],
@@ -99,7 +71,6 @@ const stats = [
   ["AA", "WCAG 2.2 (AAA opt-in)"],
   ["1,545", "icons available"]
 ];
-
 const packs = [
   [
     "@fluid-ds/charts",
@@ -136,23 +107,20 @@ const packs = [
     "Attribute-driven keyframes plus 31 canvas effects, confetti to butterflies, all reduced-motion aware."
   ]
 ];
-
 const surfaces = [
   ["Docs", "Guides, per-component pages, live examples, framework tabs.", "/docs/"],
   ["Storybook", "Every variant, state, and a11y check, interactively.", "/storybook/"],
   ["Theme builder", "Edit tokens live, isolate one element, export the CSS.", "/playground/"],
   ["Bundle builder", "Pick the components you need and generate a custom bundle.", "/wizard/"]
 ];
-
 const frameworks = [
   ["Native HTML", "Buildless, via an import map.", "/demos/native/"],
   ["React", "React 19 + Vite.", "/demos/react/"],
   ["Next.js", "App Router, static host demo.", "/demos/next/"],
   ["Angular", "Angular 20 standalone.", "/demos/angular/"]
 ];
-
 document.body.innerHTML = `
-  <!-- ============================ NAV ============================ -->
+
   <header class="site-nav">
     <a class="brand" href="/">${LOGO}<span>Fluid</span></a>
     <nav class="primary" aria-label="Primary">
@@ -181,9 +149,9 @@ document.body.innerHTML = `
     </nav>
   </header>
 
-  <!-- ============================ HERO ============================ -->
+
   <section class="hero">
-    <!-- Left column: who we are, and the numbers behind it. -->
+
     <div class="hero-copy">
       <div class="hero-badges">
         <fluid-badge variant="info">153 stable components</fluid-badge>
@@ -237,20 +205,11 @@ document.body.innerHTML = `
       </div>
     </div>
 
-    <!-- Right column: a scattered collage of real Fluid components, each one
-         hand-placed on a fixed-size stage. Nothing is wrapped in a card it
-         did not bring itself. Below the two-column breakpoint the stage stops
-         positioning and the pieces fall into a plain wrapped row, so nothing
-         collides on narrow screens. -->
+
     <div class="hero-showcase">
-      <!-- Two flow columns on the stage. The theme cycler animates paddings
-           and fonts, so pieces change height; flow layout lets each column
-           reflow smoothly instead of colliding the way absolute pins did. The
-           scattered look comes from column offsets and per-item jitter. -->
+
       <div class="hero-stage" aria-label="A sample of Fluid components, restyled live">
-        <!-- The stage is a framed canvas: a caption plus two live pieces, all
-             re-themed by the token cycler in the script below. The caption is
-             decorative marketing, so it is hidden on narrow screens. -->
+
         <span class="hero-stage-tag" aria-hidden="true">
           <fluid-icon name="sparkles"></fluid-icon>
           Style it however you want
@@ -290,10 +249,8 @@ document.body.innerHTML = `
     </div>
   </section>
 
-  <!-- ====================== DEMO PORTAL ====================== -->
-  <!-- PrimeNG-style "website inside the website": a framed demo application
-       assembled entirely from live Fluid components. Nothing in here is a
-       screenshot; it is the same catalog the rest of the page uses. -->
+
+
   <section class="row portal-section" id="portal-demo">
     <h2>An app, assembled from the catalog</h2>
     <p class="subhead">
@@ -342,9 +299,7 @@ document.body.innerHTML = `
       <div class="portal-chrome fluid-glass-panel" aria-hidden="true">
         <span></span><span></span><span></span>
       </div>
-      <!-- The portal's top bar is a real fluid-app-bar: brand in the start
-           slot, a PrimeNG-style menubar (links + dropdown submenus) in the
-           default nav region, and search/actions in the end slot. -->
+
       <fluid-app-bar class="portal-bar">
         <span slot="start" class="portal-brand">${LOGO.replace('class="brand-mark"', 'class="portal-mark"')}<strong>Fluid Cloud</strong></span>
 
@@ -375,9 +330,7 @@ document.body.innerHTML = `
       </fluid-app-bar>
 
       <div class="portal">
-        <!-- Compact icon-only rail. Every control is a real button with an
-             accessible name plus a tooltip; the active destination is the
-             filled one. -->
+
         <aside class="portal-side fluid-glass-panel">
           <nav class="portal-rail" aria-label="Demo portal">
             <fluid-tooltip content="Dashboard" placement="right">
@@ -424,8 +377,7 @@ document.body.innerHTML = `
                 </fluid-button>
               </span>
             </div>
-            <!-- A compact mosaic: two KPIs and the revenue line share the left,
-                 the traffic-sources card spans the full height on the right. -->
+
             <div class="portal-grid">
               <fluid-card class="kpi kpi-balance">
                 <span class="kpi-top">Total balance <span class="kpi-chip fluid-glass-panel"><fluid-icon name="wallet"></fluid-icon></span></span>
@@ -444,16 +396,14 @@ document.body.innerHTML = `
               <fluid-card class="portal-donut-card">
                 <h3 class="card-h">Traffic sources</h3>
                 <fluid-doughnut-chart id="portal-donut" style="--fluid-chart-height:170px;"></fluid-doughnut-chart>
-                <!-- Same brand-ramp tokens the chart paints its slices with,
-                     so this list recolors with the donut on a brand switch. -->
+
                 <ul class="portal-mix">
                   <li><span class="mix-dot" style="background:var(--fluid-color-brand-600);"></span>Direct<span class="mix-val">42%</span></li>
                   <li><span class="mix-dot" style="background:var(--fluid-color-brand-500);"></span>Search<span class="mix-val">31%</span></li>
                   <li><span class="mix-dot" style="background:var(--fluid-color-brand-400);"></span>Referral<span class="mix-val">17%</span></li>
                   <li><span class="mix-dot" style="background:var(--fluid-color-brand-300);"></span>Social<span class="mix-val">10%</span></li>
                 </ul>
-                <!-- Footer pinned to the card's bottom so the tall traffic card
-                     reads as full rather than half-empty. Demo chrome. -->
+
                 <div class="portal-traffic-foot">
                   <span class="portal-traffic-note">Live &middot; refreshed just now</span>
                   <fluid-button size="sm" variant="ghost">
@@ -474,7 +424,7 @@ document.body.innerHTML = `
     </div>
   </section>
 
-  <!-- ====================== MOTION / ANIMATIONS ====================== -->
+
   <section class="motion-band" id="motion">
     <div class="motion-band-inner">
       <span class="motion-eyebrow">✨ @fluid-ds/animations</span>
@@ -515,14 +465,14 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== STATS ====================== -->
+
   <section class="row">
     <div class="stat-band">
       ${stats.map(([n, l]) => `<div class="stat"><span class="stat-num">${n}</span><span class="stat-label">${l}</span></div>`).join("")}
     </div>
   </section>
 
-  <!-- ====================== FEATURES ====================== -->
+
   <section class="row">
     <h2>Drop in, look right, ship</h2>
     <p class="subhead">Four things Fluid does that most component libraries do not.</p>
@@ -539,7 +489,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== COMPONENT WALL ====================== -->
+
   <section class="row">
     <h2>One design language, 124 core elements</h2>
     <p class="subhead">A taste of the library, every element sharing one set of tokens. Change the theme, or drop in a brand preset, and they all retheme at once.</p>
@@ -587,7 +537,7 @@ confetti();</code></pre>
     </p>
   </section>
 
-  <!-- ====================== CHARTS ====================== -->
+
   <section class="row">
     <h2>Dashboards, themed in one variable</h2>
     <p class="subhead">The <code>@fluid-ds/charts</code> pack reads the same tokens, so dashboards match your brand with no extra work. Try the theme switcher in the top bar: both charts repaint live.</p>
@@ -599,7 +549,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== THEMING CALLOUT ====================== -->
+
   <section class="row">
     <fluid-callout variant="info">
       <span slot="header">Theming is the whole point</span>
@@ -611,7 +561,7 @@ confetti();</code></pre>
     </fluid-callout>
   </section>
 
-  <!-- ====================== WHAT'S NEW (v0.4) ====================== -->
+
   <section class="row" id="whatsnew">
     <h2>New in <span class="accent">v0.4</span></h2>
     <p class="subhead">This release: a standalone animation system, ink-true signature capture, managed table columns, built-in field labels, a multi-pick typeahead, and a folding divider.</p>
@@ -682,7 +632,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== EXPANSION PACKS ====================== -->
+
   <section class="row">
     <h2>Lean core, opt-in power</h2>
     <p class="subhead">Thirteen expansion packs keep the base bundle small. Add only what you reach for.</p>
@@ -699,7 +649,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== SURFACES / TOOLING ====================== -->
+
   <section class="row">
     <h2>Four ways to work with it</h2>
     <p class="subhead">Documented, explorable, designable, and configurable, all from the same components.</p>
@@ -718,7 +668,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== FRAMEWORKS ====================== -->
+
   <section class="row">
     <h2>Don't take "agnostic" on faith</h2>
     <p class="subhead">The same admin portal, built four times: plain HTML, React, Next.js, and Angular. Open them side by side. The repository also maintains tested Vue, Astro, and SvelteKit consumers; the docs spell out exactly what each one verifies.</p>
@@ -737,7 +687,7 @@ confetti();</code></pre>
     </div>
   </section>
 
-  <!-- ====================== SETUP ====================== -->
+
   <section class="row">
     <h2>Five-line setup</h2>
     <p class="subhead">Paste into any HTML page. No bundler, no framework, no build step.</p>
@@ -751,8 +701,8 @@ confetti();</code></pre>
     <p class="subhead" style="margin-top:1rem;">Prefer npm? <code>npm i @fluid-ds/components@latest</code>. Full <a href="/docs/getting-started/installation/">installation guide</a>.</p>
   </section>
 
-  <!-- ====================== OPEN SOURCE CTA ====================== -->
-  <!-- Dogfoods fluid-hero: background media with the component's own scrim. -->
+
+
   <section class="row cta-row">
     <fluid-hero align="center" media-position="background" size="lg" class="cta-hero">
       <span slot="eyebrow">MIT licensed</span>
@@ -769,10 +719,10 @@ confetti();</code></pre>
     </fluid-hero>
   </section>
 
-  <!-- Guided tour overlay (steps set + opened from JS). -->
+
   <fluid-tour id="page-tour"></fluid-tour>
 
-  <!-- ============================ FOOTER ============================ -->
+
   <footer class="site-footer">
     <div class="footer-links">
       <a href="/docs/">Docs</a><a href="/storybook/">Storybook</a><a href="/playground/">Theme builder</a>
@@ -784,14 +734,6 @@ confetti();</code></pre>
       <a href="https://rheijnen.github.io" target="_blank" rel="noopener">René Heijnen</a>.</p>
   </footer>
 `;
-
-/* ---------------------------------------------------------------- */
-/* Live theme switcher in the nav: flip data-fluid-brand /           */
-/* data-fluid-theme on <html> and the whole page (charts included)   */
-/* re-themes. Same attributes a consuming app sets; the charts       */
-/* observe the document element and repaint themselves. A brand can  */
-/* change fonts and paddings, so the measurement overlay re-derives. */
-/* ---------------------------------------------------------------- */
 const html = document.documentElement;
 document.getElementById("site-brand")?.addEventListener("fluid-change", (e) => {
   const value = String((e as CustomEvent).detail?.value ?? "default");
@@ -803,22 +745,7 @@ document.getElementById("site-dark")?.addEventListener("click", () => {
   const dark = html.getAttribute("data-fluid-theme") === "dark";
   html.setAttribute("data-fluid-theme", dark ? "light" : "dark");
 });
-
-/* ---------------------------------------------------------------- */
-/* Chart data. The chart components read Fluid tokens themselves and  */
-/* re-theme on attribute changes, so we only feed them data here.     */
-/* ---------------------------------------------------------------- */
-/* ---------------------------------------------------------------- */
-/* Hero theme cycler. Every few seconds the collage stage flips       */
-/* data-fluid-brand to the next REAL installable preset, so what the  */
-/* visitor watches is exactly what `@fluid-ds/themes` ships: nothing  */
-/* is simulated with hand-tuned token maps. styles.css registers the  */
-/* shared tokens with @property and declares transitions on           */
-/* .hero-stage, so each brand hand-off tweens instead of snapping.    */
-/* ---------------------------------------------------------------- */
 const heroStage = document.querySelector<HTMLElement>(".hero-stage");
-/* "" is the clean default: removing the attribute returns the stage to the
-   page theme. The loop runs forever: default, glass, corporate, orchid. */
 const HERO_BRAND_STEPS = ["", "glass", "corporate", "orchid"] as const;
 const heroReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let heroThemeStep = 0;
@@ -831,8 +758,6 @@ if (heroStage) {
     { threshold: 0.15 }
   ).observe(heroStage);
   window.setInterval(() => {
-    /* Decorative motion: hold still for reduced-motion users, hidden tabs,
-       and whenever the collage is scrolled out of view. */
     if (heroReducedMotion.matches || document.hidden || !heroStageInView) return;
     heroThemeStep = (heroThemeStep + 1) % HERO_BRAND_STEPS.length;
     const brand = HERO_BRAND_STEPS[heroThemeStep] ?? "";
@@ -840,24 +765,35 @@ if (heroStage) {
     else heroStage.removeAttribute("data-fluid-brand");
   }, 3200);
 }
-
-const lc = document.getElementById("lc") as (HTMLElement & { data?: unknown }) | null;
+const lc = document.getElementById("lc") as
+  | (HTMLElement & {
+      data?: unknown;
+    })
+  | null;
 if (lc) {
   lc.data = {
     labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6"],
     datasets: [{ label: "Stars", data: [3, 9, 14, 22, 31, 44], tension: 0.4, fill: true }]
   };
 }
-const dc = document.getElementById("dc") as (HTMLElement & { data?: unknown }) | null;
+const dc = document.getElementById("dc") as
+  | (HTMLElement & {
+      data?: unknown;
+    })
+  | null;
 if (dc) {
   dc.data = {
     labels: ["Common", "Rare", "Epic", "Legendary"],
     datasets: [{ data: [58, 27, 12, 3] }]
   };
 }
-
-/* Demo-portal charts. The segmented control swaps the line chart's range. */
-const PORTAL_RANGES: Record<string, { labels: string[]; data: number[] }> = {
+const PORTAL_RANGES: Record<
+  string,
+  {
+    labels: string[];
+    data: number[];
+  }
+> = {
   weekly: {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     data: [14, 18, 16, 24, 22, 31, 28]
@@ -869,7 +805,9 @@ const PORTAL_RANGES: Record<string, { labels: string[]; data: number[] }> = {
   yearly: { labels: ["2022", "2023", "2024", "2025", "2026"], data: [220, 385, 540, 760, 918] }
 };
 const portalLine = document.getElementById("portal-line") as
-  | (HTMLElement & { data?: unknown })
+  | (HTMLElement & {
+      data?: unknown;
+    })
   | null;
 const feedPortalLine = (range: string) => {
   const r = PORTAL_RANGES[range] ?? PORTAL_RANGES.monthly;
@@ -878,8 +816,11 @@ const feedPortalLine = (range: string) => {
       labels: r.labels,
       datasets: [{ label: "Revenue", data: r.data, tension: 0.4, fill: true }]
     };
-    /* Single series: the legend chip adds nothing. */
-    (portalLine as HTMLElement & { options?: unknown }).options = {
+    (
+      portalLine as HTMLElement & {
+        options?: unknown;
+      }
+    ).options = {
       plugins: { legend: { display: false } }
     };
   }
@@ -888,35 +829,21 @@ feedPortalLine("monthly");
 document.getElementById("portal-range")?.addEventListener("fluid-change", (e) => {
   feedPortalLine(String((e as CustomEvent).detail?.value ?? "monthly"));
 });
-
-/*
- * Demo-portal theme switcher. Each choice is a real @fluid-ds/themes brand,
- * applied by flipping data-fluid-brand on the portal frame alone, so only the
- * demo re-themes and the choice is exactly what a consumer would install.
- */
-/* The canvas charts read their colours once, at draw time, and observe theme
-   attributes on the document element rather than on this subtree, so a brand or
-   scheme flip on the frame leaves them stale. Ask both to repaint. */
 function repaintPortalCharts(): void {
-  (portalLine as (HTMLElement & { refresh?: () => void }) | null)?.refresh?.();
+  (
+    portalLine as
+      | (HTMLElement & {
+          refresh?: () => void;
+        })
+      | null
+  )?.refresh?.();
   const donut = document.getElementById("portal-donut") as
-    | (HTMLElement & { refresh?: () => void })
+    | (HTMLElement & {
+        refresh?: () => void;
+      })
     | null;
   donut?.refresh?.();
 }
-
-/*
- * Live token measurements, in the style of PrimeNG's theme designer. An SVG
- * overlay draws the geometry directly on the live components: outline circles
- * that trace each corner's border-radius, red calipers spanning padding, and a
- * green caliper spanning the font size, each with a value label. Everything is
- * measured from the rendered elements (via getBoundingClientRect + computed
- * style), so it re-derives whenever the theme changes. Targets are picked to
- * show generic vs per-element control: the KPI card carries the card radius and
- * padding, while the Download button carries its own tighter inner padding,
- * measured separately. The accent resolves through a var() chain, so a hidden
- * probe inside the frame carries it as a real `color` we read back.
- */
 const SVG_NS = "http://www.w3.org/2000/svg";
 function svgEl(name: string, attrs: Record<string, string | number>): SVGElement {
   const node = document.createElementNS(SVG_NS, name);
@@ -931,8 +858,6 @@ function rgbToHex(rgb: string): string {
     .map((v) => Math.round(Number(v)).toString(16).padStart(2, "0"))
     .join("")}`;
 }
-/** Like rgbToHex, but keeps a translucent alpha visible ("#ffffff 62%"),
- *  which is exactly what distinguishes a frosted surface from an opaque one. */
 function formatSurfaceColor(css: string): string {
   const hex = rgbToHex(css);
   const parts = css.match(/[\d.]+/g);
@@ -967,7 +892,6 @@ function updatePortalAnnotations(): void {
   };
   const line = (x1: number, y1: number, x2: number, y2: number, cls: string) =>
     svg.appendChild(svgEl("line", { x1, y1, x2, y2, class: cls }));
-  // A caliper: the span line plus a short perpendicular cap at each end.
   const caliper = (x1: number, y1: number, x2: number, y2: number, cls: string) => {
     line(x1, y1, x2, y2, cls);
     const dx = x2 - x1;
@@ -978,14 +902,14 @@ function updatePortalAnnotations(): void {
     line(x1 - nx, y1 - ny, x1 + nx, y1 + ny, cls);
     line(x2 - nx, y2 - ny, x2 + nx, y2 + ny, cls);
   };
-  // A radius indicator: a quarter arc concentric with the rounded corner,
-  // floated ARC_OFF outside the edge so it annotates the shape without ever
-  // touching the control (an on-edge arc in a matching hue read as a broken
-  // corner). Full circles looked fine at 8px but became giant rings over the
-  // content under large-radius brands like Glass. `corner` is "tl" or "tr".
   const ARC_OFF = 3;
   const cornerArc = (
-    box: { x: number; y: number; x2: number; y2: number },
+    box: {
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+    },
     rad: number,
     corner: "tl" | "tr"
   ) => {
@@ -997,16 +921,7 @@ function updatePortalAnnotations(): void {
         : `M ${box.x2 - rad} ${box.y - ARC_OFF} A ${r} ${r} 0 0 1 ${box.x2 + ARC_OFF} ${box.y + rad}`;
     svg.appendChild(svgEl("path", { d, fill: "none", class: "mm-radius" }));
   };
-  /** Offset of the arc's 45-degree midpoint from the box corner, for anchors. */
   const arcAnchorInset = (rad: number): number => rad - (rad + ARC_OFF) * Math.SQRT1_2;
-  /*
-   * Chips are laid out AFTER all measurements are collected: every value pill
-   * sits in the clear margin beside the portal frame (falling back to just
-   * inside the frame edge when the viewport leaves no wing room), vertically
-   * collision-resolved, with a dashed leader line running to a small dot on
-   * the geometry it measures. Keeping the chips out of the dashboard is what
-   * keeps them legible: the UI underneath stays untouched.
-   */
   interface MeasureChip {
     text: string;
     cls: string;
@@ -1024,8 +939,6 @@ function updatePortalAnnotations(): void {
     anchorX: number,
     anchorY: number
   ) => chips.push({ text, cls, stroke, side, anchorX, anchorY });
-
-  // KPI card: corner-radius circles + a red caliper spanning the top padding.
   const cardBase = partOf(document.querySelector(".kpi-balance"), "base");
   const cardFirst = document.querySelector(".kpi-balance .kpi-top");
   if (cardBase) {
@@ -1033,21 +946,14 @@ function updatePortalAnnotations(): void {
     const rad = num(getComputedStyle(cardBase).borderTopLeftRadius);
     cornerArc(b, rad, "tl");
     cornerArc(b, rad, "tr");
-    // Visual top padding: the gap from the card border to its first content,
-    // which is what the eye reads as the inset (the card pads its `base`, so
-    // there is no inner part to diff).
     const padTop = cardFirst
       ? boxOf(cardFirst).y - b.y
       : num(getComputedStyle(cardBase).paddingTop);
     const cx = b.x + 18;
     caliper(cx, b.y, cx, b.y + padTop, "mm-padding");
-    // Anchor the radius chip on the arc's midpoint (45 degrees around the corner).
     const arcMid = arcAnchorInset(rad);
     chip(`radius: ${pxToRem(rad)}`, "mm-l-radius", "mm-radius", "left", b.x + arcMid, b.y + arcMid);
     chip(`padding: ${pxToRem(padTop)}`, "mm-l-padding", "mm-padding", "left", cx, b.y + padTop / 2);
-    // The card's surface fill: opaque in most brands, translucent frost under
-    // Glass, which the alpha in the value makes visible. Anchored on an empty
-    // patch of the card near its bottom-left corner.
     chip(
       `surface: ${formatSurfaceColor(getComputedStyle(cardBase).backgroundColor)}`,
       "mm-l-surface",
@@ -1057,9 +963,6 @@ function updatePortalAnnotations(): void {
       b.y2 - 16
     );
   }
-
-  // Download button: its own radius + inner padding (measured separately from
-  // the card), plus the resolved primary colour read off the probe.
   const btnHost = [...document.querySelectorAll<HTMLElement>(".portal-frame fluid-button")].find(
     (el) => /Download/i.test(el.textContent ?? "")
   );
@@ -1067,15 +970,9 @@ function updatePortalAnnotations(): void {
   if (btnBase) {
     const bb = boxOf(btnBase);
     const cs = getComputedStyle(btnBase);
-    // The label-side (right) padding is the representative inner padding: the
-    // icon side is deliberately a step tighter, so measuring it would mislead.
     const padR = num(cs.paddingRight);
     const yc = (bb.y + bb.y2) / 2;
     caliper(bb.x2 - padR, yc, bb.x2, yc, "mm-padding");
-    // The button's own corner radius, measured separately from the card's:
-    // the two values differing is the point (component tokens override the
-    // generic radius). Same arc treatment, on the corner away from the
-    // primary dot and the padding caliper.
     const btnRad = num(cs.borderTopLeftRadius);
     cornerArc(bb, btnRad, "tl");
     const btnArcMid = arcAnchorInset(btnRad);
@@ -1100,10 +997,6 @@ function updatePortalAnnotations(): void {
       yc
     );
   }
-
-  // Body text: green caliper spanning the font size at the text's right end,
-  // where there is open space. The header sub-line is normal body copy, so it
-  // reads the base font size rather than a display number.
   const text =
     document.querySelector<HTMLElement>(".portal-frame .portal-sub") ??
     document.querySelector<HTMLElement>(".portal-frame .kpi-top");
@@ -1115,14 +1008,9 @@ function updatePortalAnnotations(): void {
     caliper(x, y1, x, y1 + fs, "mm-font");
     chip(`fontSize: ${Math.round(fs)}px`, "mm-l-font", "mm-font", "right", x, y1 + fs / 2);
   }
-
-  // Lay the chips out beside the frame and connect each to its geometry.
   const frame = document.querySelector<HTMLElement>(".portal-frame");
   if (frame && chips.length) {
     const f = boxOf(frame);
-    // Wing room per side: the free viewport margin beside the stage. A chip
-    // is ~170px including its leader gap; with less room than that, tuck the
-    // side's chips just inside the frame edge instead of clipping offscreen.
     const stageRect = stage.getBoundingClientRect();
     const wingFor = (side: "left" | "right"): boolean =>
       (side === "left" ? stageRect.left : document.documentElement.clientWidth - stageRect.right) >=
@@ -1131,9 +1019,6 @@ function updatePortalAnnotations(): void {
     for (const side of ["left", "right"] as const) {
       const outside = wingFor(side);
       const group = chips.filter((c) => c.side === side).sort((a, b) => a.anchorY - b.anchorY);
-      // Tucked-inside right chips would land on the controls they measure
-      // (the Download button lives at that edge), so in that mode they stack
-      // in the empty top-right lane instead and let the leaders travel.
       const stackFromTop = !outside && side === "right";
       let prevY = stackFromTop ? f.y + 20 : -Infinity;
       for (const c of group) {
@@ -1156,7 +1041,6 @@ function updatePortalAnnotations(): void {
         d.style.top = `${y}px`;
         d.textContent = c.text;
         labels.appendChild(d);
-        // Dashed leader from the chip to a dot on the measured geometry.
         line(x, y, c.anchorX, c.anchorY, `mm-lead ${c.stroke}`);
         svg.appendChild(
           svgEl("circle", { cx: c.anchorX, cy: c.anchorY, r: 3, class: `mm-dot ${c.stroke}` })
@@ -1165,10 +1049,6 @@ function updatePortalAnnotations(): void {
     }
   }
 }
-/* The portal frame tweens its re-theme (colors, radii), so a measurement
-   taken at the instant of a brand or scheme flip reads mid-transition values
-   (e.g. the surface still opaque on the way to frosted). Measure immediately
-   for responsiveness, then once more after the transition has settled. */
 let annotationSettleTimer: ReturnType<typeof setTimeout> | undefined;
 function refreshPortalAnnotations(): void {
   updatePortalAnnotations();
@@ -1177,24 +1057,11 @@ function refreshPortalAnnotations(): void {
 }
 requestAnimationFrame(() => updatePortalAnnotations());
 window.addEventListener("resize", () => updatePortalAnnotations());
-
-/* The Measurements switch shows/hides the overlay (on by default); redraw on
-   enable so the marks match the current layout. */
 document.getElementById("portal-annotations")?.addEventListener("fluid-change", (e) => {
   const on = Boolean((e as CustomEvent).detail?.checked);
   document.querySelector(".portal-stage")?.classList.toggle("annotations-off", !on);
   if (on) refreshPortalAnnotations();
 });
-
-/*
- * Motion demo. Each effect button fires the matching burst from its own
- * on-screen position (origin: the button), so the confetti erupts where you
- * clicked. Snow is ambient, so it toggles. The attribute chips already play on
- * scroll-in; the Replay button re-runs them through the controller's imperative
- * trigger, the same call a `manual` trigger would use.
- */
-// Finite bursts self-terminate; the ambient ones (snow, sparkles, butterflies)
-// get a bounded duration so they play for a beat and fizzle out, never running on.
 const MOTION_BURSTS = { confetti, fireworks, pride, hearts, stars };
 document.querySelectorAll<HTMLElement>("[data-effect]").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -1204,7 +1071,7 @@ document.querySelectorAll<HTMLElement>("[data-effect]").forEach((btn) => {
       return;
     }
     if (name === "butterflies") {
-      butterflies({ duration: 5000, rate: 2 });
+      butterflies({ space: "document", duration: 5000, rate: 2 });
       return;
     }
     if (name === "sparkles") {
@@ -1214,16 +1081,14 @@ document.querySelectorAll<HTMLElement>("[data-effect]").forEach((btn) => {
     MOTION_BURSTS[name as keyof typeof MOTION_BURSTS]?.({ origin: btn });
   });
 });
-// The v0.4 card's own release valve.
 document.getElementById("wn-butterflies")?.addEventListener("click", () => {
-  butterflies({ duration: 4500, rate: 3 });
+  butterflies({ space: "document", duration: 4500, rate: 3 });
 });
 document.getElementById("motion-replay")?.addEventListener("click", () => {
   document
     .querySelectorAll<HTMLElement>(".motion-chip")
     .forEach((chip) => playElementAnimation(chip));
 });
-
 document.getElementById("portal-theme")?.addEventListener("fluid-change", (e) => {
   const value = String((e as CustomEvent).detail?.value ?? "default");
   const frame = document.querySelector<HTMLElement>(".portal-frame");
@@ -1233,14 +1098,6 @@ document.getElementById("portal-theme")?.addEventListener("fluid-change", (e) =>
   repaintPortalCharts();
   refreshPortalAnnotations();
 });
-
-/*
- * Demo-portal light/dark toggle. Flips data-fluid-theme on the frame alone, so
- * only the demo re-schemes, exactly the attribute a consumer sets. It sits on
- * the same element as data-fluid-brand, which is why the brand files carry a
- * `[data-fluid-brand][data-fluid-theme="dark"]` compound rule: brand and scheme
- * compose on one node.
- */
 document.getElementById("portal-appearance")?.addEventListener("fluid-change", (e) => {
   const value = String((e as CustomEvent).detail?.value ?? "light");
   const frame = document.querySelector<HTMLElement>(".portal-frame");
@@ -1249,47 +1106,41 @@ document.getElementById("portal-appearance")?.addEventListener("fluid-change", (
   repaintPortalCharts();
   refreshPortalAnnotations();
 });
-
 const portalDonut = document.getElementById("portal-donut") as
-  | (HTMLElement & { data?: unknown; options?: unknown })
+  | (HTMLElement & {
+      data?: unknown;
+      options?: unknown;
+    })
   | null;
 if (portalDonut) {
   portalDonut.data = {
     labels: ["Direct", "Search", "Referral", "Social"],
     datasets: [{ data: [42, 31, 17, 10] }]
   };
-  /* The card carries its own breakdown list, so the default legend is noise. */
   portalDonut.options = { plugins: { legend: { display: false } } };
 }
-
-/* ---------------------------------------------------------------- */
-/* New in v0.4: the keep-open typeahead demo collects each pick as a */
-/* tag under the field, so the multi-pick behavior is visible.       */
-/* ---------------------------------------------------------------- */
 const wnPick = document.getElementById("wn-pick");
 const wnPicks = document.getElementById("wn-picks");
 wnPick?.addEventListener("fluid-change", (e) => {
   const option = (e as CustomEvent).detail?.option as
-    | { value?: unknown; label?: string }
+    | {
+        value?: unknown;
+        label?: string;
+      }
     | undefined;
   if (!option || !wnPicks) return;
   const label = option.label ?? String(option.value ?? "");
-  // One tag per distinct pick; re-picking the same value is a no-op.
   if (Array.from(wnPicks.children).some((c) => c.textContent === label)) return;
   const tag = document.createElement("fluid-tag");
   tag.setAttribute("size", "sm");
   tag.textContent = label;
   wnPicks.appendChild(tag);
 });
-
-/* ---------------------------------------------------------------- */
-/* Guided product tour: walk the nav theme switcher, the demo        */
-/* portal, the motion band, the v0.4 showcase, and the dashboards.   */
-/* Targets are light-DOM ids/classes, so the tour resolves them via  */
-/* its document fallback.                                            */
-/* ---------------------------------------------------------------- */
 const tour = document.getElementById("page-tour") as
-  | (HTMLElement & { steps?: unknown; show?: () => void })
+  | (HTMLElement & {
+      steps?: unknown;
+      show?: () => void;
+    })
   | null;
 if (tour) {
   tour.steps = [
