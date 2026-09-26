@@ -3,15 +3,15 @@
   "capturedAt": "2026-08-27",
   "packageManager": "pnpm@9.15.0",
   "rootBaseRevision": "28dd7a621bb0321298ec6cc1857fa7f9079b620a",
-  "rootLockSha256": "0e3a0d7337f52e2eb6496c405578f30ba1ef7e420383cdfee390a83ce5ad4a71",
+  "rootLockSha256": "cead01afbdc1f99f05b16e288465fbfa56a11585ddedfed6485496a902701ae8",
   "lanes": [
     {
       "id": "react",
       "manifestName": "@fluid-ds/admin-react-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/react",
-      "sourceResultSha256": "299b7d359cafca13e55787113c211a82c3e3f5d9be7bbdf89554ea5418af74bc",
-      "bundleSha256": "86dda1bc9aef32dc0b3cc4f7c8ca3c3a886117181d84868fdacdab28c88c92db",
-      "consumerLockSha256": "cd820932842ec0464c4ec925c609f90fa07924d1a46b91055aef20b36bd38e03",
+      "sourceResultSha256": "ffa98510c090455a9300d67e43d1df1ba94ce7e9e8af875f6535ea7880dc6d3e",
+      "bundleSha256": "fe13f5ace78dbfb2c75b2ac042fbc9edc5e333f063acee0425e34c4f6f44377c",
+      "consumerLockSha256": "f30afe9524cf050d47e19fff55c4d97c47688feec11ceb19363d387595d7ec38",
       "derivation": "The final root graph pins react-router-dom 6.30.4 within the successful latest-compatible fixture's declared range; the portable consumer lock was derived with pnpm 9.15.0 offline lock-only resolution.",
       "renderingContract": "csr"
     },
@@ -19,54 +19,54 @@
       "id": "astro",
       "manifestName": "@fluid-ds/framework-astro-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/astro",
-      "sourceResultSha256": "d786aac21981b86afed85a2d56967c40f12db460fe9196b69496905df1a951cc",
-      "bundleSha256": "7f93bfc6d37aa8642f41c78c902d628a1550eb5fe625368d8fb7578e96e586bb",
-      "consumerLockSha256": "304b7859d237c731c627884bba0d9a3e3db9a47811989634343819c12f91616b",
+      "sourceResultSha256": "dcfc05f65659d6499d608234230e50ae90ba895cbd32e420c50d4a691389135e",
+      "bundleSha256": "a311652a34bf64a1a0bc54a5b4956dced632f639d5d741b0ed6c224cca347d91",
+      "consumerLockSha256": "aa93232689dcb591a137c490c8fb2ac34de35bf2f2e0e0b94f289e529c941aff",
       "renderingContract": "build-time-static-dsd"
     },
     {
       "id": "next",
       "manifestName": "@fluid-ds/admin-next-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/next",
-      "sourceResultSha256": "c7f1d07a49128795af8a449686d8fef5a9363ca8e49383183759ff6634c71bb7",
-      "bundleSha256": "131a35e974b8f1da8a95fb0373e72ececf5e21b5f6a9b2125c94751b85274c98",
-      "consumerLockSha256": "b9776f13815cc99d6793af6c2724e8e8ea017681206ada94be4f7a3719bba717",
+      "sourceResultSha256": "045995bff59f7b78c5fb17589eeb5033fbcdfc0c5c2d9ebe1d312f9d3fe0828f",
+      "bundleSha256": "8c5798c84aab194d750f0cc268a2051ae67622c48135b2e665b78b39decbdc70",
+      "consumerLockSha256": "a0fd102a64be5ae42c9fdca94d70dfd8845201f4f6339854db06762248a76e78",
       "renderingContract": "build-time-static-dsd"
     },
     {
       "id": "sveltekit",
       "manifestName": "@fluid-ds/framework-sveltekit-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/sveltekit",
-      "sourceResultSha256": "172ba2bdd919005c202c1cbedd4fa8e5364c2efc9cde79565e7796e9788e4a73",
-      "bundleSha256": "fe2e5cdecae86447ec150138c1c8a8d25b79d666463b878e6c14f76fefc03012",
-      "consumerLockSha256": "7dec78f4dbfddbeefa46c952645a0d2ecd32c32aa40b950c1dae951d8f127a4d",
+      "sourceResultSha256": "6b3bfe252946606e5a06a8da1105829cc421194549ce606a6dcb72cba50d8a8f",
+      "bundleSha256": "7cece461adc84b61e4267d472ce7a380758d58fe1fd7a621b53ed24714eda8ee",
+      "consumerLockSha256": "6d108feb4d18fe52e7b994b8efde746a60a380f3f6f455774e405c3b96ae53d2",
       "renderingContract": "build-time-static-dsd"
     },
     {
       "id": "vue",
       "manifestName": "@fluid-ds/framework-vue-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/vue",
-      "sourceResultSha256": "bafdd42d5169b715fbb9617fc06ce2d8c8c4e8bd8ea557e0e97a569b66fc66b2",
-      "bundleSha256": "c593db8ed170662219e1602ee696808e420bd5cdac7d71910c02de0ea27c8125",
-      "consumerLockSha256": "a9d886d8d1abed9eafa4bd739983116fb8dfb92bff613a03b973b4c48fa24688",
+      "sourceResultSha256": "c53d4d9b2f7a5e4bd8f578f40a13d404eca83aea26f4518eea6ee6f3faba77f4",
+      "bundleSha256": "8fbe85622f3ab58213221668bb5c5f1854c03aedeab13cd949377bc3210565ed",
+      "consumerLockSha256": "34fcc75a305900731d89d011060e945939ee8356898347c9c7faafaf4bac9296",
       "renderingContract": "csr"
     },
     {
       "id": "angular",
       "manifestName": "@fluid-ds/admin-angular-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/angular",
-      "sourceResultSha256": "12d6c39a809e74bc380e26f17783174f47c74c4ee9c95f951ec81481e0a8d5c1",
-      "bundleSha256": "548fdb4cc196d8e95e50a6f4237253cb0d575266ca01c1319e1f611a9e0a8ae6",
-      "consumerLockSha256": "8c46121685969cbf76025a8aa63fe3f66aa5df531f23d30ed1400a818b78f9ad",
+      "sourceResultSha256": "3ebd93a95a287f1038f54d0e53c9d0fb1ad0abf287879986634857b67f267f79",
+      "bundleSha256": "bb38ab29704b8dfbd4cdba5af2f801abb613f260e5b7847ee643b1113fa70cfe",
+      "consumerLockSha256": "1d9c3828b3e49b2baefe0c3a97837f8cbec7feaf4c77f37d9f636be8d4fae1dc",
       "renderingContract": "csr"
     },
     {
       "id": "vanilla",
       "manifestName": "@fluid-ds/framework-vanilla-packed-contract",
       "sourceEvidence": "scripts/fixtures/framework-pinned/vanilla",
-      "sourceResultSha256": "292cc284ee27cf759db03775625ff57d1ab9ebf025388e7f47a5a825915b2088",
-      "bundleSha256": "9ad9e27642290bafe7c25c7d03c66a5ddbedead41eda65760778f112916f3ddd",
-      "consumerLockSha256": "264b33b61530a36c94ac088d4cfad88dcf7c250263ca724241b6d6fae753e004",
+      "sourceResultSha256": "c931379ae069d5430f0c43defda77e98376e51084ccc65cb3ed6a07cc97e2af1",
+      "bundleSha256": "2b695524c49c167df6fce464b756e1b74b31988216ffac86d6ae9a25038f85ad",
+      "consumerLockSha256": "3ed0d5dc55899890b6c12760e8d15da991754eda21bdd0534fbbda775c523acc",
       "renderingContract": "csr"
     }
   ]

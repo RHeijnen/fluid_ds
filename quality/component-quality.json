@@ -4996,7 +4996,7 @@
         "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
       },
       "unit": {
-        "cases": 17,
+        "cases": 18,
         "accessibilityAudits": 4,
         "accessibilityException": null
       },
@@ -5043,7 +5043,7 @@
         "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
       },
       "unit": {
-        "cases": 17,
+        "cases": 18,
         "accessibilityAudits": 4,
         "accessibilityException": null
       },
@@ -5090,7 +5090,7 @@
         "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
       },
       "unit": {
-        "cases": 17,
+        "cases": 18,
         "accessibilityAudits": 4,
         "accessibilityException": null
       },

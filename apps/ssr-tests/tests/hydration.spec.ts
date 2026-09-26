@@ -55,9 +55,9 @@ test("registers the catalog and retains the named form's server nodes without br
       mismatches: window.fluidHydrationMismatches
     };
   });
-  expect(result.count).toBe(155);
+  expect(result.count).toBe(158);
   expect(result.undefinedTags).toEqual([]);
-  expect(result.shadowRoots).toBe(154);
+  expect(result.shadowRoots).toBe(157);
   expect(result.mismatches).toEqual([]);
   expect(await page.evaluate(() => window.assertFluidServerNodes())).toBe(18);
   expect(errors).toEqual([]);

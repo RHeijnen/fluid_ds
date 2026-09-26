@@ -172,6 +172,13 @@ describe("rainbow illustrations", () => {
     }
   });
 
+  it("registers the whole set from the side-effect entry", async () => {
+    // "@fluid-ds/rainbow/illustrations/register" is the documented one-line
+    // setup; importing it must be enough, with no explicit call.
+    await import("./illustrations-register.js");
+    for (const name of rainbowIllustrationNames) expect(getIcon(name), name).to.contain("<svg");
+  });
+
   it("lists every illustration exactly once across the groups", () => {
     const names = [...rainbowIllustrationNames].sort();
     expect(new Set(names).size).to.equal(names.length);

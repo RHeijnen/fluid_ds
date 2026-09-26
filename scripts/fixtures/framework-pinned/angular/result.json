@@ -2,8 +2,8 @@
   "fixture": "@fluid-ds/admin-angular",
   "status": "passed",
   "lane": "latest-compatible",
-  "node": "v22.22.2",
-  "platform": "win32",
+  "node": "v24.15.0",
+  "platform": "linux",
   "packageManager": "pnpm@9.15.0",
   "compilerConfiguration": "isolated",
   "outcomes": {
@@ -19,108 +19,108 @@
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 20972,
+      "pid": 2478,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 619
+      "elapsedMs": 536
     },
     {
       "stage": "pack",
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 22276,
+      "pid": 2490,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 1512
+      "elapsedMs": 1952
     },
     {
       "stage": "pack",
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 25040,
+      "pid": 2502,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 3808
+      "elapsedMs": 4146
     },
     {
       "stage": "pack",
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 25304,
+      "pid": 2514,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 603
+      "elapsedMs": 474
     },
     {
       "stage": "pack",
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 24808,
+      "pid": 2526,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 552
+      "elapsedMs": 477
     },
     {
       "stage": "pack",
       "args": [
         "pack",
         "--pack-destination",
-        "<TEMP>\\packs"
+        "<TEMP>/packs"
       ],
       "status": "passed",
       "reason": null,
-      "pid": 25480,
+      "pid": 2538,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 582
+      "elapsedMs": 462
     },
     {
       "stage": "install",
@@ -132,14 +132,14 @@
       ],
       "status": "passed",
       "reason": null,
-      "pid": 18752,
+      "pid": 2550,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 59416
+      "elapsedMs": 7416
     },
     {
       "stage": "typecheck",
@@ -149,14 +149,14 @@
       ],
       "status": "passed",
       "reason": null,
-      "pid": 24708,
+      "pid": 2567,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 5327
+      "elapsedMs": 1652
     },
     {
       "stage": "build",
@@ -166,14 +166,14 @@
       ],
       "status": "passed",
       "reason": null,
-      "pid": 20708,
+      "pid": 2592,
       "exitCode": 0,
       "signal": null,
       "directChildExitObserved": true,
       "terminationRequested": false,
       "terminationAccepted": null,
       "descendantCleanup": "unknown-not-inspected",
-      "elapsedMs": 50870
+      "elapsedMs": 10458
     }
   ],
   "browserRuntimeTested": false,

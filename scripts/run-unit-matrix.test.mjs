@@ -64,13 +64,13 @@ test("the active pnpm must match the exact packageManager pin without requiring 
   assert.throws(() => resolvePinnedPnpm("pnpm@9", { env: {} }), /exact pnpm version/);
 });
 
-test("the current matrix contains all fourteen published component packages", async () => {
+test("the current matrix contains all fifteen published component packages", async () => {
   const catalog = JSON.parse(
     await readFile(new URL("../quality/component-quality.json", import.meta.url), "utf8")
   );
   const [entry] = unitMatrixCommands(catalog, ["webkit"]);
   assert.equal(entry.packages.length, catalog.summary.packages);
-  assert.equal(entry.packages.length, 14);
+  assert.equal(entry.packages.length, 15);
 });
 
 const repository = dirname(dirname(fileURLToPath(import.meta.url)));

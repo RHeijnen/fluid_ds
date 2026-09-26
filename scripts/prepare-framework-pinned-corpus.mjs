@@ -11,15 +11,13 @@ const profilePath = join(root, "scripts/framework-pinned-profile.json");
 const corpusRoot = join(root, "scripts/fixtures/framework-pinned");
 
 const sourceEvidence = Object.freeze({
-  react: "quality/evidence/framework-fixtures/2026-08-30T19-40-16-868Z--fluid-ds-admin-react",
-  astro: "quality/evidence/framework-fixtures/2026-08-30T19-41-54-976Z--fluid-ds-framework-astro",
-  next: "quality/evidence/framework-fixtures/2026-08-30T19-43-20-927Z--fluid-ds-admin-next",
-  sveltekit:
-    "quality/evidence/framework-fixtures/2026-08-30T19-45-19-901Z--fluid-ds-framework-sveltekit",
-  vue: "quality/evidence/framework-fixtures/2026-08-30T19-46-16-677Z--fluid-ds-framework-vue",
-  angular: "quality/evidence/framework-fixtures/2026-08-30T19-47-00-085Z--fluid-ds-admin-angular",
-  vanilla:
-    "quality/evidence/framework-fixtures/2026-08-30T19-49-09-622Z--fluid-ds-framework-vanilla"
+  react: "quality/evidence/framework-fixtures/2026-09-26T21-16-18-707Z--fluid-ds-admin-react",
+  next: "quality/evidence/framework-fixtures/2026-09-26T21-17-26-464Z--fluid-ds-admin-next",
+  angular: "quality/evidence/framework-fixtures/2026-09-26T21-18-18-331Z--fluid-ds-admin-angular",
+  vue: "quality/evidence/framework-fixtures/2026-09-26T21-18-47-591Z--fluid-ds-framework-vue",
+  astro: "quality/evidence/framework-fixtures/2026-09-26T21-19-07-960Z--fluid-ds-framework-astro",
+  sveltekit: "quality/evidence/framework-fixtures/2026-09-26T21-20-02-602Z--fluid-ds-framework-sveltekit",
+  vanilla: "quality/evidence/framework-fixtures/2026-09-26T21-20-32-429Z--fluid-ds-framework-vanilla"
 });
 
 function sha256(value) {

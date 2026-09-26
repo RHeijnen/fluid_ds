@@ -112,5 +112,5 @@ test("every browser unit package uses the shared policy without a local override
     );
     checked.push(entry.name);
   }
-  assert.equal(checked.length, 14, "All fourteen configured browser unit packages must be checked");
+  assert.equal(checked.length, 15, "All fifteen configured browser unit packages must be checked");
 });

@@ -15,16 +15,16 @@ importers:
     dependencies:
       '@fluid-ds/charts':
         specifier: file:../packs/fluid-ds-charts-0.4.0.tgz
-        version: file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)
+        version: file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)
       '@fluid-ds/components':
         specifier: file:../packs/fluid-ds-components-0.4.0.tgz
-        version: file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)
+        version: file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)
       '@fluid-ds/icons':
         specifier: file:../packs/fluid-ds-icons-0.4.0.tgz
         version: file:../packs/fluid-ds-icons-0.4.0.tgz
       '@fluid-ds/react':
         specifier: file:../packs/fluid-ds-react-0.4.0.tgz
-        version: file:../packs/fluid-ds-react-0.4.0.tgz(@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3))(@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3))(@types/react@19.2.18)(react@19.2.8)
+        version: file:../packs/fluid-ds-react-0.4.0.tgz(@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3))(@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3))(@types/react@19.3.0)(react@19.3.0)
       '@fluid-ds/themes':
         specifier: file:../packs/fluid-ds-themes-0.4.0.tgz
         version: file:../packs/fluid-ds-themes-0.4.0.tgz(@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz)
@@ -36,23 +36,23 @@ importers:
         version: 3.3.3
       next:
         specifier: ^15.5.21
-        version: 15.5.24(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 15.5.26(@types/node@22.20.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.0.0
-        version: 19.2.8
+        version: 19.3.0
       react-dom:
         specifier: ^19.0.0
-        version: 19.2.8(react@19.2.8)
+        version: 19.3.0(react@19.3.0)
     devDependencies:
       '@types/node':
         specifier: ^22.10.5
-        version: 22.20.1
+        version: 22.20.4
       '@types/react':
         specifier: ^19.0.0
-        version: 19.2.18
+        version: 19.3.0
       '@types/react-dom':
         specifier: ^19.0.0
-        version: 19.2.5(@types/react@19.2.18)
+        version: 19.3.0(@types/react@19.3.0)
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -63,23 +63,23 @@ packages:
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
   '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz':
-    resolution: {integrity: sha512-gg9dnF6VK4X7JYciKHbfnYR8tkXe74v6x26YgcneYauZ+tVFn4BrpqZl1RCuvc0rzLKAgYG8rOTR0NODQbx1yQ==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
+    resolution: {integrity: sha512-afHY/gmx12/Zi1Srmm+bk0A1fGGuPdlvQqweep4MnRHXxinj24DPp9+tqrXjfnwH3+lvJGNYjZ1hoQDcjCQFXQ==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz':
-    resolution: {integrity: sha512-SFcsDRCElZFdv59roDKLbEI9vdMS6x5t8BKMa4FzpYK9jtoVsL0RNNi+0jmBIEPnkei0na8S2xJuqlggqNCLGw==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
+    resolution: {integrity: sha512-qvbk7ZxoKROgQ2MU32GAwPxHeEt7PFo1jrhhgF6Ba9Qvh8wEMPMKtFAs3dW5bz5+XtmvKgd5fHUfSZgKvravHQ==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       lit: ^3.2.1
 
   '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
-    resolution: {integrity: sha512-t28zqrYr7/M1PDjV2O1uFU87KvJkccrCLGjyDfmT0xBOx+/chG203+Mb24vzyFR198CwwGhtc14Mc017PqqgMw==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
+    resolution: {integrity: sha512-hnuIg3O45sM1S3qaJtg/7uwNMIYvIrShR1JAltjn39bOIVdy8QOuGvwkCSgmEhv6pEinr3g9Pl3UsbCU5ZfW8g==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
     version: 0.4.0
 
   '@fluid-ds/react@file:../packs/fluid-ds-react-0.4.0.tgz':
-    resolution: {integrity: sha512-KYapxCCvLrbRiyjq6dWxbBWIc8TVUlzT2MKpsceV6qKA8mXGuG8s6+frVpGP0Dzbg0jN+KKBhD7CUtp+F+K0Nw==, tarball: file:../packs/fluid-ds-react-0.4.0.tgz}
+    resolution: {integrity: sha512-04eLvVLEj4/rRDjp7Mc3X8Z/viF8BdsvuWvnvgpkKhcXwSnrOX7r6GMKf6QKpwVpfyAG5Kjhf0th+2FDR+Sl7g==, tarball: file:../packs/fluid-ds-react-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       '@fluid-ds/animations': ^0.4.0
@@ -94,6 +94,7 @@ packages:
       '@fluid-ds/node-graph': ^0.4.0
       '@fluid-ds/parser': ^0.4.0
       '@fluid-ds/qr': ^0.4.0
+      '@fluid-ds/rainbow': ^0.4.0
       '@fluid-ds/scheduler': ^0.4.0
       '@fluid-ds/table': ^0.4.0
       react: ^19.0.0
@@ -122,19 +123,21 @@ packages:
         optional: true
       '@fluid-ds/qr':
         optional: true
+      '@fluid-ds/rainbow':
+        optional: true
       '@fluid-ds/scheduler':
         optional: true
       '@fluid-ds/table':
         optional: true
 
   '@fluid-ds/themes@file:../packs/fluid-ds-themes-0.4.0.tgz':
-    resolution: {integrity: sha512-jXjRKPIheYBn7I2K92gxuQkJYpARGIZuXHf1HazMQeK5oIo3PhPM6wNeD61e1Y7KjcXuu1I2+VHIlSW+Hj6gWw==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
+    resolution: {integrity: sha512-cb41svpRxzWOHpHWnaeKobqMo84wBKVBo3IN1BUvv0uMFA9GwV6gjeXClEIdgbSxr8toVHBI4beWnkHRX2OdEw==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
     version: 0.4.0
     peerDependencies:
       '@fluid-ds/tokens': 0.4.0
 
   '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz':
-    resolution: {integrity: sha512-CFEDFIOvu3D2Sik+Ay6Rdg33QXY+qIN8C6yvmJNJPdoT0SWEBiPk9zV8CJGN0UuZO/0rl/U3U0O+pOobr6cFww==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
+    resolution: {integrity: sha512-CUCg6UyTwHSTiu7X1C/Do2YLBe2AgFhdnFtGeSeYStWVQbXmY2ceNbZBL4tiahxvZr0gTW9uRleHrd5gr83TtA==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
     version: 0.4.0
 
   '@img/colour@1.1.0':
@@ -309,53 +312,53 @@ packages:
   '@lit/reactive-element@2.1.2':
     resolution: {integrity: sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A==}
 
-  '@next/env@15.5.24':
-    resolution: {integrity: sha512-mBDF7T0XKZjs9SpUAl0buizVO+O02ULjOvWX8o/AZo/5AGw/UAS1Zzcylmd4pqbftzmKQi+L/nB4jgBYKEAl5Q==}
+  '@next/env@15.5.26':
+    resolution: {integrity: sha512-NJBz9q10LU9h3KjHLEbdgWIV+ow/x+MYzKBRfqhm9/QmML3tPMhYmXF/UIV9SDVCNtOqFNc5oX7kZqeiigMCEA==}
 
-  '@next/swc-darwin-arm64@15.5.24':
-    resolution: {integrity: sha512-AGdNLvxZNY6eR2iSnV+6wUa8CiHTMr4F7g3uHH7fT4ICIJBE00R9u4tzN/Vuwsw0cOi8MTD2HJcTCb6siMH88Q==}
+  '@next/swc-darwin-arm64@15.5.26':
+    resolution: {integrity: sha512-So8eoJxIcXw/TexNUvvh3uY72J9nDo5BpJsAwUKx+FK57CrWXg6RqVufV7U9OT3BO+siMzJ2FuAwBhaHoPlLGg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@15.5.24':
-    resolution: {integrity: sha512-9HrQajBMmGcrrrvDfRimiCrbAPh3E6uHJmwBovYr6Yrmi9p9PZqI876BrXX280wICh3o2XwUlp4blkB0NNBqFg==}
+  '@next/swc-darwin-x64@15.5.26':
+    resolution: {integrity: sha512-jImzLUTClVWKhP91e5sgDumjxCLhaFSt7DuN5cnRYw99Dppxxhhq5jKRyDa2aTv3JE7dQmTSTsY3EFkSOp9Pog==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@15.5.24':
-    resolution: {integrity: sha512-rl9LSfE75si0WT3cDgdUC1XYCKS+TgxC+/IjitmeycrAG18X/plIP1/vy8dd/HPycYcIvE688PD7FuvEAiEAew==}
+  '@next/swc-linux-arm64-gnu@15.5.26':
+    resolution: {integrity: sha512-CaWd+T/Lud2BmZbrsa1CzCnIOdU3YX9Nuk89virZaSB1O+C+8Yrrevgmnl68u4dvZIfOAzQ77S+Njrq7v1XwSA==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-arm64-musl@15.5.24':
-    resolution: {integrity: sha512-TlNAnpsjxSF3aAUtqnfmtXXf8m9sIDBlmF3c7bTAlnshUYu2U0OxN2uf5d0gcFwqHVEdivJNBcCaqNOwPGNimw==}
+  '@next/swc-linux-arm64-musl@15.5.26':
+    resolution: {integrity: sha512-97AyKI34yjpaudlkWHswAf7c1PjWQAC7lLyrw3R5K+bq834EOA+9IG68rIVy0VqrqGjtPSMjJmMmgeJ3wHR5og==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@15.5.24':
-    resolution: {integrity: sha512-7dwtlhr0SLndqTG1z9ncRkbJswDZiKWlxzFyXDvJ2RDZRDRHp8zyMJ4D9UH/FgnQeXxxB6gZy2pMcIUoNKQ4pA==}
+  '@next/swc-linux-x64-gnu@15.5.26':
+    resolution: {integrity: sha512-eVtuOCew1sBPV7BEgxy7qxuVyqoU3tJIS/xDZwa1/NiQ4Q0LM2JMH7rny+/uVIN6hsQ3PTb0hTQWypA0L2QxtA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-linux-x64-musl@15.5.24':
-    resolution: {integrity: sha512-kGZxM+WhkYs0276lFrMkj7PRtXT3Btp6cwvfSO/cCVLxJJttB5Ccnl2niaCgUja8HgSbEVnMHpg3FJWoOJ9e/g==}
+  '@next/swc-linux-x64-musl@15.5.26':
+    resolution: {integrity: sha512-EiUXADp+Z+OdQnSqbX10YgOSUrs0CXVODoTfySfsP2jdhngn9bq5RJd376FJzqMPe/XX25FMr1aXtYUVPA0qDw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-win32-arm64-msvc@15.5.24':
-    resolution: {integrity: sha512-jBDDkZ/qKAqkWivWDMkJSXUzbzV0QKRBKJjEHUAvSB97Hzw7NLzJ6yV56Lts/wjir7s4P31GYgpbS6ZL+hasAA==}
+  '@next/swc-win32-arm64-msvc@15.5.26':
+    resolution: {integrity: sha512-HPl41fgkC4kdM5CCIoqNW6KlKEj1N+xS6bjNFFxDNKooUNUu09frgD948zo95TPw/C3XINZpkdkBGNU2RhjEnw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@15.5.24':
-    resolution: {integrity: sha512-JqtwjvvorjacQ0spgjmUJoxySoYgPwdT1sFdQ0/zmW4iMlP2hjYlCoJIyS7o6Epb4Fug8eco3HXFoBDUCDeH7Q==}
+  '@next/swc-win32-x64-msvc@15.5.26':
+    resolution: {integrity: sha512-TgmJ5ginKr34RPsz01/swpYtFBxh51d66jM26aytpE6NIypU5KtBVI8C2hJjUNpWr7v6sWj8a6+og2MyntcnpA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -366,22 +369,22 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
-  '@types/node@22.20.1':
-    resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
+  '@types/node@22.20.4':
+    resolution: {integrity: sha512-zJRE40jpHtKqE/C4fgHrAKQLJuSpzEnP9ff9Y7YtoR3Wd2pwqzlekDeEuUQXjRd+QCYnVnNwuJYmhdk9XV8gvA==}
 
-  '@types/react-dom@19.2.5':
-    resolution: {integrity: sha512-fMPwH9v7r/pp43yUd2/Mbiex5KouJwwR3dzHkhLREUC6764VyDsqxhAxv6OFEYR1RhjOyD1naqba8ECDBe7ZQg==}
+  '@types/react-dom@19.3.0':
+    resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
     peerDependencies:
-      '@types/react': ^19.2.0
+      '@types/react': ^19.3.0
 
-  '@types/react@19.2.18':
-    resolution: {integrity: sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==}
+  '@types/react@19.3.0':
+    resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
-  caniuse-lite@1.0.30001810:
-    resolution: {integrity: sha512-TITQPUkaz+aVk5GL6NhOdwk1aEaNTSDPsGFWrTuhKGtjTF70jL/Oht2W4c6rXUe5fu7Ie19VIahAXHIIiWWNeg==}
+  caniuse-lite@1.0.30001812:
+    resolution: {integrity: sha512-qN+QNNBr93TCmFrmte0bBCjSDMuRvt78VlHT99qIGPszm4QsqCX8lnyWUFkHi8B7ZBAPq8SH+UqyXNy/odMdng==}
 
   chart.js@4.5.1:
     resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
@@ -401,8 +404,8 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  enhanced-resolve@5.24.5:
-    resolution: {integrity: sha512-L1l8TNvomm6UVW5B253AGxQagSQr+vGwhMlrrfRS2qmhx46AMpMVJKQYLvWYbysTMY8VoicOvzHzoHMbyzB+4A==}
+  enhanced-resolve@5.25.1:
+    resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
     engines: {node: '>=10.13.0'}
 
   entities@6.0.1:
@@ -432,13 +435,13 @@ packages:
   lucide-static@0.469.0:
     resolution: {integrity: sha512-ravTgZodIVLO53rJyjIq0iuCRHs+kjd3dAfOcTbA41KCDfdy0Pt6Me8akkhda3jRpbIxjKe1PpYZOg2eQnI/lA==}
 
-  nanoid@3.3.18:
-    resolution: {integrity: sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w==}
+  nanoid@3.3.19:
+    resolution: {integrity: sha512-Y2tUNy4ouw6tq5oDSKeQYGOyhkUBhNOcGV/02KC+6kd9eDGqdZd++mjMiIDilrBYvjEnCYvVtsuHCuP+okSfug==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  next@15.5.24:
-    resolution: {integrity: sha512-Y+xn8EQCoC3ZbsFPyzE+tE8XOdrWeUdUF7NeXbmg9DsgAxl5UYxlsrvgVESHTyTGigoTa1bCUrxn70F5bqt0Gw==}
+  next@15.5.26:
+    resolution: {integrity: sha512-EVCqhvq8Hs+nX9udH2VzE/iXAg9QodZBZnwVJTuAMl386GIYvlJtYhFytV9nSlDYxKw3kEyv8I2dCQs0+on0sQ==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -477,17 +480,17 @@ packages:
     resolution: {integrity: sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ==}
     engines: {node: ^10 || ^12 || >=14}
 
-  react-dom@19.2.8:
-    resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
+  react-dom@19.3.0:
+    resolution: {integrity: sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==}
     peerDependencies:
-      react: ^19.2.8
+      react: ^19.3.0
 
-  react@19.2.8:
-    resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
+  react@19.3.0:
+    resolution: {integrity: sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==}
     engines: {node: '>=0.10.0'}
 
-  scheduler@0.27.0:
-    resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
+  scheduler@0.28.0:
+    resolution: {integrity: sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==}
 
   semver@7.8.5:
     resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
@@ -546,19 +549,19 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)':
+  '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)':
     dependencies:
-      '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)
+      '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)
       chart.js: 4.5.1
       lit: 3.3.3
     transitivePeerDependencies:
       - '@types/node'
 
-  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)':
+  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)':
     dependencies:
       '@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
       '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
-      '@lit-labs/ssr': 4.1.0(@types/node@22.20.1)
+      '@lit-labs/ssr': 4.1.0(@types/node@22.20.4)
       '@lit-labs/ssr-client': 1.1.8
       lit: 3.3.3
       parse5: 7.3.0
@@ -569,13 +572,13 @@ snapshots:
     dependencies:
       lucide-static: 0.469.0
 
-  '@fluid-ds/react@file:../packs/fluid-ds-react-0.4.0.tgz(@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3))(@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3))(@types/react@19.2.18)(react@19.2.8)':
+  '@fluid-ds/react@file:../packs/fluid-ds-react-0.4.0.tgz(@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3))(@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3))(@types/react@19.3.0)(react@19.3.0)':
     dependencies:
-      '@lit/react': 1.0.8(@types/react@19.2.18)
-      react: 19.2.8
+      '@lit/react': 1.0.8(@types/react@19.3.0)
+      react: 19.3.0
     optionalDependencies:
-      '@fluid-ds/charts': file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)
-      '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.1)(lit@3.3.3)
+      '@fluid-ds/charts': file:../packs/fluid-ds-charts-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)
+      '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(@types/node@22.20.4)(lit@3.3.3)
     transitivePeerDependencies:
       - '@types/react'
 
@@ -702,53 +705,53 @@ snapshots:
 
   '@lit-labs/ssr-dom-shim@1.6.0': {}
 
-  '@lit-labs/ssr@4.1.0(@types/node@22.20.1)':
+  '@lit-labs/ssr@4.1.0(@types/node@22.20.4)':
     dependencies:
       '@lit-labs/ssr-client': 1.1.8
       '@lit-labs/ssr-dom-shim': 1.6.0
       '@lit/reactive-element': 2.1.2
       '@parse5/tools': 0.3.0
-      enhanced-resolve: 5.24.5
+      enhanced-resolve: 5.25.1
       lit: 3.3.3
       lit-element: 4.2.2
       lit-html: 3.3.3
       node-fetch: 3.3.2
       parse5: 7.3.0
     optionalDependencies:
-      '@types/node': 22.20.1
+      '@types/node': 22.20.4
 
-  '@lit/react@1.0.8(@types/react@19.2.18)':
+  '@lit/react@1.0.8(@types/react@19.3.0)':
     dependencies:
-      '@types/react': 19.2.18
+      '@types/react': 19.3.0
 
   '@lit/reactive-element@2.1.2':
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.6.0
 
-  '@next/env@15.5.24': {}
+  '@next/env@15.5.26': {}
 
-  '@next/swc-darwin-arm64@15.5.24':
+  '@next/swc-darwin-arm64@15.5.26':
     optional: true
 
-  '@next/swc-darwin-x64@15.5.24':
+  '@next/swc-darwin-x64@15.5.26':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@15.5.24':
+  '@next/swc-linux-arm64-gnu@15.5.26':
     optional: true
 
-  '@next/swc-linux-arm64-musl@15.5.24':
+  '@next/swc-linux-arm64-musl@15.5.26':
     optional: true
 
-  '@next/swc-linux-x64-gnu@15.5.24':
+  '@next/swc-linux-x64-gnu@15.5.26':
     optional: true
 
-  '@next/swc-linux-x64-musl@15.5.24':
+  '@next/swc-linux-x64-musl@15.5.26':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@15.5.24':
+  '@next/swc-win32-arm64-msvc@15.5.26':
     optional: true
 
-  '@next/swc-win32-x64-msvc@15.5.24':
+  '@next/swc-win32-x64-msvc@15.5.26':
     optional: true
 
   '@parse5/tools@0.3.0':
@@ -759,21 +762,21 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@types/node@22.20.1':
+  '@types/node@22.20.4':
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react-dom@19.2.5(@types/react@19.2.18)':
+  '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:
-      '@types/react': 19.2.18
+      '@types/react': 19.3.0
 
-  '@types/react@19.2.18':
+  '@types/react@19.3.0':
     dependencies:
       csstype: 3.2.3
 
   '@types/trusted-types@2.0.7': {}
 
-  caniuse-lite@1.0.30001810: {}
+  caniuse-lite@1.0.30001812: {}
 
   chart.js@4.5.1:
     dependencies:
@@ -788,7 +791,7 @@ snapshots:
   detect-libc@2.1.2:
     optional: true
 
-  enhanced-resolve@5.24.5:
+  enhanced-resolve@5.25.1:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -824,27 +827,27 @@ snapshots:
 
   lucide-static@0.469.0: {}
 
-  nanoid@3.3.18: {}
+  nanoid@3.3.19: {}
 
-  next@15.5.24(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+  next@15.5.26(@types/node@22.20.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
-      '@next/env': 15.5.24
+      '@next/env': 15.5.26
       '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001810
+      caniuse-lite: 1.0.30001812
       postcss: 8.4.31
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-      styled-jsx: 5.1.6(react@19.2.8)
+      react: 19.3.0
+      react-dom: 19.3.0(react@19.3.0)
+      styled-jsx: 5.1.6(react@19.3.0)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.24
-      '@next/swc-darwin-x64': 15.5.24
-      '@next/swc-linux-arm64-gnu': 15.5.24
-      '@next/swc-linux-arm64-musl': 15.5.24
-      '@next/swc-linux-x64-gnu': 15.5.24
-      '@next/swc-linux-x64-musl': 15.5.24
-      '@next/swc-win32-arm64-msvc': 15.5.24
-      '@next/swc-win32-x64-msvc': 15.5.24
-      sharp: 0.35.4(@types/node@22.20.1)
+      '@next/swc-darwin-arm64': 15.5.26
+      '@next/swc-darwin-x64': 15.5.26
+      '@next/swc-linux-arm64-gnu': 15.5.26
+      '@next/swc-linux-arm64-musl': 15.5.26
+      '@next/swc-linux-x64-gnu': 15.5.26
+      '@next/swc-linux-x64-musl': 15.5.26
+      '@next/swc-win32-arm64-msvc': 15.5.26
+      '@next/swc-win32-x64-msvc': 15.5.26
+      sharp: 0.35.4(@types/node@22.20.4)
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/node'
@@ -866,23 +869,23 @@ snapshots:
 
   postcss@8.4.31:
     dependencies:
-      nanoid: 3.3.18
+      nanoid: 3.3.19
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  react-dom@19.2.8(react@19.2.8):
+  react-dom@19.3.0(react@19.3.0):
     dependencies:
-      react: 19.2.8
-      scheduler: 0.27.0
+      react: 19.3.0
+      scheduler: 0.28.0
 
-  react@19.2.8: {}
+  react@19.3.0: {}
 
-  scheduler@0.27.0: {}
+  scheduler@0.28.0: {}
 
   semver@7.8.5:
     optional: true
 
-  sharp@0.35.4(@types/node@22.20.1):
+  sharp@0.35.4(@types/node@22.20.4):
     dependencies:
       '@img/colour': 1.1.0
       detect-libc: 2.1.2
@@ -913,15 +916,15 @@ snapshots:
       '@img/sharp-win32-arm64': 0.35.4
       '@img/sharp-win32-ia32': 0.35.4
       '@img/sharp-win32-x64': 0.35.4
-      '@types/node': 22.20.1
+      '@types/node': 22.20.4
     optional: true
 
   source-map-js@1.2.1: {}
 
-  styled-jsx@5.1.6(react@19.2.8):
+  styled-jsx@5.1.6(react@19.3.0):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.8
+      react: 19.3.0
 
   tapable@2.3.3: {}
 
