@@ -130,6 +130,7 @@ document.body.innerHTML = `
       <a href="/playground/">Theme builder</a>
       <a href="/wizard/">Bundle builder</a>
       <a href="/demos/">Demos</a>
+      <a href="/rainbow.html">Rainbow</a>
       <div class="nav-theme" role="group" aria-label="Theme this page">
         <fluid-select id="site-brand" value="default" aria-label="Brand theme" class="anim-brand-picker">
           <fluid-option value="default">Default</fluid-option>
@@ -557,7 +558,9 @@ confetti();</code></pre>
       <span slot="header">Theming is the whole point</span>
       Change a brand variable and everything reflows: scope it to one component, one element, or the
       whole app. Light and dark are a single attribute, and installable presets go as far as the
-      frosted Glass and graphite Titanium takeovers in the switcher above. The
+      frosted Glass and graphite Titanium takeovers in the switcher above. For something
+      playful, the <a href="/rainbow.html">Rainbow theme package</a> turns every component
+      into cream paper, ink outlines and pastel fills, with widgets and illustrated icons. The
       <a href="/docs/theming/basics/">theming guide</a> has the full model, and the
       <a href="/playground/">theme builder</a> lets you design a brand right in the browser.
     </fluid-callout>

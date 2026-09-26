@@ -22,7 +22,8 @@
     "@fluid-ds/qr": "workspace:*",
     "@fluid-ds/table": "workspace:*",
     "@fluid-ds/animations": "workspace:*",
-    "@fluid-ds/parser": "workspace:*"
+    "@fluid-ds/parser": "workspace:*",
+    "@fluid-ds/rainbow": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

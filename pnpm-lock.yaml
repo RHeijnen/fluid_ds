@@ -537,6 +537,9 @@ importers:
       '@fluid-ds/qr':
         specifier: workspace:*
         version: link:../../packages/qr
+      '@fluid-ds/rainbow':
+        specifier: workspace:*
+        version: link:../../packages/rainbow
       '@fluid-ds/table':
         specifier: workspace:*
         version: link:../../packages/table

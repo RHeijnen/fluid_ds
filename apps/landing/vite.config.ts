@@ -13,7 +13,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(here, "index.html"),
-        animations: resolve(here, "animations.html")
+        animations: resolve(here, "animations.html"),
+        rainbow: resolve(here, "rainbow.html")
       }
     }
   }

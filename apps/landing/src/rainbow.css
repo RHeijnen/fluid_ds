@@ -1,0 +1,427 @@
+/*
+ * Rainbow sub-site. Everything is scoped under .rbw-page so the shared landing
+ * styles stay untouched; component look comes from @fluid-ds/themes/rainbow.css.
+ */
+.rbw-page {
+  background: var(--fluid-surface-subtle);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-sans);
+}
+
+/* The shared landing CSS colors links with the accent fill, which is a pastel
+   here. Links read the accent text role instead. */
+.rbw-page a {
+  color: var(--fluid-accent-fg, var(--fluid-accent-base));
+}
+.rbw-page h1,
+.rbw-page h2,
+.rbw-page h3 {
+  font-family: var(--fluid-font-family-display);
+}
+.rbw-page code {
+  font-family: var(--fluid-font-family-mono);
+}
+
+.rbw-page header.site-nav {
+  background: color-mix(in srgb, var(--fluid-surface-subtle) 88%, transparent);
+  border-bottom: var(--fluid-border-width-default) solid var(--fluid-border-default);
+}
+.rbw-page nav.primary a {
+  color: var(--fluid-text-primary);
+  font-weight: 600;
+}
+.rbw-page .brand {
+  font-family: var(--fluid-font-family-display);
+  font-size: 1.2rem;
+}
+.rbw-page .brand em {
+  font-style: normal;
+  color: var(--fluid-accent-fg);
+}
+.rbw-logo {
+  --fluid-icon-size: 2.1rem;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.rbw-hero {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 7vw, 6rem) 1.25rem clamp(3rem, 7vw, 5.5rem);
+}
+.rbw-hero-copy {
+  display: grid;
+  gap: 1.4rem;
+  justify-items: start;
+}
+.rbw-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.9rem 0.35rem 0.45rem;
+  font: 600 0.9rem/1 var(--fluid-font-family-display);
+  background: var(--fluid-surface-base);
+  border: var(--fluid-border-width-default) solid var(--fluid-border-strong);
+  border-radius: 999px;
+}
+.rbw-dot {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--rainbow-green);
+  border: 3px solid var(--rainbow-line);
+  animation: rbw-breathe 2.4s ease-in-out infinite;
+}
+@keyframes rbw-breathe {
+  50% {
+    transform: scale(0.75);
+  }
+}
+.rbw-hero h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 5.4vw, 4.1rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+/* Sticker highlight; clones its box per line so it wraps on phones. */
+.rbw-hl {
+  padding: 0 0.14em 0.04em;
+  background: var(--hl);
+  color: var(--rainbow-ink);
+  border: var(--fluid-border-width-default) solid var(--rainbow-line);
+  border-radius: 0.3em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  line-height: 1.22;
+}
+.rbw-hl--blue {
+  --hl: var(--rainbow-blue);
+}
+.rbw-hl--yellow {
+  --hl: var(--rainbow-yellow);
+}
+@media (min-width: 600px) {
+  .rbw-hl {
+    white-space: nowrap;
+  }
+}
+.rbw-lead {
+  margin: 0;
+  max-width: 34em;
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  color: var(--fluid-text-secondary);
+}
+.rbw-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+.rbw-install {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  background: var(--fluid-surface-base);
+  border: 2px dashed var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+}
+
+/* Bento of widgets, modelled on a phone home screen. */
+.rbw-bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.6rem, 1.4vw, 1.1rem);
+}
+.rbw-b-scene {
+  grid-column: span 4;
+}
+.rbw-b-card {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: var(--fluid-surface-base);
+  border: var(--fluid-border-width-default) solid var(--fluid-border-strong);
+  border-radius: var(--fluid-radius-xl);
+}
+.rbw-b-battery {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.rbw-b-battery fluid-rainbow-battery {
+  inline-size: 100%;
+}
+.rbw-b-icon {
+  --fluid-icon-size: 100%;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  transition: transform 0.3s var(--fluid-easing-spring);
+}
+.rbw-b-icon:hover {
+  transform: rotate(-6deg) scale(1.06);
+}
+.rbw-b-cal {
+  grid-column: span 3;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem 0.45rem 0.45rem;
+  background: var(--rainbow-tan);
+  color: var(--rainbow-ink);
+  border: var(--fluid-border-width-default) solid var(--rainbow-line);
+  border-radius: 999px;
+}
+.rbw-b-month {
+  display: grid;
+  place-items: end center;
+  flex: none;
+  width: clamp(3.2rem, 7vw, 4.4rem);
+  aspect-ratio: 1;
+  padding-bottom: 10%;
+  background: linear-gradient(var(--rainbow-pink) 0 34%, var(--rainbow-purple) 34%);
+  border: var(--fluid-border-width-default) solid var(--rainbow-line);
+  border-radius: 1.1rem;
+  font: 700 clamp(0.85rem, 1.3vw, 1.1rem) / 1 var(--fluid-font-family-display);
+}
+.rbw-b-days {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+  font: 600 clamp(1rem, 1.8vw, 1.45rem) / 1 var(--fluid-font-family-display);
+}
+.rbw-b-days span {
+  display: grid;
+  place-items: center;
+  width: 2.1em;
+  aspect-ratio: 1;
+}
+.rbw-b-days .is-today {
+  background: var(--rainbow-paper);
+  border: var(--fluid-border-width-default) solid var(--rainbow-line);
+  border-radius: 50%;
+}
+
+/* ── Shared bits ──────────────────────────────────────────────────────── */
+.rbw-page section.row {
+  max-width: 72rem;
+  margin-bottom: 6rem;
+}
+.rbw-page section.row > h2 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+}
+.rbw-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.rbw-stack {
+  display: grid;
+  gap: 0.9rem;
+}
+.rbw-page .motion-code {
+  background: var(--fluid-surface-base);
+  border: 2px solid var(--fluid-border-default);
+  border-radius: var(--fluid-radius-md);
+}
+
+/* ── Compare ──────────────────────────────────────────────────────────── */
+.rbw-switcher {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.rbw-sink {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  background: var(--fluid-surface-subtle);
+  color: var(--fluid-text-primary);
+  font-family: var(--fluid-font-family-sans);
+  border: 2px dashed color-mix(in srgb, var(--fluid-text-primary) 25%, transparent);
+  border-radius: 1.75rem;
+  transition: background-color 0.3s ease;
+}
+.rbw-sink-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+.rbw-tones {
+  justify-content: center;
+}
+
+/* ── Widgets ──────────────────────────────────────────────────────────── */
+.rbw-widgets {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.rbw-widget [slot="header"] {
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.9rem;
+}
+.rbw-battery-stage {
+  display: grid;
+  place-items: center;
+  min-height: 11rem;
+}
+.rbw-battery-stage fluid-rainbow-battery {
+  inline-size: min(100%, 16rem);
+}
+.rbw-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.25rem;
+  margin-top: 1rem;
+}
+.rbw-controls fluid-slider {
+  flex: 1 1 10rem;
+}
+
+/* ── Icons ────────────────────────────────────────────────────────────── */
+.rbw-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: 1rem;
+}
+.rbw-icon-tile {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem 0.8rem;
+  font: 600 0.85rem/1 var(--fluid-font-family-display);
+  color: var(--fluid-text-primary);
+  background: var(--fluid-surface-base);
+  border: var(--fluid-border-width-default) solid var(--fluid-border-strong);
+  border-radius: var(--fluid-radius-lg);
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--fluid-easing-spring),
+    box-shadow 0.25s var(--fluid-easing-spring);
+}
+.rbw-icon-tile fluid-icon {
+  --fluid-icon-size: 3.5rem;
+}
+.rbw-icon-tile:hover,
+.rbw-icon-tile:focus-visible {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 0 6px 0 var(--rainbow-pop);
+}
+.rbw-icon-tile:focus-visible {
+  outline: var(--fluid-focus-ring-width) solid var(--fluid-focus-ring-color);
+  outline-offset: 3px;
+}
+.rbw-copied {
+  min-height: 1.5em;
+  margin: 1rem 0 0;
+  text-align: center;
+  font-family: var(--fluid-font-family-mono);
+  font-size: 0.85rem;
+  color: var(--fluid-text-secondary);
+}
+
+/* ── Token tuner ──────────────────────────────────────────────────────── */
+.rbw-tuner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.rbw-knobs {
+  display: grid;
+  gap: 1rem;
+}
+.rbw-knob {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+.rbw-knob code {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--fluid-text-secondary);
+}
+.rbw-tuned {
+  padding: 1.5rem;
+}
+
+/* ── Install + footer ─────────────────────────────────────────────────── */
+.rbw-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+.rbw-steps p {
+  margin: 0 0 0.5rem;
+}
+.rbw-docs-link {
+  margin-top: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+.rbw-footer {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 2rem 1.25rem 3rem;
+  text-align: center;
+}
+.rbw-dock {
+  display: flex;
+  gap: clamp(0.75rem, 3vw, 1.5rem);
+  padding: 0.8rem 1.4rem;
+  background: var(--fluid-surface-base);
+  border: var(--fluid-border-width-default) solid var(--fluid-border-strong);
+  border-radius: 2rem;
+}
+.rbw-dock a {
+  display: block;
+  transition: transform 0.3s var(--fluid-easing-spring);
+}
+.rbw-dock a:hover {
+  transform: translateY(-6px) scale(1.1);
+}
+.rbw-dock fluid-icon {
+  --fluid-icon-size: 3rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .rbw-hero,
+  .rbw-widgets,
+  .rbw-tuner {
+    grid-template-columns: 1fr;
+  }
+  .rbw-bento {
+    max-width: 34rem;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .rbw-sink-grid,
+  .rbw-steps {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .rbw-page nav.primary a {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rbw-dot {
+    animation: none;
+  }
+  .rbw-b-icon,
+  .rbw-icon-tile,
+  .rbw-dock a {
+    transition: none;
+  }
+}
