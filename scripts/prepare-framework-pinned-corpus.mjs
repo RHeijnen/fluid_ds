@@ -16,8 +16,10 @@ const sourceEvidence = Object.freeze({
   angular: "quality/evidence/framework-fixtures/2026-09-26T21-18-18-331Z--fluid-ds-admin-angular",
   vue: "quality/evidence/framework-fixtures/2026-09-26T21-18-47-591Z--fluid-ds-framework-vue",
   astro: "quality/evidence/framework-fixtures/2026-09-26T21-19-07-960Z--fluid-ds-framework-astro",
-  sveltekit: "quality/evidence/framework-fixtures/2026-09-26T21-20-02-602Z--fluid-ds-framework-sveltekit",
-  vanilla: "quality/evidence/framework-fixtures/2026-09-26T21-20-32-429Z--fluid-ds-framework-vanilla"
+  sveltekit:
+    "quality/evidence/framework-fixtures/2026-09-26T21-20-02-602Z--fluid-ds-framework-sveltekit",
+  vanilla:
+    "quality/evidence/framework-fixtures/2026-09-26T21-20-32-429Z--fluid-ds-framework-vanilla"
 });
 
 function sha256(value) {
