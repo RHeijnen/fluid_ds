@@ -630,6 +630,16 @@
         },
         {
           "kind": "function",
+          "name": "effectSpace",
+          "return": {
+            "type": {
+              "text": "EffectSpace"
+            }
+          },
+          "description": "Active coordinate space while an effect is being constructed or updated."
+        },
+        {
+          "kind": "function",
           "name": "isCanvasMounted",
           "return": {
             "type": {
@@ -674,7 +684,16 @@
               "text": "{ width: number; height: number }"
             }
           },
-          "description": "Current viewport size in CSS px."
+          "parameters": [
+            {
+              "name": "space",
+              "default": "activeSpace",
+              "type": {
+                "text": "EffectSpace"
+              }
+            }
+          ],
+          "description": "Current effect bounds in CSS px. The no-argument form follows the active\nemitter and remains viewport-based outside an effect callback."
         },
         {
           "kind": "function",
@@ -693,6 +712,30 @@
             }
           ],
           "description": "Wind an emitter down gracefully: it spawns no more particles (its `update` is\nnever called again), but the ones already on screen finish their motion, and\nthe emitter ends itself and resolves once they are gone. Contrast with\nstopEmitter, which drops the particles at once. This reuses the same\n\"spawn no more\" path a `duration` uses when it elapses, so a manual stop\nfizzles out exactly like a timed one."
+        },
+        {
+          "kind": "function",
+          "name": "withEffectSpace",
+          "return": {
+            "type": {
+              "text": "T"
+            }
+          },
+          "parameters": [
+            {
+              "name": "space",
+              "type": {
+                "text": "EffectSpace"
+              }
+            },
+            {
+              "name": "callback",
+              "type": {
+                "text": "() => T"
+              }
+            }
+          ],
+          "description": "Run synchronous effect setup/update code in its selected coordinate space."
         }
       ],
       "exports": [
@@ -725,6 +768,14 @@
           "name": "drawLegacyParticle",
           "declaration": {
             "name": "drawLegacyParticle",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "effectSpace",
+          "declaration": {
+            "name": "effectSpace",
             "module": "src/effects/engine.ts"
           }
         },
@@ -765,6 +816,14 @@
           "name": "windDownEmitter",
           "declaration": {
             "name": "windDownEmitter",
+            "module": "src/effects/engine.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "withEffectSpace",
+          "declaration": {
+            "name": "withEffectSpace",
             "module": "src/effects/engine.ts"
           }
         }
@@ -1034,6 +1093,9 @@
               "name": "colors"
             },
             {
+              "name": "space"
+            },
+            {
               "name": "count"
             },
             {
@@ -1223,7 +1285,7 @@
             "text": "Readonly<Record<EffectOriginPreset, readonly EffectSource[]>>"
           },
           "default": "{ center: [{ origin: { rx: 0.5, ry: 0.5 }, angle: 90 }], top: [{ origin: { rx: 0.5, ry: 0 }, angle: -90 }], bottom: [{ origin: { rx: 0.5, ry: 1 }, angle: 90 }], left: [{ origin: { rx: 0, ry: 0.5 }, angle: 0 }], right: [{ origin: { rx: 1, ry: 0.5 }, angle: 180 }], \"top-left\": [TOP_LEFT], \"top-right\": [TOP_RIGHT], \"bottom-left\": [BOTTOM_LEFT], \"bottom-right\": [BOTTOM_RIGHT], \"top-corners\": [TOP_LEFT, TOP_RIGHT], \"bottom-corners\": [BOTTOM_LEFT, BOTTOM_RIGHT], \"all-corners\": [TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT] }",
-          "description": "Reusable launch presets with inward-facing directions at viewport edges."
+          "description": "Reusable launch presets with inward-facing directions at the selected\neffect-space edges."
         },
         {
           "kind": "function",
@@ -1829,6 +1891,14 @@
           "declaration": {
             "name": "EFFECT_ORIGIN_PRESETS",
             "module": "src/effects/index.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "EffectSpace",
+          "declaration": {
+            "name": "EffectSpace",
+            "module": "src/effects/engine.ts"
           }
         },
         {

@@ -281,6 +281,11 @@ file is the source of truth for "what's queued next."
 
 MIT © [René Heijnen][portfolio]
 
+Exception: **`@fluid-ds/animations`** is licensed under **LGPL-3.0-or-later**
+(see [`packages/animations/LICENSE`](./packages/animations/LICENSE)). You can
+depend on it from any project, including closed-source and commercial ones;
+copies or modifications of that package's own source stay under the LGPL.
+
 [owc]: https://open-wc.org/
 [lucide]: https://lucide.dev/
 [npm]: https://www.npmjs.com/package/@fluid-ds/components

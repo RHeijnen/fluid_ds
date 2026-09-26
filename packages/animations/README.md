@@ -8,6 +8,12 @@ through the Web Animations API.
 Framework-agnostic, works on `fluid-*` components, plain HTML, and
 elements rendered by any framework.
 
+**Completely standalone.** This package has **zero runtime dependencies** and
+does **not** require `@fluid-ds/components` or any other Fluid package. Both
+halves, the attribute-driven keyframes and the imperative effects engine, run on
+their own: `<fluid-celebrate>` extends the platform `HTMLElement` directly rather
+than a Fluid base class. Drop it into plain HTML or any framework on its own.
+
 ## Quick start
 
 ### CDN
@@ -194,4 +200,10 @@ and never focusable.
 
 ## License
 
-MIT
+`@fluid-ds/animations` is licensed under the **GNU Lesser General Public License
+v3.0 or later (`LGPL-3.0-or-later`)**. The rest of the Fluid packages are MIT;
+this one is intentionally different. You may use this package as a dependency in
+any project, including closed-source and commercial ones, but copies or
+modifications of the library's own source must remain available under the LGPL.
+See [`LICENSE`](./LICENSE) (the Lesser additional permissions) and
+[`LICENSE.GPL-3.0`](./LICENSE.GPL-3.0) (the base GPL v3 it incorporates).

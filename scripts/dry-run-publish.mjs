@@ -32,6 +32,7 @@ export const expectedPackageNames = Object.freeze([
   "@fluid-ds/node-graph",
   "@fluid-ds/parser",
   "@fluid-ds/qr",
+  "@fluid-ds/rainbow",
   "@fluid-ds/react",
   "@fluid-ds/scheduler",
   "@fluid-ds/table",
@@ -123,6 +124,12 @@ function hasExactMarkdownHeading(markdown, expectedHeading) {
   return false;
 }
 
+/**
+ * Every package is MIT except the ones listed here. Each exception is a
+ * deliberate owner decision recorded in the root README's license section.
+ */
+const LICENSE_EXCEPTIONS = new Map([["@fluid-ds/animations", "LGPL-3.0-or-later"]]);
+
 export async function auditPackageMetadata(records, root = repositoryRoot) {
   const failures = [];
   const versions = new Set(records.map((record) => record.manifest.version));
@@ -135,7 +142,8 @@ export async function auditPackageMetadata(records, root = repositoryRoot) {
     if (!/^@fluid-ds\/[a-z][a-z0-9-]*$/.test(manifest.name)) fail("invalid public package name");
     if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(manifest.version))
       fail("invalid semver version");
-    if (manifest.license !== "MIT") fail("license metadata must be MIT");
+    const expectedLicense = LICENSE_EXCEPTIONS.get(manifest.name) ?? "MIT";
+    if (manifest.license !== expectedLicense) fail(`license metadata must be ${expectedLicense}`);
     if (manifest.publishConfig?.access !== "public") fail("publishConfig.access must be public");
     if (manifest.publishConfig?.tag !== "latest")
       fail("publishConfig.tag must match the current latest policy");

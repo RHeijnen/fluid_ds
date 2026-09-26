@@ -1,10 +1,10 @@
 {
   "name": "@fluid-ds/animations",
   "version": "0.4.0",
-  "description": "Attribute-driven animation system for Fluid. A registry of named keyframes plus a global controller that watches data-fluid-animation attributes on any element.",
+  "description": "Standalone animation system for Fluid with zero runtime dependencies (no other @fluid-ds package required): a registry of named keyframes driven by data-fluid-animation attributes, plus an imperative canvas effects engine and a <fluid-celebrate> element.",
   "type": "module",
   "customElements": "custom-elements.json",
-  "license": "MIT",
+  "license": "LGPL-3.0-or-later",
   "author": "Fluid contributors",
   "homepage": "https://github.com/RHeijnen/fluid_ds",
   "repository": {
@@ -98,6 +98,7 @@
     "dist",
     "src",
     "LICENSE",
+    "LICENSE.GPL-3.0",
     "README.md",
     "CHANGELOG.md"
   ],
