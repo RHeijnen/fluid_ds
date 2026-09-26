@@ -31,8 +31,8 @@ to hand off context when you switch machines.
 > every existing capture except `media-animated-image` (5 captures), which
 > fails identically on untouched main. Before merging: (1) regenerate
 > `scripts/framework-pinned-profile.json` after committing (the lock changed);
-> (2) review the new `rainbow-*` visual baselines; (3) the npm bootstrap for a
-> brand-new package (`@fluid-ds/rainbow`) needs the owner's passkey publish once;
+> (2) review the new `rainbow-*` visual baselines; (3) DONE 2026-09-26: `@fluid-ds/rainbow@0.4.0` bootstrapped on npm by the owner
+> (passkey, interactive `pnpm publish`); add its trusted publisher binding;
 > (4) the animations GPL relicense in the working tree fails the "license
 > metadata must be MIT" governance gate, independent of this work.
 
@@ -1220,8 +1220,10 @@ result states). Pinned-container visual run: 1,245 captures identical, only the
 pre-existing media-animated-image failures. Charts coverage restored with new
 behavioral tests. Also fixed: battery SSR (childNodes), the dist-tag test for
 the rc pre-mode, and the button bundle budget (19000 -> 19500 for the new
-knobs). Still owner-side: regenerate the pinned framework profile; the
-animations coverage floor (branches 93.44 < 94) predates this work.
+knobs). Still owner-side: regenerate the pinned framework profile. Animations coverage
+was raised to 97.28% branches / 100% functions (floor ratcheted to 97/100), which
+also fixed ensureCanvas leaving an unusable overlay mounted when no 2D context
+was available.
 
 ### 2026-09-26: Rainbow theme, stroke tokens and the @fluid-ds/rainbow pack
 

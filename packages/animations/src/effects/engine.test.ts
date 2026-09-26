@@ -99,6 +99,39 @@ function imageSource(): HTMLCanvasElement {
   return canvas;
 }
 
+/**
+ * Shadow a property (own or inherited) with a fixed value. The returned
+ * function puts the original back exactly: the own descriptor if there was
+ * one, otherwise it deletes the shadow so the inherited getter shows again.
+ */
+function stubProperty(target: object, key: PropertyKey, value: unknown): () => void {
+  const own = Object.getOwnPropertyDescriptor(target, key);
+  Object.defineProperty(target, key, { configurable: true, get: () => value });
+  return () => {
+    if (own) Object.defineProperty(target, key, own);
+    else Reflect.deleteProperty(target, key);
+  };
+}
+
+/** Make every `getContext` call answer null, as a browser does when it cannot
+ *  hand out another 2D context. The returned function restores it. */
+function withoutContexts(): () => void {
+  const real = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = (() => null) as typeof real;
+  return () => {
+    HTMLCanvasElement.prototype.getContext = real;
+  };
+}
+
+/** An emitter that stays alive (spawning nothing) until it is stopped. */
+function idleEmitter(): Emitter {
+  return { particles: [], done: false, resolve: () => undefined, update: () => true };
+}
+
+function overlayCanvases(): HTMLCanvasElement[] {
+  return [...document.querySelectorAll<HTMLCanvasElement>("canvas[data-fluid-effects-canvas]")];
+}
+
 /** Drain whatever the engine is still running so the next test starts clean. */
 async function drain(): Promise<void> {
   await waitUntil(() => activeEmitterCount() === 0, "emitters did not drain", { timeout: 3000 });
@@ -125,6 +158,34 @@ describe("engine: environment probes", () => {
       expect(bounds.height).to.be.at.least(2400);
     } finally {
       marker.remove();
+    }
+  });
+
+  it("measures document bounds from the root element alone before the body exists", () => {
+    // A script in <head> can fire an effect before <body> is parsed.
+    const root = document.documentElement;
+    const restoreBody = stubProperty(document, "body", null);
+    try {
+      expect(viewport("document")).to.deep.equal({
+        width: Math.max(window.innerWidth, root.scrollWidth),
+        height: Math.max(window.innerHeight, root.scrollHeight)
+      });
+    } finally {
+      restoreBody();
+    }
+  });
+
+  it("falls back to the window size for a document with no elements at all", () => {
+    const restoreBody = stubProperty(document, "body", null);
+    const restoreRoot = stubProperty(document, "documentElement", null);
+    try {
+      expect(viewport("document")).to.deep.equal({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    } finally {
+      restoreRoot();
+      restoreBody();
     }
   });
 
@@ -364,6 +425,23 @@ describe("engine: drawLegacyParticle", () => {
     ).to.deep.equal(Array.from(first.getImageData(0, 0, SCRATCH, SCRATCH).data));
   });
 
+  it("skips a glyph whose sprite cannot get a 2D context, and retries it later", () => {
+    const context = scratchContext();
+    const restore = withoutContexts();
+    try {
+      // A glyph no other test has rasterized, so the sprite cache is cold.
+      expect(() =>
+        drawLegacyParticle(context, particle({ shape: "emoji", glyph: "Z", size: 16 }))
+      ).not.to.throw();
+    } finally {
+      restore();
+    }
+    expect(painted(context), "a glyph with no sprite paints nothing").to.equal(0);
+    // The failure must not be cached: once contexts are available it draws.
+    drawLegacyParticle(context, particle({ shape: "emoji", glyph: "Z", size: 16 }));
+    expect(painted(context)).to.be.greaterThan(0);
+  });
+
   it("clamps opacity and leaves the context state untouched", () => {
     const context = scratchContext();
     context.globalAlpha = 0.5;
@@ -373,5 +451,77 @@ describe("engine: drawLegacyParticle", () => {
     drawLegacyParticle(context, particle({ shape: "circle", opacity: -3 }));
     expect(context.globalAlpha, "save/restore must balance").to.equal(0.5);
     expect(painted(context), "an opaque particle still paints").to.be.greaterThan(0);
+  });
+});
+
+describe("engine: canvas mounting", () => {
+  afterEach(async () => {
+    restoreMatchMedia();
+    await drain();
+  });
+
+  it("mounts the overlay on the root element while there is no body yet", async () => {
+    await waitUntil(() => !isCanvasMounted(), "a previous canvas is still mounted");
+    const emitter = idleEmitter();
+    const restoreBody = stubProperty(document, "body", null);
+    try {
+      addEmitter(emitter);
+    } finally {
+      restoreBody();
+    }
+    try {
+      const [canvas] = overlayCanvases();
+      expect(canvas?.parentElement).to.equal(document.documentElement);
+    } finally {
+      stopEmitter(emitter);
+    }
+    expect(isCanvasMounted(), "the overlay goes with the last emitter").to.equal(false);
+  });
+
+  it("throws without a 2D context, leaves no dead canvas behind, and recovers", async () => {
+    await waitUntil(() => !isCanvasMounted(), "a previous canvas is still mounted");
+    const restore = withoutContexts();
+    try {
+      expect(() => addEmitter(idleEmitter())).to.throw(/2D canvas context unavailable/);
+    } finally {
+      restore();
+    }
+    expect(overlayCanvases(), "a canvas that cannot draw must not linger").to.have.length(0);
+    expect(activeEmitterCount(), "the rejected emitter must not join the loop").to.equal(0);
+
+    // The next effect gets a complete overlay: sized to the viewport and
+    // tracking resizes, exactly as if the failure had never happened.
+    const emitter = idleEmitter();
+    addEmitter(emitter);
+    try {
+      const canvases = overlayCanvases();
+      expect(canvases).to.have.length(1);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      expect(canvases[0]!.width).to.equal(Math.floor(window.innerWidth * dpr));
+      expect(canvases[0]!.height).to.equal(Math.floor(window.innerHeight * dpr));
+      canvases[0]!.style.width = "1px";
+      window.dispatchEvent(new Event("resize"));
+      expect(canvases[0]!.style.width, "the overlay must track resizes").to.equal(
+        `${window.innerWidth}px`
+      );
+    } finally {
+      stopEmitter(emitter);
+    }
+  });
+
+  it("treats a missing device pixel ratio as 1", async () => {
+    await waitUntil(() => !isCanvasMounted(), "a previous canvas is still mounted");
+    const emitter = idleEmitter();
+    const restoreRatio = stubProperty(window, "devicePixelRatio", 0);
+    try {
+      addEmitter(emitter);
+      const [canvas] = overlayCanvases();
+      // One backing pixel per CSS pixel rather than a zero-sized canvas.
+      expect(canvas!.width).to.equal(window.innerWidth);
+      expect(canvas!.height).to.equal(window.innerHeight);
+    } finally {
+      restoreRatio();
+      stopEmitter(emitter);
+    }
   });
 });

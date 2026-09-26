@@ -6,6 +6,7 @@ import {
   drawCircle,
   drawEmoji,
   drawEmojiOrImage,
+  drawFog,
   drawImage,
   drawMagic,
   drawMagicOrCircle,
@@ -263,4 +264,39 @@ describe("renderers: particleWithRenderer", () => {
       0
     );
   });
+});
+
+describe("renderers: sprite contexts", () => {
+  // Fog and glyph particles blit a cached offscreen sprite. When the browser
+  // will not hand out a 2D context for that sprite, the particle is skipped
+  // for the frame (never a throw mid-loop) and the miss is not cached.
+  function withoutContexts(): () => void {
+    const real = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = (() => null) as typeof real;
+    return () => {
+      HTMLCanvasElement.prototype.getContext = real;
+    };
+  }
+
+  const cases: [string, Particle][] = [
+    // A color and a glyph no other test uses, so each sprite cache starts cold.
+    ["fog", particle({ shape: "fog", color: "#0a1b2c", size: 12 })],
+    ["glyph", particle({ shape: "emoji", glyph: "Q", size: 16 })]
+  ];
+
+  for (const [name, subject] of cases) {
+    it(`skips a ${name} particle without a sprite context, then draws it once one is available`, () => {
+      const render = name === "fog" ? drawFog : drawEmoji;
+      const context = scratchContext();
+      const restore = withoutContexts();
+      try {
+        expect(() => render(context, subject)).not.to.throw();
+      } finally {
+        restore();
+      }
+      expect(painted(context), `a ${name} with no sprite paints nothing`).to.equal(0);
+      render(context, subject);
+      expect(painted(context), `the ${name} sprite must be retried`).to.be.greaterThan(0);
+    });
+  }
 });

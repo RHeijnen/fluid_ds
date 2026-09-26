@@ -218,7 +218,9 @@ function run(
   make: (onDone: () => void) => Emitter[],
   space: EffectSpace = "viewport"
 ): EffectHandle {
-  let settle: () => void = () => undefined;
+  // The Promise executor runs synchronously, so `settle` is always assigned
+  // before anything can call it; no placeholder function is needed.
+  let settle!: () => void;
   const finished = new Promise<void>((res) => {
     settle = res;
   });

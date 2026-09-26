@@ -179,23 +179,21 @@ function createCanvas(): HTMLCanvasElement {
 }
 
 function ensureCanvas(): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
-  if (!canvas || !canvas.isConnected) {
-    canvas = createCanvas();
-    (document.body ?? document.documentElement).appendChild(canvas);
-    const context = canvas.getContext("2d");
+  if (!canvas || !canvas.isConnected || !ctx) {
+    // Acquire the context before mounting: a canvas that cannot draw must not
+    // be left in the document, and the next attempt must get a fully sized,
+    // resize-tracked overlay rather than a half-initialized one.
+    const el = createCanvas();
+    const context = el.getContext("2d");
     if (!context) {
       throw new Error("@fluid-ds/animations: 2D canvas context unavailable.");
     }
+    canvas?.remove();
+    canvas = el;
     ctx = context;
+    (document.body ?? document.documentElement).appendChild(el);
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas, { passive: true });
-  }
-  if (!ctx) {
-    const context = canvas.getContext("2d");
-    if (!context) {
-      throw new Error("@fluid-ds/animations: 2D canvas context unavailable.");
-    }
-    ctx = context;
   }
   return { canvas, ctx };
 }

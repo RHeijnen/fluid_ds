@@ -488,3 +488,115 @@ describe("effects: firework finale", () => {
     }
   });
 });
+
+describe("effects: document space", () => {
+  // Scroll the page, then fire at an element pinned on screen. In document
+  // space the origin is measured in page coordinates (rect plus scroll) and
+  // the engine paints through the inverse scroll, so the ink must land on the
+  // element itself. Dropping either half of that pairing would paint 1500px
+  // off screen and leave the element's neighbourhood blank.
+  const SCROLL = 1500;
+  let page: HTMLElement;
+  let target: HTMLElement;
+
+  beforeEach(() => {
+    page = document.createElement("div");
+    page.style.cssText = "position:absolute;left:0;top:0;width:1px;height:6000px";
+    target = document.createElement("div");
+    target.style.cssText = "position:fixed;left:60px;top:60px;width:40px;height:40px";
+    document.body.append(page, target);
+    window.scrollTo(0, SCROLL);
+  });
+
+  afterEach(() => {
+    window.scrollTo(0, 0);
+    page.remove();
+    target.remove();
+    restoreMatchMedia();
+  });
+
+  /** Opaque overlay pixels within `pad` CSS px of the target. */
+  function inkAroundTarget(pad: number): number {
+    const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-fluid-effects-canvas]");
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context) return 0;
+    const scale = canvas.width / window.innerWidth;
+    const r = target.getBoundingClientRect();
+    const { data } = context.getImageData(
+      Math.floor((r.left - pad) * scale),
+      Math.floor((r.top - pad) * scale),
+      Math.ceil((r.width + pad * 2) * scale),
+      Math.ceil((r.height + pad * 2) * scale)
+    );
+    let total = 0;
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i]! > 0) total += 1;
+    }
+    return total;
+  }
+
+  const cases: [string, () => EffectHandle][] = [
+    [
+      "a burst",
+      () =>
+        confetti({
+          origin: target,
+          space: "document",
+          velocity: 0,
+          gravity: 0,
+          count: 30,
+          colors: ["#ff0000"]
+        })
+    ],
+    [
+      "sparkles",
+      () => sparkles({ origin: target, space: "document", rate: 200, colors: ["#ff0000"] })
+    ]
+  ];
+
+  for (const [name, start] of cases) {
+    it(`paints ${name} from an element origin on the element while scrolled`, async () => {
+      expect(window.scrollY, "the page must actually be scrolled").to.equal(SCROLL);
+      const handle = start();
+      try {
+        await waitUntil(() => inkAroundTarget(24) > 0, `${name} did not paint on its element`, {
+          timeout: 2000
+        });
+      } finally {
+        await settle(handle);
+      }
+    });
+  }
+});
+
+describe("effects: butterflies leaving to the left", () => {
+  afterEach(restoreMatchMedia);
+
+  it("retires a right-to-left butterfly once it clears the left edge", async () => {
+    // Pin the dice so every butterfly enters from the right (a roll of 0.99
+    // picks the leftward heading) and narrow the viewport so the crossing is
+    // short. Without the edge exit the flock would linger for its whole
+    // 11-17s life, far past the bound below.
+    const realRandom = Math.random;
+    const own = Object.getOwnPropertyDescriptor(window, "innerWidth");
+    Math.random = () => 0.99;
+    Object.defineProperty(window, "innerWidth", { configurable: true, get: () => 60 });
+    let handle: EffectHandle | undefined;
+    try {
+      handle = butterflies({ duration: 50 });
+      await waitUntil(() => activeParticleCount() > 0, "no butterflies entered", {
+        timeout: 1000
+      });
+      const outcome = await Promise.race([
+        handle.finished.then(() => "gone"),
+        aTimeout(3500).then(() => "lingering")
+      ]);
+      expect(outcome, "the flock must leave through the left edge").to.equal("gone");
+    } finally {
+      Math.random = realRandom;
+      if (own) Object.defineProperty(window, "innerWidth", own);
+      else Reflect.deleteProperty(window, "innerWidth");
+      if (handle) await settle(handle);
+    }
+  });
+});
