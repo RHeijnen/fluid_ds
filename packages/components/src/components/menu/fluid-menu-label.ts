@@ -27,6 +27,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @cssproperty --fluid-menu-label-fg - Heading text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-menu-label-padding - Row padding (shorthand). Falls back to --fluid-space-1 --fluid-space-3.
+ * @cssproperty --fluid-menu-label-font-family - Heading font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-menu-label-font-size - Heading font size. Falls back to --fluid-font-size-xs.
  * @cssproperty --fluid-menu-label-divider - Top divider color. Falls back to --fluid-border-default.
  *
@@ -53,7 +54,7 @@ export class FluidMenuLabel extends FluidElement {
     .base {
       box-sizing: border-box;
       padding: var(--fluid-menu-label-padding, var(--fluid-space-1) var(--fluid-space-3));
-      font-family: var(--fluid-font-family-sans);
+      font-family: var(--fluid-menu-label-font-family, var(--fluid-font-family-sans));
       font-size: var(--fluid-menu-label-font-size, var(--fluid-font-size-xs));
       font-weight: var(--fluid-font-weight-medium);
       line-height: 1.5;

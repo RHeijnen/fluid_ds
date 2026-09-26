@@ -49,6 +49,9 @@ export type FluidAnchorNavActiveChangeEvent = CustomEvent<FluidAnchorNavActiveCh
  * @cssproperty --fluid-anchor-nav-active-fg - Active (current) link text color.
  * @cssproperty --fluid-anchor-nav-active-marker - Color of the active marker rail.
  * @cssproperty --fluid-anchor-nav-marker - Color of the idle marker rail.
+ * @cssproperty --fluid-anchor-nav-marker-width - Width of the per-link marker (the active rail). Falls back to 2px.
+ * @cssproperty --fluid-anchor-nav-marker-offset - Inline-start offset that pulls each link's marker over the rail. Falls back to -1px.
+ * @cssproperty --fluid-anchor-nav-active-bg - Active (current) link background. Falls back to transparent.
  * @cssproperty --fluid-anchor-nav-indent - Indent step applied per nesting level.
  * @cssproperty --fluid-anchor-nav-radius - Link corner radius.
  * @cssproperty --fluid-anchor-nav-focus-ring - Link focus ring color.
@@ -110,8 +113,8 @@ export class FluidAnchorNav extends FluidElement {
         min-height: max(var(--fluid-space-6), var(--fluid-target-min, 0px));
         box-sizing: border-box;
         padding: var(--fluid-space-1) var(--fluid-space-3);
-        margin-inline-start: -1px;
-        border-inline-start: 2px solid transparent;
+        margin-inline-start: var(--fluid-anchor-nav-marker-offset, -1px);
+        border-inline-start: var(--fluid-anchor-nav-marker-width, 2px) solid transparent;
         border-radius: var(--fluid-anchor-nav-radius, var(--fluid-radius-sm));
         color: var(--fluid-anchor-nav-fg, var(--fluid-text-secondary));
         font-size: var(--fluid-font-size-sm);
@@ -133,6 +136,7 @@ export class FluidAnchorNav extends FluidElement {
         color: var(--fluid-anchor-nav-active-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
         font-weight: var(--fluid-font-weight-medium);
         border-inline-start-color: var(--fluid-anchor-nav-active-marker, var(--fluid-accent-base));
+        background: var(--fluid-anchor-nav-active-bg, transparent);
       }
 
       .level-2 {

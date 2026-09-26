@@ -1,6 +1,6 @@
 ---
 title: "@fluid-ds/rainbow"
-description: "The Rainbow expansion pack: an animated landscape tile, a live localized clock, a battery gauge with charging and heartbeat flourishes, and fourteen illustrated app icons."
+description: "The Rainbow expansion pack: an animated landscape tile, a live localized clock, a battery gauge with charging and heartbeat flourishes, and a set of 92 illustrations: app tiles and spot scenes."
 ---
 
 import RainbowDemo from "../../../components/RainbowDemo.astro";
@@ -9,7 +9,7 @@ The Rainbow pack is the illustrated half of the
 [Rainbow brand preset](/theming/brand/#what-rainbow-changes). The preset
 restyles every Fluid component with cream paper, ink outlines and pastel fills.
 This pack adds the pieces a theme alone cannot: home-screen style widgets and a
-set of multi-color app icons. Expansion pack.
+set of multi-color illustrations. Expansion pack.
 
 Everything here works under any brand. Colors read the Rainbow palette
 (`--rainbow-blue`, `--rainbow-ink`, …) when the preset is active and fall back
@@ -26,7 +26,7 @@ pnpm add @fluid-ds/rainbow @fluid-ds/themes
 ```ts
 import "@fluid-ds/themes/rainbow.css"; // the look (optional, but recommended)
 import "@fluid-ds/rainbow/define"; // the three widgets
-import "@fluid-ds/rainbow/icons/register"; // the illustrated icons
+import "@fluid-ds/rainbow/illustrations/register"; // the illustrations
 ```
 
 ```html
@@ -106,22 +106,39 @@ rainbow gradient), `-casing`, `-ink`, `-border-width`, `-radius`, `-plug`,
 `-heart`, `-fg` and `-font-family`. Parts: `base`, `body`, `cell`, `label`,
 `pulse`.
 
-## Icons
+## Illustrations
 
-Fourteen illustrated app icons register with the shared icon registry and
-render through `<fluid-icon>` like any other icon: `rainbow-chat`,
-`rainbow-chart`, `rainbow-lock`, `rainbow-calendar`, `rainbow-bolt`,
-`rainbow-cloud`, `rainbow-globe`, `rainbow-gear`, `rainbow-mail`,
-`rainbow-clock`, `rainbow-music`, `rainbow-gallery`, `rainbow-game` and
-`rainbow-logo`.
+The pack ships 92 hand-built illustrations. They register with the shared icon
+registry and render through `<fluid-icon>` like any other icon, under names
+prefixed `rainbow-`. Every drawing uses the same language: flat pastel fills, a
+chunky ink outline of one weight, round caps and joins, and no text.
+
+- **App tiles** (84): a 64×64 squircle tile, readable down to 32px. They come
+  in groups by subject: communication (chat, mail, inbox, send, bell, ...),
+  people, media, work (calendar, document, clipboard, search, ...), data and
+  tech (chart, database, server, bug, rocket, ...), security, shopping, places
+  and travel, nature and weather, food and fun, status (check, warning, info,
+  help, upload, download, trash) and the Rainbow logo.
+- **Spot illustrations** (8): wider 160×120 scenes on a soft blob, named
+  `rainbow-spot-*`, for empty states and results: `empty-inbox`,
+  `no-results`, `success`, `error`, `offline`, `lost` (a 404), `all-caught-up`
+  and `welcome`.
 
 ```html
 <fluid-icon name="rainbow-chat" style="--fluid-icon-size: 4rem"></fluid-icon>
+<fluid-icon name="rainbow-spot-no-results" style="width: 16rem; height: 12rem"></fluid-icon>
 ```
 
+Size a spot with an explicit width and height in its 4:3 ratio;
+`--fluid-icon-size` sets both sides to the same value.
+
 Unlike the line icons they carry their own colors, painted from the Rainbow
-palette with hex fallbacks. To register them yourself (for example under other
-names), import `rainbowIcons` from `@fluid-ds/rainbow/icons`.
+palette with hex fallbacks, and the tile rim follows `--rainbow-line`, so it
+turns cream on the dark scheme. They are decorative (`aria-hidden`) unless you
+give the `<fluid-icon>` a `label`. `rainbowIllustrationGroups` from
+`@fluid-ds/rainbow/illustrations` lists every name by group (handy for a
+picker), and `rainbowIllustrations` holds the SVG strings if you want to
+register them yourself, for example under other names.
 
 ## When to use
 

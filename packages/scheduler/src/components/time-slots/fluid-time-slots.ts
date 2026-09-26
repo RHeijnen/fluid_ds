@@ -55,6 +55,10 @@ type TimeFormat = "12h" | "24h";
  * @uses-token --fluid-target-min - Minimum slot height (24px AA / 44px AAA).
  * @cssproperty --fluid-time-slots-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-time-slots-hover-border - Slot hover border color. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-time-slots-selected-border - Selected slot border color. Falls back to --fluid-time-slots-selected-bg.
+ * @cssproperty --fluid-time-slots-selected-shadow - Selected slot shadow. Falls back to none.
+ * @cssproperty --fluid-time-slots-heading-font-family - Date heading font family. Falls back to inherit.
  *
  * @fires fluid-change - A slot was selected. `detail: { value, slot }`.
  */
@@ -79,6 +83,7 @@ export class FluidTimeSlots extends FluidElement {
       .heading {
         margin: 0 0 0.6rem;
         font-size: var(--fluid-font-size-sm, 0.875rem);
+        font-family: var(--fluid-time-slots-heading-font-family, inherit);
         font-weight: 600;
         color: var(--fluid-text-primary);
       }
@@ -119,12 +124,16 @@ export class FluidTimeSlots extends FluidElement {
       }
       .slot:hover:not(:disabled):not(.selected) {
         background: var(--fluid-time-slots-hover-bg, var(--fluid-surface-muted));
-        border-color: var(--fluid-accent-base);
+        border-color: var(--fluid-time-slots-hover-border, var(--fluid-accent-base));
       }
       .slot.selected {
         background: var(--fluid-time-slots-selected-bg, var(--fluid-accent-base));
         color: var(--fluid-time-slots-selected-fg, var(--fluid-accent-text));
-        border-color: var(--fluid-time-slots-selected-bg, var(--fluid-accent-base));
+        border-color: var(
+          --fluid-time-slots-selected-border,
+          var(--fluid-time-slots-selected-bg, var(--fluid-accent-base))
+        );
+        box-shadow: var(--fluid-time-slots-selected-shadow, none);
         font-weight: 600;
       }
       .slot:disabled {

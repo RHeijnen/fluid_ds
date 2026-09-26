@@ -63,6 +63,36 @@ interface FluidTheme {
   border: string;
   surface: string;
   font: string;
+  /** Outline drawn around bars, arcs and points; empty keeps the built-in look. */
+  seriesBorder: string;
+  seriesBorderWidth: number | null;
+  lineWidth: number;
+  pointRadius: number | null;
+  barRadius: number;
+  /** False when a theme asks for flat fills instead of the gradients. */
+  gradients: boolean;
+  tooltipBg: string;
+  tooltipFg: string;
+  tooltipBorder: string;
+  tooltipBorderWidth: number;
+  centerFont: string;
+}
+
+/** Split a comma list of colors, keeping commas inside rgb() or color-mix() intact. */
+function splitColorList(value: string): string[] {
+  const out: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of value) {
+    if (ch === "(") depth++;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    if (ch === "," && depth === 0) {
+      if (current.trim()) out.push(current.trim());
+      current = "";
+    } else current += ch;
+  }
+  if (current.trim()) out.push(current.trim());
+  return out;
 }
 
 /**
@@ -101,6 +131,18 @@ interface FluidTheme {
  * @cssproperty --fluid-chart-legend-focus-color - Legend focus ring color.
  * @cssproperty --fluid-chart-legend-focus-width - Legend focus ring width.
  * @cssproperty --fluid-chart-legend-focus-offset - Legend focus ring offset.
+ * @cssproperty --fluid-chart-palette - Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).
+ * @cssproperty --fluid-chart-series-border - Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).
+ * @cssproperty --fluid-chart-series-border-width - Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.
+ * @cssproperty --fluid-chart-line-width - Line series stroke width (px). Falls back to 2.5.
+ * @cssproperty --fluid-chart-point-radius - Resting radius (px) of line points. Falls back to 0 (shown on hover only).
+ * @cssproperty --fluid-chart-bar-radius - Bar corner radius (px). Falls back to 6.
+ * @cssproperty --fluid-chart-fill-style - Set to "flat" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.
+ * @cssproperty --fluid-chart-tooltip-bg - Tooltip background. Falls back to --fluid-text-primary.
+ * @cssproperty --fluid-chart-tooltip-fg - Tooltip text color. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-chart-tooltip-border - Tooltip outline color. Falls back to transparent.
+ * @cssproperty --fluid-chart-tooltip-border-width - Tooltip outline width (px). Falls back to 0.
+ * @cssproperty --fluid-chart-center-font-family - Font of the doughnut center total. Falls back to --fluid-font-family-sans.
  *
  * @uses-token --fluid-accent-base - Primary series + area-fill gradient.
  * @uses-token --fluid-color-brand-200 - Categorical series palette (brand ramp).
@@ -322,20 +364,44 @@ export class FluidChart extends FluidElement {
   private readTheme(): FluidTheme {
     const cs = getComputedStyle(this);
     const read = (name: string, fallback: string) => cs.getPropertyValue(name).trim() || fallback;
+    const num = (name: string): number | null => {
+      const parsed = Number.parseFloat(cs.getPropertyValue(name).trim());
+      return Number.isFinite(parsed) ? parsed : null;
+    };
     const accent = read("--fluid-accent-base", "#3b82f6");
     const brand = ["600", "400", "800", "300", "700", "500", "200", "900"]
       .map((s) => cs.getPropertyValue(`--fluid-color-brand-${s}`).trim())
       .filter(Boolean);
+    const custom = splitColorList(cs.getPropertyValue("--fluid-chart-palette"));
     const palette =
-      brand.length >= 3 ? brand : [accent, "#22d3ee", "#8b5cf6", "#f59e0b", "#ec4899", "#10b981"];
+      custom.length > 0
+        ? custom
+        : brand.length >= 3
+          ? brand
+          : [accent, "#22d3ee", "#8b5cf6", "#f59e0b", "#ec4899", "#10b981"];
+    const text = read("--fluid-text-primary", "#111827");
+    const surface = read("--fluid-surface-base", "#ffffff");
+    const font = read("--fluid-font-family-sans", "system-ui, -apple-system, sans-serif");
+    const seriesBorder = cs.getPropertyValue("--fluid-chart-series-border").trim();
     return {
       palette,
       accent,
-      text: read("--fluid-text-primary", "#111827"),
+      text,
       muted: read("--fluid-text-secondary", "#6b7280"),
       border: read("--fluid-border-default", "#e5e7eb"),
-      surface: read("--fluid-surface-base", "#ffffff"),
-      font: read("--fluid-font-family-sans", "system-ui, -apple-system, sans-serif")
+      surface,
+      font,
+      seriesBorder,
+      seriesBorderWidth: seriesBorder ? (num("--fluid-chart-series-border-width") ?? 2) : null,
+      lineWidth: num("--fluid-chart-line-width") ?? 2.5,
+      pointRadius: num("--fluid-chart-point-radius"),
+      barRadius: num("--fluid-chart-bar-radius") ?? 6,
+      gradients: cs.getPropertyValue("--fluid-chart-fill-style").trim() !== "flat",
+      tooltipBg: read("--fluid-chart-tooltip-bg", text),
+      tooltipFg: read("--fluid-chart-tooltip-fg", surface),
+      tooltipBorder: read("--fluid-chart-tooltip-border", "transparent"),
+      tooltipBorderWidth: num("--fluid-chart-tooltip-border-width") ?? 0,
+      centerFont: read("--fluid-chart-center-font-family", font)
     };
   }
 
@@ -361,9 +427,11 @@ export class FluidChart extends FluidElement {
           }
         },
         tooltip: {
-          backgroundColor: t.text,
-          titleColor: t.surface,
-          bodyColor: t.surface,
+          backgroundColor: t.tooltipBg,
+          titleColor: t.tooltipFg,
+          bodyColor: t.tooltipFg,
+          borderColor: t.tooltipBorder,
+          borderWidth: t.tooltipBorderWidth,
           padding: 10,
           cornerRadius: 8,
           boxPadding: 4,
@@ -373,10 +441,15 @@ export class FluidChart extends FluidElement {
         }
       },
       elements: {
-        line: { tension: 0.35, borderWidth: 2.5 },
-        point: { radius: 0, hoverRadius: 5, hitRadius: 12, borderWidth: 2 },
-        bar: { borderRadius: 6, borderSkipped: false },
-        arc: { borderWidth: 2, borderColor: t.surface }
+        line: { tension: 0.35, borderWidth: t.lineWidth },
+        point: {
+          radius: t.pointRadius ?? 0,
+          hoverRadius: Math.max(5, (t.pointRadius ?? 0) + 2),
+          hitRadius: 12,
+          borderWidth: t.seriesBorderWidth ?? 2
+        },
+        bar: { borderRadius: t.barRadius, borderSkipped: false },
+        arc: { borderWidth: t.seriesBorderWidth ?? 2, borderColor: t.seriesBorder || t.surface }
       }
     };
     if (CARTESIAN.has(this.type)) {
@@ -462,7 +535,7 @@ export class FluidChart extends FluidElement {
           c.textAlign = "center";
           c.textBaseline = "middle";
           c.fillStyle = t.text;
-          c.font = `700 26px ${t.font}`;
+          c.font = `700 26px ${t.centerFont}`;
           c.fillText(this.formatNumber(total), cx, cy - 8);
           c.fillStyle = t.muted;
           c.font = `500 13px ${t.font}`;
@@ -482,7 +555,9 @@ export class FluidChart extends FluidElement {
       if (this.type === "doughnut" || this.type === "pie" || this.type === "polarArea") {
         // Each arc gets a radial gradient (lighter toward the hole, saturated at
         // the rim) so the ring reads as glossy rather than flat.
-        if (ds.backgroundColor == null) {
+        if (ds.backgroundColor == null && !t.gradients) {
+          ds.backgroundColor = (ctx: { dataIndex: number }) => pick(ctx.dataIndex ?? 0);
+        } else if (ds.backgroundColor == null) {
           ds.backgroundColor = (ctx: { chart: Chart; dataIndex: number }) => {
             const c = pick(ctx.dataIndex ?? 0);
             const area = ctx.chart.chartArea;
@@ -497,11 +572,13 @@ export class FluidChart extends FluidElement {
           };
         }
         if (this.type === "polarArea") {
-          if (ds.borderColor == null) ds.borderColor = t.surface;
-          if (ds.borderWidth == null) ds.borderWidth = 2;
+          if (ds.borderColor == null) ds.borderColor = t.seriesBorder || t.surface;
+          if (ds.borderWidth == null) ds.borderWidth = t.seriesBorderWidth ?? 2;
         } else {
           // Floating, rounded segments: no border, a small gap, rounded caps.
-          if (ds.borderWidth == null) ds.borderWidth = 0;
+          // A theme outline (--fluid-chart-series-border) inks each segment.
+          if (ds.borderColor == null && t.seriesBorder) ds.borderColor = t.seriesBorder;
+          if (ds.borderWidth == null) ds.borderWidth = t.seriesBorderWidth ?? 0;
           if (ds.borderRadius == null) ds.borderRadius = 10;
           if (ds.spacing == null) ds.spacing = 3;
         }
@@ -512,14 +589,21 @@ export class FluidChart extends FluidElement {
           // In a stack, rounding all four corners of every segment puts caps
           // in the middle of the column. Round only the outer edges of each
           // stack instead; grouped bars keep the plain radius.
-          ds.borderRadius = this.isStacked() ? this.stackedBarRadius(6) : 6;
+          ds.borderRadius = this.isStacked() ? this.stackedBarRadius(t.barRadius) : t.barRadius;
+        }
+        if (t.seriesBorder) {
+          if (ds.borderColor == null) ds.borderColor = t.seriesBorder;
+          if (ds.borderWidth == null) ds.borderWidth = t.seriesBorderWidth;
         }
       } else if (this.type === "line") {
         if (ds.borderColor == null) ds.borderColor = color;
         if (ds.pointBackgroundColor == null) ds.pointBackgroundColor = color;
-        if (ds.pointBorderColor == null) ds.pointBorderColor = t.surface;
-        // Area fill: a soft vertical gradient from the series color to transparent.
-        if (ds.fill && ds.backgroundColor == null) {
+        if (ds.pointBorderColor == null) ds.pointBorderColor = t.seriesBorder || t.surface;
+        // Area fill: a soft vertical gradient from the series color to transparent,
+        // or a flat wash when the theme asks for flat fills.
+        if (ds.fill && ds.backgroundColor == null && !t.gradients) {
+          ds.backgroundColor = rgba(color, 0.35);
+        } else if (ds.fill && ds.backgroundColor == null) {
           ds.backgroundColor = (ctx: { chart: Chart }) => {
             const area = ctx.chart.chartArea;
             if (!area) return rgba(color, 0.15);
@@ -531,7 +615,9 @@ export class FluidChart extends FluidElement {
         }
       } else {
         if (ds.backgroundColor == null) ds.backgroundColor = rgba(color, 0.65);
-        if (ds.borderColor == null) ds.borderColor = color;
+        if (ds.borderColor == null) ds.borderColor = t.seriesBorder || color;
+        if (ds.borderWidth == null && t.seriesBorderWidth != null)
+          ds.borderWidth = t.seriesBorderWidth;
       }
       return ds as unknown as ChartDataset;
     });

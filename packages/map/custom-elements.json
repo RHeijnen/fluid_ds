@@ -37,6 +37,10 @@
             {
               "description": "Border around the viewport. Falls back to 1px solid --fluid-border-default.",
               "name": "--fluid-map-border"
+            },
+            {
+              "description": "Shadow under the viewport. Falls back to none.",
+              "name": "--fluid-map-shadow"
             }
           ],
           "cssParts": [

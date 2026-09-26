@@ -1,23 +1,23 @@
 ---
 /**
  * Live demo for the Rainbow pack page: the landscape clock tile, a charging
- * battery with the heartbeat trace, and a row of illustrated icons, rendered
+ * battery with the heartbeat trace, and a row of illustrations, rendered
  * under the Rainbow brand preset.
  */
 import Demo from "./Demo.astro";
 
-const icons = ["rainbow-chat", "rainbow-chart", "rainbow-calendar", "rainbow-cloud", "rainbow-music", "rainbow-game"];
+const illustrations = ["rainbow-chat", "rainbow-chart", "rainbow-calendar", "rainbow-cloud", "rainbow-music", "rainbow-game"];
 ---
 
-<Demo title="Landscape, clock, battery and icons">
+<Demo title="Landscape, clock, battery and illustrations">
   <div class="rainbow-demo" data-fluid-brand="rainbow">
     <fluid-rainbow-landscape>
       <fluid-rainbow-clock hour-cycle="h23"></fluid-rainbow-clock>
     </fluid-rainbow-landscape>
     <div class="rainbow-side">
       <fluid-rainbow-battery value="99.98" show-value charging pulse>Uptime</fluid-rainbow-battery>
-      <div class="rainbow-icons">
-        {icons.map((name) => <fluid-icon name={name} style="--fluid-icon-size: 3rem" />)}
+      <div class="rainbow-illustrations">
+        {illustrations.map((name) => <fluid-icon name={name} style="--fluid-icon-size: 3rem" />)}
       </div>
     </div>
   </div>
@@ -37,7 +37,7 @@ const icons = ["rainbow-chat", "rainbow-chart", "rainbow-calendar", "rainbow-clo
     display: grid;
     gap: 1rem;
   }
-  .rainbow-icons {
+  .rainbow-illustrations {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -51,5 +51,5 @@ const icons = ["rainbow-chat", "rainbow-chart", "rainbow-calendar", "rainbow-clo
 
 <script>
   import "@fluid-ds/rainbow/define";
-  import "@fluid-ds/rainbow/icons/register";
+  import "@fluid-ds/rainbow/illustrations/register";
 </script>

@@ -41,6 +41,12 @@ const DEFAULT_WINDOW: TimeWindow = { start: "09:00", end: "17:00" };
  * @uses-token --fluid-focus-ring-width - Time-input focus ring (2px AA / 3px AAA).
  * @cssproperty --fluid-availability-editor-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-availability-editor-heading-font-family - Section heading font family. Falls back to inherit.
+ * @cssproperty --fluid-availability-editor-row-gap - Space between weekday rows. Falls back to 0.
+ * @cssproperty --fluid-availability-editor-row-border - Weekday row outline. Falls back to none.
+ * @cssproperty --fluid-availability-editor-input-border-width - Time-input outline width. Falls back to --fluid-availability-editor-border-width.
+ * @cssproperty --fluid-availability-editor-input-radius - Time-input corner radius. Falls back to --fluid-radius-sm.
+ * @uses-token --fluid-radius-sm - Time-input radius.
  *
  * @fires fluid-change - The availability config changed. `detail: { availability }`.
  */
@@ -58,6 +64,7 @@ export class FluidAvailabilityEditor extends FluidElement {
     }
     h3 {
       margin: 0 0 0.6rem;
+      font-family: var(--fluid-availability-editor-heading-font-family, inherit);
       font-size: var(--fluid-font-size-md, 1rem);
       font-weight: 600;
     }
@@ -83,6 +90,10 @@ export class FluidAvailabilityEditor extends FluidElement {
       padding: 0.6rem 0.75rem;
       background: var(--fluid-availability-editor-row-bg, var(--fluid-surface-muted));
       border-radius: var(--fluid-availability-editor-radius, var(--fluid-radius-md));
+      border: var(--fluid-availability-editor-row-border, none);
+    }
+    .day + .day {
+      margin-top: var(--fluid-availability-editor-row-gap, 0);
     }
     .day-name {
       flex: 0 0 6rem;
@@ -102,9 +113,12 @@ export class FluidAvailabilityEditor extends FluidElement {
     input[type="time"] {
       min-height: max(2rem, var(--fluid-target-min, 0px));
       padding: 0.2rem 0.4rem;
-      border: var(--fluid-availability-editor-border-width, var(--fluid-border-width-default, 1px))
+      border: var(
+          --fluid-availability-editor-input-border-width,
+          var(--fluid-availability-editor-border-width, var(--fluid-border-width-default, 1px))
+        )
         solid var(--fluid-border-default);
-      border-radius: var(--fluid-radius-sm, 4px);
+      border-radius: var(--fluid-availability-editor-input-radius, var(--fluid-radius-sm, 4px));
       background: var(--fluid-surface-base);
       color: var(--fluid-text-primary);
       font: inherit;

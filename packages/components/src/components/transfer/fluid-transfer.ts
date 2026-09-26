@@ -71,6 +71,8 @@ type Side = "source" | "target";
  * @cssproperty --fluid-transfer-button-fg - Move-button icon color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-transfer-button-border - Move-button border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-transfer-button-hover-bg - Move-button hover background. Falls back to --fluid-surface-muted.
+ * @cssproperty --fluid-transfer-button-radius - Move-button corner radius. Falls back to --fluid-transfer-radius.
+ * @cssproperty --fluid-transfer-button-shadow - Move-button shadow. Falls back to none.
  * @cssproperty --fluid-transfer-focus-ring-color - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-transfer-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  * @cssproperty --fluid-transfer-gap - Gap between panes and the controls. Falls back to --fluid-space-3.
@@ -259,7 +261,11 @@ export class FluidTransfer extends FluidFormAssociated {
         color: var(--fluid-transfer-button-fg, var(--fluid-text-primary));
         border: var(--fluid-transfer-border-width, var(--fluid-field-border-width)) solid
           var(--fluid-transfer-button-border, var(--fluid-border-default));
-        border-radius: var(--fluid-transfer-radius, var(--fluid-field-border-radius));
+        border-radius: var(
+          --fluid-transfer-button-radius,
+          var(--fluid-transfer-radius, var(--fluid-field-border-radius))
+        );
+        box-shadow: var(--fluid-transfer-button-shadow, none);
         cursor: pointer;
         transition: background-color var(--fluid-duration-fast) var(--fluid-easing-standard);
       }

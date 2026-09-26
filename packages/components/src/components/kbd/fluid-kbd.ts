@@ -22,6 +22,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-border-default - Key border.
  * @uses-token --fluid-radius-sm - Corner radius.
  * @cssproperty --fluid-kbd-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @cssproperty --fluid-kbd-border-bottom-width - Bottom edge stroke width (the key lip). Falls back to 2px.
+ * @cssproperty --fluid-kbd-shadow - Key shadow. Falls back to none.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  */
 export class FluidKbd extends FluidElement {
@@ -47,8 +49,9 @@ export class FluidKbd extends FluidElement {
       background: var(--fluid-kbd-bg, var(--fluid-surface-muted));
       border: var(--fluid-kbd-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-kbd-border, var(--fluid-border-default));
-      border-bottom-width: 2px;
+      border-bottom-width: var(--fluid-kbd-border-bottom-width, 2px);
       border-radius: var(--fluid-kbd-radius, var(--fluid-radius-sm, 4px));
+      box-shadow: var(--fluid-kbd-shadow, none);
     }
     :host([size="sm"]) kbd {
       font-size: 0.6875rem;

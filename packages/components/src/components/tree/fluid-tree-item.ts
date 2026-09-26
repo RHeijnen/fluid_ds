@@ -33,6 +33,9 @@ registerIcon(
  * @cssproperty --fluid-tree-item-fg - Default text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-tree-item-hover-bg - Row hover background. Falls back to --fluid-surface-muted.
  * @cssproperty --fluid-tree-item-selected-accent - Accent color for the selected row. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-tree-item-selected-bg - Selected row background. Falls back to a 15% tint of --fluid-tree-item-selected-accent.
+ * @cssproperty --fluid-tree-item-selected-fg - Selected row text color. Falls back to --fluid-tree-item-selected-accent, then --fluid-accent-fg.
+ * @cssproperty --fluid-tree-item-selected-shadow - Selected row shadow, for example an inset outline ring. Falls back to none.
  * @cssproperty --fluid-tree-item-chevron-fg - Chevron color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-tree-item-radius - Row corner radius. Falls back to --fluid-radius-sm.
  * @cssproperty --fluid-tree-item-font-family - Font family. Falls back to --fluid-font-family-sans.
@@ -78,15 +81,19 @@ export class FluidTreeItem extends FluidElement {
     }
 
     :host([selected]) > .row {
-      background: color-mix(
-        in srgb,
-        var(--fluid-tree-item-selected-accent, var(--fluid-accent-base)) 15%,
-        transparent
+      background: var(
+        --fluid-tree-item-selected-bg,
+        color-mix(
+          in srgb,
+          var(--fluid-tree-item-selected-accent, var(--fluid-accent-base)) 15%,
+          transparent
+        )
       );
       color: var(
-        --fluid-tree-item-selected-accent,
-        var(--fluid-accent-fg, var(--fluid-accent-base))
+        --fluid-tree-item-selected-fg,
+        var(--fluid-tree-item-selected-accent, var(--fluid-accent-fg, var(--fluid-accent-base)))
       );
+      box-shadow: var(--fluid-tree-item-selected-shadow, none);
       font-weight: var(--fluid-font-weight-medium);
     }
 

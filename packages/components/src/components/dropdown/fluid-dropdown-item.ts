@@ -22,6 +22,8 @@ let counter = 0;
  *
  * @cssproperty --fluid-dropdown-item-fg - Item text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-dropdown-item-active-accent - Accent for the active highlight + rail. Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-dropdown-item-active-bg - Active (highlighted) item background. Falls back to an 8% tint of --fluid-dropdown-item-active-accent.
+ * @cssproperty --fluid-dropdown-item-active-fg - Active (highlighted) item text color. Falls back to --fluid-dropdown-item-fg.
  * @cssproperty --fluid-dropdown-item-rail-width - Active left-rail width. Falls back to 2px.
  * @cssproperty --fluid-dropdown-item-separator-color - Separator line color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-dropdown-item-separator-width - Separator line thickness. Falls back to 1px.
@@ -71,10 +73,17 @@ export class FluidDropdownItem extends FluidElement {
        rail on the left, identical to fluid-option so menus and listboxes
        share one highlight language. */
     :host([active]) {
-      background: color-mix(
-        in srgb,
-        var(--fluid-dropdown-item-active-accent, var(--fluid-accent-base)) 8%,
-        transparent
+      background: var(
+        --fluid-dropdown-item-active-bg,
+        color-mix(
+          in srgb,
+          var(--fluid-dropdown-item-active-accent, var(--fluid-accent-base)) 8%,
+          transparent
+        )
+      );
+      color: var(
+        --fluid-dropdown-item-active-fg,
+        var(--fluid-dropdown-item-fg, var(--fluid-text-primary))
       );
     }
     :host([active])::before {
@@ -102,7 +111,7 @@ export class FluidDropdownItem extends FluidElement {
     :host([type="separator"])::before {
       content: "";
       flex: 1 1 auto;
-      height: 1px;
+      height: var(--fluid-dropdown-item-separator-width, 1px);
       background: var(--fluid-dropdown-item-separator-color, var(--fluid-border-default));
       margin: var(--fluid-space-1) 0;
     }

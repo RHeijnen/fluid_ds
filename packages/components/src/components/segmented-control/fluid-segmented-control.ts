@@ -20,6 +20,10 @@ import type { FluidSegment } from "./fluid-segment.js";
  * @cssproperty --fluid-segmented-radius - Track corner radius. Falls back to --fluid-radius-lg.
  * @cssproperty --fluid-segmented-gap - Gap between segments. Falls back to --fluid-space-1.
  * @cssproperty --fluid-segmented-thumb-bg - The sliding active-thumb fill. Falls back to --fluid-surface-base.
+ * @cssproperty --fluid-segmented-border-width - Track outline width. Falls back to 0px.
+ * @cssproperty --fluid-segmented-border - Track outline color. Falls back to transparent.
+ * @cssproperty --fluid-segmented-thumb-border-width - Thumb outline width. Falls back to 0.
+ * @cssproperty --fluid-segmented-thumb-border - Thumb outline color. Falls back to transparent.
  * @cssproperty [--fluid-segmented-thumb-duration=var(--fluid-duration-normal)] - Thumb slide duration (scaled by --fluid-motion).
  * @cssproperty [--fluid-segmented-thumb-easing=var(--fluid-easing-emphasized)] - Thumb slide easing.
  *
@@ -52,6 +56,8 @@ export class FluidSegmentedControl extends FluidElement {
           --fluid-segmented-bg,
           var(--fluid-segmented-control-surface-muted, var(--fluid-surface-muted))
         );
+        border: var(--fluid-segmented-border-width, 0px) solid
+          var(--fluid-segmented-border, transparent);
         border-radius: var(--fluid-segmented-radius, var(--fluid-radius-lg));
       }
 
@@ -60,8 +66,11 @@ export class FluidSegmentedControl extends FluidElement {
        it (z-index) so only this thumb provides the "raised" selected surface. */
       .thumb {
         position: absolute;
-        top: 0;
-        left: 0;
+        /* The thumb is measured from the track's border box but positioned
+           from its padding box, so a track outline is subtracted here. */
+        top: calc(-1 * var(--fluid-segmented-border-width, 0px));
+        left: calc(-1 * var(--fluid-segmented-border-width, 0px));
+        box-sizing: border-box;
         width: var(--_seg-w, 0);
         height: var(--_seg-h, 0);
         transform: translate(var(--_seg-x, 0), var(--_seg-y, 0));
@@ -69,6 +78,8 @@ export class FluidSegmentedControl extends FluidElement {
           --fluid-segmented-thumb-bg,
           var(--fluid-segmented-control-surface-base, var(--fluid-surface-base))
         );
+        border: var(--fluid-segmented-thumb-border-width, 0) solid
+          var(--fluid-segmented-thumb-border, transparent);
         border-radius: var(--fluid-segment-radius, var(--fluid-radius-md));
         box-shadow: var(--fluid-segmented-control-shadow-sm, var(--fluid-shadow-sm));
         opacity: 0;

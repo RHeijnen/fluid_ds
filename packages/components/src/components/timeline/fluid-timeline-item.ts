@@ -34,6 +34,8 @@ export type FluidTimelineItemTone = "default" | "info" | "success" | "warning" |
  * @cssproperty --fluid-timeline-item-marker-size - Diameter of the marker dot. Falls back to 0.875rem.
  * @cssproperty --fluid-timeline-item-marker-bg - Marker fill color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-timeline-item-marker-fg - Marker icon color. Falls back to --fluid-accent-text.
+ * @cssproperty --fluid-timeline-item-marker-border-width - Outline stroke drawn inside the marker dot. Falls back to 0px.
+ * @cssproperty --fluid-timeline-item-marker-border - Marker outline color. Falls back to transparent.
  * @cssproperty --fluid-timeline-item-marker-ring - Ring drawn around the marker (separates it from the line). Falls back to --fluid-surface-base.
  * @cssproperty --fluid-timeline-item-line-color - Connecting line color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-timeline-item-line-size - Connecting line thickness. Falls back to 2px.
@@ -100,6 +102,8 @@ export class FluidTimelineItem extends FluidElement {
       /* A small top offset so the dot sits on the first line of content. */
       margin-top: 0.3rem;
       border-radius: var(--fluid-radius-full);
+      border: var(--fluid-timeline-item-marker-border-width, 0px) solid
+        var(--fluid-timeline-item-marker-border, transparent);
       background: var(--fluid-timeline-item-marker-bg, var(--fluid-accent-base));
       color: var(--fluid-timeline-item-marker-fg, var(--fluid-accent-text));
       /* A ring in the surface color visually separates the dot from the line. */

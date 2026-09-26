@@ -87,8 +87,10 @@ test("unrecognized or unreadable pre-state fails closed", async (t) => {
   await assert.rejects(() => readPreState(root), SyntaxError);
 });
 
-test("the repository's own committed state resolves to the stable latest dist-tag", async () => {
-  // The repository is deliberately not in pre-mode yet; entering it flips this.
+test("the repository's own committed state resolves to the rc prerelease dist-tag", async () => {
+  // The repository is in changesets pre-mode for the 1.0.0-rc line (see
+  // docs/HANDOFF.md); exiting pre-mode for 1.0.0 flips this back to "latest".
   const plan = resolvePublishPlan(await readPreState(repositoryRoot));
-  assert.equal(plan.tag, "latest");
+  assert.equal(plan.mode, "pre");
+  assert.equal(plan.tag, "rc");
 });

@@ -40,6 +40,7 @@ registerIcon(
  * Every styled property reads a component-scoped `--fluid-app-bar-*` token
  * that falls back to a main semantic var (the override ladder).
  *
+ * @cssproperty --fluid-app-bar-font-family - Bar font family, inherited by slotted content. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-app-bar-bg - Bar background. Falls back to --fluid-surface-base.
  * @cssproperty --fluid-app-bar-fg - Bar text/icon color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-app-bar-height - Bar height. Falls back to 3.5rem.
@@ -71,7 +72,7 @@ export class FluidAppBar extends FluidElement {
   static override styles = css`
     :host {
       display: block;
-      font-family: var(--fluid-font-family-sans);
+      font-family: var(--fluid-app-bar-font-family, var(--fluid-font-family-sans));
       color: var(--fluid-app-bar-fg, var(--fluid-text-primary));
     }
 

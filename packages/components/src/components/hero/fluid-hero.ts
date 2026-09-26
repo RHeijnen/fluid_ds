@@ -40,6 +40,7 @@ type HeroSize = "sm" | "md" | "lg";
  * @cssproperty --fluid-hero-padding - Section padding. Falls back to a responsive block padding.
  * @cssproperty --fluid-hero-max-width - Max content width. Falls back to 70rem.
  * @cssproperty --fluid-hero-radius - Media corner radius. Falls back to --fluid-radius-lg.
+ * @cssproperty --fluid-hero-eyebrow-font-family - Eyebrow font family. Falls back to the host font (inherit).
  * @cssproperty --fluid-hero-overlay - Scrim over background media. Falls back to a 55% surface tint.
  *
  * @uses-token --fluid-text-primary - Heading text.
@@ -91,6 +92,7 @@ export class FluidHero extends FluidElement {
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      font-family: var(--fluid-hero-eyebrow-font-family, inherit);
       color: var(--fluid-hero-eyebrow-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
     .description {

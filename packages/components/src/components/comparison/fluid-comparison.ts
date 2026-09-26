@@ -26,6 +26,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-comparison-handle-bg - Handle background.
  * @cssproperty --fluid-comparison-handle-fg - Handle icon color.
  * @cssproperty --fluid-comparison-focus-ring - Focus ring color.
+ * @cssproperty --fluid-comparison-divider-size - Divider line thickness. Falls back to 2px.
+ * @cssproperty --fluid-comparison-handle-border-width - Handle outline stroke width. Falls back to 2px.
  *
  * @uses-token --fluid-accent-base - Default divider color.
  * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
@@ -71,9 +73,9 @@ export class FluidComparison extends FluidElement {
       top: 0;
       bottom: 0;
       left: calc(var(--_pos) * 1%);
-      width: 2px;
+      width: var(--fluid-comparison-divider-size, 2px);
       background: var(--fluid-comparison-divider-color, var(--fluid-accent-base));
-      transform: translateX(-1px);
+      transform: translateX(calc(var(--fluid-comparison-divider-size, 2px) / -2));
       pointer-events: none;
     }
 
@@ -86,7 +88,8 @@ export class FluidComparison extends FluidElement {
       height: 2.5rem;
       border-radius: 50%;
       background: var(--fluid-comparison-handle-bg, var(--fluid-surface-base));
-      border: 2px solid var(--fluid-comparison-divider-color, var(--fluid-accent-base));
+      border: var(--fluid-comparison-handle-border-width, 2px) solid
+        var(--fluid-comparison-divider-color, var(--fluid-accent-base));
       cursor: ew-resize;
       display: inline-flex;
       align-items: center;

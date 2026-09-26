@@ -58,6 +58,12 @@ export type FluidMeterBand = "optimum" | "suboptimum" | "even-less-good";
  * @uses-token --fluid-text-secondary - Value text color.
  * @uses-token --fluid-font-family-sans - Label font family.
  * @uses-token --fluid-gradient-glossy - Fill sheen.
+ * @cssproperty --fluid-meter-border-width - Track outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-meter-border - Track outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-meter-track-shadow - Track inset boundary line. Falls back to a 1px 8% black inset hairline.
+ * @cssproperty --fluid-meter-fill-edge-width - Stroke on the leading edge of the fill, marking the fill-to-track boundary. Falls back to 0.
+ * @cssproperty --fluid-meter-fill-edge - Fill leading-edge color. Falls back to --fluid-border-strong.
+ * @uses-token --fluid-border-strong - Track outline and fill edge color when a theme enables them.
  */
 export class FluidMeter extends FluidElement {
   static override styles = css`
@@ -106,6 +112,8 @@ export class FluidMeter extends FluidElement {
       width: 100%;
       height: var(--fluid-meter-height, 0.75rem);
       background: var(--fluid-meter-track, var(--fluid-color-neutral-200));
+      border: var(--fluid-meter-border-width, 0px) solid
+        var(--fluid-meter-border, var(--fluid-border-strong, transparent));
       border-radius: var(--fluid-meter-radius, var(--fluid-radius-full));
       overflow: hidden;
       /*
@@ -113,7 +121,7 @@ export class FluidMeter extends FluidElement {
        * carries an inset hairline to keep that boundary visible at 3:1 even on
        * a low-contrast page background (SC 1.4.11).
        */
-      box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+      box-shadow: var(--fluid-meter-track-shadow, inset 0 0 0 1px rgb(0 0 0 / 0.08));
     }
 
     .fill {
@@ -122,6 +130,8 @@ export class FluidMeter extends FluidElement {
       inset-inline-start: 0;
       background-color: var(--fluid-meter-fill, var(--fluid-accent-base));
       background-image: var(--fluid-gradient-glossy);
+      border-inline-end: var(--fluid-meter-fill-edge-width, 0px) solid
+        var(--fluid-meter-fill-edge, var(--fluid-border-strong, transparent));
       border-radius: inherit;
       transition: width var(--fluid-duration-normal) var(--fluid-easing-standard);
     }

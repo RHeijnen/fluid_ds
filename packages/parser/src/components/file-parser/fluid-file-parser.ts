@@ -75,6 +75,7 @@ import type {
  * @cssproperty --fluid-file-parser-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  * @uses-token --fluid-border-width-divider - Divider stroke width.
+ * @cssproperty --fluid-file-parser-heading-font-family - Step heading font family. Falls back to inherit.
  *
  * @fires fluid-file-loaded - A file was read into a raw table. detail: { file: File, raw: RawTable }.
  * @fires fluid-parse-error - Reading / parsing the file threw. detail: { file: File, message: string }.
@@ -100,6 +101,7 @@ export class FluidFileParser extends FluidElement {
       }
       .step-heading {
         margin: 0;
+        font-family: var(--fluid-file-parser-heading-font-family, inherit);
         font-size: var(--fluid-font-size-sm);
         font-weight: var(--fluid-font-weight-semibold, 600);
         color: var(--fluid-parser-heading-fg, var(--fluid-text-primary));

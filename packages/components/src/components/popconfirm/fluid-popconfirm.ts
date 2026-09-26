@@ -81,6 +81,9 @@ let popconfirmIdCounter = 0;
  * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-secondary - Neutral tone accent.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-popconfirm-arrow-display - Arrow display. Falls back to block; set none to hide the pointer.
+ * @uses-token --fluid-danger-fg - Optional danger icon color; falls back to --fluid-danger-base.
+ * @uses-token --fluid-warning-fg - Optional warning icon color; falls back to --fluid-warning-base.
  *
  * @fires fluid-confirm - Fired when the user confirms the action.
  * @fires fluid-cancel - Fired when the user cancels (button, outside click, or Escape).
@@ -133,6 +136,7 @@ export class FluidPopconfirm extends FluidElement {
       }
 
       .arrow {
+        display: var(--fluid-popconfirm-arrow-display, block);
         position: absolute;
         width: 0.625rem;
         height: 0.625rem;
@@ -159,10 +163,13 @@ export class FluidPopconfirm extends FluidElement {
       }
 
       :host([tone="danger"]) .icon {
-        color: var(--fluid-popconfirm-icon-color, var(--fluid-danger-base));
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-danger-fg, var(--fluid-danger-base)));
       }
       :host([tone="warning"]) .icon {
-        color: var(--fluid-popconfirm-icon-color, var(--fluid-warning-base));
+        color: var(
+          --fluid-popconfirm-icon-color,
+          var(--fluid-warning-fg, var(--fluid-warning-base))
+        );
       }
       :host([tone="brand"]) .icon {
         color: var(--fluid-popconfirm-icon-color, var(--fluid-accent-fg, var(--fluid-accent-base)));

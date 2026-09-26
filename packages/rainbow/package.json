@@ -1,7 +1,7 @@
 {
   "name": "@fluid-ds/rainbow",
   "version": "0.4.0",
-  "description": "Rainbow expansion pack for Fluid: illustrated widgets (landscape, clock, battery) and multi-color app icons that pair with the Rainbow brand preset.",
+  "description": "Rainbow expansion pack for Fluid: illustrated widgets (landscape, clock, battery) and multi-color illustrations (app tiles and spot scenes) that pair with the Rainbow brand preset.",
   "type": "module",
   "customElements": "custom-elements.json",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "rainbow",
     "illustration",
     "widgets",
-    "icons",
+    "illustrations",
     "web-components",
     "design-system"
   ],
@@ -37,13 +37,13 @@
         "types": "./dist/define.d.ts",
         "import": "./dist/define.js"
       },
-      "./icons": {
-        "types": "./dist/icons.d.ts",
-        "import": "./dist/icons.js"
+      "./illustrations": {
+        "types": "./dist/illustrations.d.ts",
+        "import": "./dist/illustrations.js"
       },
-      "./icons/register": {
-        "types": "./dist/icons-register.d.ts",
-        "import": "./dist/icons-register.js"
+      "./illustrations/register": {
+        "types": "./dist/illustrations-register.d.ts",
+        "import": "./dist/illustrations-register.js"
       }
     }
   },
@@ -61,13 +61,13 @@
       "types": "./src/define.ts",
       "import": "./src/define.ts"
     },
-    "./icons": {
-      "types": "./src/icons.ts",
-      "import": "./src/icons.ts"
+    "./illustrations": {
+      "types": "./src/illustrations.ts",
+      "import": "./src/illustrations.ts"
     },
-    "./icons/register": {
-      "types": "./src/icons-register.ts",
-      "import": "./src/icons-register.ts"
+    "./illustrations/register": {
+      "types": "./src/illustrations-register.ts",
+      "import": "./src/illustrations-register.ts"
     }
   },
   "files": [
@@ -81,8 +81,8 @@
   "sideEffects": [
     "**/define.js",
     "**/define.ts",
-    "**/icons-register.js",
-    "**/icons-register.ts"
+    "**/illustrations-register.js",
+    "**/illustrations-register.ts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

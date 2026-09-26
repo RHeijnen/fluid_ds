@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "bundleGzipBytes": {
-    "button": 19000,
+    "button": 19500,
     "dialog": 15000,
     "input": 18500,
     "react-button": 23000

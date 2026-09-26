@@ -37,6 +37,8 @@ export type FluidStepState = "complete" | "current" | "upcoming";
  * @csspart description - The optional description text.
  *
  * @cssproperty --fluid-step-indicator-size - Diameter of the indicator circle. Falls back to 1.75rem.
+ * @cssproperty --fluid-step-indicator-shadow - Indicator shadow, for example an inset outline ring. Falls back to none.
+ * @cssproperty --fluid-step-indicator-font-family - Indicator number font family. Falls back to inherit.
  * @cssproperty --fluid-step-connector-color - Connector line color (upcoming). Falls back to --fluid-border-default.
  * @cssproperty --fluid-step-connector-complete-color - Connector color for a completed segment. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-step-connector-size - Connector line thickness. Falls back to 2px.
@@ -198,6 +200,8 @@ export class FluidStep extends FluidElement {
       width: var(--_indicator);
       height: var(--_indicator);
       border-radius: var(--fluid-radius-full);
+      box-shadow: var(--fluid-step-indicator-shadow, none);
+      font-family: var(--fluid-step-indicator-font-family, inherit);
       font-size: var(--fluid-font-size-sm);
       font-weight: var(--fluid-font-weight-semibold);
       line-height: 1;

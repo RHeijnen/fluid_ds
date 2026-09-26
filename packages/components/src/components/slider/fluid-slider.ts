@@ -34,6 +34,13 @@ export type FluidSliderChangeEvent = CustomEvent<FluidSliderValueDetail>;
  * @cssproperty --fluid-slider-thumb-color - Thumb color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-slider-track-size - Track thickness. Falls back to 8px.
  * @cssproperty --fluid-slider-radius - Track corner radius. Falls back to --fluid-radius-full.
+ * @cssproperty --fluid-slider-track-shadow - Track inner shadow (an inset ring here reads as an outline). Falls back to a soft 1px inset shadow.
+ * @cssproperty --fluid-slider-thumb-width - Resting thumb width (hover and drag add 2px and 4px). Falls back to 6px.
+ * @cssproperty --fluid-slider-thumb-height - Resting thumb height (hover and drag add 2px and 4px). Falls back to 22px.
+ * @cssproperty --fluid-slider-thumb-radius - Thumb corner radius. Falls back to 3px.
+ * @cssproperty --fluid-slider-thumb-border-width - Thumb outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-slider-thumb-border - Thumb outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-slider-thumb-shadow - Resting and hover thumb shadow. Falls back to a soft layered shadow.
  * @cssproperty --fluid-slider-font-family - Value-label font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-slider-value-fg - Value-label text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-slider-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
@@ -48,6 +55,7 @@ export type FluidSliderChangeEvent = CustomEvent<FluidSliderValueDetail>;
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum pointer-target row height (24px AA / 44px AAA).
  * @uses-token --fluid-gradient-glossy - Thumb sheen.
+ * @uses-token --fluid-border-strong - Thumb outline color when a theme enables the thumb outline.
  *
  * @fires {FluidSliderInputEvent} fluid-input - Fires on every value change (drag, keypress).
  * @fires {FluidSliderChangeEvent} fluid-change - Fires when the user commits a change (release / blur).
@@ -102,13 +110,13 @@ export class FluidSlider extends FluidFormAssociated {
       height: var(--fluid-slider-track-size, 8px);
       border-radius: var(--fluid-slider-radius, var(--fluid-radius-full));
       background: var(--track-bg);
-      box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.06);
+      box-shadow: var(--fluid-slider-track-shadow, inset 0 1px 1px rgb(0 0 0 / 0.06));
     }
     input[type="range"]::-moz-range-track {
       height: var(--fluid-slider-track-size, 8px);
       border-radius: var(--fluid-slider-radius, var(--fluid-radius-full));
       background: var(--track-bg);
-      box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.06);
+      box-shadow: var(--fluid-slider-track-shadow, inset 0 1px 1px rgb(0 0 0 / 0.06));
     }
 
     /*
@@ -120,17 +128,23 @@ export class FluidSlider extends FluidFormAssociated {
     input[type="range"]::-webkit-slider-thumb {
       appearance: none;
       -webkit-appearance: none;
-      width: 6px;
-      height: 22px;
-      margin-top: -7px;
+      width: var(--fluid-slider-thumb-width, 6px);
+      height: var(--fluid-slider-thumb-height, 22px);
+      margin-top: calc(
+        (var(--fluid-slider-track-size, 8px) - var(--fluid-slider-thumb-height, 22px)) / 2
+      );
       background-color: var(--fluid-slider-thumb-color, var(--fluid-accent-base));
       background-image: var(--fluid-gradient-glossy);
-      border: none;
-      border-radius: 3px;
-      box-shadow:
+      box-sizing: border-box;
+      border: var(--fluid-slider-thumb-border-width, 0px) solid
+        var(--fluid-slider-thumb-border, var(--fluid-border-strong));
+      border-radius: var(--fluid-slider-thumb-radius, 3px);
+      box-shadow: var(
+        --fluid-slider-thumb-shadow,
         0 1px 2px rgb(0 0 0 / 0.18),
         0 2px 4px rgb(0 0 0 / 0.1),
-        inset 0 1px 0 rgb(255 255 255 / 0.3);
+        inset 0 1px 0 rgb(255 255 255 / 0.3)
+      );
       transition:
         width var(--fluid-duration-fast) var(--fluid-easing-standard),
         height var(--fluid-duration-fast) var(--fluid-easing-standard),
@@ -138,16 +152,20 @@ export class FluidSlider extends FluidFormAssociated {
         box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 6px;
-      height: 22px;
+      width: var(--fluid-slider-thumb-width, 6px);
+      height: var(--fluid-slider-thumb-height, 22px);
       background-color: var(--fluid-slider-thumb-color, var(--fluid-accent-base));
       background-image: var(--fluid-gradient-glossy);
-      border: none;
-      border-radius: 3px;
-      box-shadow:
+      box-sizing: border-box;
+      border: var(--fluid-slider-thumb-border-width, 0px) solid
+        var(--fluid-slider-thumb-border, var(--fluid-border-strong));
+      border-radius: var(--fluid-slider-thumb-radius, 3px);
+      box-shadow: var(
+        --fluid-slider-thumb-shadow,
         0 1px 2px rgb(0 0 0 / 0.18),
         0 2px 4px rgb(0 0 0 / 0.1),
-        inset 0 1px 0 rgb(255 255 255 / 0.3);
+        inset 0 1px 0 rgb(255 255 255 / 0.3)
+      );
       transition:
         width var(--fluid-duration-fast) var(--fluid-easing-standard),
         height var(--fluid-duration-fast) var(--fluid-easing-standard),
@@ -156,20 +174,24 @@ export class FluidSlider extends FluidFormAssociated {
 
     /* Hover, thumb thickens to invite the grab. */
     input[type="range"]:hover::-webkit-slider-thumb {
-      width: 8px;
-      height: 24px;
-      margin-top: -8px;
+      width: calc(var(--fluid-slider-thumb-width, 6px) + 2px);
+      height: calc(var(--fluid-slider-thumb-height, 22px) + 2px);
+      margin-top: calc(
+        (var(--fluid-slider-track-size, 8px) - var(--fluid-slider-thumb-height, 22px) - 2px) / 2
+      );
     }
     input[type="range"]:hover::-moz-range-thumb {
-      width: 8px;
-      height: 24px;
+      width: calc(var(--fluid-slider-thumb-width, 6px) + 2px);
+      height: calc(var(--fluid-slider-thumb-height, 22px) + 2px);
     }
 
     /* Active, thumb expands plus accent glow halo. */
     input[type="range"]:active::-webkit-slider-thumb {
-      width: 10px;
-      height: 26px;
-      margin-top: -9px;
+      width: calc(var(--fluid-slider-thumb-width, 6px) + 4px);
+      height: calc(var(--fluid-slider-thumb-height, 22px) + 4px);
+      margin-top: calc(
+        (var(--fluid-slider-track-size, 8px) - var(--fluid-slider-thumb-height, 22px) - 4px) / 2
+      );
       box-shadow:
         0 0 0 6px
           color-mix(
@@ -180,8 +202,8 @@ export class FluidSlider extends FluidFormAssociated {
         0 2px 4px rgb(0 0 0 / 0.15);
     }
     input[type="range"]:active::-moz-range-thumb {
-      width: 10px;
-      height: 26px;
+      width: calc(var(--fluid-slider-thumb-width, 6px) + 4px);
+      height: calc(var(--fluid-slider-thumb-height, 22px) + 4px);
       box-shadow:
         0 0 0 6px
           color-mix(

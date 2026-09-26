@@ -246,6 +246,7 @@ interface KeyboardLink {
  * @uses-token --fluid-target-min - Minimum port target size (24px AA / 44px AAA).
  * @cssproperty --fluid-node-graph-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-node-graph-title-font-family - Node title font family. Falls back to inherit.
  *
  * @fires fluid-node-move - A node moved. detail: { id, x, y }.
  * @fires fluid-node-remove - A node (and its edges) was removed. detail: { id }.
@@ -403,6 +404,7 @@ export class FluidNodeGraph extends FluidElement {
       overflow: hidden;
     }
     .node-title {
+      font-family: var(--fluid-node-graph-title-font-family, inherit);
       font-size: var(--fluid-font-size-sm, 0.875rem);
       font-weight: 600;
       white-space: nowrap;

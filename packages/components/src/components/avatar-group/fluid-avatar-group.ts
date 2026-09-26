@@ -28,6 +28,10 @@ export type FluidAvatarGroupSize = "xs" | "sm" | "md" | "lg" | "xl";
  * @cssproperty --fluid-avatar-group-ring - Ring color drawn between overlapping avatars and around the overflow circle.
  * @cssproperty --fluid-avatar-group-overflow-bg - Overflow circle background color.
  * @cssproperty --fluid-avatar-group-overflow-fg - Overflow circle foreground (text) color.
+ * @cssproperty --fluid-avatar-group-ring-width - Width of the separating ring. Falls back to 2px.
+ * @cssproperty --fluid-avatar-group-overflow-border-width - Outline stroke drawn inside the overflow circle. Falls back to 0px.
+ * @cssproperty --fluid-avatar-group-overflow-border - Overflow circle outline color. Falls back to transparent.
+ * @cssproperty --fluid-avatar-group-overflow-font-family - Overflow counter font family. Falls back to --fluid-font-family-sans.
  *
  * @uses-token --fluid-surface-base - Default ring color that separates the stacked avatars.
  * @uses-token --fluid-surface-muted - Default overflow circle background.
@@ -79,12 +83,22 @@ export class FluidAvatarGroup extends FluidElement {
       height: var(--avatar-size, 2.5rem);
       background-color: var(--fluid-avatar-group-overflow-bg, var(--fluid-surface-muted));
       color: var(--fluid-avatar-group-overflow-fg, var(--fluid-text-primary));
-      font-family: var(--fluid-font-family-sans);
+      font-family: var(--fluid-avatar-group-overflow-font-family, var(--fluid-font-family-sans));
       font-weight: var(--fluid-font-weight-semibold);
       font-size: calc(var(--avatar-size, 2.5rem) * 0.36);
       line-height: 1;
       letter-spacing: -0.02em;
       user-select: none;
+    }
+
+    /* The overflow circle adds an optional inner outline to the shared ring.
+       The outline layer is empty by default (0px, transparent). */
+    .overflow {
+      box-shadow:
+        0 0 0 var(--fluid-avatar-group-ring-width, 2px)
+          var(--fluid-avatar-group-ring, var(--fluid-surface-base)),
+        inset 0 0 0 var(--fluid-avatar-group-overflow-border-width, 0px)
+          var(--fluid-avatar-group-overflow-border, transparent);
     }
 
     /* Sizes mirror <fluid-avatar>: drive the overflow circle's --avatar-size. */

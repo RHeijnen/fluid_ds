@@ -16,6 +16,8 @@ export type FluidBadgeSize = "sm" | "md";
  *
  * @cssproperty --fluid-badge-bg - Background color (neutral variant default).
  * @cssproperty --fluid-badge-fg - Foreground color (neutral variant default).
+ * @cssproperty --fluid-badge-radius - Corner radius. Falls back to --fluid-radius-full (a pill).
+ * @cssproperty --fluid-badge-font-family - Label font. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-badge-border-width - Outline ring stroke, all variants. Falls back to 0 (no outline).
  * @cssproperty --fluid-badge-border - Outline ring color. Falls back to --fluid-border-strong.
  * @cssproperty --fluid-badge-info-bg - Info variant background.
@@ -55,8 +57,8 @@ export class FluidBadge extends FluidElement {
       align-items: center;
       gap: var(--fluid-space-1);
       padding: 2px var(--fluid-space-2);
-      border-radius: var(--fluid-radius-full);
-      font-family: var(--fluid-font-family-sans);
+      border-radius: var(--fluid-badge-radius, var(--fluid-radius-full));
+      font-family: var(--fluid-badge-font-family, var(--fluid-font-family-sans));
       font-weight: var(--fluid-font-weight-medium);
       line-height: 1;
       white-space: nowrap;

@@ -39,6 +39,9 @@ registerIcon(
  * @cssproperty --fluid-carousel-dot-bg - Inactive pagination dot color.
  * @cssproperty --fluid-carousel-dot-active-bg - Active pagination dot color.
  * @cssproperty --fluid-carousel-dot-focus-ring - Pagination dot focus ring color.
+ * @cssproperty --fluid-carousel-dot-size - Pagination dot diameter. Falls back to 0.5rem.
+ * @cssproperty --fluid-carousel-dot-ring-width - Outline ring around each dot. Falls back to 0px.
+ * @cssproperty --fluid-carousel-dot-ring - Dot outline ring color. Falls back to transparent.
  *
  * @uses-token --fluid-surface-base - Default scroller background.
  * @uses-token --fluid-accent-base - Active pagination dot.
@@ -122,10 +125,12 @@ export class FluidCarousel extends FluidElement {
     }
     .dot::before {
       content: "";
-      width: 0.5rem;
-      height: 0.5rem;
+      width: var(--fluid-carousel-dot-size, 0.5rem);
+      height: var(--fluid-carousel-dot-size, 0.5rem);
       border-radius: 50%;
       background: var(--fluid-carousel-dot-bg, var(--fluid-border-default));
+      box-shadow: 0 0 0 var(--fluid-carousel-dot-ring-width, 0px)
+        var(--fluid-carousel-dot-ring, transparent);
       transition:
         background 120ms ease,
         transform 120ms ease;

@@ -67,6 +67,11 @@ export type FluidDrawerHideEvent = CustomEvent<null>;
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
  * @uses-token --fluid-border-width-divider - Divider stroke width.
+ * @cssproperty --fluid-drawer-outline-width - Outline stroke on the panel edge that faces the page. Falls back to 0 (no outline).
+ * @cssproperty --fluid-drawer-outline - Panel edge outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-drawer-radius - Corner radius of the two panel corners that face the page. Falls back to 0.
+ * @cssproperty --fluid-drawer-title-font-family - Label (title) font family. Falls back to the panel font; themes point it at --fluid-font-family-display.
+ * @uses-token --fluid-border-strong - Panel edge outline color when a theme enables it.
  *
  * @fires {FluidDrawerShowEvent} fluid-show - Fired when the drawer opens.
  * @fires {FluidDrawerHideEvent} fluid-hide - Fired when the drawer closes.
@@ -121,6 +126,10 @@ export class FluidDrawer extends FluidElement {
         bottom: 0;
         width: var(--fluid-drawer-size, 22rem);
         transform: translateX(-100%);
+        border-inline-end: var(--fluid-drawer-outline-width, 0px) solid
+          var(--fluid-drawer-outline, var(--fluid-border-strong, transparent));
+        border-start-end-radius: var(--fluid-drawer-radius, 0);
+        border-end-end-radius: var(--fluid-drawer-radius, 0);
       }
       :host([placement="end"]) .panel {
         top: 0;
@@ -128,6 +137,10 @@ export class FluidDrawer extends FluidElement {
         bottom: 0;
         width: var(--fluid-drawer-size, 22rem);
         transform: translateX(100%);
+        border-inline-start: var(--fluid-drawer-outline-width, 0px) solid
+          var(--fluid-drawer-outline, var(--fluid-border-strong, transparent));
+        border-start-start-radius: var(--fluid-drawer-radius, 0);
+        border-end-start-radius: var(--fluid-drawer-radius, 0);
       }
       :host([placement="start"]:dir(rtl)) .panel {
         transform: translateX(100%);
@@ -141,6 +154,10 @@ export class FluidDrawer extends FluidElement {
         right: 0;
         height: var(--fluid-drawer-size, 22rem);
         transform: translateY(-100%);
+        border-bottom: var(--fluid-drawer-outline-width, 0px) solid
+          var(--fluid-drawer-outline, var(--fluid-border-strong, transparent));
+        border-end-start-radius: var(--fluid-drawer-radius, 0);
+        border-end-end-radius: var(--fluid-drawer-radius, 0);
       }
       :host([placement="bottom"]) .panel {
         bottom: 0;
@@ -148,6 +165,10 @@ export class FluidDrawer extends FluidElement {
         right: 0;
         height: var(--fluid-drawer-size, 22rem);
         transform: translateY(100%);
+        border-top: var(--fluid-drawer-outline-width, 0px) solid
+          var(--fluid-drawer-outline, var(--fluid-border-strong, transparent));
+        border-start-start-radius: var(--fluid-drawer-radius, 0);
+        border-start-end-radius: var(--fluid-drawer-radius, 0);
       }
 
       :host([open]) .panel {
@@ -168,6 +189,7 @@ export class FluidDrawer extends FluidElement {
       }
 
       .label {
+        font-family: var(--fluid-drawer-title-font-family, inherit);
         font-size: var(--fluid-font-size-lg);
         font-weight: var(--fluid-font-weight-semibold);
         flex: 1 1 auto;

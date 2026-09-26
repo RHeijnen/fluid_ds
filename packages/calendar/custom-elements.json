@@ -65,6 +65,38 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-event-calendar-border-width"
+            },
+            {
+              "description": "Shadow under the calendar. Falls back to none.",
+              "name": "--fluid-event-calendar-shadow"
+            },
+            {
+              "description": "Month title font family. Falls back to inherit.",
+              "name": "--fluid-event-calendar-title-font-family"
+            },
+            {
+              "description": "Navigation button radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-event-calendar-nav-radius"
+            },
+            {
+              "description": "Navigation button outline width. Falls back to --fluid-event-calendar-border-width.",
+              "name": "--fluid-event-calendar-nav-border-width"
+            },
+            {
+              "description": "Event chip radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-event-calendar-event-radius"
+            },
+            {
+              "description": "Event chip shadow or ring. Falls back to none.",
+              "name": "--fluid-event-calendar-event-shadow"
+            },
+            {
+              "description": "Fill behind today's day number. Falls back to transparent.",
+              "name": "--fluid-event-calendar-today-number-bg"
+            },
+            {
+              "description": "Today's day number color. Falls back to inherit.",
+              "name": "--fluid-event-calendar-today-number-fg"
             }
           ],
           "cssParts": [
@@ -581,6 +613,10 @@
             {
               "name": "--fluid-border-width-divider",
               "description": "Divider stroke width."
+            },
+            {
+              "name": "--fluid-radius-sm",
+              "description": "Navigation and event chip radius."
             }
           ],
           "tagName": "fluid-event-calendar",

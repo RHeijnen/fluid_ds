@@ -34,6 +34,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-nav-item-hover-fg - Hover/focus text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-nav-item-active-bg - Active (current page) background. Falls back to a tint of --fluid-accent-base.
  * @cssproperty --fluid-nav-item-active-fg - Active (current page) text color. Falls back to --fluid-accent-active.
+ * @cssproperty --fluid-nav-item-active-shadow - Active (current page) row shadow, for example an inset outline ring. Falls back to none.
  * @cssproperty --fluid-nav-item-radius - Row corner radius. Falls back to --fluid-radius-sm.
  * @cssproperty --fluid-nav-item-padding - Row padding (shorthand). Falls back to --fluid-space-2 --fluid-space-3.
  * @cssproperty --fluid-nav-item-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
@@ -112,6 +113,7 @@ export class FluidNavItem extends FluidElement {
           color-mix(in srgb, var(--fluid-accent-base) 12%, transparent)
         );
         color: var(--fluid-nav-item-active-fg, var(--fluid-accent-active));
+        box-shadow: var(--fluid-nav-item-active-shadow, none);
         font-weight: var(--fluid-font-weight-medium);
       }
 

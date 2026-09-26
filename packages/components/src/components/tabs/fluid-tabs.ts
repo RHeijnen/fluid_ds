@@ -28,6 +28,13 @@ export type FluidTabsActivation = "auto" | "manual";
  * @cssproperty --fluid-tabs-gap - Gap between tabs. Falls back to --fluid-space-1.
  * @cssproperty --fluid-tabs-indicator-color - The sliding active-tab underline color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-tabs-indicator-size - Underline thickness. Falls back to 2px.
+ * @cssproperty --fluid-tabs-indicator-height - Indicator height. Set it to `auto` with a `--fluid-tabs-indicator-top` to turn the underline into a pill behind the tab. Falls back to --fluid-tabs-indicator-size.
+ * @cssproperty --fluid-tabs-indicator-top - Indicator top offset inside the strip. Falls back to auto.
+ * @cssproperty --fluid-tabs-indicator-bottom - Indicator bottom offset inside the strip. Falls back to 0.
+ * @cssproperty --fluid-tabs-indicator-radius - Indicator corner radius. Falls back to --fluid-tabs-indicator-size.
+ * @cssproperty --fluid-tabs-indicator-border-width - Indicator outline width. Falls back to 0.
+ * @cssproperty --fluid-tabs-indicator-border - Indicator outline color. Falls back to transparent.
+ * @cssproperty --fluid-tabs-indicator-layer - Indicator stacking order: -1 paints it behind the tab labels. Falls back to auto.
  * @cssproperty [--fluid-tabs-indicator-duration=var(--fluid-duration-normal)] - Underline slide duration (scaled by --fluid-motion).
  * @cssproperty [--fluid-tabs-indicator-easing=var(--fluid-easing-emphasized)] - Underline slide easing.
  *
@@ -50,6 +57,9 @@ export class FluidTabs extends FluidElement {
 
       .nav {
         position: relative;
+        /* Own stacking context, so an indicator layered behind the labels
+           (--fluid-tabs-indicator-layer: -1) never drops behind the page. */
+        isolation: isolate;
         display: flex;
         gap: var(--fluid-tabs-gap, var(--fluid-space-1));
         border-bottom: var(--fluid-tabs-nav-border-width, var(--fluid-border-width-divider, 1px))
@@ -60,13 +70,18 @@ export class FluidTabs extends FluidElement {
       /* Sliding active-tab underline, measured over the selected tab. */
       .indicator {
         position: absolute;
-        bottom: 0;
+        z-index: var(--fluid-tabs-indicator-layer, auto);
+        top: var(--fluid-tabs-indicator-top, auto);
+        bottom: var(--fluid-tabs-indicator-bottom, 0);
         left: 0;
-        height: var(--fluid-tabs-indicator-size, 2px);
+        box-sizing: border-box;
+        height: var(--fluid-tabs-indicator-height, var(--fluid-tabs-indicator-size, 2px));
         width: var(--_w, 0);
         transform: translateX(var(--_x, 0));
         background: var(--fluid-tabs-indicator-color, var(--fluid-accent-base));
-        border-radius: var(--fluid-tabs-indicator-size, 2px);
+        border: var(--fluid-tabs-indicator-border-width, 0) solid
+          var(--fluid-tabs-indicator-border, transparent);
+        border-radius: var(--fluid-tabs-indicator-radius, var(--fluid-tabs-indicator-size, 2px));
         opacity: 0;
         pointer-events: none;
         transition:

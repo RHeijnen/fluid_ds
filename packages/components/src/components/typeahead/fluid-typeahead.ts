@@ -158,6 +158,7 @@ export type TypeaheadOptionRenderer = (
  * @cssproperty --fluid-typeahead-option-radius - Option radius. Falls back to --fluid-radius-sm.
  * @cssproperty --fluid-typeahead-option-active-bg - Active option background.
  * @cssproperty --fluid-typeahead-option-active-rail-width - Active rail width. Defaults to 2px.
+ * @cssproperty --fluid-typeahead-option-active-rail - Active rail color. Falls back to --fluid-typeahead-accent.
  * @cssproperty --fluid-typeahead-option-active-rail-inset - Active rail block inset. Defaults to 4px.
  * @cssproperty --fluid-typeahead-option-selected-font-weight - Selected option weight. Falls back to --fluid-font-weight-semibold.
  *
@@ -462,7 +463,10 @@ export class FluidTypeahead extends FluidFormAssociated {
         top: var(--fluid-typeahead-option-active-rail-inset, 4px);
         bottom: var(--fluid-typeahead-option-active-rail-inset, 4px);
         width: var(--fluid-typeahead-option-active-rail-width, 2px);
-        background: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        background: var(
+          --fluid-typeahead-option-active-rail,
+          var(--fluid-typeahead-accent, var(--fluid-accent-base))
+        );
         border-radius: var(--fluid-typeahead-option-active-rail-radius, var(--fluid-radius-full));
       }
 

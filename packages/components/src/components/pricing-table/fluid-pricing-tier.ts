@@ -48,6 +48,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-radius-lg - Corner radius.
  * @cssproperty --fluid-pricing-tier-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-pricing-tier-heading-font-family - Plan name and price font family. Falls back to the host font (inherit).
  * @cssproperty --fluid-pricing-tier-shadow-lg - Component override for the corresponding semantic token.
  */
 export class FluidPricingTier extends FluidElement {
@@ -99,6 +100,7 @@ export class FluidPricingTier extends FluidElement {
 
     .name {
       margin: 0;
+      font-family: var(--fluid-pricing-tier-heading-font-family, inherit);
       font-size: var(--fluid-font-size-lg, 1.125rem);
       font-weight: var(--fluid-font-weight-semibold, 600);
     }
@@ -134,6 +136,7 @@ export class FluidPricingTier extends FluidElement {
     }
 
     .amount {
+      font-family: var(--fluid-pricing-tier-heading-font-family, inherit);
       font-size: var(--fluid-pricing-tier-amount-size, 2.25rem);
       font-weight: var(--fluid-font-weight-bold, 700);
       line-height: 1.1;

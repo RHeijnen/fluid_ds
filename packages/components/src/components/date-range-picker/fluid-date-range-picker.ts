@@ -64,6 +64,11 @@ let counter = 0;
  * @cssproperty --fluid-date-range-picker-dialog-bg - Popover background. Falls back to --fluid-surface-base.
  * @cssproperty --fluid-date-range-picker-dialog-shadow - Popover elevation. Falls back to --fluid-shadow-lg.
  * @cssproperty --fluid-date-range-picker-preset-active-bg - Active preset fill. Falls back to a 15% accent tint.
+ * @cssproperty --fluid-date-range-picker-preset-active-fg - Active preset text. Falls back to --fluid-date-range-picker-accent-base, then --fluid-accent-fg.
+ * @cssproperty --fluid-date-range-picker-button-radius - Cancel and Apply button corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-date-range-picker-button-border-width - Cancel and Apply button outline stroke. Falls back to --fluid-date-range-picker-border-width.
+ * @cssproperty --fluid-date-range-picker-button-font-family - Cancel and Apply button font family. Falls back to the dialog font (inherit).
+ * @cssproperty --fluid-date-range-picker-apply-border - Apply button outline color. Falls back to transparent.
  * @cssproperty --fluid-date-range-picker-radius - Field radius. Falls back to --fluid-field-border-radius → --fluid-radius-md.
  *
  * @uses-token --fluid-surface-base - Field + dialog background.
@@ -294,8 +299,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
           color-mix(in srgb, var(--fluid-accent-base) 15%, transparent)
         );
         color: var(
-          --fluid-date-range-picker-accent-base,
-          var(--fluid-accent-fg, var(--fluid-accent-base))
+          --fluid-date-range-picker-preset-active-fg,
+          var(
+            --fluid-date-range-picker-accent-base,
+            var(--fluid-accent-fg, var(--fluid-accent-base))
+          )
         );
         font-weight: 600;
       }
@@ -369,11 +377,15 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       }
       .btn {
         padding: 0.4rem 0.85rem;
-        border-radius: var(--fluid-radius-md, 6px);
+        border-radius: var(--fluid-date-range-picker-button-radius, var(--fluid-radius-md, 6px));
         font: inherit;
+        font-family: var(--fluid-date-range-picker-button-font-family, inherit);
         cursor: pointer;
         min-height: max(2rem, var(--fluid-target-min, 0px));
-        border: var(--fluid-date-range-picker-border-width, var(--fluid-border-width-default, 1px))
+        border: var(
+            --fluid-date-range-picker-button-border-width,
+            var(--fluid-date-range-picker-border-width, var(--fluid-border-width-default, 1px))
+          )
           solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
         background: var(--fluid-date-range-picker-surface-base, var(--fluid-surface-base));
         color: inherit;
@@ -381,7 +393,7 @@ export class FluidDateRangePicker extends FluidFormAssociated {
       .btn.apply {
         background: var(--fluid-date-range-picker-accent-base, var(--fluid-accent-base));
         color: var(--fluid-date-range-picker-accent-text, var(--fluid-accent-text));
-        border-color: transparent;
+        border-color: var(--fluid-date-range-picker-apply-border, transparent);
       }
       .btn:disabled {
         opacity: 0.5;

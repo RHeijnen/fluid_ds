@@ -939,6 +939,18 @@
               "name": "--fluid-anchor-nav-marker"
             },
             {
+              "description": "Width of the per-link marker (the active rail). Falls back to 2px.",
+              "name": "--fluid-anchor-nav-marker-width"
+            },
+            {
+              "description": "Inline-start offset that pulls each link's marker over the rail. Falls back to -1px.",
+              "name": "--fluid-anchor-nav-marker-offset"
+            },
+            {
+              "description": "Active (current) link background. Falls back to transparent.",
+              "name": "--fluid-anchor-nav-active-bg"
+            },
+            {
               "description": "Indent step applied per nesting level.",
               "name": "--fluid-anchor-nav-indent"
             },
@@ -2136,6 +2148,10 @@
           "name": "FluidAppBar",
           "cssProperties": [
             {
+              "description": "Bar font family, inherited by slotted content. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-app-bar-font-family"
+            },
+            {
               "description": "Bar background. Falls back to --fluid-surface-base.",
               "name": "--fluid-app-bar-bg"
             },
@@ -3060,6 +3076,22 @@
             {
               "description": "Overflow circle foreground (text) color.",
               "name": "--fluid-avatar-group-overflow-fg"
+            },
+            {
+              "description": "Width of the separating ring. Falls back to 2px.",
+              "name": "--fluid-avatar-group-ring-width"
+            },
+            {
+              "description": "Outline stroke drawn inside the overflow circle. Falls back to 0px.",
+              "name": "--fluid-avatar-group-overflow-border-width"
+            },
+            {
+              "description": "Overflow circle outline color. Falls back to transparent.",
+              "name": "--fluid-avatar-group-overflow-border"
+            },
+            {
+              "description": "Overflow counter font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-avatar-group-overflow-font-family"
             }
           ],
           "cssParts": [
@@ -3559,6 +3591,10 @@
               "name": "--fluid-avatar-border"
             },
             {
+              "description": "Initials font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-avatar-font-family"
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-avatar-border-width"
             }
@@ -4028,6 +4064,14 @@
             {
               "description": "Foreground color (neutral variant default).",
               "name": "--fluid-badge-fg"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-full (a pill).",
+              "name": "--fluid-badge-radius"
+            },
+            {
+              "description": "Label font. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-badge-font-family"
             },
             {
               "description": "Outline ring stroke, all variants. Falls back to 0 (no outline).",
@@ -6305,6 +6349,14 @@
               "name": "--fluid-button-pressed-shadow"
             },
             {
+              "description": "How far the button rises on hover. Falls back to 0 (no lift).",
+              "name": "--fluid-button-hover-lift"
+            },
+            {
+              "description": "Elevation on hover. Falls back to --fluid-button-shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-button-hover-shadow"
+            },
+            {
               "description": "How far the button sinks while pressed. Falls back to 1px.",
               "name": "--fluid-button-press-offset"
             },
@@ -7158,6 +7210,18 @@
               "name": "--fluid-calendar-selected-fg"
             },
             {
+              "description": "Selected day outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-calendar-selected-border-width"
+            },
+            {
+              "description": "Selected day outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-calendar-selected-border"
+            },
+            {
+              "description": "Month label font family. Falls back to the calendar font (inherit).",
+              "name": "--fluid-calendar-month-font-family"
+            },
+            {
               "description": "In-range day fill. Falls back to a 15% accent tint.",
               "name": "--fluid-calendar-range-bg"
             },
@@ -7951,6 +8015,10 @@
               "description": "Selected text."
             },
             {
+              "name": "--fluid-border-strong",
+              "description": "Selected day outline color when a theme enables it."
+            },
+            {
               "name": "--fluid-radius-md",
               "description": "Day corner radius."
             },
@@ -8085,6 +8153,22 @@
             {
               "description": "Focus ring color.",
               "name": "--fluid-callout-focus-ring"
+            },
+            {
+              "description": "Full outline stroke around the callout. Falls back to 0 (no outline).",
+              "name": "--fluid-callout-outline-width"
+            },
+            {
+              "description": "Full outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-callout-outline"
+            },
+            {
+              "description": "Icon color for every variant. Falls back to the variant accent border color.",
+              "name": "--fluid-callout-icon-fg"
+            },
+            {
+              "description": "Header font family. Falls back to the callout font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-callout-header-font-family"
             }
           ],
           "cssParts": [
@@ -8493,6 +8577,10 @@
             {
               "name": "--fluid-border-default",
               "description": "Outline."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Outline color when a theme enables it."
             }
           ],
           "tagName": "fluid-callout",
@@ -9311,6 +9399,18 @@
               "name": "--fluid-carousel-dot-focus-ring"
             },
             {
+              "description": "Pagination dot diameter. Falls back to 0.5rem.",
+              "name": "--fluid-carousel-dot-size"
+            },
+            {
+              "description": "Outline ring around each dot. Falls back to 0px.",
+              "name": "--fluid-carousel-dot-ring-width"
+            },
+            {
+              "description": "Dot outline ring color. Falls back to transparent.",
+              "name": "--fluid-carousel-dot-ring"
+            },
+            {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-carousel-shadow-sm"
             }
@@ -9899,6 +9999,14 @@
             {
               "description": "Box border on hover. Falls back to --fluid-border-strong.",
               "name": "--fluid-checkbox-border-hover"
+            },
+            {
+              "description": "Box border color when checked/indeterminate. Falls back to --fluid-checkbox-bg-on.",
+              "name": "--fluid-checkbox-border-on"
+            },
+            {
+              "description": "Box width and height. Falls back to 1.125rem.",
+              "name": "--fluid-checkbox-size"
             },
             {
               "description": "Invalid box border color. Falls back to --fluid-danger-base.",
@@ -11411,6 +11519,10 @@
             {
               "description": "Swatch + preset corner radius. Falls back to --fluid-radius-sm.",
               "name": "--fluid-color-picker-radius"
+            },
+            {
+              "description": "Preset chip inner outline color. Falls back to a 12% black hairline.",
+              "name": "--fluid-color-picker-preset-ring"
             },
             {
               "description": "Hex field font family. Falls back to --fluid-font-family-mono.",
@@ -13192,6 +13304,14 @@
             {
               "description": "Focus ring color.",
               "name": "--fluid-comparison-focus-ring"
+            },
+            {
+              "description": "Divider line thickness. Falls back to 2px.",
+              "name": "--fluid-comparison-divider-size"
+            },
+            {
+              "description": "Handle outline stroke width. Falls back to 2px.",
+              "name": "--fluid-comparison-handle-border-width"
             },
             {
               "description": "Component override for the corresponding semantic token.",
@@ -16915,6 +17035,26 @@
               "name": "--fluid-date-range-picker-preset-active-bg"
             },
             {
+              "description": "Active preset text. Falls back to --fluid-date-range-picker-accent-base, then --fluid-accent-fg.",
+              "name": "--fluid-date-range-picker-preset-active-fg"
+            },
+            {
+              "description": "Cancel and Apply button corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-date-range-picker-button-radius"
+            },
+            {
+              "description": "Cancel and Apply button outline stroke. Falls back to --fluid-date-range-picker-border-width.",
+              "name": "--fluid-date-range-picker-button-border-width"
+            },
+            {
+              "description": "Cancel and Apply button font family. Falls back to the dialog font (inherit).",
+              "name": "--fluid-date-range-picker-button-font-family"
+            },
+            {
+              "description": "Apply button outline color. Falls back to transparent.",
+              "name": "--fluid-date-range-picker-apply-border"
+            },
+            {
               "description": "Field radius. Falls back to --fluid-field-border-radius → --fluid-radius-md.",
               "name": "--fluid-date-range-picker-radius"
             },
@@ -20091,6 +20231,10 @@
             {
               "description": "Line thickness.",
               "name": "--fluid-divider-width"
+            },
+            {
+              "description": "Line end rounding. Falls back to 0.",
+              "name": "--fluid-divider-radius"
             }
           ],
           "members": [
@@ -20482,6 +20626,22 @@
               "description": "Slide easing.",
               "name": "--fluid-drawer-enter-easing",
               "default": "var(--fluid-easing-emphasized)"
+            },
+            {
+              "description": "Outline stroke on the panel edge that faces the page. Falls back to 0 (no outline).",
+              "name": "--fluid-drawer-outline-width"
+            },
+            {
+              "description": "Panel edge outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-drawer-outline"
+            },
+            {
+              "description": "Corner radius of the two panel corners that face the page. Falls back to 0.",
+              "name": "--fluid-drawer-radius"
+            },
+            {
+              "description": "Label (title) font family. Falls back to the panel font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-drawer-title-font-family"
             }
           ],
           "cssParts": [
@@ -21061,6 +21221,10 @@
             {
               "name": "--fluid-border-width-divider",
               "description": "Divider stroke width."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Panel edge outline color when a theme enables it."
             }
           ],
           "tagName": "fluid-drawer",
@@ -21117,6 +21281,14 @@
             {
               "description": "Accent for the active highlight + rail. Falls back to --fluid-accent-base.",
               "name": "--fluid-dropdown-item-active-accent"
+            },
+            {
+              "description": "Active (highlighted) item background. Falls back to an 8% tint of --fluid-dropdown-item-active-accent.",
+              "name": "--fluid-dropdown-item-active-bg"
+            },
+            {
+              "description": "Active (highlighted) item text color. Falls back to --fluid-dropdown-item-fg.",
+              "name": "--fluid-dropdown-item-active-fg"
             },
             {
               "description": "Active left-rail width. Falls back to 2px.",
@@ -23231,6 +23403,10 @@
             {
               "description": "Max content width. Falls back to 28rem.",
               "name": "--fluid-empty-state-max-width"
+            },
+            {
+              "description": "Heading font family. Falls back to the component font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-empty-state-heading-font-family"
             }
           ],
           "cssParts": [
@@ -24373,6 +24549,14 @@
             {
               "description": "Legend font weight. Falls back to --fluid-font-weight-semibold.",
               "name": "--fluid-fieldset-legend-font-weight"
+            },
+            {
+              "description": "Legend font family. Falls back to the fieldset font (inherit).",
+              "name": "--fluid-fieldset-legend-font-family"
+            },
+            {
+              "description": "Legend padding, the gap it cuts into the outline. Falls back to 0.",
+              "name": "--fluid-fieldset-legend-padding"
             },
             {
               "description": "Description text color. Falls back to --fluid-text-secondary.",
@@ -29748,6 +29932,10 @@
               "name": "--fluid-hero-radius"
             },
             {
+              "description": "Eyebrow font family. Falls back to the host font (inherit).",
+              "name": "--fluid-hero-eyebrow-font-family"
+            },
+            {
               "description": "Scrim over background media. Falls back to a 55% surface tint.",
               "name": "--fluid-hero-overlay"
             }
@@ -34097,6 +34285,14 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-kbd-border-width"
+            },
+            {
+              "description": "Bottom edge stroke width (the key lip). Falls back to 2px.",
+              "name": "--fluid-kbd-border-bottom-width"
+            },
+            {
+              "description": "Key shadow. Falls back to none.",
+              "name": "--fluid-kbd-shadow"
             }
           ],
           "cssParts": [
@@ -37545,6 +37741,10 @@
               "name": "--fluid-menu-label-padding"
             },
             {
+              "description": "Heading font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-menu-label-font-family"
+            },
+            {
               "description": "Heading font size. Falls back to --fluid-font-size-xs.",
               "name": "--fluid-menu-label-font-size"
             },
@@ -38546,6 +38746,26 @@
             {
               "description": "Value text color. Falls back to --fluid-text-secondary.",
               "name": "--fluid-meter-value-fg"
+            },
+            {
+              "description": "Track outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-meter-border-width"
+            },
+            {
+              "description": "Track outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-meter-border"
+            },
+            {
+              "description": "Track inset boundary line. Falls back to a 1px 8% black inset hairline.",
+              "name": "--fluid-meter-track-shadow"
+            },
+            {
+              "description": "Stroke on the leading edge of the fill, marking the fill-to-track boundary. Falls back to 0.",
+              "name": "--fluid-meter-fill-edge-width"
+            },
+            {
+              "description": "Fill leading-edge color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-meter-fill-edge"
             }
           ],
           "cssParts": [
@@ -39142,6 +39362,10 @@
             {
               "name": "--fluid-gradient-glossy",
               "description": "Fill sheen."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Track outline and fill edge color when a theme enables them."
             }
           ],
           "tagName": "fluid-meter",
@@ -40494,6 +40718,10 @@
             {
               "description": "Active (current page) text color. Falls back to --fluid-accent-active.",
               "name": "--fluid-nav-item-active-fg"
+            },
+            {
+              "description": "Active (current page) row shadow, for example an inset outline ring. Falls back to none.",
+              "name": "--fluid-nav-item-active-shadow"
             },
             {
               "description": "Row corner radius. Falls back to --fluid-radius-sm.",
@@ -44402,6 +44630,22 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-pagination-border-width"
+            },
+            {
+              "description": "Control font family. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-pagination-font-family"
+            },
+            {
+              "description": "Control font weight. Falls back to --fluid-font-weight-medium.",
+              "name": "--fluid-pagination-font-weight"
+            },
+            {
+              "description": "Minimum control size; the target-size floor still applies on top. Falls back to 0px.",
+              "name": "--fluid-pagination-size"
+            },
+            {
+              "description": "Extra shadow layer on the current page, after the outline ring. Falls back to a transparent shadow.",
+              "name": "--fluid-pagination-current-shadow"
             }
           ],
           "cssParts": [
@@ -45053,6 +45297,10 @@
             {
               "description": "Tone accent for the leading icon. Falls back per tone.",
               "name": "--fluid-popconfirm-icon-color"
+            },
+            {
+              "description": "Arrow display. Falls back to block; set none to hide the pointer.",
+              "name": "--fluid-popconfirm-arrow-display"
             }
           ],
           "cssParts": [
@@ -45816,6 +46064,14 @@
             {
               "name": "--fluid-border-width-default",
               "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-danger-fg",
+              "description": "Optional danger icon color; falls back to --fluid-danger-base."
+            },
+            {
+              "name": "--fluid-warning-fg",
+              "description": "Optional warning icon color; falls back to --fluid-warning-base."
             }
           ],
           "tagName": "fluid-popconfirm",
@@ -47579,6 +47835,10 @@
               "name": "--fluid-pricing-tier-border-width"
             },
             {
+              "description": "Plan name and price font family. Falls back to the host font (inherit).",
+              "name": "--fluid-pricing-tier-heading-font-family"
+            },
+            {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-pricing-tier-shadow-lg"
             }
@@ -48122,6 +48382,14 @@
             {
               "description": "Value text color. Falls back to --fluid-text-secondary.",
               "name": "--fluid-progress-bar-value-fg"
+            },
+            {
+              "description": "Track outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-progress-bar-border-width"
+            },
+            {
+              "description": "Track outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-progress-bar-border"
             }
           ],
           "cssParts": [
@@ -48507,6 +48775,10 @@
             {
               "name": "--fluid-gradient-glossy",
               "description": "Indicator sheen."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Track outline color when a theme enables it."
             }
           ],
           "tagName": "fluid-progress-bar",
@@ -49907,6 +50179,26 @@
               "name": "--fluid-radio-accent"
             },
             {
+              "description": "Circle background when checked. Falls back to --fluid-radio-bg.",
+              "name": "--fluid-radio-bg-on"
+            },
+            {
+              "description": "Circle border color when checked. Falls back to --fluid-radio-accent.",
+              "name": "--fluid-radio-border-on"
+            },
+            {
+              "description": "Circle border width when checked. Falls back to 2px.",
+              "name": "--fluid-radio-border-width-on"
+            },
+            {
+              "description": "Checked dot color. Falls back to --fluid-radio-accent.",
+              "name": "--fluid-radio-dot-color"
+            },
+            {
+              "description": "Circle width and height. Falls back to 1.125rem.",
+              "name": "--fluid-radio-size"
+            },
+            {
               "description": "Label text color. Falls back to --fluid-text-primary.",
               "name": "--fluid-radio-fg"
             },
@@ -50412,6 +50704,34 @@
             {
               "description": "Track corner radius. Falls back to --fluid-radius-full.",
               "name": "--fluid-range-slider-radius"
+            },
+            {
+              "description": "Track inner shadow (an inset ring here reads as an outline). Falls back to a soft 1px inset shadow.",
+              "name": "--fluid-range-slider-track-shadow"
+            },
+            {
+              "description": "Selected-range inner shadow, drawn over the track. Falls back to none.",
+              "name": "--fluid-range-slider-fill-shadow"
+            },
+            {
+              "description": "Resting thumb width (hover and drag add 2px and 4px). Falls back to 6px.",
+              "name": "--fluid-range-slider-thumb-width"
+            },
+            {
+              "description": "Resting thumb height (hover and drag add 2px and 4px). Falls back to 22px.",
+              "name": "--fluid-range-slider-thumb-height"
+            },
+            {
+              "description": "Thumb outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-range-slider-thumb-border-width"
+            },
+            {
+              "description": "Thumb outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-range-slider-thumb-border"
+            },
+            {
+              "description": "Resting and hover thumb shadow. Falls back to a soft layered shadow.",
+              "name": "--fluid-range-slider-thumb-shadow"
             },
             {
               "description": "Gap between the track and visible value readout. Falls back to --fluid-space-3.",
@@ -51481,6 +51801,10 @@
               "description": "Thumb sheen."
             },
             {
+              "name": "--fluid-border-strong",
+              "description": "Thumb outline color when a theme enables the thumb outline."
+            },
+            {
               "name": "--fluid-focus-ring-color",
               "description": "Keyboard focus ring."
             },
@@ -51551,6 +51875,14 @@
             {
               "description": "Symbol size. Falls back to 1.5rem.",
               "name": "--fluid-rating-symbol-size"
+            },
+            {
+              "description": "Symbol outline color. Falls back to none (no outline).",
+              "name": "--fluid-rating-stroke"
+            },
+            {
+              "description": "Symbol outline width, in 24-unit viewBox units. Falls back to 0.",
+              "name": "--fluid-rating-stroke-width"
             },
             {
               "description": "Gap between symbols. Falls back to --fluid-space-1.",
@@ -53094,6 +53426,10 @@
             {
               "description": "404 icon color. Falls back to --fluid-text-secondary.",
               "name": "--fluid-result-404-icon"
+            },
+            {
+              "description": "Title font family. Falls back to the component font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-result-title-font-family"
             }
           ],
           "cssParts": [
@@ -53517,6 +53853,22 @@
             {
               "name": "--fluid-warning-base",
               "description": "Warning icon color."
+            },
+            {
+              "name": "--fluid-success-fg",
+              "description": "Optional success icon color; falls back to --fluid-success-base."
+            },
+            {
+              "name": "--fluid-danger-fg",
+              "description": "Optional error icon color; falls back to --fluid-danger-base."
+            },
+            {
+              "name": "--fluid-info-fg",
+              "description": "Optional info icon color; falls back to --fluid-info-base."
+            },
+            {
+              "name": "--fluid-warning-fg",
+              "description": "Optional warning icon color; falls back to --fluid-warning-base."
             }
           ],
           "tagName": "fluid-result",
@@ -54432,6 +54784,22 @@
             {
               "description": "The sliding active-thumb fill. Falls back to --fluid-surface-base.",
               "name": "--fluid-segmented-thumb-bg"
+            },
+            {
+              "description": "Track outline width. Falls back to 0px.",
+              "name": "--fluid-segmented-border-width"
+            },
+            {
+              "description": "Track outline color. Falls back to transparent.",
+              "name": "--fluid-segmented-border"
+            },
+            {
+              "description": "Thumb outline width. Falls back to 0.",
+              "name": "--fluid-segmented-thumb-border-width"
+            },
+            {
+              "description": "Thumb outline color. Falls back to transparent.",
+              "name": "--fluid-segmented-thumb-border"
             },
             {
               "description": "Thumb slide duration (scaled by --fluid-motion).",
@@ -59082,6 +59450,34 @@
               "name": "--fluid-slider-radius"
             },
             {
+              "description": "Track inner shadow (an inset ring here reads as an outline). Falls back to a soft 1px inset shadow.",
+              "name": "--fluid-slider-track-shadow"
+            },
+            {
+              "description": "Resting thumb width (hover and drag add 2px and 4px). Falls back to 6px.",
+              "name": "--fluid-slider-thumb-width"
+            },
+            {
+              "description": "Resting thumb height (hover and drag add 2px and 4px). Falls back to 22px.",
+              "name": "--fluid-slider-thumb-height"
+            },
+            {
+              "description": "Thumb corner radius. Falls back to 3px.",
+              "name": "--fluid-slider-thumb-radius"
+            },
+            {
+              "description": "Thumb outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-slider-thumb-border-width"
+            },
+            {
+              "description": "Thumb outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-slider-thumb-border"
+            },
+            {
+              "description": "Resting and hover thumb shadow. Falls back to a soft layered shadow.",
+              "name": "--fluid-slider-thumb-shadow"
+            },
+            {
               "description": "Value-label font family. Falls back to --fluid-font-family-sans.",
               "name": "--fluid-slider-font-family"
             },
@@ -59971,6 +60367,10 @@
             {
               "name": "--fluid-gradient-glossy",
               "description": "Thumb sheen."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Thumb outline color when a theme enables the thumb outline."
             }
           ],
           "tagName": "fluid-slider",
@@ -62193,6 +62593,10 @@
             {
               "description": "Corner radius. Falls back to --fluid-radius-lg.",
               "name": "--fluid-stat-radius"
+            },
+            {
+              "description": "Value font family. Falls back to the host font (inherit).",
+              "name": "--fluid-stat-value-font-family"
             }
           ],
           "cssParts": [
@@ -62632,6 +63036,14 @@
             {
               "description": "Diameter of the indicator circle. Falls back to 1.75rem.",
               "name": "--fluid-step-indicator-size"
+            },
+            {
+              "description": "Indicator shadow, for example an inset outline ring. Falls back to none.",
+              "name": "--fluid-step-indicator-shadow"
+            },
+            {
+              "description": "Indicator number font family. Falls back to inherit.",
+              "name": "--fluid-step-indicator-font-family"
             },
             {
               "description": "Connector line color (upcoming). Falls back to --fluid-border-default.",
@@ -65538,6 +65950,34 @@
               "name": "--fluid-tabs-indicator-size"
             },
             {
+              "description": "Indicator height. Set it to `auto` with a `--fluid-tabs-indicator-top` to turn the underline into a pill behind the tab. Falls back to --fluid-tabs-indicator-size.",
+              "name": "--fluid-tabs-indicator-height"
+            },
+            {
+              "description": "Indicator top offset inside the strip. Falls back to auto.",
+              "name": "--fluid-tabs-indicator-top"
+            },
+            {
+              "description": "Indicator bottom offset inside the strip. Falls back to 0.",
+              "name": "--fluid-tabs-indicator-bottom"
+            },
+            {
+              "description": "Indicator corner radius. Falls back to --fluid-tabs-indicator-size.",
+              "name": "--fluid-tabs-indicator-radius"
+            },
+            {
+              "description": "Indicator outline width. Falls back to 0.",
+              "name": "--fluid-tabs-indicator-border-width"
+            },
+            {
+              "description": "Indicator outline color. Falls back to transparent.",
+              "name": "--fluid-tabs-indicator-border"
+            },
+            {
+              "description": "Indicator stacking order: -1 paints it behind the tab labels. Falls back to auto.",
+              "name": "--fluid-tabs-indicator-layer"
+            },
+            {
               "description": "Underline slide duration (scaled by --fluid-motion).",
               "name": "--fluid-tabs-indicator-duration",
               "default": "var(--fluid-duration-normal)"
@@ -67167,6 +67607,14 @@
             {
               "description": "Remove button focus ring color.",
               "name": "--fluid-tag-focus-ring"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-tag-radius"
+            },
+            {
+              "description": "Label font. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-tag-font-family"
             },
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
@@ -69016,6 +69464,10 @@
             {
               "description": "Corner radius. Falls back to --fluid-radius-md.",
               "name": "--fluid-theme-toggle-radius"
+            },
+            {
+              "description": "Button shadow. Falls back to none.",
+              "name": "--fluid-theme-toggle-shadow"
             },
             {
               "description": "Square button size. Falls back to 2.25rem.",
@@ -71048,6 +71500,14 @@
               "name": "--fluid-timeline-item-marker-fg"
             },
             {
+              "description": "Outline stroke drawn inside the marker dot. Falls back to 0px.",
+              "name": "--fluid-timeline-item-marker-border-width"
+            },
+            {
+              "description": "Marker outline color. Falls back to transparent.",
+              "name": "--fluid-timeline-item-marker-border"
+            },
+            {
               "description": "Ring drawn around the marker (separates it from the line). Falls back to --fluid-surface-base.",
               "name": "--fluid-timeline-item-marker-ring"
             },
@@ -71942,16 +72402,32 @@
               "name": "--fluid-toast-item-info-accent"
             },
             {
+              "description": "Info variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-info-accent.",
+              "name": "--fluid-toast-item-info-icon-fg"
+            },
+            {
               "description": "Success variant accent + icon color. Falls back to --fluid-success-base.",
               "name": "--fluid-toast-item-success-accent"
+            },
+            {
+              "description": "Success variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-success-accent.",
+              "name": "--fluid-toast-item-success-icon-fg"
             },
             {
               "description": "Warning variant accent + icon color. Falls back to --fluid-warning-base.",
               "name": "--fluid-toast-item-warning-accent"
             },
             {
+              "description": "Warning variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-warning-accent.",
+              "name": "--fluid-toast-item-warning-icon-fg"
+            },
+            {
               "description": "Danger variant accent + icon color. Falls back to --fluid-danger-base.",
               "name": "--fluid-toast-item-danger-accent"
+            },
+            {
+              "description": "Danger variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-danger-accent.",
+              "name": "--fluid-toast-item-danger-icon-fg"
             }
           ],
           "cssParts": [
@@ -72483,6 +72959,22 @@
             {
               "name": "--fluid-danger-base",
               "description": "Danger variant accent."
+            },
+            {
+              "name": "--fluid-info-fg",
+              "description": "Optional info icon color; falls back to --fluid-info-base."
+            },
+            {
+              "name": "--fluid-success-fg",
+              "description": "Optional success icon color; falls back to --fluid-success-base."
+            },
+            {
+              "name": "--fluid-warning-fg",
+              "description": "Optional warning icon color; falls back to --fluid-warning-base."
+            },
+            {
+              "name": "--fluid-danger-fg",
+              "description": "Optional danger icon color; falls back to --fluid-danger-base."
             },
             {
               "name": "--fluid-focus-ring-color",
@@ -73453,6 +73945,14 @@
             {
               "description": "Popover elevation. Falls back to --fluid-shadow-md.",
               "name": "--fluid-tooltip-shadow"
+            },
+            {
+              "description": "Outline stroke width. Falls back to 0 (no outline).",
+              "name": "--fluid-tooltip-border-width"
+            },
+            {
+              "description": "Outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-tooltip-border"
             }
           ],
           "cssParts": [
@@ -74113,6 +74613,10 @@
             {
               "name": "--fluid-shadow-md",
               "description": "Popover elevation."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Outline color when a theme enables it."
             }
           ],
           "tagName": "fluid-tooltip",
@@ -74205,6 +74709,10 @@
             {
               "description": "Focus ring color for the action buttons. Falls back to --fluid-focus-ring-color.",
               "name": "--fluid-tour-focus-ring-color"
+            },
+            {
+              "description": "Step title font family. Falls back to the popover font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-tour-title-font-family"
             }
           ],
           "cssParts": [
@@ -74995,6 +75503,14 @@
             {
               "description": "Move-button hover background. Falls back to --fluid-surface-muted.",
               "name": "--fluid-transfer-button-hover-bg"
+            },
+            {
+              "description": "Move-button corner radius. Falls back to --fluid-transfer-radius.",
+              "name": "--fluid-transfer-button-radius"
+            },
+            {
+              "description": "Move-button shadow. Falls back to none.",
+              "name": "--fluid-transfer-button-shadow"
             },
             {
               "description": "Component override for the corresponding semantic token.",
@@ -76257,6 +76773,18 @@
             {
               "description": "Accent color for the selected row. Falls back to --fluid-accent-base.",
               "name": "--fluid-tree-item-selected-accent"
+            },
+            {
+              "description": "Selected row background. Falls back to a 15% tint of --fluid-tree-item-selected-accent.",
+              "name": "--fluid-tree-item-selected-bg"
+            },
+            {
+              "description": "Selected row text color. Falls back to --fluid-tree-item-selected-accent, then --fluid-accent-fg.",
+              "name": "--fluid-tree-item-selected-fg"
+            },
+            {
+              "description": "Selected row shadow, for example an inset outline ring. Falls back to none.",
+              "name": "--fluid-tree-item-selected-shadow"
             },
             {
               "description": "Chevron color. Falls back to --fluid-text-secondary.",
@@ -77893,6 +78421,10 @@
             {
               "description": "Active rail width. Defaults to 2px.",
               "name": "--fluid-typeahead-option-active-rail-width"
+            },
+            {
+              "description": "Active rail color. Falls back to --fluid-typeahead-accent.",
+              "name": "--fluid-typeahead-option-active-rail"
             },
             {
               "description": "Active rail block inset. Defaults to 4px.",

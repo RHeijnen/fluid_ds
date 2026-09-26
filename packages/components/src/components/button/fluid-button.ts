@@ -58,6 +58,8 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @cssproperty --fluid-button-shadow - Resting elevation, all filled variants. Falls back to the built-in soft shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
  * @cssproperty --fluid-button-active-shadow - Elevation while pressed. Falls back to the built-in pressed shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
  * @cssproperty --fluid-button-pressed-shadow - Elevation of a toggled-on (aria-pressed) button. Falls back to a soft inset shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-button-hover-lift - How far the button rises on hover. Falls back to 0 (no lift).
+ * @cssproperty --fluid-button-hover-shadow - Elevation on hover. Falls back to --fluid-button-shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
  * @cssproperty --fluid-button-press-offset - How far the button sinks while pressed. Falls back to 1px.
  * @cssproperty --fluid-button-padding-block - Vertical inner padding, all sizes. Falls back to the per-size default (--fluid-space-1 / 0 / --fluid-space-3).
  * @cssproperty --fluid-button-padding-inline - Horizontal inner padding, all sizes. Falls back to the per-size default (--fluid-space-3 / --fluid-space-4 / --fluid-space-5).
@@ -247,7 +249,8 @@ export class FluidButton extends FluidElement {
       transition:
         background-color var(--fluid-duration-fast) var(--fluid-easing-standard),
         color var(--fluid-duration-fast) var(--fluid-easing-standard),
-        box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard);
+        box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard),
+        transform var(--fluid-duration-fast) var(--fluid-easing-standard);
     }
 
     /*
@@ -292,6 +295,10 @@ export class FluidButton extends FluidElement {
      * shadow softens, like a key being pressed. Subtle but it's the kind of
      * thing your finger remembers.
      */
+    /* Optional hover lift; 0 by default, themes opt in with --fluid-button-hover-lift. */
+    .button:hover:not([aria-disabled="true"]) {
+      transform: translateY(calc(-1 * var(--fluid-button-hover-lift, 0px)));
+    }
     .button:active:not([aria-disabled="true"]) {
       transform: translateY(var(--fluid-button-press-offset, 1px));
     }
@@ -390,6 +397,17 @@ export class FluidButton extends FluidElement {
         --fluid-button-hover-bg,
         var(--fluid-button-bg, var(--fluid-accent-hover))
       );
+      box-shadow:
+        inset 0 0 0 var(--fluid-button-border-width, 0px)
+          var(--fluid-button-border, var(--fluid-border-default, transparent)),
+        var(
+          --fluid-button-hover-shadow,
+          var(
+            --fluid-button-shadow,
+            0 1px 2px rgb(0 0 0 / 0.12),
+            inset 0 1px 0 rgb(255 255 255 / 0.12)
+          )
+        );
     }
     .variant-primary:active:not([aria-disabled="true"]) {
       background-color: var(
@@ -438,6 +456,17 @@ export class FluidButton extends FluidElement {
           color-mix(in srgb, var(--fluid-accent-base) 6%, var(--fluid-surface-base))
         )
       );
+      box-shadow:
+        inset 0 0 0 var(--fluid-button-border-width, var(--fluid-border-width-default, 1px))
+          var(--fluid-button-border, var(--fluid-border-default)),
+        var(
+          --fluid-button-hover-shadow,
+          var(
+            --fluid-button-shadow,
+            0 1px 2px rgb(0 0 0 / 0.06),
+            inset 0 1px 0 rgb(255 255 255 / 0.4)
+          )
+        );
     }
     .variant-secondary:active:not([aria-disabled="true"]) {
       box-shadow:

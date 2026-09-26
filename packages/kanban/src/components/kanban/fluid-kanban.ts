@@ -80,6 +80,12 @@ type KanbanAnnouncement =
  * @uses-token --fluid-font-size-xs - Card description size.
  * @cssproperty --fluid-kanban-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-kanban-column-radius - Column corner radius. Falls back to --fluid-kanban-radius.
+ * @cssproperty --fluid-kanban-card-shadow - Card shadow. Falls back to none.
+ * @cssproperty --fluid-kanban-header-font-family - Column and card title font family. Falls back to inherit.
+ * @cssproperty --fluid-kanban-control-radius - Move button corner radius. Falls back to --fluid-kanban-radius.
+ * @cssproperty --fluid-kanban-control-border-width - Move button outline width. Falls back to --fluid-kanban-border-width.
+ * @cssproperty --fluid-kanban-drop-ring - Drop-target ring color. Falls back to --fluid-accent-base.
  *
  * @fires fluid-move - A card moved. detail: { cardId, fromColumn, toColumn, index }.
  */
@@ -105,14 +111,18 @@ export class FluidKanban extends FluidElement {
       background: var(--fluid-kanban-column-bg, var(--fluid-surface-muted, #f4f4f5));
       border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
-      border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
+      border-radius: var(
+        --fluid-kanban-column-radius,
+        var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem))
+      );
     }
     /* Drop highlight uses an INSET ring (and a faint accent tint) rather than an
        outline: the board is an overflow:auto scroll container, which clips an
        outset outline / outline-offset, so the indicator showed only partially.
        An inset box-shadow paints inside the column box and is never clipped. */
     .column.drop-target {
-      box-shadow: inset 0 0 0 var(--fluid-focus-ring-width, 2px) var(--fluid-accent-base, #4f46e5);
+      box-shadow: inset 0 0 0 var(--fluid-focus-ring-width, 2px)
+        var(--fluid-kanban-drop-ring, var(--fluid-accent-base, #4f46e5));
       background: color-mix(
         in srgb,
         var(--fluid-accent-base, #4f46e5) 8%,
@@ -121,6 +131,7 @@ export class FluidKanban extends FluidElement {
     }
     .column-header {
       margin: 0;
+      font-family: var(--fluid-kanban-header-font-family, inherit);
       font-size: var(--fluid-font-size-sm, 0.875rem);
       font-weight: 600;
       display: flex;
@@ -151,6 +162,7 @@ export class FluidKanban extends FluidElement {
       border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
+      box-shadow: var(--fluid-kanban-card-shadow, none);
       cursor: grab;
     }
     .card:focus-visible {
@@ -165,6 +177,7 @@ export class FluidKanban extends FluidElement {
     }
     .card-title {
       margin: 0;
+      font-family: var(--fluid-kanban-header-font-family, inherit);
       font-size: var(--fluid-font-size-sm, 0.875rem);
       font-weight: 600;
     }
@@ -187,9 +200,15 @@ export class FluidKanban extends FluidElement {
     .move-controls button {
       min-width: var(--fluid-target-min, 24px);
       min-height: var(--fluid-target-min, 24px);
-      border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
-        var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
-      border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
+      border: var(
+          --fluid-kanban-control-border-width,
+          var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px))
+        )
+        solid var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
+      border-radius: var(
+        --fluid-kanban-control-radius,
+        var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem))
+      );
       background: var(--fluid-kanban-card-bg, var(--fluid-surface-base, #ffffff));
       color: var(--fluid-kanban-fg, var(--fluid-text-primary, #18181b));
       font: inherit;

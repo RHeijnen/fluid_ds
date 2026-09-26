@@ -312,6 +312,10 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-file-parser-border-width"
+            },
+            {
+              "description": "Step heading font family. Falls back to inherit.",
+              "name": "--fluid-file-parser-heading-font-family"
             }
           ],
           "cssParts": [

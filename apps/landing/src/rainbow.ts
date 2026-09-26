@@ -11,12 +11,16 @@ import "@fluid-ds/icons/lucide/package";
 import "@fluid-ds/icons/lucide/info";
 import "@fluid-ds/components/define/segmented-control";
 import "@fluid-ds/rainbow/define";
-import { rainbowIconNames, registerRainbowIcons } from "@fluid-ds/rainbow/icons";
+import {
+  rainbowIllustrationGroups,
+  rainbowIllustrationNames,
+  registerRainbowIllustrations
+} from "@fluid-ds/rainbow/illustrations";
 import type { FluidRainbowBattery } from "@fluid-ds/rainbow";
 import "./styles.css";
 import "./rainbow.css";
 
-registerRainbowIcons();
+registerRainbowIllustrations();
 
 const GH = "https://github.com/RHeijnen/fluid_ds";
 const root = document.documentElement;
@@ -36,7 +40,7 @@ const TOKEN_KNOBS = [
     token: "--fluid-border-width-default",
     min: 0,
     max: 6,
-    value: 3,
+    value: 4,
     unit: "px"
   },
   {
@@ -45,16 +49,16 @@ const TOKEN_KNOBS = [
     token: "--fluid-border-width-divider",
     min: 0,
     max: 4,
-    value: 2,
+    value: 3,
     unit: "px"
   },
   {
     id: "radius",
     label: "Corner radius",
-    token: "--fluid-radius-lg",
+    token: "--fluid-radius-*",
     min: 0,
-    max: 40,
-    value: 24,
+    max: 48,
+    value: 34,
     unit: "px"
   },
   {
@@ -140,7 +144,7 @@ document.body.innerHTML = `
       <div class="rbw-hero-copy">
         <span class="rbw-pill"><span class="rbw-dot" aria-hidden="true"></span>Theme package · new in 1.0</span>
         <h1>Make Fluid <span class="rbw-hl rbw-hl--blue">feel like</span> <span class="rbw-hl rbw-hl--yellow">a home screen.</span></h1>
-        <p class="rbw-lead">Rainbow is a theme package for Fluid. One attribute gives every component cream paper, chunky ink outlines, pastel fills and pop shadows. An optional expansion pack adds animated widgets and illustrated icons. Checked against WCAG AA and AAA, light and dark.</p>
+        <p class="rbw-lead">Rainbow is a theme package for Fluid. One attribute gives every component cream paper, chunky ink outlines, pastel fills and pop shadows. An optional expansion pack adds animated widgets and illustrations. Checked against WCAG AA and AAA, light and dark.</p>
         <div class="rbw-cta">
           <fluid-button size="lg" data-scroll="#install">Get started <fluid-icon slot="suffix" name="arrow-right"></fluid-icon></fluid-button>
           <fluid-button size="lg" variant="secondary" data-scroll="#compare">See it restyle Fluid</fluid-button>
@@ -156,9 +160,9 @@ document.body.innerHTML = `
           <fluid-rainbow-battery value="99.98" show-value charging pulse>Uptime</fluid-rainbow-battery>
         </div>
         ${["rainbow-chat", "rainbow-music", "rainbow-gallery", "rainbow-game"]
-          .map((n) => `<fluid-icon class="rbw-b-icon" name="${n}"></fluid-icon>`)
+          .map((n) => `<fluid-icon class="rbw-b-ill" name="${n}"></fluid-icon>`)
           .join("")}
-        <fluid-icon class="rbw-b-icon" name="rainbow-clock"></fluid-icon>
+        <fluid-icon class="rbw-b-ill" name="rainbow-clock"></fluid-icon>
         <div class="rbw-b-cal" aria-hidden="true">
           <span class="rbw-b-month"><b id="cal-month">APR</b></span>
           <span id="cal-days" class="rbw-b-days"></span>
@@ -216,21 +220,29 @@ document.body.innerHTML = `
       </div>
     </section>
 
-    <section class="row" id="icons">
-      <h2>Illustrated icons</h2>
-      <p class="subhead">Fourteen app icons for the shared icon registry. They paint from the Rainbow palette, so they follow the theme, and they fall back to their own colors anywhere else. Click one to copy its markup.</p>
-      <div class="rbw-icons" role="list">
-        ${rainbowIconNames
+    <section class="row" id="illustrations">
+      <h2>Illustrations</h2>
+      <p class="subhead">${rainbowIllustrationNames.length} hand-drawn illustrations for the shared icon registry: app tiles in every subject, plus wide spot scenes for empty states and results. They paint from the Rainbow palette, so they follow the theme, and they fall back to their own colors anywhere else. Click one to copy its markup.</p>
+      ${Object.entries(rainbowIllustrationGroups)
+        .map(
+          ([
+            group,
+            names
+          ]) => `<h3 class="rbw-ill-group">${group === "spots" ? "Spot illustrations" : group.charAt(0).toUpperCase() + group.slice(1)}</h3>
+      <ul class="rbw-illustrations${group === "spots" ? " rbw-illustrations-spots" : ""}">
+        ${names
           .map(
             (
               n
-            ) => `<button class="rbw-icon-tile" role="listitem" data-icon="${n}" title="Copy &lt;fluid-icon name=&quot;${n}&quot;&gt;">
+            ) => `<li><button class="rbw-ill-tile" data-illustration="${n}" title="Copy &lt;fluid-icon name=&quot;${n}&quot;&gt;">
               <fluid-icon name="${n}"></fluid-icon><span>${n.replace("rainbow-", "")}</span>
-            </button>`
+            </button></li>`
           )
           .join("")}
-      </div>
-      <p class="rbw-copied" id="icon-copied" role="status" aria-live="polite"></p>
+      </ul>`
+        )
+        .join("")}
+      <p class="rbw-copied" id="illustration-copied" role="status" aria-live="polite"></p>
     </section>
 
     <section class="row" id="tokens">
@@ -253,7 +265,8 @@ document.body.innerHTML = `
                 <fluid-button>Save</fluid-button>
                 <fluid-button variant="secondary">Cancel</fluid-button>
               </div>
-              <div class="rbw-row"><fluid-badge variant="success">Synced</fluid-badge><fluid-switch checked>Auto-save</fluid-switch></div>
+              <div class="rbw-row"><fluid-tag variant="success">Synced</fluid-tag><fluid-tag>Draft</fluid-tag><fluid-badge variant="info">New</fluid-badge></div>
+              <fluid-switch checked>Auto-save</fluid-switch>
             </div>
           </fluid-card>
         </div>
@@ -262,7 +275,7 @@ document.body.innerHTML = `
 
     <section class="row" id="install">
       <h2>Install</h2>
-      <p class="subhead">The theme and the pack are separate on purpose. Use the look on its own, or add the widgets and icons too.</p>
+      <p class="subhead">The theme and the pack are separate on purpose. Use the look on its own, or add the widgets and illustrations too.</p>
       <div class="rbw-steps">
         <fluid-card>
           <span slot="header">1 · The theme</span>
@@ -280,11 +293,11 @@ import "@fluid-ds/themes/rainbow.css";
         </fluid-card>
         <fluid-card>
           <span slot="header">3 · The pack (optional)</span>
-          <p>Widgets and illustrated icons, in <code>@fluid-ds/rainbow</code>.</p>
+          <p>Widgets and illustrations, in <code>@fluid-ds/rainbow</code>.</p>
           <pre class="motion-code"><code>pnpm add @fluid-ds/rainbow
 
 import "@fluid-ds/rainbow/define";
-import "@fluid-ds/rainbow/icons/register";</code></pre>
+import "@fluid-ds/rainbow/illustrations/register";</code></pre>
         </fluid-card>
       </div>
       <p class="rbw-docs-link"><a href="/docs/theming/brand/#what-rainbow-changes">What Rainbow changes</a> · <a href="/docs/expansion/rainbow/">Pack reference</a> · <a href="/storybook/?globals=brand:rainbow">Browse Storybook in Rainbow</a></p>
@@ -295,7 +308,7 @@ import "@fluid-ds/rainbow/icons/register";</code></pre>
     <nav class="rbw-dock" aria-label="Sections">
       <a href="#compare" title="Compare"><fluid-icon name="rainbow-gallery" label="Compare"></fluid-icon></a>
       <a href="#widgets" title="Widgets"><fluid-icon name="rainbow-clock" label="Widgets"></fluid-icon></a>
-      <a href="#icons" title="Icons"><fluid-icon name="rainbow-chat" label="Icons"></fluid-icon></a>
+      <a href="#illustrations" title="Illustrations"><fluid-icon name="rainbow-chat" label="Illustrations"></fluid-icon></a>
       <a href="#tokens" title="Tokens"><fluid-icon name="rainbow-gear" label="Tokens"></fluid-icon></a>
     </nav>
     <p>Rainbow is part of <a href="/">Fluid</a>, MIT licensed.</p>
@@ -379,11 +392,11 @@ onToggle("w-pulse", (on) => {
 });
 renderBatteryCode();
 
-/* ── Icon gallery: click to copy ───────────────────────────────────────── */
-const copied = document.getElementById("icon-copied")!;
-document.querySelectorAll<HTMLButtonElement>(".rbw-icon-tile").forEach((tile) => {
+/* ── Illustration gallery: click to copy ───────────────────────────────── */
+const copied = document.getElementById("illustration-copied")!;
+document.querySelectorAll<HTMLButtonElement>(".rbw-ill-tile").forEach((tile) => {
   tile.addEventListener("click", async () => {
-    const markup = `<fluid-icon name="${tile.dataset.icon}"></fluid-icon>`;
+    const markup = `<fluid-icon name="${tile.dataset.illustration}"></fluid-icon>`;
     try {
       await navigator.clipboard.writeText(markup);
       copied.textContent = `Copied ${markup}`;
@@ -407,14 +420,17 @@ const applyTokens = () => {
     ["--fluid-field-border-width", `${values.border}px`],
     ["--fluid-button-border-width", `${values.border}px`],
     ["--fluid-border-width-divider", `${values.divider}px`],
+    // One slider drives the whole ramp, so tags (sm), fields (md) and cards
+    // (lg) stay in proportion.
+    ["--fluid-radius-sm", `${Math.round(values.radius * 0.3)}px`],
+    ["--fluid-radius-md", `${Math.round(values.radius * 0.47)}px`],
     ["--fluid-radius-lg", `${values.radius}px`],
-    ["--fluid-field-border-radius", `${Math.round(values.radius * 0.6)}px`],
+    ["--fluid-radius-xl", `${Math.round(values.radius * 1.18)}px`],
+    ["--fluid-field-border-radius", `${Math.round(values.radius * 0.47)}px`],
     ["--fluid-shadow-md", `0 ${values.pop}px 0 var(--rainbow-pop)`],
     ["--fluid-button-shadow", `0 ${values.pop}px 0 var(--rainbow-pop)`],
-    [
-      "--fluid-card-shadow-md",
-      `0 0 0 ${values.border}px var(--rainbow-line), 0 ${values.pop}px 0 ${values.border}px var(--rainbow-pop)`
-    ]
+    ["--fluid-button-hover-shadow", `0 ${values.pop + 2}px 0 var(--rainbow-pop)`],
+    ["--fluid-card-shadow-md", `0 0 0 ${values.border}px var(--rainbow-line)`]
   ];
   for (const [prop, value] of decls) tuned.style.setProperty(prop, value);
   tunerCss.textContent = `[data-fluid-brand="my-brand"] {\n${decls.map(([p, v]) => `  ${p}: ${v};`).join("\n")}\n}`;

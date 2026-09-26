@@ -31,6 +31,8 @@ import { reducedMotion } from "../../internal/motion.js";
  * @cssproperty --fluid-rating-active-color - Color of selected stars. Falls back to --fluid-color-amber-500.
  * @cssproperty --fluid-rating-inactive-color - Color of unselected stars. Falls back to --fluid-color-neutral-300.
  * @cssproperty --fluid-rating-symbol-size - Symbol size. Falls back to 1.5rem.
+ * @cssproperty --fluid-rating-stroke - Symbol outline color. Falls back to none (no outline).
+ * @cssproperty --fluid-rating-stroke-width - Symbol outline width, in 24-unit viewBox units. Falls back to 0.
  * @cssproperty --fluid-rating-gap - Gap between symbols. Falls back to --fluid-space-1.
  * @cssproperty --fluid-rating-focus-ring - Keyboard focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-rating-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
@@ -161,6 +163,9 @@ export class FluidRating extends FluidElement {
         width: 100%;
         height: 100%;
         display: inline-block;
+        stroke: var(--fluid-rating-stroke, none);
+        stroke-width: var(--fluid-rating-stroke-width, 0);
+        stroke-linejoin: round;
       }
     `
   ];

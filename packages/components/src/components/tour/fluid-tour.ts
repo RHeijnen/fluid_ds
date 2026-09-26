@@ -98,6 +98,7 @@ let counter = 0;
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Button min target (24/44px).
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-tour-title-font-family - Step title font family. Falls back to the popover font; themes point it at --fluid-font-family-display.
  *
  * @fires fluid-step-change - The active step changed. `detail: { index }`.
  * @fires fluid-finish - The tour completed (Done on the last step).
@@ -201,6 +202,7 @@ export class FluidTour extends FluidElement {
       }
       .title {
         margin: 0 0 var(--fluid-space-2, 0.5rem);
+        font-family: var(--fluid-tour-title-font-family, inherit);
         font-size: var(--fluid-font-size-md, 1rem);
         font-weight: var(--fluid-font-weight-semibold, 600);
         line-height: 1.3;

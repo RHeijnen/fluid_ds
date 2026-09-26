@@ -1203,6 +1203,26 @@ Things true across machines (machine-specific quirks go in private memory):
 
 ## Log
 
+### 2026-09-26 (later): Rainbow across the whole catalog, 92 illustrations
+
+The theme now matches the owner's reference site (4px container outlines, 34px
+card radius, flat outlined cards, 2px hover lift, dotted wallpaper). Five
+parallel agents audited every component family under Rainbow and added
+default-preserving knobs (tabs sticker indicator, segmented control, slider and
+range-slider thumbs, checkbox/radio, menus, dropdowns, callouts, toasts,
+tooltips, drawers, progress/meter, timeline, avatars, tables, charts palette and
+outlines, kanban, event calendar, time slots, media, markdown, and more); the
+lead merged their snippets into one knob section of rainbow.css whose selector
+also matches nested theme/conformance regions. The pack's "icons" became
+"illustrations" (@fluid-ds/rainbow/illustrations): the 14 originals were redrawn
+where they read wrong and 78 were added (70 tiles, 8 spot scenes for empty and
+result states). Pinned-container visual run: 1,245 captures identical, only the
+pre-existing media-animated-image failures. Charts coverage restored with new
+behavioral tests. Also fixed: battery SSR (childNodes), the dist-tag test for
+the rc pre-mode, and the button bundle budget (19000 -> 19500 for the new
+knobs). Still owner-side: regenerate the pinned framework profile; the
+animations coverage floor (branches 93.44 < 94) predates this work.
+
 ### 2026-09-26: Rainbow theme, stroke tokens and the @fluid-ds/rainbow pack
 
 Started from the owner's company site (company-saas), whose pastel "Rough Edge

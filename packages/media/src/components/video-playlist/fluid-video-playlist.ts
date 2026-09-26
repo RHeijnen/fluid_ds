@@ -37,6 +37,11 @@ export interface PlaylistEntry {
  * @cssproperty --fluid-video-playlist-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  * @uses-token --fluid-border-width-divider - Divider stroke width.
+ * @cssproperty --fluid-video-playlist-active-bg - Active row background. Falls back to a 15% tint of --fluid-video-playlist-active-accent.
+ * @cssproperty --fluid-video-playlist-active-fg - Active row text color. Falls back to --fluid-accent-active.
+ * @cssproperty --fluid-video-playlist-radius - Playlist corner radius. Falls back to --fluid-radius-md.
+ * @uses-token --fluid-accent-active - Active row text.
+ * @uses-token --fluid-radius-md - Playlist corner radius.
  *
  * @fires fluid-change - Fired when the active index changes; detail = { index, entry }.
  */
@@ -62,7 +67,7 @@ export class FluidVideoPlaylist extends FluidElement {
       overflow-y: auto;
       border: var(--fluid-video-playlist-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-video-playlist-list-border, var(--fluid-border-default));
-      border-radius: var(--fluid-radius-md);
+      border-radius: var(--fluid-video-playlist-radius, var(--fluid-radius-md));
     }
 
     .item {
@@ -88,10 +93,13 @@ export class FluidVideoPlaylist extends FluidElement {
       outline-offset: calc(-1 * var(--fluid-focus-ring-width));
     }
     .item[aria-pressed="true"] {
-      background: color-mix(
-        in srgb,
-        var(--fluid-video-playlist-active-accent, var(--fluid-accent-base)) 15%,
-        transparent
+      background: var(
+        --fluid-video-playlist-active-bg,
+        color-mix(
+          in srgb,
+          var(--fluid-video-playlist-active-accent, var(--fluid-accent-base)) 15%,
+          transparent
+        )
       );
       color: var(--fluid-video-playlist-active-fg, var(--fluid-accent-active));
       font-weight: var(--fluid-font-weight-medium);

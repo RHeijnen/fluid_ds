@@ -57,6 +57,11 @@ export type FluidCalloutDismissEvent = CustomEvent<null>;
  * @uses-token --fluid-text-primary - Default text color.
  * @uses-token --fluid-color-brand-500 - Info accent.
  * @uses-token --fluid-border-default - Outline.
+ * @cssproperty --fluid-callout-outline-width - Full outline stroke around the callout. Falls back to 0 (no outline).
+ * @cssproperty --fluid-callout-outline - Full outline color. Falls back to --fluid-border-strong.
+ * @uses-token --fluid-border-strong - Outline color when a theme enables it.
+ * @cssproperty --fluid-callout-icon-fg - Icon color for every variant. Falls back to the variant accent border color.
+ * @cssproperty --fluid-callout-header-font-family - Header font family. Falls back to the callout font; themes point it at --fluid-font-family-display.
  *
  * @fires {FluidCalloutDismissEvent} fluid-dismiss - Fired when the dismiss button is clicked.
  */
@@ -79,6 +84,8 @@ export class FluidCallout extends FluidElement {
       background-color: var(--fluid-callout-bg, var(--fluid-surface-muted));
       color: var(--fluid-callout-fg, var(--fluid-text-primary));
       border-radius: var(--fluid-callout-radius, var(--fluid-radius-md));
+      border: var(--fluid-callout-outline-width, 0px) solid
+        var(--fluid-callout-outline, var(--fluid-border-strong, transparent));
       border-inline-start: var(--fluid-callout-accent-width, 3px) solid
         var(--fluid-callout-border, var(--fluid-border-default));
       font-family: var(--fluid-callout-font-family, var(--fluid-font-family-sans));
@@ -92,7 +99,7 @@ export class FluidCallout extends FluidElement {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--fluid-callout-border, var(--fluid-text-primary));
+      color: var(--fluid-callout-icon-fg, var(--fluid-callout-border, var(--fluid-text-primary)));
       font-size: 1.25rem;
       flex-shrink: 0;
     }
@@ -114,6 +121,7 @@ export class FluidCallout extends FluidElement {
     }
 
     .header {
+      font-family: var(--fluid-callout-header-font-family, inherit);
       font-weight: var(--fluid-font-weight-semibold);
       color: inherit;
     }
@@ -158,7 +166,10 @@ export class FluidCallout extends FluidElement {
       border-inline-start-color: var(--fluid-callout-info-border, var(--fluid-color-brand-500));
     }
     .variant-info .icon-slot {
-      color: var(--fluid-callout-info-border, var(--fluid-color-brand-600));
+      color: var(
+        --fluid-callout-icon-fg,
+        var(--fluid-callout-info-border, var(--fluid-color-brand-600))
+      );
     }
     .variant-success {
       background-color: var(--fluid-callout-success-bg, var(--fluid-color-emerald-50));
@@ -169,7 +180,10 @@ export class FluidCallout extends FluidElement {
       );
     }
     .variant-success .icon-slot {
-      color: var(--fluid-callout-success-border, var(--fluid-color-emerald-700));
+      color: var(
+        --fluid-callout-icon-fg,
+        var(--fluid-callout-success-border, var(--fluid-color-emerald-700))
+      );
     }
     .variant-warning {
       background-color: var(--fluid-callout-warning-bg, var(--fluid-color-amber-50));
@@ -177,7 +191,10 @@ export class FluidCallout extends FluidElement {
       border-inline-start-color: var(--fluid-callout-warning-border, var(--fluid-color-amber-500));
     }
     .variant-warning .icon-slot {
-      color: var(--fluid-callout-warning-border, var(--fluid-color-amber-700));
+      color: var(
+        --fluid-callout-icon-fg,
+        var(--fluid-callout-warning-border, var(--fluid-color-amber-700))
+      );
     }
     .variant-danger {
       background-color: var(--fluid-callout-danger-bg, var(--fluid-color-red-50));
@@ -185,7 +202,10 @@ export class FluidCallout extends FluidElement {
       border-inline-start-color: var(--fluid-callout-danger-border, var(--fluid-color-red-500));
     }
     .variant-danger .icon-slot {
-      color: var(--fluid-callout-danger-border, var(--fluid-color-red-700));
+      color: var(
+        --fluid-callout-icon-fg,
+        var(--fluid-callout-danger-border, var(--fluid-color-red-700))
+      );
     }
   `;
 

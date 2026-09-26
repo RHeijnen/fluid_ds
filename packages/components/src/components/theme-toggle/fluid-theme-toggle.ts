@@ -54,6 +54,7 @@ const BRAND_STORAGE_KEY = "fluid-brand";
  * @cssproperty --fluid-theme-toggle-hover-bg - Hover background. Falls back to --fluid-surface-muted.
  * @cssproperty --fluid-theme-toggle-border - Border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-theme-toggle-radius - Corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-theme-toggle-shadow - Button shadow. Falls back to none.
  * @cssproperty --fluid-theme-toggle-size - Square button size. Falls back to 2.25rem.
  * @cssproperty --fluid-theme-toggle-gap - Gap between the theme and brand buttons. Falls back to --fluid-space-1.
  * @cssproperty --fluid-theme-toggle-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
@@ -112,6 +113,7 @@ export class FluidThemeToggle extends FluidElement {
           var(--fluid-theme-toggle-border, var(--fluid-border-default));
         background: var(--fluid-theme-toggle-bg, transparent);
         color: var(--fluid-theme-toggle-fg, var(--fluid-text-primary));
+        box-shadow: var(--fluid-theme-toggle-shadow, none);
         cursor: pointer;
         transition:
           background-color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))

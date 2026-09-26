@@ -906,6 +906,387 @@ describe("<fluid-chart>", () => {
   });
 });
 
+describe("<fluid-chart> theming knobs", () => {
+  type Elements = {
+    line: { borderWidth: unknown };
+    point: { radius: unknown; hoverRadius: unknown; borderWidth: unknown };
+    bar: { borderRadius: unknown };
+    arc: { borderWidth: unknown; borderColor: unknown };
+  };
+  type Tooltip = {
+    backgroundColor: unknown;
+    titleColor: unknown;
+    bodyColor: unknown;
+    borderColor: unknown;
+    borderWidth: unknown;
+  };
+  const elementsOf = (el: FluidChart) => el.instance!.options.elements as unknown as Elements;
+  const tooltipOf = (el: FluidChart) => el.instance!.options.plugins!.tooltip as unknown as Tooltip;
+  const datasetOf = (el: FluidChart, index = 0) =>
+    el.instance!.data.datasets[index] as unknown as Record<string, unknown>;
+  const threeSeries = {
+    labels: ["A"],
+    datasets: [{ data: [1] }, { data: [2] }, { data: [3] }]
+  };
+  const mount = (tag: string, style: string, data: object = sampleData) => {
+    const el = document.createElement(tag) as FluidChart;
+    el.setAttribute("style", style);
+    el.data = data as FluidChart["data"];
+    el.options = { animation: false };
+    return fixture<FluidChart>(el);
+  };
+  const seriesColors = (el: FluidChart) =>
+    el.instance!.data.datasets.map((dataset) => dataset.backgroundColor);
+
+  describe("--fluid-chart-palette", () => {
+    it("colors series in list order, keeping commas inside color functions", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        `${brandRampStyle}; --fluid-chart-palette: rgb(1, 2, 3), #ff0000 , color-mix(in srgb, red 50%, blue)`,
+        threeSeries
+      );
+      // The custom list wins over the brand ramp that is also in scope.
+      expect(seriesColors(el)).to.deep.equal([
+        "rgb(1, 2, 3)",
+        "#ff0000",
+        "color-mix(in srgb, red 50%, blue)"
+      ]);
+    });
+
+    it("wraps around a list shorter than the series count", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        "--fluid-chart-palette: #111111, #222222",
+        threeSeries
+      );
+      expect(seriesColors(el)).to.deep.equal(["#111111", "#222222", "#111111"]);
+    });
+
+    it("skips empty entries and resumes splitting after nested functions close", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        "--fluid-chart-palette: , color-mix(in srgb, rgb(1, 2, 3) 50%, white),, #222222 ,",
+        threeSeries
+      );
+      /* Empty slots from leading, doubled or trailing commas are dropped, and
+         once a nested function closes the next top-level comma splits again
+         instead of being swallowed into the previous entry. */
+      expect(seriesColors(el)).to.deep.equal([
+        "color-mix(in srgb, rgb(1, 2, 3) 50%, white)",
+        "#222222",
+        "color-mix(in srgb, rgb(1, 2, 3) 50%, white)"
+      ]);
+    });
+
+    it("falls back to the brand ramp when the list holds no colors", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        `${brandRampStyle}; --fluid-chart-palette: , ,`,
+        threeSeries
+      );
+      expect(seriesColors(el)).to.deep.equal([
+        brandRamp["600"],
+        brandRamp["400"],
+        brandRamp["800"]
+      ]);
+    });
+
+    it("falls back to the fixed palette when neither list nor ramp is set", async () => {
+      const el = await mount("fluid-bar-chart", "--fluid-accent-base: #123456", threeSeries);
+      expect(seriesColors(el)).to.deep.equal(["#123456", "#22d3ee", "#8b5cf6"]);
+    });
+
+    it("reaches the canvas on refresh() after the knob changes", async () => {
+      const el = await mount("fluid-bar-chart", "", threeSeries);
+      expect(seriesColors(el)[0]).to.not.equal("#abcdef");
+      el.style.setProperty("--fluid-chart-palette", "#abcdef");
+      el.refresh();
+      await aTimeout(0);
+      expect(seriesColors(el)).to.deep.equal(["#abcdef", "#abcdef", "#abcdef"]);
+    });
+  });
+
+  describe("element geometry", () => {
+    it("keeps the built-in line, point, bar and arc look when no knob is set", async () => {
+      const el = await mount("fluid-line-chart", "--fluid-surface-base: #fafafa");
+      const e = elementsOf(el);
+      expect(e.line.borderWidth).to.equal(2.5);
+      expect(e.point.radius, "points only show on hover").to.equal(0);
+      expect(e.point.hoverRadius).to.equal(5);
+      expect(e.point.borderWidth).to.equal(2);
+      expect(e.bar.borderRadius).to.equal(6);
+      expect(e.arc.borderWidth).to.equal(2);
+      expect(e.arc.borderColor).to.equal("#fafafa");
+      expect(datasetOf(el).pointBorderColor).to.equal("#fafafa");
+    });
+
+    it("applies line width, point radius and bar radius from their knobs", async () => {
+      const line = await mount(
+        "fluid-line-chart",
+        "--fluid-chart-line-width: 4; --fluid-chart-point-radius: 6"
+      );
+      expect(elementsOf(line).line.borderWidth).to.equal(4);
+      expect(elementsOf(line).point.radius).to.equal(6);
+      // The hover state has to stay larger than the resting point.
+      expect(elementsOf(line).point.hoverRadius).to.equal(8);
+
+      const small = await mount("fluid-line-chart", "--fluid-chart-point-radius: 2");
+      expect(elementsOf(small).point.hoverRadius, "never smaller than the default").to.equal(5);
+
+      const bar = await mount("fluid-bar-chart", "--fluid-chart-bar-radius: 0");
+      // Zero is a real value (square bars), not a missing one.
+      expect(elementsOf(bar).bar.borderRadius).to.equal(0);
+      expect(datasetOf(bar).borderRadius).to.equal(0);
+    });
+
+    it("threads the bar radius knob through stacked columns", async () => {
+      const el = await mount("fluid-bar-chart", "--fluid-chart-bar-radius: 12", {
+        labels: ["Q1"],
+        datasets: [
+          { label: "A", data: [1] },
+          { label: "B", data: [2] }
+        ]
+      });
+      el.options = { animation: false, scales: { x: { stacked: true }, y: { stacked: true } } };
+      await el.updateComplete;
+      const chart = el.instance!;
+      const radius = datasetOf(el).borderRadius as (c: object) => Record<string, number>;
+      expect(radius({ chart, datasetIndex: 0, dataIndex: 0 }).bottomLeft).to.equal(12);
+      expect(radius({ chart, datasetIndex: 1, dataIndex: 0 }).topLeft).to.equal(12);
+    });
+
+    it("ignores malformed numeric knobs and uses the defaults", async () => {
+      const el = await mount(
+        "fluid-line-chart",
+        "--fluid-chart-line-width: thick; --fluid-chart-point-radius: none; --fluid-chart-bar-radius: auto; --fluid-chart-tooltip-border-width: wide"
+      );
+      const e = elementsOf(el);
+      expect(e.line.borderWidth).to.equal(2.5);
+      expect(e.point.radius).to.equal(0);
+      expect(e.bar.borderRadius).to.equal(6);
+      expect(tooltipOf(el).borderWidth).to.equal(0);
+    });
+  });
+
+  describe("--fluid-chart-series-border", () => {
+    const outline = "--fluid-chart-series-border: #000000";
+
+    it("outlines bars only when the knob is set", async () => {
+      const plain = await mount("fluid-bar-chart", "");
+      expect(datasetOf(plain).borderColor).to.equal(undefined);
+      expect(datasetOf(plain).borderWidth).to.equal(undefined);
+
+      const outlined = await mount("fluid-bar-chart", outline);
+      expect(datasetOf(outlined).borderColor).to.equal("#000000");
+      expect(datasetOf(outlined).borderWidth, "width falls back to 2").to.equal(2);
+
+      const wide = await mount(
+        "fluid-bar-chart",
+        `${outline}; --fluid-chart-series-border-width: 3`
+      );
+      expect(datasetOf(wide).borderWidth).to.equal(3);
+    });
+
+    it("ignores the width knob when no outline color is set", async () => {
+      const el = await mount("fluid-bar-chart", "--fluid-chart-series-border-width: 5");
+      expect(datasetOf(el).borderWidth).to.equal(undefined);
+      expect(elementsOf(el).point.borderWidth).to.equal(2);
+      expect(elementsOf(el).arc.borderWidth).to.equal(2);
+    });
+
+    it("keeps caller-set bar border options", async () => {
+      const el = await mount("fluid-bar-chart", outline, {
+        labels: ["A"],
+        datasets: [{ data: [1], borderColor: "#ff00ff", borderWidth: 1 }]
+      });
+      expect(datasetOf(el).borderColor).to.equal("#ff00ff");
+      expect(datasetOf(el).borderWidth).to.equal(1);
+    });
+
+    it("inks doughnut and pie segments, which are borderless by default", async () => {
+      const plain = await mount("fluid-doughnut-chart", "");
+      expect(datasetOf(plain).borderColor).to.equal(undefined);
+      expect(datasetOf(plain).borderWidth).to.equal(0);
+
+      const outlined = await mount(
+        "fluid-pie-chart",
+        `${outline}; --fluid-chart-series-border-width: 1`
+      );
+      expect(datasetOf(outlined).borderColor).to.equal("#000000");
+      expect(datasetOf(outlined).borderWidth).to.equal(1);
+      expect(elementsOf(outlined).arc.borderColor).to.equal("#000000");
+      expect(elementsOf(outlined).arc.borderWidth).to.equal(1);
+    });
+
+    it("replaces the surface-colored polar area outline", async () => {
+      const plain = await mount("fluid-polar-area-chart", "--fluid-surface-base: #fafafa");
+      expect(datasetOf(plain).borderColor).to.equal("#fafafa");
+      expect(datasetOf(plain).borderWidth).to.equal(2);
+
+      const outlined = await mount(
+        "fluid-polar-area-chart",
+        `${outline}; --fluid-chart-series-border-width: 4`
+      );
+      expect(datasetOf(outlined).borderColor).to.equal("#000000");
+      expect(datasetOf(outlined).borderWidth).to.equal(4);
+    });
+
+    it("rings line points in the outline color", async () => {
+      const el = await mount(
+        "fluid-line-chart",
+        `${outline}; --fluid-chart-series-border-width: 3`
+      );
+      expect(datasetOf(el).pointBorderColor).to.equal("#000000");
+      expect(elementsOf(el).point.borderWidth).to.equal(3);
+    });
+
+    for (const tag of ["fluid-scatter-chart", "fluid-bubble-chart", "fluid-radar-chart"]) {
+      it(`${tag} strokes in the series color by default and the outline when set`, async () => {
+        const plain = await mount(tag, "--fluid-chart-palette: #123456");
+        expect(datasetOf(plain).borderColor).to.equal("#123456");
+        expect(datasetOf(plain).borderWidth).to.equal(undefined);
+
+        const outlined = await mount(
+          tag,
+          `--fluid-chart-palette: #123456; ${outline}; --fluid-chart-series-border-width: 0`
+        );
+        expect(datasetOf(outlined).borderColor).to.equal("#000000");
+        // Zero is an explicit width, not a missing value.
+        expect(datasetOf(outlined).borderWidth).to.equal(0);
+      });
+    }
+  });
+
+  describe("--fluid-chart-fill-style", () => {
+    it("paints pie arcs with gradients by default and solid colors when flat", async () => {
+      const gradient = await mount("fluid-pie-chart", brandRampStyle);
+      const paintGradient = datasetOf(gradient).backgroundColor as (c: object) => unknown;
+      expect(
+        paintGradient({ chart: gradient.instance, dataIndex: 1 }),
+        "default arcs are gradients"
+      ).to.be.instanceOf(CanvasGradient);
+
+      const flat = await mount(
+        "fluid-pie-chart",
+        `${brandRampStyle}; --fluid-chart-fill-style: flat`
+      );
+      const paintFlat = datasetOf(flat).backgroundColor as (c: object) => unknown;
+      expect(paintFlat({ chart: flat.instance, dataIndex: 1 })).to.equal(brandRamp["400"]);
+      expect(paintFlat({ chart: flat.instance }), "no data index uses the first color").to.equal(
+        brandRamp["600"]
+      );
+    });
+
+    it("keeps a caller arc background under the flat style", async () => {
+      const el = await mount("fluid-doughnut-chart", "--fluid-chart-fill-style: flat", {
+        labels: ["A"],
+        datasets: [{ data: [1], backgroundColor: "#ff00ff" }]
+      });
+      expect(datasetOf(el).backgroundColor).to.equal("#ff00ff");
+    });
+
+    it("gives a filled line a flat wash when flat, and a gradient otherwise", async () => {
+      const filled = { labels: ["A", "B"], datasets: [{ data: [1, 2], fill: true }] };
+      const flat = await mount(
+        "fluid-line-chart",
+        "--fluid-chart-palette: #6366f1; --fluid-chart-fill-style:  flat ",
+        filled
+      );
+      expect(datasetOf(flat).backgroundColor).to.equal("rgba(99, 102, 241, 0.35)");
+
+      const gradient = await mount("fluid-line-chart", "--fluid-chart-palette: #6366f1", filled);
+      expect(typeof datasetOf(gradient).backgroundColor).to.equal("function");
+
+      const other = await mount(
+        "fluid-line-chart",
+        "--fluid-chart-palette: #6366f1; --fluid-chart-fill-style: gradient",
+        filled
+      );
+      expect(typeof datasetOf(other).backgroundColor, "only 'flat' opts out").to.equal("function");
+    });
+
+    it("leaves an unfilled line without a background under the flat style", async () => {
+      const el = await mount("fluid-line-chart", "--fluid-chart-fill-style: flat");
+      expect(datasetOf(el).backgroundColor).to.equal(undefined);
+    });
+  });
+
+  describe("tooltip knobs", () => {
+    it("derives the tooltip from text and surface tokens by default", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        "--fluid-text-primary: #101010; --fluid-surface-base: #fefefe"
+      );
+      expect(tooltipOf(el)).to.include({
+        backgroundColor: "#101010",
+        titleColor: "#fefefe",
+        bodyColor: "#fefefe",
+        borderColor: "transparent",
+        borderWidth: 0
+      });
+    });
+
+    it("applies the tooltip color and outline knobs", async () => {
+      const el = await mount(
+        "fluid-bar-chart",
+        "--fluid-chart-tooltip-bg: #ffffff; --fluid-chart-tooltip-fg: #000000; --fluid-chart-tooltip-border: #cccccc; --fluid-chart-tooltip-border-width: 1.5"
+      );
+      expect(tooltipOf(el)).to.include({
+        backgroundColor: "#ffffff",
+        titleColor: "#000000",
+        bodyColor: "#000000",
+        borderColor: "#cccccc",
+        borderWidth: 1.5
+      });
+    });
+  });
+
+  describe("--fluid-chart-center-font-family", () => {
+    /** Record the canvas font active for each painted string. */
+    async function paintedFonts(style: string): Promise<Map<string, string>> {
+      const fonts = new Map<string, string>();
+      const original = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (
+        this: CanvasRenderingContext2D,
+        text: string,
+        x: number,
+        y: number,
+        maxWidth?: number
+      ): void {
+        fonts.set(String(text), this.font);
+        if (maxWidth === undefined) original.call(this, text, x, y);
+        else original.call(this, text, x, y, maxWidth);
+      };
+      try {
+        const el = await mount("fluid-doughnut-chart", style, {
+          labels: ["A", "B"],
+          datasets: [{ data: [10, 5] }]
+        });
+        fonts.clear();
+        el.instance!.draw();
+        return fonts;
+      } finally {
+        CanvasRenderingContext2D.prototype.fillText = original;
+      }
+    }
+
+    it("sets the center total in the sans family by default", async () => {
+      const fonts = await paintedFonts("--fluid-font-family-sans: monospace");
+      expect(fonts.get("15")).to.match(/monospace/);
+    });
+
+    it("sets only the center total in the knob's family", async () => {
+      const fonts = await paintedFonts(
+        "--fluid-font-family-sans: monospace; --fluid-chart-center-font-family: serif"
+      );
+      expect(fonts.get("15")).to.match(/serif/);
+      expect(fonts.get("15")).to.not.match(/monospace/);
+      // The caption under the total keeps the body font.
+      expect(fonts.get("Total")).to.match(/monospace/);
+    });
+  });
+});
+
 const typedCharts = [
   "fluid-bar-chart",
   "fluid-bubble-chart",
@@ -1104,5 +1485,22 @@ describe("<fluid-sparkline>", () => {
     await el.updateComplete;
     const canvas = el.shadowRoot!.querySelector("canvas") as HTMLCanvasElement;
     expect(Chart.getChart(canvas)!.data.datasets[0]!.data).to.deep.equal([2, 4, 6]);
+  });
+
+  it("strokes 1.5px by default and follows --fluid-sparkline-line-width", async () => {
+    const width = async (style: string) => {
+      const el = await fixture<FluidSparkline>(
+        html`<fluid-sparkline style=${style} .values=${[1, 4, 2]}></fluid-sparkline>`
+      );
+      const canvas = el.shadowRoot!.querySelector("canvas") as HTMLCanvasElement;
+      return (Chart.getChart(canvas)!.data.datasets[0] as { borderWidth?: unknown }).borderWidth;
+    };
+    expect(await width("")).to.equal(1.5);
+    expect(await width("--fluid-sparkline-line-width: 3")).to.equal(3);
+    expect(await width("--fluid-sparkline-line-width: 0"), "zero is a value, not a gap").to.equal(
+      0
+    );
+    // A value that is not a number keeps the default instead of NaN.
+    expect(await width("--fluid-sparkline-line-width: thin")).to.equal(1.5);
   });
 });

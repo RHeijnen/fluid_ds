@@ -25,6 +25,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @uses-token --fluid-text-primary - Heading text.
  * @uses-token --fluid-text-secondary - Description text.
+ * @cssproperty --fluid-empty-state-heading-font-family - Heading font family. Falls back to the component font; themes point it at --fluid-font-family-display.
  */
 export class FluidEmptyState extends FluidElement {
   static override styles = css`
@@ -53,6 +54,7 @@ export class FluidEmptyState extends FluidElement {
     }
     .heading {
       margin: 0;
+      font-family: var(--fluid-empty-state-heading-font-family, inherit);
       font-size: var(--fluid-font-size-lg, 1.125rem);
       font-weight: 600;
       color: var(--fluid-empty-state-fg, var(--fluid-text-primary));

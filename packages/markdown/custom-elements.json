@@ -53,6 +53,14 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-markdown-border-width"
+            },
+            {
+              "description": "Heading font family. Falls back to inherit.",
+              "name": "--fluid-markdown-heading-font-family"
+            },
+            {
+              "description": "Code block outline. Falls back to none.",
+              "name": "--fluid-markdown-pre-border"
             }
           ],
           "cssParts": [

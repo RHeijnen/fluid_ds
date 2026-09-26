@@ -23,6 +23,11 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-radio-border-width - Circle border width. Falls back to --fluid-field-border-width.
  * @cssproperty --fluid-radio-radius - Circle corner radius. Falls back to --fluid-radius-full.
  * @cssproperty --fluid-radio-accent - Checked color (border + dot). Falls back to --fluid-accent-base.
+ * @cssproperty --fluid-radio-bg-on - Circle background when checked. Falls back to --fluid-radio-bg.
+ * @cssproperty --fluid-radio-border-on - Circle border color when checked. Falls back to --fluid-radio-accent.
+ * @cssproperty --fluid-radio-border-width-on - Circle border width when checked. Falls back to 2px.
+ * @cssproperty --fluid-radio-dot-color - Checked dot color. Falls back to --fluid-radio-accent.
+ * @cssproperty --fluid-radio-size - Circle width and height. Falls back to 1.125rem.
  * @cssproperty --fluid-radio-fg - Label text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-radio-gap - Gap between circle and label. Falls back to --fluid-space-2.
  * @cssproperty --fluid-radio-font-family - Label font family. Falls back to --fluid-font-family-sans.
@@ -88,8 +93,8 @@ export class FluidRadio extends FluidElement {
       position: relative;
       flex-shrink: 0;
       box-sizing: border-box;
-      width: 1.125rem;
-      height: 1.125rem;
+      width: var(--fluid-radio-size, 1.125rem);
+      height: var(--fluid-radio-size, 1.125rem);
       background: var(--fluid-radio-bg, var(--fluid-surface-base));
       border: var(--fluid-radio-border-width, var(--fluid-field-border-width, 1px)) solid
         var(--fluid-radio-border, var(--fluid-border-default));
@@ -104,8 +109,12 @@ export class FluidRadio extends FluidElement {
     }
 
     :host([checked]) .control {
-      border-color: var(--fluid-radio-accent, var(--fluid-accent-base));
-      border-width: 2px;
+      background: var(--fluid-radio-bg-on, var(--fluid-radio-bg, var(--fluid-surface-base)));
+      border-color: var(
+        --fluid-radio-border-on,
+        var(--fluid-radio-accent, var(--fluid-accent-base))
+      );
+      border-width: var(--fluid-radio-border-width-on, 2px);
     }
 
     .dot {
@@ -115,7 +124,7 @@ export class FluidRadio extends FluidElement {
       width: 0.5em;
       height: 0.5em;
       border-radius: var(--fluid-radius-full);
-      background: var(--fluid-radio-accent, var(--fluid-accent-base));
+      background: var(--fluid-radio-dot-color, var(--fluid-radio-accent, var(--fluid-accent-base)));
       background-image: var(--fluid-gradient-glossy);
       transform: scale(0);
       transition: transform var(--fluid-duration-fast) var(--fluid-easing-standard);

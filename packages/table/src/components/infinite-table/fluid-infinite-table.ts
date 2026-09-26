@@ -135,6 +135,12 @@ export interface FluidInfiniteTableSort {
  * @cssproperty --fluid-infinite-table-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  * @uses-token --fluid-border-width-divider - Divider stroke width.
+ * @cssproperty --fluid-infinite-table-shadow - Shadow under the outlined viewport. Falls back to none.
+ * @cssproperty --fluid-infinite-table-header-divider-width - Stroke under the toolbar and header row. Falls back to --fluid-infinite-table-divider-width.
+ * @cssproperty --fluid-infinite-table-header-font-family - Header cell and dialog heading font family. Falls back to inherit.
+ * @cssproperty --fluid-infinite-table-button-radius - Toolbar and dialog button radius. Falls back to --fluid-radius-sm.
+ * @cssproperty --fluid-infinite-table-button-border-width - Toolbar and dialog button outline width. Falls back to --fluid-infinite-table-border-width.
+ * @cssproperty --fluid-infinite-table-sort-color - Active sort mark color. Falls back to --fluid-accent-base.
  */
 export class FluidInfiniteTable extends FluidElement {
   static override styles = css`
@@ -150,6 +156,7 @@ export class FluidInfiniteTable extends FluidElement {
         var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-infinite-table-radius, var(--fluid-radius-md, 0.5rem));
       background: var(--fluid-infinite-table-bg, var(--fluid-surface-base, #fff));
+      box-shadow: var(--fluid-infinite-table-shadow, none);
     }
     :host([scroll-mode="container"]) .viewport {
       max-height: var(--fluid-infinite-table-height, 42rem);
@@ -169,8 +176,8 @@ export class FluidInfiniteTable extends FluidElement {
       min-height: max(3rem, var(--fluid-target-min, 0px));
       padding: 0.5rem 0.75rem;
       border-bottom: var(
-          --fluid-infinite-table-divider-width,
-          var(--fluid-border-width-divider, 1px)
+          --fluid-infinite-table-header-divider-width,
+          var(--fluid-infinite-table-divider-width, var(--fluid-border-width-divider, 1px))
         )
         solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       background: var(--fluid-infinite-table-toolbar-bg, var(--fluid-surface-base, #fff));
@@ -201,9 +208,12 @@ export class FluidInfiniteTable extends FluidElement {
     button {
       min-width: max(1.75rem, var(--fluid-target-min, 0px));
       min-height: max(1.75rem, var(--fluid-target-min, 0px));
-      border: var(--fluid-infinite-table-border-width, var(--fluid-border-width-default, 1px)) solid
-        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
-      border-radius: var(--fluid-radius-sm, 0.25rem);
+      border: var(
+          --fluid-infinite-table-button-border-width,
+          var(--fluid-infinite-table-border-width, var(--fluid-border-width-default, 1px))
+        )
+        solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border-radius: var(--fluid-infinite-table-button-radius, var(--fluid-radius-sm, 0.25rem));
       background: var(--fluid-surface-base, #fff);
       color: inherit;
       font: inherit;
@@ -358,8 +368,13 @@ export class FluidInfiniteTable extends FluidElement {
       min-height: max(2.5rem, var(--fluid-target-min, 0px));
       background: var(--fluid-infinite-table-header-bg, var(--fluid-surface-muted, #f4f4f5));
       color: var(--fluid-infinite-table-fg, var(--fluid-text-primary, #18181b));
+      font-family: var(--fluid-infinite-table-header-font-family, inherit);
       font-weight: 700;
       white-space: nowrap;
+      border-bottom-width: var(
+        --fluid-infinite-table-header-divider-width,
+        var(--fluid-infinite-table-divider-width, var(--fluid-border-width-divider, 1px))
+      );
     }
     /*
      * Rendered cell content truncates the way plain content does. The cell's
@@ -424,7 +439,7 @@ export class FluidInfiniteTable extends FluidElement {
     th[aria-sort="ascending"] .sort-mark,
     th[aria-sort="descending"] .sort-mark {
       opacity: 1;
-      color: var(--fluid-accent-base, #4f46e5);
+      color: var(--fluid-infinite-table-sort-color, var(--fluid-accent-base, #4f46e5));
     }
     .header-inner {
       display: flex;
@@ -573,6 +588,7 @@ export class FluidInfiniteTable extends FluidElement {
     }
     .dialog-head h2 {
       margin: 0;
+      font-family: var(--fluid-infinite-table-header-font-family, inherit);
       font-size: 1.125rem;
     }
     .dialog-list {

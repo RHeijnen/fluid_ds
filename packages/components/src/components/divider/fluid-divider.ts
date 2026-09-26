@@ -13,6 +13,7 @@ export type FluidDividerOrientation = "horizontal" | "vertical";
  *
  * @cssproperty --fluid-divider-color - Line color.
  * @cssproperty --fluid-divider-width - Line thickness.
+ * @cssproperty --fluid-divider-radius - Line end rounding. Falls back to 0.
  *
  * @uses-token --fluid-border-default - Default line color.
  */
@@ -21,6 +22,7 @@ export class FluidDivider extends FluidElement {
     :host {
       display: block;
       border: 0;
+      border-radius: var(--fluid-divider-radius, 0);
       background: var(--fluid-divider-color, var(--fluid-border-default));
     }
 

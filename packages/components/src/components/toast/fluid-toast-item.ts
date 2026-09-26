@@ -47,9 +47,13 @@ export type FluidToastVariant = "neutral" | "info" | "success" | "warning" | "da
  * @cssproperty --fluid-toast-item-focus-ring - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-toast-item-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  * @cssproperty --fluid-toast-item-info-accent - Info variant accent + icon color. Falls back to --fluid-info-base.
+ * @cssproperty --fluid-toast-item-info-icon-fg - Info variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-info-accent.
  * @cssproperty --fluid-toast-item-success-accent - Success variant accent + icon color. Falls back to --fluid-success-base.
+ * @cssproperty --fluid-toast-item-success-icon-fg - Success variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-success-accent.
  * @cssproperty --fluid-toast-item-warning-accent - Warning variant accent + icon color. Falls back to --fluid-warning-base.
+ * @cssproperty --fluid-toast-item-warning-icon-fg - Warning variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-warning-accent.
  * @cssproperty --fluid-toast-item-danger-accent - Danger variant accent + icon color. Falls back to --fluid-danger-base.
+ * @cssproperty --fluid-toast-item-danger-icon-fg - Danger variant icon color, when it should differ from the accent. Falls back to --fluid-toast-item-danger-accent.
  *
  * @uses-token --fluid-surface-base - Default background.
  * @uses-token --fluid-surface-muted - Close-button hover background.
@@ -60,6 +64,10 @@ export type FluidToastVariant = "neutral" | "info" | "success" | "warning" | "da
  * @uses-token --fluid-success-base - Success variant accent.
  * @uses-token --fluid-warning-base - Warning variant accent.
  * @uses-token --fluid-danger-base - Danger variant accent.
+ * @uses-token --fluid-info-fg - Optional info icon color; falls back to --fluid-info-base.
+ * @uses-token --fluid-success-fg - Optional success icon color; falls back to --fluid-success-base.
+ * @uses-token --fluid-warning-fg - Optional warning icon color; falls back to --fluid-warning-base.
+ * @uses-token --fluid-danger-fg - Optional danger icon color; falls back to --fluid-danger-base.
  * @uses-token --fluid-focus-ring-color - Close-button focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum close-button hit-target size (24px AA / 44px AAA).
@@ -187,7 +195,10 @@ export class FluidToastItem extends FluidElement {
         border-inline-start-color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
       }
       :host([variant="info"]) .icon-slot {
-        color: var(--fluid-toast-item-info-accent, var(--fluid-info-base));
+        color: var(
+          --fluid-toast-item-info-icon-fg,
+          var(--fluid-toast-item-info-accent, var(--fluid-info-fg, var(--fluid-info-base)))
+        );
       }
       :host([variant="success"]) .base {
         border-inline-start-color: var(
@@ -196,7 +207,10 @@ export class FluidToastItem extends FluidElement {
         );
       }
       :host([variant="success"]) .icon-slot {
-        color: var(--fluid-toast-item-success-accent, var(--fluid-success-base));
+        color: var(
+          --fluid-toast-item-success-icon-fg,
+          var(--fluid-toast-item-success-accent, var(--fluid-success-fg, var(--fluid-success-base)))
+        );
       }
       :host([variant="warning"]) .base {
         border-inline-start-color: var(
@@ -205,13 +219,19 @@ export class FluidToastItem extends FluidElement {
         );
       }
       :host([variant="warning"]) .icon-slot {
-        color: var(--fluid-toast-item-warning-accent, var(--fluid-warning-base));
+        color: var(
+          --fluid-toast-item-warning-icon-fg,
+          var(--fluid-toast-item-warning-accent, var(--fluid-warning-fg, var(--fluid-warning-base)))
+        );
       }
       :host([variant="danger"]) .base {
         border-inline-start-color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
       }
       :host([variant="danger"]) .icon-slot {
-        color: var(--fluid-toast-item-danger-accent, var(--fluid-danger-base));
+        color: var(
+          --fluid-toast-item-danger-icon-fg,
+          var(--fluid-toast-item-danger-accent, var(--fluid-danger-fg, var(--fluid-danger-base)))
+        );
       }
     `
   ];

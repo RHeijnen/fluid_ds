@@ -41,6 +41,26 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-availability-editor-border-width"
+            },
+            {
+              "description": "Section heading font family. Falls back to inherit.",
+              "name": "--fluid-availability-editor-heading-font-family"
+            },
+            {
+              "description": "Space between weekday rows. Falls back to 0.",
+              "name": "--fluid-availability-editor-row-gap"
+            },
+            {
+              "description": "Weekday row outline. Falls back to none.",
+              "name": "--fluid-availability-editor-row-border"
+            },
+            {
+              "description": "Time-input outline width. Falls back to --fluid-availability-editor-border-width.",
+              "name": "--fluid-availability-editor-input-border-width"
+            },
+            {
+              "description": "Time-input corner radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-availability-editor-input-radius"
             }
           ],
           "cssParts": [
@@ -539,6 +559,10 @@
             {
               "name": "--fluid-border-width-default",
               "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-radius-sm",
+              "description": "Time-input radius."
             }
           ],
           "tagName": "fluid-availability-editor",
@@ -1243,6 +1267,22 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-time-slots-border-width"
+            },
+            {
+              "description": "Slot hover border color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-time-slots-hover-border"
+            },
+            {
+              "description": "Selected slot border color. Falls back to --fluid-time-slots-selected-bg.",
+              "name": "--fluid-time-slots-selected-border"
+            },
+            {
+              "description": "Selected slot shadow. Falls back to none.",
+              "name": "--fluid-time-slots-selected-shadow"
+            },
+            {
+              "description": "Date heading font family. Falls back to inherit.",
+              "name": "--fluid-time-slots-heading-font-family"
             }
           ],
           "cssParts": [

@@ -53,6 +53,30 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-kanban-border-width"
+            },
+            {
+              "description": "Column corner radius. Falls back to --fluid-kanban-radius.",
+              "name": "--fluid-kanban-column-radius"
+            },
+            {
+              "description": "Card shadow. Falls back to none.",
+              "name": "--fluid-kanban-card-shadow"
+            },
+            {
+              "description": "Column and card title font family. Falls back to inherit.",
+              "name": "--fluid-kanban-header-font-family"
+            },
+            {
+              "description": "Move button corner radius. Falls back to --fluid-kanban-radius.",
+              "name": "--fluid-kanban-control-radius"
+            },
+            {
+              "description": "Move button outline width. Falls back to --fluid-kanban-border-width.",
+              "name": "--fluid-kanban-control-border-width"
+            },
+            {
+              "description": "Drop-target ring color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-kanban-drop-ring"
             }
           ],
           "cssParts": [

@@ -61,6 +61,10 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-node-graph-border-width"
+            },
+            {
+              "description": "Node title font family. Falls back to inherit.",
+              "name": "--fluid-node-graph-title-font-family"
             }
           ],
           "cssParts": [

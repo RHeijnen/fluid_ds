@@ -33,6 +33,7 @@ function formatTime(s: number, locale: string): string {
  * @uses-token --fluid-accent-base - Progress + focus ring.
  * @uses-token --fluid-border-default - Unplayed track.
  * @uses-token --fluid-radius-md - Corner radius.
+ * @cssproperty --fluid-audio-border - Player outline. Falls back to none.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum control target (24px AA / 44px AAA).
  *
@@ -54,6 +55,7 @@ export class FluidAudio extends FluidElement {
       padding: 0.5rem 0.75rem;
       background: var(--fluid-audio-bg, var(--fluid-surface-muted));
       border-radius: var(--fluid-audio-radius, var(--fluid-radius-md, 0.5rem));
+      border: var(--fluid-audio-border, none);
     }
     audio {
       display: none;

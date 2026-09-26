@@ -18,6 +18,7 @@ import { FluidElement } from "@fluid-ds/components/internal/base-element";
  * @cssproperty --fluid-video-radius - Border radius applied to the player.
  *
  * @uses-token --fluid-radius-md - Default border radius.
+ * @cssproperty --fluid-video-shadow - Outline ring or shadow around the player. Falls back to none.
  *
  * @fires fluid-play - Fired when playback starts.
  * @fires fluid-pause - Fired when playback pauses.
@@ -34,6 +35,7 @@ export class FluidVideo extends FluidElement {
       height: auto;
       display: block;
       border-radius: var(--fluid-video-radius, var(--fluid-radius-md));
+      box-shadow: var(--fluid-video-shadow, none);
       background: black;
     }
   `;

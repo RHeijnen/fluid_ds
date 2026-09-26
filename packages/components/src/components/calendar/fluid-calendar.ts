@@ -46,6 +46,9 @@ import {
  * @cssproperty --fluid-calendar-hover-bg - Day hover background. Falls back to --fluid-surface-muted.
  * @cssproperty --fluid-calendar-selected-bg - Selected day fill. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-calendar-selected-fg - Selected day text. Falls back to --fluid-accent-text.
+ * @cssproperty --fluid-calendar-selected-border-width - Selected day outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-calendar-selected-border - Selected day outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-calendar-month-font-family - Month label font family. Falls back to the calendar font (inherit).
  * @cssproperty --fluid-calendar-range-bg - In-range day fill. Falls back to a 15% accent tint.
  * @cssproperty --fluid-calendar-today-ring - Today's outline color. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-calendar-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
@@ -59,6 +62,7 @@ import {
  * @uses-token --fluid-text-secondary - Outside-month / weekday text.
  * @uses-token --fluid-accent-base - Selected fill + today ring + focus ring.
  * @uses-token --fluid-accent-text - Selected text.
+ * @uses-token --fluid-border-strong - Selected day outline color when a theme enables it.
  * @uses-token --fluid-radius-md - Day corner radius.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum tap target (24px AA / 44px AAA).
@@ -92,6 +96,7 @@ export class FluidCalendar extends FluidElement {
       margin-bottom: 0.5rem;
     }
     .month-label {
+      font-family: var(--fluid-calendar-month-font-family, inherit);
       font-weight: 600;
       font-size: var(--fluid-font-size-md, 1rem);
     }
@@ -180,6 +185,8 @@ export class FluidCalendar extends FluidElement {
       background: var(--fluid-calendar-selected-bg, var(--fluid-accent-base));
       color: var(--fluid-calendar-selected-fg, var(--fluid-accent-text));
       font-weight: 600;
+      border: var(--fluid-calendar-selected-border-width, 0px) solid
+        var(--fluid-calendar-selected-border, var(--fluid-border-strong));
     }
     .day:disabled {
       color: var(--fluid-calendar-muted-fg, var(--fluid-text-secondary));

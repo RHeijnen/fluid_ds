@@ -254,7 +254,7 @@ export class FluidRainbowBattery extends FluidElement {
     this.setAttribute("aria-valuemax", String(hi));
     this.setAttribute("aria-valuenow", String(now));
     this.setAttribute("aria-valuetext", this.percent(this.fraction));
-    const slotted = Array.from(this.childNodes)
+    const slotted = Array.from(this.childNodes ?? [])
       .filter((n) => n.nodeType === 3 || (n.nodeType === 1 && !(n as Element).getAttribute("slot")))
       .map((n) => n.textContent ?? "")
       .join("")
@@ -336,7 +336,7 @@ export class FluidRainbowBattery extends FluidElement {
 
   override render(): TemplateResult {
     const pct = (this.fraction * 100).toFixed(2);
-    const hasLabel = Array.from(this.childNodes).some(
+    const hasLabel = Array.from(this.childNodes ?? []).some(
       (n) => n.nodeType === 1 || Boolean(n.textContent?.trim())
     );
     return html`

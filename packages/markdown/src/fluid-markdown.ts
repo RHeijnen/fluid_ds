@@ -37,6 +37,8 @@ function sanitizeHtml(dirty: string): string {
  * @cssproperty --fluid-markdown-table-border - Table cell border color.
  * @cssproperty --fluid-markdown-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-markdown-heading-font-family - Heading font family. Falls back to inherit.
+ * @cssproperty --fluid-markdown-pre-border - Code block outline. Falls back to none.
  *
  * @fires fluid-render - Fired when render completes.
  */
@@ -61,6 +63,7 @@ export class FluidMarkdown extends FluidElement {
       margin-top: 1.25em;
       margin-bottom: 0.5em;
       line-height: 1.25;
+      font-family: var(--fluid-markdown-heading-font-family, inherit);
     }
     .content code {
       font-family: var(--fluid-font-family-mono, ui-monospace, monospace);
@@ -72,6 +75,7 @@ export class FluidMarkdown extends FluidElement {
     .content pre {
       background: var(--fluid-markdown-code-bg, var(--fluid-surface-muted));
       padding: var(--fluid-space-3);
+      border: var(--fluid-markdown-pre-border, none);
       border-radius: var(--fluid-radius-md);
       overflow-x: auto;
     }

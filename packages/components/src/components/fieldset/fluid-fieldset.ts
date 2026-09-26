@@ -47,6 +47,8 @@ let fieldsetIdCounter = 0;
  * @cssproperty --fluid-fieldset-legend-fg - Legend text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-fieldset-legend-font-size - Legend font size. Falls back to --fluid-font-size-md.
  * @cssproperty --fluid-fieldset-legend-font-weight - Legend font weight. Falls back to --fluid-font-weight-semibold.
+ * @cssproperty --fluid-fieldset-legend-font-family - Legend font family. Falls back to the fieldset font (inherit).
+ * @cssproperty --fluid-fieldset-legend-padding - Legend padding, the gap it cuts into the outline. Falls back to 0.
  * @cssproperty --fluid-fieldset-description-fg - Description text color. Falls back to --fluid-text-secondary.
  * @cssproperty --fluid-fieldset-description-font-size - Description font size. Falls back to --fluid-font-size-sm.
  * @cssproperty --fluid-fieldset-error-fg - Error text color. Falls back to --fluid-danger-base.
@@ -105,7 +107,8 @@ export class FluidFieldset extends FluidElement {
     }
 
     .legend {
-      padding: 0;
+      padding: var(--fluid-fieldset-legend-padding, 0);
+      font-family: var(--fluid-fieldset-legend-font-family, inherit);
       color: var(--fluid-fieldset-legend-fg, var(--fluid-text-primary));
       font-size: var(--fluid-fieldset-legend-font-size, var(--fluid-font-size-md));
       font-weight: var(--fluid-fieldset-legend-font-weight, var(--fluid-font-weight-semibold));

@@ -75,6 +75,12 @@ export interface FluidTableSort {
  * @cssproperty --fluid-table-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  * @uses-token --fluid-border-width-divider - Divider stroke width.
+ * @cssproperty --fluid-table-border-collapse - Table border model. Set to separate so --fluid-table-radius rounds the outline. Falls back to collapse.
+ * @cssproperty --fluid-table-shadow - Shadow under the table. Falls back to none.
+ * @cssproperty --fluid-table-header-divider-width - Stroke under the header row. Falls back to --fluid-table-divider-width.
+ * @cssproperty --fluid-table-header-font-family - Header cell font family. Falls back to inherit.
+ * @cssproperty --fluid-table-sort-color - Sort icon color. Falls back to currentColor.
+ * @cssproperty --fluid-table-corner-radius - Radius of the four corner cells, so their fills follow a rounded outline (needs --fluid-table-border-collapse: separate). Falls back to 0.
  *
  * @fires fluid-sort - The sort changed. `detail: { key, dir }`.
  * @fires fluid-selection-change - The row selection changed. `detail: { selected: rowKeys[] }`.
@@ -88,7 +94,9 @@ export class FluidTable extends FluidElement {
     }
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: var(--fluid-table-border-collapse, collapse);
+      border-spacing: 0;
+      box-shadow: var(--fluid-table-shadow, none);
       background: var(--fluid-table-bg, var(--fluid-surface-base, #fff));
       border: var(--fluid-table-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-table-border, var(--fluid-border-default, #e4e4e7));
@@ -125,11 +133,28 @@ export class FluidTable extends FluidElement {
     thead th {
       background: var(--fluid-table-header-bg, var(--fluid-surface-muted, #f4f4f5));
       color: var(--fluid-table-header-fg, var(--fluid-text-primary, #18181b));
+      font-family: var(--fluid-table-header-font-family, inherit);
       font-weight: 600;
       white-space: nowrap;
+      border-bottom-width: var(
+        --fluid-table-header-divider-width,
+        var(--fluid-table-divider-width, var(--fluid-border-width-divider, 1px))
+      );
     }
     tbody tr:last-child td {
       border-bottom: 0;
+    }
+    thead tr:first-child > :first-child {
+      border-start-start-radius: var(--fluid-table-corner-radius, 0);
+    }
+    thead tr:first-child > :last-child {
+      border-start-end-radius: var(--fluid-table-corner-radius, 0);
+    }
+    tbody tr:last-child > :first-child {
+      border-end-start-radius: var(--fluid-table-corner-radius, 0);
+    }
+    tbody tr:last-child > :last-child {
+      border-end-end-radius: var(--fluid-table-corner-radius, 0);
     }
     tbody tr:nth-child(odd) td {
       background: var(--fluid-table-zebra-bg, transparent);
@@ -171,6 +196,7 @@ export class FluidTable extends FluidElement {
       width: 1em;
       height: 1em;
       flex: none;
+      color: var(--fluid-table-sort-color, currentColor);
       opacity: 0.4;
       transition:
         opacity 120ms ease,

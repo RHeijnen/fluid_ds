@@ -28,6 +28,7 @@ const HEX_RE = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
  * @cssproperty --fluid-color-picker-swatch-size - Swatch width. Falls back to 2.5rem.
  * @cssproperty --fluid-color-picker-preset-size - Preset chip size (floored by --fluid-target-min). Falls back to 1.25rem.
  * @cssproperty --fluid-color-picker-radius - Swatch + preset corner radius. Falls back to --fluid-radius-sm.
+ * @cssproperty --fluid-color-picker-preset-ring - Preset chip inner outline color. Falls back to a 12% black hairline.
  * @cssproperty --fluid-color-picker-font-family - Hex field font family. Falls back to --fluid-font-family-mono.
  * @cssproperty --fluid-color-picker-field-border - Field border color. Defaults to the selected color.
  * @cssproperty --fluid-color-picker-field-border-hover - Hovered field border color. Defaults to the selected color.
@@ -155,7 +156,8 @@ export class FluidColorPicker extends FluidFormAssociated {
       height: max(var(--fluid-color-picker-preset-size, 1.25rem), var(--fluid-target-min, 0px));
       border-radius: var(--fluid-color-picker-radius, var(--fluid-radius-sm));
       cursor: pointer;
-      box-shadow: inset 0 0 0 var(--fluid-field-border-width, 1px) rgb(0 0 0 / 0.12);
+      box-shadow: inset 0 0 0 var(--fluid-field-border-width, 1px)
+        var(--fluid-color-picker-preset-ring, rgb(0 0 0 / 0.12));
     }
 
     .preset:hover {

@@ -202,6 +202,102 @@
               }
             },
             {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-chart-border-width",
               "inheritedFrom": {
@@ -949,6 +1045,102 @@
               }
             },
             {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-chart-border-width",
               "inheritedFrom": {
@@ -1575,6 +1767,54 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset"
+            },
+            {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette"
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border"
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width"
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width"
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius"
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius"
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style"
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg"
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg"
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border"
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width"
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family"
             },
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
@@ -2308,6 +2548,102 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -3061,6 +3397,102 @@
               }
             },
             {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-chart-border-width",
               "inheritedFrom": {
@@ -3802,6 +4234,102 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -4555,6 +5083,102 @@
               }
             },
             {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-chart-border-width",
               "inheritedFrom": {
@@ -5296,6 +5920,102 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -6049,6 +6769,102 @@
               }
             },
             {
+              "description": "Comma-separated series colors, used in order. Falls back to the brand ramp (--fluid-color-brand-600, 400, 800, 300, 700, 500, 200, 900).",
+              "name": "--fluid-chart-palette",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline color around bars, arcs, bubbles and line points. Falls back to the built-in look (bars unoutlined, arcs and points outlined in --fluid-surface-base).",
+              "name": "--fluid-chart-series-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline width (px) for bars, arcs, bubbles and points, applied when --fluid-chart-series-border is set. Falls back to 2.",
+              "name": "--fluid-chart-series-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Line series stroke width (px). Falls back to 2.5.",
+              "name": "--fluid-chart-line-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Resting radius (px) of line points. Falls back to 0 (shown on hover only).",
+              "name": "--fluid-chart-point-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Bar corner radius (px). Falls back to 6.",
+              "name": "--fluid-chart-bar-radius",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Set to \"flat\" to paint arcs and line areas with solid fills instead of gradients. Falls back to gradient.",
+              "name": "--fluid-chart-fill-style",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip background. Falls back to --fluid-text-primary.",
+              "name": "--fluid-chart-tooltip-bg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip text color. Falls back to --fluid-surface-base.",
+              "name": "--fluid-chart-tooltip-fg",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline color. Falls back to transparent.",
+              "name": "--fluid-chart-tooltip-border",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Tooltip outline width (px). Falls back to 0.",
+              "name": "--fluid-chart-tooltip-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Font of the doughnut center total. Falls back to --fluid-font-family-sans.",
+              "name": "--fluid-chart-center-font-family",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-chart-border-width",
               "inheritedFrom": {
@@ -6631,6 +7447,10 @@
             {
               "description": "Default height.",
               "name": "--fluid-sparkline-height"
+            },
+            {
+              "description": "Stroke width (px). Falls back to 1.5.",
+              "name": "--fluid-sparkline-line-width"
             }
           ],
           "cssParts": [

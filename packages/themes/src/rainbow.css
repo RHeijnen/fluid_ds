@@ -124,14 +124,16 @@
   --fluid-color-sky-900: #3f2d68;
 
   /* ── Shape ───────────────────────────────────────────────────────────── */
-  --fluid-border-width-default: 3px;
-  --fluid-border-width-divider: 2px;
+  /* Containers take a 4px outline, controls 3px, matching the reference
+     home-screen look; dividers sit one step lighter. */
+  --fluid-border-width-default: 4px;
+  --fluid-border-width-divider: 3px;
   --fluid-field-border-width: 3px;
-  --fluid-radius-sm: 0.5rem;
-  --fluid-radius-md: 0.875rem;
-  --fluid-radius-lg: 1.5rem;
-  --fluid-radius-xl: 2rem;
-  --fluid-field-border-radius: 0.875rem;
+  --fluid-radius-sm: 0.625rem;
+  --fluid-radius-md: 1rem;
+  --fluid-radius-lg: 2.125rem;
+  --fluid-radius-xl: 2.5rem;
+  --fluid-field-border-radius: 1rem;
 
   /* No glossy sheen: fills are flat, like cut paper. */
   --fluid-gradient-glossy: none;
@@ -160,6 +162,7 @@
   --fluid-button-font-family: var(--fluid-font-family-display);
   --fluid-button-font-weight: var(--fluid-font-weight-semibold);
   --fluid-button-press-offset: 3px;
+  --fluid-button-hover-lift: 2px;
   --fluid-button-pressed-shadow: inset 0 3px 0 rgb(0 0 0 / 0.12);
 
   --fluid-card-header-font-family: var(--fluid-font-family-display);
@@ -180,7 +183,9 @@
   --fluid-switch-thumb-sheen: none;
 
   --fluid-badge-border-width: 2px;
-  --fluid-tag-border-width: 2px;
+  --fluid-badge-font-family: var(--fluid-font-family-display);
+  --fluid-tag-border-width: 3px;
+  --fluid-tag-font-family: var(--fluid-font-family-display);
   --fluid-input-shadow: none;
 }
 
@@ -246,10 +251,9 @@
   --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
   --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
   --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-button-hover-shadow: 0 6px 0 var(--rainbow-pop);
   --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
-  --fluid-card-shadow-md:
-    0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
-    0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+  --fluid-card-shadow-md: 0 0 0 var(--fluid-border-width-default) var(--rainbow-line);
   --fluid-switch-track-bg: var(--rainbow-sand);
   --fluid-switch-border: var(--rainbow-line);
   --fluid-tag-info-border: var(--rainbow-line);
@@ -261,9 +265,512 @@
   color: var(--fluid-text-primary);
 }
 
-/* Low-specificity defaults for the page itself, easy for an app to override. */
+/*
+ * Component knobs.
+ *
+ * Each rule below tunes one family of components through its own
+ * --fluid-<component>-* knobs. The selector also matches nested
+ * data-fluid-theme and data-fluid-conformance regions, so knobs that read the
+ * palette (--rainbow-line, --rainbow-pop, --fluid-<tone>-fg, ...) re-resolve
+ * inside a dark or AAA section instead of inheriting the outer values.
+ */
+
+/* Core */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  /* Focused fields keep an ink border, matching select, typeahead and the
+     pickers; the focus ring still carries the focus indication. */
+  --fluid-input-border-focus: var(--rainbow-line);
+  --fluid-textarea-border-focus: var(--rainbow-line);
+}
+
+/* Navigation */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  /* Tabs: the sliding underline becomes a pastel sticker pill behind the
+     selected label, with an ink label and the display face. */
+  --fluid-tabs-indicator-top: 0.3125rem;
+  --fluid-tabs-indicator-bottom: 0.3125rem;
+  --fluid-tabs-indicator-height: auto;
+  --fluid-tabs-indicator-radius: var(--fluid-radius-full);
+  --fluid-tabs-indicator-border-width: 3px;
+  --fluid-tabs-indicator-layer: -1;
+  --fluid-tabs-gap: var(--fluid-space-2);
+  --fluid-tab-font-family: var(--fluid-font-family-display);
+
+  /* Segmented control: outlined pill track, pastel thumb. */
+  --fluid-segmented-radius: var(--fluid-radius-full);
+  --fluid-segmented-border-width: 3px;
+  --fluid-segmented-thumb-border-width: 3px;
+  --fluid-segment-radius: var(--fluid-radius-full);
+  --fluid-segment-font-family: var(--fluid-font-family-display);
+
+  /* Anchor nav: chunky marker, current link reads as a pastel tab. */
+  --fluid-anchor-nav-marker-width: 6px;
+  --fluid-anchor-nav-marker-offset: calc(-1 * var(--fluid-border-width-divider));
+  --fluid-anchor-nav-radius: 0 var(--fluid-radius-sm) var(--fluid-radius-sm) 0;
+
+  /* Breadcrumb: display face on the trail. */
+  --fluid-breadcrumb-item-font-family: var(--fluid-font-family-display);
+
+  /* Pagination: pill controls on the control stroke, display numerals. */
+  --fluid-pagination-size: 2.25rem;
+  --fluid-pagination-gap: var(--fluid-space-2);
+  --fluid-pagination-radius: var(--fluid-radius-full);
+  --fluid-pagination-border-width: 3px;
+  --fluid-pagination-font-family: var(--fluid-font-family-display);
+  --fluid-pagination-font-weight: var(--fluid-font-weight-semibold);
+
+  /* Steps: thicker rail, outlined display-face indicators. */
+  --fluid-step-connector-size: 4px;
+  --fluid-step-indicator-size: 2rem;
+  --fluid-step-indicator-font-family: var(--fluid-font-family-display);
+
+  /* Nav list: the current row is a pastel sticker with an ink label. */
+  --fluid-nav-item-radius: var(--fluid-radius-md);
+
+  /* App bar: display face across the bar, pill menu button. */
+  --fluid-app-bar-font-family: var(--fluid-font-family-display);
+  --fluid-app-bar-radius: var(--fluid-radius-full);
+
+  /* Menus (menu, context menu, dropdown): control-weight outline, solid
+     pastel highlight with ink text; the accent rail disappears into it. */
+  --fluid-menu-item-radius: var(--fluid-radius-md);
+  --fluid-menu-item-accent: transparent;
+  --fluid-dropdown-item-rail-width: 0px;
+  /* The check follows the label so it stays visible on the pastel highlight. */
+  --fluid-dropdown-item-check-color: currentColor;
+  --fluid-menu-label-font-family: var(--fluid-font-family-display);
+  --fluid-dropdown-border-width: 3px;
+  --fluid-dropdown-item-radius: var(--fluid-radius-md);
+  --fluid-dropdown-item-separator-width: var(--fluid-border-width-divider);
+
+  /* Tree: selected row as a pastel sticker. */
+  --fluid-tree-item-radius: var(--fluid-radius-md);
+
+  /* Command palette: display face on the panel. */
+  --fluid-command-palette-font-family: var(--fluid-font-family-display);
+
+  /* Semantic color reads: resolved where declared, so restated per scheme. */
+  --fluid-tab-selected-fg: var(--fluid-accent-text);
+  --fluid-segmented-thumb-bg: var(--fluid-accent-base);
+  --fluid-segment-selected-fg: var(--fluid-accent-text);
+  --fluid-anchor-nav-active-bg: var(--fluid-accent-base);
+  --fluid-anchor-nav-active-fg: var(--fluid-accent-text);
+  --fluid-nav-item-active-bg: var(--fluid-accent-base);
+  --fluid-nav-item-active-fg: var(--fluid-accent-text);
+  --fluid-menu-item-active-bg: var(--fluid-accent-base);
+  --fluid-menu-item-active-fg: var(--fluid-accent-text);
+  --fluid-dropdown-item-active-bg: var(--fluid-accent-base);
+  --fluid-dropdown-item-active-fg: var(--fluid-accent-text);
+  --fluid-tree-item-selected-bg: var(--fluid-accent-base);
+  --fluid-tree-item-selected-fg: var(--fluid-accent-text);
+  --fluid-tabs-indicator-border: var(--rainbow-line);
+  --fluid-segmented-border: var(--rainbow-line);
+  --fluid-segmented-thumb-border: var(--rainbow-line);
+  --fluid-segmented-control-shadow-sm: 0 2px 0 var(--rainbow-pop);
+  --fluid-anchor-nav-active-marker: var(--rainbow-line);
+  --fluid-pagination-current-shadow: 0 3px 0 var(--rainbow-pop);
+  --fluid-step-indicator-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-step-connector-color: color-mix(in srgb, var(--rainbow-line) 22%, transparent);
+  --fluid-step-connector-complete-color: var(--rainbow-line);
+  --fluid-step-chip-current-border: var(--rainbow-line);
+  --fluid-nav-item-active-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-tree-item-selected-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-sidebar-shadow: 6px 0 0 var(--rainbow-pop);
+  --fluid-menu-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-context-menu-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-dropdown-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-command-palette-shadow: 0 0 0 4px var(--rainbow-line), 0 4px 0 4px var(--rainbow-pop);
+  --fluid-speed-dial-shadow-lg: inset 0 0 0 3px var(--rainbow-line), 0 4px 0 var(--rainbow-pop);
+}
+
+/* Forms */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  /* Checkbox and radio: a touch bigger so the 3px outline leaves room for the mark. */
+  --fluid-checkbox-size: 1.375rem;
+  --fluid-checkbox-radius: 0.5rem;
+  --fluid-radio-size: 1.375rem;
+  --fluid-radio-border-width-on: 3px;
+
+  /* Slider and range slider: a chunky outlined rail with a pill thumb. */
+  --fluid-slider-track-size: 14px;
+  --fluid-slider-thumb-width: 14px;
+  --fluid-slider-thumb-height: 26px;
+  --fluid-slider-thumb-radius: 999px;
+  --fluid-slider-thumb-border-width: 3px;
+  --fluid-range-slider-track-size: 14px;
+  --fluid-range-slider-thumb-width: 14px;
+  --fluid-range-slider-thumb-height: 26px;
+  --fluid-range-slider-thumb-radius: 999px;
+  --fluid-range-slider-thumb-border-width: 3px;
+
+  /* Listbox options (select, typeahead, time picker): a thick rail. */
+  --fluid-option-active-rail-width: 4px;
+  --fluid-typeahead-option-active-rail-width: 4px;
+  --fluid-time-picker-option-active-rail-width: 4px;
+
+  /* Calendar (and the date pickers built on it). */
+  --fluid-calendar-month-font-family: var(--fluid-font-family-display);
+  --fluid-calendar-selected-border-width: 3px;
+  --fluid-calendar-border-width: 3px;
+
+  /* Date range picker footer buttons match fluid-button. */
+  --fluid-date-range-picker-button-radius: var(--fluid-radius-full);
+  --fluid-date-range-picker-button-border-width: 3px;
+  --fluid-date-range-picker-button-font-family: var(--fluid-font-family-display);
+
+  /* Fieldset legend. */
+  --fluid-fieldset-legend-font-family: var(--fluid-font-family-display);
+  --fluid-fieldset-legend-padding: 0 0.5rem;
+
+  /* Rating: flat yellow stars with an ink outline. */
+  --fluid-rating-active-color: var(--rainbow-yellow);
+  --fluid-rating-stroke-width: 1.75;
+
+  /* Dashed drop areas and the signature pad take the control stroke. */
+  --fluid-file-input-border-width: 3px;
+  --fluid-dropzone-border-width: 3px;
+  --fluid-signature-pad-border-width: 3px;
+  --fluid-signature-pad-radius: var(--fluid-radius-md);
+
+  /* Round pill buttons, like fluid-button. */
+  --fluid-transfer-button-radius: var(--fluid-radius-full);
+  --fluid-theme-toggle-radius: var(--fluid-radius-full);
+  --fluid-theme-toggle-border-width: 3px;
+
+  /* Checked controls are a pastel sticker: accent fill, ink outline, ink mark. */
+  --fluid-checkbox-border-on: var(--rainbow-line);
+  --fluid-radio-bg-on: var(--fluid-accent-base);
+  --fluid-radio-border-on: var(--rainbow-line);
+  --fluid-radio-dot-color: var(--fluid-accent-text);
+
+  --fluid-slider-track-color: var(--fluid-surface-muted);
+  --fluid-slider-track-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-slider-thumb-border: var(--rainbow-line);
+  --fluid-slider-thumb-shadow: 0 2px 0 var(--rainbow-pop);
+  --fluid-range-slider-track-color: var(--fluid-surface-muted);
+  --fluid-range-slider-track-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-range-slider-fill-shadow: inset 0 0 0 3px var(--rainbow-line);
+  --fluid-range-slider-thumb-border: var(--rainbow-line);
+  --fluid-range-slider-thumb-shadow: 0 2px 0 var(--rainbow-pop);
+
+  /* Open comboboxes keep an ink outline instead of switching to the pastel
+     accent, so trigger and listbox read as one outlined panel. */
+  --fluid-select-border-focus: var(--rainbow-line);
+  --fluid-typeahead-border-focus: var(--rainbow-line);
+  --fluid-time-picker-border-focus: var(--rainbow-line);
+  --fluid-date-picker-border-focus: var(--rainbow-line);
+  --fluid-select-listbox-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-typeahead-listbox-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-time-picker-listbox-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-date-picker-dialog-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-date-range-picker-dialog-shadow: 0 4px 0 var(--rainbow-pop);
+
+  /* Options: sand hover row with an ink rail; the selected option is a pastel
+     sticker with an ink label. */
+  --fluid-option-accent: var(--rainbow-line);
+  --fluid-option-active-bg: var(--fluid-surface-muted);
+  --fluid-option-selected-bg: var(--fluid-accent-base);
+  --fluid-option-selected-fg: var(--fluid-accent-text);
+  --fluid-typeahead-option-active-bg: var(--fluid-surface-muted);
+  --fluid-typeahead-option-active-rail: var(--rainbow-line);
+  --fluid-time-picker-option-active-bg: var(--fluid-surface-muted);
+  --fluid-time-picker-option-active-rail: var(--rainbow-line);
+  --fluid-time-picker-option-selected-bg: var(--fluid-accent-base);
+  --fluid-time-picker-option-selected-fg: var(--fluid-accent-text);
+
+  --fluid-calendar-selected-border: var(--rainbow-line);
+  --fluid-calendar-today-ring: var(--rainbow-line);
+
+  --fluid-date-range-picker-preset-active-bg: var(--fluid-accent-base);
+  --fluid-date-range-picker-preset-active-fg: var(--fluid-accent-text);
+  --fluid-date-range-picker-apply-border: var(--rainbow-line);
+
+  /* Error and required text read the deep tone, never the pastel fill. */
+  --fluid-field-error-fg: var(--fluid-danger-fg);
+  --fluid-field-required-fg: var(--fluid-danger-fg);
+  --fluid-fieldset-error-fg: var(--fluid-danger-fg);
+  --fluid-copy-button-success-color: var(--fluid-success-fg);
+
+  --fluid-rating-stroke: var(--rainbow-line);
+  --fluid-rating-inactive-color: var(--fluid-surface-muted);
+  --fluid-color-picker-preset-ring: var(--rainbow-line);
+
+  /* A signed pad (and the placed-image frame) outline in ink, not pastel. */
+  --fluid-signature-pad-accent-base: var(--rainbow-line);
+
+  /* Transfer: selected rows are pastel stickers, move buttons pop. */
+  --fluid-transfer-option-selected-bg: var(--fluid-accent-base);
+  --fluid-transfer-option-selected-hover-bg: var(--fluid-accent-hover);
+  --fluid-transfer-option-selected-fg: var(--fluid-accent-text);
+  --fluid-transfer-option-selected-ring: var(--rainbow-line);
+  --fluid-transfer-button-bg: var(--fluid-accent-base);
+  --fluid-transfer-button-hover-bg: var(--fluid-accent-hover);
+  --fluid-transfer-button-fg: var(--fluid-accent-text);
+  --fluid-transfer-button-shadow: 0 3px 0 var(--rainbow-pop);
+
+  --fluid-theme-toggle-bg: var(--fluid-surface-base);
+  --fluid-theme-toggle-shadow: 0 3px 0 var(--rainbow-pop);
+}
+
+/* Feedback */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  /* Callout: a full ink outline (the start accent matches its weight) around a
+     flat pastel fill. */
+  --fluid-callout-outline-width: var(--fluid-border-width-default);
+  --fluid-callout-accent-width: var(--fluid-border-width-default);
+  --fluid-callout-info-bg: var(--fluid-color-brand-200);
+  --fluid-callout-success-bg: var(--fluid-color-emerald-200);
+  --fluid-callout-warning-bg: var(--fluid-color-amber-200);
+  --fluid-callout-danger-bg: var(--fluid-color-red-200);
+  --fluid-callout-icon-fg: currentColor;
+  --fluid-callout-header-font-family: var(--fluid-font-family-display);
+  /* Banner: flat pastel bars on an ink divider. */
+  --fluid-banner-info-bg: var(--fluid-color-brand-200);
+  --fluid-banner-success-bg: var(--fluid-color-emerald-200);
+  --fluid-banner-warning-bg: var(--fluid-color-amber-200);
+  --fluid-banner-danger-bg: var(--fluid-color-red-200);
+  /* Toast: an even ink outline all round; the tone rides on the icon. */
+  --fluid-toast-item-accent-width: var(--fluid-border-width-default);
+  /* Tooltip: an outlined paper chip instead of a dark slab. */
+  --fluid-tooltip-border-width: 3px;
+  --fluid-tooltip-font-family: var(--fluid-font-family-display);
+  /* Popconfirm: the rotated arrow cannot carry a 4px outline cleanly. */
+  --fluid-popconfirm-arrow-display: none;
+  /* Drawer: outline and round only the edge that faces the page. */
+  --fluid-drawer-outline-width: var(--fluid-border-width-default);
+  --fluid-drawer-radius: var(--fluid-radius-lg);
+  --fluid-drawer-title-font-family: var(--fluid-font-family-display);
+  /* Progress bar and meter: chunky outlined tracks. */
+  --fluid-progress-bar-height: 0.75rem;
+  --fluid-progress-bar-border-width: 3px;
+  --fluid-meter-height: 0.75rem;
+  --fluid-meter-border-width: 3px;
+  --fluid-meter-track-shadow: none;
+  --fluid-meter-fill-edge-width: 3px;
+  /* Display face for numerals and titles. */
+  --fluid-progress-ring-font-family: var(--fluid-font-family-display);
+  --fluid-countdown-font-family: var(--fluid-font-family-display);
+  --fluid-tour-title-font-family: var(--fluid-font-family-display);
+  --fluid-result-title-font-family: var(--fluid-font-family-display);
+  --fluid-empty-state-heading-font-family: var(--fluid-font-family-display);
+
+  --fluid-callout-outline: var(--rainbow-line);
+  --fluid-callout-border: var(--rainbow-line);
+  --fluid-callout-info-border: var(--rainbow-line);
+  --fluid-callout-success-border: var(--rainbow-line);
+  --fluid-callout-warning-border: var(--rainbow-line);
+  --fluid-callout-danger-border: var(--rainbow-line);
+  --fluid-callout-info-fg: var(--fluid-accent-text);
+  --fluid-callout-success-fg: var(--fluid-success-text);
+  --fluid-callout-warning-fg: var(--fluid-warning-text);
+  --fluid-callout-danger-fg: var(--fluid-danger-text);
+  --fluid-banner-border: var(--rainbow-line);
+  --fluid-banner-info-border: var(--rainbow-line);
+  --fluid-banner-success-border: var(--rainbow-line);
+  --fluid-banner-warning-border: var(--rainbow-line);
+  --fluid-banner-danger-border: var(--rainbow-line);
+  --fluid-banner-info-fg: var(--fluid-accent-text);
+  --fluid-banner-success-fg: var(--fluid-success-text);
+  --fluid-banner-warning-fg: var(--fluid-warning-text);
+  --fluid-banner-danger-fg: var(--fluid-danger-text);
+  --fluid-toast-item-info-accent: var(--rainbow-line);
+  --fluid-toast-item-success-accent: var(--rainbow-line);
+  --fluid-toast-item-warning-accent: var(--rainbow-line);
+  --fluid-toast-item-danger-accent: var(--rainbow-line);
+  --fluid-toast-item-info-icon-fg: var(--fluid-info-fg);
+  --fluid-toast-item-success-icon-fg: var(--fluid-success-fg);
+  --fluid-toast-item-warning-icon-fg: var(--fluid-warning-fg);
+  --fluid-toast-item-danger-icon-fg: var(--fluid-danger-fg);
+  --fluid-toast-item-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-tooltip-bg: var(--fluid-surface-base);
+  --fluid-tooltip-color: var(--fluid-text-primary);
+  --fluid-tooltip-border: var(--rainbow-line);
+  --fluid-tooltip-shadow: 0 3px 0 var(--rainbow-pop);
+  --fluid-popover-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-popconfirm-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-tour-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-drawer-outline: var(--rainbow-line);
+  --fluid-progress-bar-track: var(--fluid-surface-base);
+  --fluid-progress-bar-border: var(--rainbow-line);
+  --fluid-meter-track: var(--fluid-surface-base);
+  --fluid-meter-border: var(--rainbow-line);
+  --fluid-meter-fill-edge: var(--rainbow-line);
+}
+
+/* Content */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  --fluid-details-font-family: var(--fluid-font-family-display);
+  --fluid-fold-font-family: var(--fluid-font-family-display);
+  --fluid-fold-line-width: var(--fluid-border-width-divider);
+  --fluid-divider-width: var(--fluid-border-width-divider);
+  --fluid-divider-radius: var(--fluid-radius-full);
+  --fluid-stat-value-font-family: var(--fluid-font-family-display);
+  --fluid-timeline-item-marker-size: 1.125rem;
+  --fluid-timeline-item-line-size: 3px;
+  --fluid-timeline-item-marker-border-width: 3px;
+  --fluid-avatar-border-width: 3px;
+  --fluid-avatar-font-family: var(--fluid-font-family-display);
+  --fluid-avatar-group-overflow-border-width: 3px;
+  --fluid-avatar-group-overflow-font-family: var(--fluid-font-family-display);
+  --fluid-kbd-border-width: 2px;
+  --fluid-pricing-tier-heading-font-family: var(--fluid-font-family-display);
+  --fluid-carousel-dot-size: 0.625rem;
+  --fluid-carousel-dot-ring-width: 2px;
+  --fluid-comparison-divider-size: 4px;
+  --fluid-comparison-handle-border-width: 3px;
+  --fluid-hero-eyebrow-font-family: var(--fluid-font-family-display);
+
+  /* Trend text sits on the page, so it reads the -fg (text-on-surface) tones,
+     not the pastel -base fills. */
+  --fluid-stat-up-fg: var(--fluid-success-fg);
+  --fluid-stat-down-fg: var(--fluid-danger-fg);
+  --fluid-timeline-item-marker-border: var(--rainbow-line);
+  --fluid-avatar-bg: var(--fluid-accent-base);
+  --fluid-avatar-fg: var(--fluid-accent-text);
+  --fluid-avatar-group-overflow-border: var(--rainbow-line);
+  --fluid-kbd-shadow: 0 2px 0 var(--rainbow-pop);
+  /* Naming the featured fill explicitly also fixes the badge, which reads this
+     knob for its label color (pastel on ink instead of deep accent on ink). */
+  --fluid-pricing-tier-featured-bg: var(--fluid-accent-base);
+  --fluid-pricing-tier-featured-border: var(--rainbow-line);
+  --fluid-carousel-shadow-sm: 0 0 0 3px var(--rainbow-line), 0 4px 0 3px var(--rainbow-pop);
+  --fluid-carousel-dot-bg: var(--fluid-surface-base);
+  --fluid-carousel-dot-ring: var(--rainbow-line);
+  --fluid-comparison-divider-color: var(--rainbow-line);
+  --fluid-comparison-handle-bg: var(--fluid-accent-base);
+  --fluid-comparison-handle-fg: var(--fluid-accent-text);
+}
+
+/* Packs */
+[data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"] [data-fluid-theme],
+[data-fluid-brand="rainbow"] [data-fluid-conformance] {
+  /* Table: separate borders so the outline takes the squircle radius; light
+     row rules under a chunky header rule. */
+  --fluid-table-border-collapse: separate;
+  --fluid-table-radius: var(--fluid-radius-lg);
+  --fluid-table-corner-radius: calc(var(--fluid-radius-lg) - var(--fluid-border-width-default));
+  --fluid-table-divider-width: 2px;
+  --fluid-table-header-divider-width: var(--fluid-border-width-default);
+  --fluid-table-header-font-family: var(--fluid-font-family-display);
+  --fluid-infinite-table-divider-width: 2px;
+  --fluid-infinite-table-header-divider-width: var(--fluid-border-width-default);
+  --fluid-infinite-table-header-font-family: var(--fluid-font-family-display);
+  --fluid-infinite-table-button-radius: var(--fluid-radius-full);
+  --fluid-infinite-table-button-border-width: 3px;
+
+  /* Charts: pastel series with ink outlines, chunky lines, flat fills. */
+  --fluid-chart-palette:
+    var(--rainbow-blue), var(--rainbow-pink), var(--rainbow-green), var(--rainbow-yellow),
+    var(--rainbow-purple), var(--rainbow-coral), var(--rainbow-tan), var(--rainbow-blue-deep);
+  --fluid-chart-series-border-width: 3;
+  --fluid-chart-line-width: 4;
+  --fluid-chart-point-radius: 4;
+  --fluid-chart-bar-radius: 12;
+  --fluid-chart-fill-style: flat;
+  --fluid-chart-tooltip-border-width: 3;
+  --fluid-chart-center-font-family: var(--fluid-font-family-display);
+  --fluid-chart-border-width: 3px;
+  --fluid-chart-legend-radius: var(--fluid-radius-full);
+  --fluid-chart-legend-padding: var(--fluid-space-1) var(--fluid-space-3);
+  --fluid-chart-legend-font: 500 0.9375rem / 1.4 var(--fluid-font-family-display);
+  --fluid-sparkline-line-width: 3;
+  --fluid-sparkline-fill: var(--rainbow-blue);
+
+  /* Kanban: roomier columns, pill move buttons, display titles. */
+  --fluid-kanban-column-radius: var(--fluid-radius-lg);
+  --fluid-kanban-header-font-family: var(--fluid-font-family-display);
+  --fluid-kanban-control-radius: var(--fluid-radius-full);
+  --fluid-kanban-control-border-width: 3px;
+
+  /* Event calendar: lighter grid rules, pill chips and nav, display title. */
+  --fluid-event-calendar-radius: var(--fluid-radius-lg);
+  --fluid-event-calendar-divider-width: 2px;
+  --fluid-event-calendar-title-font-family: var(--fluid-font-family-display);
+  --fluid-event-calendar-nav-radius: var(--fluid-radius-full);
+  --fluid-event-calendar-nav-border-width: 3px;
+  --fluid-event-calendar-event-radius: var(--fluid-radius-full);
+  --fluid-event-calendar-today-number-bg: var(--fluid-color-brand-400);
+  --fluid-event-calendar-today-number-fg: var(--rainbow-ink);
+
+  /* Scheduler: pill slots, outlined time inputs, separated weekday rows. */
+  --fluid-time-slots-radius: var(--fluid-radius-full);
+  --fluid-time-slots-border-width: 3px;
+  --fluid-time-slots-heading-font-family: var(--fluid-font-family-display);
+  --fluid-availability-editor-heading-font-family: var(--fluid-font-family-display);
+  --fluid-availability-editor-radius: var(--fluid-radius-lg);
+  --fluid-availability-editor-row-gap: 0.5rem;
+  --fluid-availability-editor-input-border-width: var(--fluid-field-border-width);
+  --fluid-availability-editor-input-radius: var(--fluid-field-border-radius);
+
+  /* Map, node graph, markdown, parser. */
+  --fluid-map-radius: var(--fluid-radius-lg);
+  --fluid-node-graph-edge-width: 3px;
+  --fluid-node-graph-title-font-family: var(--fluid-font-family-display);
+  --fluid-markdown-heading-font-family: var(--fluid-font-family-display);
+  --fluid-markdown-border-width: 2px;
+  --fluid-file-parser-heading-font-family: var(--fluid-font-family-display);
+  --fluid-file-parser-divider-width: 2px;
+  --fluid-column-mapper-border-width: var(--fluid-field-border-width);
+  --fluid-mapper-radius: var(--fluid-field-border-radius);
+
+  /* Media: pill audio bar, sticker playlist row, outlined controls. */
+  --fluid-audio-radius: var(--fluid-radius-full);
+  --fluid-video-playlist-active-bg: var(--fluid-accent-base);
+  --fluid-video-playlist-active-fg: var(--rainbow-ink);
+
+  --fluid-table-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-table-sort-color: var(--fluid-accent-fg);
+  --fluid-infinite-table-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-infinite-table-sort-color: var(--fluid-accent-fg);
+
+  --fluid-chart-series-border: var(--rainbow-line);
+  --fluid-chart-tooltip-bg: var(--fluid-surface-base);
+  --fluid-chart-tooltip-fg: var(--fluid-text-primary);
+  --fluid-chart-tooltip-border: var(--rainbow-line);
+  --fluid-sparkline-color: var(--rainbow-line);
+
+  --fluid-kanban-card-shadow: 0 3px 0 var(--rainbow-pop);
+  --fluid-kanban-drop-ring: var(--rainbow-line);
+
+  --fluid-event-calendar-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-event-calendar-event-shadow: inset 0 0 0 2px var(--rainbow-line);
+
+  --fluid-time-slots-hover-border: var(--rainbow-line);
+  --fluid-time-slots-selected-border: var(--rainbow-line);
+  --fluid-time-slots-selected-shadow: 0 3px 0 var(--rainbow-pop);
+
+  --fluid-map-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-markdown-link-fg: var(--fluid-accent-fg);
+  --fluid-markdown-pre-border: 3px solid var(--rainbow-line);
+  --fluid-audio-border: 3px solid var(--rainbow-line);
+  --fluid-video-shadow: 0 0 0 var(--fluid-border-width-default) var(--rainbow-line);
+  --fluid-zoomable-frame-button-border: 3px solid var(--rainbow-line);
+  --fluid-lightbox-thumb-border: 3px solid var(--rainbow-line);
+  --fluid-lightbox-control-bg: var(--fluid-surface-base);
+  --fluid-lightbox-control-fg: var(--fluid-text-primary);
+  --fluid-lightbox-control-border: 3px solid var(--rainbow-line);
+}
+
+/* Low-specificity defaults for the page itself, easy for an app to override:
+   the body font and a faint dotted "home screen" wallpaper. */
 :where([data-fluid-brand="rainbow"]) {
   font-family: var(--fluid-font-family-sans);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--fluid-text-primary) 9%, transparent) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 26px 26px;
 }
 :where([data-fluid-brand="rainbow"]) :where(h1, h2, h3, h4, h5, h6) {
   font-family: var(--fluid-font-family-display);
@@ -323,10 +830,9 @@
   --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
   --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
   --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-button-hover-shadow: 0 6px 0 var(--rainbow-pop);
   --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
-  --fluid-card-shadow-md:
-    0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
-    0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+  --fluid-card-shadow-md: 0 0 0 var(--fluid-border-width-default) var(--rainbow-line);
   --fluid-switch-track-bg: var(--fluid-surface-muted);
   --fluid-switch-border: var(--rainbow-line);
   --fluid-tag-info-border: var(--rainbow-line);
@@ -388,10 +894,9 @@
     --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
     --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
     --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+    --fluid-button-hover-shadow: 0 6px 0 var(--rainbow-pop);
     --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
-    --fluid-card-shadow-md:
-      0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
-      0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+    --fluid-card-shadow-md: 0 0 0 var(--fluid-border-width-default) var(--rainbow-line);
     --fluid-switch-track-bg: var(--fluid-surface-muted);
     --fluid-switch-border: var(--rainbow-line);
     --fluid-tag-info-border: var(--rainbow-line);

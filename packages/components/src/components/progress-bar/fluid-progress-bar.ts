@@ -33,6 +33,9 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-radius-full - Default track corner radius.
  * @uses-token --fluid-font-family-sans - Label font family.
  * @uses-token --fluid-gradient-glossy - Indicator sheen.
+ * @cssproperty --fluid-progress-bar-border-width - Track outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-progress-bar-border - Track outline color. Falls back to --fluid-border-strong.
+ * @uses-token --fluid-border-strong - Track outline color when a theme enables it.
  */
 export class FluidProgressBar extends FluidElement {
   static override styles = css`
@@ -75,6 +78,8 @@ export class FluidProgressBar extends FluidElement {
       width: 100%;
       height: var(--fluid-progress-bar-height, 0.5rem);
       background: var(--fluid-progress-bar-track, var(--fluid-color-neutral-200));
+      border: var(--fluid-progress-bar-border-width, 0px) solid
+        var(--fluid-progress-bar-border, var(--fluid-border-strong, transparent));
       border-radius: var(--fluid-progress-bar-radius, var(--fluid-radius-full));
       overflow: hidden;
     }

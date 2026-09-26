@@ -258,6 +258,10 @@
             {
               "description": "Corner radius. Falls back to --fluid-radius-md.",
               "name": "--fluid-audio-radius"
+            },
+            {
+              "description": "Player outline. Falls back to none.",
+              "name": "--fluid-audio-border"
             }
           ],
           "cssParts": [
@@ -591,6 +595,14 @@
             {
               "description": "Control button color. Falls back to white.",
               "name": "--fluid-lightbox-control-fg"
+            },
+            {
+              "description": "Thumbnail outline. Falls back to none.",
+              "name": "--fluid-lightbox-thumb-border"
+            },
+            {
+              "description": "Control button outline. Falls back to none.",
+              "name": "--fluid-lightbox-control-border"
             }
           ],
           "cssParts": [
@@ -985,6 +997,18 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-video-playlist-border-width"
+            },
+            {
+              "description": "Active row background. Falls back to a 15% tint of --fluid-video-playlist-active-accent.",
+              "name": "--fluid-video-playlist-active-bg"
+            },
+            {
+              "description": "Active row text color. Falls back to --fluid-accent-active.",
+              "name": "--fluid-video-playlist-active-fg"
+            },
+            {
+              "description": "Playlist corner radius. Falls back to --fluid-radius-md.",
+              "name": "--fluid-video-playlist-radius"
             }
           ],
           "cssParts": [
@@ -1140,6 +1164,14 @@
             {
               "name": "--fluid-border-width-divider",
               "description": "Divider stroke width."
+            },
+            {
+              "name": "--fluid-accent-active",
+              "description": "Active row text."
+            },
+            {
+              "name": "--fluid-radius-md",
+              "description": "Playlist corner radius."
             }
           ],
           "tagName": "fluid-video-playlist",
@@ -1184,6 +1216,10 @@
             {
               "description": "Border radius applied to the player.",
               "name": "--fluid-video-radius"
+            },
+            {
+              "description": "Outline ring or shadow around the player. Falls back to none.",
+              "name": "--fluid-video-shadow"
             }
           ],
           "cssParts": [
@@ -1570,6 +1606,10 @@
             {
               "description": "Focus ring color.",
               "name": "--fluid-zoom-focus-ring"
+            },
+            {
+              "description": "Zoom button outline. Falls back to none.",
+              "name": "--fluid-zoomable-frame-button-border"
             }
           ],
           "cssParts": [

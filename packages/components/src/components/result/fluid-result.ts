@@ -80,6 +80,11 @@ export type FluidResultStatus = "success" | "error" | "info" | "warning" | "404"
  * @uses-token --fluid-danger-base - Error icon color.
  * @uses-token --fluid-info-base - Info icon color.
  * @uses-token --fluid-warning-base - Warning icon color.
+ * @cssproperty --fluid-result-title-font-family - Title font family. Falls back to the component font; themes point it at --fluid-font-family-display.
+ * @uses-token --fluid-success-fg - Optional success icon color; falls back to --fluid-success-base.
+ * @uses-token --fluid-danger-fg - Optional error icon color; falls back to --fluid-danger-base.
+ * @uses-token --fluid-info-fg - Optional info icon color; falls back to --fluid-info-base.
+ * @uses-token --fluid-warning-fg - Optional warning icon color; falls back to --fluid-warning-base.
  */
 export class FluidResult extends FluidElement {
   static override styles = [
@@ -123,16 +128,16 @@ export class FluidResult extends FluidElement {
       }
 
       .status-success .icon {
-        color: var(--fluid-result-success-icon, var(--fluid-success-base));
+        color: var(--fluid-result-success-icon, var(--fluid-success-fg, var(--fluid-success-base)));
       }
       .status-error .icon {
-        color: var(--fluid-result-error-icon, var(--fluid-danger-base));
+        color: var(--fluid-result-error-icon, var(--fluid-danger-fg, var(--fluid-danger-base)));
       }
       .status-info .icon {
-        color: var(--fluid-result-info-icon, var(--fluid-info-base));
+        color: var(--fluid-result-info-icon, var(--fluid-info-fg, var(--fluid-info-base)));
       }
       .status-warning .icon {
-        color: var(--fluid-result-warning-icon, var(--fluid-warning-base));
+        color: var(--fluid-result-warning-icon, var(--fluid-warning-fg, var(--fluid-warning-base)));
       }
       .status-404 .icon {
         color: var(--fluid-result-404-icon, var(--fluid-text-secondary));
@@ -140,6 +145,7 @@ export class FluidResult extends FluidElement {
 
       .title {
         margin: 0;
+        font-family: var(--fluid-result-title-font-family, inherit);
         font-size: var(--fluid-result-title-size, var(--fluid-font-size-xl));
         font-weight: var(--fluid-font-weight-semibold);
         line-height: var(--fluid-font-line-height-tight, 1.25);

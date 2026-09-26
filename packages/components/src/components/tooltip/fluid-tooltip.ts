@@ -55,6 +55,9 @@ let counter = 0;
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-font-size-sm - Default font size.
  * @uses-token --fluid-shadow-md - Popover elevation.
+ * @cssproperty --fluid-tooltip-border-width - Outline stroke width. Falls back to 0 (no outline).
+ * @cssproperty --fluid-tooltip-border - Outline color. Falls back to --fluid-border-strong.
+ * @uses-token --fluid-border-strong - Outline color when a theme enables it.
  *
  * @fires {FluidTooltipShowEvent} fluid-show - Fired when the tooltip becomes visible.
  * @fires {FluidTooltipHideEvent} fluid-hide - Fired when the tooltip is dismissed.
@@ -82,7 +85,8 @@ export class FluidTooltip extends FluidElement {
         position: fixed;
         inset: auto;
         margin: 0;
-        border: 0;
+        border: var(--fluid-tooltip-border-width, 0px) solid
+          var(--fluid-tooltip-border, var(--fluid-border-strong, transparent));
         top: 0;
         left: 0;
         z-index: 1000;

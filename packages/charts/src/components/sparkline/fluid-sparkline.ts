@@ -16,6 +16,7 @@ Chart.register(...registerables);
  * @cssproperty --fluid-sparkline-color - Line/stroke color.
  * @cssproperty --fluid-sparkline-fill - Area fill color.
  * @cssproperty --fluid-sparkline-height - Default height.
+ * @cssproperty --fluid-sparkline-line-width - Stroke width (px). Falls back to 1.5.
  *
  * @uses-token --fluid-accent-base - Default stroke color.
  */
@@ -104,6 +105,9 @@ export class FluidSparkline extends LitElement {
     const fill =
       styles.getPropertyValue("--fluid-sparkline-fill").trim() ||
       `color-mix(in srgb, ${stroke} 13%, transparent)`;
+    const lineWidth = Number.parseFloat(
+      styles.getPropertyValue("--fluid-sparkline-line-width").trim()
+    );
     this.chart = new Chart(ctx, {
       type: "line",
       data: {
@@ -113,7 +117,7 @@ export class FluidSparkline extends LitElement {
             data: [...this.values],
             borderColor: stroke,
             backgroundColor: fill,
-            borderWidth: 1.5,
+            borderWidth: Number.isFinite(lineWidth) ? lineWidth : 1.5,
             tension: 0.25,
             fill: !this.noFill,
             pointRadius: 0

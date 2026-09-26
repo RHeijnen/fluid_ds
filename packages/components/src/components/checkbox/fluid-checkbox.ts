@@ -33,6 +33,8 @@ export type FluidCheckboxChangeEvent = CustomEvent<FluidCheckboxValueDetail>;
  * @cssproperty --fluid-checkbox-bg-on - Box background when checked/indeterminate. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-checkbox-border - Box border color. Falls back to --fluid-border-default.
  * @cssproperty --fluid-checkbox-border-hover - Box border on hover. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-checkbox-border-on - Box border color when checked/indeterminate. Falls back to --fluid-checkbox-bg-on.
+ * @cssproperty --fluid-checkbox-size - Box width and height. Falls back to 1.125rem.
  * @cssproperty --fluid-checkbox-invalid-border - Invalid box border color. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-checkbox-border-width - Box border width. Falls back to --fluid-field-border-width.
  * @cssproperty --fluid-checkbox-radius - Box corner radius. Falls back to --fluid-radius-sm.
@@ -113,8 +115,8 @@ export class FluidCheckbox extends FluidFormAssociated {
     .control {
       position: relative;
       flex-shrink: 0;
-      width: 1.125rem;
-      height: 1.125rem;
+      width: var(--fluid-checkbox-size, 1.125rem);
+      height: var(--fluid-checkbox-size, 1.125rem);
       background-color: var(--fluid-checkbox-bg, var(--fluid-surface-base));
       border: var(--fluid-checkbox-border-width, var(--fluid-field-border-width, 1px)) solid
         var(--fluid-checkbox-border, var(--fluid-border-default));
@@ -133,7 +135,10 @@ export class FluidCheckbox extends FluidFormAssociated {
     .base.indeterminate .control {
       background-color: var(--fluid-checkbox-bg-on, var(--fluid-accent-base));
       background-image: var(--fluid-gradient-glossy);
-      border-color: var(--fluid-checkbox-bg-on, var(--fluid-accent-base));
+      border-color: var(
+        --fluid-checkbox-border-on,
+        var(--fluid-checkbox-bg-on, var(--fluid-accent-base))
+      );
     }
 
     .base.focused .control {

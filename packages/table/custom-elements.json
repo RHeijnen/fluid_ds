@@ -129,6 +129,30 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-infinite-table-border-width"
+            },
+            {
+              "description": "Shadow under the outlined viewport. Falls back to none.",
+              "name": "--fluid-infinite-table-shadow"
+            },
+            {
+              "description": "Stroke under the toolbar and header row. Falls back to --fluid-infinite-table-divider-width.",
+              "name": "--fluid-infinite-table-header-divider-width"
+            },
+            {
+              "description": "Header cell and dialog heading font family. Falls back to inherit.",
+              "name": "--fluid-infinite-table-header-font-family"
+            },
+            {
+              "description": "Toolbar and dialog button radius. Falls back to --fluid-radius-sm.",
+              "name": "--fluid-infinite-table-button-radius"
+            },
+            {
+              "description": "Toolbar and dialog button outline width. Falls back to --fluid-infinite-table-border-width.",
+              "name": "--fluid-infinite-table-button-border-width"
+            },
+            {
+              "description": "Active sort mark color. Falls back to --fluid-accent-base.",
+              "name": "--fluid-infinite-table-sort-color"
             }
           ],
           "cssParts": [
@@ -2050,6 +2074,30 @@
             {
               "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
               "name": "--fluid-table-border-width"
+            },
+            {
+              "description": "Table border model. Set to separate so --fluid-table-radius rounds the outline. Falls back to collapse.",
+              "name": "--fluid-table-border-collapse"
+            },
+            {
+              "description": "Shadow under the table. Falls back to none.",
+              "name": "--fluid-table-shadow"
+            },
+            {
+              "description": "Stroke under the header row. Falls back to --fluid-table-divider-width.",
+              "name": "--fluid-table-header-divider-width"
+            },
+            {
+              "description": "Header cell font family. Falls back to inherit.",
+              "name": "--fluid-table-header-font-family"
+            },
+            {
+              "description": "Sort icon color. Falls back to currentColor.",
+              "name": "--fluid-table-sort-color"
+            },
+            {
+              "description": "Radius of the four corner cells, so their fills follow a rounded outline (needs --fluid-table-border-collapse: separate). Falls back to 0.",
+              "name": "--fluid-table-corner-radius"
             }
           ],
           "cssParts": [

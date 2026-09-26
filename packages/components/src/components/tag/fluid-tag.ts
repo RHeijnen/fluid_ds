@@ -58,6 +58,8 @@ export type FluidTagSize = "sm" | "md" | "lg";
  * @uses-token --fluid-color-red-200 - Danger variant default border.
  * @uses-token --fluid-color-red-800 - Danger variant default text.
  * @uses-token --fluid-target-min - Remove button minimum hit-target size.
+ * @cssproperty --fluid-tag-radius - Corner radius. Falls back to --fluid-radius-sm.
+ * @cssproperty --fluid-tag-font-family - Label font. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-tag-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
  *
@@ -80,8 +82,8 @@ export class FluidTag extends FluidElement {
       align-items: center;
       gap: var(--fluid-space-1);
       padding: 0 var(--fluid-space-2);
-      border-radius: var(--fluid-radius-sm);
-      font-family: var(--fluid-font-family-sans);
+      border-radius: var(--fluid-tag-radius, var(--fluid-radius-sm));
+      font-family: var(--fluid-tag-font-family, var(--fluid-font-family-sans));
       font-weight: var(--fluid-font-weight-medium);
       line-height: 1;
       white-space: nowrap;

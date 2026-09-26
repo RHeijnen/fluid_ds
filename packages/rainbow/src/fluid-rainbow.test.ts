@@ -2,7 +2,12 @@ import { expect, fixture, html, elementUpdated } from "@open-wc/testing";
 import "./define.js";
 import "@fluid-ds/components/locales/nl";
 import { getIcon } from "@fluid-ds/icons/registry";
-import { rainbowIconNames, registerRainbowIcons } from "./icons.js";
+import {
+  rainbowIllustrationGroups,
+  rainbowIllustrationNames,
+  rainbowIllustrations,
+  registerRainbowIllustrations
+} from "./illustrations.js";
 import type { FluidRainbowBattery } from "./fluid-rainbow-battery.js";
 import type { FluidRainbowClock } from "./fluid-rainbow-clock.js";
 import type { FluidRainbowLandscape } from "./fluid-rainbow-landscape.js";
@@ -152,14 +157,53 @@ describe("<fluid-rainbow-battery>", () => {
   });
 });
 
-describe("rainbow icons", () => {
-  it("registers every icon with the shared registry", () => {
-    registerRainbowIcons();
-    expect(rainbowIconNames.length).to.equal(14);
-    for (const name of rainbowIconNames) {
-      const svg = getIcon(name)!;
-      expect(svg, name).to.contain("<svg");
-      expect(svg, name).to.contain('aria-hidden="true"');
+describe("rainbow illustrations", () => {
+  const parse = (svg: string) =>
+    new DOMParser().parseFromString(svg, "image/svg+xml")
+      .documentElement as unknown as SVGSVGElement;
+
+  it("registers every illustration with the shared registry", () => {
+    registerRainbowIllustrations();
+    expect(rainbowIllustrationNames.length).to.equal(92);
+    expect(rainbowIllustrationGroups.spots!.length).to.equal(8);
+    for (const name of rainbowIllustrationNames) {
+      expect(name, name).to.match(/^rainbow-/);
+      expect(getIcon(name), name).to.contain("<svg");
+    }
+  });
+
+  it("lists every illustration exactly once across the groups", () => {
+    const names = [...rainbowIllustrationNames].sort();
+    expect(new Set(names).size).to.equal(names.length);
+    expect(names).to.deep.equal(Object.keys(rainbowIllustrations).sort());
+  });
+
+  it("hides every drawing from assistive tech and keeps it out of the tab order", () => {
+    for (const name of rainbowIllustrationNames) {
+      const svg = parse(rainbowIllustrations[name]!);
+      expect(svg.querySelector("parsererror"), name).to.equal(null);
+      expect(svg.getAttribute("aria-hidden"), name).to.equal("true");
+      expect(svg.getAttribute("focusable"), name).to.equal("false");
+      const box = name.startsWith("rainbow-spot-") ? "0 0 160 120" : "0 0 64 64";
+      expect(svg.getAttribute("viewBox"), name).to.equal(box);
+      expect(svg.querySelector("text"), name).to.equal(null);
+    }
+  });
+
+  it("uses prefixed ids that are unique across the whole set", () => {
+    const seen = new Map<string, string>();
+    for (const name of rainbowIllustrationNames) {
+      const short = name.replace(/^rainbow-/, "");
+      const svg = parse(rainbowIllustrations[name]!);
+      for (const el of Array.from(svg.querySelectorAll("[id]"))) {
+        const id = el.id;
+        expect(id.startsWith(`rbw-${short}`), `${name}: ${id}`).to.equal(true);
+        expect(seen.has(id), `${id} in ${name} and ${seen.get(id)}`).to.equal(false);
+        seen.set(id, name);
+      }
+      for (const ref of svg.outerHTML.matchAll(/url\(#([^)]+)\)/g)) {
+        expect(svg.querySelector(`[id="${ref[1]}"]`), `${name}: ${ref[1]}`).to.not.equal(null);
+      }
     }
   });
 });

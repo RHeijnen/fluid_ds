@@ -26,6 +26,7 @@ export type FluidAvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
  * @cssproperty --fluid-avatar-bg - Background color when no image is loaded.
  * @cssproperty --fluid-avatar-fg - Foreground (text/icon) color.
  * @cssproperty --fluid-avatar-border - Subtle border color.
+ * @cssproperty --fluid-avatar-font-family - Initials font family. Falls back to --fluid-font-family-sans.
  *
  * @uses-token --fluid-surface-muted - Default avatar background.
  * @uses-token --fluid-text-primary - Default avatar foreground.
@@ -49,7 +50,7 @@ export class FluidAvatar extends FluidElement {
       height: var(--avatar-size, 2.5rem);
       background-color: var(--fluid-avatar-bg, var(--fluid-surface-muted));
       color: var(--fluid-avatar-fg, var(--fluid-text-primary));
-      font-family: var(--fluid-font-family-sans);
+      font-family: var(--fluid-avatar-font-family, var(--fluid-font-family-sans));
       font-weight: var(--fluid-font-weight-semibold);
       font-size: calc(var(--avatar-size, 2.5rem) * 0.42);
       line-height: 1;

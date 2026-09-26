@@ -25,6 +25,7 @@ type Trend = "up" | "down" | "neutral";
  * @cssproperty --fluid-stat-up-fg - Upward trend color. Falls back to --fluid-success-base.
  * @cssproperty --fluid-stat-down-fg - Downward trend color. Falls back to --fluid-danger-base.
  * @cssproperty --fluid-stat-radius - Corner radius. Falls back to --fluid-radius-lg.
+ * @cssproperty --fluid-stat-value-font-family - Value font family. Falls back to the host font (inherit).
  *
  * @uses-token --fluid-text-primary - Value text.
  * @uses-token --fluid-text-secondary - Label + neutral change text.
@@ -56,6 +57,7 @@ export class FluidStat extends FluidElement {
     }
     .value {
       font-size: var(--fluid-stat-value-size, 1.875rem);
+      font-family: var(--fluid-stat-value-font-family, inherit);
       font-weight: 700;
       line-height: 1.1;
       color: var(--fluid-stat-fg, var(--fluid-text-primary));

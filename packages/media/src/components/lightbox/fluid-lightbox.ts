@@ -34,6 +34,8 @@ import { formatMediaNumber } from "../../internal/format.js";
  * @cssproperty --fluid-lightbox-control-fg - Control button color. Falls back to white.
  *
  * @uses-token --fluid-radius-md - Thumbnail radius.
+ * @cssproperty --fluid-lightbox-thumb-border - Thumbnail outline. Falls back to none.
+ * @cssproperty --fluid-lightbox-control-border - Control button outline. Falls back to none.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum control target (24px AA / 44px AAA).
  *
@@ -56,6 +58,8 @@ export class FluidLightbox extends FluidElement {
       height: 100%;
       object-fit: cover;
       aspect-ratio: 1;
+      box-sizing: border-box;
+      border: var(--fluid-lightbox-thumb-border, none);
       border-radius: var(--fluid-lightbox-thumb-radius, var(--fluid-radius-md, 0.5rem));
       cursor: pointer;
     }
@@ -92,7 +96,7 @@ export class FluidLightbox extends FluidElement {
       place-items: center;
       min-width: max(2.75rem, var(--fluid-target-min, 0px));
       min-height: max(2.75rem, var(--fluid-target-min, 0px));
-      border: 0;
+      border: var(--fluid-lightbox-control-border, 0);
       border-radius: var(--fluid-radius-full, 999px);
       background: var(--fluid-lightbox-control-bg, rgba(0, 0, 0, 0.5));
       color: var(--fluid-lightbox-control-fg, #fff);

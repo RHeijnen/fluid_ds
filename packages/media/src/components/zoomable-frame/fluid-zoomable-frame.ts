@@ -31,6 +31,7 @@ import { FluidElement } from "@fluid-ds/components/internal/base-element";
  * @uses-token --fluid-space-3 - Controls strip inset from the edges.
  * @uses-token --fluid-space-2 - Gap between zoom buttons.
  * @uses-token --fluid-target-min - Conformance-aware control target size.
+ * @cssproperty --fluid-zoomable-frame-button-border - Zoom button outline. Falls back to none.
  *
  * @fires fluid-zoom - Fired when the zoom level changes; detail = { scale }.
  */
@@ -79,6 +80,8 @@ export class FluidZoomableFrame extends FluidElement {
       height: 2rem;
       min-width: var(--fluid-target-min, 24px);
       min-height: var(--fluid-target-min, 24px);
+      box-sizing: border-box;
+      border: var(--fluid-zoomable-frame-button-border, none);
       border-radius: 50%;
       background: var(--fluid-zoom-button-bg, var(--fluid-surface-base));
       color: var(--fluid-zoom-button-fg, var(--fluid-text-primary));

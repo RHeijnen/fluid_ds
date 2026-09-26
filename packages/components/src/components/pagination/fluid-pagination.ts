@@ -64,6 +64,10 @@ type PageItem = number | "ellipsis";
  * @uses-token --fluid-easing-standard - Hover transition easing.
  * @cssproperty --fluid-pagination-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
  * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @cssproperty --fluid-pagination-font-family - Control font family. Falls back to --fluid-font-family-sans.
+ * @cssproperty --fluid-pagination-font-weight - Control font weight. Falls back to --fluid-font-weight-medium.
+ * @cssproperty --fluid-pagination-size - Minimum control size; the target-size floor still applies on top. Falls back to 0px.
+ * @cssproperty --fluid-pagination-current-shadow - Extra shadow layer on the current page, after the outline ring. Falls back to a transparent shadow.
  *
  * @fires fluid-page-change - Dispatched when the user navigates to a different
  *   page (prev, next, or a numbered button). `detail` is `{ page: number }`,
@@ -116,8 +120,8 @@ export class FluidPagination extends FluidElement {
        * into AAA (data-fluid-conformance="aaa") lift every target to 44x44
        * (SC 2.5.5) with no per-component branching.
        */
-      min-block-size: var(--fluid-target-min, 24px);
-      min-inline-size: var(--fluid-target-min, 24px);
+      min-block-size: max(var(--fluid-pagination-size, 0px), var(--fluid-target-min, 24px));
+      min-inline-size: max(var(--fluid-pagination-size, 0px), var(--fluid-target-min, 24px));
       padding: 0 var(--fluid-space-2);
       border-radius: var(--fluid-pagination-radius, var(--fluid-radius-md));
       font: inherit;
@@ -155,6 +159,10 @@ export class FluidPagination extends FluidElement {
     .button[aria-current="page"] {
       background-color: var(--fluid-pagination-current-bg, var(--fluid-accent-base));
       color: var(--fluid-pagination-current-fg, var(--fluid-accent-text));
+      box-shadow:
+        inset 0 0 0 var(--fluid-pagination-border-width, var(--fluid-border-width-default, 1px))
+          var(--fluid-pagination-border, var(--fluid-border-default)),
+        var(--fluid-pagination-current-shadow, 0 0 #0000);
       cursor: default;
     }
 
