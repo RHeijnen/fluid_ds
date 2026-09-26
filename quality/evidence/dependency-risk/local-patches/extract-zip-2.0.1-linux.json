@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
   "status": "passed",
-  "observedAt": "2026-08-30T19:31:55.767Z",
+  "observedAt": "2026-09-26T17:18:07.890Z",
   "platform": "linux",
   "architecture": "x64",
-  "nodeVersion": "v22.23.2",
+  "nodeVersion": "v24.15.0",
   "dispositionId": "extract-zip-2.0.1-symlink-traversal",
   "module": "extract-zip",
   "version": "2.0.1",
   "lockPatchHash": "5guokmk2c4keaki7w3gnbg3qha",
   "patchSha256": "eb7256cf5bb05c6b698eed8c07015d911dc016a155b815f6e7cfccbf467dc7b0",
-  "lockSha256": "0e3a0d7337f52e2eb6496c405578f30ba1ef7e420383cdfee390a83ce5ad4a71",
+  "lockSha256": "df9eea0f0e2274274da5303747d18029a16a3b1e554e7a68dfa06af0feb9a51a",
   "checks": [
     {
       "id": "escaping-symlink-target-rejected",

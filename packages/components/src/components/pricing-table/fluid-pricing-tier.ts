@@ -43,8 +43,11 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-text-secondary - Period + label text.
  * @uses-token --fluid-border-default - Card border.
  * @uses-token --fluid-accent-base - Featured background + accent.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-accent-text - Featured foreground.
  * @uses-token --fluid-radius-lg - Corner radius.
+ * @cssproperty --fluid-pricing-tier-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  * @cssproperty --fluid-pricing-tier-shadow-lg - Component override for the corresponding semantic token.
  */
 export class FluidPricingTier extends FluidElement {
@@ -69,7 +72,8 @@ export class FluidPricingTier extends FluidElement {
       padding: var(--fluid-pricing-tier-padding, var(--fluid-space-5));
       background: var(--fluid-pricing-tier-bg, var(--fluid-surface-base));
       color: var(--fluid-pricing-tier-fg, var(--fluid-text-primary));
-      border: 1px solid var(--fluid-pricing-tier-border, var(--fluid-border-default));
+      border: var(--fluid-pricing-tier-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-pricing-tier-border, var(--fluid-border-default));
       border-radius: var(--fluid-pricing-tier-radius, var(--fluid-radius-lg));
     }
 
@@ -116,7 +120,10 @@ export class FluidPricingTier extends FluidElement {
        legible against the accent surface. */
     :host([featured]) .badge {
       background: var(--fluid-pricing-tier-featured-fg, var(--fluid-accent-text));
-      color: var(--fluid-pricing-tier-featured-bg, var(--fluid-accent-base));
+      color: var(
+        --fluid-pricing-tier-featured-bg,
+        var(--fluid-accent-fg, var(--fluid-accent-base))
+      );
     }
 
     .price {

@@ -6302,6 +6302,78 @@ export const catalog = [
     "representative": false
   },
   {
+    "id": "rainbow-battery--levels",
+    "title": "Rainbow/Battery",
+    "name": "Levels",
+    "source": "packages/rainbow/src/fluid-rainbow-battery.stories.ts",
+    "tags": [
+      "fluid-rainbow-battery"
+    ],
+    "fixtures": [
+      {
+        "tag": "fluid-rainbow-battery",
+        "storyId": "rainbow-battery--levels",
+        "source": "packages/rainbow/src/fluid-rainbow-battery.stories.ts",
+        "setupButtons": []
+      }
+    ],
+    "representative": true
+  },
+  {
+    "id": "rainbow-battery--charging-with-pulse",
+    "title": "Rainbow/Battery",
+    "name": "Charging With Pulse",
+    "source": "packages/rainbow/src/fluid-rainbow-battery.stories.ts",
+    "tags": [],
+    "fixtures": [],
+    "representative": false
+  },
+  {
+    "id": "rainbow-clock--faces",
+    "title": "Rainbow/Clock",
+    "name": "Faces",
+    "source": "packages/rainbow/src/fluid-rainbow-clock.stories.ts",
+    "tags": [
+      "fluid-rainbow-clock"
+    ],
+    "fixtures": [
+      {
+        "tag": "fluid-rainbow-clock",
+        "storyId": "rainbow-clock--faces",
+        "source": "packages/rainbow/src/fluid-rainbow-clock.stories.ts",
+        "setupButtons": []
+      }
+    ],
+    "representative": true
+  },
+  {
+    "id": "rainbow-landscape--with-clock",
+    "title": "Rainbow/Landscape",
+    "name": "With Clock",
+    "source": "packages/rainbow/src/fluid-rainbow-landscape.stories.ts",
+    "tags": [
+      "fluid-rainbow-landscape"
+    ],
+    "fixtures": [
+      {
+        "tag": "fluid-rainbow-landscape",
+        "storyId": "rainbow-landscape--with-clock",
+        "source": "packages/rainbow/src/fluid-rainbow-landscape.stories.ts",
+        "setupButtons": []
+      }
+    ],
+    "representative": true
+  },
+  {
+    "id": "rainbow-landscape--labelled",
+    "title": "Rainbow/Landscape",
+    "name": "Labelled",
+    "source": "packages/rainbow/src/fluid-rainbow-landscape.stories.ts",
+    "tags": [],
+    "fixtures": [],
+    "representative": false
+  },
+  {
     "id": "scheduler-availability-editor--default",
     "title": "Scheduler/Availability editor",
     "name": "Default",

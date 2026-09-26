@@ -78,7 +78,9 @@ let popconfirmIdCounter = 0;
  * @uses-token --fluid-danger-base - Danger tone accent.
  * @uses-token --fluid-warning-base - Warning tone accent.
  * @uses-token --fluid-accent-base - Brand tone accent.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-secondary - Neutral tone accent.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-confirm - Fired when the user confirms the action.
  * @fires fluid-cancel - Fired when the user cancels (button, outside click, or Escape).
@@ -105,7 +107,7 @@ export class FluidPopconfirm extends FluidElement {
         gap: var(--fluid-popconfirm-gap, var(--fluid-space-3));
         padding: var(--fluid-popconfirm-padding, var(--fluid-space-4));
         background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
-        border: var(--fluid-popconfirm-border-width, 1px) solid
+        border: var(--fluid-popconfirm-border-width, var(--fluid-border-width-default, 1px)) solid
           var(--fluid-popconfirm-border, var(--fluid-border-default));
         border-radius: var(--fluid-popconfirm-radius, var(--fluid-radius-md));
         box-shadow: var(--fluid-popconfirm-shadow, var(--fluid-shadow-lg));
@@ -135,7 +137,7 @@ export class FluidPopconfirm extends FluidElement {
         width: 0.625rem;
         height: 0.625rem;
         background: var(--fluid-popconfirm-bg, var(--fluid-surface-base));
-        border: var(--fluid-popconfirm-border-width, 1px) solid
+        border: var(--fluid-popconfirm-border-width, var(--fluid-border-width-default, 1px)) solid
           var(--fluid-popconfirm-border, var(--fluid-border-default));
         transform: rotate(45deg);
         z-index: -1;
@@ -163,7 +165,7 @@ export class FluidPopconfirm extends FluidElement {
         color: var(--fluid-popconfirm-icon-color, var(--fluid-warning-base));
       }
       :host([tone="brand"]) .icon {
-        color: var(--fluid-popconfirm-icon-color, var(--fluid-accent-base));
+        color: var(--fluid-popconfirm-icon-color, var(--fluid-accent-fg, var(--fluid-accent-base)));
       }
 
       .icon svg {

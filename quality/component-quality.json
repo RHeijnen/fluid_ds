@@ -20,28 +20,28 @@
     ]
   },
   "summary": {
-    "packages": 14,
-    "components": 155,
-    "unitTested": 155,
-    "accessibilityAudited": 155,
+    "packages": 15,
+    "components": 158,
+    "unitTested": 158,
+    "accessibilityAudited": 158,
     "accessibilityExempt": 0,
-    "storybookCovered": 155,
+    "storybookCovered": 158,
     "storybookInteractions": 102,
     "interactionClassification": {
       "interactive": 39,
       "composite": 63,
-      "presentational": 29,
+      "presentational": 32,
       "helper": 24
     },
     "interactionRequired": 102,
     "interactionCovered": 102,
     "interactionMissing": 0,
     "interactionCoveragePercent": 100,
-    "interactionCatalogCoveragePercent": 65.8,
-    "visualCovered": 155,
-    "browserAccessibilityCovered": 155,
-    "ssrRenderedFixtures": 155,
-    "localized": 90,
+    "interactionCatalogCoveragePercent": 64.6,
+    "visualCovered": 158,
+    "browserAccessibilityCovered": 158,
+    "ssrRenderedFixtures": 158,
+    "localized": 93,
     "rtlAware": 30,
     "blockingGaps": 0
   },
@@ -813,7 +813,7 @@
         "docs": "apps/docs/src/content/docs/components/button.mdx"
       },
       "unit": {
-        "cases": 29,
+        "cases": 32,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },
@@ -1001,7 +1001,7 @@
         "docs": "apps/docs/src/content/docs/components/card.mdx"
       },
       "unit": {
-        "cases": 9,
+        "cases": 10,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },
@@ -1142,7 +1142,7 @@
         "docs": null
       },
       "unit": {
-        "cases": 19,
+        "cases": 20,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },
@@ -4983,6 +4983,147 @@
       }
     },
     {
+      "tag": "fluid-rainbow-battery",
+      "package": "@fluid-ds/rainbow",
+      "version": "0.4.0",
+      "family": "rainbow",
+      "maturity": "beta",
+      "maturitySource": "quality/maturity.json",
+      "files": {
+        "definition": "packages/rainbow/src/define.ts",
+        "test": "packages/rainbow/src/fluid-rainbow.test.ts",
+        "story": "packages/rainbow/src/fluid-rainbow-battery.stories.ts",
+        "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
+      },
+      "unit": {
+        "cases": 14,
+        "accessibilityAudits": 4,
+        "accessibilityException": null
+      },
+      "storybook": {
+        "stories": 2,
+        "interactions": 0,
+        "classification": "presentational",
+        "interactionRequired": false
+      },
+      "visual": {
+        "spec": "apps/visual-regression/tests/catalog.spec.ts",
+        "modes": [
+          "light",
+          "dark",
+          "forced-colors",
+          "rtl",
+          "reduced-motion"
+        ]
+      },
+      "browserAccessibility": {
+        "fixture": "apps/a11y/tests/catalog.spec.ts"
+      },
+      "ssr": {
+        "importSafetyGate": true,
+        "catalogRenderGate": true,
+        "renderedFixture": true
+      },
+      "localization": {
+        "usesRegistry": true,
+        "directionAware": false
+      }
+    },
+    {
+      "tag": "fluid-rainbow-clock",
+      "package": "@fluid-ds/rainbow",
+      "version": "0.4.0",
+      "family": "rainbow",
+      "maturity": "beta",
+      "maturitySource": "quality/maturity.json",
+      "files": {
+        "definition": "packages/rainbow/src/define.ts",
+        "test": "packages/rainbow/src/fluid-rainbow.test.ts",
+        "story": "packages/rainbow/src/fluid-rainbow-clock.stories.ts",
+        "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
+      },
+      "unit": {
+        "cases": 14,
+        "accessibilityAudits": 4,
+        "accessibilityException": null
+      },
+      "storybook": {
+        "stories": 1,
+        "interactions": 0,
+        "classification": "presentational",
+        "interactionRequired": false
+      },
+      "visual": {
+        "spec": "apps/visual-regression/tests/catalog.spec.ts",
+        "modes": [
+          "light",
+          "dark",
+          "forced-colors",
+          "rtl",
+          "reduced-motion"
+        ]
+      },
+      "browserAccessibility": {
+        "fixture": "apps/a11y/tests/catalog.spec.ts"
+      },
+      "ssr": {
+        "importSafetyGate": true,
+        "catalogRenderGate": true,
+        "renderedFixture": true
+      },
+      "localization": {
+        "usesRegistry": true,
+        "directionAware": false
+      }
+    },
+    {
+      "tag": "fluid-rainbow-landscape",
+      "package": "@fluid-ds/rainbow",
+      "version": "0.4.0",
+      "family": "rainbow",
+      "maturity": "beta",
+      "maturitySource": "quality/maturity.json",
+      "files": {
+        "definition": "packages/rainbow/src/define.ts",
+        "test": "packages/rainbow/src/fluid-rainbow.test.ts",
+        "story": "packages/rainbow/src/fluid-rainbow-landscape.stories.ts",
+        "docs": "apps/docs/src/content/docs/expansion/rainbow.mdx"
+      },
+      "unit": {
+        "cases": 14,
+        "accessibilityAudits": 4,
+        "accessibilityException": null
+      },
+      "storybook": {
+        "stories": 2,
+        "interactions": 0,
+        "classification": "presentational",
+        "interactionRequired": false
+      },
+      "visual": {
+        "spec": "apps/visual-regression/tests/catalog.spec.ts",
+        "modes": [
+          "light",
+          "dark",
+          "forced-colors",
+          "rtl",
+          "reduced-motion"
+        ]
+      },
+      "browserAccessibility": {
+        "fixture": "apps/a11y/tests/catalog.spec.ts"
+      },
+      "ssr": {
+        "importSafetyGate": true,
+        "catalogRenderGate": true,
+        "renderedFixture": true
+      },
+      "localization": {
+        "usesRegistry": true,
+        "directionAware": false
+      }
+    },
+    {
       "tag": "fluid-range-slider",
       "package": "@fluid-ds/components",
       "version": "0.4.0",
@@ -6124,7 +6265,7 @@
         "docs": "apps/docs/src/content/docs/components/switch.mdx"
       },
       "unit": {
-        "cases": 18,
+        "cases": 21,
         "accessibilityAudits": 1,
         "accessibilityException": null
       },

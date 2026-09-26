@@ -275,6 +275,7 @@ export default defineConfig({
             { label: "@fluid-ds/node-graph", link: "/expansion/node-graph/" },
             { label: "@fluid-ds/markdown", link: "/expansion/markdown/" },
             { label: "@fluid-ds/qr", link: "/expansion/qr/" },
+            { label: "@fluid-ds/rainbow", link: "/expansion/rainbow/" },
             { label: "@fluid-ds/media", link: "/expansion/media/" },
             { label: "@fluid-ds/parser", link: "/expansion/parser/" },
             { label: "@fluid-ds/animations", link: "/expansion/animations-effects/" }

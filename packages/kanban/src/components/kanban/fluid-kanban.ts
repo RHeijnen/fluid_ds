@@ -78,6 +78,8 @@ type KanbanAnnouncement =
  * @uses-token --fluid-font-family-sans - Board typography.
  * @uses-token --fluid-font-size-sm - Column and card title size.
  * @uses-token --fluid-font-size-xs - Card description size.
+ * @cssproperty --fluid-kanban-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-move - A card moved. detail: { cardId, fromColumn, toColumn, index }.
  */
@@ -101,7 +103,8 @@ export class FluidKanban extends FluidElement {
       gap: var(--fluid-kanban-gap, var(--fluid-space-md, 1rem));
       padding: var(--fluid-kanban-gap, var(--fluid-space-md, 1rem));
       background: var(--fluid-kanban-column-bg, var(--fluid-surface-muted, #f4f4f5));
-      border: 1px solid var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
     }
     /* Drop highlight uses an INSET ring (and a faint accent tint) rather than an
@@ -145,7 +148,8 @@ export class FluidKanban extends FluidElement {
       min-height: max(2.5rem, var(--fluid-target-min, 0px));
       padding: 0.625rem 0.75rem;
       background: var(--fluid-kanban-card-bg, var(--fluid-surface-base, #ffffff));
-      border: 1px solid var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
       cursor: grab;
     }
@@ -183,7 +187,8 @@ export class FluidKanban extends FluidElement {
     .move-controls button {
       min-width: var(--fluid-target-min, 24px);
       min-height: var(--fluid-target-min, 24px);
-      border: 1px solid var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-kanban-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-kanban-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-kanban-radius, var(--fluid-radius-md, 0.5rem));
       background: var(--fluid-kanban-card-bg, var(--fluid-surface-base, #ffffff));
       color: var(--fluid-kanban-fg, var(--fluid-text-primary, #18181b));

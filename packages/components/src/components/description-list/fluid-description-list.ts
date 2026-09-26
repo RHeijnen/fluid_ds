@@ -36,6 +36,8 @@ import type { FluidDescriptionItem } from "./fluid-description-item.js";
  * @uses-token --fluid-space-6 - Default horizontal gap between grid columns.
  * @uses-token --fluid-border-default - Default divider rule color.
  * @uses-token --fluid-font-family-sans - Inherited typography for slotted content.
+ * @cssproperty --fluid-description-list-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  */
 export class FluidDescriptionList extends FluidElement {
   static override styles = css`
@@ -83,7 +85,11 @@ export class FluidDescriptionList extends FluidElement {
      * row rule.
      */
     :host([divider]) ::slotted(fluid-description-item:not(:first-child)) {
-      border-top: 1px solid var(--fluid-description-list-divider-color, var(--fluid-border-default));
+      border-top: var(
+          --fluid-description-list-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-description-list-divider-color, var(--fluid-border-default));
       padding-top: var(--fluid-description-list-gap, var(--fluid-space-3));
     }
   `;

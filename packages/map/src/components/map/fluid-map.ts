@@ -113,6 +113,7 @@ export interface FluidMapMarker {
  * @uses-token --fluid-warning-base - Warning tone pin fill.
  * @uses-token --fluid-danger-base - Danger tone pin fill.
  * @uses-token --fluid-text-secondary - Neutral tone pin fill.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-marker-click - A marker was clicked. `detail: { marker }`.
  * @fires fluid-move - The view moved or zoomed. `detail: { center, zoom }`.
@@ -126,7 +127,10 @@ export class FluidMap extends FluidElement {
       width: 100%;
       height: var(--fluid-map-height, 24rem);
       border-radius: var(--fluid-map-radius, var(--fluid-radius-md, 0.5rem));
-      border: var(--fluid-map-border, 1px solid var(--fluid-border-default, #e4e4e7));
+      border: var(
+        --fluid-map-border,
+        var(--fluid-border-width-default, 1px) solid var(--fluid-border-default, #e4e4e7)
+      );
       overflow: hidden;
     }
     fluid-map .viewport:focus-within {

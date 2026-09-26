@@ -254,4 +254,35 @@ describe("<fluid-switch>", () => {
     const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
     expect(base.getBoundingClientRect().height).to.be.greaterThanOrEqual(44);
   });
+
+  it("keeps the default thumb travel at 1rem", async () => {
+    const el = await fixture<FluidSwitch>(html`<fluid-switch checked>On</fluid-switch>`);
+    const thumb = el.shadowRoot!.querySelector<HTMLElement>(".thumb")!;
+    const m = new DOMMatrix(getComputedStyle(thumb).transform);
+    expect(m.m41).to.equal(16);
+  });
+
+  it("derives thumb travel from the track, thumb and inset tokens", async () => {
+    const el = await fixture<FluidSwitch>(html`<fluid-switch checked>On</fluid-switch>`);
+    el.style.setProperty("--fluid-switch-track-width", "48px");
+    el.style.setProperty("--fluid-switch-thumb-size", "14px");
+    el.style.setProperty("--fluid-switch-thumb-inset", "5px");
+    await el.updateComplete;
+    const thumb = el.shadowRoot!.querySelector<HTMLElement>(".thumb")!;
+    const cs = getComputedStyle(thumb);
+    expect(cs.width).to.equal("14px");
+    expect(cs.left).to.equal("5px");
+    // 48 - 14 - 2 * 5: the thumb lands flush with the far inset.
+    expect(new DOMMatrix(cs.transform).m41).to.equal(24);
+  });
+
+  it("draws a track outline only when --fluid-switch-border-width is set", async () => {
+    const el = await fixture<FluidSwitch>(html`<fluid-switch>Off</fluid-switch>`);
+    const track = el.shadowRoot!.querySelector<HTMLElement>(".track")!;
+    expect(getComputedStyle(track).boxShadow).to.contain("0px 0px 0px 0px inset");
+    el.style.setProperty("--fluid-switch-border-width", "3px");
+    el.style.setProperty("--fluid-switch-border", "rgb(7, 8, 9)");
+    await el.updateComplete;
+    expect(getComputedStyle(track).boxShadow).to.contain("rgb(7, 8, 9) 0px 0px 0px 3px inset");
+  });
 });

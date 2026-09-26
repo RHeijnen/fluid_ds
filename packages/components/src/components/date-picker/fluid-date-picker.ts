@@ -91,6 +91,8 @@ let counter = 0;
  * @uses-token --fluid-font-size-sm - Text size at size="sm".
  * @uses-token --fluid-font-size-md - Text size at size="md".
  * @uses-token --fluid-font-size-lg - Text size at size="lg".
+ * @cssproperty --fluid-date-picker-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-change - The committed date changed. `detail: { value, date, timestamp }`.
  * @fires fluid-open - The calendar opened.
@@ -223,7 +225,8 @@ export class FluidDatePicker extends FluidFormAssociated {
         margin: 0;
         padding: 0.65rem;
         background: var(--fluid-date-picker-dialog-bg, var(--fluid-surface-base));
-        border: 1px solid var(--fluid-date-picker-border-default, var(--fluid-border-default));
+        border: var(--fluid-date-picker-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-date-picker-border-default, var(--fluid-border-default));
         border-radius: var(--fluid-radius-lg, 0.75rem);
         box-shadow: var(
           --fluid-date-picker-dialog-shadow,

@@ -171,11 +171,11 @@ test("byte checking detects absent and modified artifacts without rewriting them
   assert.equal(await readFile(path, "utf8"), "tampered\n");
 });
 
-test("repository analysis resolves all 155 actual registrations and leaves payloads honest", async () => {
+test("repository analysis resolves all 158 actual registrations and leaves payloads honest", async () => {
   const before = await readFile(join(root, "packages/components/custom-elements.json"), "utf8");
   const { records, registry } = await readRepositoryManifests(root);
-  assert.equal(records.length, 14);
-  assert.equal(registry.length, 155);
+  assert.equal(records.length, 15);
+  assert.equal(registry.length, 158);
   assert.equal(registry.flatMap((entry) => entry.events).length, 166);
   const events = registry.flatMap((entry) => entry.events);
   assert.equal(events.filter((event) => event.type.text === "CustomEvent<unknown>").length, 128);

@@ -482,4 +482,43 @@ describe("<fluid-button>", () => {
 
     expect(updated).to.be.false;
   });
+
+  it("draws no primary outline by default and keeps the soft elevation", async () => {
+    const el = await fixture<FluidButton>(html`<fluid-button>Save</fluid-button>`);
+    const shadow = getComputedStyle(el.shadowRoot!.querySelector("button")!).boxShadow;
+    /* Pixel parity with the pre-token look: a zero-width ring, then the two
+       built-in layers. The ring must not invalidate the list when the token
+       stylesheet is absent (this suite loads none). */
+    expect(shadow).to.contain("0px 0px 0px 0px inset");
+    expect(shadow).to.contain("0px 1px 2px 0px");
+  });
+
+  it("lets --fluid-button-border-width and --fluid-button-shadow restyle every filled variant", async () => {
+    for (const variant of ["primary", "secondary"]) {
+      const el = await fixture<FluidButton>(
+        html`<fluid-button variant=${variant}>Go</fluid-button>`
+      );
+      el.style.setProperty("--fluid-button-border-width", "3px");
+      el.style.setProperty("--fluid-button-border", "rgb(1, 2, 3)");
+      el.style.setProperty("--fluid-button-shadow", "0 4px 0 rgb(4, 5, 6)");
+      await elementUpdated(el);
+      const shadow = getComputedStyle(el.shadowRoot!.querySelector("button")!).boxShadow;
+      expect(shadow, variant).to.contain("rgb(1, 2, 3) 0px 0px 0px 3px inset");
+      expect(shadow, variant).to.contain("rgb(4, 5, 6) 0px 4px 0px 0px");
+    }
+  });
+
+  it("routes tone labels through the optional --fluid-<tone>-fg token", async () => {
+    const el = await fixture<FluidButton>(
+      html`<fluid-button variant="secondary" tone="danger">Delete</fluid-button>`
+    );
+    el.style.setProperty("--fluid-danger-base", "rgb(250, 0, 0)");
+    await elementUpdated(el);
+    const inner = el.shadowRoot!.querySelector("button")!;
+    // Unset: falls back to the tone's base fill, the previous behavior.
+    expect(getComputedStyle(inner).color).to.equal("rgb(250, 0, 0)");
+    el.style.setProperty("--fluid-danger-fg", "rgb(120, 0, 0)");
+    await elementUpdated(el);
+    expect(getComputedStyle(inner).color).to.equal("rgb(120, 0, 0)");
+  });
 });

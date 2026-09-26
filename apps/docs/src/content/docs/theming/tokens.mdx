@@ -83,10 +83,22 @@ so this is the shortlist worth knowing.
 | **Status**     | `--fluid-success-*`, `--fluid-danger-*`, `--fluid-warning-*`, `--fluid-info-*` (each with `-base` / `-hover` / `-active` / `-text`) |
 | **Surfaces**   | `--fluid-surface-base`, `--fluid-surface-subtle`, `--fluid-surface-muted`                                                           |
 | **Text**       | `--fluid-text-primary`, `--fluid-text-secondary`, `--fluid-text-inverse`                                                            |
-| **Borders**    | `--fluid-border-default`, `--fluid-border-strong`                                                                                   |
+| **Borders**    | `--fluid-border-default`, `--fluid-border-strong` (color); `--fluid-border-width-default`, `--fluid-border-width-divider` (stroke)  |
 | **Shape**      | `--fluid-radius-none` … `--fluid-radius-full`                                                                                       |
-| **Type**       | `--fluid-font-family-sans`, `--fluid-font-family-mono`                                                                              |
+| **Type**       | `--fluid-font-family-sans`, `--fluid-font-family-mono`, `--fluid-font-family-display` (headings; aliases sans by default)           |
+| **Motion**     | `--fluid-duration-*`, `--fluid-easing-*` (including `--fluid-easing-spring`, a playful overshoot)                                   |
 | **Brand ramp** | `--fluid-color-brand-50` … `--fluid-color-brand-900` (the source the accent derives from)                                           |
+
+Two optional roles have no default value: `--fluid-accent-fg` and
+`--fluid-<tone>-fg` (`--fluid-success-fg` and so on). They set the color a hue
+paints when it is used as text or an icon on a surface, for themes whose accent
+fill is too light to double as a text color. When a theme leaves them unset,
+components fall back to the matching `-base` fill, exactly as before.
+
+Every literal edge in the component catalog reads the two stroke tokens
+through a component knob (`--fluid-card-border-width`,
+`--fluid-table-divider-width`, and so on), so one declaration thickens every
+outline or divider at once.
 
 Status tones are intentionally **theme-independent**: a brand retunes the
 accent, not danger/success, so destructive actions stay recognizable across

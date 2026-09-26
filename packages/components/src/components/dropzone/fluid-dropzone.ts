@@ -96,6 +96,8 @@ interface RejectedFile {
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-focus-ring-offset - Focus ring offset.
  * @uses-token --fluid-target-min - Minimum interactive-target size (24px AA / 44px AAA).
+ * @cssproperty --fluid-dropzone-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires {FluidDropzoneChangeEvent} fluid-change - Fires when valid files are accepted. detail: { files: File[] }.
  * @fires {FluidDropzoneRejectEvent} fluid-reject - Fires when one or more files fail validation.
@@ -217,7 +219,8 @@ export class FluidDropzone extends FluidElement {
         padding: var(--fluid-space-2) var(--fluid-space-3);
         background-color: var(--fluid-dropzone-file-bg, var(--fluid-surface-base));
         color: var(--fluid-dropzone-file-fg, var(--fluid-text-primary));
-        border: 1px solid var(--fluid-dropzone-file-border, var(--fluid-border-default));
+        border: var(--fluid-dropzone-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-dropzone-file-border, var(--fluid-border-default));
         border-radius: var(--fluid-dropzone-radius, var(--fluid-radius-md));
       }
 

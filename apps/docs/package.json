@@ -29,6 +29,7 @@
     "@fluid-ds/node-graph": "workspace:*",
     "@fluid-ds/parser": "workspace:*",
     "@fluid-ds/qr": "workspace:*",
+    "@fluid-ds/rainbow": "workspace:*",
     "@fluid-ds/scheduler": "workspace:*",
     "@fluid-ds/table": "workspace:*",
     "@fluid-ds/themes": "workspace:*",

@@ -24,6 +24,7 @@ let counter = 0;
  * @cssproperty --fluid-tab-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
  * @uses-token --fluid-accent-base - Active tab text + underline.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-primary - Hovered tab text.
  * @uses-token --fluid-text-secondary - Default tab text.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
@@ -64,7 +65,7 @@ export class FluidTab extends FluidElement {
        animates between tabs); the tab only switches its text color. The
        transparent border-bottom stays to reserve the same vertical space. */
     :host([selected]) {
-      color: var(--fluid-tab-selected-fg, var(--fluid-accent-base));
+      color: var(--fluid-tab-selected-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
 
     :host([disabled]) {

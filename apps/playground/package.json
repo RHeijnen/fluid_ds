@@ -26,6 +26,7 @@
     "@fluid-ds/markdown": "workspace:*",
     "@fluid-ds/media": "workspace:*",
     "@fluid-ds/qr": "workspace:*",
+    "@fluid-ds/rainbow": "workspace:*",
     "@fluid-ds/scheduler": "workspace:*",
     "@fluid-ds/themes": "workspace:*",
     "@fluid-ds/tokens": "workspace:*",

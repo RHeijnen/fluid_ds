@@ -26,6 +26,7 @@ let truncateId = 0;
  * @cssproperty --fluid-truncate-toggle-fg - Toggle button text color.
  *
  * @uses-token --fluid-accent-base - Default toggle text color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-focus-ring-color - Toggle focus ring color.
  * @uses-token --fluid-target-min - Minimum interactive target size.
  * @uses-token --fluid-focus-ring-width - Focus ring thickness.
@@ -77,7 +78,7 @@ export class FluidTruncate extends FluidElement {
         min-height: max(24px, var(--fluid-target-min, 0px));
         font: inherit;
         font-weight: var(--fluid-font-weight-medium);
-        color: var(--fluid-truncate-toggle-fg, var(--fluid-accent-base));
+        color: var(--fluid-truncate-toggle-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
         cursor: pointer;
         border-radius: var(--fluid-radius-sm);
         text-decoration: underline;

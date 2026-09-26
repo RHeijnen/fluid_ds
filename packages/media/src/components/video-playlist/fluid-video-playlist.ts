@@ -33,6 +33,10 @@ export interface PlaylistEntry {
  * @uses-token --fluid-border-default - Row separator.
  * @uses-token --fluid-focus-ring-color - Keyboard focus ring.
  * @uses-token --fluid-focus-ring-width - Conformance-aware focus ring width.
+ * @cssproperty --fluid-video-playlist-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-video-playlist-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-change - Fired when the active index changes; detail = { index, entry }.
  */
@@ -56,7 +60,8 @@ export class FluidVideoPlaylist extends FluidElement {
       align-self: start;
       max-height: 28rem;
       overflow-y: auto;
-      border: 1px solid var(--fluid-video-playlist-list-border, var(--fluid-border-default));
+      border: var(--fluid-video-playlist-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-video-playlist-list-border, var(--fluid-border-default));
       border-radius: var(--fluid-radius-md);
     }
 
@@ -65,7 +70,11 @@ export class FluidVideoPlaylist extends FluidElement {
       display: block;
       padding: var(--fluid-space-3);
       cursor: pointer;
-      border-bottom: 1px solid var(--fluid-video-playlist-list-border, var(--fluid-border-default));
+      border-bottom: var(
+          --fluid-video-playlist-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-video-playlist-list-border, var(--fluid-border-default));
     }
     .item:last-child {
       border-bottom: none;

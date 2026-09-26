@@ -17,6 +17,25 @@ to hand off context when you switch machines.
 
 ## Current state
 
+> **IN FLIGHT (2026-09-26): Rainbow theme + `@fluid-ds/rainbow` pack, branch
+> `feat/rainbow-theme`, uncommitted.** The owner decided to add this to the 1.0
+> line (a deliberate exception to the no-new-features note below). What landed:
+> stroke tokens (`--fluid-border-width-default` / `-divider`, every literal 1px
+> edge in 50 files now reads them through a component knob),
+> `--fluid-font-family-display`, `--fluid-easing-spring`, optional
+> `--fluid-accent-fg` / `--fluid-<tone>-fg`, outline/shadow knobs on button,
+> switch, badge, card, dialog, input, a `fluid-pop-in` keyframe, the
+> `rainbow.css` preset (AA + AAA verified in all four scheme contexts), and a
+> new 20th package `@fluid-ds/rainbow` (landscape, clock, battery, 14 icons).
+> All defaults are the previous values: the pinned-container visual run passed
+> every existing capture except `media-animated-image` (5 captures), which
+> fails identically on untouched main. Before merging: (1) regenerate
+> `scripts/framework-pinned-profile.json` after committing (the lock changed);
+> (2) review the new `rainbow-*` visual baselines; (3) the npm bootstrap for a
+> brand-new package (`@fluid-ds/rainbow`) needs the owner's passkey publish once;
+> (4) the animations GPL relicense in the working tree fails the "license
+> metadata must be MIT" governance gate, independent of this work.
+
 > **ROAD TO 1.0.0 (owner-declared: no new features planned; 0.4.0 is the
 > feature-complete baseline, 1.0.0 lands after a pre-release + feedback).**
 >
@@ -1183,6 +1202,17 @@ Things true across machines (machine-specific quirks go in private memory):
 ---
 
 ## Log
+
+### 2026-09-26: Rainbow theme, stroke tokens and the @fluid-ds/rainbow pack
+
+Started from the owner's company site (company-saas), whose pastel "Rough Edge
+Rainbow" look should become a theme every Fluid app can switch to. Token gaps
+filled first so the preset is pure tokens, then `rainbow.css`, then the pack for
+what a theme cannot express (animated widgets, illustrated icons). Contrast test
+now also asserts optional `-fg` tokens where a brand declares them. Storybook
+vendors Fredoka and Nunito (latin subsets, pinned in its font manifest). The
+extract-zip Linux proof was regenerated in the pinned container for the new
+lock. Details: branch `feat/rainbow-theme` and `.changeset/rainbow-theme.md`.
 
 ### 2026-09-01: coverage maximization campaign, visual lane green in CI
 

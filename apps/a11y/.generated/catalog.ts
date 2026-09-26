@@ -631,6 +631,24 @@ export const catalog = [
     "setupButtons": []
   },
   {
+    "tag": "fluid-rainbow-battery",
+    "storyId": "rainbow-battery--levels",
+    "source": "packages/rainbow/src/fluid-rainbow-battery.stories.ts",
+    "setupButtons": []
+  },
+  {
+    "tag": "fluid-rainbow-clock",
+    "storyId": "rainbow-clock--faces",
+    "source": "packages/rainbow/src/fluid-rainbow-clock.stories.ts",
+    "setupButtons": []
+  },
+  {
+    "tag": "fluid-rainbow-landscape",
+    "storyId": "rainbow-landscape--with-clock",
+    "source": "packages/rainbow/src/fluid-rainbow-landscape.stories.ts",
+    "setupButtons": []
+  },
+  {
     "tag": "fluid-range-slider",
     "storyId": "components-forms-range-slider--default",
     "source": "packages/components/src/components/range-slider/fluid-range-slider.stories.ts",

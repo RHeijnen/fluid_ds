@@ -40,6 +40,7 @@ registerIcon(
  * @cssproperty --fluid-tree-item-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  *
  * @uses-token --fluid-accent-base - Selection background tint + text.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-surface-muted - Row hover background.
  * @uses-token --fluid-text-primary - Default text color.
  * @uses-token --fluid-text-secondary - Chevron color.
@@ -82,7 +83,10 @@ export class FluidTreeItem extends FluidElement {
         var(--fluid-tree-item-selected-accent, var(--fluid-accent-base)) 15%,
         transparent
       );
-      color: var(--fluid-tree-item-selected-accent, var(--fluid-accent-base));
+      color: var(
+        --fluid-tree-item-selected-accent,
+        var(--fluid-accent-fg, var(--fluid-accent-base))
+      );
       font-weight: var(--fluid-font-weight-medium);
     }
 

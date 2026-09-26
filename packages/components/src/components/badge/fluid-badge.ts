@@ -16,6 +16,8 @@ export type FluidBadgeSize = "sm" | "md";
  *
  * @cssproperty --fluid-badge-bg - Background color (neutral variant default).
  * @cssproperty --fluid-badge-fg - Foreground color (neutral variant default).
+ * @cssproperty --fluid-badge-border-width - Outline ring stroke, all variants. Falls back to 0 (no outline).
+ * @cssproperty --fluid-badge-border - Outline ring color. Falls back to --fluid-border-strong.
  * @cssproperty --fluid-badge-info-bg - Info variant background.
  * @cssproperty --fluid-badge-info-fg - Info variant text.
  * @cssproperty --fluid-badge-success-bg - Success variant background.
@@ -35,6 +37,7 @@ export type FluidBadgeSize = "sm" | "md";
  * @uses-token --fluid-color-amber-800 - Warning variant text.
  * @uses-token --fluid-color-red-100 - Danger variant background.
  * @uses-token --fluid-color-red-800 - Danger variant text.
+ * @uses-token --fluid-border-strong - Outline ring color when a theme enables it.
  */
 export class FluidBadge extends FluidElement {
   static override styles = css`
@@ -59,6 +62,9 @@ export class FluidBadge extends FluidElement {
       white-space: nowrap;
       background: var(--fluid-badge-bg, var(--fluid-color-neutral-200));
       color: var(--fluid-badge-fg, var(--fluid-color-neutral-800));
+      /* Outline ring, off unless a theme sets --fluid-badge-border-width. */
+      box-shadow: inset 0 0 0 var(--fluid-badge-border-width, 0px)
+        var(--fluid-badge-border, var(--fluid-border-strong, transparent));
     }
 
     .size-sm {

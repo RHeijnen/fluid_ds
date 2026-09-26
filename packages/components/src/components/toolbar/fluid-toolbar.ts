@@ -36,6 +36,8 @@ export type FluidToolbarOrientation = "horizontal" | "vertical";
  * @uses-token --fluid-surface-base - Default background.
  * @uses-token --fluid-border-default - Default border color.
  * @uses-token --fluid-radius-md - Default corner radius.
+ * @cssproperty --fluid-toolbar-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  */
 export class FluidToolbar extends FluidElement {
   static override styles = css`
@@ -53,7 +55,9 @@ export class FluidToolbar extends FluidElement {
       gap: var(--fluid-toolbar-gap, var(--fluid-space-1));
       padding: var(--fluid-toolbar-padding, var(--fluid-space-2));
       background-color: var(--fluid-toolbar-bg, var(--fluid-surface-base));
-      box-shadow: inset 0 0 0 1px var(--fluid-toolbar-border, var(--fluid-border-default));
+      box-shadow: inset 0 0 0
+        var(--fluid-toolbar-border-width, var(--fluid-border-width-default, 1px))
+        var(--fluid-toolbar-border, var(--fluid-border-default));
       border-radius: var(--fluid-toolbar-radius, var(--fluid-radius-md));
     }
 

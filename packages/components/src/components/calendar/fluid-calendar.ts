@@ -62,6 +62,8 @@ import {
  * @uses-token --fluid-radius-md - Day corner radius.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum tap target (24px AA / 44px AAA).
+ * @cssproperty --fluid-calendar-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-date-activate - A day was chosen. `detail: { iso, date }`.
  * @fires fluid-date-hover - The pointer entered a day (range preview). `detail: { iso, date }`.
@@ -154,7 +156,9 @@ export class FluidCalendar extends FluidElement {
       color: var(--fluid-calendar-muted-fg, var(--fluid-text-secondary));
     }
     .day.today {
-      box-shadow: inset 0 0 0 1px var(--fluid-calendar-today-ring, var(--fluid-accent-base));
+      box-shadow: inset 0 0 0
+        var(--fluid-calendar-border-width, var(--fluid-border-width-default, 1px))
+        var(--fluid-calendar-today-ring, var(--fluid-accent-base));
     }
     /* In-range fill sits on the cell so the band reads continuous; selected
        endpoints paint on top. Square inner edges so the band looks connected. */

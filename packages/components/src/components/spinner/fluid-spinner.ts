@@ -22,6 +22,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-spinner-speed - Rotation duration. Falls back to 1s.
  *
  * @uses-token --fluid-accent-base - Default stroke color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-color-neutral-200 - Default track color.
  */
 export class FluidSpinner extends FluidElement {
@@ -44,7 +45,7 @@ export class FluidSpinner extends FluidElement {
     }
 
     .indicator {
-      stroke: var(--fluid-spinner-color, var(--fluid-accent-base));
+      stroke: var(--fluid-spinner-color, var(--fluid-accent-fg, var(--fluid-accent-base)));
       stroke-linecap: round;
       stroke-dasharray: 60 100;
     }

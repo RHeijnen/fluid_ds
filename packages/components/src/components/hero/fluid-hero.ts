@@ -45,6 +45,7 @@ type HeroSize = "sm" | "md" | "lg";
  * @uses-token --fluid-text-primary - Heading text.
  * @uses-token --fluid-text-secondary - Description text.
  * @uses-token --fluid-accent-base - Eyebrow text.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-radius-lg - Media radius.
  */
 export class FluidHero extends FluidElement {
@@ -90,7 +91,7 @@ export class FluidHero extends FluidElement {
       font-weight: 600;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      color: var(--fluid-hero-eyebrow-fg, var(--fluid-accent-base));
+      color: var(--fluid-hero-eyebrow-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
     .description {
       font-size: var(--fluid-font-size-lg, 1.125rem);

@@ -71,6 +71,12 @@
     "functions": 95,
     "lines": 99
   },
+  "rainbow": {
+    "statements": 99,
+    "branches": 92,
+    "functions": 100,
+    "lines": 99
+  },
   "scheduler": {
     "statements": 97,
     "branches": 87,

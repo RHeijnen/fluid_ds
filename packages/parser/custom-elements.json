@@ -65,6 +65,10 @@
             {
               "description": "Focus ring color. Falls back to --fluid-focus-ring-color.",
               "name": "--fluid-mapper-focus-ring"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-column-mapper-border-width"
             }
           ],
           "cssParts": [
@@ -208,6 +212,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum interactive-target size (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-column-mapper",
@@ -296,6 +304,14 @@
             {
               "description": "Step-heading color. Falls back to --fluid-text-primary.",
               "name": "--fluid-parser-heading-fg"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-file-parser-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-file-parser-border-width"
             }
           ],
           "cssParts": [
@@ -775,6 +791,14 @@
             {
               "name": "--fluid-danger-text",
               "description": "Invalid-cell text."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-file-parser",

@@ -71,6 +71,7 @@ let counter = 0;
  * @uses-token --fluid-text-primary - Field text.
  * @uses-token --fluid-border-default - Borders.
  * @uses-token --fluid-accent-base - Focus + active preset.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-font-size-sm - Text size at size="sm".
  * @uses-token --fluid-font-size-md - Text size at size="md".
  * @uses-token --fluid-font-size-lg - Text size at size="lg".
@@ -78,6 +79,10 @@ let counter = 0;
  * @uses-token --fluid-field-height-md - Field height.
  * @uses-token --fluid-focus-ring-width - Focus ring width.
  * @uses-token --fluid-target-min - Min target size.
+ * @cssproperty --fluid-date-range-picker-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-date-range-picker-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-change - The range was applied, by calendar or by typing when
  *   `typeable` is set. `detail: { start, end, startDate, endDate }`.
@@ -230,7 +235,8 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         z-index: 1000;
         margin: 0;
         background: var(--fluid-date-range-picker-dialog-bg, var(--fluid-surface-base));
-        border: 1px solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
+        border: var(--fluid-date-range-picker-border-width, var(--fluid-border-width-default, 1px))
+          solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
         border-radius: var(--fluid-radius-lg, 0.75rem);
         box-shadow: var(
           --fluid-date-range-picker-dialog-shadow,
@@ -262,8 +268,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         gap: 0.15rem;
         padding: 0.65rem;
         min-width: 9rem;
-        border-inline-end: 1px solid
-          var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
+        border-inline-end: var(
+            --fluid-date-range-picker-divider-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
       }
       .preset {
         text-align: left;
@@ -284,7 +293,10 @@ export class FluidDateRangePicker extends FluidFormAssociated {
           --fluid-date-range-picker-preset-active-bg,
           color-mix(in srgb, var(--fluid-accent-base) 15%, transparent)
         );
-        color: var(--fluid-date-range-picker-accent-base, var(--fluid-accent-base));
+        color: var(
+          --fluid-date-range-picker-accent-base,
+          var(--fluid-accent-fg, var(--fluid-accent-base))
+        );
         font-weight: 600;
       }
       .preset:focus-visible {
@@ -328,8 +340,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         padding: 0.5rem 0.65rem;
       }
       .calendars fluid-calendar + fluid-calendar {
-        border-inline-start: 1px solid
-          var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
+        border-inline-start: var(
+            --fluid-date-range-picker-divider-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
         padding-inline-start: 0.5rem;
       }
       .footer {
@@ -338,8 +353,11 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         justify-content: space-between;
         gap: 1rem;
         padding: 0.65rem;
-        border-top: 1px solid
-          var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
+        border-top: var(
+            --fluid-date-range-picker-divider-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
       }
       .selected-range {
         font-size: 0.875rem;
@@ -355,7 +373,8 @@ export class FluidDateRangePicker extends FluidFormAssociated {
         font: inherit;
         cursor: pointer;
         min-height: max(2rem, var(--fluid-target-min, 0px));
-        border: 1px solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
+        border: var(--fluid-date-range-picker-border-width, var(--fluid-border-width-default, 1px))
+          solid var(--fluid-date-range-picker-border-default, var(--fluid-border-default));
         background: var(--fluid-date-range-picker-surface-base, var(--fluid-surface-base));
         color: inherit;
       }

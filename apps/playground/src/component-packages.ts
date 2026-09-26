@@ -30,6 +30,11 @@ export const EXPANSION_PACKAGES: Record<string, string> = {
   // QR Code, qrcode-generator
   "fluid-qr-code": "@fluid-ds/qr",
 
+  // Rainbow, illustrated widgets that pair with the Rainbow brand preset
+  "fluid-rainbow-landscape": "@fluid-ds/rainbow",
+  "fluid-rainbow-clock": "@fluid-ds/rainbow",
+  "fluid-rainbow-battery": "@fluid-ds/rainbow",
+
   // Media, video, animated images, zoomable frame
   "fluid-video": "@fluid-ds/media",
   "fluid-video-playlist": "@fluid-ds/media",

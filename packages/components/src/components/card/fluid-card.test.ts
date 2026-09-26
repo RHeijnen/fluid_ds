@@ -130,4 +130,21 @@ describe("<fluid-card>", () => {
     `);
     await expect(el).to.be.accessible();
   });
+
+  it("exposes radius, outline width and header font knobs", async () => {
+    const el = await fixture<FluidCard>(
+      html`<fluid-card variant="outlined"><span slot="header">Title</span>Body</fluid-card>`
+    );
+    el.style.setProperty("--fluid-card-radius", "20px");
+    el.style.setProperty("--fluid-card-border-width", "3px");
+    // The suite loads no token CSS, so the outline color needs a value too.
+    el.style.setProperty("--fluid-card-border", "rgb(0, 0, 0)");
+    el.style.setProperty("--fluid-card-header-font-family", "monospace");
+    await el.updateComplete;
+    const base = el.shadowRoot!.querySelector<HTMLElement>(".base")!;
+    const header = el.shadowRoot!.querySelector<HTMLElement>(".header")!;
+    expect(getComputedStyle(base).borderTopLeftRadius).to.equal("20px");
+    expect(getComputedStyle(base).borderTopWidth).to.equal("3px");
+    expect(getComputedStyle(header).fontFamily).to.equal("monospace");
+  });
 });

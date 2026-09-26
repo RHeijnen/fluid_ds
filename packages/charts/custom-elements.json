@@ -200,6 +200,14 @@
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
               }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
             }
           ],
           "attributes": [
@@ -939,6 +947,14 @@
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
               }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
             }
           ],
           "attributes": [
@@ -1559,6 +1575,10 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width"
             }
           ],
           "cssParts": [
@@ -2069,6 +2089,10 @@
             {
               "name": "--fluid-focus-ring-offset",
               "description": "Legend focus ring offset."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-chart",
@@ -2284,6 +2308,14 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -3027,6 +3059,14 @@
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
               }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
             }
           ],
           "attributes": [
@@ -3762,6 +3802,14 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
@@ -4505,6 +4553,14 @@
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
               }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
             }
           ],
           "attributes": [
@@ -5244,6 +5300,14 @@
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"
               }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
             }
           ],
           "attributes": [
@@ -5979,6 +6043,14 @@
             {
               "description": "Legend focus ring offset.",
               "name": "--fluid-chart-legend-focus-offset",
+              "inheritedFrom": {
+                "name": "FluidChart",
+                "module": "src/components/chart/fluid-chart.ts"
+              }
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-chart-border-width",
               "inheritedFrom": {
                 "name": "FluidChart",
                 "module": "src/components/chart/fluid-chart.ts"

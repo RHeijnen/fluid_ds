@@ -30,6 +30,8 @@ export type FluidAvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
  * @uses-token --fluid-surface-muted - Default avatar background.
  * @uses-token --fluid-text-primary - Default avatar foreground.
  * @uses-token --fluid-border-default - Subtle border around the avatar.
+ * @cssproperty --fluid-avatar-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  */
 export class FluidAvatar extends FluidElement {
   static override styles = css`
@@ -53,7 +55,9 @@ export class FluidAvatar extends FluidElement {
       line-height: 1;
       letter-spacing: -0.02em;
       overflow: hidden;
-      box-shadow: inset 0 0 0 1px var(--fluid-avatar-border, var(--fluid-border-default));
+      box-shadow: inset 0 0 0
+        var(--fluid-avatar-border-width, var(--fluid-border-width-default, 1px))
+        var(--fluid-avatar-border, var(--fluid-border-default));
       user-select: none;
     }
 

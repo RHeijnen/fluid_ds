@@ -59,6 +59,8 @@ export type FluidBannerDismissEvent = CustomEvent<null>;
  * @uses-token --fluid-text-primary - Neutral variant text.
  * @uses-token --fluid-border-default - Bottom border.
  * @uses-token --fluid-color-brand-50 - Info accent background.
+ * @cssproperty --fluid-banner-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires {FluidBannerDismissEvent} fluid-dismiss - Fired when the dismiss button is clicked. The banner
  *   removes itself from the DOM after dispatching.
@@ -85,7 +87,8 @@ export class FluidBanner extends FluidElement {
         padding-inline: var(--fluid-banner-padding-inline, var(--fluid-space-4));
         background-color: var(--fluid-banner-bg, var(--fluid-surface-muted));
         color: var(--fluid-banner-fg, var(--fluid-text-primary));
-        border-bottom: 1px solid var(--fluid-banner-border, var(--fluid-border-default));
+        border-bottom: var(--fluid-banner-divider-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-banner-border, var(--fluid-border-default));
         font-family: var(--fluid-banner-font-family, var(--fluid-font-family-sans));
         font-size: var(--fluid-font-size-md);
         line-height: var(--fluid-font-line-height-normal);

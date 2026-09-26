@@ -36,6 +36,7 @@ export type FluidTabsActivation = "auto" | "manual";
  * @uses-token --fluid-border-default - Bottom border under the tab strip.
  * @uses-token --fluid-accent-base - Default active-tab underline color.
  * @uses-token --fluid-space-1 - Default gap between tabs.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-change - Fired when the active panel changes. `event.detail.value`.
  */
@@ -51,8 +52,8 @@ export class FluidTabs extends FluidElement {
         position: relative;
         display: flex;
         gap: var(--fluid-tabs-gap, var(--fluid-space-1));
-        border-bottom: var(--fluid-tabs-nav-border-width, 1px) solid
-          var(--fluid-tabs-nav-border, var(--fluid-border-default));
+        border-bottom: var(--fluid-tabs-nav-border-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-tabs-nav-border, var(--fluid-border-default));
         overflow-x: auto;
       }
 

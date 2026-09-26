@@ -66,6 +66,7 @@ export type FluidDrawerHideEvent = CustomEvent<null>;
  * @uses-token --fluid-radius-sm - Close-button corner radius.
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires {FluidDrawerShowEvent} fluid-show - Fired when the drawer opens.
  * @fires {FluidDrawerHideEvent} fluid-hide - Fired when the drawer closes.
@@ -159,8 +160,8 @@ export class FluidDrawer extends FluidElement {
         justify-content: space-between;
         gap: var(--fluid-space-3);
         padding: var(--fluid-space-4) var(--fluid-space-5);
-        border-bottom: var(--fluid-drawer-border-width, 1px) solid
-          var(--fluid-drawer-header-border, var(--fluid-border-default));
+        border-bottom: var(--fluid-drawer-border-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-drawer-header-border, var(--fluid-border-default));
       }
       .header.empty {
         display: none;
@@ -208,7 +209,7 @@ export class FluidDrawer extends FluidElement {
         justify-content: flex-end;
         gap: var(--fluid-space-2);
         padding: var(--fluid-space-4) var(--fluid-space-5);
-        border-top: var(--fluid-drawer-border-width, 1px) solid
+        border-top: var(--fluid-drawer-border-width, var(--fluid-border-width-divider, 1px)) solid
           var(--fluid-drawer-footer-border, var(--fluid-border-default));
         background: var(--fluid-drawer-footer-bg, var(--fluid-surface-subtle));
       }

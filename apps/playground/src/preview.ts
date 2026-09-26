@@ -1423,6 +1423,18 @@ pnpm exec checkout migrate && pnpm exec checkout dev"
                   </fluid-card>
 
                   <fluid-card>
+                    <h3 slot="header">Rainbow widgets</h3>
+                    <div style="display: grid; gap: 1rem">
+                      <fluid-rainbow-landscape>
+                        <fluid-rainbow-clock hour-cycle="h23"></fluid-rainbow-clock>
+                      </fluid-rainbow-landscape>
+                      <fluid-rainbow-battery value="99.98" show-value charging pulse>
+                        Uptime
+                      </fluid-rainbow-battery>
+                    </div>
+                  </fluid-card>
+
+                  <fluid-card>
                     <h3 slot="header">Open on mobile</h3>
                     <div class="qr-row">
                       <fluid-qr-code

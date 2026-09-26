@@ -5,6 +5,7 @@ import "@fluid-ds/tokens/light.css";
 import "@fluid-ds/tokens/dark.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
+import "@fluid-ds/themes/rainbow.css";
 
 // Default icon set so component slots that take a `name="…"` icon
 // render properly in stories without each story having to register.
@@ -118,7 +119,8 @@ const preview: Preview = {
         items: [
           { value: "default", title: "Default (Blue)" },
           { value: "midnight", title: "Midnight (Violet)" },
-          { value: "corporate", title: "Corporate (Slate)" }
+          { value: "corporate", title: "Corporate (Slate)" },
+          { value: "rainbow", title: "Rainbow (Pastel)" }
         ],
         dynamicTitle: true
       }

@@ -42,6 +42,7 @@ let counter = 0;
  * @uses-token --fluid-border-strong - Scrollbar thumb color.
  * @uses-token --fluid-radius-md - Default menu corner radius.
  * @uses-token --fluid-shadow-lg - Menu elevation.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-select - Fired when an item is selected. detail.value, detail.item.
  * @fires {FluidDropdownShowEvent} fluid-show - Fired when the menu opens.
@@ -94,7 +95,7 @@ export class FluidDropdown extends FluidElement {
         transparent;
       padding: var(--fluid-space-1);
       background: var(--fluid-dropdown-bg, var(--fluid-surface-base));
-      border: var(--fluid-dropdown-border-width, 1px) solid
+      border: var(--fluid-dropdown-border-width, var(--fluid-border-width-default, 1px)) solid
         var(--fluid-dropdown-border, var(--fluid-border-default));
       border-radius: var(--fluid-dropdown-radius, var(--fluid-radius-md));
       box-shadow: var(--fluid-dropdown-shadow, var(--fluid-shadow-lg));

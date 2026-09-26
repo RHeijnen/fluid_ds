@@ -33,6 +33,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-text-secondary - Default segment text + separator.
  * @uses-token --fluid-text-primary - Current segment (no link).
  * @uses-token --fluid-accent-base - Hover/focus accent.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-font-family-sans - Font family.
@@ -63,7 +64,7 @@ export class FluidBreadcrumbItem extends FluidElement {
 
     a.label:hover,
     a.label:focus-visible {
-      color: var(--fluid-breadcrumb-item-accent, var(--fluid-accent-base));
+      color: var(--fluid-breadcrumb-item-accent, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
 
     a.label:focus-visible {

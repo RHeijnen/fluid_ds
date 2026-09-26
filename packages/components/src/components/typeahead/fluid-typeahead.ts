@@ -166,6 +166,7 @@ export type TypeaheadOptionRenderer = (
  * @uses-token --fluid-border-default - Default borders.
  * @uses-token --fluid-border-strong - Border on hover.
  * @uses-token --fluid-accent-base - Focused state + highlight.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-primary - Input + option text.
  * @uses-token --fluid-text-secondary - Placeholder, disabled, empty text.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
@@ -466,7 +467,7 @@ export class FluidTypeahead extends FluidFormAssociated {
       }
 
       .option.selected {
-        color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        color: var(--fluid-typeahead-accent, var(--fluid-accent-fg, var(--fluid-accent-base)));
         font-weight: var(
           --fluid-typeahead-option-selected-font-weight,
           var(--fluid-font-weight-semibold)
@@ -487,7 +488,7 @@ export class FluidTypeahead extends FluidFormAssociated {
      * with the active-row tint instead of fighting it.
      */
       .match {
-        color: var(--fluid-typeahead-accent, var(--fluid-accent-base));
+        color: var(--fluid-typeahead-accent, var(--fluid-accent-fg, var(--fluid-accent-base)));
         font-weight: var(--fluid-typeahead-match-font-weight, var(--fluid-font-weight-semibold));
       }
       .option.active .match,

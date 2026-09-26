@@ -96,7 +96,10 @@
     {
       "disposition": "completed-existing-contract",
       "meaning": "Current-source review confirms known Fluid-owned strings already use the shared registry with focused component coverage; this remains bounded and does not imply fluent, visual, or manual assistive-technology approval.",
-      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"],
+      "evidence": [
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md",
+        "docs/reviews/rainbow-localization-2026-09-26.md"
+      ],
       "tags": [
         "fluid-avatar",
         "fluid-breadcrumb",
@@ -128,6 +131,7 @@
         "fluid-progress-bar",
         "fluid-radio",
         "fluid-radio-group",
+        "fluid-rainbow-battery",
         "fluid-rating",
         "fluid-sidebar",
         "fluid-spinner",
@@ -141,7 +145,10 @@
     {
       "disposition": "reviewed-no-owned-candidate",
       "meaning": "The current-source review found no additional Fluid-owned runtime message candidate; application, browser, dependency and canonical boundaries remain explicit and this is not localization or accessibility certification.",
-      "evidence": ["docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md"],
+      "evidence": [
+        "docs/reviews/localization-rtl-integration-reconciliation-2026-08-27.md",
+        "docs/reviews/rainbow-localization-2026-09-26.md"
+      ],
       "tags": [
         "fluid-accordion",
         "fluid-animation",
@@ -178,6 +185,8 @@
         "fluid-mutation-observer",
         "fluid-page",
         "fluid-popup",
+        "fluid-rainbow-clock",
+        "fluid-rainbow-landscape",
         "fluid-relative-time",
         "fluid-resize-observer",
         "fluid-result",

@@ -5,7 +5,7 @@
  *   1. Load Fluid tokens so any embedded `<fluid-*>` component picks
  *      up its variables.
  *   2. Load the brand presets. Midnight and Corporate back the in-header
- *      brand picker; Titanium, Glass and Orchid are loaded so the live
+ *      brand picker; Titanium, Glass, Orchid and Rainbow are loaded so the live
  *      preset demos on /theming/brand/ render the real stylesheets rather
  *      than a hand-copied approximation. Each one is scoped to its own
  *      `[data-fluid-brand="…"]` selector, so loading them costs nothing
@@ -34,6 +34,7 @@
 @import "@fluid-ds/themes/titanium.css";
 @import "@fluid-ds/themes/glass.css";
 @import "@fluid-ds/themes/orchid.css";
+@import "@fluid-ds/themes/rainbow.css";
 
 /* ------------------------------------------------------------------ */
 /* Starlight token bridge                                              */

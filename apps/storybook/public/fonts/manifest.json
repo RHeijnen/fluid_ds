@@ -67,6 +67,16 @@
       "file": "UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2",
       "sha256": "6e9e020a25f9b56d418f2c085b1d3c09725a4da23fe693a5b463064606732190",
       "source": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2"
+    },
+    {
+      "file": "fredoka-latin-wght-normal.woff2",
+      "sha256": "99d6c78e043710d4f83ed90716779798b7b04eb690f73e0ad0e8f32d1f0e98c2",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/fredoka@5.3.0/files/fredoka-latin-wght-normal.woff2"
+    },
+    {
+      "file": "nunito-latin-wght-normal.woff2",
+      "sha256": "ba344451eab25b217a165363b1982048a5e5830a0daf36577973955a04cac793",
+      "source": "https://cdn.jsdelivr.net/npm/@fontsource-variable/nunito@5.3.0/files/nunito-latin-wght-normal.woff2"
     }
   ]
 }

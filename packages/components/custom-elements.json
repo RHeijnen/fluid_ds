@@ -869,6 +869,10 @@
             {
               "name": "--fluid-radius-sm",
               "description": "Summary focus-ring corner radius."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-details",
@@ -945,6 +949,10 @@
             {
               "description": "Link focus ring color.",
               "name": "--fluid-anchor-nav-focus-ring"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-anchor-nav-divider-width"
             }
           ],
           "cssParts": [
@@ -1492,6 +1500,10 @@
               "description": "Active link text + marker."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-border-default",
               "description": "Idle marker rail."
             },
@@ -1506,6 +1518,10 @@
             {
               "name": "--fluid-focus-ring-width",
               "description": "Focus ring width (conformance)."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-anchor-nav",
@@ -2611,6 +2627,10 @@
             {
               "name": "--fluid-focus-ring-width",
               "description": "Focus ring thickness."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-app-bar",
@@ -3537,6 +3557,10 @@
             {
               "description": "Subtle border color.",
               "name": "--fluid-avatar-border"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-avatar-border-width"
             }
           ],
           "cssParts": [
@@ -3952,6 +3976,10 @@
             {
               "name": "--fluid-border-default",
               "description": "Subtle border around the avatar."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-avatar",
@@ -4000,6 +4028,14 @@
             {
               "description": "Foreground color (neutral variant default).",
               "name": "--fluid-badge-fg"
+            },
+            {
+              "description": "Outline ring stroke, all variants. Falls back to 0 (no outline).",
+              "name": "--fluid-badge-border-width"
+            },
+            {
+              "description": "Outline ring color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-badge-border"
             },
             {
               "description": "Info variant background.",
@@ -4421,6 +4457,10 @@
             {
               "name": "--fluid-color-red-800",
               "description": "Danger variant text."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Outline ring color when a theme enables it."
             }
           ],
           "tagName": "fluid-badge",
@@ -4545,6 +4585,10 @@
             {
               "description": "Danger variant bottom border.",
               "name": "--fluid-banner-danger-border"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-banner-divider-width"
             }
           ],
           "cssParts": [
@@ -4952,6 +4996,10 @@
             {
               "name": "--fluid-color-brand-50",
               "description": "Info accent background."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-banner",
@@ -5376,6 +5424,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Hover/focus accent."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-focus-ring-color",
@@ -6237,6 +6289,26 @@
               "name": "--fluid-button-radius"
             },
             {
+              "description": "Outline stroke. Falls back to 0 on primary and --fluid-border-width-default on secondary.",
+              "name": "--fluid-button-border-width"
+            },
+            {
+              "description": "Resting elevation, all filled variants. Falls back to the built-in soft shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-button-shadow"
+            },
+            {
+              "description": "Elevation while pressed. Falls back to the built-in pressed shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-button-active-shadow"
+            },
+            {
+              "description": "Elevation of a toggled-on (aria-pressed) button. Falls back to a soft inset shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-button-pressed-shadow"
+            },
+            {
+              "description": "How far the button sinks while pressed. Falls back to 1px.",
+              "name": "--fluid-button-press-offset"
+            },
+            {
               "description": "Vertical inner padding, all sizes. Falls back to the per-size default (--fluid-space-1 / 0 / --fluid-space-3).",
               "name": "--fluid-button-padding-block"
             },
@@ -6882,6 +6954,10 @@
               "description": "Primary background; secondary/ghost text (per tone)."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-accent-hover",
               "description": "Primary hover background."
             },
@@ -6906,6 +6982,10 @@
               "description": "Secondary active outline."
             },
             {
+              "name": "--fluid-border-width-default",
+              "description": "Secondary outline stroke width."
+            },
+            {
               "name": "--fluid-neutral-base",
               "description": "`tone=\"neutral\"` accent track (base/hover/active/text)."
             },
@@ -6924,6 +7004,22 @@
             {
               "name": "--fluid-info-base",
               "description": "`tone=\"info\"` accent track."
+            },
+            {
+              "name": "--fluid-success-fg",
+              "description": "Optional tone text color for outline/ghost labels; falls back to the tone base. Likewise --fluid-neutral-fg, --fluid-danger-fg, --fluid-warning-fg, --fluid-info-fg."
+            },
+            {
+              "name": "--fluid-danger-fg",
+              "description": "Optional danger text color; falls back to --fluid-danger-base."
+            },
+            {
+              "name": "--fluid-warning-fg",
+              "description": "Optional warning text color; falls back to --fluid-warning-base."
+            },
+            {
+              "name": "--fluid-info-fg",
+              "description": "Optional info text color; falls back to --fluid-info-base."
             },
             {
               "name": "--fluid-focus-ring-color",
@@ -7084,6 +7180,10 @@
             {
               "description": "Availability dot for fully-booked days. Falls back to --fluid-danger-base.",
               "name": "--fluid-calendar-dot-full"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-calendar-border-width"
             },
             {
               "description": "Component override for the corresponding semantic token.",
@@ -7861,6 +7961,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum tap target (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-calendar",
@@ -8443,6 +8547,14 @@
               "name": "--fluid-card-padding"
             },
             {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-card-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-card-border-width"
+            },
+            {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-card-border-default"
             },
@@ -8457,6 +8569,14 @@
             {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-card-text-primary"
+            },
+            {
+              "description": "Corner radius. Falls back to --fluid-radius-lg.",
+              "name": "--fluid-card-radius"
+            },
+            {
+              "description": "Header font family. Falls back to the inherited font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-card-header-font-family"
             }
           ],
           "cssParts": [
@@ -8805,6 +8925,14 @@
             {
               "name": "--fluid-text-primary",
               "description": "Text color."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-card",
@@ -10826,6 +10954,14 @@
             {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-code-block-text-secondary"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-code-block-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-code-block-border-width"
             }
           ],
           "cssParts": [
@@ -11215,6 +11351,16 @@
             "module": "src/internal/base-element.ts"
           },
           "summary": "Read-only code display with a header bar and copy-to-clipboard.",
+          "usesTokens": [
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
+            }
+          ],
           "tagName": "fluid-code-block",
           "customElement": true
         }
@@ -12986,6 +13132,10 @@
             {
               "name": "--fluid-shadow-lg",
               "description": "Panel elevation."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-command-palette",
@@ -13433,6 +13583,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Default divider color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-surface-base",
@@ -15450,6 +15604,10 @@
               "name": "--fluid-date-picker-focus-ring-width"
             },
             {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-date-picker-border-width"
+            },
+            {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-date-picker-accent-base"
             },
@@ -16691,6 +16849,10 @@
             {
               "name": "--fluid-font-size-lg",
               "description": "Text size at size=\"lg\"."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-date-picker",
@@ -16755,6 +16917,14 @@
             {
               "description": "Field radius. Falls back to --fluid-field-border-radius → --fluid-radius-md.",
               "name": "--fluid-date-range-picker-radius"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-date-range-picker-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-date-range-picker-border-width"
             },
             {
               "description": "Component override for the corresponding semantic token.",
@@ -18261,6 +18431,10 @@
               "description": "Focus + active preset."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-font-size-sm",
               "description": "Text size at size=\"sm\"."
             },
@@ -18287,6 +18461,14 @@
             {
               "name": "--fluid-target-min",
               "description": "Min target size."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-date-range-picker",
@@ -18703,6 +18885,10 @@
             {
               "description": "Color of the rule drawn between rows when `divider` is set. Falls back to --fluid-border-default.",
               "name": "--fluid-description-list-divider-color"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-description-list-divider-width"
             }
           ],
           "cssParts": [
@@ -19093,6 +19279,10 @@
             {
               "name": "--fluid-font-family-sans",
               "description": "Inherited typography for slotted content."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-description-list",
@@ -19212,6 +19402,18 @@
               "description": "Panel open easing.",
               "name": "--fluid-dialog-enter-easing",
               "default": "var(--fluid-easing-emphasized)"
+            },
+            {
+              "description": "Panel outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-dialog-outline-width"
+            },
+            {
+              "description": "Panel outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-dialog-outline"
+            },
+            {
+              "description": "Title font family. Falls back to the panel font; themes point it at --fluid-font-family-display.",
+              "name": "--fluid-dialog-title-font-family"
             }
           ],
           "cssParts": [
@@ -19831,8 +20033,16 @@
               "description": "Default font family."
             },
             {
+              "name": "--fluid-border-strong",
+              "description": "Panel outline color when a theme enables it."
+            },
+            {
               "name": "--fluid-shadow-lg",
               "description": "Panel elevation."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-dialog",
@@ -20847,6 +21057,10 @@
             {
               "name": "--fluid-shadow-lg",
               "description": "Panel elevation."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-drawer",
@@ -21331,6 +21545,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Active accent + checkmark color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-border-default",
@@ -22139,6 +22357,10 @@
             {
               "name": "--fluid-shadow-lg",
               "description": "Menu elevation."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-dropdown",
@@ -22227,6 +22449,10 @@
             {
               "description": "Focus ring color. Falls back to --fluid-focus-ring-color.",
               "name": "--fluid-dropzone-focus-ring"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-dropzone-border-width"
             }
           ],
           "cssParts": [
@@ -22945,6 +23171,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum interactive-target size (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-dropzone",
@@ -25907,6 +26137,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Hover + drag-over color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-text-primary",
@@ -29914,6 +30148,10 @@
               "description": "Eyebrow text."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-radius-lg",
               "description": "Media radius."
             }
@@ -31977,6 +32215,10 @@
               "name": "--fluid-input-radius"
             },
             {
+              "description": "Resting depth of the field. Falls back to a faint inset highlight plus soft drop shadow.",
+              "name": "--fluid-input-shadow"
+            },
+            {
               "description": "Focus ring color. Falls back to --fluid-focus-ring-color.",
               "name": "--fluid-input-focus-ring-color"
             },
@@ -33851,6 +34093,10 @@
             {
               "description": "Corner radius. Falls back to --fluid-radius-sm.",
               "name": "--fluid-kbd-radius"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-kbd-border-width"
             }
           ],
           "cssParts": [
@@ -34156,6 +34402,10 @@
             {
               "name": "--fluid-radius-sm",
               "description": "Corner radius."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-kbd",
@@ -34752,6 +35002,14 @@
             {
               "description": "Color of the rule between rows. Falls back to --fluid-border-default.",
               "name": "--fluid-list-divider"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-list-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-list-border-width"
             }
           ],
           "cssParts": [
@@ -35100,6 +35358,14 @@
             {
               "name": "--fluid-radius-md",
               "description": "Outer corner radius."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-list",
@@ -37285,6 +37551,10 @@
             {
               "description": "Top divider color. Falls back to --fluid-border-default.",
               "name": "--fluid-menu-label-divider"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-menu-label-divider-width"
             }
           ],
           "cssParts": [
@@ -37580,6 +37850,10 @@
             {
               "name": "--fluid-space-3",
               "description": "Row horizontal padding."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-menu-label",
@@ -44124,6 +44398,10 @@
             {
               "description": "Focus ring offset. Falls back to --fluid-focus-ring-offset.",
               "name": "--fluid-pagination-focus-ring-offset"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-pagination-border-width"
             }
           ],
           "cssParts": [
@@ -44683,6 +44961,10 @@
             {
               "name": "--fluid-easing-standard",
               "description": "Hover transition easing."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-pagination",
@@ -45524,8 +45806,16 @@
               "description": "Brand tone accent."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-text-secondary",
               "description": "Neutral tone accent."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-popconfirm",
@@ -46232,6 +46522,10 @@
             {
               "name": "--fluid-shadow-lg",
               "description": "Panel elevation."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-popover",
@@ -47281,6 +47575,10 @@
               "name": "--fluid-pricing-tier-featured-border"
             },
             {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-pricing-tier-border-width"
+            },
+            {
               "description": "Component override for the corresponding semantic token.",
               "name": "--fluid-pricing-tier-shadow-lg"
             }
@@ -47742,12 +48040,20 @@
               "description": "Featured background + accent."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-accent-text",
               "description": "Featured foreground."
             },
             {
               "name": "--fluid-radius-lg",
               "description": "Corner radius."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-pricing-tier",
@@ -48615,6 +48921,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Default indicator color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-text-primary",
@@ -57285,6 +57595,10 @@
             {
               "name": "--fluid-easing-emphasized",
               "description": "Default collapse easing."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-sidebar",
@@ -57353,6 +57667,14 @@
             {
               "description": "Baseline rule color. Falls back to --fluid-text-secondary.",
               "name": "--fluid-signature-pad-guideline"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-signature-pad-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-signature-pad-border-width"
             },
             {
               "description": "Component override for the corresponding semantic token.",
@@ -58347,6 +58669,14 @@
             {
               "name": "--fluid-focus-ring-color",
               "description": "Keyboard focus indicator color."
+            },
+            {
+              "name": "--fluid-focus-ring-width",
+              "description": "Focus ring width."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-signature-pad",
@@ -60737,6 +61067,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Default stroke color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-color-neutral-200",
@@ -63434,6 +63768,46 @@
               "name": "--fluid-switch-radius"
             },
             {
+              "description": "Track width. Falls back to 2.25rem.",
+              "name": "--fluid-switch-track-width"
+            },
+            {
+              "description": "Track height. Falls back to 1.25rem.",
+              "name": "--fluid-switch-track-height"
+            },
+            {
+              "description": "Thumb diameter. Falls back to 1rem.",
+              "name": "--fluid-switch-thumb-size"
+            },
+            {
+              "description": "Gap between thumb and track edge. Falls back to 0.125rem.",
+              "name": "--fluid-switch-thumb-inset"
+            },
+            {
+              "description": "Track outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-switch-border-width"
+            },
+            {
+              "description": "Track and thumb outline color. Falls back to --fluid-border-strong.",
+              "name": "--fluid-switch-border"
+            },
+            {
+              "description": "Track inner shadow. Falls back to a soft inset shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-switch-track-shadow"
+            },
+            {
+              "description": "Thumb outline stroke. Falls back to 0 (no outline).",
+              "name": "--fluid-switch-thumb-border-width"
+            },
+            {
+              "description": "Thumb elevation. Falls back to a soft layered shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.",
+              "name": "--fluid-switch-thumb-shadow"
+            },
+            {
+              "description": "Thumb highlight overlay (background-image). Falls back to a white top sheen; set to none for a flat thumb.",
+              "name": "--fluid-switch-thumb-sheen"
+            },
+            {
               "description": "Gap between control and label. Falls back to --fluid-space-2.",
               "name": "--fluid-switch-gap"
             },
@@ -64302,6 +64676,10 @@
               "description": "Track + thumb radius."
             },
             {
+              "name": "--fluid-border-strong",
+              "description": "Outline color when a theme enables the switch outline."
+            },
+            {
               "name": "--fluid-space-2",
               "description": "Gap between control and label."
             },
@@ -65079,6 +65457,10 @@
               "description": "Active tab text + underline."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-text-primary",
               "description": "Hovered tab text."
             },
@@ -65638,6 +66020,10 @@
             {
               "name": "--fluid-space-1",
               "description": "Default gap between tabs."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-tabs",
@@ -66781,6 +67167,10 @@
             {
               "description": "Remove button focus ring color.",
               "name": "--fluid-tag-focus-ring"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-tag-border-width"
             }
           ],
           "cssParts": [
@@ -67238,6 +67628,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Remove button minimum hit-target size."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-tag",
@@ -68642,6 +69036,10 @@
             {
               "description": "Focus ring offset. Falls back to --fluid-focus-ring-offset.",
               "name": "--fluid-theme-toggle-focus-ring-offset"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-theme-toggle-border-width"
             }
           ],
           "cssParts": [
@@ -69138,6 +69536,10 @@
             {
               "name": "--fluid-easing-standard",
               "description": "Hover/press transition easing."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-theme-toggle",
@@ -72109,6 +72511,10 @@
             {
               "name": "--fluid-shadow-lg",
               "description": "Toast elevation."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-toast-item",
@@ -72519,6 +72925,10 @@
             {
               "description": "Corner radius of the toolbar surface.",
               "name": "--fluid-toolbar-radius"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-toolbar-border-width"
             }
           ],
           "cssParts": [
@@ -72971,6 +73381,10 @@
             {
               "name": "--fluid-radius-md",
               "description": "Default corner radius."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-toolbar",
@@ -74469,6 +74883,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Button min target (24/44px)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-tour",
@@ -76266,6 +76684,10 @@
               "description": "Selection background tint + text."
             },
             {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
+            },
+            {
               "name": "--fluid-surface-muted",
               "description": "Row hover background."
             },
@@ -77271,6 +77693,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Default toggle text color."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-focus-ring-color",
@@ -78865,6 +79291,10 @@
             {
               "name": "--fluid-accent-base",
               "description": "Focused state + highlight."
+            },
+            {
+              "name": "--fluid-accent-fg",
+              "description": "Accent used as text or icon color. Optional; falls back to --fluid-accent-base."
             },
             {
               "name": "--fluid-text-primary",
@@ -82516,7 +82946,7 @@
         {
           "kind": "variable",
           "name": "motionStyles",
-          "default": "css` @keyframes fluid-fade-in { from { opacity: 0; } to { opacity: 1; } } @keyframes fluid-fade-out { from { opacity: 1; } to { opacity: 0; } } @keyframes fluid-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } } @keyframes fluid-scale-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.96); } } @keyframes fluid-slide-in-up { from { opacity: 0; transform: translateY(var(--fluid-motion-slide, 8px)); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-up { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(var(--fluid-motion-slide, 8px)); } } @keyframes fluid-slide-in-down { from { opacity: 0; transform: translateY(calc(-1 * var(--fluid-motion-slide, 8px))); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-down { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(calc(-1 * var(--fluid-motion-slide, 8px))); } } @keyframes fluid-slide-in-left { from { opacity: 0; transform: translateX(var(--fluid-motion-slide, 8px)); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-left { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(var(--fluid-motion-slide, 8px)); } } @keyframes fluid-slide-in-right { from { opacity: 0; transform: translateX(calc(-1 * var(--fluid-motion-slide, 8px))); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-right { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(calc(-1 * var(--fluid-motion-slide, 8px))); } } @keyframes fluid-backdrop-in { from { opacity: 0; } to { opacity: 1; } } @keyframes fluid-backdrop-out { from { opacity: 1; } to { opacity: 0; } } `",
+          "default": "css` @keyframes fluid-fade-in { from { opacity: 0; } to { opacity: 1; } } @keyframes fluid-fade-out { from { opacity: 1; } to { opacity: 0; } } @keyframes fluid-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } } /* A bouncier scale-in: pair with --fluid-easing-spring for a playful settle. */ @keyframes fluid-pop-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } } @keyframes fluid-scale-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.96); } } @keyframes fluid-slide-in-up { from { opacity: 0; transform: translateY(var(--fluid-motion-slide, 8px)); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-up { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(var(--fluid-motion-slide, 8px)); } } @keyframes fluid-slide-in-down { from { opacity: 0; transform: translateY(calc(-1 * var(--fluid-motion-slide, 8px))); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-down { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(calc(-1 * var(--fluid-motion-slide, 8px))); } } @keyframes fluid-slide-in-left { from { opacity: 0; transform: translateX(var(--fluid-motion-slide, 8px)); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-left { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(var(--fluid-motion-slide, 8px)); } } @keyframes fluid-slide-in-right { from { opacity: 0; transform: translateX(calc(-1 * var(--fluid-motion-slide, 8px))); } to { opacity: 1; transform: none; } } @keyframes fluid-slide-out-right { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(calc(-1 * var(--fluid-motion-slide, 8px))); } } @keyframes fluid-backdrop-in { from { opacity: 0; } to { opacity: 1; } } @keyframes fluid-backdrop-out { from { opacity: 1; } to { opacity: 0; } } `",
           "description": "Shared motion foundation for Fluid components.\n\n`@keyframes` do NOT cross shadow boundaries, so the standard animation set\nships as a `css` fragment that each component spreads into its\n`static styles` (it's adopted into that component's shadow root, where its\n`animation-name` can then resolve the preset by name). This is what lets a\nconsumer swap one preset for another purely with a token:\n\n    animation-name: var(--fluid-dialog-enter-animation, fluid-scale-in);\n    [data-fluid-brand=\"x\"] fluid-dialog { --fluid-dialog-enter-animation: fluid-slide-in-up; }\n\nOpt out of motion three ways (all declarative):\n  - per animation: `--fluid-<comp>-enter-animation: none`\n  - globally / per subtree / per instance: set the inherited scalar\n    `--fluid-motion: 0` (custom properties pierce shadow DOM). Components\n    multiply their durations by it: `calc(<dur> * var(--fluid-motion, 1))`.\n  - automatically: `prefers-reduced-motion: reduce` (see `reducedMotion`).\n\nSlide distance is `--fluid-motion-slide` (default 8px); a component can scale\nit (e.g. a toast nudging in further) without redefining keyframes."
         },
         {

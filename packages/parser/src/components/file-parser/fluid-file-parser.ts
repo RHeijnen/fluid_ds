@@ -71,6 +71,10 @@ import type {
  * @uses-token --fluid-radius-md - Table radius.
  * @uses-token --fluid-danger-base - Invalid-cell highlight.
  * @uses-token --fluid-danger-text - Invalid-cell text.
+ * @cssproperty --fluid-file-parser-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-file-parser-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-file-loaded - A file was read into a raw table. detail: { file: File, raw: RawTable }.
  * @fires fluid-parse-error - Reading / parsing the file threw. detail: { file: File, message: string }.
@@ -122,7 +126,8 @@ export class FluidFileParser extends FluidElement {
       }
       .table-scroll {
         overflow-x: auto;
-        border: 1px solid var(--fluid-parser-table-border, var(--fluid-border-default));
+        border: var(--fluid-file-parser-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-parser-table-border, var(--fluid-border-default));
         border-radius: var(--fluid-parser-table-radius, var(--fluid-radius-md));
       }
       table {
@@ -141,7 +146,11 @@ export class FluidFileParser extends FluidElement {
       td {
         padding: var(--fluid-parser-cell-padding, 0.5rem 0.625rem);
         text-align: start;
-        border-bottom: 1px solid var(--fluid-parser-table-border, var(--fluid-border-default));
+        border-bottom: var(
+            --fluid-file-parser-divider-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-parser-table-border, var(--fluid-border-default));
         white-space: nowrap;
         max-width: 16rem;
         overflow: hidden;

@@ -61,6 +61,7 @@ registerIcon(
  * @uses-token --fluid-focus-ring-color - Menu button focus ring.
  * @uses-token --fluid-target-min - Menu button minimum target size.
  * @uses-token --fluid-focus-ring-width - Focus ring thickness.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-menu-toggle - Dispatched when the built-in hamburger button is
  *   pressed. `event.detail.expanded` carries the new intended expanded state
@@ -94,7 +95,7 @@ export class FluidAppBar extends FluidElement {
       padding-inline: var(--fluid-app-bar-padding, var(--fluid-space-4));
       background-color: var(--fluid-app-bar-bg, var(--fluid-surface-base));
       color: var(--fluid-app-bar-fg, var(--fluid-text-primary));
-      border-bottom: var(--fluid-app-bar-border-width, 1px) solid
+      border-bottom: var(--fluid-app-bar-border-width, var(--fluid-border-width-divider, 1px)) solid
         var(--fluid-app-bar-border, var(--fluid-border-default));
     }
 

@@ -289,13 +289,28 @@ Lift these directly onto marketing surfaces. Each maps to a capability below.
   enterprise surfaces: a ~15% tighter spacing ramp, squared corners, flat
   elevation with ruled borders), Titanium
   (metallic graphite chrome, gray data, colour kept for status), Glass
-  (frosted translucent surfaces over a colour wash) and Orchid (violet accent
-  track with soft radii and a ~35% roomier spacing ramp). Pure CSS applied via
+  (frosted translucent surfaces over a colour wash), Orchid (violet accent
+  track with soft radii and a ~35% roomier spacing ramp) and Rainbow (playful
+  pastels on cream paper, 3px ink outlines, squircle corners, solid offset "pop"
+  shadows, a rounded display font and a springy dialog entrance, AA and AAA
+  verified in light and dark). Pure CSS applied via
   `data-fluid-brand`, swappable at runtime, and each one now re-derives the
   accent at its own scope so it themes a single subtree, not only `<html>`.
   Glass composes with the light/dark scheme (wash and frost invert to a dark
   material) and ships a `.fluid-glass-panel` helper so an app's own non-component
   chrome frosts to match from one definition.
+- ✅ **Stroke, display type and accent-as-text tokens**: every outline and
+  divider in the catalog reads `--fluid-border-width-default` /
+  `--fluid-border-width-divider` through a per-component knob, headings can take
+  `--fluid-font-family-display`, `--fluid-easing-spring` adds an overshoot
+  curve, and the optional `--fluid-accent-fg` / `--fluid-<tone>-fg` roles let a
+  theme with pastel fills keep text on surfaces above AA. Buttons, switches,
+  badges and dialogs gained optional outline and shadow knobs. All default to
+  the previous values, so existing themes render unchanged.
+- 🔨 **Rainbow expansion pack** (`@fluid-ds/rainbow`, beta): an animated
+  landscape tile, a live localized clock, a battery gauge with charging and
+  heartbeat flourishes, and fourteen illustrated app icons. Pairs with the
+  Rainbow preset, works under any brand.
 - ✅ **Semantic action tones**: brand / neutral / success / danger / warning /
   info, theme-independent, so a delete button stays red across brands.
 - ✅ **Motion system**: overlays (dialog, drawer, toast, popover, tooltip,
@@ -503,7 +518,7 @@ Kept out of the core so the base bundle stays lean:
 | `@fluid-ds/tokens`     | Design tokens → CSS + manifest                                                         | ✅     |
 | `@fluid-ds/components` | The core library: 103 component families (124 elements)                                | ✅     |
 | `@fluid-ds/icons`      | Lucide-backed icon registry                                                            | ✅     |
-| `@fluid-ds/themes`     | Brand presets (Midnight, Corporate, Titanium, Glass, Orchid)                           | ✅     |
+| `@fluid-ds/themes`     | Brand presets (Midnight, Corporate, Titanium, Glass, Orchid, Rainbow)                  | ✅     |
 | `@fluid-ds/charts`     | Charts (opt-in)                                                                        | ✅     |
 | `@fluid-ds/scheduler`  | Appointment / availability scheduler: bookable time slots + hours editor (opt-in)      | ✅     |
 | `@fluid-ds/table`      | Data grid: sortable, selectable, plus infinite loading + configurable columns (opt-in) | ✅     |

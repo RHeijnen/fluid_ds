@@ -67,6 +67,7 @@ export type FluidToastVariant = "neutral" | "info" | "success" | "warning" | "da
  * @uses-token --fluid-radius-sm - Close-button corner radius.
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Toast elevation.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-dismiss - Fired when the toast is dismissed (any reason).
  */
@@ -87,7 +88,7 @@ export class FluidToastItem extends FluidElement {
         padding: var(--fluid-space-3) var(--fluid-space-4);
         background: var(--fluid-toast-item-bg, var(--fluid-surface-base));
         color: var(--fluid-toast-item-fg, var(--fluid-text-primary));
-        border: var(--fluid-toast-item-border-width, 1px) solid
+        border: var(--fluid-toast-item-border-width, var(--fluid-border-width-default, 1px)) solid
           var(--fluid-toast-item-border, var(--fluid-border-default));
         border-inline-start: var(--fluid-toast-item-accent-width, 3px) solid
           var(

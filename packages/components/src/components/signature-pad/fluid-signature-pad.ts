@@ -49,6 +49,10 @@ interface SignaturePoint {
  * @uses-token --fluid-radius-sm - Default corner radius.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width.
+ * @cssproperty --fluid-signature-pad-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-signature-pad-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * A prepared signature can be placed instead of drawn: the Upload control and
  * dragging an image onto the pad both call `placeImage`, which layers the
@@ -156,7 +160,8 @@ export class FluidSignaturePad extends FluidElement {
     }
     .base {
       position: relative;
-      border: 1px dashed var(--fluid-signature-pad-border, var(--fluid-border-default, #d5dbe3));
+      border: var(--fluid-signature-pad-border-width, var(--fluid-border-width-default, 1px)) dashed
+        var(--fluid-signature-pad-border, var(--fluid-border-default, #d5dbe3));
       border-radius: var(--fluid-signature-pad-radius, var(--fluid-radius-sm, 0.5rem));
       background: var(--fluid-signature-pad-bg, var(--fluid-surface-base, #fff));
       /* A whisper of depth reads as a writable surface rather than a gap. */
@@ -202,8 +207,11 @@ export class FluidSignaturePad extends FluidElement {
       display: flex;
       align-items: flex-end;
       gap: var(--fluid-space-2, 0.5rem);
-      border-bottom: 1px solid
-        var(--fluid-signature-pad-guideline, var(--fluid-text-secondary, #5b6b7b));
+      border-bottom: var(
+          --fluid-signature-pad-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-signature-pad-guideline, var(--fluid-text-secondary, #5b6b7b));
       opacity: 0.45;
       pointer-events: none;
     }
@@ -237,7 +245,8 @@ export class FluidSignaturePad extends FluidElement {
      */
     .frame {
       position: absolute;
-      border: 1px dashed var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
+      border: var(--fluid-signature-pad-border-width, var(--fluid-border-width-default, 1px)) dashed
+        var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
       border-radius: 2px;
       pointer-events: none;
     }
@@ -247,7 +256,8 @@ export class FluidSignaturePad extends FluidElement {
       bottom: -5px;
       width: 10px;
       height: 10px;
-      border: 1px solid var(--fluid-signature-pad-surface-base, var(--fluid-surface-base, #fff));
+      border: var(--fluid-signature-pad-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-signature-pad-surface-base, var(--fluid-surface-base, #fff));
       border-radius: 2px;
       background: var(--fluid-signature-pad-accent-base, var(--fluid-accent-base, #4f46e5));
     }

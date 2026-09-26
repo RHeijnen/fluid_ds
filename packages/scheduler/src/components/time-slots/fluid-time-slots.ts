@@ -53,6 +53,8 @@ type TimeFormat = "12h" | "24h";
  * @uses-token --fluid-radius-md - Slot radius.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum slot height (24px AA / 44px AAA).
+ * @cssproperty --fluid-time-slots-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-change - A slot was selected. `detail: { value, slot }`.
  */
@@ -95,7 +97,8 @@ export class FluidTimeSlots extends FluidElement {
         min-height: max(2.25rem, var(--fluid-target-min, 0px));
         padding: 0.35rem 0.5rem;
         box-sizing: border-box;
-        border: 1px solid var(--fluid-time-slots-border, var(--fluid-border-default));
+        border: var(--fluid-time-slots-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-time-slots-border, var(--fluid-border-default));
         border-radius: var(--fluid-time-slots-radius, var(--fluid-radius-md));
         background: var(--fluid-time-slots-bg, var(--fluid-surface-base));
         color: inherit;

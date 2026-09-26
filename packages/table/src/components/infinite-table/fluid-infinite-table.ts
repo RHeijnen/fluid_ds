@@ -131,6 +131,10 @@ export interface FluidInfiniteTableSort {
  * @uses-token --fluid-focus-ring-width
  * @uses-token --fluid-focus-ring-offset
  * @uses-token --fluid-target-min
+ * @cssproperty --fluid-infinite-table-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-infinite-table-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  */
 export class FluidInfiniteTable extends FluidElement {
   static override styles = css`
@@ -142,7 +146,8 @@ export class FluidInfiniteTable extends FluidElement {
     }
     .viewport {
       position: relative;
-      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-infinite-table-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-infinite-table-radius, var(--fluid-radius-md, 0.5rem));
       background: var(--fluid-infinite-table-bg, var(--fluid-surface-base, #fff));
     }
@@ -163,8 +168,11 @@ export class FluidInfiniteTable extends FluidElement {
       gap: 0.75rem;
       min-height: max(3rem, var(--fluid-target-min, 0px));
       padding: 0.5rem 0.75rem;
-      border-bottom: 1px solid
-        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border-bottom: var(
+          --fluid-infinite-table-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       background: var(--fluid-infinite-table-toolbar-bg, var(--fluid-surface-base, #fff));
     }
     /*
@@ -193,7 +201,8 @@ export class FluidInfiniteTable extends FluidElement {
     button {
       min-width: max(1.75rem, var(--fluid-target-min, 0px));
       min-height: max(1.75rem, var(--fluid-target-min, 0px));
-      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-infinite-table-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-radius-sm, 0.25rem);
       background: var(--fluid-surface-base, #fff);
       color: inherit;
@@ -243,8 +252,11 @@ export class FluidInfiniteTable extends FluidElement {
       );
       z-index: 3;
       padding: 0;
-      border-bottom: 1px solid
-        var(--fluid-infinite-table-border, var(--fluid-border-default, #e2e8f0));
+      border-bottom: var(
+          --fluid-infinite-table-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e2e8f0));
       background: var(--fluid-infinite-table-header-bg, var(--fluid-surface-muted, #f8fafc));
     }
     /*
@@ -308,8 +320,11 @@ export class FluidInfiniteTable extends FluidElement {
       height: var(--_fluid-row-height);
       padding: var(--fluid-infinite-table-cell-padding, 0.625rem 0.75rem);
       overflow: hidden;
-      border-bottom: 1px solid
-        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border-bottom: var(
+          --fluid-infinite-table-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       text-align: var(--_cell-align, start);
       text-overflow: ellipsis;
       vertical-align: middle;
@@ -531,7 +546,8 @@ export class FluidInfiniteTable extends FluidElement {
       max-height: min(38rem, calc(100vh - 2rem));
       padding: 0;
       overflow: hidden;
-      border: 1px solid var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-infinite-table-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-infinite-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-infinite-table-radius, var(--fluid-radius-md, 0.5rem));
       background: var(--fluid-surface-base, #fff);
       color: var(--fluid-text-primary, #18181b);
@@ -549,7 +565,11 @@ export class FluidInfiniteTable extends FluidElement {
       padding: 1rem;
     }
     .dialog-head {
-      border-bottom: 1px solid var(--fluid-border-default, #e4e4e7);
+      border-bottom: var(
+          --fluid-infinite-table-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-border-default, #e4e4e7);
     }
     .dialog-head h2 {
       margin: 0;
@@ -587,7 +607,8 @@ export class FluidInfiniteTable extends FluidElement {
     }
     .dialog-foot {
       justify-content: flex-end;
-      border-top: 1px solid var(--fluid-border-default, #e4e4e7);
+      border-top: var(--fluid-infinite-table-divider-width, var(--fluid-border-width-divider, 1px))
+        solid var(--fluid-border-default, #e4e4e7);
     }
     @media (prefers-reduced-motion: reduce) {
       * {

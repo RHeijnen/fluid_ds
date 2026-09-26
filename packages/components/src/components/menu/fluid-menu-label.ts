@@ -37,6 +37,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-font-family-sans - Font family.
  * @uses-token --fluid-space-1 - Row vertical padding.
  * @uses-token --fluid-space-3 - Row horizontal padding.
+ * @cssproperty --fluid-menu-label-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  */
 export class FluidMenuLabel extends FluidElement {
   static override styles = css`
@@ -65,7 +67,8 @@ export class FluidMenuLabel extends FluidElement {
        visually separates groups. The first label in a menu omits it. */
     :host(:not(:first-child)) .base {
       margin-top: var(--fluid-space-1);
-      border-top: 1px solid var(--fluid-menu-label-divider, var(--fluid-border-default));
+      border-top: var(--fluid-menu-label-divider-width, var(--fluid-border-width-divider, 1px))
+        solid var(--fluid-menu-label-divider, var(--fluid-border-default));
       padding-top: var(--fluid-space-2);
     }
   `;

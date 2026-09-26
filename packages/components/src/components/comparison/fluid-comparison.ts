@@ -28,6 +28,7 @@ import { FluidElement } from "../../internal/base-element.js";
  * @cssproperty --fluid-comparison-focus-ring - Focus ring color.
  *
  * @uses-token --fluid-accent-base - Default divider color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-surface-base - Default handle background.
  * @uses-token --fluid-focus-ring-color - Focus ring.
  *
@@ -90,7 +91,7 @@ export class FluidComparison extends FluidElement {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: var(--fluid-comparison-handle-fg, var(--fluid-accent-base));
+      color: var(--fluid-comparison-handle-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
       box-shadow: var(--fluid-comparison-shadow-md, var(--fluid-shadow-md));
       touch-action: none;
     }

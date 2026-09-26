@@ -89,6 +89,7 @@ const PATHS = [
   { path: "expansion/charts", title: "@fluid-ds/charts" },
   { path: "expansion/markdown", title: "@fluid-ds/markdown" },
   { path: "expansion/qr", title: "@fluid-ds/qr" },
+  { path: "expansion/rainbow", title: "@fluid-ds/rainbow" },
   { path: "expansion/media", title: "@fluid-ds/media" },
 
   // Guides.

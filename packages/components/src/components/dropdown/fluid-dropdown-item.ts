@@ -35,6 +35,7 @@ let counter = 0;
  * @uses-token --fluid-text-secondary - Suffix text.
  * @uses-token --fluid-surface-muted - Highlight background.
  * @uses-token --fluid-accent-base - Active accent + checkmark color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-border-default - Separator line color.
  * @uses-token --fluid-target-min - Minimum item hit-target height (24px AA / 44px AAA).
  * @uses-token --fluid-radius-sm - Corner radius.
@@ -109,7 +110,10 @@ export class FluidDropdownItem extends FluidElement {
     .check {
       width: 1rem;
       height: 1rem;
-      color: var(--fluid-dropdown-item-check-color, var(--fluid-accent-base));
+      color: var(
+        --fluid-dropdown-item-check-color,
+        var(--fluid-accent-fg, var(--fluid-accent-base))
+      );
       visibility: hidden;
     }
     :host([type="checkbox"][checked]) .check {

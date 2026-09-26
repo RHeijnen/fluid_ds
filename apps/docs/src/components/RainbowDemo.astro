@@ -1,0 +1,55 @@
+---
+/**
+ * Live demo for the Rainbow pack page: the landscape clock tile, a charging
+ * battery with the heartbeat trace, and a row of illustrated icons, rendered
+ * under the Rainbow brand preset.
+ */
+import Demo from "./Demo.astro";
+
+const icons = ["rainbow-chat", "rainbow-chart", "rainbow-calendar", "rainbow-cloud", "rainbow-music", "rainbow-game"];
+---
+
+<Demo title="Landscape, clock, battery and icons">
+  <div class="rainbow-demo" data-fluid-brand="rainbow">
+    <fluid-rainbow-landscape>
+      <fluid-rainbow-clock hour-cycle="h23"></fluid-rainbow-clock>
+    </fluid-rainbow-landscape>
+    <div class="rainbow-side">
+      <fluid-rainbow-battery value="99.98" show-value charging pulse>Uptime</fluid-rainbow-battery>
+      <div class="rainbow-icons">
+        {icons.map((name) => <fluid-icon name={name} style="--fluid-icon-size: 3rem" />)}
+      </div>
+    </div>
+  </div>
+</Demo>
+
+<style>
+  .rainbow-demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+    inline-size: 100%;
+    padding: 1.25rem;
+    border-radius: 1.5rem;
+  }
+  .rainbow-side {
+    display: grid;
+    gap: 1rem;
+  }
+  .rainbow-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .rainbow-demo {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import "@fluid-ds/rainbow/define";
+  import "@fluid-ds/rainbow/icons/register";
+</script>

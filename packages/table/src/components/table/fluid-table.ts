@@ -71,6 +71,10 @@ export interface FluidTableSort {
  * @uses-token --fluid-radius-md - Outer radius.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum interactive target (24px AA / 44px AAA).
+ * @cssproperty --fluid-table-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-table-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-sort - The sort changed. `detail: { key, dir }`.
  * @fires fluid-selection-change - The row selection changed. `detail: { selected: rowKeys[] }`.
@@ -86,7 +90,8 @@ export class FluidTable extends FluidElement {
       width: 100%;
       border-collapse: collapse;
       background: var(--fluid-table-bg, var(--fluid-surface-base, #fff));
-      border: 1px solid var(--fluid-table-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-table-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-table-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-table-radius, var(--fluid-radius-md, 0.5rem));
       overflow: hidden;
       font-size: var(--fluid-font-size-sm, 0.875rem);
@@ -112,7 +117,8 @@ export class FluidTable extends FluidElement {
     th,
     td {
       padding: var(--fluid-table-cell-padding, 0.625rem 0.75rem);
-      border-bottom: 1px solid var(--fluid-table-border, var(--fluid-border-default, #e4e4e7));
+      border-bottom: var(--fluid-table-divider-width, var(--fluid-border-width-divider, 1px)) solid
+        var(--fluid-table-border, var(--fluid-border-default, #e4e4e7));
       text-align: var(--cell-align, start);
       vertical-align: middle;
     }

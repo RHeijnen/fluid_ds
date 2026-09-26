@@ -17,3 +17,11 @@ licenses, update the manifest, and run `test:fonts`, the a11y font test, and vis
 regressions. Do not silently update font assets or accept changed baselines.
 Arabic is not covered by these fonts and continues to use the configured fallback;
 deterministic Arabic typography remains part of the localization/visual work.
+
+Fredoka and Nunito back the Rainbow brand preset (`--fluid-font-family-display`
+and `--fluid-font-family-sans` under `data-fluid-brand="rainbow"`). Only the latin
+variable-weight subsets are vendored, taken unchanged from the
+`@fontsource-variable/fredoka` and `@fontsource-variable/nunito` 5.3.0 npm
+packages (sources and digests in `manifest.json`). `Fredoka-OFL.txt` and
+`Nunito-OFL.txt` are the SIL Open Font License 1.1 texts shipped in those packages.
+No other brand references these families, so the default captures are unaffected.

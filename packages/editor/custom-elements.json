@@ -49,6 +49,14 @@
             {
               "description": "Focus ring color. Falls back to --fluid-accent-base.",
               "name": "--fluid-editor-focus"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-rich-text-editor-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-rich-text-editor-border-width"
             }
           ],
           "cssParts": [
@@ -354,6 +362,14 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum control target (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-rich-text-editor",

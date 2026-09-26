@@ -39,6 +39,8 @@ const DEFAULT_WINDOW: TimeWindow = { start: "09:00", end: "17:00" };
  * @uses-token --fluid-border-default - Time-input borders.
  * @uses-token --fluid-radius-md - Row radius.
  * @uses-token --fluid-focus-ring-width - Time-input focus ring (2px AA / 3px AAA).
+ * @cssproperty --fluid-availability-editor-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-change - The availability config changed. `detail: { availability }`.
  */
@@ -100,7 +102,8 @@ export class FluidAvailabilityEditor extends FluidElement {
     input[type="time"] {
       min-height: max(2rem, var(--fluid-target-min, 0px));
       padding: 0.2rem 0.4rem;
-      border: 1px solid var(--fluid-border-default);
+      border: var(--fluid-availability-editor-border-width, var(--fluid-border-width-default, 1px))
+        solid var(--fluid-border-default);
       border-radius: var(--fluid-radius-sm, 4px);
       background: var(--fluid-surface-base);
       color: var(--fluid-text-primary);

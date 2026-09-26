@@ -18,6 +18,7 @@ const packages = [
   "node-graph",
   "animations",
   "qr",
+  "rainbow",
   "parser",
   "markdown"
 ];

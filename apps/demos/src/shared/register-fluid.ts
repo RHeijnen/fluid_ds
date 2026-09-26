@@ -21,6 +21,7 @@ import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
 import "@fluid-ds/themes/orchid.css";
+import "@fluid-ds/themes/rainbow.css";
 
 import "@fluid-ds/icons/register-defaults";
 

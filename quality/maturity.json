@@ -532,6 +532,21 @@
       "since": "0.4.0",
       "support": "supported"
     },
+    "fluid-rainbow-battery": {
+      "status": "beta",
+      "since": "1.0.0",
+      "support": "supported"
+    },
+    "fluid-rainbow-clock": {
+      "status": "beta",
+      "since": "1.0.0",
+      "support": "supported"
+    },
+    "fluid-rainbow-landscape": {
+      "status": "beta",
+      "since": "1.0.0",
+      "support": "supported"
+    },
     "fluid-range-slider": {
       "status": "stable",
       "since": "0.4.0",

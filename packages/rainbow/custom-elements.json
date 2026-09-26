@@ -1,0 +1,852 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/define.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-rainbow-battery",
+          "declaration": {
+            "name": "FluidRainbowBattery",
+            "module": "src/fluid-rainbow-battery.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-rainbow-clock",
+          "declaration": {
+            "name": "FluidRainbowClock",
+            "module": "src/fluid-rainbow-clock.ts"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "fluid-rainbow-landscape",
+          "declaration": {
+            "name": "FluidRainbowLandscape",
+            "module": "src/fluid-rainbow-landscape.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/fluid-rainbow-battery.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A battery-shaped gauge in the Rainbow widget style: a rainbow cell that fills\nto the value, an optional charging cord with a smiling plug, and an optional\nheartbeat line underneath. Good for uptime, quota, health or progress-to-goal\nreadouts on a dashboard.\n\nSemantically it is a meter (APG Meter pattern): `role=\"meter\"` with\n`aria-valuemin` / `-max` / `-now` and an `aria-valuetext` that reads the\nvalue as a localized percentage. Not interactive, so there is no keyboard\ncontract. The cord, plug and heartbeat are decorative and hidden from\nassistive technology. If charging state matters to the reader, say so in the\nlabel (for example \"Charging\").\n\nMotion (the charge shimmer, the heartbeat trace, the bobbing plug) stops\nunder `prefers-reduced-motion` and scales with the global `--fluid-motion`.",
+          "name": "FluidRainbowBattery",
+          "cssProperties": [
+            {
+              "description": "Cell fill (any background). Falls back to a pastel rainbow gradient.",
+              "name": "--fluid-rainbow-battery-fill"
+            },
+            {
+              "description": "Casing background. Falls back to --fluid-surface-base.",
+              "name": "--fluid-rainbow-battery-casing"
+            },
+            {
+              "description": "Outline, cord and trace color. Falls back to --rainbow-line, then --fluid-text-secondary.",
+              "name": "--fluid-rainbow-battery-ink"
+            },
+            {
+              "description": "Casing outline width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-rainbow-battery-border-width"
+            },
+            {
+              "description": "Casing corner radius. Falls back to --fluid-radius-lg.",
+              "name": "--fluid-rainbow-battery-radius"
+            },
+            {
+              "description": "Plug face color. Falls back to --rainbow-yellow, then --fluid-color-amber-300.",
+              "name": "--fluid-rainbow-battery-plug"
+            },
+            {
+              "description": "Heart color. Falls back to --rainbow-rose, then --fluid-color-red-400.",
+              "name": "--fluid-rainbow-battery-heart"
+            },
+            {
+              "description": "Label color. Falls back to --fluid-text-primary.",
+              "name": "--fluid-rainbow-battery-fg"
+            },
+            {
+              "description": "Label font. Falls back to --fluid-font-family-display.",
+              "name": "--fluid-rainbow-battery-font-family"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The whole widget.",
+              "name": "base"
+            },
+            {
+              "description": "The battery casing.",
+              "name": "body"
+            },
+            {
+              "description": "The filled cell.",
+              "name": "cell"
+            },
+            {
+              "description": "The label row.",
+              "name": "label"
+            },
+            {
+              "description": "The heartbeat row.",
+              "name": "pulse"
+            }
+          ],
+          "slots": [
+            {
+              "description": "The label, e.g. \"Uptime\". Also the accessible name when `label` is unset.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Current level. Clamped into [min, max].",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Lower bound of the range.",
+              "attribute": "min"
+            },
+            {
+              "kind": "field",
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Upper bound of the range.",
+              "attribute": "max"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible name, before slotted text and the localized default.",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "showValue",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the value as a percentage after the label.",
+              "attribute": "show-value"
+            },
+            {
+              "kind": "field",
+              "name": "charging",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the cord and plug and animate the cell. Decorative.",
+              "attribute": "charging",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "pulse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the heart and heartbeat trace under the battery. Decorative.",
+              "attribute": "pulse",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "fraction",
+              "type": {
+                "text": "number"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "percent",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "fraction",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "renderCord",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "renderPulse",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TemplateResult | typeof nothing"
+                }
+              }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "value",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Current level. Clamped into [min, max].",
+              "fieldName": "value"
+            },
+            {
+              "name": "min",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "description": "Lower bound of the range.",
+              "fieldName": "min"
+            },
+            {
+              "name": "max",
+              "type": {
+                "text": "number"
+              },
+              "default": "100",
+              "description": "Upper bound of the range.",
+              "fieldName": "max"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible name, before slotted text and the localized default.",
+              "fieldName": "label"
+            },
+            {
+              "name": "show-value",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the value as a percentage after the label.",
+              "fieldName": "showValue"
+            },
+            {
+              "name": "charging",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the cord and plug and animate the cell. Decorative.",
+              "fieldName": "charging"
+            },
+            {
+              "name": "pulse",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Show the heart and heartbeat trace under the battery. Decorative.",
+              "fieldName": "pulse"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Battery-shaped gauge with charging and heartbeat flourishes.",
+          "usesTokens": [
+            {
+              "name": "--fluid-surface-base",
+              "description": "Casing background."
+            },
+            {
+              "name": "--fluid-text-secondary",
+              "description": "Outline, cord and trace color outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Casing outline width."
+            },
+            {
+              "name": "--fluid-radius-lg",
+              "description": "Casing radius."
+            },
+            {
+              "name": "--fluid-color-amber-300",
+              "description": "Plug face outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-color-red-400",
+              "description": "Heart outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-text-primary",
+              "description": "Label color."
+            },
+            {
+              "name": "--fluid-font-family-display",
+              "description": "Label font."
+            },
+            {
+              "name": "--fluid-font-weight-semibold",
+              "description": "Label weight."
+            },
+            {
+              "name": "--fluid-font-size-md",
+              "description": "Label size."
+            },
+            {
+              "name": "--fluid-space-2",
+              "description": "Row gap."
+            },
+            {
+              "name": "--fluid-motion",
+              "description": "Global motion scalar; 0 stops the flourishes."
+            }
+          ],
+          "tagName": "fluid-rainbow-battery",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRainbowBattery",
+          "declaration": {
+            "name": "FluidRainbowBattery",
+            "module": "src/fluid-rainbow-battery.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/fluid-rainbow-clock.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "A big, friendly clock face: hours and minutes in the display font with a\nshort date line underneath, in the Rainbow widget style. Pairs with\n`<fluid-rainbow-landscape>` but works anywhere.\n\nRendered as a native `<time>` element with a machine-readable `datetime`.\nThe face ticks once a minute, aligned to the minute boundary, and is never a\nlive region: a clock that announced itself every minute would be noise.\n\nFormatting follows the Fluid locale (`lang` on the element or an ancestor)\nthrough `Intl.DateTimeFormat`, so the weekday is translated and the hour\ncycle matches the locale unless `hour-cycle` overrides it.\n\nSet `datetime` to show a fixed moment instead of the current time (a\ntimezone demo, a screenshot, a test). The timer only runs while no\n`datetime` is set and the element is connected.",
+          "name": "FluidRainbowClock",
+          "cssProperties": [
+            {
+              "description": "Face font. Falls back to --fluid-font-family-display.",
+              "name": "--fluid-rainbow-clock-font-family"
+            },
+            {
+              "description": "Size of the hours and minutes. Falls back to clamp(1.75rem, 14cqi, 4.5rem), which scales with a containing landscape.",
+              "name": "--fluid-rainbow-clock-size"
+            },
+            {
+              "description": "Text color. Falls back to inherited color.",
+              "name": "--fluid-rainbow-clock-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The `<time>` element.",
+              "name": "base"
+            },
+            {
+              "description": "The hours and minutes.",
+              "name": "time"
+            },
+            {
+              "description": "The date line.",
+              "name": "date"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "datetime",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A fixed moment to display (anything `Date` can parse). When unset the\nclock shows the current time and updates every minute.",
+              "attribute": "datetime"
+            },
+            {
+              "kind": "field",
+              "name": "hideDate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the date line.",
+              "attribute": "hide-date",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "hourCycle",
+              "type": {
+                "text": "\"auto\" | \"h12\" | \"h23\""
+              },
+              "default": "\"auto\"",
+              "description": "Force a 12- or 24-hour face. `auto` follows the locale.",
+              "attribute": "hour-cycle"
+            },
+            {
+              "kind": "field",
+              "name": "now",
+              "privacy": "private",
+              "default": "new Date()"
+            },
+            {
+              "kind": "field",
+              "name": "timer",
+              "type": {
+                "text": "ReturnType<typeof setTimeout> | undefined"
+              },
+              "privacy": "private"
+            },
+            {
+              "kind": "method",
+              "name": "stop",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "schedule",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Tick on the next minute boundary, then every minute, while live."
+            },
+            {
+              "kind": "field",
+              "name": "moment",
+              "type": {
+                "text": "Date"
+              },
+              "privacy": "private",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "format",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "options",
+                  "type": {
+                    "text": "Intl.DateTimeFormatOptions"
+                  }
+                },
+                {
+                  "name": "date",
+                  "type": {
+                    "text": "Date"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "datetime",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "A fixed moment to display (anything `Date` can parse). When unset the\nclock shows the current time and updates every minute.",
+              "fieldName": "datetime"
+            },
+            {
+              "name": "hide-date",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Hide the date line.",
+              "fieldName": "hideDate"
+            },
+            {
+              "name": "hour-cycle",
+              "type": {
+                "text": "\"auto\" | \"h12\" | \"h23\""
+              },
+              "default": "\"auto\"",
+              "description": "Force a 12- or 24-hour face. `auto` follows the locale.",
+              "fieldName": "hourCycle"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Live, localized clock face in the Rainbow widget style.",
+          "usesTokens": [
+            {
+              "name": "--fluid-font-family-display",
+              "description": "Default face font."
+            },
+            {
+              "name": "--fluid-font-weight-bold",
+              "description": "Hours and minutes weight."
+            },
+            {
+              "name": "--fluid-font-weight-semibold",
+              "description": "Date line weight."
+            },
+            {
+              "name": "--fluid-font-size-sm",
+              "description": "Date line size."
+            }
+          ],
+          "tagName": "fluid-rainbow-clock",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRainbowClock",
+          "declaration": {
+            "name": "FluidRainbowClock",
+            "module": "src/fluid-rainbow-clock.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/fluid-rainbow-landscape.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "An illustrated landscape tile: sky, a drifting cloud, rolling hills and two\ntrees, drawn with the Rainbow ink outline. It is a frame for content: slot a\n`<fluid-rainbow-clock>`, a heading or a stat into the top corner.\n\nThe artwork is decorative and hidden from assistive technology. Slotted\ncontent stays fully accessible. Give the element a `label` only when the\npicture itself carries meaning, which exposes it as an image with that name.\n\nThe cloud and the tile's gentle float are the only motion. Both stop under\n`prefers-reduced-motion`, when the global `--fluid-motion` scalar is 0, or\nwhen the `still` attribute is set.\n\nColors read the Rainbow palette (`--rainbow-blue`, `--rainbow-green`, …) when\nthe Rainbow brand is active and fall back to Fluid's brand and status ramps,\nso the tile fits any preset.",
+          "name": "FluidRainbowLandscape",
+          "cssProperties": [
+            {
+              "description": "Sky color. Falls back to --rainbow-blue, then --fluid-color-brand-200.",
+              "name": "--fluid-rainbow-landscape-sky"
+            },
+            {
+              "description": "Far hill color. Falls back to --rainbow-paper, then white (the scene stays in daylight in every scheme).",
+              "name": "--fluid-rainbow-landscape-hill"
+            },
+            {
+              "description": "Near meadow color. Falls back to --rainbow-green, then --fluid-color-emerald-300.",
+              "name": "--fluid-rainbow-landscape-meadow"
+            },
+            {
+              "description": "Tree crown color. Falls back to --rainbow-green-deep, then --fluid-color-emerald-600.",
+              "name": "--fluid-rainbow-landscape-tree"
+            },
+            {
+              "description": "Cloud color. Falls back to --rainbow-paper, then white.",
+              "name": "--fluid-rainbow-landscape-cloud"
+            },
+            {
+              "description": "Outline color for the tile and every shape. Falls back to --fluid-border-strong.",
+              "name": "--fluid-rainbow-landscape-ink"
+            },
+            {
+              "description": "Tile outline width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-rainbow-landscape-border-width"
+            },
+            {
+              "description": "Tile corner radius. Falls back to --fluid-radius-xl.",
+              "name": "--fluid-rainbow-landscape-radius"
+            },
+            {
+              "description": "Tile aspect ratio. Falls back to 2 / 1.",
+              "name": "--fluid-rainbow-landscape-aspect-ratio"
+            },
+            {
+              "description": "Inset of the slotted content. Falls back to --fluid-space-5.",
+              "name": "--fluid-rainbow-landscape-padding"
+            },
+            {
+              "description": "Text color of slotted content. Falls back to --rainbow-ink, then a fixed dark ink, because the sky is light in every scheme.",
+              "name": "--fluid-rainbow-landscape-fg"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The outlined tile.",
+              "name": "base"
+            },
+            {
+              "description": "The illustration SVG.",
+              "name": "scene"
+            },
+            {
+              "description": "The wrapper around slotted content.",
+              "name": "content"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Content overlaid on the sky, top-start aligned.",
+              "name": ""
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "still",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Stop the float and the drifting cloud regardless of motion settings.",
+              "attribute": "still",
+              "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible name for the picture. Leave unset when it is decoration.",
+              "attribute": "label"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "still",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "description": "Stop the float and the drifting cloud regardless of motion settings.",
+              "fieldName": "still"
+            },
+            {
+              "name": "label",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Accessible name for the picture. Leave unset when it is decoration.",
+              "fieldName": "label"
+            }
+          ],
+          "superclass": {
+            "name": "FluidElement",
+            "package": "@fluid-ds/components/internal/base-element"
+          },
+          "summary": "Decorative animated landscape that frames slotted content.",
+          "usesTokens": [
+            {
+              "name": "--fluid-color-brand-200",
+              "description": "Default sky outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-color-emerald-300",
+              "description": "Default meadow outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-color-emerald-600",
+              "description": "Default tree crowns outside the Rainbow brand."
+            },
+            {
+              "name": "--fluid-border-strong",
+              "description": "Outline color."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline width."
+            },
+            {
+              "name": "--fluid-radius-xl",
+              "description": "Tile corner radius."
+            },
+            {
+              "name": "--fluid-space-5",
+              "description": "Content inset."
+            },
+            {
+              "name": "--fluid-motion",
+              "description": "Global motion scalar; 0 stops the drift."
+            }
+          ],
+          "tagName": "fluid-rainbow-landscape",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRainbowLandscape",
+          "declaration": {
+            "name": "FluidRainbowLandscape",
+            "module": "src/fluid-rainbow-landscape.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icons-register.ts",
+      "declarations": [],
+      "exports": []
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/icons.ts",
+      "declarations": [
+        {
+          "kind": "variable",
+          "name": "rainbowIconNames",
+          "description": "The names this set registers, in display order."
+        },
+        {
+          "kind": "variable",
+          "name": "rainbowIcons",
+          "type": {
+            "text": "Record<string, string>"
+          },
+          "default": "{ \"rainbow-chat\": tile( \"chat\", `<g clip-path=\"CLIP\">${fill(c.yellow)}<rect y=\"42\" width=\"64\" height=\"22\" fill=\"${c.purple}\" stroke=\"none\"/></g>` + `<path d=\"M4 42h56\"/><path d=\"M15 21v12M24 21v12M15 27h9M30 25v8\"/>` + `<circle cx=\"30\" cy=\"20\" r=\"0.6\" fill=\"${c.ink}\" stroke-width=\"3\"/>` + dot(38, 32, 1) + dot(44, 32, 1) + dot(50, 32, 1) + `<path d=\"M22 42l-3 8 9-8\" fill=\"${c.yellow}\"/>` ), \"rainbow-chart\": tile( \"chart\", `<g clip-path=\"CLIP\">${fill(c.blue)}</g>` + `<rect x=\"15\" y=\"32\" width=\"8\" height=\"15\" rx=\"3\" fill=\"${c.pink}\"/>` + `<rect x=\"28\" y=\"22\" width=\"8\" height=\"25\" rx=\"3\" fill=\"${c.yellow}\"/>` + `<rect x=\"41\" y=\"15\" width=\"8\" height=\"32\" rx=\"3\" fill=\"${c.paper}\"/>` ), \"rainbow-lock\": tile( \"lock\", `<g clip-path=\"CLIP\">${fill(c.green)}<path d=\"M0 46C16 38 30 50 64 40V64H0Z\" fill=\"${c.paper}\"/></g>` + `<path d=\"M24 29v-5a8 8 0 0 1 16 0v5\"/>` + `<rect x=\"19\" y=\"29\" width=\"26\" height=\"19\" rx=\"6\" fill=\"${c.yellow}\"/><path d=\"M32 36v5\"/>` ), \"rainbow-calendar\": tile( \"calendar\", `<g clip-path=\"CLIP\">${fill(c.paper)}<rect width=\"64\" height=\"21\" fill=\"${c.rose}\"/></g>` + dot(22, 14, 2) + dot(42, 14, 2) + // A week of days, with today circled. [18, 32, 46] .map((x) => `<circle cx=\"${x}\" cy=\"33\" r=\"2.5\" fill=\"${c.pink}\" stroke=\"none\"/>`) .join(\"\") + [18, 46] .map((x) => `<circle cx=\"${x}\" cy=\"45\" r=\"2.5\" fill=\"${c.pink}\" stroke=\"none\"/>`) .join(\"\") + `<circle cx=\"32\" cy=\"45\" r=\"5\" fill=\"${c.yellow}\" stroke-width=\"3\"/>` ), \"rainbow-bolt\": tile( \"bolt\", `<g clip-path=\"CLIP\">${fill(c.yellow)}<circle cx=\"54\" cy=\"54\" r=\"20\" fill=\"${c.coral}\"/></g>` + `<path d=\"M35 12 20 35h11l-3 17 16-24H33z\" fill=\"${c.paper}\"/>` ), \"rainbow-cloud\": tile( \"cloud\", `<g clip-path=\"CLIP\">${fill(c.blue)}<circle cx=\"42\" cy=\"24\" r=\"10\" fill=\"${c.yellow}\"/></g>` + `<path d=\"M17 45a8 8 0 0 1 1-16 11 11 0 0 1 21-3 9 9 0 0 1 8 13 6 6 0 0 1-3 6z\" fill=\"${c.paper}\"/>` ), \"rainbow-globe\": tile( \"globe\", `<g clip-path=\"CLIP\">${fill(c.purple)}</g>` + `<circle cx=\"32\" cy=\"32\" r=\"16\" fill=\"${c.paper}\"/>` + `<path d=\"M16 32h32M32 16c-6 5-6 27 0 32M32 16c6 5 6 27 0 32\" stroke-width=\"3\"/>` + `<path d=\"M17.5 25h29M17.5 39h29\" stroke-width=\"2.5\"/>` ), \"rainbow-gear\": tile( \"gear\", `<g clip-path=\"CLIP\">${fill(c.paper)}<rect width=\"64\" height=\"30\" fill=\"${c.sand}\"/></g>` + `<path d=\"M4 30h56\"/><rect x=\"22\" y=\"15\" width=\"20\" height=\"10\" rx=\"4\" fill=\"${c.tan}\"/>` + `<path d=\"M32 25v10\"/><circle cx=\"32\" cy=\"43\" r=\"8\" fill=\"${c.green}\"/>` ), \"rainbow-mail\": tile( \"mail\", `<g clip-path=\"CLIP\">${fill(c.blue)}<path d=\"M0 46C18 40 40 52 64 44V64H0Z\" fill=\"${c.paper}\"/></g>` + `<rect x=\"15\" y=\"19\" width=\"34\" height=\"23\" rx=\"5\" fill=\"${c.yellow}\"/><path d=\"M16 21l16 11 16-11\"/>` ), \"rainbow-clock\": tile( \"clock\", `<g clip-path=\"CLIP\">${fill(c.paper)}<rect width=\"64\" height=\"26\" fill=\"${c.rose}\"/></g>` + `<path d=\"M4 26h56\"/><circle cx=\"24\" cy=\"21\" r=\"7\" fill=\"${c.pink}\"/>` + `<circle cx=\"40\" cy=\"21\" r=\"7\" fill=\"${c.pink}\"/><path d=\"M24 38v8h8\"/>` ), \"rainbow-music\": tile( \"music\", `<g clip-path=\"CLIP\">${fill(c.paper)}<circle cx=\"32\" cy=\"32\" r=\"26\" fill=\"${c.pink}\"/>` + `<circle cx=\"32\" cy=\"32\" r=\"18\" fill=\"${c.blue}\"/><circle cx=\"32\" cy=\"32\" r=\"10\" fill=\"${c.purpleDeep}\"/>` + `<rect width=\"32\" height=\"64\" fill=\"${c.paper}\"/></g>` + `<path d=\"M32 4v56\"/><path d=\"M14 28v8M20 24v16M26 29v6\"/>` ), \"rainbow-gallery\": tile( \"gallery\", `<g clip-path=\"CLIP\">${fill(c.purple)}<path d=\"M0 44C16 34 40 50 64 38V64H0Z\" fill=\"${c.paper}\"/></g>` + `<path d=\"M22 44V34\"/><path d=\"M22 22c5 0 7 7 6 11a6 6 0 0 1-12 0c-1-4 1-11 6-11z\" fill=\"${c.green}\"/>` + `<path d=\"M42 41c4 0 6 5 5 8H37c-1-3 1-8 5-8z\" fill=\"${c.greenDeep}\"/>` + `<path d=\"M46 15l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z\" fill=\"${c.paper}\" stroke-width=\"2\"/>` ), \"rainbow-game\": tile( \"game\", `<g clip-path=\"CLIP\">${fill(c.blue)}<rect width=\"64\" height=\"24\" fill=\"${c.paper}\"/></g>` + `<path d=\"M4 24h56\"/>` + dot(17, 15) + dot(24, 15) + `<rect x=\"14\" y=\"32\" width=\"15\" height=\"15\" rx=\"5\" fill=\"${c.paper}\"/><path d=\"M21.5 36v7M18 39.5h7\" stroke-width=\"3\"/>` + `<rect x=\"35\" y=\"32\" width=\"15\" height=\"15\" rx=\"5\" fill=\"${c.pink}\"/><path d=\"M39 37.5h7M39 41.5h7\" stroke-width=\"3\"/>` ), \"rainbow-logo\": tile( \"logo\", `<g clip-path=\"CLIP\">${fill(c.paper)}<circle cx=\"32\" cy=\"50\" r=\"30\" fill=\"${c.pink}\"/>` + `<circle cx=\"32\" cy=\"50\" r=\"22\" fill=\"${c.yellow}\"/><circle cx=\"32\" cy=\"50\" r=\"14\" fill=\"${c.blue}\"/>` + `<circle cx=\"32\" cy=\"50\" r=\"6\" fill=\"${c.paper}\"/></g><path d=\"M4 50h56\"/>` ) }"
+        },
+        {
+          "kind": "function",
+          "name": "registerRainbowIcons",
+          "return": {
+            "type": {
+              "text": "void"
+            }
+          },
+          "description": "Register every Rainbow icon with the shared registry."
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "rainbowIconNames",
+          "declaration": {
+            "name": "rainbowIconNames",
+            "module": "src/icons.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "rainbowIcons",
+          "declaration": {
+            "name": "rainbowIcons",
+            "module": "src/icons.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "registerRainbowIcons",
+          "declaration": {
+            "name": "registerRainbowIcons",
+            "module": "src/icons.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "FluidRainbowBattery",
+          "declaration": {
+            "name": "FluidRainbowBattery",
+            "module": "src/fluid-rainbow-battery.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidRainbowClock",
+          "declaration": {
+            "name": "FluidRainbowClock",
+            "module": "src/fluid-rainbow-clock.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "FluidRainbowLandscape",
+          "declaration": {
+            "name": "FluidRainbowLandscape",
+            "module": "src/fluid-rainbow-landscape.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "rainbowIconNames",
+          "declaration": {
+            "name": "rainbowIconNames",
+            "module": "src/icons.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "rainbowIcons",
+          "declaration": {
+            "name": "rainbowIcons",
+            "module": "src/icons.ts"
+          }
+        },
+        {
+          "kind": "js",
+          "name": "registerRainbowIcons",
+          "declaration": {
+            "name": "registerRainbowIcons",
+            "module": "src/icons.ts"
+          }
+        }
+      ]
+    }
+  ]
+}

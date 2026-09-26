@@ -32,6 +32,7 @@ import { FluidElement } from "../../internal/base-element.js";
  *
  * @uses-token --fluid-color-neutral-200 - Default track color.
  * @uses-token --fluid-accent-base - Default indicator color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-primary - Center label color.
  * @uses-token --fluid-font-family-sans - Center label font family.
  */
@@ -55,7 +56,7 @@ export class FluidProgressRing extends FluidElement {
       stroke: var(--fluid-progress-ring-track, var(--fluid-color-neutral-200));
     }
     .indicator {
-      stroke: var(--fluid-progress-ring-fill, var(--fluid-accent-base));
+      stroke: var(--fluid-progress-ring-fill, var(--fluid-accent-fg, var(--fluid-accent-base)));
       stroke-linecap: round;
       transition: stroke-dashoffset var(--fluid-duration-normal) var(--fluid-easing-standard);
     }

@@ -430,7 +430,7 @@ async function main() {
           limitations: [
             "Astro output is production static SSR generated during astro build, not an on-demand adapter server.",
             "This is a latest-compatible install lane; the retained lock and tarballs permit a later frozen replay but this script does not perform that replay.",
-            "Four representative core elements do not certify the full 155-element catalog or other frameworks.",
+            "Four representative core elements do not certify the full 158-element catalog or other frameworks.",
             "Package tarballs use the repository's existing built dist; source-to-dist equivalence remains covered by the separate package build and artifact gates."
           ]
         },

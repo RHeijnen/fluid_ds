@@ -34,6 +34,16 @@ export type FluidSwitchChangeEvent = CustomEvent<FluidSwitchValueDetail>;
  * @cssproperty --fluid-switch-thumb-bg - Thumb color. Falls back to --fluid-color-white.
  * @cssproperty --fluid-switch-fg - Label text color. Falls back to --fluid-text-primary.
  * @cssproperty --fluid-switch-radius - Track + thumb corner radius. Falls back to --fluid-radius-full.
+ * @cssproperty --fluid-switch-track-width - Track width. Falls back to 2.25rem.
+ * @cssproperty --fluid-switch-track-height - Track height. Falls back to 1.25rem.
+ * @cssproperty --fluid-switch-thumb-size - Thumb diameter. Falls back to 1rem.
+ * @cssproperty --fluid-switch-thumb-inset - Gap between thumb and track edge. Falls back to 0.125rem.
+ * @cssproperty --fluid-switch-border-width - Track outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-switch-border - Track and thumb outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-switch-track-shadow - Track inner shadow. Falls back to a soft inset shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-switch-thumb-border-width - Thumb outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-switch-thumb-shadow - Thumb elevation. Falls back to a soft layered shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-switch-thumb-sheen - Thumb highlight overlay (background-image). Falls back to a white top sheen; set to none for a flat thumb.
  * @cssproperty --fluid-switch-gap - Gap between control and label. Falls back to --fluid-space-2.
  * @cssproperty --fluid-switch-font-family - Label font family. Falls back to --fluid-font-family-sans.
  * @cssproperty --fluid-switch-font-size - Label font size. Falls back to --fluid-font-size-md.
@@ -50,6 +60,7 @@ export type FluidSwitchChangeEvent = CustomEvent<FluidSwitchValueDetail>;
  * @uses-token --fluid-focus-ring-offset - Focus ring offset.
  * @uses-token --fluid-target-min - Minimum hit-target height (24px AA / 44px AAA).
  * @uses-token --fluid-radius-full - Track + thumb radius.
+ * @uses-token --fluid-border-strong - Outline color when a theme enables the switch outline.
  * @uses-token --fluid-space-2 - Gap between control and label.
  * @uses-token --fluid-font-family-sans - Label font family.
  * @uses-token --fluid-font-size-md - Label font size.
@@ -109,12 +120,15 @@ export class FluidSwitch extends FluidFormAssociated {
     .track {
       position: relative;
       flex-shrink: 0;
-      width: 2.25rem;
-      height: 1.25rem;
+      width: var(--fluid-switch-track-width, 2.25rem);
+      height: var(--fluid-switch-track-height, 1.25rem);
       background-color: var(--fluid-switch-track-bg, var(--fluid-color-neutral-300));
       background-image: var(--fluid-gradient-glossy-inverse);
       border-radius: var(--fluid-switch-radius, var(--fluid-radius-full));
-      box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.08);
+      box-shadow:
+        inset 0 0 0 var(--fluid-switch-border-width, 0px)
+          var(--fluid-switch-border, var(--fluid-border-strong, transparent)),
+        var(--fluid-switch-track-shadow, inset 0 1px 1px rgb(0 0 0 / 0.08));
       transition: background-color calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
         var(--fluid-easing-standard);
     }
@@ -127,23 +141,38 @@ export class FluidSwitch extends FluidFormAssociated {
     .thumb {
       position: absolute;
       top: 50%;
-      left: 0.125rem;
-      width: 1rem;
-      height: 1rem;
+      left: var(--fluid-switch-thumb-inset, 0.125rem);
+      width: var(--fluid-switch-thumb-size, 1rem);
+      height: var(--fluid-switch-thumb-size, 1rem);
       background-color: var(--fluid-switch-thumb-bg, var(--fluid-color-white));
-      background-image: linear-gradient(180deg, rgb(255 255 255 / 0.4) 0%, transparent 50%);
+      background-image: var(
+        --fluid-switch-thumb-sheen,
+        linear-gradient(180deg, rgb(255 255 255 / 0.4) 0%, transparent 50%)
+      );
       border-radius: var(--fluid-radius-full);
       box-shadow:
-        0 1px 2px rgb(0 0 0 / 0.15),
-        0 2px 4px rgb(0 0 0 / 0.1),
-        inset 0 1px 0 rgb(255 255 255 / 0.6);
+        inset 0 0 0 var(--fluid-switch-thumb-border-width, 0px)
+          var(--fluid-switch-border, var(--fluid-border-strong, transparent)),
+        var(
+          --fluid-switch-thumb-shadow,
+          0 1px 2px rgb(0 0 0 / 0.15),
+          0 2px 4px rgb(0 0 0 / 0.1),
+          inset 0 1px 0 rgb(255 255 255 / 0.6)
+        );
       transform: translate(0, -50%);
       transition: transform calc(var(--fluid-duration-fast) * var(--fluid-motion, 1))
         var(--fluid-easing-standard);
     }
 
     .base.checked .thumb {
-      transform: translate(1rem, -50%);
+      /* Travel = track width minus the thumb and both insets (1rem at the defaults). */
+      transform: translate(
+        calc(
+          var(--fluid-switch-track-width, 2.25rem) - var(--fluid-switch-thumb-size, 1rem) - 2 *
+            var(--fluid-switch-thumb-inset, 0.125rem)
+        ),
+        -50%
+      );
     }
 
     /* Hidden but focusable native input, keyboard, screen reader, form participation. */

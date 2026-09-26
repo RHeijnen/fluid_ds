@@ -163,7 +163,10 @@ export const primitives = {
         '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
         "fontFamily",
         { $userFacing: true }
-      )
+      ),
+      // Headings and titles (card header, dialog title, stat value). Aliases
+      // the sans family by default, so it only diverges when a theme sets it.
+      display: t("{font.family.sans}", "fontFamily", { $userFacing: true })
     },
     size: {
       $label: "Font sizes",
@@ -265,6 +268,21 @@ export const primitives = {
     }),
     full: t("9999px", "dimension")
   },
+  borderWidth: {
+    $label: "Border widths",
+    $description:
+      "Stroke weight for outlines and dividers. Components read these instead of literal pixel values, so a theme can thicken every edge at once.",
+    // Outer outline of containers and controls (card, list, table, tag ring).
+    default: t("1px", "dimension", {
+      $userFacing: true,
+      $range: { min: 0, max: 6, step: 1, unit: "px" }
+    }),
+    // Internal separators (card header/footer, table rows, tab rail).
+    divider: t("1px", "dimension", {
+      $userFacing: true,
+      $range: { min: 0, max: 4, step: 1, unit: "px" }
+    })
+  },
   duration: {
     $label: "Motion durations",
     fast: t("120ms", "duration", {
@@ -293,7 +311,9 @@ export const primitives = {
     // Exit: starts at rest, accelerates away, for things leaving.
     accelerate: t("cubic-bezier(0.3, 0, 1, 1)", "cubicBezier"),
     // Expressive enter for larger surfaces (dialog/drawer panels).
-    emphasized: t("cubic-bezier(0.05, 0.7, 0.1, 1)", "cubicBezier")
+    emphasized: t("cubic-bezier(0.05, 0.7, 0.1, 1)", "cubicBezier"),
+    // Playful overshoot, for themes that want a springy settle.
+    spring: t("cubic-bezier(0.34, 1.56, 0.64, 1)", "cubicBezier")
   },
   shadow: {
     $label: "Elevation",
@@ -325,7 +345,7 @@ export const primitives = {
       md: t("0.75rem", "dimension"),
       lg: t("1rem", "dimension")
     },
-    borderWidth: t("1px", "dimension"),
+    borderWidth: t("{borderWidth.default}", "dimension"),
     borderRadius: t("0.5rem", "dimension")
   },
   gradient: {

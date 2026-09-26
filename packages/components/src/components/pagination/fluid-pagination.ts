@@ -62,6 +62,8 @@ type PageItem = number | "ellipsis";
  * @uses-token --fluid-font-weight-medium - Control font weight.
  * @uses-token --fluid-duration-fast - Hover transition duration.
  * @uses-token --fluid-easing-standard - Hover transition easing.
+ * @cssproperty --fluid-pagination-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-page-change - Dispatched when the user navigates to a different
  *   page (prev, next, or a numbered button). `detail` is `{ page: number }`,
@@ -127,7 +129,9 @@ export class FluidPagination extends FluidElement {
       user-select: none;
       background-color: var(--fluid-pagination-bg, transparent);
       color: var(--fluid-pagination-fg, var(--fluid-text-primary));
-      box-shadow: inset 0 0 0 1px var(--fluid-pagination-border, var(--fluid-border-default));
+      box-shadow: inset 0 0 0
+        var(--fluid-pagination-border-width, var(--fluid-border-width-default, 1px))
+        var(--fluid-pagination-border, var(--fluid-border-default));
       transition:
         background-color var(--fluid-duration-fast) var(--fluid-easing-standard),
         color var(--fluid-duration-fast) var(--fluid-easing-standard);

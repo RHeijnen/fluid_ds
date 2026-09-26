@@ -244,6 +244,8 @@ interface KeyboardLink {
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-focus-ring-offset - Focus ring offset (scales with conformance).
  * @uses-token --fluid-target-min - Minimum port target size (24px AA / 44px AAA).
+ * @cssproperty --fluid-node-graph-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-node-move - A node moved. detail: { id, x, y }.
  * @fires fluid-node-remove - A node (and its edges) was removed. detail: { id }.
@@ -364,7 +366,8 @@ export class FluidNodeGraph extends FluidElement {
     .node {
       position: absolute;
       pointer-events: auto;
-      border: 1px solid var(--fluid-node-graph-node-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-node-graph-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-node-graph-node-border, var(--fluid-border-default, #e4e4e7));
       /* Graph ports and edge coordinates are physical: input remains on the
          left and output remains on the right in every writing direction. */
       border-left: 4px solid var(--node-accent, var(--fluid-accent-base, #4f46e5));
@@ -516,7 +519,8 @@ export class FluidNodeGraph extends FluidElement {
       font-size: var(--fluid-font-size-xs, 0.75rem);
       color: var(--fluid-text-secondary, #52525b);
       background: var(--fluid-node-graph-node-bg, var(--fluid-surface-base, #ffffff));
-      border: 1px solid var(--fluid-node-graph-node-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-node-graph-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-node-graph-node-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-radius-full, 999px);
       padding: var(--fluid-space-1, 0.25rem) var(--fluid-space-2, 0.5rem);
       pointer-events: none;

@@ -26,6 +26,8 @@ import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
 import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/glass.css";
+import "@fluid-ds/themes/orchid.css";
+import "@fluid-ds/themes/rainbow.css";
 ```
 
 ## What's in the box
@@ -37,8 +39,13 @@ import "@fluid-ds/themes/glass.css";
   container, not `<html>`, so the frost has something to blur). Composes with the
   light/dark colour scheme: the wash and frost invert to a dark material under
   `data-fluid-theme="dark"`.
+- `src/orchid.css`: airy spacing, soft round corners, slower motion
+- `src/rainbow.css`: playful pastels, cream paper, 3px ink outlines, squircle
+  corners and solid offset "pop" shadows. Names Fredoka (display) and Nunito
+  (body); your app loads them, for example from `@fontsource-variable/fredoka`
+  and `@fontsource-variable/nunito`.
 
-Each theme is a single `[data-fluid-brand="..."]` rule that overrides the
+Each theme is a `[data-fluid-brand="..."]` rule set that overrides the
 semantic tokens. Pair with [`@fluid-ds/tokens`](../tokens) as the base.
 
 ### Glass: frosting your own chrome
@@ -58,6 +65,23 @@ one definition in `glass.css`:
 The frost is driven by `--glass-frost`, `--glass-frost-border` and
 `--glass-blur`, so overriding those on the container retunes every frosted
 surface at once.
+
+### Rainbow: painting with the palette
+
+Rainbow exposes its pastels as public custom properties on the themed element,
+so your own markup can match: `--rainbow-blue`, `--rainbow-green`,
+`--rainbow-yellow`, `--rainbow-pink`, `--rainbow-purple`, `--rainbow-coral`,
+`--rainbow-tan`, plus `--rainbow-ink`, `--rainbow-cream` and `--rainbow-sand`.
+
+```html
+<html data-fluid-brand="rainbow">
+  <div
+    style="background: var(--rainbow-yellow); border: 3px solid var(--rainbow-ink)"
+  >
+    Sticker
+  </div>
+</html>
+```
 
 ## Roll your own
 

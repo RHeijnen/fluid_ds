@@ -183,6 +183,17 @@ const USES_FALLBACK: Record<string, string[]> = {
   "fluid-sparkline": ["--fluid-color-primary"],
   "fluid-markdown": ["--fluid-text-primary", "--fluid-color-primary", "--fluid-surface-muted"],
   "fluid-qr-code": ["--fluid-text-primary"],
+  "fluid-rainbow-landscape": [
+    "--fluid-border-strong",
+    "--fluid-surface-base",
+    "--fluid-color-brand-200"
+  ],
+  "fluid-rainbow-clock": ["--fluid-font-family-display"],
+  "fluid-rainbow-battery": [
+    "--fluid-border-strong",
+    "--fluid-surface-base",
+    "--fluid-text-primary"
+  ],
   "fluid-animated-image": [],
   "fluid-video": [],
   "fluid-video-playlist": [

@@ -1,0 +1,511 @@
+/*
+ * Rainbow, a playful pastel preset.
+ *
+ * Inspired by illustrated "rough edge" phone themes: cream paper, chunky ink
+ * outlines on every surface, big squircle corners, flat pastel fills and solid
+ * offset "pop" shadows instead of soft blur. Labels on pastel fills are ink,
+ * never white, which is what keeps every tone above the AA floor.
+ *
+ * Usage: load this stylesheet, then set `data-fluid-brand="rainbow"` on
+ * <html> (global) or any subtree you want themed.
+ *
+ *   <html data-fluid-brand="rainbow">
+ *     <link rel="stylesheet" href="@fluid-ds/themes/rainbow.css">
+ *
+ * The theme names two fonts and the consuming app loads them: Fredoka for
+ * headings (--fluid-font-family-display) and Nunito for body text. Both are on
+ * Google Fonts and @fontsource. Without them it degrades to the system
+ * rounded or sans stack.
+ *
+ * Composes with the light/dark color scheme (data-fluid-theme). Dark keeps the
+ * pastel fills and flips the paper to warm charcoal with cream outlines.
+ *
+ * How the colors are wired: every color decision is a private --rainbow-* value,
+ * and the Fluid semantics read those. A custom property that reads another is
+ * substituted where it is declared, so each scheme block below restates the
+ * semantics it changes rather than only the private values.
+ */
+[data-fluid-brand="rainbow"] {
+  /* ── Private palette (light) ─────────────────────────────────────────── */
+  --rainbow-ink: #3b3634;
+  --rainbow-ink-strong: #1f1b1a;
+  --rainbow-paper: #ffffff;
+  --rainbow-cream: #fdf5ef;
+  --rainbow-sand: #f6ebe1;
+  --rainbow-line: var(--rainbow-ink);
+  --rainbow-pop: var(--rainbow-ink);
+
+  /* The pastel set. Public so apps and illustrations can paint with it. */
+  --rainbow-blue: #aebdf0;
+  --rainbow-green: #9cc587;
+  --rainbow-yellow: #ffd86e;
+  --rainbow-pink: #f6b3c4;
+  --rainbow-purple: #bba8e0;
+  --rainbow-coral: #f28b7b;
+  --rainbow-tan: #c4a595;
+  /* Deeper companions, for illustration details (tree crowns, shading). */
+  --rainbow-blue-deep: #8ea3e6;
+  --rainbow-green-deep: #6f9f63;
+  --rainbow-purple-deep: #9a82c9;
+  --rainbow-rose: #e8738a;
+
+  /* Brand ramp, periwinkle. The accent sits at the pastel end (400) and
+     carries ink text; the deep end (700+) is for text and focus on paper. */
+  --fluid-color-brand-50: #f3f5fd;
+  --fluid-color-brand-100: #e6ebfb;
+  --fluid-color-brand-200: #d6def8;
+  --fluid-color-brand-300: #c3cef4;
+  --fluid-color-brand-400: #aebdf0;
+  --fluid-color-brand-500: #97a9ea;
+  --fluid-color-brand-600: #7087d9;
+  --fluid-color-brand-700: #4a5cb4;
+  --fluid-color-brand-800: #3a4891;
+  --fluid-color-brand-900: #2d3870;
+
+  /* Warm the neutral ramp so grays read as paper and cocoa, not steel. */
+  --fluid-color-neutral-50: #fdf9f5;
+  --fluid-color-neutral-100: #f6ebe1;
+  --fluid-color-neutral-200: #ecdcc8;
+  --fluid-color-neutral-300: #dccab8;
+  --fluid-color-neutral-400: #b3a397;
+  --fluid-color-neutral-500: #857873;
+  --fluid-color-neutral-600: #655c58;
+  --fluid-color-neutral-700: #4d4542;
+  --fluid-color-neutral-800: #3b3634;
+  --fluid-color-neutral-900: #2a2523;
+  --fluid-color-neutral-950: #1f1b1a;
+
+  /* Status ramps, pastel. Badges, tags and callouts read these raw scales
+     directly (tint at 50/100, pastel at 300/400, deep text at 700+), so they
+     are remapped here. The semantic tones below are declared explicitly. */
+  /* emerald -> green */
+  --fluid-color-emerald-50: #f1f8ed;
+  --fluid-color-emerald-100: #e2f0da;
+  --fluid-color-emerald-200: #c8e0bb;
+  --fluid-color-emerald-300: #b3d3a2;
+  --fluid-color-emerald-400: #9cc587;
+  --fluid-color-emerald-500: #7faf68;
+  --fluid-color-emerald-600: #5f8f4a;
+  --fluid-color-emerald-700: #4a7a3a;
+  --fluid-color-emerald-800: #3d6b30;
+  --fluid-color-emerald-900: #2f5424;
+  /* red -> coral */
+  --fluid-color-red-50: #fdf0ee;
+  --fluid-color-red-100: #fbe0dc;
+  --fluid-color-red-200: #f8bdb3;
+  --fluid-color-red-300: #f5a497;
+  --fluid-color-red-400: #f28b7b;
+  --fluid-color-red-500: #e56f5d;
+  --fluid-color-red-600: #cc5040;
+  --fluid-color-red-700: #b23a2a;
+  --fluid-color-red-800: #8f2c1f;
+  --fluid-color-red-900: #6f2218;
+  /* amber -> yellow */
+  --fluid-color-amber-50: #fffaeb;
+  --fluid-color-amber-100: #fff3cf;
+  --fluid-color-amber-200: #ffebb2;
+  --fluid-color-amber-300: #ffe291;
+  --fluid-color-amber-400: #ffd86e;
+  --fluid-color-amber-500: #f5c14a;
+  --fluid-color-amber-600: #d99e22;
+  --fluid-color-amber-700: #a87a10;
+  --fluid-color-amber-800: #80600a;
+  --fluid-color-amber-900: #624807;
+  /* sky -> lavender */
+  --fluid-color-sky-50: #f6f3fb;
+  --fluid-color-sky-100: #ede7f7;
+  --fluid-color-sky-200: #dbd0ee;
+  --fluid-color-sky-300: #cbbce7;
+  --fluid-color-sky-400: #bba8e0;
+  --fluid-color-sky-500: #a48dd3;
+  --fluid-color-sky-600: #8a6fc2;
+  --fluid-color-sky-700: #6a4fa8;
+  --fluid-color-sky-800: #523b86;
+  --fluid-color-sky-900: #3f2d68;
+
+  /* ── Shape ───────────────────────────────────────────────────────────── */
+  --fluid-border-width-default: 3px;
+  --fluid-border-width-divider: 2px;
+  --fluid-field-border-width: 3px;
+  --fluid-radius-sm: 0.5rem;
+  --fluid-radius-md: 0.875rem;
+  --fluid-radius-lg: 1.5rem;
+  --fluid-radius-xl: 2rem;
+  --fluid-field-border-radius: 0.875rem;
+
+  /* No glossy sheen: fills are flat, like cut paper. */
+  --fluid-gradient-glossy: none;
+  --fluid-gradient-glossy-inverse: none;
+
+  /* ── Type ────────────────────────────────────────────────────────────── */
+  --fluid-font-family-sans:
+    "Nunito Variable", "Nunito", ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --fluid-font-family-display:
+    "Fredoka Variable", "Fredoka", ui-rounded, "SF Pro Rounded", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+
+  /* ── Motion: a little slower, with a springy settle ──────────────────── */
+  --fluid-duration-fast: 160ms;
+  --fluid-duration-normal: 260ms;
+  --fluid-dialog-enter-animation: fluid-pop-in;
+  --fluid-dialog-enter-easing: var(--fluid-easing-spring);
+
+  /* ── Components ──────────────────────────────────────────────────────── */
+  /* Buttons: a pill with an ink outline that sits on a solid shadow and sinks
+     into it when pressed. The outline color comes from --fluid-border-* so it
+     follows the scheme without restating here. */
+  --fluid-button-radius: var(--fluid-radius-full);
+  --fluid-button-border-width: 3px;
+  --fluid-button-font-family: var(--fluid-font-family-display);
+  --fluid-button-font-weight: var(--fluid-font-weight-semibold);
+  --fluid-button-press-offset: 3px;
+  --fluid-button-pressed-shadow: inset 0 3px 0 rgb(0 0 0 / 0.12);
+
+  --fluid-card-header-font-family: var(--fluid-font-family-display);
+  --fluid-dialog-title-font-family: var(--fluid-font-family-display);
+  --fluid-dialog-outline-width: 3px;
+
+  /* Switch: a chunkier track with room for the outline inside it. */
+  --fluid-switch-track-width: 2.875rem;
+  --fluid-switch-track-height: 1.625rem;
+  --fluid-switch-thumb-size: 0.875rem;
+  --fluid-switch-thumb-inset: 0.375rem;
+  --fluid-switch-border-width: 3px;
+  --fluid-switch-thumb-border-width: 3px;
+  /* Shadow knobs that share a list with an outline ring take a transparent
+     shadow, not none (none is only valid on its own). */
+  --fluid-switch-track-shadow: 0 0 #0000;
+  --fluid-switch-thumb-shadow: 0 0 #0000;
+  --fluid-switch-thumb-sheen: none;
+
+  --fluid-badge-border-width: 2px;
+  --fluid-tag-border-width: 2px;
+  --fluid-input-shadow: none;
+}
+
+/*
+ * Color semantics and everything that reads the ink, light scheme.
+ *
+ * Kept apart from the shape block so the dark and AAA blocks below restate
+ * exactly this list and nothing else.
+ */
+[data-fluid-brand="rainbow"] {
+  --fluid-surface-base: var(--rainbow-paper);
+  --fluid-surface-subtle: var(--rainbow-cream);
+  --fluid-surface-muted: var(--rainbow-sand);
+  --fluid-text-primary: var(--rainbow-ink); /* 11.91 / 11.05 / 10.15:1 on the surfaces */
+  --fluid-text-secondary: #5e5552; /* 7.25 / 6.73 / 6.17:1 */
+  --fluid-text-inverse: var(--rainbow-paper);
+  --fluid-border-default: var(--rainbow-line);
+  --fluid-border-strong: var(--rainbow-line);
+
+  /* Every fill is a pastel and every label on it is ink, so the ladders run
+     toward white (lighter on hover and press) the way the warning tone does
+     in the base tokens. Ratios are ink on the fill. */
+  --fluid-accent-base: var(--fluid-color-brand-400); /* #aebdf0, 6.43:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300); /* #c3cef4, 7.63:1 */
+  --fluid-accent-active: var(--fluid-color-brand-200); /* #d6def8, 8.88:1 */
+  --fluid-accent-text: var(--rainbow-ink);
+  --fluid-accent-fg: var(--fluid-color-brand-700); /* 6.03 / 5.60 / 5.14:1 on the surfaces */
+  --fluid-neutral-fg: #655c58; /* 6.51 / 6.04 / 5.55:1 */
+  --fluid-success-fg: #3d6b30; /* 6.28 / 5.83 / 5.35:1 */
+  --fluid-danger-fg: #b23a2a; /* 5.95 / 5.52 / 5.07:1 */
+  --fluid-warning-fg: #80600a; /* 5.84 / 5.42 / 4.98:1 */
+  --fluid-info-fg: #6a4fa8; /* 6.37 / 5.91 / 5.43:1 */
+  --fluid-focus-ring-color: var(--fluid-color-brand-700); /* 5.60:1 on cream */
+
+  /* Tones go pastel too, a deliberate departure from theme-independent
+     status colors (titanium sets the precedent): the whole point of the look
+     is that color arrives as soft fills with ink on top. Each keeps its
+     meaning: green success, coral danger, yellow warning, lavender info. */
+  --fluid-neutral-base: var(--rainbow-tan); /* 5.20:1 */
+  --fluid-neutral-hover: #d2b9ac; /* 6.39:1 */
+  --fluid-neutral-active: #dfcdc3; /* 7.75:1 */
+  --fluid-neutral-text: var(--rainbow-ink);
+  --fluid-success-base: var(--rainbow-green); /* 6.10:1 */
+  --fluid-success-hover: #b3d3a2; /* 7.23:1 */
+  --fluid-success-active: #c8e0bb; /* 8.41:1 */
+  --fluid-success-text: var(--rainbow-ink);
+  --fluid-danger-base: var(--rainbow-coral); /* 4.97:1 */
+  --fluid-danger-hover: #f5a497; /* 6.03:1 */
+  --fluid-danger-active: #f8bdb3; /* 7.33:1 */
+  --fluid-danger-text: var(--rainbow-ink);
+  --fluid-warning-base: var(--rainbow-yellow); /* 8.68:1 */
+  --fluid-warning-hover: #ffe291; /* 9.38:1 */
+  --fluid-warning-active: #ffebb2; /* 10.08:1 */
+  --fluid-warning-text: var(--rainbow-ink);
+  --fluid-info-base: var(--rainbow-purple); /* 5.55:1 */
+  --fluid-info-hover: #cbbce7; /* 6.74:1 */
+  --fluid-info-active: #dbd0ee; /* 8.09:1 */
+  --fluid-info-text: var(--rainbow-ink);
+
+  /* Solid offset shadows. The card's elevated variant draws its outline as a
+     spread ring so it matches the outlined variant's weight. */
+  --fluid-shadow-sm: 0 2px 0 var(--rainbow-pop);
+  --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
+  --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
+  --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
+  --fluid-card-shadow-md:
+    0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
+    0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+  --fluid-switch-track-bg: var(--rainbow-sand);
+  --fluid-switch-border: var(--rainbow-line);
+  --fluid-tag-info-border: var(--rainbow-line);
+  --fluid-tag-success-border: var(--rainbow-line);
+  --fluid-tag-warning-border: var(--rainbow-line);
+  --fluid-tag-danger-border: var(--rainbow-line);
+
+  background-color: var(--fluid-surface-subtle);
+  color: var(--fluid-text-primary);
+}
+
+/* Low-specificity defaults for the page itself, easy for an app to override. */
+:where([data-fluid-brand="rainbow"]) {
+  font-family: var(--fluid-font-family-sans);
+}
+:where([data-fluid-brand="rainbow"]) :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--fluid-font-family-display);
+}
+
+/*
+ * Dark: warm charcoal paper, cream outlines, near-black pop shadows. The pastel
+ * fills and their ink labels are unchanged, so every tone ratio above holds.
+ * The trailing descendant form is the region case, a dark section inside a
+ * light rainbow page.
+ */
+[data-fluid-theme="dark"] [data-fluid-brand="rainbow"],
+[data-fluid-brand="rainbow"][data-fluid-theme="dark"],
+[data-fluid-brand="rainbow"] [data-fluid-theme="dark"] {
+  --rainbow-line: #e9dccf; /* 11.10:1 on the page */
+  --rainbow-pop: #120f0e;
+  --fluid-surface-base: #332d2a;
+  --fluid-surface-subtle: #2b2624;
+  --fluid-surface-muted: #3d3632;
+  --fluid-text-primary: var(--rainbow-cream); /* 12.57 / 13.86 / 10.99:1 */
+  --fluid-text-secondary: #d4c6ba; /* 8.12 / 8.96 / 7.10:1 */
+  --fluid-text-inverse: var(--rainbow-ink);
+  --fluid-border-default: var(--rainbow-line);
+  --fluid-border-strong: var(--rainbow-line);
+  --fluid-focus-ring-color: var(--fluid-color-brand-400); /* 8.07:1 on the page */
+  --fluid-accent-base: var(--fluid-color-brand-400);
+  --fluid-accent-hover: var(--fluid-color-brand-300);
+  --fluid-accent-active: var(--fluid-color-brand-200);
+  --fluid-accent-text: var(--rainbow-ink);
+  --fluid-accent-fg: var(--fluid-color-brand-400);
+  --fluid-neutral-fg: var(--rainbow-tan);
+  --fluid-success-fg: var(--rainbow-green);
+  --fluid-danger-fg: var(--rainbow-coral);
+  --fluid-warning-fg: var(--rainbow-yellow);
+  --fluid-info-fg: var(--rainbow-purple);
+  --fluid-neutral-base: var(--rainbow-tan);
+  --fluid-neutral-hover: #d2b9ac;
+  --fluid-neutral-active: #dfcdc3;
+  --fluid-neutral-text: var(--rainbow-ink);
+  --fluid-success-base: var(--rainbow-green);
+  --fluid-success-hover: #b3d3a2;
+  --fluid-success-active: #c8e0bb;
+  --fluid-success-text: var(--rainbow-ink);
+  --fluid-danger-base: var(--rainbow-coral);
+  --fluid-danger-hover: #f5a497;
+  --fluid-danger-active: #f8bdb3;
+  --fluid-danger-text: var(--rainbow-ink);
+  --fluid-warning-base: var(--rainbow-yellow);
+  --fluid-warning-hover: #ffe291;
+  --fluid-warning-active: #ffebb2;
+  --fluid-warning-text: var(--rainbow-ink);
+  --fluid-info-base: var(--rainbow-purple);
+  --fluid-info-hover: #cbbce7;
+  --fluid-info-active: #dbd0ee;
+  --fluid-info-text: var(--rainbow-ink);
+  --fluid-shadow-sm: 0 2px 0 var(--rainbow-pop);
+  --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
+  --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
+  --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+  --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
+  --fluid-card-shadow-md:
+    0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
+    0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+  --fluid-switch-track-bg: var(--fluid-surface-muted);
+  --fluid-switch-border: var(--rainbow-line);
+  --fluid-tag-info-border: var(--rainbow-line);
+  --fluid-tag-success-border: var(--rainbow-line);
+  --fluid-tag-warning-border: var(--rainbow-line);
+  --fluid-tag-danger-border: var(--rainbow-line);
+  background-color: var(--fluid-surface-subtle);
+  color: var(--fluid-text-primary);
+}
+
+/* The dark blocks above only match when a scheme is named. When the operating
+   system asks for dark and nothing sets the attribute, the automatic dark block
+   in @fluid-ds/tokens would out-rank the plain brand block, so the same dark
+   values are restated under the media query. */
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="rainbow"]:not([data-fluid-theme="light"]) {
+    --rainbow-line: #e9dccf;
+    --rainbow-pop: #120f0e;
+    --fluid-surface-base: #332d2a;
+    --fluid-surface-subtle: #2b2624;
+    --fluid-surface-muted: #3d3632;
+    --fluid-text-primary: var(--rainbow-cream);
+    --fluid-text-secondary: #d4c6ba;
+    --fluid-text-inverse: var(--rainbow-ink);
+    --fluid-border-default: var(--rainbow-line);
+    --fluid-border-strong: var(--rainbow-line);
+    --fluid-focus-ring-color: var(--fluid-color-brand-400);
+    --fluid-accent-base: var(--fluid-color-brand-400);
+    --fluid-accent-hover: var(--fluid-color-brand-300);
+    --fluid-accent-active: var(--fluid-color-brand-200);
+    --fluid-accent-text: var(--rainbow-ink);
+    --fluid-accent-fg: var(--fluid-color-brand-400);
+    --fluid-neutral-fg: var(--rainbow-tan);
+    --fluid-success-fg: var(--rainbow-green);
+    --fluid-danger-fg: var(--rainbow-coral);
+    --fluid-warning-fg: var(--rainbow-yellow);
+    --fluid-info-fg: var(--rainbow-purple);
+    --fluid-neutral-base: var(--rainbow-tan);
+    --fluid-neutral-hover: #d2b9ac;
+    --fluid-neutral-active: #dfcdc3;
+    --fluid-neutral-text: var(--rainbow-ink);
+    --fluid-success-base: var(--rainbow-green);
+    --fluid-success-hover: #b3d3a2;
+    --fluid-success-active: #c8e0bb;
+    --fluid-success-text: var(--rainbow-ink);
+    --fluid-danger-base: var(--rainbow-coral);
+    --fluid-danger-hover: #f5a497;
+    --fluid-danger-active: #f8bdb3;
+    --fluid-danger-text: var(--rainbow-ink);
+    --fluid-warning-base: var(--rainbow-yellow);
+    --fluid-warning-hover: #ffe291;
+    --fluid-warning-active: #ffebb2;
+    --fluid-warning-text: var(--rainbow-ink);
+    --fluid-info-base: var(--rainbow-purple);
+    --fluid-info-hover: #cbbce7;
+    --fluid-info-active: #dbd0ee;
+    --fluid-info-text: var(--rainbow-ink);
+    --fluid-shadow-sm: 0 2px 0 var(--rainbow-pop);
+    --fluid-shadow-md: 0 4px 0 var(--rainbow-pop);
+    --fluid-shadow-lg: 0 6px 0 var(--rainbow-pop);
+    --fluid-button-shadow: 0 4px 0 var(--rainbow-pop);
+    --fluid-button-active-shadow: 0 1px 0 var(--rainbow-pop);
+    --fluid-card-shadow-md:
+      0 0 0 var(--fluid-border-width-default) var(--rainbow-line),
+      0 4px 0 var(--fluid-border-width-default) var(--rainbow-pop);
+    --fluid-switch-track-bg: var(--fluid-surface-muted);
+    --fluid-switch-border: var(--rainbow-line);
+    --fluid-tag-info-border: var(--rainbow-line);
+    --fluid-tag-success-border: var(--rainbow-line);
+    --fluid-tag-warning-border: var(--rainbow-line);
+    --fluid-tag-danger-border: var(--rainbow-line);
+    background-color: var(--fluid-surface-subtle);
+    color: var(--fluid-text-primary);
+  }
+}
+
+/*
+ * Enhanced contrast (WCAG 2.2 SC 1.4.6, AAA, 7:1 for normal text).
+ *
+ * The fills stay pastel; only the ink deepens. #1f1b1a on the weakest fill
+ * (coral #f28b7b) reads 7.12:1, so every tone clears 7 without changing hue.
+ * The AAA blocks in @fluid-ds/tokens move the accent and tones to deep ramp
+ * steps meant for white text, so each rainbow track is restated here at a
+ * scope that out-ranks them.
+ *
+ * Light: text-secondary also deepens, #4d4542 on sand reads 8.40:1.
+ */
+[data-fluid-brand="rainbow"][data-fluid-conformance="aaa"],
+[data-fluid-brand="rainbow"]:not([data-fluid-theme="dark"]) [data-fluid-conformance="aaa"] {
+  --fluid-text-primary: var(--rainbow-ink-strong);
+  --fluid-text-secondary: #4d4542;
+  --fluid-accent-base: var(--fluid-color-brand-400); /* 9.22:1 */
+  --fluid-accent-hover: var(--fluid-color-brand-300);
+  --fluid-accent-active: var(--fluid-color-brand-200);
+  --fluid-accent-text: var(--rainbow-ink-strong);
+  --fluid-accent-fg: var(--fluid-color-brand-800); /* 8.35 / 7.74 / 7.11:1 */
+  --fluid-neutral-fg: #4d4542;
+  --fluid-success-fg: #2f5424;
+  --fluid-danger-fg: #8f2c1f;
+  --fluid-warning-fg: #624807;
+  --fluid-info-fg: #523b86;
+  --fluid-neutral-text: var(--rainbow-ink-strong); /* 7.45:1 on tan */
+  --fluid-success-base: var(--rainbow-green); /* 8.74:1 */
+  --fluid-success-hover: #b3d3a2;
+  --fluid-success-active: #c8e0bb;
+  --fluid-success-text: var(--rainbow-ink-strong);
+  --fluid-danger-base: var(--rainbow-coral); /* 7.12:1 */
+  --fluid-danger-hover: #f5a497;
+  --fluid-danger-active: #f8bdb3;
+  --fluid-danger-text: var(--rainbow-ink-strong);
+  --fluid-warning-text: var(--rainbow-ink-strong);
+  --fluid-info-base: var(--rainbow-purple); /* 7.96:1 */
+  --fluid-info-hover: #cbbce7;
+  --fluid-info-active: #dbd0ee;
+  --fluid-info-text: var(--rainbow-ink-strong);
+}
+
+/* Dark AAA: the page text already clears 7:1 (secondary is 7.10:1 at its
+   weakest), so only the labels on fills deepen. Stated on every dark path for
+   the same source-order reason as the other presets. */
+[data-fluid-theme="dark"] [data-fluid-brand="rainbow"][data-fluid-conformance="aaa"],
+[data-fluid-brand="rainbow"][data-fluid-theme="dark"][data-fluid-conformance="aaa"],
+[data-fluid-brand="rainbow"][data-fluid-theme="dark"] [data-fluid-conformance="aaa"] {
+  --fluid-text-primary: var(--rainbow-cream);
+  --fluid-text-secondary: #d4c6ba;
+  --fluid-accent-base: var(--fluid-color-brand-400);
+  --fluid-accent-hover: var(--fluid-color-brand-300);
+  --fluid-accent-active: var(--fluid-color-brand-200);
+  --fluid-accent-text: var(--rainbow-ink-strong);
+  --fluid-accent-fg: var(--fluid-color-brand-200);
+  --fluid-neutral-fg: #dfcdc3;
+  --fluid-success-fg: #c8e0bb;
+  --fluid-danger-fg: #f8bdb3;
+  --fluid-warning-fg: #ffebb2;
+  --fluid-info-fg: #dbd0ee;
+  --fluid-neutral-text: var(--rainbow-ink-strong);
+  --fluid-success-base: var(--rainbow-green);
+  --fluid-success-hover: #b3d3a2;
+  --fluid-success-active: #c8e0bb;
+  --fluid-success-text: var(--rainbow-ink-strong);
+  --fluid-danger-base: var(--rainbow-coral);
+  --fluid-danger-hover: #f5a497;
+  --fluid-danger-active: #f8bdb3;
+  --fluid-danger-text: var(--rainbow-ink-strong);
+  --fluid-warning-text: var(--rainbow-ink-strong);
+  --fluid-info-base: var(--rainbow-purple);
+  --fluid-info-hover: #cbbce7;
+  --fluid-info-active: #dbd0ee;
+  --fluid-info-text: var(--rainbow-ink-strong);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-fluid-brand="rainbow"][data-fluid-conformance="aaa"]:not([data-fluid-theme="light"]),
+  [data-fluid-brand="rainbow"]:not([data-fluid-theme="light"]) [data-fluid-conformance="aaa"] {
+    --fluid-text-primary: var(--rainbow-cream);
+    --fluid-text-secondary: #d4c6ba;
+    --fluid-accent-base: var(--fluid-color-brand-400);
+    --fluid-accent-hover: var(--fluid-color-brand-300);
+    --fluid-accent-active: var(--fluid-color-brand-200);
+    --fluid-accent-text: var(--rainbow-ink-strong);
+    --fluid-accent-fg: var(--fluid-color-brand-200);
+    --fluid-neutral-fg: #dfcdc3;
+    --fluid-success-fg: #c8e0bb;
+    --fluid-danger-fg: #f8bdb3;
+    --fluid-warning-fg: #ffebb2;
+    --fluid-info-fg: #dbd0ee;
+    --fluid-neutral-text: var(--rainbow-ink-strong);
+    --fluid-success-base: var(--rainbow-green);
+    --fluid-success-hover: #b3d3a2;
+    --fluid-success-active: #c8e0bb;
+    --fluid-success-text: var(--rainbow-ink-strong);
+    --fluid-danger-base: var(--rainbow-coral);
+    --fluid-danger-hover: #f5a497;
+    --fluid-danger-active: #f8bdb3;
+    --fluid-danger-text: var(--rainbow-ink-strong);
+    --fluid-warning-text: var(--rainbow-ink-strong);
+    --fluid-info-base: var(--rainbow-purple);
+    --fluid-info-hover: #cbbce7;
+    --fluid-info-active: #dbd0ee;
+    --fluid-info-text: var(--rainbow-ink-strong);
+  }
+}

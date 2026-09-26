@@ -50,6 +50,8 @@ import type { Blueprint } from "../../core/types.js";
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-focus-ring-offset - Focus ring offset.
  * @uses-token --fluid-target-min - Minimum interactive-target size (24px AA / 44px AAA).
+ * @cssproperty --fluid-column-mapper-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-mapping-change - The mapping changed. detail: { mapping: Record<string, string | null> }.
  */
@@ -101,7 +103,8 @@ export class FluidColumnMapper extends FluidElement {
         font-size: var(--fluid-font-size-sm);
         color: var(--fluid-mapper-fg, var(--fluid-text-primary));
         background: var(--fluid-mapper-select-bg, var(--fluid-surface-base));
-        border: 1px solid var(--fluid-mapper-border, var(--fluid-border-default));
+        border: var(--fluid-column-mapper-border-width, var(--fluid-border-width-default, 1px))
+          solid var(--fluid-mapper-border, var(--fluid-border-default));
         border-radius: var(--fluid-mapper-radius, var(--fluid-radius-md));
       }
       select:focus-visible {

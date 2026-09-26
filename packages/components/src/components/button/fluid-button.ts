@@ -54,6 +54,11 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @cssproperty --fluid-button-border - Outline color (secondary variant). Falls back to --fluid-border-default.
  * @cssproperty --fluid-button-active-border - Active outline color. Falls back to --fluid-button-border.
  * @cssproperty --fluid-button-radius - Corner radius. Falls back to --fluid-radius-md.
+ * @cssproperty --fluid-button-border-width - Outline stroke. Falls back to 0 on primary and --fluid-border-width-default on secondary.
+ * @cssproperty --fluid-button-shadow - Resting elevation, all filled variants. Falls back to the built-in soft shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-button-active-shadow - Elevation while pressed. Falls back to the built-in pressed shadow per variant. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-button-pressed-shadow - Elevation of a toggled-on (aria-pressed) button. Falls back to a soft inset shadow. Combined with the outline ring, so remove it with `0 0 #0000`, not `none`.
+ * @cssproperty --fluid-button-press-offset - How far the button sinks while pressed. Falls back to 1px.
  * @cssproperty --fluid-button-padding-block - Vertical inner padding, all sizes. Falls back to the per-size default (--fluid-space-1 / 0 / --fluid-space-3).
  * @cssproperty --fluid-button-padding-inline - Horizontal inner padding, all sizes. Falls back to the per-size default (--fluid-space-3 / --fluid-space-4 / --fluid-space-5).
  * @cssproperty --fluid-button-padding-inline-icon - Horizontal padding on a side occupied by a prefix/suffix icon (and both sides of icon-only buttons). Falls back one step tighter than the per-size default.
@@ -67,17 +72,23 @@ export type FluidButtonTone = "brand" | "neutral" | "success" | "danger" | "warn
  * @cssproperty --fluid-button-focus-ring-offset - Focus ring offset. Falls back to --fluid-focus-ring-offset.
  *
  * @uses-token --fluid-accent-base - Primary background; secondary/ghost text (per tone).
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-accent-hover - Primary hover background.
  * @uses-token --fluid-accent-active - Primary active background.
  * @uses-token --fluid-accent-text - Primary text color.
  * @uses-token --fluid-surface-base - Secondary variant background.
  * @uses-token --fluid-border-default - Secondary variant outline.
  * @uses-token --fluid-border-strong - Secondary active outline.
+ * @uses-token --fluid-border-width-default - Secondary outline stroke width.
  * @uses-token --fluid-neutral-base - `tone="neutral"` accent track (base/hover/active/text).
  * @uses-token --fluid-success-base - `tone="success"` accent track.
  * @uses-token --fluid-danger-base - `tone="danger"` accent track.
  * @uses-token --fluid-warning-base - `tone="warning"` accent track.
  * @uses-token --fluid-info-base - `tone="info"` accent track.
+ * @uses-token --fluid-success-fg - Optional tone text color for outline/ghost labels; falls back to the tone base. Likewise --fluid-neutral-fg, --fluid-danger-fg, --fluid-warning-fg, --fluid-info-fg.
+ * @uses-token --fluid-danger-fg - Optional danger text color; falls back to --fluid-danger-base.
+ * @uses-token --fluid-warning-fg - Optional warning text color; falls back to --fluid-warning-base.
+ * @uses-token --fluid-info-fg - Optional info text color; falls back to --fluid-info-base.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-focus-ring-offset - Focus ring offset.
@@ -165,30 +176,35 @@ export class FluidButton extends FluidElement {
       --fluid-accent-hover: var(--fluid-neutral-hover);
       --fluid-accent-active: var(--fluid-neutral-active);
       --fluid-accent-text: var(--fluid-neutral-text);
+      --fluid-accent-fg: var(--fluid-neutral-fg, var(--fluid-neutral-base));
     }
     :host([data-tone="success"]) {
       --fluid-accent-base: var(--fluid-success-base);
       --fluid-accent-hover: var(--fluid-success-hover);
       --fluid-accent-active: var(--fluid-success-active);
       --fluid-accent-text: var(--fluid-success-text);
+      --fluid-accent-fg: var(--fluid-success-fg, var(--fluid-success-base));
     }
     :host([data-tone="danger"]) {
       --fluid-accent-base: var(--fluid-danger-base);
       --fluid-accent-hover: var(--fluid-danger-hover);
       --fluid-accent-active: var(--fluid-danger-active);
       --fluid-accent-text: var(--fluid-danger-text);
+      --fluid-accent-fg: var(--fluid-danger-fg, var(--fluid-danger-base));
     }
     :host([data-tone="warning"]) {
       --fluid-accent-base: var(--fluid-warning-base);
       --fluid-accent-hover: var(--fluid-warning-hover);
       --fluid-accent-active: var(--fluid-warning-active);
       --fluid-accent-text: var(--fluid-warning-text);
+      --fluid-accent-fg: var(--fluid-warning-fg, var(--fluid-warning-base));
     }
     :host([data-tone="info"]) {
       --fluid-accent-base: var(--fluid-info-base);
       --fluid-accent-hover: var(--fluid-info-hover);
       --fluid-accent-active: var(--fluid-info-active);
       --fluid-accent-text: var(--fluid-info-text);
+      --fluid-accent-fg: var(--fluid-info-fg, var(--fluid-info-base));
     }
 
     .button {
@@ -277,7 +293,7 @@ export class FluidButton extends FluidElement {
      * thing your finger remembers.
      */
     .button:active:not([aria-disabled="true"]) {
-      transform: translateY(1px);
+      transform: translateY(var(--fluid-button-press-offset, 1px));
     }
 
     .button[aria-disabled="true"] {
@@ -361,8 +377,13 @@ export class FluidButton extends FluidElement {
       background-image: var(--fluid-gradient-glossy);
       color: var(--fluid-button-fg, var(--fluid-accent-text));
       box-shadow:
-        0 1px 2px rgb(0 0 0 / 0.12),
-        inset 0 1px 0 rgb(255 255 255 / 0.12);
+        inset 0 0 0 var(--fluid-button-border-width, 0px)
+          var(--fluid-button-border, var(--fluid-border-default, transparent)),
+        var(
+          --fluid-button-shadow,
+          0 1px 2px rgb(0 0 0 / 0.12),
+          inset 0 1px 0 rgb(255 255 255 / 0.12)
+        );
     }
     .variant-primary:hover {
       background-color: var(
@@ -376,8 +397,16 @@ export class FluidButton extends FluidElement {
         var(--fluid-button-bg, var(--fluid-accent-active))
       );
       box-shadow:
-        0 1px 1px rgb(0 0 0 / 0.08),
-        inset 0 1px 2px rgb(0 0 0 / 0.1);
+        inset 0 0 0 var(--fluid-button-border-width, 0px)
+          var(
+            --fluid-button-active-border,
+            var(--fluid-button-border, var(--fluid-border-strong, transparent))
+          ),
+        var(
+          --fluid-button-active-shadow,
+          0 1px 1px rgb(0 0 0 / 0.08),
+          inset 0 1px 2px rgb(0 0 0 / 0.1)
+        );
     }
 
     /*
@@ -391,11 +420,15 @@ export class FluidButton extends FluidElement {
     .variant-secondary {
       background-color: var(--fluid-button-bg, var(--fluid-surface-base));
       background-image: var(--fluid-gradient-glossy);
-      color: var(--fluid-button-fg, var(--fluid-accent-base));
+      color: var(--fluid-button-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
       box-shadow:
-        0 1px 2px rgb(0 0 0 / 0.06),
-        inset 0 0 0 1px var(--fluid-button-border, var(--fluid-border-default)),
-        inset 0 1px 0 rgb(255 255 255 / 0.4);
+        inset 0 0 0 var(--fluid-button-border-width, var(--fluid-border-width-default, 1px))
+          var(--fluid-button-border, var(--fluid-border-default)),
+        var(
+          --fluid-button-shadow,
+          0 1px 2px rgb(0 0 0 / 0.06),
+          inset 0 1px 0 rgb(255 255 255 / 0.4)
+        );
     }
     .variant-secondary:hover {
       background-color: var(
@@ -408,9 +441,9 @@ export class FluidButton extends FluidElement {
     }
     .variant-secondary:active:not([aria-disabled="true"]) {
       box-shadow:
-        inset 0 0 0 1px
+        inset 0 0 0 var(--fluid-button-border-width, var(--fluid-border-width-default, 1px))
           var(--fluid-button-active-border, var(--fluid-button-border, var(--fluid-border-strong))),
-        inset 0 1px 2px rgb(0 0 0 / 0.05);
+        var(--fluid-button-active-shadow, inset 0 1px 2px rgb(0 0 0 / 0.05));
     }
 
     /*
@@ -422,7 +455,7 @@ export class FluidButton extends FluidElement {
      */
     .variant-ghost {
       background: var(--fluid-button-bg, transparent);
-      color: var(--fluid-button-fg, var(--fluid-accent-base));
+      color: var(--fluid-button-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
     .variant-ghost:hover {
       background: var(
@@ -446,7 +479,14 @@ export class FluidButton extends FluidElement {
           var(--fluid-button-bg, color-mix(in srgb, var(--fluid-accent-base) 22%, transparent))
         )
       );
-      box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.12);
+      /* The outline ring only draws when a theme sets --fluid-button-border-width. */
+      box-shadow:
+        inset 0 0 0 var(--fluid-button-border-width, 0px)
+          var(
+            --fluid-button-active-border,
+            var(--fluid-button-border, var(--fluid-border-strong, transparent))
+          ),
+        var(--fluid-button-pressed-shadow, inset 0 1px 2px rgb(0 0 0 / 0.12));
     }
 
     /*

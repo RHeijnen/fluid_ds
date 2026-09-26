@@ -56,10 +56,13 @@ export type FluidAnchorNavActiveChangeEvent = CustomEvent<FluidAnchorNavActiveCh
  * @uses-token --fluid-text-secondary - Idle link text.
  * @uses-token --fluid-text-primary - Hovered link text.
  * @uses-token --fluid-accent-base - Active link text + marker.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-border-default - Idle marker rail.
  * @uses-token --fluid-focus-ring-color - Link focus ring.
  * @uses-token --fluid-target-min - Minimum interactive target size (conformance).
  * @uses-token --fluid-focus-ring-width - Focus ring width (conformance).
+ * @cssproperty --fluid-anchor-nav-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires {FluidAnchorNavActiveChangeEvent} fluid-active-change - Dispatched with `{ id }` when the section in view
  *   changes. `id` is the target id of the now-active section, or `null` when no
@@ -89,7 +92,11 @@ export class FluidAnchorNav extends FluidElement {
         display: flex;
         flex-direction: column;
         gap: var(--fluid-anchor-nav-gap, var(--fluid-space-1));
-        border-inline-start: 1px solid var(--fluid-anchor-nav-marker, var(--fluid-border-default));
+        border-inline-start: var(
+            --fluid-anchor-nav-divider-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-anchor-nav-marker, var(--fluid-border-default));
       }
 
       li {
@@ -123,7 +130,7 @@ export class FluidAnchorNav extends FluidElement {
       }
 
       a[aria-current="true"] {
-        color: var(--fluid-anchor-nav-active-fg, var(--fluid-accent-base));
+        color: var(--fluid-anchor-nav-active-fg, var(--fluid-accent-fg, var(--fluid-accent-base)));
         font-weight: var(--fluid-font-weight-medium);
         border-inline-start-color: var(--fluid-anchor-nav-active-marker, var(--fluid-accent-base));
       }

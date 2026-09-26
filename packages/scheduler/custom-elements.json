@@ -37,6 +37,10 @@
             {
               "description": "Row corner radius. Falls back to --fluid-radius-md.",
               "name": "--fluid-availability-editor-radius"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-availability-editor-border-width"
             }
           ],
           "cssParts": [
@@ -531,6 +535,10 @@
             {
               "name": "--fluid-focus-ring-width",
               "description": "Time-input focus ring (2px AA / 3px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-availability-editor",
@@ -1231,6 +1239,10 @@
             {
               "description": "Focus ring width. Falls back to --fluid-focus-ring-width.",
               "name": "--fluid-time-slots-focus-ring-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-time-slots-border-width"
             }
           ],
           "cssParts": [
@@ -1666,6 +1678,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum slot height (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-time-slots",

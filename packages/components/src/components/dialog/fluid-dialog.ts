@@ -49,6 +49,9 @@ export type FluidDialogHideEvent = CustomEvent<null>;
  * @cssproperty [--fluid-dialog-enter-animation=fluid-scale-in] - Panel open animation. Set to another preset (fluid-slide-in-up, fluid-fade-in, …) or `none`.
  * @cssproperty [--fluid-dialog-enter-duration=var(--fluid-duration-normal)] - Panel open duration (scaled by --fluid-motion).
  * @cssproperty [--fluid-dialog-enter-easing=var(--fluid-easing-emphasized)] - Panel open easing.
+ * @cssproperty --fluid-dialog-outline-width - Panel outline stroke. Falls back to 0 (no outline).
+ * @cssproperty --fluid-dialog-outline - Panel outline color. Falls back to --fluid-border-strong.
+ * @cssproperty --fluid-dialog-title-font-family - Title font family. Falls back to the panel font; themes point it at --fluid-font-family-display.
  *
  * @uses-token --fluid-surface-base - Default panel background.
  * @uses-token --fluid-surface-subtle - Footer background.
@@ -62,7 +65,9 @@ export type FluidDialogHideEvent = CustomEvent<null>;
  * @uses-token --fluid-radius-lg - Default panel corner radius.
  * @uses-token --fluid-radius-sm - Close-button corner radius.
  * @uses-token --fluid-font-family-sans - Default font family.
+ * @uses-token --fluid-border-strong - Panel outline color when a theme enables it.
  * @uses-token --fluid-shadow-lg - Panel elevation.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires {FluidDialogShowEvent} fluid-show - Fired when the dialog opens.
  * @fires {FluidDialogHideEvent} fluid-hide - Fired when the dialog closes (any reason).
@@ -105,6 +110,8 @@ export class FluidDialog extends FluidElement {
         background: var(--fluid-dialog-bg, var(--fluid-surface-base));
         border-radius: var(--fluid-dialog-radius, var(--fluid-radius-lg));
         box-shadow: var(--fluid-dialog-shadow, var(--fluid-shadow-lg));
+        border: var(--fluid-dialog-outline-width, 0px) solid
+          var(--fluid-dialog-outline, var(--fluid-border-strong, transparent));
         font-family: var(--fluid-dialog-font-family, var(--fluid-font-family-sans));
         overflow: hidden;
         animation: var(--fluid-dialog-enter-animation, fluid-scale-in)
@@ -139,11 +146,12 @@ export class FluidDialog extends FluidElement {
         justify-content: space-between;
         gap: var(--fluid-space-3);
         padding: var(--fluid-space-4) var(--fluid-space-5);
-        border-bottom: var(--fluid-dialog-border-width, 1px) solid
-          var(--fluid-dialog-header-border, var(--fluid-border-default));
+        border-bottom: var(--fluid-dialog-border-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-dialog-header-border, var(--fluid-border-default));
       }
 
       .label {
+        font-family: var(--fluid-dialog-title-font-family, inherit);
         font-size: var(--fluid-font-size-lg);
         font-weight: var(--fluid-font-weight-semibold);
         flex: 1 1 auto;
@@ -185,7 +193,7 @@ export class FluidDialog extends FluidElement {
         justify-content: flex-end;
         gap: var(--fluid-space-2);
         padding: var(--fluid-space-4) var(--fluid-space-5);
-        border-top: var(--fluid-dialog-border-width, 1px) solid
+        border-top: var(--fluid-dialog-border-width, var(--fluid-border-width-divider, 1px)) solid
           var(--fluid-dialog-footer-border, var(--fluid-border-default));
         background: var(--fluid-dialog-footer-bg, var(--fluid-surface-subtle));
       }

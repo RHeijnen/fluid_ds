@@ -977,6 +977,14 @@
             {
               "description": "Keyboard focus ring color.",
               "name": "--fluid-video-playlist-focus-ring"
+            },
+            {
+              "description": "Divider stroke width. Falls back to --fluid-border-width-divider.",
+              "name": "--fluid-video-playlist-divider-width"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-video-playlist-border-width"
             }
           ],
           "cssParts": [
@@ -1124,6 +1132,14 @@
             {
               "name": "--fluid-focus-ring-width",
               "description": "Conformance-aware focus ring width."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            },
+            {
+              "name": "--fluid-border-width-divider",
+              "description": "Divider stroke width."
             }
           ],
           "tagName": "fluid-video-playlist",

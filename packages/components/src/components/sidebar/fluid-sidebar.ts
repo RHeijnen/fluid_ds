@@ -55,6 +55,7 @@ import { reducedMotion } from "../../internal/motion.js";
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-duration-normal - Default collapse duration.
  * @uses-token --fluid-easing-emphasized - Default collapse easing.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-toggle - Fired when the open state changes. `detail.open` is the new state.
  */
@@ -80,8 +81,8 @@ export class FluidSidebar extends FluidElement {
         overflow: hidden;
         background: var(--fluid-sidebar-bg, var(--fluid-surface-base));
         color: var(--fluid-sidebar-fg, var(--fluid-text-primary));
-        border-inline-end: var(--fluid-sidebar-border-width, 1px) solid
-          var(--fluid-sidebar-border, var(--fluid-border-default));
+        border-inline-end: var(--fluid-sidebar-border-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-sidebar-border, var(--fluid-border-default));
         font-family: var(--fluid-sidebar-font-family, var(--fluid-font-family-sans));
         transition: inline-size
           calc(var(--fluid-sidebar-duration, var(--fluid-duration-normal)) * var(--fluid-motion, 1))
@@ -122,8 +123,11 @@ export class FluidSidebar extends FluidElement {
       .footer {
         flex: 0 0 auto;
         padding: var(--fluid-space-3);
-        border-block-start: var(--fluid-sidebar-border-width, 1px) solid
-          var(--fluid-sidebar-border, var(--fluid-border-default));
+        border-block-start: var(
+            --fluid-sidebar-border-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-sidebar-border, var(--fluid-border-default));
       }
       .footer.empty {
         display: none;

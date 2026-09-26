@@ -26,10 +26,16 @@ export type FluidCardVariant = "elevated" | "outlined" | "filled";
  * @uses-token --fluid-surface-subtle - Footer background.
  * @uses-token --fluid-border-default - Header/footer separators.
  * @uses-token --fluid-text-primary - Text color.
+ * @cssproperty --fluid-card-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-card-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  * @cssproperty --fluid-card-border-default - Component override for the corresponding semantic token.
  * @cssproperty --fluid-card-shadow-md - Component override for the corresponding semantic token.
  * @cssproperty --fluid-card-surface-subtle - Component override for the corresponding semantic token.
  * @cssproperty --fluid-card-text-primary - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-card-radius - Corner radius. Falls back to --fluid-radius-lg.
+ * @cssproperty --fluid-card-header-font-family - Header font family. Falls back to the inherited font; themes point it at --fluid-font-family-display.
  */
 export class FluidCard extends FluidElement {
   static override styles = css`
@@ -45,7 +51,7 @@ export class FluidCard extends FluidElement {
       display: flex;
       flex-direction: column;
       background: var(--fluid-card-bg, var(--fluid-surface-base));
-      border-radius: var(--fluid-radius-lg);
+      border-radius: var(--fluid-card-radius, var(--fluid-radius-lg));
       color: var(--fluid-card-text-primary, var(--fluid-text-primary));
       overflow: hidden;
     }
@@ -55,7 +61,8 @@ export class FluidCard extends FluidElement {
     }
 
     .variant-outlined {
-      border: 1px solid var(--fluid-card-border, var(--fluid-border-default));
+      border: var(--fluid-card-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-card-border, var(--fluid-border-default));
     }
 
     .variant-filled {
@@ -71,12 +78,15 @@ export class FluidCard extends FluidElement {
     }
 
     .header {
-      border-bottom: 1px solid var(--fluid-card-border-default, var(--fluid-border-default));
+      border-bottom: var(--fluid-card-divider-width, var(--fluid-border-width-divider, 1px)) solid
+        var(--fluid-card-border-default, var(--fluid-border-default));
+      font-family: var(--fluid-card-header-font-family, inherit);
       font-weight: var(--fluid-font-weight-semibold);
     }
 
     .footer {
-      border-top: 1px solid var(--fluid-card-border-default, var(--fluid-border-default));
+      border-top: var(--fluid-card-divider-width, var(--fluid-border-width-divider, 1px)) solid
+        var(--fluid-card-border-default, var(--fluid-border-default));
       background: var(--fluid-card-surface-subtle, var(--fluid-surface-subtle));
     }
 

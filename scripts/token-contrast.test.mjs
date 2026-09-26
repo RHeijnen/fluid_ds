@@ -37,7 +37,7 @@ const TOKEN_FILES = [
   "packages/tokens/dist/dark.css"
 ];
 /** `default` is the built-in ramp, i.e. no `data-fluid-brand` attribute. */
-const BRANDS = ["default", "midnight", "corporate", "titanium", "glass", "orchid"];
+const BRANDS = ["default", "midnight", "corporate", "titanium", "glass", "orchid", "rainbow"];
 
 /**
  * The four ways a scheme can be reached. Explicit dark under an OS that
@@ -80,6 +80,21 @@ const PAIRS = [
       label: `${tone}-text on ${tone}-${state}`,
       fg: `--fluid-${tone}-text`,
       bg: `--fluid-${tone}-${state}`
+    }))
+  ),
+  /*
+   * A tone used as text or an icon on a page surface (a secondary button
+   * label, a selected tab, a link-styled toggle). Components read the optional
+   * `--fluid-<tone>-fg` first and fall back to the tone's base fill. The pair
+   * is only measured where a brand declares the `-fg` token, so it asserts
+   * what a theme promises and does not re-grade the fallback.
+   */
+  ...TONES.flatMap((tone) =>
+    ["base", "subtle", "muted"].map((surface) => ({
+      label: `${tone}-fg on surface-${surface}`,
+      fg: `--fluid-${tone}-fg`,
+      bg: `--fluid-surface-${surface}`,
+      optional: true
     }))
   )
 ];
@@ -378,6 +393,7 @@ function measure() {
           }
           const where = placement === "region" ? `${context.name}, region` : context.name;
           for (const pair of PAIRS) {
+            if (pair.optional && !scope.has(pair.fg)) continue;
             const fg = resolveToken(pair.fg, scope);
             const bg = resolveToken(pair.bg, scope);
             rows.push({

@@ -83,14 +83,15 @@ const expectedOrder = [
   "@fluid-ds/node-graph",
   "@fluid-ds/parser",
   "@fluid-ds/qr",
+  "@fluid-ds/rainbow",
   "@fluid-ds/scheduler",
   "@fluid-ds/table",
   "@fluid-ds/react"
 ];
 
-test("release rehearsal owns the exact 19-package dependency order", async () => {
+test("release rehearsal owns the exact 20-package dependency order", async () => {
   const records = await readPublishablePackages();
-  assert.equal(records.length, 19);
+  assert.equal(records.length, 20);
   assert.deepEqual(
     records.map((record) => record.manifest.name),
     [...expectedPackageNames]
@@ -102,7 +103,7 @@ test("release rehearsal owns the exact 19-package dependency order", async () =>
   assert.throws(() => releaseOrder(cycle), /Cyclic publish graph/);
 });
 
-test("all 19 package archives contain the required governance files", async (t) => {
+test("all 20 package archives contain the required governance files", async (t) => {
   const records = await readPublishablePackages();
   assert.deepEqual(await auditPackageMetadata(records), []);
   const scratchRoot = await mkdtemp(join(tmpdir(), "fluid-release-pack-"));
@@ -193,7 +194,7 @@ test("the audited wrapper resolves the dist-tag from changesets pre-state", asyn
 test("offline rehearsal cannot claim network or publish work", async () => {
   const result = await auditReleaseDryRun(repositoryRoot, { gitStatus: async () => "" });
   assert.equal(result.mode, "offline-no-publish");
-  assert.equal(result.packageCount, 19);
+  assert.equal(result.packageCount, 20);
   assert.deepEqual(result.packageOrder, expectedOrder);
   assert.deepEqual(result.networkCommands, []);
   assert.deepEqual(result.publishCommands, []);

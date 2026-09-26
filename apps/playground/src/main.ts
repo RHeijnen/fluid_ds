@@ -132,6 +132,7 @@ import "@fluid-ds/kanban/define/kanban";
 import "@fluid-ds/map/define/map";
 import "@fluid-ds/node-graph/define/node-graph";
 import "@fluid-ds/qr/define";
+import "@fluid-ds/rainbow/define";
 import "@fluid-ds/parser/define/file-parser";
 import "@fluid-ds/parser/define/column-mapper";
 import "@fluid-ds/animations/define/celebrate";

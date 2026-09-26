@@ -50,6 +50,7 @@ let counter = 0;
  * @uses-token --fluid-font-family-sans - Summary font family.
  * @uses-token --fluid-font-size-md - Summary font size.
  * @uses-token --fluid-radius-sm - Summary focus-ring corner radius.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-toggle - Fired when the open state changes. `event.detail.open`.
  */
@@ -60,8 +61,8 @@ export class FluidDetails extends FluidElement {
     css`
       :host {
         display: block;
-        border-bottom: var(--fluid-details-border-width, 1px) solid
-          var(--fluid-details-border, var(--fluid-border-default));
+        border-bottom: var(--fluid-details-border-width, var(--fluid-border-width-divider, 1px))
+          solid var(--fluid-details-border, var(--fluid-border-default));
       }
 
       :host([hidden]) {

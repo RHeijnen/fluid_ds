@@ -14,9 +14,14 @@ for (const entry of manifest.files) {
   assert.equal(bytes.subarray(0, 4).toString(), "wOF2", "Asset must be WOFF2, not an error page");
   assert.equal(createHash("sha256").update(bytes).digest("hex"), entry.sha256, entry.file);
 }
-for (const name of ["Inter", "JetBrains-Mono"]) {
+for (const [name, year] of [
+  ["Inter", "2020"],
+  ["JetBrains-Mono", "2020"],
+  ["Fredoka", "2016"],
+  ["Nunito", "2014"]
+]) {
   const license = await readFile(new URL(`${name}-OFL.txt`, root), "utf8");
-  assert.match(license, /Copyright 2020/);
+  assert.match(license, new RegExp(`Copyright ${year}`));
   assert.match(license, /SIL OPEN FONT LICENSE Version 1\.1/);
 }
-console.log(`Verified ${urls.size} pinned local font assets and both licenses.`);
+console.log(`Verified ${urls.size} pinned local font assets and all four licenses.`);

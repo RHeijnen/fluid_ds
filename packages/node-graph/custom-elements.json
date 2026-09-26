@@ -57,6 +57,10 @@
             {
               "description": "Node text color. Falls back to --fluid-text-primary.",
               "name": "--fluid-node-graph-fg"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-node-graph-border-width"
             }
           ],
           "cssParts": [
@@ -1446,6 +1450,10 @@
             {
               "name": "--fluid-target-min",
               "description": "Minimum port target size (24px AA / 44px AAA)."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-node-graph",

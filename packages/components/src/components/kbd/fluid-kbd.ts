@@ -21,6 +21,8 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-text-primary - Key text.
  * @uses-token --fluid-border-default - Key border.
  * @uses-token --fluid-radius-sm - Corner radius.
+ * @cssproperty --fluid-kbd-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  */
 export class FluidKbd extends FluidElement {
   static override styles = css`
@@ -43,7 +45,8 @@ export class FluidKbd extends FluidElement {
       line-height: 1.4;
       color: var(--fluid-kbd-fg, var(--fluid-text-primary));
       background: var(--fluid-kbd-bg, var(--fluid-surface-muted));
-      border: 1px solid var(--fluid-kbd-border, var(--fluid-border-default));
+      border: var(--fluid-kbd-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-kbd-border, var(--fluid-border-default));
       border-bottom-width: 2px;
       border-radius: var(--fluid-kbd-radius, var(--fluid-radius-sm, 4px));
     }

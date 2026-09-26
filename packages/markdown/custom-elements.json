@@ -49,6 +49,10 @@
             {
               "description": "Table cell border color.",
               "name": "--fluid-markdown-table-border"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-markdown-border-width"
             }
           ],
           "cssParts": [
@@ -175,6 +179,12 @@
             "package": "@fluid-ds/components/internal/base-element"
           },
           "summary": "Markdown renderer.",
+          "usesTokens": [
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
+            }
+          ],
           "tagName": "fluid-markdown",
           "customElement": true
         }

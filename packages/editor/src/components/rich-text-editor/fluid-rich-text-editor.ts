@@ -143,6 +143,10 @@ const COMMANDS: readonly ToolbarCommand[] = [
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-focus-ring-offset - Focus ring offset (AA / AAA).
  * @uses-token --fluid-target-min - Minimum control target (24px AA / 44px AAA).
+ * @cssproperty --fluid-rich-text-editor-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-rich-text-editor-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-change - The content changed. `detail: { value }` (current HTML).
  */
@@ -153,7 +157,8 @@ export class FluidRichTextEditor extends FluidElement {
       font-family: var(--fluid-font-family-sans, system-ui, sans-serif);
     }
     .base {
-      border: 1px solid var(--fluid-editor-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-rich-text-editor-border-width, var(--fluid-border-width-default, 1px))
+        solid var(--fluid-editor-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-editor-radius, var(--fluid-radius-md, 0.5rem));
       overflow: hidden;
       background: var(--fluid-editor-bg, var(--fluid-surface-base, #ffffff));
@@ -164,7 +169,11 @@ export class FluidRichTextEditor extends FluidElement {
       gap: 0.125rem;
       padding: 0.25rem;
       background: var(--fluid-editor-toolbar-bg, var(--fluid-surface-muted, #f4f4f5));
-      border-bottom: 1px solid var(--fluid-editor-border, var(--fluid-border-default, #e4e4e7));
+      border-bottom: var(
+          --fluid-rich-text-editor-divider-width,
+          var(--fluid-border-width-divider, 1px)
+        )
+        solid var(--fluid-editor-border, var(--fluid-border-default, #e4e4e7));
     }
     .button {
       display: inline-grid;

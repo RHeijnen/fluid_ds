@@ -96,6 +96,7 @@ let counter = 0;
  * @uses-token --fluid-radius-sm - Option row corner radius.
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-open - Fired when the palette opens.
  * @fires fluid-close - Fired when the palette closes (Escape, backdrop, or programmatically).
@@ -154,8 +155,11 @@ export class FluidCommandPalette extends FluidElement {
         align-items: center;
         gap: var(--fluid-space-3);
         padding: var(--fluid-space-3) var(--fluid-space-4);
-        border-bottom: var(--fluid-command-palette-border-width, 1px) solid
-          var(--fluid-command-palette-border, var(--fluid-border-default));
+        border-bottom: var(
+            --fluid-command-palette-border-width,
+            var(--fluid-border-width-divider, 1px)
+          )
+          solid var(--fluid-command-palette-border, var(--fluid-border-default));
       }
 
       /*

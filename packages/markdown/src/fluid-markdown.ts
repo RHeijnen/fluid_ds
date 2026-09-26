@@ -35,6 +35,8 @@ function sanitizeHtml(dirty: string): string {
  * @cssproperty --fluid-markdown-blockquote-fg - Blockquote text color.
  * @cssproperty --fluid-markdown-link-fg - Link color.
  * @cssproperty --fluid-markdown-table-border - Table cell border color.
+ * @cssproperty --fluid-markdown-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-render - Fired when render completes.
  */
@@ -91,7 +93,8 @@ export class FluidMarkdown extends FluidElement {
     }
     .content th,
     .content td {
-      border: 1px solid var(--fluid-markdown-table-border, var(--fluid-border-default));
+      border: var(--fluid-markdown-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-markdown-table-border, var(--fluid-border-default));
       padding: 0.4em 0.6em;
     }
   `;

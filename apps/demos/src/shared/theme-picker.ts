@@ -29,7 +29,8 @@ const BRANDS: Brand[] = [
   { id: "titanium", label: "Titanium" },
   { id: "midnight", label: "Midnight" },
   { id: "corporate", label: "Corporate" },
-  { id: "orchid", label: "Orchid" }
+  { id: "orchid", label: "Orchid" },
+  { id: "rainbow", label: "Rainbow" }
 ];
 
 function applyScheme(scheme: Scheme): void {

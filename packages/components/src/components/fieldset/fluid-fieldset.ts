@@ -88,6 +88,8 @@ export class FluidFieldset extends FluidElement {
      * that falls back to a main semantic var, so a consumer can retheme one
      * fieldset, all fieldsets, or the whole system. See the @cssproperty /
      * @uses-token lists in the JSDoc for the complete set.
+     * @cssproperty --fluid-fieldset-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+     * @uses-token --fluid-border-width-default - Outline stroke width.
      */
     .base {
       display: flex;
@@ -95,7 +97,8 @@ export class FluidFieldset extends FluidElement {
       gap: var(--fluid-fieldset-gap, var(--fluid-space-3));
       margin: 0;
       padding: var(--fluid-fieldset-padding, var(--fluid-space-4));
-      border: 1px solid var(--fluid-fieldset-border, var(--fluid-border-default));
+      border: var(--fluid-fieldset-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-fieldset-border, var(--fluid-border-default));
       border-radius: var(--fluid-fieldset-radius, var(--fluid-radius-md));
       background: var(--fluid-fieldset-bg, transparent);
       min-inline-size: 0;

@@ -13,7 +13,7 @@ function clone(value) {
 test("inventory exactly covers the published catalog and every ownership boundary", async () => {
   const inventory = await readInventory();
   assert.deepEqual(await validateInventory(inventory), []);
-  assert.equal((await publishedTags()).length, 155);
+  assert.equal((await publishedTags()).length, 158);
 });
 
 test("a new or omitted catalog element cannot silently escape disposition review", async () => {

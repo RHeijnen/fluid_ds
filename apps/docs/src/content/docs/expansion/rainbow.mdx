@@ -1,0 +1,154 @@
+---
+title: "@fluid-ds/rainbow"
+description: "The Rainbow expansion pack: an animated landscape tile, a live localized clock, a battery gauge with charging and heartbeat flourishes, and fourteen illustrated app icons."
+---
+
+import RainbowDemo from "../../../components/RainbowDemo.astro";
+
+The Rainbow pack is the illustrated half of the
+[Rainbow brand preset](/theming/brand/#what-rainbow-changes). The preset
+restyles every Fluid component with cream paper, ink outlines and pastel fills.
+This pack adds the pieces a theme alone cannot: home-screen style widgets and a
+set of multi-color app icons. Expansion pack.
+
+Everything here works under any brand. Colors read the Rainbow palette
+(`--rainbow-blue`, `--rainbow-ink`, …) when the preset is active and fall back
+to Fluid's own brand and status ramps otherwise.
+
+<RainbowDemo />
+
+## Install
+
+```bash
+pnpm add @fluid-ds/rainbow @fluid-ds/themes
+```
+
+```ts
+import "@fluid-ds/themes/rainbow.css"; // the look (optional, but recommended)
+import "@fluid-ds/rainbow/define"; // the three widgets
+import "@fluid-ds/rainbow/icons/register"; // the illustrated icons
+```
+
+```html
+<html data-fluid-brand="rainbow"></html>
+```
+
+The preset names Fredoka and Nunito; load them in your app, for example with
+`@fontsource-variable/fredoka` and `@fontsource-variable/nunito`.
+
+## Landscape
+
+`<fluid-rainbow-landscape>` draws sky, a drifting cloud, rolling hills and two
+trees inside an outlined tile, and overlays whatever you slot in at the top
+start corner.
+
+```html
+<fluid-rainbow-landscape>
+  <fluid-rainbow-clock></fluid-rainbow-clock>
+</fluid-rainbow-landscape>
+```
+
+| Attribute | Default | Description                                                          |
+| --------- | ------- | -------------------------------------------------------------------- |
+| `still`   | `false` | Stop the float and the drifting cloud regardless of motion settings. |
+| `label`   | unset   | Accessible name for the picture. Leave unset when it is decoration.  |
+
+Retune it with `--fluid-rainbow-landscape-sky`, `-hill`, `-meadow`, `-tree`,
+`-cloud`, `-ink`, `-border-width`, `-radius`, `-aspect-ratio` (default `2 / 1`),
+`-padding` and `-fg`. Parts: `base`, `scene`, `content`.
+
+## Clock
+
+`<fluid-rainbow-clock>` is a big face in the display font with a short date
+line. It renders a native `<time>`, ticks on each minute boundary, and follows
+the Fluid locale through `Intl.DateTimeFormat`.
+
+```html
+<fluid-rainbow-clock hour-cycle="h23"></fluid-rainbow-clock>
+<fluid-rainbow-clock
+  datetime="2026-04-28T16:45:00"
+  hour-cycle="h12"
+  hide-date
+></fluid-rainbow-clock>
+```
+
+| Attribute    | Default | Description                                                       |
+| ------------ | ------- | ----------------------------------------------------------------- |
+| `datetime`   | unset   | Show a fixed moment instead of the current time. Stops the timer. |
+| `hour-cycle` | `auto`  | `auto` follows the locale; `h12` or `h23` forces a face.          |
+| `hide-date`  | `false` | Hide the date line.                                               |
+
+Tokens: `--fluid-rainbow-clock-font-family`, `-size` (scales with a containing
+landscape by default) and `-fg`. Parts: `base`, `time`, `date`.
+
+## Battery
+
+`<fluid-rainbow-battery>` is a meter drawn as a battery: a rainbow cell that
+fills to the value, an optional cord with a smiling plug, and an optional
+heartbeat trace. Use it for uptime, quota or health readouts.
+
+```html
+<fluid-rainbow-battery value="95" show-value>Battery</fluid-rainbow-battery>
+<fluid-rainbow-battery value="99.98" show-value charging pulse>Uptime</fluid-rainbow-battery>
+```
+
+| Attribute    | Default    | Description                                    |
+| ------------ | ---------- | ---------------------------------------------- |
+| `value`      | `0`        | Current level, clamped into `min`…`max`.       |
+| `min`, `max` | `0`, `100` | The range.                                     |
+| `label`      | unset      | Accessible name, before slotted text.          |
+| `show-value` | `false`    | Show the localized percentage after the label. |
+| `charging`   | `false`    | Show the cord and plug and animate the cell.   |
+| `pulse`      | `false`    | Show the heart and heartbeat trace.            |
+
+Tokens: `--fluid-rainbow-battery-fill` (any background, default a pastel
+rainbow gradient), `-casing`, `-ink`, `-border-width`, `-radius`, `-plug`,
+`-heart`, `-fg` and `-font-family`. Parts: `base`, `body`, `cell`, `label`,
+`pulse`.
+
+## Icons
+
+Fourteen illustrated app icons register with the shared icon registry and
+render through `<fluid-icon>` like any other icon: `rainbow-chat`,
+`rainbow-chart`, `rainbow-lock`, `rainbow-calendar`, `rainbow-bolt`,
+`rainbow-cloud`, `rainbow-globe`, `rainbow-gear`, `rainbow-mail`,
+`rainbow-clock`, `rainbow-music`, `rainbow-gallery`, `rainbow-game` and
+`rainbow-logo`.
+
+```html
+<fluid-icon name="rainbow-chat" style="--fluid-icon-size: 4rem"></fluid-icon>
+```
+
+Unlike the line icons they carry their own colors, painted from the Rainbow
+palette with hex fallbacks. To register them yourself (for example under other
+names), import `rainbowIcons` from `@fluid-ds/rainbow/icons`.
+
+## When to use
+
+- Dashboards, onboarding and marketing surfaces that want warmth and
+  personality: a landscape clock in a hero, a battery for service health.
+- Reach for the plain `<fluid-meter>` or `<fluid-stat>` in dense, data-first
+  screens; these widgets trade density for charm.
+
+## Accessibility
+
+- The landscape artwork is decorative and hidden from assistive technology;
+  slotted content stays fully accessible. Set `label` only when the picture
+  itself carries meaning, which exposes it as an image.
+- The clock is a `<time>` element with a machine-readable `datetime`. It is
+  deliberately not a live region, so it never announces itself every minute.
+- The battery is a meter (`role="meter"` with `aria-valuemin`, `-max`, `-now`
+  and a localized percentage as `aria-valuetext`). The cord, plug and heartbeat
+  are decorative; if charging matters, say so in the label.
+- All motion stops under `prefers-reduced-motion` and scales with the global
+  `--fluid-motion`.
+
+### AA vs AAA
+
+The widgets read the same semantic tokens as the rest of Fluid, so switching an
+ancestor to `data-fluid-conformance="aaa"` deepens their text and outlines along
+with everything else.
+
+## License
+
+MIT.

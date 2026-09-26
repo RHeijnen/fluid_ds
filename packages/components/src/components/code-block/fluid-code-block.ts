@@ -49,6 +49,10 @@ registerIcon(
  * @cssproperty --fluid-code-block-surface-subtle - Component override for the corresponding semantic token.
  * @cssproperty --fluid-code-block-text-primary - Component override for the corresponding semantic token.
  * @cssproperty --fluid-code-block-text-secondary - Component override for the corresponding semantic token.
+ * @cssproperty --fluid-code-block-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-code-block-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  */
 export class FluidCodeBlock extends FluidElement {
   static override styles = css`
@@ -61,7 +65,7 @@ export class FluidCodeBlock extends FluidElement {
     }
 
     .base {
-      border: 1px solid
+      border: var(--fluid-code-block-border-width, var(--fluid-border-width-default, 1px)) solid
         var(
           --fluid-code-border,
           var(--fluid-code-block-border-default, var(--fluid-border-default))
@@ -88,7 +92,8 @@ export class FluidCodeBlock extends FluidElement {
         --fluid-code-header-bg,
         var(--fluid-code-block-surface-muted, var(--fluid-surface-muted))
       );
-      border-bottom: 1px solid
+      border-bottom: var(--fluid-code-block-divider-width, var(--fluid-border-width-divider, 1px))
+        solid
         var(
           --fluid-code-border,
           var(--fluid-code-block-border-default, var(--fluid-border-default))

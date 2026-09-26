@@ -49,6 +49,10 @@
             {
               "description": "Border color of columns and cards. Falls back to --fluid-border-default.",
               "name": "--fluid-kanban-border"
+            },
+            {
+              "description": "Outline stroke width. Falls back to --fluid-border-width-default.",
+              "name": "--fluid-kanban-border-width"
             }
           ],
           "cssParts": [
@@ -562,6 +566,10 @@
             {
               "name": "--fluid-font-size-xs",
               "description": "Card description size."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-kanban",

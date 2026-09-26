@@ -49,6 +49,17 @@ export const motionStyles = css`
       transform: none;
     }
   }
+  /* A bouncier scale-in: pair with --fluid-easing-spring for a playful settle. */
+  @keyframes fluid-pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
   @keyframes fluid-scale-out {
     from {
       opacity: 1;

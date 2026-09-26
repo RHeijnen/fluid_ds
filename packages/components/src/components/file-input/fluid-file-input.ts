@@ -81,6 +81,7 @@ registerIcon(
  * @uses-token --fluid-surface-muted - Remove-button hover background.
  * @uses-token --fluid-border-default - Default borders.
  * @uses-token --fluid-accent-base - Hover + drag-over color.
+ * @uses-token --fluid-accent-fg - Accent used as text or icon color. Optional; falls back to --fluid-accent-base.
  * @uses-token --fluid-text-primary - Label + file-name text.
  * @uses-token --fluid-text-secondary - Hint, icon, file-size, remove-button text.
  * @uses-token --fluid-focus-ring-color - Keyboard focus indicator color.
@@ -232,7 +233,7 @@ export class FluidFileInput extends FluidFormAssociated {
     }
     .dropzone:hover:not(.disabled) .icon,
     .dropzone.dragging .icon {
-      color: var(--fluid-file-input-accent, var(--fluid-accent-base));
+      color: var(--fluid-file-input-accent, var(--fluid-accent-fg, var(--fluid-accent-base)));
     }
     .compact .icon {
       width: 1rem;

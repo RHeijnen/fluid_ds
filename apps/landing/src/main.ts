@@ -4,6 +4,7 @@ import "@fluid-ds/themes/glass.css";
 import "@fluid-ds/themes/midnight.css";
 import "@fluid-ds/themes/corporate.css";
 import "@fluid-ds/themes/orchid.css";
+import "@fluid-ds/themes/rainbow.css";
 import "@fluid-ds/animations/define/controller";
 import "@fluid-ds/animations/register-defaults";
 import { playElementAnimation } from "@fluid-ds/animations";
@@ -137,6 +138,7 @@ document.body.innerHTML = `
           <fluid-option value="midnight">Midnight</fluid-option>
           <fluid-option value="corporate">Corporate</fluid-option>
           <fluid-option value="orchid">Orchid</fluid-option>
+          <fluid-option value="rainbow">Rainbow</fluid-option>
         </fluid-select>
         <fluid-button id="site-dark" variant="ghost" size="sm" aria-label="Toggle dark mode">
           <fluid-icon name="sun-moon"></fluid-icon>

@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "../../../packages/charts/src/**/*.stories.@(js|ts)",
     "../../../packages/animations/src/**/*.stories.@(js|ts)",
     "../../../packages/qr/src/**/*.stories.@(js|ts)",
+    "../../../packages/rainbow/src/**/*.stories.@(js|ts)",
     "../../../packages/parser/src/**/*.stories.@(js|ts)",
     "../../../packages/scheduler/src/**/*.stories.@(js|ts)",
     "../../../packages/media/src/**/*.stories.@(js|ts)",

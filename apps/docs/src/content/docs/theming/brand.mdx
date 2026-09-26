@@ -32,23 +32,24 @@ override those only if you really mean to.
 
 ## The built-in presets
 
-There are six presets. **Default** is the baseline you get with no attribute at
-all; `@fluid-ds/themes` ships the other five as pure CSS (no JavaScript):
-**Midnight**, **Corporate**, **Titanium**, **Glass**, and **Orchid**. Import the
+There are seven presets. **Default** is the baseline you get with no attribute at
+all; `@fluid-ds/themes` ships the other six as pure CSS (no JavaScript):
+**Midnight**, **Corporate**, **Titanium**, **Glass**, **Orchid**, and **Rainbow**. Import the
 ones you want and flip the attribute at runtime.
 
 A preset is not only a palette. Every shipped one also retunes shape, and most
 retune density, elevation or motion as well, because that is what makes two
 brands read as different products rather than the same app in another colour.
 
-| Preset        | Accent   | Beyond the palette                                                                                                                                                                                                                            |
-| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Default**   | Blue     | Nothing to import. The baseline every other preset is tuned against.                                                                                                                                                                          |
-| **Midnight**  | Violet   | Softer corners and slightly slower motion.                                                                                                                                                                                                    |
-| **Corporate** | Slate    | Dense: the spacing ramp scales down about 15%, corners square off, elevation flattens to hairlines and ruled borders (a step darker, re-derived for dark), digits go tabular, and headings slotted into a card become uppercase micro-labels. |
-| **Titanium**  | Graphite | Roomier: the spacing ramp scales up about 20%, radii tighten, the theme names a technical typeface your app loads, and success / warning / info drop to gray. Danger keeps its red.                                                           |
-| **Glass**     | Sky blue | Paints a colour wash on the themed element and frosts the surfaces, fields, overlays and data grids over it. Meant for a container, not a lone control ([details below](#what-glass-frosts)).                                                 |
-| **Orchid**    | Violet   | Airy: the spacing ramp scales up about 35%, radii go soft and round, and motion slows to match.                                                                                                                                               |
+| Preset        | Accent   | Beyond the palette                                                                                                                                                                                                                                  |
+| ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default**   | Blue     | Nothing to import. The baseline every other preset is tuned against.                                                                                                                                                                                |
+| **Midnight**  | Violet   | Softer corners and slightly slower motion.                                                                                                                                                                                                          |
+| **Corporate** | Slate    | Dense: the spacing ramp scales down about 15%, corners square off, elevation flattens to hairlines and ruled borders (a step darker, re-derived for dark), digits go tabular, and headings slotted into a card become uppercase micro-labels.       |
+| **Titanium**  | Graphite | Roomier: the spacing ramp scales up about 20%, radii tighten, the theme names a technical typeface your app loads, and success / warning / info drop to gray. Danger keeps its red.                                                                 |
+| **Glass**     | Sky blue | Paints a colour wash on the themed element and frosts the surfaces, fields, overlays and data grids over it. Meant for a container, not a lone control ([details below](#what-glass-frosts)).                                                       |
+| **Orchid**    | Violet   | Airy: the spacing ramp scales up about 35%, radii go soft and round, and motion slows to match.                                                                                                                                                     |
+| **Rainbow**   | Pastel   | Playful: cream paper, 3px ink outlines on every surface, squircle corners, solid offset "pop" shadows, pastel fills with ink labels, a rounded display font your app loads, and a springy dialog entrance ([details below](#what-rainbow-changes)). |
 
 ```ts
 import "@fluid-ds/themes/midnight.css";
@@ -56,6 +57,7 @@ import "@fluid-ds/themes/corporate.css";
 import "@fluid-ds/themes/titanium.css";
 import "@fluid-ds/themes/glass.css";
 import "@fluid-ds/themes/orchid.css";
+import "@fluid-ds/themes/rainbow.css";
 ```
 
 ```ts
@@ -114,6 +116,20 @@ schemes.
   </div>
 </Demo>
 
+<Demo title='data-fluid-brand="rainbow"'>
+  <div
+    data-fluid-brand="rainbow"
+    style="padding: 1.5rem; border-radius: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;"
+  >
+    <fluid-button>Primary</fluid-button>
+    <fluid-button variant="secondary">Secondary</fluid-button>
+    <fluid-button tone="danger">Delete</fluid-button>
+    <fluid-badge variant="success">Paid</fluid-badge>
+    <fluid-tag variant="warning">Pending</fluid-tag>
+    <fluid-switch checked>Notifications</fluid-switch>
+  </div>
+</Demo>
+
 <Demo title='data-fluid-brand="glass" (a container, not a single control)'>
   <div
     data-fluid-brand="glass"
@@ -128,6 +144,38 @@ schemes.
     <fluid-card style="max-width: 15rem;">Frosted over the wash.</fluid-card>
   </div>
 </Demo>
+
+### What Rainbow changes
+
+Rainbow reshapes more than any other preset, and it does it entirely through
+tokens, so every component follows without per-component rules:
+
+- **Outlines.** `--fluid-border-width-default` goes to 3px and
+  `--fluid-border-width-divider` to 2px, in ink. Buttons, switches, badges,
+  tags and dialogs switch on their optional outline knobs
+  (`--fluid-button-border-width` and friends).
+- **Pop shadows.** The `--fluid-shadow-*` ramp becomes a solid offset
+  (`0 4px 0` ink) and buttons sink into theirs when pressed
+  (`--fluid-button-press-offset`).
+- **Pastel fills, ink labels.** The accent and every tone are pastels that
+  carry ink text, so their state ladders lighten on hover and press. Status
+  tones are recolored on purpose (green, coral, yellow, lavender) because color
+  arriving as soft fills is the point of the look.
+- **Accent as text.** A pastel cannot double as a text color, so Rainbow
+  declares the optional `--fluid-accent-fg` and `--fluid-<tone>-fg` tokens: a
+  deep shade of each hue that components use wherever the accent paints text or
+  an icon on a surface (secondary and ghost buttons, the selected tab, links).
+- **Type.** Body text uses Nunito and headings, button labels, card headers and
+  dialog titles use Fredoka through `--fluid-font-family-display`. The theme
+  only names the fonts. Load them in your app, for example with
+  `@fontsource-variable/nunito` and `@fontsource-variable/fredoka`; without
+  them it falls back to the system rounded or sans face.
+- **Dark.** Paper turns warm charcoal and outlines turn cream. The fills and
+  their ink labels do not change.
+
+Rainbow also paints the themed element's background (cream) and sets its
+`font-family` and heading font through zero-specificity `:where()` rules, so
+your own page styles still win.
 
 ### What Glass frosts
 

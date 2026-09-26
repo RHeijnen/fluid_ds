@@ -97,6 +97,7 @@ let counter = 0;
  * @uses-token --fluid-accent-text - Primary button text.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Button min target (24/44px).
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-step-change - The active step changed. `detail: { index }`.
  * @fires fluid-finish - The tour completed (Done on the last step).
@@ -164,7 +165,7 @@ export class FluidTour extends FluidElement {
         padding: var(--fluid-space-4, 1rem);
         background: var(--fluid-tour-bg, var(--fluid-surface-base));
         color: var(--fluid-tour-fg, var(--fluid-text-primary));
-        border: var(--fluid-tour-border-width, 1px) solid
+        border: var(--fluid-tour-border-width, var(--fluid-border-width-default, 1px)) solid
           var(--fluid-tour-border, var(--fluid-border-default));
         border-radius: var(--fluid-tour-radius, var(--fluid-radius-lg, 0.75rem));
         box-shadow: var(

@@ -521,6 +521,10 @@
             {
               "name": "--fluid-text-secondary",
               "description": "Neutral tone pin fill."
+            },
+            {
+              "name": "--fluid-border-width-default",
+              "description": "Outline stroke width."
             }
           ],
           "tagName": "fluid-map",

@@ -123,6 +123,8 @@ interface FluidTheme {
  * @uses-token --fluid-focus-ring-color - Legend focus ring.
  * @uses-token --fluid-focus-ring-width - Legend focus ring thickness.
  * @uses-token --fluid-focus-ring-offset - Legend focus ring offset.
+ * @cssproperty --fluid-chart-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  */
 export class FluidChart extends FluidElement {
   static override styles = css`
@@ -160,7 +162,8 @@ export class FluidChart extends FluidElement {
       );
       color: var(--fluid-chart-legend-fg, var(--fluid-text-primary, #111827));
       background: var(--fluid-chart-legend-bg, var(--fluid-surface-base, #fff));
-      border: 1px solid var(--fluid-chart-legend-border, var(--fluid-border-default, #e5e7eb));
+      border: var(--fluid-chart-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-chart-legend-border, var(--fluid-border-default, #e5e7eb));
       border-radius: var(--fluid-chart-legend-radius, var(--fluid-radius-sm, 0.25rem));
       font: var(--fluid-chart-legend-font, inherit);
     }

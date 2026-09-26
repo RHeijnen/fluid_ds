@@ -30,7 +30,8 @@
     "./corporate.css": "./src/corporate.css",
     "./titanium.css": "./src/titanium.css",
     "./glass.css": "./src/glass.css",
-    "./orchid.css": "./src/orchid.css"
+    "./orchid.css": "./src/orchid.css",
+    "./rainbow.css": "./src/rainbow.css"
   },
   "files": [
     "src",

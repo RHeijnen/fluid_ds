@@ -72,6 +72,8 @@ const BRAND_STORAGE_KEY = "fluid-brand";
  * @uses-token --fluid-duration-fast - Hover/press transition duration (scaled by --fluid-motion).
  * @uses-token --fluid-motion - Global motion scalar; multiplies the transition duration (0 = off).
  * @uses-token --fluid-easing-standard - Hover/press transition easing.
+ * @cssproperty --fluid-theme-toggle-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires fluid-theme-change - Fired after the color scheme flips.
  *   `event.detail.theme` is the new "light" | "dark" value.
@@ -106,7 +108,8 @@ export class FluidThemeToggle extends FluidElement {
         min-width: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
         min-height: max(var(--fluid-theme-toggle-size, 2.25rem), var(--fluid-target-min, 0px));
         border-radius: var(--fluid-theme-toggle-radius, var(--fluid-radius-md));
-        border: 1px solid var(--fluid-theme-toggle-border, var(--fluid-border-default));
+        border: var(--fluid-theme-toggle-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-theme-toggle-border, var(--fluid-border-default));
         background: var(--fluid-theme-toggle-bg, transparent);
         color: var(--fluid-theme-toggle-fg, var(--fluid-text-primary));
         cursor: pointer;

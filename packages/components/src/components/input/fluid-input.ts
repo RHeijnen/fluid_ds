@@ -68,6 +68,7 @@ export type FluidInputChangeEvent = CustomEvent<FluidInputValueDetail>;
  * @cssproperty --fluid-input-border-focus - Border color when focused. Falls back to --fluid-accent-base.
  * @cssproperty --fluid-input-border-width - Border width. Falls back to --fluid-field-border-width.
  * @cssproperty --fluid-input-radius - Corner radius. Falls back to --fluid-field-border-radius.
+ * @cssproperty --fluid-input-shadow - Resting depth of the field. Falls back to a faint inset highlight plus soft drop shadow.
  * @cssproperty --fluid-input-focus-ring-color - Focus ring color. Falls back to --fluid-focus-ring-color.
  * @cssproperty --fluid-input-focus-ring-width - Focus ring width. Falls back to --fluid-focus-ring-width.
  * @cssproperty --fluid-input-placeholder-fg - Placeholder text color. Falls back to --fluid-text-secondary.
@@ -152,9 +153,11 @@ export class FluidInput extends FluidFormAssociated {
        * surface is pressed into the page", gives fields tactile weight
        * without using full shadows. Inspired by Linear / Vercel inputs.
        */
-        box-shadow:
+        box-shadow: var(
+          --fluid-input-shadow,
           inset 0 1px 0 0 rgb(0 0 0 / 0.02),
-          0 1px 2px 0 rgb(0 0 0 / 0.04);
+          0 1px 2px 0 rgb(0 0 0 / 0.04)
+        );
         transition:
           border-color var(--fluid-duration-fast) var(--fluid-easing-standard),
           box-shadow var(--fluid-duration-fast) var(--fluid-easing-standard),

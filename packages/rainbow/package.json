@@ -1,0 +1,110 @@
+{
+  "name": "@fluid-ds/rainbow",
+  "version": "0.4.0",
+  "description": "Rainbow expansion pack for Fluid: illustrated widgets (landscape, clock, battery) and multi-color app icons that pair with the Rainbow brand preset.",
+  "type": "module",
+  "customElements": "custom-elements.json",
+  "license": "MIT",
+  "author": "Fluid contributors",
+  "homepage": "https://github.com/RHeijnen/fluid_ds",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RHeijnen/fluid_ds.git",
+    "directory": "packages/rainbow"
+  },
+  "bugs": {
+    "url": "https://github.com/RHeijnen/fluid_ds/issues"
+  },
+  "keywords": [
+    "fluid-ds",
+    "rainbow",
+    "illustration",
+    "widgets",
+    "icons",
+    "web-components",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest",
+    "exports": {
+      "./custom-elements.json": "./custom-elements.json",
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./define": {
+        "types": "./dist/define.d.ts",
+        "import": "./dist/define.js"
+      },
+      "./icons": {
+        "types": "./dist/icons.d.ts",
+        "import": "./dist/icons.js"
+      },
+      "./icons/register": {
+        "types": "./dist/icons-register.d.ts",
+        "import": "./dist/icons-register.js"
+      }
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./custom-elements.json": "./custom-elements.json",
+    ".": {
+      "types": "./src/index.ts",
+      "node": "./dist/index.js",
+      "import": "./src/index.ts"
+    },
+    "./define": {
+      "types": "./src/define.ts",
+      "import": "./src/define.ts"
+    },
+    "./icons": {
+      "types": "./src/icons.ts",
+      "import": "./src/icons.ts"
+    },
+    "./icons/register": {
+      "types": "./src/icons-register.ts",
+      "import": "./src/icons-register.ts"
+    }
+  },
+  "files": [
+    "custom-elements.json",
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "**/define.js",
+    "**/define.ts",
+    "**/icons-register.js",
+    "**/icons-register.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "node ../../scripts/run-web-tests.mjs --config web-test-runner.config.js",
+    "dev": "tsc -p tsconfig.json --watch"
+  },
+  "dependencies": {
+    "@fluid-ds/components": "workspace:*",
+    "@fluid-ds/icons": "workspace:*"
+  },
+  "peerDependencies": {
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@open-wc/testing": "^4.0.0",
+    "@storybook/web-components": "^8.4.7",
+    "@web/dev-server-esbuild": "^1.0.4",
+    "@web/test-runner": "^0.20.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "playwright": "^1.49.1",
+    "lit": "^3.2.1",
+    "typescript": "^5.7.2"
+  }
+}

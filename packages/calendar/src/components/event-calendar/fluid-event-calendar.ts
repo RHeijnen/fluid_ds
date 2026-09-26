@@ -103,6 +103,10 @@ function parseMonth(value: string | undefined): [number, number] {
  * @uses-token --fluid-danger-text - Danger tone foreground.
  * @uses-token --fluid-focus-ring-width - Focus ring width (2px AA / 3px AAA).
  * @uses-token --fluid-target-min - Minimum control target (24px AA / 44px AAA).
+ * @cssproperty --fluid-event-calendar-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-event-calendar-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  *
  * @fires fluid-month-change - The visible month changed. detail: { month: "YYYY-MM" }.
  * @fires fluid-day-click - A day cell was activated. detail: { date: "YYYY-MM-DD" }.
@@ -117,7 +121,8 @@ export class FluidEventCalendar extends FluidElement {
     }
     .base {
       background: var(--fluid-event-calendar-bg, var(--fluid-surface-base, #ffffff));
-      border: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-event-calendar-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-event-calendar-radius, var(--fluid-radius-md, 0.5rem));
       overflow: hidden;
     }
@@ -144,7 +149,8 @@ export class FluidEventCalendar extends FluidElement {
       min-width: max(2rem, var(--fluid-target-min, 0px));
       min-height: max(2rem, var(--fluid-target-min, 0px));
       padding: 0;
-      border: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border: var(--fluid-event-calendar-border-width, var(--fluid-border-width-default, 1px)) solid
+        var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
       border-radius: var(--fluid-radius-sm, 0.375rem);
       background: transparent;
       color: var(--fluid-event-calendar-nav-fg, var(--fluid-text-primary, #18181b));
@@ -175,7 +181,8 @@ export class FluidEventCalendar extends FluidElement {
       font-size: var(--fluid-font-size-sm, 0.875rem);
       font-weight: 600;
       color: var(--fluid-event-calendar-muted-fg, var(--fluid-text-secondary, #3f3f46));
-      border-top: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border-top: var(--fluid-event-calendar-divider-width, var(--fluid-border-width-divider, 1px))
+        solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
     }
     .week {
       display: contents;
@@ -186,9 +193,10 @@ export class FluidEventCalendar extends FluidElement {
       gap: 0.2rem;
       min-height: 5.5rem;
       padding: 0.3rem;
-      border-top: 1px solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
-      border-left: 1px solid
-        var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border-top: var(--fluid-event-calendar-divider-width, var(--fluid-border-width-divider, 1px))
+        solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
+      border-left: var(--fluid-event-calendar-divider-width, var(--fluid-border-width-divider, 1px))
+        solid var(--fluid-event-calendar-border, var(--fluid-border-default, #e4e4e7));
       text-align: left;
       background: transparent;
       color: inherit;

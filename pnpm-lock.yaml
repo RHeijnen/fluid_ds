@@ -388,6 +388,9 @@ importers:
       '@fluid-ds/qr':
         specifier: workspace:*
         version: link:../../packages/qr
+      '@fluid-ds/rainbow':
+        specifier: workspace:*
+        version: link:../../packages/rainbow
       '@fluid-ds/scheduler':
         specifier: workspace:*
         version: link:../../packages/scheduler
@@ -598,6 +601,9 @@ importers:
       '@fluid-ds/qr':
         specifier: workspace:*
         version: link:../../packages/qr
+      '@fluid-ds/rainbow':
+        specifier: workspace:*
+        version: link:../../packages/rainbow
       '@fluid-ds/scheduler':
         specifier: workspace:*
         version: link:../../packages/scheduler
@@ -1230,6 +1236,40 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/rainbow:
+    dependencies:
+      '@fluid-ds/components':
+        specifier: workspace:*
+        version: link:../components
+      '@fluid-ds/icons':
+        specifier: workspace:*
+        version: link:../icons
+    devDependencies:
+      '@open-wc/testing':
+        specifier: ^4.0.0
+        version: 4.0.0
+      '@storybook/web-components':
+        specifier: ^8.4.7
+        version: 8.6.18(lit@3.3.3)(storybook@8.6.18(prettier@3.8.3))
+      '@web/dev-server-esbuild':
+        specifier: ^1.0.4
+        version: 1.0.5
+      '@web/test-runner':
+        specifier: ^0.20.0
+        version: 0.20.2
+      '@web/test-runner-playwright':
+        specifier: ^0.11.0
+        version: 0.11.1
+      lit:
+        specifier: ^3.2.1
+        version: 3.3.3
+      playwright:
+        specifier: ^1.49.1
+        version: 1.60.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.8.3
+
   packages/react:
     dependencies:
       '@lit/react':
@@ -1272,6 +1312,9 @@ importers:
       '@fluid-ds/qr':
         specifier: 0.4.0
         version: link:../qr
+      '@fluid-ds/rainbow':
+        specifier: 0.4.0
+        version: link:../rainbow
       '@fluid-ds/scheduler':
         specifier: 0.4.0
         version: link:../scheduler
@@ -16115,7 +16158,7 @@ snapshots:
       call-bound: 1.0.4
       gopd: 1.2.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.3
+      hasown: 2.0.4
 
   is-stream@2.0.1: {}
 

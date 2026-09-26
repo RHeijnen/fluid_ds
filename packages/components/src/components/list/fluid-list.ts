@@ -33,6 +33,10 @@ import { FluidElement } from "../../internal/base-element.js";
  * @uses-token --fluid-font-line-height-normal - Surface text line-height.
  * @uses-token --fluid-border-default - Outer border and dividers.
  * @uses-token --fluid-radius-md - Outer corner radius.
+ * @cssproperty --fluid-list-divider-width - Divider stroke width. Falls back to --fluid-border-width-divider.
+ * @cssproperty --fluid-list-border-width - Outline stroke width. Falls back to --fluid-border-width-default.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
+ * @uses-token --fluid-border-width-divider - Divider stroke width.
  */
 export class FluidList extends FluidElement {
   static override styles = [
@@ -62,14 +66,16 @@ export class FluidList extends FluidElement {
 
       /* Bordered variant: outer frame plus a rule between rows. */
       :host([bordered]) .base {
-        border: 1px solid var(--fluid-list-border, var(--fluid-border-default));
+        border: var(--fluid-list-border-width, var(--fluid-border-width-default, 1px)) solid
+          var(--fluid-list-border, var(--fluid-border-default));
         overflow: hidden;
       }
 
       /* Dividers between rows. Hosted here so a single token controls them and
          they survive slotted-content theming. */
       :host([divided]) ::slotted(fluid-list-item:not(:first-child)) {
-        border-top: 1px solid var(--fluid-list-divider, var(--fluid-border-default));
+        border-top: var(--fluid-list-divider-width, var(--fluid-border-width-divider, 1px)) solid
+          var(--fluid-list-divider, var(--fluid-border-default));
       }
     `
   ];

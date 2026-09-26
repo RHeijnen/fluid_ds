@@ -49,6 +49,7 @@ export type FluidPopoverHideEvent = CustomEvent<null>;
  * @uses-token --fluid-radius-md - Default corner radius.
  * @uses-token --fluid-font-family-sans - Default font family.
  * @uses-token --fluid-shadow-lg - Panel elevation.
+ * @uses-token --fluid-border-width-default - Outline stroke width.
  *
  * @fires {FluidPopoverShowEvent} fluid-show - Fired when the popover becomes visible.
  * @fires {FluidPopoverHideEvent} fluid-hide - Fired when the popover is dismissed.
@@ -70,7 +71,7 @@ export class FluidPopover extends FluidElement {
         max-width: 24rem;
         padding: var(--fluid-space-3) var(--fluid-space-4);
         background: var(--fluid-popover-bg, var(--fluid-surface-base));
-        border: var(--fluid-popover-border-width, 1px) solid
+        border: var(--fluid-popover-border-width, var(--fluid-border-width-default, 1px)) solid
           var(--fluid-popover-border, var(--fluid-border-default));
         border-radius: var(--fluid-popover-radius, var(--fluid-radius-md));
         box-shadow: var(--fluid-popover-shadow, var(--fluid-shadow-lg));
