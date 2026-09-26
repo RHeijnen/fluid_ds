@@ -40,5 +40,5 @@ test("every component unit runner uses the fail-closed selector", async () => {
     assert.doesNotMatch(source, /function resolveBrowsers/);
     checked++;
   }
-  assert.equal(checked, 14);
+  assert.equal(checked, 15);
 });
