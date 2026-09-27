@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/a11y",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "private": true,
   "type": "module",
   "description": "Browser-level accessibility gates for Fluid Storybook fixtures.",

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/angular",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Angular ControlValueAccessor directives for Fluid form components: bind fluid-* controls with ngModel and reactive forms.",
   "fluidIntegration": "angular",
   "type": "module",

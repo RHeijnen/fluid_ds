@@ -1,5 +1,21 @@
 # @fluid-ds/demos
 
+## 1.0.0-rc.0
+
+### Patch Changes
+
+- Updated dependencies [4139c57]
+  - @fluid-ds/tokens@1.0.0-rc.0
+  - @fluid-ds/themes@1.0.0-rc.0
+  - @fluid-ds/components@1.0.0-rc.0
+  - @fluid-ds/charts@1.0.0-rc.0
+  - @fluid-ds/kanban@1.0.0-rc.0
+  - @fluid-ds/markdown@1.0.0-rc.0
+  - @fluid-ds/scheduler@1.0.0-rc.0
+  - @fluid-ds/table@1.0.0-rc.0
+  - @fluid-ds/qr@1.0.0-rc.0
+  - @fluid-ds/icons@1.0.0-rc.0
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/ssr-tests",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "private": true,
   "type": "module",
   "description": "Browser SSR and hydration contract fixtures for Fluid.",

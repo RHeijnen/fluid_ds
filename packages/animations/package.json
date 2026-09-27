@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/animations",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Standalone animation system for Fluid with zero runtime dependencies (no other @fluid-ds package required): a registry of named keyframes driven by data-fluid-animation attributes, plus an imperative canvas effects engine and a <fluid-celebrate> element.",
   "type": "module",
   "customElements": "custom-elements.json",

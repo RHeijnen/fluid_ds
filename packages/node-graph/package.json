@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/node-graph",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Accessible node graph editor web component for Fluid (expansion pack): draggable nodes, connection ports and Bezier edges with full keyboard support.",
   "type": "module",
   "customElements": "custom-elements.json",

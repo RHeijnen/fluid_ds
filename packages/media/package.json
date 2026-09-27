@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/media",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Media web components for Fluid (expansion pack): video, video playlist, animated image with play/pause, zoomable frame, Web Animations API wrapper.",
   "type": "module",
   "customElements": "custom-elements.json",

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/scheduler",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Appointment and availability scheduler web components for Fluid: a calendar with bookable time slots and an owner-side hours editor. Framework-agnostic and form-associated.",
   "type": "module",
   "customElements": "custom-elements.json",

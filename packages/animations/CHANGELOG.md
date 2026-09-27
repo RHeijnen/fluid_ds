@@ -1,5 +1,14 @@
 # @fluid-ds/animations
 
+## 1.0.0-rc.0
+
+### Major Changes
+
+- 9b3167a: Add an opt-in `space: "document"` coordinate system to every canvas effect so
+  particles can remain anchored to page content while scrolling. The shared
+  canvas stays viewport-sized, and `<fluid-celebrate>` exposes the same option via
+  its `space` attribute.
+
 ## 0.4.0
 
 ### Patch Changes

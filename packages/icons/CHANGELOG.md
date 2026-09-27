@@ -1,5 +1,7 @@
 # @fluid-ds/icons
 
+## 1.0.0-rc.0
+
 ## 0.4.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/map",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Themed map web component for Fluid (expansion pack): a Leaflet wrapper with markers, framework-agnostic.",
   "type": "module",
   "customElements": "custom-elements.json",

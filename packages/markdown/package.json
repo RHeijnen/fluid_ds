@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/markdown",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Markdown rendering web component for Fluid (expansion pack). Backed by marked; themable, supports inline and src-fetched content.",
   "type": "module",
   "customElements": "custom-elements.json",

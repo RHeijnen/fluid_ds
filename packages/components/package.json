@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/components",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Framework-agnostic web components for Fluid: 124 standard custom elements in 103 component families. For HTML, React, Vue, Angular, Svelte and Solid.",
   "type": "module",
   "license": "MIT",

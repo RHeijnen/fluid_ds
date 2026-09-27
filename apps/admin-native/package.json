@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/admin-native",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "private": true,
   "type": "module",
   "description": "Admin-portal demo built with plain HTML + the Fluid web components loaded from the CDN (no framework, no bundler, no dependencies).",

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/table",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Accessible data grid web component for Fluid (expansion pack): sortable, selectable, responsive, framework-agnostic.",
   "type": "module",
   "customElements": "custom-elements.json",

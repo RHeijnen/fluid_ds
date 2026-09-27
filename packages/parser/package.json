@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/parser",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "JSON, CSV and Excel import web components for Fluid, with typed column mapping, validation and an error-preview table.",
   "type": "module",
   "customElements": "custom-elements.json",

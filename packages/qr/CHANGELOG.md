@@ -1,5 +1,12 @@
 # @fluid-ds/qr
 
+## 1.0.0-rc.0
+
+### Patch Changes
+
+- Updated dependencies [4139c57]
+  - @fluid-ds/components@1.0.0-rc.0
+
 ## 0.4.0
 
 ### Patch Changes

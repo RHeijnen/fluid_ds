@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/visual-regression",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "private": true,
   "type": "module",
   "description": "Playwright-based visual regression tests for Fluid components, driven by Storybook stories.",

@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/rainbow",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Rainbow expansion pack for Fluid: illustrated widgets (landscape, clock, battery) and multi-color illustrations (app tiles and spot scenes) that pair with the Rainbow brand preset.",
   "type": "module",
   "customElements": "custom-elements.json",

@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.0.0-rc.0
+
 ## 0.4.0
 
 - Initial release: ControlValueAccessor directives for Fluid form components

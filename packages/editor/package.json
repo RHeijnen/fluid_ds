@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/editor",
-  "version": "0.4.0",
+  "version": "1.0.0-rc.0",
   "description": "Accessible rich-text editor web component for Fluid (expansion pack): contenteditable with a toolbar, framework-agnostic.",
   "type": "module",
   "customElements": "custom-elements.json",
