@@ -50,7 +50,7 @@
     {
       "tag": "fluid-accordion",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "accordion",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -97,7 +97,7 @@
     {
       "tag": "fluid-anchor-nav",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "anchor-nav",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -144,7 +144,7 @@
     {
       "tag": "fluid-animated-image",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "animated-image",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -191,7 +191,7 @@
     {
       "tag": "fluid-animation",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "animation",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -238,7 +238,7 @@
     {
       "tag": "fluid-app-bar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "app-bar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -285,7 +285,7 @@
     {
       "tag": "fluid-aspect-ratio",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "aspect-ratio",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -332,7 +332,7 @@
     {
       "tag": "fluid-audio",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "audio",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -379,7 +379,7 @@
     {
       "tag": "fluid-availability-editor",
       "package": "@fluid-ds/scheduler",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "availability-editor",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -426,7 +426,7 @@
     {
       "tag": "fluid-avatar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "avatar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -473,7 +473,7 @@
     {
       "tag": "fluid-avatar-group",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "avatar-group",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -520,7 +520,7 @@
     {
       "tag": "fluid-badge",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "badge",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -567,7 +567,7 @@
     {
       "tag": "fluid-banner",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "banner",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -614,7 +614,7 @@
     {
       "tag": "fluid-bar-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "bar-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -661,7 +661,7 @@
     {
       "tag": "fluid-breadcrumb",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "breadcrumb",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -708,7 +708,7 @@
     {
       "tag": "fluid-breadcrumb-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "breadcrumb",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -755,7 +755,7 @@
     {
       "tag": "fluid-bubble-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "bubble-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -802,7 +802,7 @@
     {
       "tag": "fluid-button",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "button",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -849,7 +849,7 @@
     {
       "tag": "fluid-button-group",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "button-group",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -896,7 +896,7 @@
     {
       "tag": "fluid-calendar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "calendar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -943,7 +943,7 @@
     {
       "tag": "fluid-callout",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "callout",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -990,7 +990,7 @@
     {
       "tag": "fluid-card",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "card",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1037,7 +1037,7 @@
     {
       "tag": "fluid-carousel",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "carousel",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1084,7 +1084,7 @@
     {
       "tag": "fluid-carousel-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "carousel",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1131,7 +1131,7 @@
     {
       "tag": "fluid-celebrate",
       "package": "@fluid-ds/animations",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "define",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1178,7 +1178,7 @@
     {
       "tag": "fluid-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1225,7 +1225,7 @@
     {
       "tag": "fluid-checkbox",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "checkbox",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1272,7 +1272,7 @@
     {
       "tag": "fluid-code-block",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "code-block",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1319,7 +1319,7 @@
     {
       "tag": "fluid-col",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "grid",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1366,7 +1366,7 @@
     {
       "tag": "fluid-color-picker",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "color-picker",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1413,7 +1413,7 @@
     {
       "tag": "fluid-column-mapper",
       "package": "@fluid-ds/parser",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "column-mapper",
       "maturity": "experimental",
       "maturitySource": "quality/maturity.json",
@@ -1460,7 +1460,7 @@
     {
       "tag": "fluid-command-palette",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "command-palette",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1507,7 +1507,7 @@
     {
       "tag": "fluid-comparison",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "comparison",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1554,7 +1554,7 @@
     {
       "tag": "fluid-context-menu",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "context-menu",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1601,7 +1601,7 @@
     {
       "tag": "fluid-copy-button",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "copy-button",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1648,7 +1648,7 @@
     {
       "tag": "fluid-countdown",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "countdown",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1695,7 +1695,7 @@
     {
       "tag": "fluid-date-picker",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "date-picker",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1742,7 +1742,7 @@
     {
       "tag": "fluid-date-range-picker",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "date-range-picker",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1789,7 +1789,7 @@
     {
       "tag": "fluid-description-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "description-list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1836,7 +1836,7 @@
     {
       "tag": "fluid-description-list",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "description-list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1883,7 +1883,7 @@
     {
       "tag": "fluid-details",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "accordion",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1930,7 +1930,7 @@
     {
       "tag": "fluid-dialog",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "dialog",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -1977,7 +1977,7 @@
     {
       "tag": "fluid-divider",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "divider",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2024,7 +2024,7 @@
     {
       "tag": "fluid-doughnut-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "doughnut-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2071,7 +2071,7 @@
     {
       "tag": "fluid-drawer",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "drawer",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2118,7 +2118,7 @@
     {
       "tag": "fluid-dropdown",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "dropdown",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2165,7 +2165,7 @@
     {
       "tag": "fluid-dropdown-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "dropdown",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2212,7 +2212,7 @@
     {
       "tag": "fluid-dropzone",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "dropzone",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2259,7 +2259,7 @@
     {
       "tag": "fluid-empty-state",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "empty-state",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2306,7 +2306,7 @@
     {
       "tag": "fluid-event-calendar",
       "package": "@fluid-ds/calendar",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "event-calendar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2353,7 +2353,7 @@
     {
       "tag": "fluid-field",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "field",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2400,7 +2400,7 @@
     {
       "tag": "fluid-fieldset",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "fieldset",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2447,7 +2447,7 @@
     {
       "tag": "fluid-file-input",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "file-input",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2494,7 +2494,7 @@
     {
       "tag": "fluid-file-parser",
       "package": "@fluid-ds/parser",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "file-parser",
       "maturity": "experimental",
       "maturitySource": "quality/maturity.json",
@@ -2541,7 +2541,7 @@
     {
       "tag": "fluid-fold",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "fold",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2588,7 +2588,7 @@
     {
       "tag": "fluid-form",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "form",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2635,7 +2635,7 @@
     {
       "tag": "fluid-format-bytes",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "format-bytes",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2682,7 +2682,7 @@
     {
       "tag": "fluid-format-date",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "format-date",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2729,7 +2729,7 @@
     {
       "tag": "fluid-format-number",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "format-number",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2776,7 +2776,7 @@
     {
       "tag": "fluid-grid",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "grid",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2823,7 +2823,7 @@
     {
       "tag": "fluid-hero",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "hero",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2870,7 +2870,7 @@
     {
       "tag": "fluid-hotkey",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "hotkey",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2917,7 +2917,7 @@
     {
       "tag": "fluid-icon",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "icon",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -2964,7 +2964,7 @@
     {
       "tag": "fluid-image",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "image",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3011,7 +3011,7 @@
     {
       "tag": "fluid-include",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "include",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3058,7 +3058,7 @@
     {
       "tag": "fluid-infinite-table",
       "package": "@fluid-ds/table",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "infinite-table",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3105,7 +3105,7 @@
     {
       "tag": "fluid-input",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "input",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3152,7 +3152,7 @@
     {
       "tag": "fluid-intersection-observer",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "intersection-observer",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3199,7 +3199,7 @@
     {
       "tag": "fluid-kanban",
       "package": "@fluid-ds/kanban",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "kanban",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3246,7 +3246,7 @@
     {
       "tag": "fluid-kbd",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "kbd",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3293,7 +3293,7 @@
     {
       "tag": "fluid-lightbox",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "lightbox",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3340,7 +3340,7 @@
     {
       "tag": "fluid-line-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "line-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3387,7 +3387,7 @@
     {
       "tag": "fluid-list",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3434,7 +3434,7 @@
     {
       "tag": "fluid-list-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3481,7 +3481,7 @@
     {
       "tag": "fluid-loading-overlay",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "loading-overlay",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3528,7 +3528,7 @@
     {
       "tag": "fluid-map",
       "package": "@fluid-ds/map",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "map",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3575,7 +3575,7 @@
     {
       "tag": "fluid-markdown",
       "package": "@fluid-ds/markdown",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "markdown",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3622,7 +3622,7 @@
     {
       "tag": "fluid-masked-input",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "masked-input",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3669,7 +3669,7 @@
     {
       "tag": "fluid-menu",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "menu",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3716,7 +3716,7 @@
     {
       "tag": "fluid-menu-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "menu",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3763,7 +3763,7 @@
     {
       "tag": "fluid-menu-label",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "menu",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3810,7 +3810,7 @@
     {
       "tag": "fluid-meter",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "meter",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3857,7 +3857,7 @@
     {
       "tag": "fluid-mosaic",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "mosaic",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3904,7 +3904,7 @@
     {
       "tag": "fluid-mosaic-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "mosaic",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3951,7 +3951,7 @@
     {
       "tag": "fluid-mutation-observer",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "mutation-observer",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -3998,7 +3998,7 @@
     {
       "tag": "fluid-nav-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "nav-list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4045,7 +4045,7 @@
     {
       "tag": "fluid-nav-list",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "nav-list",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4092,7 +4092,7 @@
     {
       "tag": "fluid-node-graph",
       "package": "@fluid-ds/node-graph",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "node-graph",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4139,7 +4139,7 @@
     {
       "tag": "fluid-number-input",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "number-input",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4186,7 +4186,7 @@
     {
       "tag": "fluid-option",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "select",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4233,7 +4233,7 @@
     {
       "tag": "fluid-otp",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "otp",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4280,7 +4280,7 @@
     {
       "tag": "fluid-page",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "page",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4327,7 +4327,7 @@
     {
       "tag": "fluid-pagination",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "pagination",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4374,7 +4374,7 @@
     {
       "tag": "fluid-pie-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "pie-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4421,7 +4421,7 @@
     {
       "tag": "fluid-polar-area-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "polar-area-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4468,7 +4468,7 @@
     {
       "tag": "fluid-popconfirm",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "popconfirm",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4515,7 +4515,7 @@
     {
       "tag": "fluid-popover",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "popover",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4562,7 +4562,7 @@
     {
       "tag": "fluid-popup",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "popup",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4609,7 +4609,7 @@
     {
       "tag": "fluid-pricing-table",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "pricing-table",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4656,7 +4656,7 @@
     {
       "tag": "fluid-pricing-tier",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "pricing-table",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4703,7 +4703,7 @@
     {
       "tag": "fluid-progress-bar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "progress-bar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4750,7 +4750,7 @@
     {
       "tag": "fluid-progress-ring",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "progress-ring",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4797,7 +4797,7 @@
     {
       "tag": "fluid-qr-code",
       "package": "@fluid-ds/qr",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "qr",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4844,7 +4844,7 @@
     {
       "tag": "fluid-radar-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "radar-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4891,7 +4891,7 @@
     {
       "tag": "fluid-radio",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "radio",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4938,7 +4938,7 @@
     {
       "tag": "fluid-radio-group",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "radio",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -4985,7 +4985,7 @@
     {
       "tag": "fluid-rainbow-battery",
       "package": "@fluid-ds/rainbow",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "rainbow",
       "maturity": "beta",
       "maturitySource": "quality/maturity.json",
@@ -5032,7 +5032,7 @@
     {
       "tag": "fluid-rainbow-clock",
       "package": "@fluid-ds/rainbow",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "rainbow",
       "maturity": "beta",
       "maturitySource": "quality/maturity.json",
@@ -5079,7 +5079,7 @@
     {
       "tag": "fluid-rainbow-landscape",
       "package": "@fluid-ds/rainbow",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "rainbow",
       "maturity": "beta",
       "maturitySource": "quality/maturity.json",
@@ -5126,7 +5126,7 @@
     {
       "tag": "fluid-range-slider",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "range-slider",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5173,7 +5173,7 @@
     {
       "tag": "fluid-rating",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "rating",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5220,7 +5220,7 @@
     {
       "tag": "fluid-relative-time",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "relative-time",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5267,7 +5267,7 @@
     {
       "tag": "fluid-resize-observer",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "resize-observer",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5314,7 +5314,7 @@
     {
       "tag": "fluid-result",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "result",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5361,7 +5361,7 @@
     {
       "tag": "fluid-rich-text-editor",
       "package": "@fluid-ds/editor",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "rich-text-editor",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5408,7 +5408,7 @@
     {
       "tag": "fluid-scatter-chart",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "scatter-chart",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5455,7 +5455,7 @@
     {
       "tag": "fluid-scheduler",
       "package": "@fluid-ds/scheduler",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "scheduler",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5502,7 +5502,7 @@
     {
       "tag": "fluid-scroller",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "scroller",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5549,7 +5549,7 @@
     {
       "tag": "fluid-segment",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "segmented-control",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5596,7 +5596,7 @@
     {
       "tag": "fluid-segmented-control",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "segmented-control",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5643,7 +5643,7 @@
     {
       "tag": "fluid-select",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "select",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5690,7 +5690,7 @@
     {
       "tag": "fluid-sidebar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "sidebar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5737,7 +5737,7 @@
     {
       "tag": "fluid-signature-pad",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "signature-pad",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5784,7 +5784,7 @@
     {
       "tag": "fluid-skeleton",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "skeleton",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5831,7 +5831,7 @@
     {
       "tag": "fluid-slider",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "slider",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5878,7 +5878,7 @@
     {
       "tag": "fluid-sparkline",
       "package": "@fluid-ds/charts",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "sparkline",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5925,7 +5925,7 @@
     {
       "tag": "fluid-speed-dial",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "speed-dial",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -5972,7 +5972,7 @@
     {
       "tag": "fluid-spinner",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "spinner",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6019,7 +6019,7 @@
     {
       "tag": "fluid-split-panel",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "split-panel",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6066,7 +6066,7 @@
     {
       "tag": "fluid-stack",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "stack",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6113,7 +6113,7 @@
     {
       "tag": "fluid-stat",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "stat",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6160,7 +6160,7 @@
     {
       "tag": "fluid-step",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "steps",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6207,7 +6207,7 @@
     {
       "tag": "fluid-steps",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "steps",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6254,7 +6254,7 @@
     {
       "tag": "fluid-switch",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "switch",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6301,7 +6301,7 @@
     {
       "tag": "fluid-tab",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tabs",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6348,7 +6348,7 @@
     {
       "tag": "fluid-tab-panel",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tabs",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6395,7 +6395,7 @@
     {
       "tag": "fluid-table",
       "package": "@fluid-ds/table",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "table",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6442,7 +6442,7 @@
     {
       "tag": "fluid-tabs",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tabs",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6489,7 +6489,7 @@
     {
       "tag": "fluid-tag",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tag",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6536,7 +6536,7 @@
     {
       "tag": "fluid-tag-input",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tag-input",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6583,7 +6583,7 @@
     {
       "tag": "fluid-textarea",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "textarea",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6630,7 +6630,7 @@
     {
       "tag": "fluid-theme-toggle",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "theme-toggle",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6677,7 +6677,7 @@
     {
       "tag": "fluid-time-picker",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "time-picker",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6724,7 +6724,7 @@
     {
       "tag": "fluid-time-slots",
       "package": "@fluid-ds/scheduler",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "time-slots",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6771,7 +6771,7 @@
     {
       "tag": "fluid-timeline",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "timeline",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6818,7 +6818,7 @@
     {
       "tag": "fluid-timeline-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "timeline",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6865,7 +6865,7 @@
     {
       "tag": "fluid-toast",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "toast",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6912,7 +6912,7 @@
     {
       "tag": "fluid-toast-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "toast",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -6959,7 +6959,7 @@
     {
       "tag": "fluid-toolbar",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "toolbar",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7006,7 +7006,7 @@
     {
       "tag": "fluid-tooltip",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tooltip",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7053,7 +7053,7 @@
     {
       "tag": "fluid-tour",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tour",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7100,7 +7100,7 @@
     {
       "tag": "fluid-transfer",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "transfer",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7147,7 +7147,7 @@
     {
       "tag": "fluid-tree",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tree",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7194,7 +7194,7 @@
     {
       "tag": "fluid-tree-item",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "tree",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7241,7 +7241,7 @@
     {
       "tag": "fluid-truncate",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "truncate",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7288,7 +7288,7 @@
     {
       "tag": "fluid-typeahead",
       "package": "@fluid-ds/components",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "typeahead",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7335,7 +7335,7 @@
     {
       "tag": "fluid-video",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "video",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7382,7 +7382,7 @@
     {
       "tag": "fluid-video-playlist",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "video-playlist",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",
@@ -7429,7 +7429,7 @@
     {
       "tag": "fluid-zoomable-frame",
       "package": "@fluid-ds/media",
-      "version": "0.4.0",
+      "version": "1.0.0-rc.0",
       "family": "zoomable-frame",
       "maturity": "stable",
       "maturitySource": "quality/maturity.json",

@@ -148,7 +148,8 @@ jobs:
           # install rejects the version PR. A full install (not --lockfile-only)
           # is required: lockfile-only cannot fetch the URL-pinned xlsx tarball
           # and silently drops its reviewed SHA-512 from the lock. It also re-formats
-          # .changeset/pre.json, which changesets writes outside Prettier style.
+          # .changeset/pre.json, which changesets writes outside Prettier style, and
+          # refreshes quality/component-quality.json, which records package versions.
           version: pnpm run version-packages
           commit: "chore(release): version packages"
           title: "chore(release): version packages"
