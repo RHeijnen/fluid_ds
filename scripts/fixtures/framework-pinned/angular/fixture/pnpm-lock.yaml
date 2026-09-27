@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@fluid-ds/charts@0.4.0>@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz
-  '@fluid-ds/components@0.4.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
-  '@fluid-ds/components@0.4.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
+  '@fluid-ds/charts@1.0.0-rc.0>@fluid-ds/components': file:../packs/fluid-ds-components-1.0.0-rc.0.tgz
+  '@fluid-ds/components@1.0.0-rc.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
+  '@fluid-ds/components@1.0.0-rc.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
 
 importers:
 
@@ -32,23 +32,23 @@ importers:
         specifier: ^20.3.27
         version: 20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       '@fluid-ds/angular':
-        specifier: file:../packs/fluid-ds-angular-0.4.0.tgz
-        version: file:../packs/fluid-ds-angular-0.4.0.tgz(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))
+        specifier: file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))
       '@fluid-ds/charts':
-        specifier: file:../packs/fluid-ds-charts-0.4.0.tgz
-        version: file:../packs/fluid-ds-charts-0.4.0.tgz(lit@3.3.3)
+        specifier: file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz(lit@3.3.3)
       '@fluid-ds/components':
-        specifier: file:../packs/fluid-ds-components-0.4.0.tgz
-        version: file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)
+        specifier: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz(lit@3.3.3)
       '@fluid-ds/icons':
-        specifier: file:../packs/fluid-ds-icons-0.4.0.tgz
-        version: file:../packs/fluid-ds-icons-0.4.0.tgz
+        specifier: file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
       '@fluid-ds/themes':
-        specifier: file:../packs/fluid-ds-themes-0.4.0.tgz
-        version: file:../packs/fluid-ds-themes-0.4.0.tgz(@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz)
+        specifier: file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz(@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz)
       '@fluid-ds/tokens':
-        specifier: file:../packs/fluid-ds-tokens-0.4.0.tgz
-        version: file:../packs/fluid-ds-tokens-0.4.0.tgz
+        specifier: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
       chart.js:
         specifier: ^4.4.7
         version: 4.5.1
@@ -503,38 +503,38 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fluid-ds/angular@file:../packs/fluid-ds-angular-0.4.0.tgz':
-    resolution: {integrity: sha512-igtXKG5RZqVrGoDZJgThILVxQN+TO7HlKkiZ/ToNzgUo1Ll4Fs7J+xzzd7JeT9e1WlzM52ixNlwLgtZLBOIFQg==, tarball: file:../packs/fluid-ds-angular-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/angular@file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-SDYeuOJSoGl9Goi2COpbvAa0B6zOvU1ADzP/d7zPGTA2lA7CUzaq4Cm6ycsSh+BbR7DgKcl1Bpy6pUB0JzLVdA==, tarball: file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
     peerDependencies:
       '@angular/core': ^20.0.0
       '@angular/forms': ^20.0.0
 
-  '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz':
-    resolution: {integrity: sha512-afHY/gmx12/Zi1Srmm+bk0A1fGGuPdlvQqweep4MnRHXxinj24DPp9+tqrXjfnwH3+lvJGNYjZ1hoQDcjCQFXQ==, tarball: file:../packs/fluid-ds-charts-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/charts@file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-K43PxYnjYchz8tqKal8u8O4oj/m9zs4VD7mYuH6k+8nNUvyml0VoVoJnYwOyMcQoFSPMyTnjhzxHTm1WoUCO1Q==, tarball: file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
     peerDependencies:
       lit: ^3.2.1
 
-  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz':
-    resolution: {integrity: sha512-qvbk7ZxoKROgQ2MU32GAwPxHeEt7PFo1jrhhgF6Ba9Qvh8wEMPMKtFAs3dW5bz5+XtmvKgd5fHUfSZgKvravHQ==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/components@file:../packs/fluid-ds-components-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-hHP4eB/slXFFXJ7sCjqkI3y1Wm0QkiPTI2GbOkSRfbmirwowPtcTe2PcybC00VUFRG1eSXlw9tMe7LiIjHQQuA==, tarball: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
     peerDependencies:
       lit: ^3.2.1
 
-  '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
-    resolution: {integrity: sha512-hnuIg3O45sM1S3qaJtg/7uwNMIYvIrShR1JAltjn39bOIVdy8QOuGvwkCSgmEhv6pEinr3g9Pl3UsbCU5ZfW8g==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/icons@file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-rQxYLUSxTW7cdEJXBq8rdkdhoTHbo5NUwer5UwUlxKEdroqWnLd1BH6GYFbV/U25Oex0nKvPBJ6k4ig0lpeHlA==, tarball: file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
 
-  '@fluid-ds/themes@file:../packs/fluid-ds-themes-0.4.0.tgz':
-    resolution: {integrity: sha512-cb41svpRxzWOHpHWnaeKobqMo84wBKVBo3IN1BUvv0uMFA9GwV6gjeXClEIdgbSxr8toVHBI4beWnkHRX2OdEw==, tarball: file:../packs/fluid-ds-themes-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/themes@file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-r4KlkteWx0HxsM3tgXLwyrV0jmvnWEmj83GCxwC8WAESEcmH8jn4e0LGfb7sw5oBkydaBS71KBcpEysbTYpLyA==, tarball: file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
     peerDependencies:
-      '@fluid-ds/tokens': 0.4.0
+      '@fluid-ds/tokens': 1.0.0-rc.0
 
-  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz':
-    resolution: {integrity: sha512-CUCg6UyTwHSTiu7X1C/Do2YLBe2AgFhdnFtGeSeYStWVQbXmY2ceNbZBL4tiahxvZr0gTW9uRleHrd5gr83TtA==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-IckGmO7lEQV7wa5Lv1+tl+gICJ6Hv+nKkOCz/Q5g22eh+8u0psMGrsmYcLI4gJgI1gW2exBQQ21a9TcGbmRweg==, tarball: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
 
   '@gar/promise-retry@1.0.3':
     resolution: {integrity: sha512-GmzA9ckNokPypTg10pgpeHNQe7ph+iIKKmhKu3Ob9ANkswreCx7R3cKmY781K8QK3AqVL3xVh9A42JvIAbkkSA==}
@@ -1252,8 +1252,8 @@ packages:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
 
-  ansi-regex@6.3.0:
-    resolution: {integrity: sha512-WpDfL7NO6j7tH88IDBNVdUJxDh9nmCteAVW9dsep846XdwF4naCBK+/tGLX3KJgcpgMRXCFlTM2hKGoK9FsdrQ==}
+  ansi-regex@6.4.0:
+    resolution: {integrity: sha512-KzTVk2tCWAHtYrvvvaP8bJKJq2pVinhLcGEQdtLIYPbmNGNyYe8QwNaTUYQp2J7/vIsUKt5QCqAfUkYyG9DkOw==}
     engines: {node: '>=12'}
 
   ansi-styles@4.3.0:
@@ -2863,23 +2863,23 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@fluid-ds/angular@file:../packs/fluid-ds-angular-0.4.0.tgz(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))':
+  '@fluid-ds/angular@file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/forms@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2))':
     dependencies:
       '@angular/core': 20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)
       '@angular/forms': 20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.32(@angular/common@20.3.32(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.32(@angular/compiler@20.3.32)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
 
-  '@fluid-ds/charts@file:../packs/fluid-ds-charts-0.4.0.tgz(lit@3.3.3)':
+  '@fluid-ds/charts@file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz(lit@3.3.3)':
     dependencies:
-      '@fluid-ds/components': file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)
+      '@fluid-ds/components': file:../packs/fluid-ds-components-1.0.0-rc.0.tgz(lit@3.3.3)
       chart.js: 4.5.1
       lit: 3.3.3
     transitivePeerDependencies:
       - '@types/node'
 
-  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)':
+  '@fluid-ds/components@file:../packs/fluid-ds-components-1.0.0-rc.0.tgz(lit@3.3.3)':
     dependencies:
-      '@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
-      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
+      '@fluid-ds/icons': file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
+      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
       '@lit-labs/ssr': 4.1.0
       '@lit-labs/ssr-client': 1.1.8
       lit: 3.3.3
@@ -2887,15 +2887,15 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
+  '@fluid-ds/icons@file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz':
     dependencies:
       lucide-static: 0.469.0
 
-  '@fluid-ds/themes@file:../packs/fluid-ds-themes-0.4.0.tgz(@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz)':
+  '@fluid-ds/themes@file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz(@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz)':
     dependencies:
-      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
+      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
 
-  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz': {}
+  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz': {}
 
   '@gar/promise-retry@1.0.3': {}
 
@@ -3501,7 +3501,7 @@ snapshots:
 
   ansi-regex@5.0.1: {}
 
-  ansi-regex@6.3.0: {}
+  ansi-regex@6.4.0: {}
 
   ansi-styles@4.3.0:
     dependencies:
@@ -4621,7 +4621,7 @@ snapshots:
 
   strip-ansi@7.2.0:
     dependencies:
-      ansi-regex: 6.3.0
+      ansi-regex: 6.4.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 

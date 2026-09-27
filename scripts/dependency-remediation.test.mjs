@@ -3,8 +3,13 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
+import { createRequire } from "node:module";
+import { xlsxIntegrity, xlsxSource } from "./check-supply-chain.mjs";
 import { verifyExtractZipPatch } from "./verify-extract-zip-patch.mjs";
 const repositoryRoot = resolve(import.meta.dirname, "..");
+// Same YAML loader the supply-chain gate uses (js-yaml via the eslint tree).
+const require = createRequire(import.meta.url);
+const { load: parseYaml } = createRequire(require.resolve("eslint"))("js-yaml");
 
 function parseVersionFloor(value) {
   const match = /^(?:\^|~)?(\d+)\.(\d+)\.(\d+)$/.exec(value);
@@ -201,10 +206,12 @@ test("the root lock retains the reviewed critical remediation graph", async () =
   ]) {
     assert.doesNotMatch(graph, pattern);
   }
-  assert.match(
-    lock,
-    /xlsx@https:\/\/cdn\.sheetjs\.com\/xlsx-0\.20\.3\/xlsx-0\.20\.3\.tgz:\r?\n {4}resolution: \{tarball: https:\/\/cdn\.sheetjs\.com\/xlsx-0\.20\.3\/xlsx-0\.20\.3\.tgz, integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP\+Neh0SJUzV\/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH\+3AJA==\}/
-  );
+  // Parse rather than regex-match: pnpm may write the resolution keys in either
+  // order whenever it rewrites the lock (the release version step does), and
+  // what must hold is the reviewed URL and SHA-512, not the key order.
+  const lockedXlsx = parseYaml(lock)?.packages?.[`xlsx@${xlsxSource}`];
+  assert.equal(lockedXlsx?.resolution?.tarball, xlsxSource);
+  assert.equal(lockedXlsx?.resolution?.integrity, xlsxIntegrity);
 });
 
 test(

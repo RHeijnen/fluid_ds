@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/framework-astro-packed-contract",
-  "version": "0.0.0",
+  "version": "1.0.0-rc.0",
   "private": true,
   "type": "module",
   "description": "Executable Astro consumer contract for Fluid.",
@@ -9,8 +9,8 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
-    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz",
+    "@fluid-ds/components": "file:../packs/fluid-ds-components-1.0.0-rc.0.tgz",
+    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz",
     "astro": "^6.4.6",
     "lit": "^3.2.1"
   },
@@ -21,8 +21,8 @@
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
-      "@fluid-ds/components@0.4.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
-      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz"
+      "@fluid-ds/components@1.0.0-rc.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz",
+      "@fluid-ds/components@1.0.0-rc.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz"
     }
   }
 }

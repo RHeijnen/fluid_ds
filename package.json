@@ -57,6 +57,7 @@
     "test:interactions": "pnpm --filter @fluid-ds/storybook build && concurrently -k -s first \"pnpm --filter @fluid-ds/storybook exec http-server storybook-static -p 6006 --silent\" \"pnpm --filter @fluid-ds/storybook exec wait-on http://127.0.0.1:6006 && pnpm --filter @fluid-ds/storybook test:runner && pnpm --filter @fluid-ds/storybook exec test-storybook --url http://127.0.0.1:6006 --includeTags interaction-contract --failOnConsole\"",
     "verify:release": "pnpm verify && pnpm test:ssr-node && pnpm test:coverage && pnpm test:packed && pnpm check:cem:packed && pnpm check:performance && pnpm test:interactions",
     "publish:dry": "node scripts/dry-run-publish.mjs",
+    "version-packages": "changeset version && pnpm install --no-frozen-lockfile && prettier --write .changeset/pre.json",
     "check:packages": "node scripts/check-package-artifacts.mjs",
     "test:packed": "pnpm test:package-artifacts && pnpm build && node scripts/check-package-artifacts.mjs --install",
     "test:package-artifacts": "node --test scripts/check-package-artifacts.test.mjs",

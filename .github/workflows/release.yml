@@ -143,7 +143,13 @@ jobs:
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1
         with:
           publish: node scripts/changeset-publish.mjs
-          version: pnpm exec changeset version
+          # changeset version bumps @fluid-ds/react's exact internal pins, so the
+          # lockfile must move in the same commit or every workflow's frozen
+          # install rejects the version PR. A full install (not --lockfile-only)
+          # is required: lockfile-only cannot fetch the URL-pinned xlsx tarball
+          # and silently drops its reviewed SHA-512 from the lock. It also re-formats
+          # .changeset/pre.json, which changesets writes outside Prettier style.
+          version: pnpm run version-packages
           commit: "chore(release): version packages"
           title: "chore(release): version packages"
         env:

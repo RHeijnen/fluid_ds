@@ -5,19 +5,19 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@fluid-ds/components@0.4.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
-  '@fluid-ds/components@0.4.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
+  '@fluid-ds/components@1.0.0-rc.0>@fluid-ds/icons': file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
+  '@fluid-ds/components@1.0.0-rc.0>@fluid-ds/tokens': file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
 
 importers:
 
   .:
     dependencies:
       '@fluid-ds/components':
-        specifier: file:../packs/fluid-ds-components-0.4.0.tgz
-        version: file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)
+        specifier: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz(lit@3.3.3)
       '@fluid-ds/tokens':
-        specifier: file:../packs/fluid-ds-tokens-0.4.0.tgz
-        version: file:../packs/fluid-ds-tokens-0.4.0.tgz
+        specifier: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
+        version: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
       lit:
         specifier: ^3.2.1
         version: 3.3.3
@@ -202,19 +202,19 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz':
-    resolution: {integrity: sha512-qvbk7ZxoKROgQ2MU32GAwPxHeEt7PFo1jrhhgF6Ba9Qvh8wEMPMKtFAs3dW5bz5+XtmvKgd5fHUfSZgKvravHQ==, tarball: file:../packs/fluid-ds-components-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/components@file:../packs/fluid-ds-components-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-hHP4eB/slXFFXJ7sCjqkI3y1Wm0QkiPTI2GbOkSRfbmirwowPtcTe2PcybC00VUFRG1eSXlw9tMe7LiIjHQQuA==, tarball: file:../packs/fluid-ds-components-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
     peerDependencies:
       lit: ^3.2.1
 
-  '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
-    resolution: {integrity: sha512-hnuIg3O45sM1S3qaJtg/7uwNMIYvIrShR1JAltjn39bOIVdy8QOuGvwkCSgmEhv6pEinr3g9Pl3UsbCU5ZfW8g==, tarball: file:../packs/fluid-ds-icons-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/icons@file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-rQxYLUSxTW7cdEJXBq8rdkdhoTHbo5NUwer5UwUlxKEdroqWnLd1BH6GYFbV/U25Oex0nKvPBJ6k4ig0lpeHlA==, tarball: file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
 
-  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz':
-    resolution: {integrity: sha512-CUCg6UyTwHSTiu7X1C/Do2YLBe2AgFhdnFtGeSeYStWVQbXmY2ceNbZBL4tiahxvZr0gTW9uRleHrd5gr83TtA==, tarball: file:../packs/fluid-ds-tokens-0.4.0.tgz}
-    version: 0.4.0
+  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz':
+    resolution: {integrity: sha512-IckGmO7lEQV7wa5Lv1+tl+gICJ6Hv+nKkOCz/Q5g22eh+8u0psMGrsmYcLI4gJgI1gW2exBQQ21a9TcGbmRweg==, tarball: file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz}
+    version: 1.0.0-rc.0
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -782,10 +782,10 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@fluid-ds/components@file:../packs/fluid-ds-components-0.4.0.tgz(lit@3.3.3)':
+  '@fluid-ds/components@file:../packs/fluid-ds-components-1.0.0-rc.0.tgz(lit@3.3.3)':
     dependencies:
-      '@fluid-ds/icons': file:../packs/fluid-ds-icons-0.4.0.tgz
-      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-0.4.0.tgz
+      '@fluid-ds/icons': file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz
+      '@fluid-ds/tokens': file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz
       '@lit-labs/ssr': 4.1.0
       '@lit-labs/ssr-client': 1.1.8
       lit: 3.3.3
@@ -793,11 +793,11 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@fluid-ds/icons@file:../packs/fluid-ds-icons-0.4.0.tgz':
+  '@fluid-ds/icons@file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz':
     dependencies:
       lucide-static: 0.469.0
 
-  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-0.4.0.tgz': {}
+  '@fluid-ds/tokens@file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

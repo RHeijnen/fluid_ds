@@ -1,6 +1,6 @@
 {
   "name": "@fluid-ds/admin-angular-packed-contract",
-  "version": "0.0.7",
+  "version": "1.0.0-rc.0",
   "private": true,
   "description": "Admin-portal demo built with Angular 20 (standalone, no NgModules) and the Fluid web components.",
   "scripts": {
@@ -16,17 +16,17 @@
     "@angular/forms": "^20.3.27",
     "@angular/platform-browser": "^20.3.27",
     "@angular/router": "^20.3.27",
-    "@fluid-ds/charts": "file:../packs/fluid-ds-charts-0.4.0.tgz",
-    "@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
-    "@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
-    "@fluid-ds/themes": "file:../packs/fluid-ds-themes-0.4.0.tgz",
-    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz",
+    "@fluid-ds/charts": "file:../packs/fluid-ds-charts-1.0.0-rc.0.tgz",
+    "@fluid-ds/components": "file:../packs/fluid-ds-components-1.0.0-rc.0.tgz",
+    "@fluid-ds/icons": "file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz",
+    "@fluid-ds/themes": "file:../packs/fluid-ds-themes-1.0.0-rc.0.tgz",
+    "@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz",
     "chart.js": "^4.4.7",
     "lit": "^3.2.1",
     "rxjs": "^7.8.0",
     "tslib": "^2.8.0",
     "zone.js": "~0.15.0",
-    "@fluid-ds/angular": "file:../packs/fluid-ds-angular-0.4.0.tgz"
+    "@fluid-ds/angular": "file:../packs/fluid-ds-angular-1.0.0-rc.0.tgz"
   },
   "devDependencies": {
     "@angular/build": "^20.3.34",
@@ -37,9 +37,9 @@
   "packageManager": "pnpm@9.15.0",
   "pnpm": {
     "overrides": {
-      "@fluid-ds/charts@0.4.0>@fluid-ds/components": "file:../packs/fluid-ds-components-0.4.0.tgz",
-      "@fluid-ds/components@0.4.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-0.4.0.tgz",
-      "@fluid-ds/components@0.4.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-0.4.0.tgz"
+      "@fluid-ds/charts@1.0.0-rc.0>@fluid-ds/components": "file:../packs/fluid-ds-components-1.0.0-rc.0.tgz",
+      "@fluid-ds/components@1.0.0-rc.0>@fluid-ds/icons": "file:../packs/fluid-ds-icons-1.0.0-rc.0.tgz",
+      "@fluid-ds/components@1.0.0-rc.0>@fluid-ds/tokens": "file:../packs/fluid-ds-tokens-1.0.0-rc.0.tgz"
     }
   }
 }

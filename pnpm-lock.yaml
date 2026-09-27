@@ -1280,49 +1280,49 @@ importers:
         version: 1.0.8(@types/react@19.2.15)
     devDependencies:
       '@fluid-ds/animations':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../animations
       '@fluid-ds/calendar':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../calendar
       '@fluid-ds/charts':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../charts
       '@fluid-ds/components':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../components
       '@fluid-ds/editor':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../editor
       '@fluid-ds/kanban':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../kanban
       '@fluid-ds/map':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../map
       '@fluid-ds/markdown':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../markdown
       '@fluid-ds/media':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../media
       '@fluid-ds/node-graph':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../node-graph
       '@fluid-ds/parser':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../parser
       '@fluid-ds/qr':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../qr
       '@fluid-ds/rainbow':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../rainbow
       '@fluid-ds/scheduler':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../scheduler
       '@fluid-ds/table':
-        specifier: 0.4.0
+        specifier: 1.0.0-rc.0
         version: link:../table
       '@types/react':
         specifier: ^19.0.0
@@ -9836,7 +9836,7 @@ packages:
         optional: true
 
   xlsx@https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz:
-    resolution: {tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz, integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA==}
+    resolution: {integrity: sha512-oLDq3jw7AcLqKWH2AhCpVTZl8mf6X2YReP+Neh0SJUzV/BdZYjth94tG5toiMB1PPrYtxOCfaoUCkvtuH+3AJA==, tarball: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz}
     version: 0.20.3
     engines: {node: '>=0.8'}
     hasBin: true
